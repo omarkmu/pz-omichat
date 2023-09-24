@@ -952,12 +952,13 @@ function OmiChat.getPlayerPreferences()
         end
 
         if line:sub(1, 1) == '[' then
-            local target = line:sub(2, line:find(']') - 1)
-            if prefs[target] then
+            local endBracket = line:find(']')
+            local target = endBracket and line:sub(2, endBracket - 1)
+            if target and prefs[target] then
                 dest = prefs[target]
             end
         else
-            local eq = string.find(line, '=')
+            local eq = line:find('=')
             local key = line:sub(1, eq - 1)
             local value = line:sub(eq + 1)
 
@@ -965,7 +966,7 @@ function OmiChat.getPlayerPreferences()
                 prefs.showNameColors = value == 'true'
             elseif dest == prefs.colors then
                 dest[key] = utils.stringToColor(value)
-            elseif tonumber(key) then
+            elseif dest and tonumber(key) then
                 dest[tonumber(key)] = value
             elseif dest then
                 ---@cast dest table
@@ -979,6 +980,10 @@ end
 
 ---Saves current player preferences to a file.
 function OmiChat.savePlayerPreferences()
+    if not playerPrefs then
+        return
+    end
+
     local outFile = getFileWriter(iniName, true, false)
     outFile:write(concat { 'VERSION=', tostring(OmiChat.iniVersion), '\n' })
 
@@ -990,10 +995,12 @@ function OmiChat.savePlayerPreferences()
     end
 
     for _, name in pairs({ 'callouts', 'sneakcallouts' }) do
-        outFile:write(concat {'[', name, ']\n'})
+        if playerPrefs[name] then
+            outFile:write(concat {'[', name, ']\n'})
 
-        for k, v in pairs(playerPrefs[name]) do
-            outFile:write(concat { tostring(k), '=', tostring(v), '\n' })
+            for k, v in pairs(playerPrefs[name]) do
+                outFile:write(concat { tostring(k), '=', tostring(v), '\n' })
+            end
         end
     end
 
@@ -1230,7 +1237,7 @@ function OmiChat.setCustomShouts(shouts, shoutType)
     local prefs = OmiChat.getPlayerPreferences()
 
     if not shouts then
-        prefs[shoutType] = nil
+        prefs[shoutType] = {}
     else
         prefs[shoutType] = shouts
     end
