@@ -1,0 +1,48 @@
+name: Update
+
+permissions: write-all
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  library:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        ref: main
+        path: '.'
+    - name: Checkout library
+      uses: actions/checkout@v4
+      with:
+        path: OmiLib
+        repository: omarkmu/pz-omi-lib
+    - name: Checkout luabun
+      uses: actions/checkout@v4
+      with:
+        path: luabun
+        repository: omarkmu/luabun
+    - name: Install luabun
+      run: cd luabun && npm i && cd ..
+    - name: Build library
+      run: node luabun create OmiLib -m class sandbox utils interpolate -o ./Contents/mods/OmiChat/media/lua/shared/OmiChat/lib.lua
+    - name: Cleanup files
+      run: rm -rf OmiLib luabun
+    - name: Create pull request
+      uses: peter-evans/create-pull-request@v5
+      with:
+        title: Update library
+        commit-message: Update lib.lua
+        add-paths: ./Contents/mods/OmiChat/media/lua/shared/OmiChat/lib.lua
+        body: Pulled in new [library](https://github.com/omarkmu/pz-omi-lib) changes.
+        base: main
+        branch: update-library
+        labels: dependencies,automated
+        token: ${{ github.token }}

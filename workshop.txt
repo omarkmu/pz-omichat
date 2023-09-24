@@ -1,0 +1,44 @@
+version=1
+title=OmiChat
+description=It's a chat mod.
+description=
+description=[h2]Features[/h2]
+description=This mod aims to be as configurable as possible. All of the features listed below can be configured or completely disabled via sandbox options.
+description=
+description=The default settings are tailored to usage for roleplay chat; by default, local chats will use character forenames instead of usernames. Additionally, chat will use a colon for names instead of square brackets. Both of these can be reverted using the sandbox options.
+description=
+description=Features for players: [list]
+description=[*]Chat color customization
+description=[*]Name color customization
+description=[*]Callout customization
+description=[*]Character naming with /name
+description=[*]Chat names in menus (Trading, Medical Check)
+description=[*]Roleplay emotes with /me
+description=[*]Local /whisper chat
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556]True Actions Act 3 - Dancing[/url] compatibility with /dance
+description=[*]Icon picker for local chats
+description=[*]Emote animation shortcuts (.clap, .salute, .surrender, etc.) + /emotes command to display a list of emotes
+description=[/list]
+description=
+description=Features for server operators: [list]
+description=[*]Chat range options
+description=[*]Customizable chat [url=https://github.com/omarkmu/pz-omichat/blob/main/docs/format-strings.md]formats[/url] for names, timestamps, and all chat types
+description=[*][url=https://github.com/omarkmu/pz-omichat/blob/main/docs/sandbox-options.md]Sandbox options[/url] to control all of the features listed above
+description=[/list]
+description=
+description=[h2]Compatibility[/h2]
+description=Although I don't expect this to be compatible with other mods that heavily modify chat, it shouldn't cause compatibility issues otherwise.
+description=If there seems to be a conflict, let me know!
+description=
+description=[h2]Permissions[/h2]
+description=You may [b]not[/b] include this mod directly in modpacks.
+description=Updates will be infrequent enough that a modpack should not be necessary anyway; future features will be added in bulk.
+description=
+description=The code and associated documentation is licensed under the [url=https://github.com/omarkmu/pz-omichat/blob/main/LICENSE]MIT License.[/url]
+description=[hr][/hr]Questions? Use the [url=https://github.com/omarkmu/pz-omichat/discussions]GitHub discussions.[/url]
+description=Suggestions? Create a [url=https://github.com/omarkmu/pz-omichat/issues/new?template=feature_request.yaml]feature request.[/url]
+description=Problems? Create an [url=https://github.com/omarkmu/pz-omichat/issues/new?template=bug_report.yaml]issue.[/url]
+description=Want to contribute? [url=https://github.com/omarkmu/pz-omichat]You can![/url]
+description=Poster image adapted from the Messenger icon by [url=https://www.flaticon.com/free-icons/message]Freepik on Flaticon.[/url]
+tags=Build 41;Multiplayer;Silly/Fun
+visibility=unlisted

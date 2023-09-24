@@ -1,0 +1,15 @@
+name: Feature Request
+description: Request an enhancement
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before requesting a new feature, please make sure it's not already part of the mod. Check the sandbox options!
+  - type: textarea
+    id: describe-feature
+    attributes:
+      label: Feature Description
+      description: Describe the new feature you would like to see.
+    validations:
+      required: true

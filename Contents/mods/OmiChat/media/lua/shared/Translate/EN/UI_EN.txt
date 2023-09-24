@@ -1,0 +1,91 @@
+UI_EN = {
+    --- general ---
+    UI_OmiChat_whisper_chat_title_id = "Whisper",
+
+    UI_OmiChat_context_enable_name_colors = "Enable name colors",
+    UI_OmiChat_context_disable_name_colors = "Disable name colors",
+    UI_OmiChat_context_colors_submenu_name = "Set chat colors",
+
+    -- %1 = the chat stream (e.g., /say, /yell)
+    UI_OmiChat_context_submenu_color = "%1 color",
+    UI_OmiChat_context_submenu_color_radio = "Radio Message Color",
+    UI_OmiChat_context_submenu_color_discord = "Discord Message Color",
+    UI_OmiChat_context_submenu_color_server = "Server Message Color",
+    UI_OmiChat_context_submenu_color_name = "Name Color",
+    UI_OmiChat_context_submenu_color_speech = "Speech Color",
+
+    UI_OmiChat_context_message_type_radio = "radio",
+    UI_OmiChat_context_message_type_discord = "Discord",
+    UI_OmiChat_context_message_type_server = "server",
+
+    -- %1 = the chat stream (e.g., /say, /yell), or one of the `context_message_type` strings
+    UI_OmiChat_context_color = "Set %1 color",
+    UI_OmiChat_context_color_name = "Set name color",
+    UI_OmiChat_context_color_speech = "Set speech color",
+    UI_OmiChat_context_color_radio = "Set radio message color",
+    UI_OmiChat_context_color_discord = "Set Discord message color",
+    UI_OmiChat_context_color_server = "Set server message color",
+
+    UI_OmiChat_context_color_desc = "Enter a color in RGB or hex format to set the color used for %1 messages, or nothing to reset.",
+    UI_OmiChat_context_color_desc_name = "Enter a color in RGB or hex format to set the color of your name in chat, or nothing to reset.",
+    UI_OmiChat_context_color_desc_speech = "Enter a color in RGB or hex format to set the color of your overhead speech bubbles.",
+
+    UI_OmiChat_context_set_custom_callouts = "Customize callouts",
+    UI_OmiChat_context_set_custom_sneakcallouts = "Customize sneak callouts",
+    UI_OmiChat_context_set_custom_callouts_desc = "Enter one 'Q' callout per line, or nothing to reset.",
+
+    -- %1 = the name that the player set with /name
+    UI_OmiChat_set_name_success = "Name has been set to '%1'.",
+    UI_OmiChat_set_name_failure = "Failed to set name.",
+    UI_OmiChat_reset_name_success = "Name has been reset.",
+
+    UI_OmiChat_error_invalid_color = "Input must be a hexadecimal color value or three numbers separated by commas or spaces.",
+
+    -- %1 = the maximum color value (number)
+    UI_OmiChat_error_color_max = "Values must be less than or equal to %1.",
+
+    -- %1 = the minimum color value (number)
+    UI_OmiChat_error_color_min = "Values must be greater than or equal to %1.",
+
+    -- %1 = the maximum amount of custom shouts (number)
+    UI_OmiChat_error_too_many_shouts = "Too many lines; up to %1 custom shouts can be specified.",
+
+    -- %1 = the maximum length of custom shouts (number)
+    UI_OmiChat_error_shout_too_long = "Shout text can only be up to %1 characters long.",
+
+    UI_OmiChat_icon_cat_clothing = "Clothing",
+    UI_OmiChat_icon_cat_cooking = "Cooking",
+    UI_OmiChat_icon_cat_food = "Food",
+    UI_OmiChat_icon_cat_items = "Items",
+    UI_OmiChat_icon_cat_miscellaneous = "Miscellaneous",
+    UI_OmiChat_icon_cat_nature = "Nature",
+    UI_OmiChat_icon_cat_objects = "Objects",
+    UI_OmiChat_icon_cat_tools = "Tools",
+    UI_OmiChat_icon_cat_weapons = "Weapons",
+
+    -- %1 = a radio frequency, in the format `#.#`.
+    UI_OmiChat_radio = "Radio (%1 MHz)",
+
+    -- %1 = the private message recipient.
+    UI_OmiChat_private_chat_to = "to %1",
+
+    --- commands  ---
+    UI_OmiChat_clear_message = "Console cleared",
+    UI_OmiChat_available_emotes = "Trigger emote animations in local chats by including one of the following emotes in your message. Available emotes:",
+    UI_OmiChat_list_of_commands = "List of commands:"
+
+    --- help text  ---
+    UI_OmiChat_helptext_emotes = "Get a list of available chat emotes",
+    UI_OmiChat_helptext_name = "To set your name in chat, use: /name Name. Example: /name Bob. To reset your name, use /name"
+    UI_OmiChat_helptext_name_no_reset = "To set your name in chat, use: /name Name. Example: /name Bob"
+
+    --- TAD compat  ---
+    UI_OmiChat_helptext_dance = "Use /dance to do a random dance. Use /dance followed by the name of the dance to do a specific dance. To see a list of dances, use /dance list",
+    UI_OmiChat_available_dances = "Available dances:",
+
+    -- %1 = the name of the dance the player tried to do with /dance
+    UI_OmiChat_unknown_dance_recipe = "You don't know the %1 dance.",
+
+    -- %1 = the name of the dance the player tried to do with /dance
+    UI_OmiChat_missing_dance_item = "You need a dance card to do the %1 dance.",
+}

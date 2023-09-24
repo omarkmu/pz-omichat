@@ -1,0 +1,26 @@
+name: Bug Report
+description: Create a bug report
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to submit a bug report! Just a few questions:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Bug Description
+      description: Describe what happened and what you expected.
+    validations:
+      required: true
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: Additional Information
+      description: Provide any additional information here. For example, it's helpful to know whether you're a player or a server admin.
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs
+      description: Please include any relevant log output (`console.txt`). This will be automatically formatted, so no need for backticks.
+      render: shell
