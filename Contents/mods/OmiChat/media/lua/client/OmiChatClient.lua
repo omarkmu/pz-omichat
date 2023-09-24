@@ -57,7 +57,7 @@ OmiChat.commandStreams = {
                     feedback = 'UI_OmiChat_set_name_failure'
                 end
 
-                OmiChat.showInfoMessage(getText(feedback, name))
+                OmiChat.showInfoMessage(getText(feedback, name and utils.escapeRichText(name)))
             end,
             onHelp = function()
                 local msg = 'UI_OmiChat_helptext_name'

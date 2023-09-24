@@ -244,6 +244,13 @@ function utils.toOverheadColor(color, bbCodeFormat)
     }
 end
 
+---Escapes a string for use in a rich text panel.
+---@see ISRichTextPanel
+---@param text string
+function utils.escapeRichText(text)
+    return (text:gsub('<', '&lt;'):gsub('>', '&gt;'))
+end
+
 ---Encodes a table as a string of key-value pairs.
 ---Keys and values are converted to strings.
 ---@param table table

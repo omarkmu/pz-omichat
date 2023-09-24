@@ -228,10 +228,10 @@ local function processTransforms(message)
 
         context = {},
         substitutions = {
-            author = author,
+            author = utils.escapeRichText(author),
             authorRaw = author,
-            name = meta.name or author,
-            nameRaw = meta.name or author,
+            name = utils.escapeRichText(meta.name or author),
+            nameRaw = utils.escapeRichText(meta.name or author),
         },
         formatOptions = {
             font = instance.chatFont,
