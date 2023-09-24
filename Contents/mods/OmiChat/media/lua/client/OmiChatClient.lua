@@ -1079,20 +1079,18 @@ function OmiChat.setNickname(nickname)
         modData.nicknames[username] = nil
         modData._updates = { nicknameToClear = username }
         ModData.transmit(OmiChat.modDataKey)
-    end
 
-    if Option.UseChatNameAsCharacterName then
-        if #nickname == 0 then
+        if Option.UseChatNameAsCharacterName then
+            -- should display as failure, since this should usually be a no-op
             return
         end
 
-        OmiChat.updateCharacterName(nickname)
-        return 'set', nickname
+        return 'reset'
     end
 
-    -- reset nickname
-    if #nickname == 0 then
-        return 'reset'
+    if Option.UseChatNameAsCharacterName then
+        OmiChat.updateCharacterName(nickname)
+        return 'set', nickname
     end
 
     modData.nicknames[username] = nickname
