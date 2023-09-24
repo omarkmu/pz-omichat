@@ -1,5 +1,6 @@
 version=1
-title=OmiChat
+id=3040299907
+title=OmiChat (Beta)
 description=It's a chat mod.
 description=
 description=[h2]Features[/h2]

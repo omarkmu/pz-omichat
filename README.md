@@ -1,4 +1,6 @@
+<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3040299907">
 <img src="./docs/images/poster.png" width=256 height=256 />
+</a>
 
 A mod for [Project Zomboid](https://projectzomboid.com) that extends chat functionality.
 
