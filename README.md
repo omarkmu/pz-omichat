@@ -15,8 +15,8 @@ All of the features listed below can be configured or completely disabled via [s
 - Callout [customization](docs/sandbox-options.md#allowcustomshouts)
 - Character naming with [`/name`](docs/sandbox-options.md#allowsetname)
 - Chat names in [menus](docs/sandbox-options.md#menunameformat) (Trading, Medical Check)
-- Roleplay descriptions with [`/me`](docs/sandbox-options.md#allowme)
-- Local [`/whisper`](docs/sandbox-options.md#uselocalwhisper) chat
+- Roleplay descriptions with [`/me`](docs/sandbox-options.md#mechatformat)
+- Local [`/whisper`](docs/sandbox-options.md#whisperchatformat) chat
 - [Icon picker](docs/sandbox-options.md#enableemojipicker)
 - Emote animation [shortcuts](docs/emotes.md) (.clap, .salute, .surrrender, etc.)
 - Compatibility with [True Actions Act 3 - Dancing](https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556) with [`/dance`](docs/sandbox-options.md#enabletadcompat)

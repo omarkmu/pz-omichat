@@ -16,6 +16,18 @@ OmiChat.utils = utils
 OmiChat.Option = Option
 OmiChat.MetaFormatter = MetaFormatter
 
+---@type table<omichat.CustomStreamName, table>
+local customStreamOptions = {
+    me = {
+        chat = 'MeChatFormat',
+        overhead = 'MeOverheadFormat',
+    },
+    whisper = {
+        chat = 'WhisperChatFormat',
+        overhead = 'WhisperOverheadFormat',
+    },
+}
+
 
 ---Event handler for retrieving global mod data.
 ---@param key string
@@ -142,6 +154,19 @@ end
 function OmiChat.registerInterpolatorFunction(name, func)
     ---@diagnostic disable-next-line: invisible
     utils.Interpolator._registeredFunctions[name:lower()] = func
+end
+
+---Returns true if the custom chat stream specified is enabled.
+---@param name omichat.CustomStreamName
+---@return boolean
+function OmiChat.isCustomStreamEnabled(name)
+    local opts = customStreamOptions[name]
+    if not opts then
+        return false
+    end
+
+    local value = Option[opts.chat]
+    return value and value ~= ''
 end
 
 

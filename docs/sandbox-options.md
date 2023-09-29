@@ -68,12 +68,7 @@ See also: [`LowercaseCustomSneakShouts`](#lowercasecustomsneakshouts).
 `default → true`
 
 Allows players to use [emote](./emotes.md) shortcuts in the form of `.emote`.
-These are enabled only in local chats—`/say`, `/yell`, `/me`, and `/whisper` (if [`UseLocalWhisper`](#uselocalwhisper) is enabled).
-
-### AllowMe
-`default → true`
-
-Allows players to use `/me` to describe their actions. The format of these messages is controlled by [`MeChatFormat`](#mechatformat) and how they appear overhead is controlled by [`MeOverheadFormat`](#meoverheadformat).
+These are enabled only in local chats—`/say`, `/yell`, [`/me`](#mechatformat), and [`/whisper`](#whisperchatformat) (if using local whisper).
 
 ### AllowSetChatColors
 `default → true`
@@ -136,12 +131,6 @@ Uses players' names set with [`/name`](#allowsetname) as their character names.
 Note that this sets the forename and potentially the surname of the player; the `$forename` and `$surname` tokens will reflect this.
 **This disables resetting names with `/name`.**
 
-### UseLocalWhisper
-`default → true`
-
-Modifies `/whisper` chat to act as local chat with a smaller range, which doesn't attract zombies.
-The existing `/whisper` is changed to `/private` (`/pm`).
-
 ### UseNameColorInAllChats
 `default → false`
 
@@ -183,7 +172,7 @@ It applies to all chat color customization [settings](#allowsetchatcolors).
 ### MeRange
 `default → 30, minimum → 1, maximum → 30`
 
-The maximum distance between players for [`/me`](#allowme) messages to be visible.
+The maximum distance between players for [`/me`](#mechatformat) messages to be visible.
 
 ### NameMaxLength
 `default → 50, minimum → 0, maximum → 50`
@@ -204,7 +193,7 @@ The maximum distance between players for `/yell` messages to be visible.
 `default → 3, minimum → 1, maximum → 30`
 
 The maximum distance between players for local `/whisper` messages to be visible.
-This applies to the `/whisper` chat added by [`UseLocalWhisper`](#uselocalwhisper), not the default whisper chat.
+This applies to the local [`/whisper`](#whisperchatformat) chat, not the default whisper chat.
 
 
 ## Default Colors
@@ -214,13 +203,13 @@ Numbers should be in RGB format, space- or comma-delimited.
 ### MeColor
 `default → 130 130 130`
 
-The default color used for [`/me`](#allowme) messages, unless overriden using the [settings](#allowsetchatcolors).
+The default color used for [`/me`](#mechatformat) messages, unless overriden using the [settings](#allowsetchatcolors).
 
 ### WhisperColor
 `default → 85 48 139`
 
 The default color used for local `/whisper` messages, unless overriden using the [settings](#allowsetchatcolors).
-This applies to the `/whisper` chat added by [`UseLocalWhisper`](#uselocalwhisper), not the default whisper chat.
+This applies to the local [`/whisper`](#whisperchatformat) chat, not the default whisper chat.
 
 
 ## Message Component Formats
@@ -285,13 +274,17 @@ The format used for incoming private messages in chat.
 `default → $name <SPACE> $punctuate($trimright($message))`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
-The format used for [`/me`](#allowme) messages in chat.
+The format used for `/me` messages in chat.
+
+Allows players to use `/me` to describe their actions.
+If blank, `/me` messages will be disabled.
+How these messages appear overhead is controlled by [`MeOverheadFormat`](#meoverheadformat).
 
 ### MeOverheadFormat
 `(blank by default)`  
 `tokens → $1`
 
-Defines the format used for overhead speech bubbles of [`/me`](#allowme) messages.
+Defines the format used for overhead speech bubbles of [`/me`](#mechatformat) messages.
 If blank, `/me` messages will not display overhead.
 
 ### MenuNameFormat
@@ -342,7 +335,10 @@ The format used for `/yell` messages in chat.
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for local `/whisper` messages in chat.
-This applies to the `/whisper` chat added by [`UseLocalWhisper`](#uselocalwhisper), not the default whisper chat.
+
+Modifies `/whisper` chat to act as local chat which doesn't attract zombies and has a very short range.
+The existing `/whisper` is changed to `/private` (`/pm`).
+If blank, local whisper will be disabled and the default `/whisper` will not be renamed.
 
 ### WhisperOverheadFormat
 `default → ($1)`  
@@ -350,4 +346,4 @@ This applies to the `/whisper` chat added by [`UseLocalWhisper`](#uselocalwhispe
 
 Defines the format used for overhead speech bubbles of local `/whisper` messages.
 If blank, `/whisper` messages will not display overhead.
-This applies to the `/whisper` chat added by [`UseLocalWhisper`](#uselocalwhisper), not the default whisper chat.
+This applies to the local [`/whisper`](#whisperchatformat) chat, not the default whisper chat.

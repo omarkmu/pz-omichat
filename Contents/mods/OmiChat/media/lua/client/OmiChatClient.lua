@@ -264,7 +264,7 @@ OmiChat.transformers = {
         name = 'decode-me',
         priority = 8,
         transform = function(self, info)
-            if info.chatType ~= 'say' or not Option.AllowMe then
+            if info.chatType ~= 'say' or not OmiChat.isCustomStreamEnabled('me') then
                 return
             end
 
@@ -294,7 +294,7 @@ OmiChat.transformers = {
         name = 'decode-whisper',
         priority = 8,
         transform = function(self, info)
-            if info.chatType ~= 'say' or not Option.UseLocalWhisper then
+            if info.chatType ~= 'say' or not OmiChat.isCustomStreamEnabled('whisper') then
                 return
             end
 
@@ -633,7 +633,7 @@ do
             omichat = {
                 allowEmotes = true,
                 allowEmojiPicker = true,
-                isEnabled = function() return Option.AllowMe end,
+                isEnabled = function() return OmiChat.isCustomStreamEnabled('me') end,
                 onUse = formattedChatOnUse,
             },
         },
@@ -646,7 +646,7 @@ do
                 allowEmotes = true,
                 allowEmojiPicker = true,
                 context = { isLocalWhisper = true },
-                isEnabled = function() return Option.UseLocalWhisper end,
+                isEnabled = function() return OmiChat.isCustomStreamEnabled('whisper') end,
                 onUse = formattedChatOnUse,
             }
         }
@@ -789,7 +789,8 @@ local function updateStreams()
         me = OmiChat.addStreamBefore(customStreams.me, private)
     end
 
-    if Option.UseLocalWhisper and not whisper then
+    local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
+    if useLocalWhisper and not whisper then
         if private then
             -- modify /whisper to be /private
             private.name = 'private'
@@ -799,7 +800,7 @@ local function updateStreams()
 
         -- add custom /whisper
         OmiChat.addStreamBefore(customStreams.whisper, me or private)
-    elseif not Option.UseLocalWhisper and whisper then
+    elseif not useLocalWhisper and whisper then
         if private then
             -- revert /private to /whisper
             private.name = 'whisper'
@@ -1620,7 +1621,7 @@ function OmiChat.getEmote(emote)
 end
 
 ---Gets a named formatter.
----@param name omichat.FormatterName
+---@param name omichat.CustomStreamName
 ---@return omichat.MetaFormatter
 function OmiChat.getFormatter(name)
     return OmiChat.formatters[name]
@@ -1718,9 +1719,9 @@ end
 ---Function to retrieve a playable emote string given an emote name.
 ---@alias omichat.EmoteGetter fun(emoteName: string): string?
 
----The names of built-in formatters.
----@see omichat.api.getFormatter
----@alias omichat.FormatterName
+---The names of default custom streams.
+---@see omichat.api.client.getFormatter
+---@alias omichat.CustomStreamName
 ---| 'me'
 ---| 'whisper'
 

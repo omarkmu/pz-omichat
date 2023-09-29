@@ -1,6 +1,6 @@
 # Emotes
 
-The `AllowEmotes` [option](./sandbox-options.md#allowemotes) enables emote shortcuts in the form of `.emote` in local chats, including `/say`, `/yell`, `/me`, and `/whisper` (if [`UseLocalWhisper`](./sandbox-options.md#uselocalwhisper) is enabled).
+The `AllowEmotes` [option](./sandbox-options.md#allowemotes) enables emote shortcuts in the form of `.emote` in local chats, including `/say`, `/yell`, `/me`, and `/whisper` (if using local whisper).
 These cause a player's character to play the animation associated with the emote, but they don't show up in the chat message.
 
 The following is a list of available emotes. Players can use the `/emotes` command to view this list in-game.

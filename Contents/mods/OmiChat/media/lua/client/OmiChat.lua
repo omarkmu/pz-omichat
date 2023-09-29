@@ -261,7 +261,7 @@ local function getColorCatStreamCommand(cat)
     end
 
     if cat == 'private' then
-        return Option.UseLocalWhisper and '/private' or '/whisper'
+        return OmiChat.isCustomStreamEnabled('whisper') and '/private' or '/whisper'
     end
 
     if cat == 'general' then
@@ -654,6 +654,7 @@ function ISChat:onGearButtonClick()
 
     if Option.AllowSetChatColors then
         colorOpts[#colorOpts+1] = 'server'
+        local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
 
         if getServerOptions():getBoolean('DiscordEnable') then
             colorOpts[#colorOpts+1] = 'discord'
@@ -671,7 +672,7 @@ function ISChat:onGearButtonClick()
             colorOpts[#colorOpts+1] = 'admin'
         end
 
-        if Option.UseLocalWhisper then
+        if useLocalWhisper then
             colorOpts[#colorOpts+1] = 'whisper'
         elseif checkPlayerCanUseChat('/w') then
             colorOpts[#colorOpts+1] = 'private'
@@ -681,7 +682,7 @@ function ISChat:onGearButtonClick()
             colorOpts[#colorOpts+1] = 'shout'
         end
 
-        if Option.AllowMe then
+        if OmiChat.isCustomStreamEnabled('me') then
             colorOpts[#colorOpts+1] = 'me'
         end
 
@@ -697,7 +698,8 @@ function ISChat:onGearButtonClick()
             colorOpts[#colorOpts+1] = 'safehouse'
         end
 
-        if Option.UseLocalWhisper and checkPlayerCanUseChat('/w') then
+        -- add renamed /private at the end
+        if useLocalWhisper and checkPlayerCanUseChat('/w') then
             colorOpts[#colorOpts+1] = 'private'
         end
     end

@@ -5,7 +5,6 @@ local lib = require 'OmiChat/lib'
 ---@field AllowCustomShouts boolean
 ---@field AllowCustomSneakShouts boolean
 ---@field AllowEmotes boolean
----@field AllowMe boolean
 ---@field AllowSetName boolean
 ---@field AllowSetNameColor boolean
 ---@field UseNameColorInAllChats boolean
@@ -17,7 +16,6 @@ local lib = require 'OmiChat/lib'
 ---@field EnableTADCompat boolean
 ---@field UppercaseCustomShouts boolean
 ---@field LowercaseCustomSneakShouts boolean
----@field UseLocalWhisper boolean
 ---@field UseChatNameAsCharacterName boolean
 ---@field CustomShoutMaxLength integer
 ---@field MaximumCustomShouts integer

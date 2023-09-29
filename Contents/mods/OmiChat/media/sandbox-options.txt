@@ -11,9 +11,6 @@ option OmiChat.AllowCustomSneakShouts
 option OmiChat.AllowEmotes
 { type = boolean, default = true, page = OmiChat, translation = OCAllowEmotes, }
 
-option OmiChat.AllowMe
-{ type = boolean, default = true, page = OmiChat, translation = OCAllowMe, }
-
 option OmiChat.AllowSetName
 { type = boolean, default = true, page = OmiChat, translation = OCAllowSetName, }
 
@@ -46,9 +43,6 @@ option OmiChat.UppercaseCustomShouts
 
 option OmiChat.LowercaseCustomSneakShouts
 { type = boolean, default = true, page = OmiChat, translation = OCLowercaseCustomSneakShouts, }
-
-option OmiChat.UseLocalWhisper
-{ type = boolean, default = true, page = OmiChat, translation = OCUseLocalWhisper, }
 
 option OmiChat.UseChatNameAsCharacterName
 { type = boolean, default = false, page = OmiChat, translation = OCUseChatNameAsCharacterName, }
