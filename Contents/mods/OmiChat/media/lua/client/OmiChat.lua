@@ -203,8 +203,9 @@ end
 ---This does not build the final string; if a string is returned,
 ---it's the original message text.
 ---@param message ChatMessage
+---@param skipFormatting boolean?
 ---@return string | omichat.MessageInfo
-local function processTransforms(message)
+local function processTransforms(message, skipFormatting)
     local instance = ISChat.instance or {}
 
     -- :getText() doesn't handle color & image formatting.
@@ -245,7 +246,7 @@ local function processTransforms(message)
     }
 
     OmiChat.applyTransforms(info)
-    if not OmiChat.applyFormatOptions(info) then
+    if not skipFormatting and not OmiChat.applyFormatOptions(info) then
         return text
     end
 
@@ -963,7 +964,7 @@ function ISChat.addLineInChat(message, tabID)
         message:setCustomTag(encodeTag(message:getAuthor(), chatType))
 
         -- necessary to process transforms so we know whether this message should be added to chat
-        local info = processTransforms(message)
+        local info = processTransforms(message, true)
         if type(info) == 'table' and not info.formatOptions.showInChat then
             return
         end
