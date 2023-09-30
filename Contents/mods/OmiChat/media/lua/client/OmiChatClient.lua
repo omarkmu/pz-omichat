@@ -5,6 +5,7 @@ local OmiChatShared = require 'OmiChatShared'
 local ColorModal = require 'OmiChat/ColorModal'
 local IconPicker = require 'OmiChat/IconPicker'
 local vanillaCommands = require 'OmiChat/VanillaCommandList'
+local customStreamData = require 'OmiChat/CustomStreamData'
 
 local Option = OmiChatShared.Option
 local format = string.format
@@ -261,89 +262,37 @@ OmiChat.commandStreams = {
 ---@type omichat.MessageTransformer[]
 OmiChat.transformers = {
     {
-        name = 'decode-me',
+        name = 'decode-custom-stream',
         priority = 8,
         transform = function(self, info)
-            if info.chatType ~= 'say' or not OmiChat.isCustomStreamEnabled('me') then
-                return
-            end
+            for name, streamData in pairs(customStreamData) do
+                local formatter = OmiChat.getFormatter(name)
+                local isValidStream = OmiChat.isCustomStreamEnabled(name) and streamData.chatTypes[info.chatType]
+                if isValidStream and formatter:isMatch(info.rawText) then
+                    info.rawText = formatter:read(info.rawText)
+                    info.format = Option[streamData.chatFormatOpt]
+                    info.context.ocCustomStream = name
 
-            local meFormatter = OmiChat.getFormatter('me')
-            if not meFormatter:isMatch(info.rawText) then
-                return
-            end
+                    info.formatOptions.color = OmiChat.getColor(name) or Option:getDefaultColor(name)
+                    info.formatOptions.useChatColor = false
+                    info.formatOptions.useNameColor = info.formatOptions.useNameColor and Option.UseNameColorInAllChats
 
-            -- it's a /me, mario
-            info.rawText = meFormatter:read(info.rawText)
-            info.format = Option.MeChatFormat
-            info.context.customStream = 'me'
-            info.formatOptions.color = OmiChat.getColor('me') or Option:getDefaultColor('me')
-            info.formatOptions.useChatColor = false
-            info.formatOptions.useNameColor = info.formatOptions.useNameColor and Option.UseNameColorInAllChats
-            info.formatOptions.stripColors = true
+                    if streamData.stripColors then
+                        info.formatOptions.stripColors = true
+                    end
 
-            -- some actions could feasibly be heard, but generally descriptions of actions should not be
-            info.message:setShouldAttractZombies(false)
+                    if streamData.titleID then
+                        info.titleID = streamData.titleID
+                    end
 
-            if Option.MeOverheadFormat == '' then
-                info.message:setOverHeadSpeech(false)
-            end
-        end,
-    },
-    {
-        name = 'decode-whisper',
-        priority = 8,
-        transform = function(self, info)
-            if info.chatType ~= 'say' or not OmiChat.isCustomStreamEnabled('whisper') then
-                return
-            end
+                    info.message:setShouldAttractZombies(streamData.attractZombies)
 
-            local whisperFormatter = OmiChat.getFormatter('whisper')
-            if not whisperFormatter:isMatch(info.rawText) then
-                return
-            end
+                    if Option[streamData.overheadFormatOpt] == '' then
+                        info.message:setOverHeadSpeech(false)
+                    end
 
-            info.rawText = whisperFormatter:read(info.rawText)
-            info.format = Option.WhisperChatFormat
-            info.titleID = 'UI_OmiChat_whisper_chat_title_id'
-            info.context.customStream = 'whisper'
-            info.formatOptions.color = OmiChat.getColor('whisper') or Option:getDefaultColor('whisper')
-            info.formatOptions.useChatColor = false
-            info.formatOptions.useNameColor = info.formatOptions.useNameColor and Option.UseNameColorInAllChats
-
-            -- whispering should not attract zombies
-            info.message:setShouldAttractZombies(false)
-
-            if Option.WhisperOverheadFormat == '' then
-                info.message:setOverHeadSpeech(false)
-            end
-        end,
-    },
-    {
-        name = 'decode-looc',
-        priority = 8,
-        transform = function(self, info)
-            if info.chatType ~= 'say' or not OmiChat.isCustomStreamEnabled('looc') then
-                return
-            end
-
-            local loocFormatter = OmiChat.getFormatter('looc')
-            if not loocFormatter:isMatch(info.rawText) then
-                return
-            end
-
-            info.rawText = loocFormatter:read(info.rawText)
-            info.format = Option.LoocChatFormat
-            info.context.customStream = 'looc'
-            info.formatOptions.color = OmiChat.getColor('looc') or Option:getDefaultColor('looc')
-            info.formatOptions.useChatColor = false
-            info.formatOptions.useNameColor = info.formatOptions.useNameColor and Option.UseNameColorInAllChats
-
-            -- ooc shouldn't attract zombies
-            info.message:setShouldAttractZombies(false)
-
-            if Option.LoocOverheadFormat == '' then
-                info.message:setOverHeadSpeech(false)
+                    break
+                end
             end
         end,
     },
@@ -353,14 +302,9 @@ OmiChat.transformers = {
         transform = function(self, info)
             local range
             local defaultRange
-            if info.context.customStream == 'me' then
-                range = Option.MeRange
-                defaultRange = Option:getDefault('SayRange')
-            elseif info.context.customStream == 'whisper' then
-                range = Option.WhisperRange
-                defaultRange = Option:getDefault('SayRange')
-            elseif info.context.customStream == 'looc' then
-                range = Option.LoocRange
+            if info.context.ocCustomStream and customStreamData[info.context.ocCustomStream] then
+                local rangeOpt = customStreamData[info.context.ocCustomStream].rangeOpt
+                range = Option[rangeOpt]
                 defaultRange = Option:getDefault('SayRange')
             elseif info.chatType == 'say' then
                 range = Option.SayRange
@@ -391,7 +335,8 @@ OmiChat.transformers = {
             if math.sqrt(xDiff*xDiff + yDiff*yDiff) > range then
                 info.message:setOverHeadSpeech(false)
                 info.formatOptions.showInChat = false
-                info.context.outOfRange = true
+                info.context.ocOutOfRange = true
+                return true
             end
         end,
     },
@@ -411,7 +356,7 @@ OmiChat.transformers = {
                 info.substitutions.recipientName = OmiChat.getNameInChat(other, 'whisper') or other
             else
                 -- defer to basic chat format handler
-                info.context.isIncomingPrivateMessage = true
+                info.context.ocIsIncomingPM = true
             end
 
             local color = OmiChat.getColor('private')
@@ -433,7 +378,7 @@ OmiChat.transformers = {
             safehouse = 'SafehouseChatFormat',
         },
         transform = function(self, info)
-            if not self.basicChatFormats[info.chatType] and not info.context.isIncomingPrivateMessage then
+            if not self.basicChatFormats[info.chatType] and not info.context.ocIsIncomingPM then
                 return
             end
 
@@ -453,7 +398,7 @@ OmiChat.transformers = {
             end
 
             if not info.format then
-                if info.context.isIncomingPrivateMessage then
+                if info.context.ocIsIncomingPM then
                     info.format = Option.IncomingPrivateChatFormat
                 else
                     info.format = Option[self.basicChatFormats[info.chatType]]
@@ -587,8 +532,8 @@ do
         end
 
         local ctx = self.omichat.context
-        if ctx and ctx.process then
-            ctx.process(command)
+        if ctx and ctx.ocProcess then
+            ctx.ocProcess(command)
         else
             processSayMessage(command)
         end
@@ -614,13 +559,13 @@ do
 
     streamOverrides = {
         say = {
-            context = { process = processSayMessage },
+            context = { ocProcess = processSayMessage },
             allowEmojiPicker = true,
             isEnabled = chatIsEnabled,
             onUse = chatOnUse,
         },
         yell = {
-            context = { process = processShoutMessage },
+            context = { ocProcess = processShoutMessage },
             isEnabled = chatIsEnabled,
             onUse = chatOnUse,
         },
@@ -635,25 +580,25 @@ do
         },
         faction = {
             allowEmotes = false,
-            context = { process = proceedFactionMessage },
+            context = { ocProcess = proceedFactionMessage },
             isEnabled = chatIsEnabled,
             onUse = chatOnUse,
         },
         safehouse = {
             allowEmotes = false,
-            context = { process = processSafehouseMessage },
+            context = { ocProcess = processSafehouseMessage },
             isEnabled = chatIsEnabled,
             onUse = chatOnUse,
         },
         general = {
             allowEmotes = false,
-            context = { process = processGeneralMessage },
+            context = { ocProcess = processGeneralMessage },
             isEnabled = chatIsEnabled,
             onUse = chatOnUse,
         },
         admin = {
             allowEmotes = false,
-            context = { process = processAdminChatMessage },
+            context = { ocProcess = processAdminChatMessage },
             isEnabled = chatIsEnabled,
             onUse = chatOnUse,
         }
@@ -692,7 +637,7 @@ do
             omichat = {
                 allowEmotes = true,
                 allowEmojiPicker = true,
-                context = { isLocalWhisper = true },
+                context = { ocIsLocalWhisper = true },
                 isEnabled = function() return OmiChat.isCustomStreamEnabled('whisper') end,
                 onUse = formattedChatOnUse,
             }
@@ -791,19 +736,12 @@ end
 
 ---Creates or updates built-in formatters.
 local function updateFormatters()
-    local formatterDefs = {
-        { name = 'me', opt = 'MeOverheadFormat' },
-        { name = 'whisper', opt = 'WhisperOverheadFormat' },
-        { name = 'looc', opt = 'LoocOverheadFormat' },
-    }
-
-    for idx, info in ipairs(formatterDefs) do
-        local fmtName = info.name
-        local opt = Option[info.opt]
+    for fmtName, info in pairs(customStreamData) do
+        local opt = Option[info.overheadFormatOpt]
         if OmiChat.formatters[fmtName] then
             OmiChat.formatters[fmtName]:setFormatString(opt)
         else
-            OmiChat.formatters[fmtName] = createFormatter(opt, idx)
+            OmiChat.formatters[fmtName] = createFormatter(opt, info.formatId)
         end
     end
 end
@@ -811,21 +749,20 @@ end
 ---Updates streams based on sandbox options.
 local function updateStreams()
     -- grab references to insert new streams before default /whisper
-    local me, private, whisper, looc
+    local private, whisper
+    local custom = {}
     for _, stream in ipairs(ISChat.allChatStreams) do
         if stream.omichat then
-            if stream.name == 'me' then
-                me = stream
-            elseif stream.name == 'private' then
+            if stream.name == 'private' then
                 private = stream
-            elseif stream.name == 'looc' then
-                looc = stream
             elseif stream.name == 'whisper' then
-                if stream.omichat.context and stream.omichat.context.isLocalWhisper then
+                if stream.omichat.context and stream.omichat.context.ocIsLocalWhisper then
                     whisper = stream
                 else
                     private = stream
                 end
+            elseif customStreamData[stream.name] then
+                custom[stream.name] = stream
             end
         elseif stream.name == 'whisper' then
             private = stream
@@ -835,8 +772,8 @@ local function updateStreams()
         end
     end
 
-    if not me then
-        me = OmiChat.addStreamBefore(customStreams.me, private)
+    if not custom.me then
+        custom.me = OmiChat.addStreamBefore(customStreams.me, private)
     end
 
     local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
@@ -849,7 +786,7 @@ local function updateStreams()
         end
 
         -- add custom /whisper
-        OmiChat.addStreamBefore(customStreams.whisper, me or private)
+        OmiChat.addStreamBefore(customStreams.whisper, custom.me or private)
     elseif not useLocalWhisper and whisper then
         if private then
             -- revert /private to /whisper
@@ -862,8 +799,8 @@ local function updateStreams()
         OmiChat.removeStream(whisper)
     end
 
-    if not looc then
-        OmiChat.addStreamAfter(customStreams.looc, me)
+    if not custom.looc then
+        OmiChat.addStreamAfter(customStreams.looc, custom.me)
     end
 end
 
@@ -1769,20 +1706,13 @@ end
 ---Function to retrieve a playable emote string given an emote name.
 ---@alias omichat.EmoteGetter fun(emoteName: string): string?
 
----The names of default custom streams.
----@see omichat.api.client.getFormatter
----@alias omichat.CustomStreamName
----| 'looc'
----| 'me'
----| 'whisper'
-
 ---Categories for custom callouts.
 ---@alias omichat.CalloutCategory 'callouts' | 'sneakcallouts'
 
 ---Categories for colors that can be customized by players.
 ---@alias omichat.ColorCategory
+---| omichat.CustomStreamName
 ---| 'general'
----| 'whisper'
 ---| 'say'
 ---| 'shout'
 ---| 'faction'
@@ -1790,8 +1720,6 @@ end
 ---| 'radio'
 ---| 'admin'
 ---| 'server'
----| 'me'
----| 'looc'
 ---| 'private'
 ---| 'discord'
 ---| 'name'

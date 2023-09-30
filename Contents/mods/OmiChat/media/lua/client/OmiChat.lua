@@ -1,6 +1,7 @@
 ---Chat overrides and extensions.
 
 local OmiChat = require 'OmiChatClient'
+local customStreamData = require 'OmiChat/CustomStreamData'
 local utils = OmiChat.utils
 local Option = OmiChat.Option
 local ColorModal = OmiChat.ColorModal
@@ -654,7 +655,6 @@ function ISChat:onGearButtonClick()
     end
 
     colorOpts[#colorOpts+1] = 'server'
-    local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
 
     if getServerOptions():getBoolean('DiscordEnable') then
         colorOpts[#colorOpts+1] = 'discord'
@@ -672,6 +672,7 @@ function ISChat:onGearButtonClick()
         colorOpts[#colorOpts+1] = 'admin'
     end
 
+    local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
     if useLocalWhisper then
         colorOpts[#colorOpts+1] = 'whisper'
     elseif checkPlayerCanUseChat('/w') then
@@ -682,12 +683,10 @@ function ISChat:onGearButtonClick()
         colorOpts[#colorOpts+1] = 'shout'
     end
 
-    if OmiChat.isCustomStreamEnabled('me') then
-        colorOpts[#colorOpts+1] = 'me'
-    end
-
-    if OmiChat.isCustomStreamEnabled('looc') then
-        colorOpts[#colorOpts+1] = 'looc'
+    for name, streamInfo in pairs(customStreamData) do
+        if name ~= 'whisper' and streamInfo.allowColorCustomization and OmiChat.isCustomStreamEnabled(name) then
+            colorOpts[#colorOpts+1] = name
+        end
     end
 
     if checkPlayerCanUseChat('/all') then
@@ -763,7 +762,7 @@ function ISChat:onGearButtonClick()
     elseif #colorOpts == 1 then
         local category = colorOpts[1]
 
-        local name = getText('UI_OmiChat_context_color_' .. category)
+        local name = getTextOrNull('UI_OmiChat_context_color_' .. category)
         if not name then
             name = getText('UI_OmiChat_context_color', getColorCatStreamCommand(category))
         end

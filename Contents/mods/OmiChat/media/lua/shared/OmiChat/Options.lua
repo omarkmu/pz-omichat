@@ -53,29 +53,21 @@ local Option = lib.sandbox('OmiChat')
 
 local floor = math.floor
 local utils = require 'OmiChat/util'
+local customStreams = require 'OmiChat/CustomStreamData'
 
 ---@type table<omichat.ColorCategory, omichat.ColorTable>
 local colorDefaults = {
-    name = {r=255,g=255,b=255},
-    admin = {r=255,g=255,b=255},
-    me = {r=130,g=130,b=130},
-    looc = {r=0,g=128,b=128},
-    say = {r=255,g=255,b=255},
-    shout = {r=255,g=51,b=51},
-    private = {r=85,g=26,b=139}, -- pm whisper
-    whisper = {r=85,g=48,b=139}, -- local whisper
-    general = {r=255,g=165,b=0},
-    discord = {r=114,g=137,b=218},
-    radio = {r=178,g=178,b=178},
-    faction = {r=22,g=113,b=20},
-    safehouse = {r=55,g=148,b=53},
-    server = {r=0,g=128,b=255},
-}
-
-local customStreamColorOpts = {
-    me = 'MeColor',
-    whisper = 'WhisperColor',
-    looc = 'LoocColor',
+    name      = {r = 255, g = 255, b = 255},
+    admin     = {r = 255, g = 255, b = 255},
+    say       = {r = 255, g = 255, b = 255},
+    shout     = {r = 255, g =  51, b =  51},
+    private   = {r =  85, g =  26, b = 139}, -- /pm whisper
+    general   = {r = 255, g = 165, b =   0},
+    discord   = {r = 114, g = 137, b = 218},
+    radio     = {r = 178, g = 178, b = 178},
+    faction   = {r =  22, g = 113, b =  20},
+    safehouse = {r =  55, g = 148, b =  53},
+    server    = {r =   0, g = 128, b = 255},
 }
 
 ---Returns the default color associated with a category.
@@ -89,12 +81,11 @@ function Option:getDefaultColor(category, username)
             local player = getPlayerFromUsername(username)
             if player then
                 speechColor = player:getSpeakColour()
+                if not speechColor and category == 'speech' then
+                    speechColor = getCore():getMpTextColor()
+                end
             end
         else
-            speechColor = getCore():getMpTextColor()
-        end
-
-        if category == 'speech' and not speechColor then
             speechColor = getCore():getMpTextColor()
         end
 
@@ -105,15 +96,7 @@ function Option:getDefaultColor(category, username)
                 b = floor(speechColor:getB() * 255),
             }
         end
-    end
-
-    local colorOpt = customStreamColorOpts[category]
-    local settingDefault = colorOpt and utils.stringToColor(colorOpt)
-    if settingDefault then
-        return settingDefault
-    end
-
-    if category == 'faction' then
+    elseif category == 'faction' then
         local player
         if username then
             player = getPlayerFromUsername(username)
@@ -130,6 +113,19 @@ function Option:getDefaultColor(category, username)
                 g = color:getGreen(),
                 b = color:getBlue(),
             }
+        end
+    end
+
+    ---@type omichat.CustomStreamInfo?
+    local custom = customStreams[category]
+    if custom then
+        local settingDefault = utils.stringToColor(custom and custom.colorOpt)
+        if settingDefault then
+            return settingDefault
+        end
+
+        if custom.defaultColor then
+            return custom.defaultColor
         end
     end
 

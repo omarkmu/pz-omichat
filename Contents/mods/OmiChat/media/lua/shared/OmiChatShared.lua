@@ -2,6 +2,7 @@ local lib = require 'OmiChat/lib'
 local utils = require 'OmiChat/util'
 local Option = require 'OmiChat/Options'
 local MetaFormatter = require 'OmiChat/MetaFormatter'
+local customStreamData = require 'OmiChat/CustomStreamData'
 
 
 ---Provides client and server API access to OmiChat.
@@ -15,22 +16,6 @@ OmiChat.modDataKey = 'omichat'
 OmiChat.utils = utils
 OmiChat.Option = Option
 OmiChat.MetaFormatter = MetaFormatter
-
----@type table<omichat.CustomStreamName, table>
-local customStreamOptions = {
-    looc = {
-        chat = 'LoocChatFormat',
-        overhead = 'LoocOverheadFormat',
-    },
-    me = {
-        chat = 'MeChatFormat',
-        overhead = 'MeOverheadFormat',
-    },
-    whisper = {
-        chat = 'WhisperChatFormat',
-        overhead = 'WhisperOverheadFormat',
-    },
-}
 
 
 ---Event handler for retrieving global mod data.
@@ -164,12 +149,12 @@ end
 ---@param name omichat.CustomStreamName
 ---@return boolean
 function OmiChat.isCustomStreamEnabled(name)
-    local opts = customStreamOptions[name]
+    local opts = customStreamData[name]
     if not opts then
         return false
     end
 
-    local value = Option[opts.chat]
+    local value = Option[opts.chatFormatOpt]
     return value and value ~= ''
 end
 
