@@ -5,14 +5,12 @@ This document serves as an explanation of these options.
 
 ## Tokens
 
-Many of the options accept [format strings](./format-strings.md); the dollar-sign-prefixed *tokens* that these format strings accept are listed in their documentation.
+Many of the sandbox options accept [format strings](./format-strings.md); the dollar-sign-prefixed *tokens* that these format strings accept are listed in their documentation.
 The full list of tokens follows.
 **Not all of these tokens are available to every sandbox option that uses format strings. Each relevant option lists the subset of tokens that it accepts.**
 
 - `$1`: The content of a message in limited format strings.
-    - This token is **required** in format strings in which it appears, and it must be the only token present. Invalid use will result in the format string being ignored.
-    Additionally, format strings that use this token **disallow** [functions](./format-string-functions.md) and [at-maps](./format-string-at-maps.md).
-    This currently only applies to [`MeOverheadFormat`](#meoverheadformat) and [`WhisperOverheadFormat`](#whisperchatformat).
+    - See [Limited format strings](#limited-format-strings).
 - `$author`: The author of a message (usually a username). This will also include the name color, if one is included.
 - `$authorRaw`: The same as `$author`, but does not include name colors.
 - `$chatType`: The type of the chat in which the message was sent.
@@ -41,6 +39,24 @@ The full list of tokens follows.
 - `$surname`: The relevant player's character's surname.
 - `$tag`: The title of the chat type associated with the message.
 - `$username`: The relevant player's username.
+
+
+## Limited format strings
+*This currently only applies to overhead format strings: [`MeOverheadFormat`](#meoverheadformat), [`WhisperOverheadFormat`](#whisperchatformat), and [`LoocOverheadFormat`](#loocoverheadformat).*
+
+Due to necessity, some format strings are limited.
+The token `$1` (which specifies message content) is **required** by these format strings and is the **only** token that should be present.
+Invalid use will result in the format string being ignored.
+Additionally, these format strings **disallow** [functions](./format-string-functions.md) and [at-maps](./format-string-at-maps.md).
+
+When specifying sandbox options, the game strips out characters that aren't within a certain range, such as `«` and `»`.
+Regular format strings can use the `$char` function for this purpose, but this is not possible in limited format strings.
+
+To allow access to these characters, limited format strings accept numeric character references.
+These behave similarly to the `$char` function; the character with the number specified will be used in place of the reference.
+For example, `«$1»` can be specified as `&#171;$1&#187;`.
+
+This supports numbers in the [ISO-8859-1](https://www.w3schools.com/charsets/ref_html_8859.asp) character set.
 
 
 ## Feature Flags
@@ -288,7 +304,7 @@ Defines the format used for overhead speech bubbles of local out-of-character `/
 If blank, `/looc` messages will not display overhead.
 
 ### MeChatFormat
-`default → $name <SPACE> $punctuate($trimright($message))`  
+`default → $char(171) $name <SPACE> $punctuate($trimright($message)) $char(187)`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/me` messages in chat.
@@ -298,7 +314,7 @@ If blank, `/me` messages will be disabled.
 How these messages appear overhead is controlled by [`MeOverheadFormat`](#meoverheadformat).
 
 ### MeOverheadFormat
-`(blank by default)`  
+`default → &#171; $1 &#187;`  
 `tokens → $1`
 
 Defines the format used for overhead speech bubbles of [`/me`](#mechatformat) messages.

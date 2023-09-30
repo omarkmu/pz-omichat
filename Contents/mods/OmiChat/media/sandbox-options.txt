@@ -104,7 +104,7 @@ option OmiChat.LoocOverheadFormat
 { type = string, default = (( $1 )), page = OmiChat, translation = OCLoocOverheadFormat, }
 
 option OmiChat.MeOverheadFormat
-{ type = string, default =, page = OmiChat, translation = OCMeOverheadFormat, }
+{ type = string, default = &#171; $1 &#187;, page = OmiChat, translation = OCMeOverheadFormat, }
 
 option OmiChat.WhisperOverheadFormat
 { type = string, default = ($1), page = OmiChat, translation = OCWhisperOverheadFormat, }
@@ -113,7 +113,7 @@ option OmiChat.LoocChatFormat
 { type = string, default = $name: <SPACE> (( $message )), page = OmiChat, translation = OCLoocChatFormat, }
 
 option OmiChat.MeChatFormat
-{ type = string, default = $name <SPACE> $punctuate($trimright($message)), page = OmiChat, translation = OCMeChatFormat, }
+{ type = string, default = $char(171) $name <SPACE> $punctuate($trimright($message)) $char(187), page = OmiChat, translation = OCMeChatFormat, }
 
 option OmiChat.SayChatFormat
 { type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCSayChatFormat, }

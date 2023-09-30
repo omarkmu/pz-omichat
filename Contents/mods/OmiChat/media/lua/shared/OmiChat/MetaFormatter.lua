@@ -28,6 +28,17 @@ local interpolateOptions = {
     allowFunctions = false
 }
 
+---Replaces numeric character entities in text.
+---@param text string
+---@return string
+local function replaceNumericEntities(text)
+    text = text:gsub('&#(%d+);', function(x)
+        local s, c = pcall(string.char, tonumber(x))
+        return s and c or ''
+    end)
+
+    return text
+end
 
 ---Builds the pattern used to reverse the formatting operation.
 ---@param format string
@@ -168,10 +179,11 @@ end
 ---If the given string is invalid, the format will fall back to $1.
 ---This triggers a rebuild of the associated pattern.
 ---@param format string
----@return boolean #Whether the given string was valid.
+---@return boolean valid Whether the given string was valid.
 function MetaFormatter:setFormatString(format)
     local validFormat = true
 
+    format = replaceNumericEntities(format)
     self.interpolator:setPattern(format)
     local tokens = self.interpolator:getTopLevelTokens()
 
@@ -199,7 +211,7 @@ end
 function MetaFormatter:init(format)
     self.prefix = ''
     self.suffix = ''
-    self.formatString = tostring(format or '$1')
+    self.formatString = replaceNumericEntities(tostring(format or '$1'))
     self.requireExactMatch = false
     self.interpolator = utils.Interpolator:new(interpolateOptions)
 end
