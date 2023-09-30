@@ -10,17 +10,11 @@ Sandbox_EN = {
     Sandbox_OCAllowEmotes = "Emotes",
     Sandbox_OCAllowEmotes_tooltip = "Allow players to trigger emotes using the '.emote' format?",
 
-    Sandbox_OCAllowMe = "/me Chat",
-    Sandbox_OCAllowMe_tooltip = "/me can be used by players to describe their character's actions.",
-
     Sandbox_OCAllowSetName = "/name Command",
     Sandbox_OCAllowSetName_tooltip = "/name allows players to set their name in chat.",
 
     Sandbox_OCAllowSetNameColor = "Custom Name Color",
     Sandbox_OCAllowSetNameColor_tooltip = "Allow players to change the text color used for their names in chat?",
-
-    Sandbox_OCAllowSetChatColors = "Custom Chat Colors",
-    Sandbox_OCAllowSetChatColors_tooltip = "Allow players to change the text color used for various chat types? This only affects players' colors.",
 
     Sandbox_OCAllowSetSpeechColor = "Custom Speech Color",
     Sandbox_OCAllowSetSpeechColor_tooltip = "Allow players to change the color of their overhead speech bubbles?",
@@ -42,9 +36,6 @@ Sandbox_EN = {
 
     Sandbox_OCUseNameColorInAllChats = "Name Color in All Chats",
     Sandbox_OCUseNameColorInAllChats_tooltip = "Whether to respect the name color setting in all chats, rather than only /say chat.",
-
-    Sandbox_OCUseLocalWhisper = "Local Whisper",
-    Sandbox_OCUseLocalWhisper_tooltip = "Modifies /whisper chat to act as local chat with a smaller range. The existing /whisper is changed to /private (/pm).",
 
     Sandbox_OCUseChatNameAsCharacterName = "Use Chat Name as Character Name",
     Sandbox_OCUseChatNameAsCharacterName_tooltip = "Whether to use players' names set with /name as their display name."
@@ -74,7 +65,7 @@ Sandbox_EN = {
     Sandbox_OCSayRange_tooltip = "The maximum distance between players for /say messages to be visible. This does not affect the range at which zombies react.",
 
     Sandbox_OCWhisperRange = "/whisper Range",
-    Sandbox_OCWhisperRange_tooltip = "The maximum distance between players for local /whisper messages to be visible. This has no effect unless Local Whisper is enabled.",
+    Sandbox_OCWhisperRange_tooltip = "The maximum distance between players for local /whisper messages to be visible.",
 
     Sandbox_OCShoutRange = "/yell Range",
     Sandbox_OCShoutRange_tooltip = "The maximum distance between players for /yell messages to be visible. This does not affect the range at which zombies react.",
@@ -83,7 +74,7 @@ Sandbox_EN = {
     Sandbox_OCMeColor_tooltip = "The default color used for /me messages, unless overriden using the setting.",
 
     Sandbox_OCWhisperColor = "/whisper Color",
-    Sandbox_OCWhisperColor_tooltip = "The default color used for local /whisper messages, unless overriden using the setting. This has no effect unless Local Whisper is enabled.",
+    Sandbox_OCWhisperColor_tooltip = "The default color used for local /whisper messages, unless overriden using the setting.",
 
     Sandbox_OCNameFormat = "Chat Name Format",
     Sandbox_OCNameFormat_tooltip = "The format used for names in chat, unless explicitly set with /name. May include $forename, $surname, $username, and $chatType substitutions.",
@@ -101,7 +92,7 @@ Sandbox_EN = {
     Sandbox_OCMeOverheadFormat_tooltip = "The format used for /me messages in overhead messages. Must include $1 substitution unless blank. If blank, /me messages will not display overhead.",
 
     Sandbox_OCWhisperOverheadFormat = "/whisper Overhead Format",
-    Sandbox_OCWhisperOverheadFormat_tooltip = "The format used for local /whisper messages in overhead messages. This has no effect unless Local Whisper is enabled. Must include $1 substitution unless blank. If blank, /whisper messages will not display overhead.",
+    Sandbox_OCWhisperOverheadFormat_tooltip = "The format used for local /whisper messages in overhead messages. Must include $1 substitution unless blank. If blank, /whisper messages will not display overhead.",
 
     Sandbox_OCMeChatFormat = "/me Chat Format",
     Sandbox_OCMeChatFormat_tooltip = "The format used for /me messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
@@ -110,7 +101,7 @@ Sandbox_EN = {
     Sandbox_OCSayChatFormat_tooltip = "The format used for messages in /say chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
 
     Sandbox_OCWhisperChatFormat = "Whisper Chat Format",
-    Sandbox_OCWhisperChatFormat_tooltip = "The format used for local /whisper messages in chat. This has no effect unless Local Whisper is enabled. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
+    Sandbox_OCWhisperChatFormat_tooltip = "The format used for local /whisper messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
 
     Sandbox_OCShoutChatFormat = "Shout Chat Format",
     Sandbox_OCShoutChatFormat_tooltip = "The format used for callouts and messages in /yell chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",

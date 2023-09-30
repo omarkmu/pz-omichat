@@ -10,7 +10,7 @@ This mod aims to be as extensible and configurable as possible.
 All of the features listed below can be configured or completely disabled via [sandbox options](docs/sandbox-options.md).
 
 - Customizable [formats](docs/format-strings.md) for names, timestamps, and all chat types
-- Chat color [customization](docs/sandbox-options.md#allowsetchatcolors)
+- Chat color customization
 - Name color [customization](docs/sandbox-options.md#allowsetnamecolor)
 - Callout [customization](docs/sandbox-options.md#allowcustomshouts)
 - Character naming with [`/name`](docs/sandbox-options.md#allowsetname)

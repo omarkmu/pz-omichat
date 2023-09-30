@@ -238,7 +238,7 @@ local function processTransforms(message)
             showInChat = true,
             showTitle = instance.showTitle,
             showTimestamp = instance.showTimestamp,
-            useChatColor = Option.AllowSetChatColors,
+            useChatColor = true,
             useNameColor = Option.UseSpeechColorAsDefaultNameColor or (Option.AllowSetNameColor and meta.nameColor),
             stripColors = false,
         },
@@ -652,56 +652,54 @@ function ISChat:onGearButtonClick()
         colorOpts[#colorOpts+1] = 'speech'
     end
 
-    if Option.AllowSetChatColors then
-        colorOpts[#colorOpts+1] = 'server'
-        local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
+    colorOpts[#colorOpts+1] = 'server'
+    local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
 
-        if getServerOptions():getBoolean('DiscordEnable') then
-            colorOpts[#colorOpts+1] = 'discord'
-        end
+    if getServerOptions():getBoolean('DiscordEnable') then
+        colorOpts[#colorOpts+1] = 'discord'
+    end
 
-        if checkPlayerCanUseChat('/r') then
-            colorOpts[#colorOpts+1] = 'radio'
-        end
+    if checkPlayerCanUseChat('/r') then
+        colorOpts[#colorOpts+1] = 'radio'
+    end
 
-        if checkPlayerCanUseChat('/s') then
-            colorOpts[#colorOpts+1] = 'say'
-        end
+    if checkPlayerCanUseChat('/s') then
+        colorOpts[#colorOpts+1] = 'say'
+    end
 
-        if checkPlayerCanUseChat('/a') then
-            colorOpts[#colorOpts+1] = 'admin'
-        end
+    if checkPlayerCanUseChat('/a') then
+        colorOpts[#colorOpts+1] = 'admin'
+    end
 
-        if useLocalWhisper then
-            colorOpts[#colorOpts+1] = 'whisper'
-        elseif checkPlayerCanUseChat('/w') then
-            colorOpts[#colorOpts+1] = 'private'
-        end
+    if useLocalWhisper then
+        colorOpts[#colorOpts+1] = 'whisper'
+    elseif checkPlayerCanUseChat('/w') then
+        colorOpts[#colorOpts+1] = 'private'
+    end
 
-        if checkPlayerCanUseChat('/y') then
-            colorOpts[#colorOpts+1] = 'shout'
-        end
+    if checkPlayerCanUseChat('/y') then
+        colorOpts[#colorOpts+1] = 'shout'
+    end
 
-        if OmiChat.isCustomStreamEnabled('me') then
-            colorOpts[#colorOpts+1] = 'me'
-        end
+    if OmiChat.isCustomStreamEnabled('me') then
+        colorOpts[#colorOpts+1] = 'me'
+    end
 
-        if checkPlayerCanUseChat('/all') then
-            colorOpts[#colorOpts+1] = 'general'
-        end
+    if checkPlayerCanUseChat('/all') then
+        colorOpts[#colorOpts+1] = 'general'
+    end
 
-        if checkPlayerCanUseChat('/f') then
-            colorOpts[#colorOpts+1] = 'faction'
-        end
+    if checkPlayerCanUseChat('/f') then
+        colorOpts[#colorOpts+1] = 'faction'
+    end
 
-        if checkPlayerCanUseChat('/sh') then
-            colorOpts[#colorOpts+1] = 'safehouse'
-        end
+    if checkPlayerCanUseChat('/sh') then
+        colorOpts[#colorOpts+1] = 'safehouse'
+    end
 
-        -- add renamed /private at the end
-        if useLocalWhisper and checkPlayerCanUseChat('/w') then
-            colorOpts[#colorOpts+1] = 'private'
-        end
+    -- add renamed /private at the end
+    if useLocalWhisper and checkPlayerCanUseChat('/w') then
+        colorOpts[#colorOpts+1] = 'private'
     end
 
     local shoutOpts = {}

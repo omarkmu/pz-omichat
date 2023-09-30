@@ -1174,10 +1174,6 @@ function OmiChat.getColor(category)
         return OmiChat.getSpeechColor()
     end
 
-    if not Option.AllowSetChatColors then
-        return
-    end
-
     local prefs = OmiChat.getPlayerPreferences()
     return prefs.colors[category]
 end

@@ -9,7 +9,6 @@ local lib = require 'OmiChat/lib'
 ---@field AllowSetNameColor boolean
 ---@field UseNameColorInAllChats boolean
 ---@field UseSpeechColorAsDefaultNameColor boolean
----@field AllowSetChatColors boolean
 ---@field AllowSetSpeechColor boolean
 ---@field EnableEmojiPicker boolean
 ---@field IncludeMiscellaneousEmoji boolean

@@ -23,9 +23,6 @@ option OmiChat.UseNameColorInAllChats
 option OmiChat.UseSpeechColorAsDefaultNameColor
 { type = boolean, default = true, page = OmiChat, translation = OCUseSpeechColorAsDefaultNameColor, }
 
-option OmiChat.AllowSetChatColors
-{ type = boolean, default = true, page = OmiChat, translation = OCAllowSetChatColors, }
-
 option OmiChat.AllowSetSpeechColor
 { type = boolean, default = true, page = OmiChat, translation = OCAllowSetSpeechColor, }
 

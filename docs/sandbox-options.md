@@ -70,12 +70,6 @@ See also: [`LowercaseCustomSneakShouts`](#lowercasecustomsneakshouts).
 Allows players to use [emote](./emotes.md) shortcuts in the form of `.emote`.
 These are enabled only in local chats—`/say`, `/yell`, [`/me`](#mechatformat), and [`/whisper`](#whisperchatformat) (if using local whisper).
 
-### AllowSetChatColors
-`default → true`
-
-Allows players to customize the colors used in their chat.
-This works on a player-by-player basis; unlike [name](#allowsetnamecolor) and [speech](#allowsetspeechcolor) colors, players will only see the custom colors that they've set for themselves.
-
 ### AllowSetName
 `default → true`
 
@@ -161,13 +155,13 @@ The maximum number of [custom shouts](#allowcustomshouts) that players are allow
 `default → 255, minimum → 0, maximum → 255`
 
 This dictates the maximum value for R, G, and B components of chat colors.
-It applies to all chat color customization [settings](#allowsetchatcolors).
+It applies to all chat color customization settings.
 
 ### MinimumColorValue
 `default → 48, minimum → 0, maximum → 255`
 
 This dictates the minimum value for R, G, and B components of chat colors.
-It applies to all chat color customization [settings](#allowsetchatcolors).
+It applies to all chat color customization settings.
 
 ### MeRange
 `default → 30, minimum → 1, maximum → 30`
@@ -203,12 +197,12 @@ Numbers should be in RGB format, space- or comma-delimited.
 ### MeColor
 `default → 130 130 130`
 
-The default color used for [`/me`](#mechatformat) messages, unless overriden using the [settings](#allowsetchatcolors).
+The default color used for [`/me`](#mechatformat) messages, unless overriden using the settings.
 
 ### WhisperColor
 `default → 85 48 139`
 
-The default color used for local `/whisper` messages, unless overriden using the [settings](#allowsetchatcolors).
+The default color used for local `/whisper` messages, unless overriden using the settings.
 This applies to the local [`/whisper`](#whisperchatformat) chat, not the default whisper chat.
 
 
@@ -337,8 +331,9 @@ The format used for `/yell` messages in chat.
 The format used for local `/whisper` messages in chat.
 
 Modifies `/whisper` chat to act as local chat which doesn't attract zombies and has a very short range.
-The existing `/whisper` is changed to `/private` (`/pm`).
+If populated, the existing `/whisper` is changed to `/private` (`/pm`).
 If blank, local whisper will be disabled and the default `/whisper` will not be renamed.
+How these messages appear overhead is controlled by [`WhisperOverheadFormat`](#whisperoverheadformat).
 
 ### WhisperOverheadFormat
 `default → ($1)`  
