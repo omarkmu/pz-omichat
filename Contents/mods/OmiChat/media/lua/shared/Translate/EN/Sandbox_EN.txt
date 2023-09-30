@@ -28,6 +28,9 @@ Sandbox_EN = {
     Sandbox_OCEnableTADCompat = "True Actions Act 3 - Dancing Compatibility",
     Sandbox_OCEnableTADCompat_tooltip = "Enables the /dance command.",
 
+    Sandbox_OCEnableRangedMe = "Ranged /me (/wme, /yme)",
+    Sandbox_OCEnableRangedMe_tooltip = "Enables the /whisperme and /yellme commands. If /me is disabled, this has no effect.",
+
     Sandbox_OCUppercaseCustomShouts = "Uppercase Custom Shouts",
     Sandbox_OCUppercaseCustomShouts_tooltip = "Whether custom shouts should use all uppercase letters.",
 

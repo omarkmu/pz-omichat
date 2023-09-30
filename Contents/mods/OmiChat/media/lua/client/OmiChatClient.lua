@@ -262,13 +262,41 @@ OmiChat.commandStreams = {
 ---@type omichat.MessageTransformer[]
 OmiChat.transformers = {
     {
-        name = 'decode-custom-stream',
+        name = 'radio-chat',
         priority = 8,
         transform = function(self, info)
+            if info.chatType ~= 'radio' then
+                return
+            end
+
+            local _, msgStart, freq = info.rawText:find('Radio%s*%((%d+%.%d+)[^%)]+%)%s*:')
+            if not msgStart then
+                return
+            end
+
+            info.context.ocIsRadio = true
+            info.content = info.rawText:sub(msgStart + 1)
+            info.format = Option.RadioChatFormat
+            info.substitutions.frequency = freq
+        end
+    },
+    {
+        name = 'decode-custom-stream',
+        priority = 6,
+        transform = function(self, info)
+            local isRadio = info.context.ocIsRadio
             for name, streamData in pairs(customStreamData) do
                 local formatter = OmiChat.getFormatter(name)
                 local isValidStream = OmiChat.isCustomStreamEnabled(name) and streamData.chatTypes[info.chatType]
-                if isValidStream and formatter:isMatch(info.rawText) then
+                local isMatch = formatter:isMatch(isRadio and info.content or info.rawText)
+
+                if isMatch and isRadio then
+                    if streamData.showOnRadio then
+                        info.content = formatter:read(info.content)
+                    else
+                        info.formatOptions.showInChat = false
+                    end
+                elseif isValidStream and isMatch then
                     info.rawText = formatter:read(info.rawText)
                     info.format = Option[streamData.chatFormatOpt]
                     info.context.ocCustomStream = name
@@ -298,14 +326,14 @@ OmiChat.transformers = {
     },
     {
         name = 'set-range',
-        priority = 6,
+        priority = 4,
         transform = function(self, info)
             local range
             local defaultRange
-            if info.context.ocCustomStream and customStreamData[info.context.ocCustomStream] then
-                local rangeOpt = customStreamData[info.context.ocCustomStream].rangeOpt
-                range = Option[rangeOpt]
-                defaultRange = Option:getDefault('SayRange')
+            local streamData = info.context.ocCustomStream and customStreamData[info.context.ocCustomStream]
+            if streamData then
+                range = Option[streamData.rangeOpt]
+                defaultRange = Option:getDefault(streamData.defaultRangeOpt or 'SayRange')
             elseif info.chatType == 'say' then
                 range = Option.SayRange
                 defaultRange = Option:getDefault('SayRange')
@@ -342,7 +370,7 @@ OmiChat.transformers = {
     },
     {
         name = 'private-chat',
-        priority = 6,
+        priority = 2,
         transform = function(self, info)
             if info.chatType ~= 'whisper' then
                 return
@@ -403,33 +431,6 @@ OmiChat.transformers = {
                 else
                     info.format = Option[self.basicChatFormats[info.chatType]]
                 end
-            end
-        end,
-    },
-    {
-        name = 'radio-chat',
-        priority = 2,
-        transform = function(self, info)
-            if info.chatType ~= 'radio' then
-                return
-            end
-
-            local _, msgStart, freq = info.rawText:find('Radio%s*%((%d+%.%d+)[^%)]+%)%s*:')
-            if msgStart then
-                info.content = info.rawText:sub(msgStart + 1)
-                info.format = Option.RadioChatFormat
-                info.substitutions.frequency = freq
-
-                -- /whisper messages should display normally
-                local whisperFormatter = OmiChat.getFormatter('whisper')
-                if whisperFormatter:isMatch(info.content) then
-                    info.content = whisperFormatter:read(info.content)
-                end
-            end
-
-            -- /me messages on radio shouldn't show up in chat
-            if OmiChat.getFormatter('me'):isMatch(info.rawText) then
-                info.formatOptions.showInChat = false
             end
         end,
     },
@@ -641,7 +642,32 @@ do
                 isEnabled = function() return OmiChat.isCustomStreamEnabled('whisper') end,
                 onUse = formattedChatOnUse,
             }
-        }
+        },
+        whisperme = {
+            name = 'whisperme',
+            command = '/whisperme ',
+            shortCommand = '/wme ',
+            tabID = 1,
+            omichat = {
+                allowEmotes = true,
+                allowEmojiPicker = true,
+                isEnabled = function() return OmiChat.isCustomStreamEnabled('whisperme') end,
+                onUse = formattedChatOnUse,
+            }
+        },
+        yellme = {
+            name = 'yellme',
+            command = '/yellme ',
+            shortCommand = '/yme ',
+            tabID = 1,
+            omichat = {
+                context = { ocProcess = processShoutMessage },
+                allowEmotes = true,
+                allowEmojiPicker = true,
+                isEnabled = function() return OmiChat.isCustomStreamEnabled('yellme') end,
+                onUse = formattedChatOnUse,
+            }
+        },
     }
 end
 
@@ -741,7 +767,7 @@ local function updateFormatters()
         if OmiChat.formatters[fmtName] then
             OmiChat.formatters[fmtName]:setFormatString(opt)
         else
-            OmiChat.formatters[fmtName] = createFormatter(opt, info.formatId)
+            OmiChat.formatters[fmtName] = createFormatter(opt, info.formatID)
         end
     end
 end
@@ -776,6 +802,18 @@ local function updateStreams()
         custom.me = OmiChat.addStreamBefore(customStreams.me, private)
     end
 
+    if not custom.looc then
+        OmiChat.addStreamAfter(customStreams.looc, custom.me)
+    end
+
+    if not custom.yellme then
+        OmiChat.addStreamAfter(customStreams.yellme, custom.me)
+    end
+
+    if not custom.whisperme then
+        OmiChat.addStreamAfter(customStreams.whisperme, custom.me)
+    end
+
     local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
     if useLocalWhisper and not whisper then
         if private then
@@ -797,10 +835,6 @@ local function updateStreams()
 
         -- remove custom /whisper
         OmiChat.removeStream(whisper)
-    end
-
-    if not custom.looc then
-        OmiChat.addStreamAfter(customStreams.looc, custom.me)
     end
 end
 

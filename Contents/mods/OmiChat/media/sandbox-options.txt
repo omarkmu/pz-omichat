@@ -35,6 +35,9 @@ option OmiChat.IncludeMiscellaneousEmoji
 option OmiChat.EnableTADCompat
 { type = boolean, default = true, page = OmiChat, translation = OCEnableTADCompat, }
 
+option OmiChat.EnableRangedMe
+{ type = boolean, default = true, page = OmiChat, translation = OCEnableRangedMe, }
+
 option OmiChat.UppercaseCustomShouts
 { type = boolean, default = true, page = OmiChat, translation = OCUppercaseCustomShouts, }
 
@@ -113,7 +116,7 @@ option OmiChat.LoocChatFormat
 { type = string, default = $name: <SPACE> (( $message )), page = OmiChat, translation = OCLoocChatFormat, }
 
 option OmiChat.MeChatFormat
-{ type = string, default = $char(171) $name <SPACE> $punctuate($trimright($message)) $char(187), page = OmiChat, translation = OCMeChatFormat, }
+{ type = string, default = $char(171) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> $char(187), page = OmiChat, translation = OCMeChatFormat, }
 
 option OmiChat.SayChatFormat
 { type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCSayChatFormat, }

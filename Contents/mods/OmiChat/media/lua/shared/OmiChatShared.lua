@@ -155,7 +155,14 @@ function OmiChat.isCustomStreamEnabled(name)
     end
 
     local value = Option[opts.chatFormatOpt]
-    return value and value ~= ''
+    local isEnabled = value and value ~= ''
+
+
+    if name == 'whisperme' or name == 'yellme' then
+        return isEnabled and Option.EnableRangedMe
+    end
+
+    return isEnabled
 end
 
 

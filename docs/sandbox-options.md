@@ -108,6 +108,14 @@ Allows players to customize the color used for overhead speech bubbles. This aff
 
 Enables a button for local chats that allows players to select icons that show up in chat.
 
+### EnableRangedMe
+`default → true`
+
+Enables the ranged counterparts of the [`/me`](#mechatformat) command: `/wme` (`/whisperme`) and `/yme` (`/yellme`).
+These behave similarly to `/me`, but use the chat ranges specified by [`WhisperRange`](#whisperrange) and [`ShoutRange`](#shoutrange).
+
+If `/me` is not enabled, this has no effect.
+
 ### EnableTADCompat
 `default → true`
 
@@ -304,7 +312,7 @@ Defines the format used for overhead speech bubbles of local out-of-character `/
 If blank, `/looc` messages will not display overhead.
 
 ### MeChatFormat
-`default → $char(171) $name <SPACE> $punctuate($trimright($message)) $char(187)`  
+`default → $char(171) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> $char(187)`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/me` messages in chat.
