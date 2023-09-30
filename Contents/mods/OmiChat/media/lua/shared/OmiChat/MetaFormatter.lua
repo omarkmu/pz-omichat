@@ -11,9 +11,10 @@ local floor = math.floor
 
 ---Handles formatting for special chat messages with invisible characters.
 ---@class omichat.MetaFormatter : omi.Class
+---@field protected id integer
 ---@field protected formatString string
----@field protected charSequence string
----@field protected interpolator omichat.Interpolator
+---@field protected idPrefix string
+---@field protected idSuffix string
 ---@field private _nextID integer
 local MetaFormatter = lib.class()
 MetaFormatter._nextID = 101
@@ -21,26 +22,28 @@ MetaFormatter._nextID = 101
 ---@type omichat.MetaFormatter[]
 local formatters = {}
 
----@type omi.interpolate.Options
-local interpolateOptions = {
-    allowMultiMaps = false,
-    allowFunctions = false
-}
-
-
 ---Formats the text according to the formatter's format string.
 ---This encodes invisible characters for later identification.
+---If the format string doesn't return proper content, this will
+---behave as if the format string were `$1`.
 ---@param text string
 ---@return string
 function MetaFormatter:format(text)
-    return self.interpolator:interpolate({ self:wrap(text) })
+    text = self:wrap(text)
+    local formatted = utils.interpolate(self.formatString, { text })
+
+    if not self:isMatch(formatted) then
+        return text
+    end
+
+    return formatted
 end
 
 ---Wraps the provided text in the formatter's invisible characters.
 ---@param text string
 ---@return string
 function MetaFormatter:wrap(text)
-    return concat { self.charSequence, text, self.charSequence }
+    return concat { self.idPrefix, text, self.idSuffix }
 end
 
 ---Retrieves the text that was formatted using this formatter.
@@ -64,9 +67,9 @@ function MetaFormatter:getPattern(exact)
     exact = utils.default(exact, false)
     return concat {
         exact and '^' or '',
-        self.charSequence,
+        self.idPrefix,
         '(.+)',
-        self.charSequence,
+        self.idSuffix,
         exact and '$' or '',
     }
 end
@@ -94,8 +97,14 @@ function MetaFormatter:setID(id)
 
     self.id = id
 
+    -- taking advantage of the ISO-8859-1 character set
+    -- 128–160 are unused and are invisible ingame
     local n = id - 1
-    self.charSequence = char(128 + floor(n / 32)) .. char(128 + (n % 32))
+    local c1 = char(128 + floor(n / 32))
+    local c2 = char(128 + (n % 32))
+
+    self.idPrefix = c1 .. c2
+    self.idSuffix = c2 .. c1
 
     formatters[self.id] = self
 
@@ -110,32 +119,14 @@ function MetaFormatter:setID(id)
 end
 
 ---Sets the format string to the given string.
----This must contain exactly one instance of the $1 substitution string.
----If the given string is invalid, the format will fall back to $1.
----This triggers a rebuild of the associated pattern.
 ---@param format string
----@return boolean valid Whether the given string was valid.
 function MetaFormatter:setFormatString(format)
-    local validFormat = true
-
-    self.interpolator:setPattern(format)
-    local tokens = self.interpolator:getTopLevelTokens()
-
-    if #tokens ~= 1 or tokens[1] ~= '1' then
-        -- fallback if invalid
-        format = '$1'
-        validFormat = false
-        self.interpolator:setPattern(format)
-    end
-
     self.formatString = format
-    return validFormat
 end
 
 ---Initializes formatter values.
 ---@param options omichat.MetaFormatterOptions
 function MetaFormatter:init(options)
-    self.interpolator = utils.Interpolator:new(interpolateOptions)
     self:setFormatString(tostring(options.format or '$1'))
 end
 

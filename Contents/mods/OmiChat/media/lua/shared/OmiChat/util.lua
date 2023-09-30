@@ -132,7 +132,7 @@ end
 
 
 ---Interpolates substitutions into a string with format strings using $var format.
----Functions are referenced using $func(...) syntax.
+---Functions are referenced using `$func(...)` syntax.
 ---@param text string The format string.
 ---@param tokens table A table of format substitution strings.
 ---@param options omi.interpolate.Options? Interpolation options.
