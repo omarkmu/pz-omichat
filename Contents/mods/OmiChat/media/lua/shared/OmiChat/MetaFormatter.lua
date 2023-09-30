@@ -67,7 +67,7 @@ local function buildPattern(format)
         parts[#parts+1] = utils.escape(format:sub(i))
     end
 
-    return concat(parts)
+    return (concat(parts):gsub('<', '&lt;'):gsub('>', '&gt;'))
 end
 
 

@@ -606,7 +606,10 @@ do
         local ctx = self.omichat.context
         local name = ctx and ctx.formatterName or self.name
 
-        chatOnUse(self, OmiChat.getFormatter(name):format(command))
+        local formatted = OmiChat.getFormatter(name):format(command)
+        formatted = formatted:gsub('&gt;', '>'):gsub('&lt;', '<')
+
+        chatOnUse(self, formatted)
     end
 
     streamOverrides = {
