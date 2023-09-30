@@ -70,6 +70,9 @@ Sandbox_EN = {
     Sandbox_OCShoutRange = "/yell Range",
     Sandbox_OCShoutRange_tooltip = "The maximum distance between players for /yell messages to be visible. This does not affect the range at which zombies react.",
 
+    Sandbox_OCLoocColor = "/looc Color",
+    Sandbox_OCLoocColor_tooltip = "The default color used for /looc messages, unless overriden using the setting.",
+
     Sandbox_OCMeColor = "/me Color",
     Sandbox_OCMeColor_tooltip = "The default color used for /me messages, unless overriden using the setting.",
 
@@ -88,20 +91,26 @@ Sandbox_EN = {
     Sandbox_OCMenuNameFormat = "Menu Name Format",
     Sandbox_OCMenuNameFormat_tooltip = "The format used for names in menus such as the Medical Check and Trade window. If blank, these menus will be unaffected.",
 
+    Sandbox_OCLoocOverheadFormat = "/looc Overhead Format",
+    Sandbox_OCLoocOverheadFormat_tooltip = "The format used for /looc messages in overhead messages. Must include $1 substitution unless blank. If blank, /looc messages will not display overhead.",
+
     Sandbox_OCMeOverheadFormat = "/me Overhead Format",
     Sandbox_OCMeOverheadFormat_tooltip = "The format used for /me messages in overhead messages. Must include $1 substitution unless blank. If blank, /me messages will not display overhead.",
 
-    Sandbox_OCWhisperOverheadFormat = "/whisper Overhead Format",
     Sandbox_OCWhisperOverheadFormat_tooltip = "The format used for local /whisper messages in overhead messages. Must include $1 substitution unless blank. If blank, /whisper messages will not display overhead.",
+    Sandbox_OCWhisperOverheadFormat = "/whisper Overhead Format",
+
+    Sandbox_OCLoocChatFormat = "/looc Chat Format",
+    Sandbox_OCLoocChatFormat_tooltip = "The format used for /looc messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
 
     Sandbox_OCMeChatFormat = "/me Chat Format",
     Sandbox_OCMeChatFormat_tooltip = "The format used for /me messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
 
-    Sandbox_OCSayChatFormat = "Say Chat Format",
-    Sandbox_OCSayChatFormat_tooltip = "The format used for messages in /say chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
-
     Sandbox_OCWhisperChatFormat = "Whisper Chat Format",
     Sandbox_OCWhisperChatFormat_tooltip = "The format used for local /whisper messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
+
+    Sandbox_OCSayChatFormat = "Say Chat Format",
+    Sandbox_OCSayChatFormat_tooltip = "The format used for messages in /say chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
 
     Sandbox_OCShoutChatFormat = "Shout Chat Format",
     Sandbox_OCShoutChatFormat_tooltip = "The format used for callouts and messages in /yell chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",

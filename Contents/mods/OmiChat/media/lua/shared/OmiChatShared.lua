@@ -18,6 +18,10 @@ OmiChat.MetaFormatter = MetaFormatter
 
 ---@type table<omichat.CustomStreamName, table>
 local customStreamOptions = {
+    looc = {
+        chat = 'LoocChatFormat',
+        overhead = 'LoocOverheadFormat',
+    },
     me = {
         chat = 'MeChatFormat',
         overhead = 'MeOverheadFormat',

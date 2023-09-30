@@ -44,6 +44,7 @@ option OmiChat.LowercaseCustomSneakShouts
 option OmiChat.UseChatNameAsCharacterName
 { type = boolean, default = false, page = OmiChat, translation = OCUseChatNameAsCharacterName, }
 
+
 /* Limits and Ranges */
 option OmiChat.CustomShoutMaxLength
 { type = integer, default = 30, min = 1, max = 200, page = OmiChat, translation = OCCustomShoutMaxLength, }
@@ -60,6 +61,9 @@ option OmiChat.MaximumColorValue
 option OmiChat.NameMaxLength
 { type = integer, default = 50, min = 0, max = 50, page = OmiChat, translation = OCNameMaxLength, }
 
+option OmiChat.LoocRange
+{ type = integer, default = 30, min = 1, max = 30, page = OmiChat, translation = OCLoocRange, }
+
 option OmiChat.MeRange
 { type = integer, default = 30, min = 1, max = 30, page = OmiChat, translation = OCMeRange, }
 
@@ -74,6 +78,9 @@ option OmiChat.ShoutRange
 
 
 /* Colors */
+option OmiChat.LoocColor
+{ type = string, default = 0 128 128, page = OmiChat, translation = OCLoocColor, }
+
 option OmiChat.MeColor
 { type = string, default = 130 130 130, page = OmiChat, translation = OCMeColor, }
 
@@ -93,11 +100,17 @@ option OmiChat.TimestampFormat
 
 
 /* Message Formats */
+option OmiChat.LoocOverheadFormat
+{ type = string, default = (( $1 )), page = OmiChat, translation = OCLoocOverheadFormat, }
+
 option OmiChat.MeOverheadFormat
 { type = string, default =, page = OmiChat, translation = OCMeOverheadFormat, }
 
 option OmiChat.WhisperOverheadFormat
 { type = string, default = ($1), page = OmiChat, translation = OCWhisperOverheadFormat, }
+
+option OmiChat.LoocChatFormat
+{ type = string, default = $name: <SPACE> (( $message )), page = OmiChat, translation = OCLoocChatFormat, }
 
 option OmiChat.MeChatFormat
 { type = string, default = $name <SPACE> $punctuate($trimright($message)), page = OmiChat, translation = OCMeChatFormat, }

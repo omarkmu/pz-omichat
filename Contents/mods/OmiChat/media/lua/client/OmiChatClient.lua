@@ -276,7 +276,7 @@ OmiChat.transformers = {
             -- it's a /me, mario
             info.rawText = meFormatter:read(info.rawText)
             info.format = Option.MeChatFormat
-            info.context.isMeMessage = true
+            info.context.customStream = 'me'
             info.formatOptions.color = OmiChat.getColor('me') or Option:getDefaultColor('me')
             info.formatOptions.useChatColor = false
             info.formatOptions.useNameColor = info.formatOptions.useNameColor and Option.UseNameColorInAllChats
@@ -306,7 +306,7 @@ OmiChat.transformers = {
             info.rawText = whisperFormatter:read(info.rawText)
             info.format = Option.WhisperChatFormat
             info.titleID = 'UI_OmiChat_whisper_chat_title_id'
-            info.context.isWhisperMessage = true
+            info.context.customStream = 'whisper'
             info.formatOptions.color = OmiChat.getColor('whisper') or Option:getDefaultColor('whisper')
             info.formatOptions.useChatColor = false
             info.formatOptions.useNameColor = info.formatOptions.useNameColor and Option.UseNameColorInAllChats
@@ -320,16 +320,47 @@ OmiChat.transformers = {
         end,
     },
     {
+        name = 'decode-looc',
+        priority = 8,
+        transform = function(self, info)
+            if info.chatType ~= 'say' or not OmiChat.isCustomStreamEnabled('looc') then
+                return
+            end
+
+            local loocFormatter = OmiChat.getFormatter('looc')
+            if not loocFormatter:isMatch(info.rawText) then
+                return
+            end
+
+            info.rawText = loocFormatter:read(info.rawText)
+            info.format = Option.LoocChatFormat
+            info.context.customStream = 'looc'
+            info.formatOptions.color = OmiChat.getColor('looc') or Option:getDefaultColor('looc')
+            info.formatOptions.useChatColor = false
+            info.formatOptions.useNameColor = info.formatOptions.useNameColor and Option.UseNameColorInAllChats
+
+            -- ooc shouldn't attract zombies
+            info.message:setShouldAttractZombies(false)
+
+            if Option.LoocOverheadFormat == '' then
+                info.message:setOverHeadSpeech(false)
+            end
+        end,
+    },
+    {
         name = 'set-range',
         priority = 6,
         transform = function(self, info)
             local range
             local defaultRange
-            if info.context.isMeMessage then
+            if info.context.customStream == 'me' then
                 range = Option.MeRange
                 defaultRange = Option:getDefault('SayRange')
-            elseif info.context.isWhisperMessage then
+            elseif info.context.customStream == 'whisper' then
                 range = Option.WhisperRange
+                defaultRange = Option:getDefault('SayRange')
+            elseif info.context.customStream == 'looc' then
+                range = Option.LoocRange
                 defaultRange = Option:getDefault('SayRange')
             elseif info.chatType == 'say' then
                 range = Option.SayRange
@@ -360,6 +391,7 @@ OmiChat.transformers = {
             if math.sqrt(xDiff*xDiff + yDiff*yDiff) > range then
                 info.message:setOverHeadSpeech(false)
                 info.formatOptions.showInChat = false
+                info.context.outOfRange = true
             end
         end,
     },
@@ -625,6 +657,18 @@ do
     }
 
     customStreams = {
+        looc = {
+            name = 'looc',
+            command = '/looc ',
+            shortCommand = '/l ',
+            tabID = 1,
+            omichat = {
+                allowEmotes = true,
+                allowEmojiPicker = true,
+                isEnabled = function() return OmiChat.isCustomStreamEnabled('looc') end,
+                onUse = formattedChatOnUse,
+            }
+        },
         me = {
             name = 'me',
             command = '/me ',
@@ -732,7 +776,7 @@ end
 ---@param fmt string
 ---@param id integer
 local function createFormatter(fmt, id)
-    -- not using `new` directly to avoid ID assignment
+    -- not using `new` directly to avoid automatic ID assignment
     ---@type omichat.MetaFormatter
     local formatter = setmetatable({}, OmiChat.MetaFormatter)
 
@@ -747,6 +791,7 @@ local function updateFormatters()
     local formatterDefs = {
         { name = 'me', opt = 'MeOverheadFormat' },
         { name = 'whisper', opt = 'WhisperOverheadFormat' },
+        { name = 'looc', opt = 'LoocOverheadFormat' },
     }
 
     for idx, info in ipairs(formatterDefs) do
@@ -763,13 +808,15 @@ end
 ---Updates streams based on sandbox options.
 local function updateStreams()
     -- grab references to insert new streams before default /whisper
-    local me, private, whisper
+    local me, private, whisper, looc
     for _, stream in ipairs(ISChat.allChatStreams) do
         if stream.omichat then
             if stream.name == 'me' then
                 me = stream
             elseif stream.name == 'private' then
                 private = stream
+            elseif stream.name == 'looc' then
+                looc = stream
             elseif stream.name == 'whisper' then
                 if stream.omichat.context and stream.omichat.context.isLocalWhisper then
                     whisper = stream
@@ -810,6 +857,10 @@ local function updateStreams()
 
         -- remove custom /whisper
         OmiChat.removeStream(whisper)
+    end
+
+    if not looc then
+        OmiChat.addStreamAfter(customStreams.looc, me)
     end
 end
 
@@ -1382,7 +1433,7 @@ end
 ---Applies format options from a message information table.
 ---This mutates `info`.
 ---@param info omichat.MessageInfo
----@return boolean #If false, the information table is invalid.
+---@return boolean success If false, the information table is invalid.
 function OmiChat.applyFormatOptions(info)
     local meta = info.meta
     local options = info.formatOptions
@@ -1718,6 +1769,7 @@ end
 ---The names of default custom streams.
 ---@see omichat.api.client.getFormatter
 ---@alias omichat.CustomStreamName
+---| 'looc'
 ---| 'me'
 ---| 'whisper'
 
@@ -1736,6 +1788,7 @@ end
 ---| 'admin'
 ---| 'server'
 ---| 'me'
+---| 'looc'
 ---| 'private'
 ---| 'discord'
 ---| 'name'

@@ -22,6 +22,7 @@ local lib = require 'OmiChat/lib'
 ---@field MaximumColorValue integer
 ---@field NameMaxLength integer
 ---@field MeRange integer
+---@field LoocRange integer
 ---@field SayRange integer
 ---@field WhisperRange integer
 ---@field ShoutRange integer
@@ -32,8 +33,10 @@ local lib = require 'OmiChat/lib'
 ---@field TimestampFormat string
 ---@field MeOverheadFormat string
 ---@field WhisperOverheadFormat string
+---@field LoocOverheadFormat string
 ---@field MeChatFormat string
 ---@field SayChatFormat string
+---@field LoocChatFormat string
 ---@field WhisperChatFormat string
 ---@field ShoutChatFormat string
 ---@field AdminChatFormat string
@@ -56,18 +59,23 @@ local colorDefaults = {
     name = {r=255,g=255,b=255},
     admin = {r=255,g=255,b=255},
     me = {r=130,g=130,b=130},
+    looc = {r=0,g=128,b=128},
     say = {r=255,g=255,b=255},
     shout = {r=255,g=51,b=51},
-    -- pm whisper
-    private = {r=85,g=26,b=139},
-    -- local whisper
-    whisper = {r=85,g=48,b=139},
+    private = {r=85,g=26,b=139}, -- pm whisper
+    whisper = {r=85,g=48,b=139}, -- local whisper
     general = {r=255,g=165,b=0},
     discord = {r=114,g=137,b=218},
     radio = {r=178,g=178,b=178},
     faction = {r=22,g=113,b=20},
     safehouse = {r=55,g=148,b=53},
     server = {r=0,g=128,b=255},
+}
+
+local customStreamColorOpts = {
+    me = 'MeColor',
+    whisper = 'WhisperColor',
+    looc = 'LoocColor',
 }
 
 ---Returns the default color associated with a category.
@@ -99,18 +107,10 @@ function Option:getDefaultColor(category, username)
         end
     end
 
-    if category == 'me' then
-        local settingDefault = utils.stringToColor(self.MeColor)
-        if settingDefault then
-            return settingDefault
-        end
-    end
-
-    if category == 'whisper' then
-        local settingDefault = utils.stringToColor(self.WhisperColor)
-        if settingDefault then
-            return settingDefault
-        end
+    local colorOpt = customStreamColorOpts[category]
+    local settingDefault = colorOpt and utils.stringToColor(colorOpt)
+    if settingDefault then
+        return settingDefault
     end
 
     if category == 'faction' then

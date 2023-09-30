@@ -163,6 +163,11 @@ It applies to all chat color customization settings.
 This dictates the minimum value for R, G, and B components of chat colors.
 It applies to all chat color customization settings.
 
+### LoocRange
+`default → 30, minimum → 1, maximum → 30`
+
+The maximum distance between players for [`/looc`](#loocchatformat) messages to be visible.
+
 ### MeRange
 `default → 30, minimum → 1, maximum → 30`
 
@@ -193,6 +198,11 @@ This applies to the local [`/whisper`](#whisperchatformat) chat, not the default
 ## Default Colors
 These options define the default colors for the chat types added by the mod.
 Numbers should be in RGB format, space- or comma-delimited.
+
+### LoocColor
+`default → 0 128 128`
+
+The default color used for [`/looc`](#loocchatformat) messages, unless overriden using the settings.
 
 ### MeColor
 `default → 130 130 130`
@@ -263,6 +273,19 @@ The format used for `/all` messages in chat.
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for incoming private messages in chat.
+
+### LoocChatFormat
+`default → $name: <SPACE> (( $message ))`  
+`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+
+The format used for local out-of-character `/looc` messages in chat.
+
+### LoocOverheadFormat
+`default → (( $1 ))`  
+`tokens → $1`
+
+Defines the format used for overhead speech bubbles of local out-of-character `/looc` messages.
+If blank, `/looc` messages will not display overhead.
 
 ### MeChatFormat
 `default → $name <SPACE> $punctuate($trimright($message))`  
