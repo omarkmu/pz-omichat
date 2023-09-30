@@ -528,11 +528,11 @@ function _IsoPlayer:Callout(playEmote)
         return _Callout(self, playEmote)
     end
 
-    local shouts
-    local range = 30
     local isSneaking = self:isSneaking()
+    local range = isSneaking and 6 or 30
+
+    local shouts
     if isSneaking and Option.AllowCustomSneakShouts then
-        range = 6
         shouts = OmiChat.getCustomShouts('sneakcallouts')
     elseif not isSneaking and Option.AllowCustomShouts then
         shouts = OmiChat.getCustomShouts('callouts')
@@ -684,6 +684,10 @@ function ISChat:onGearButtonClick()
 
     if OmiChat.isCustomStreamEnabled('me') then
         colorOpts[#colorOpts+1] = 'me'
+    end
+
+    if OmiChat.isCustomStreamEnabled('looc') then
+        colorOpts[#colorOpts+1] = 'looc'
     end
 
     if checkPlayerCanUseChat('/all') then
