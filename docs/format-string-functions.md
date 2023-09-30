@@ -1,46 +1,24 @@
 # Functions
 
-Advanced users can make use of a number of functions in [format strings](./format-strings.md).
+Advanced users have access to various [format string](./format-strings.md) functions.
 These are specified using a dollar sign before the function name and a matched set of parentheses (e.g., `$pi()`).
+The convention of these functions is to return the empty string for invalid or missing inputs.
 
 Functions can accept an arbitrary number of arguments, which are delimited by spaces.
 These arguments may be tokens, text, or the results of other functions.
-Unlike tokens, functions are case-insensitive.
+Unlike [tokens](./format-string-tokens.md), functions are case-insensitive.
 
-To include a literal space or multiple words in a single argument, text can be enclosed within parentheses:
+Note that functions that return multiple values return them as an [at-map](./format-string-at-maps.md).
+Individual return values can be accessed using the `$nthvalue(o n)` function.
 
-> `$set(_token (hello world))`.
-
+To include a literal space or multiple words in a single argument, text can be enclosed within parentheses.
 Escapes will still function within parentheses, but they are only necessary to escape `)`.
 
-> `$reverse( $)$( )`  
-> `$len(($@-sign))`
+> `$set(_token (hello world))$_token` → `hello world`  
+> `$reverse( ($)$() )` → `()`  
+> `$len(($@-sign))` → `6`
 
-A [list](#function-list) of available functions is included below. The convention of these functions is to return the empty string for invalid or missing inputs.
-
-## Extensions
-
-Other mods may include additional functions or override existing functions by calling `OmiChat.registerInterpolatorFunction`.
-
-Extensions should adhere to this convention of returning the empty string for invalid inputs. Falsy return values will be treated as the empty string.
-
-If you think your extension should instead be included in the mod, feel free to [contribute](../.github/CONTRIBUTING.md#contributing-code)!
-
-```lua
--- $example(hello) → hello5
-local OmiChat = require 'OmiChat'
-OmiChat.registerInterpolatorFunction('example', function(s)
-    if not s then
-        return
-    end
-
-    return s .. #s
-end)
-```
-
-## Function list
-
-Note: functions that return multiple values return them as an [at-map](./format-string-at-maps.md). Individual return values can be accessed using the `$nthvalue(o n)` function.
+Other mods can [extend](./format-string-extensions.md) the available functions using the API.
 
 ### Set function
 

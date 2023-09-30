@@ -27,7 +27,7 @@ This section assumes you're familiar with Git and GitHub. If you're not, please 
 
 Start by creating a [fork](https://github.com/omarkmu/pz-omichat/fork). In your fork, you may want to create a new branch with `git checkout -b your-branch-name`.
 
-Note that changes which have a significant risk of being disruptive will be merged into the `beta` branch before being added to the mod. Once you're satisfied with your changes, create a [pull request](https://github.com/omarkmu/pz-omichat/compare).
+Once you're satisfied with your changes, create a [pull request](https://github.com/omarkmu/pz-omichat/compare). Note that most changes should be merged into the `beta` branch; minor fixes that are very unlikely to be disruptive can merge into `main` instead.
 
 ### Guidelines
 
@@ -44,18 +44,19 @@ Note that changes which have a significant risk of being disruptive will be merg
 ## Contributing translations
 *Based on the instructions provided [here](https://steamcommunity.com/sharedfiles/filedetails/?id=3006690572).*
 
-To contribute translations:
+The following steps can be used to contribute translations to the mod. If you're unsure about any of the steps, feel free to [ask about it](https://github.com/omarkmu/pz-omichat/discussions/new?category=q-a)!
 
 1. Create a copy of the `media/lua/shared/Translate/EN` folder.
 2. Rename the copy to one of the folder names in the table below, based on the translation language.
-3. Rename the files inside it to match the language code; i.e., replace `EN` with the folder name.
+3. Rename the files inside it to match the language code; that is, replace `EN` with the folder name.
 4. Modify first line in those files to match the translation language.
 For translating into Korean, for example, change `UI_EN` to `UI_KO`.
-5. Modify the quoted text to your translation. Leave the quotes intact, make sure the final comma remains, and don't change anything to the left of the equals sign.
+5. Modify the quoted text to your translation.
+Leave the quotes intact, make sure the final comma remains, and don't change anything to the left of the equals sign.
     - In translations, `%1` represents something that will be replaced when the translation is used.
-    The files have comments that explain the context of these substitutions; they should always be present in translations.
+    The files have comments that explain the context. `%1` should always be present in the translations of strings that use it.
 6. Save the files with the encoding specified in the table below. For example, for a translation into Estonian, save with UTF-8 encoding.
-7. Upload a `.zip` of the folder in a [discussion](https://github.com/omarkmu/pz-omichat/discussions/new?category=translation) post. If you know how, you can instead create a [pull request](https://github.com/omarkmu/pz-omichat/compare) with your translation changes.
+7. Upload a `.zip` of the folder in a [discussion](https://github.com/omarkmu/pz-omichat/discussions/new?category=translation) post. If you're familiar with Git, you can instead create a [pull request](https://github.com/omarkmu/pz-omichat/compare) with your translation changes.
 
 | Language             | Translation Folder | Encoding  |
 | -------------------- | ------------------ | --------- |

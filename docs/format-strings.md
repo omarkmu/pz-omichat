@@ -1,13 +1,41 @@
 # Format strings
 
-Various sandbox options use a format string style designed to be flexible enough to satisfy most needs.
+Various [sandbox options](./sandbox-options.md) use a format string style designed to be flexible enough to satisfy most needs.
+These format strings can make use of tokens and functions to include values and logic.
 
-All of the format strings have tokens which are replaced with relevant text when necessary.
-These are specified with a dollar sign followed by the token name (e.g., `$author`).
-Tokens are case-sensitive; `$author` is not the same as `$Author`.
-See [Sandbox options](./sandbox-options.md) for a list of tokens used by each format string.
+## Tokens
 
-Format strings can also utilize [functions](./format-string-functions.md) to include logic in format strings.
+**Tokens** are placeholders for values that will be replaced when the format string is used.
+They are specified with a dollar sign followed by the name of the token (e.g., `$author`).
 
-The dollar sign can also be used to escape special characters.
-The characters `$@();:` can all be escaped by preceding the character with a dollar sign; `$$pi()` would result in `$pi()`.
+For more information, see [Tokens](./format-string-tokens.md).
+
+## Functions
+
+**Functions** are used to include logic in format strings.
+
+For more information, see [Functions](./format-string-functions.md).
+
+## At-maps
+
+**At-maps** are multimaps which can be declared and used for logic branches and lists.
+
+For more information, see [At-maps](./format-string-at-maps.md).
+
+## Numeric character references
+
+While handling sandbox options, the game removes characters that aren't within a certain range, such as `«` and `»`.
+The `$char` function can be used to include these characters, but this is not possible in limited format strings.
+
+To allow access to these characters, format strings accept **numeric character references**.
+These are specified as `&#nnn;`, where `nnn` is a number, and behave similarly to the `$char` function; the character with the number specified will be used in place of the reference.
+
+The numbers map to the characters in the [ISO-8859-1](https://www.w3schools.com/charsets/ref_html_8859.asp) character set.
+For example, `« $1 »` can be specified as `&#171; $1 &#187;`.
+
+## Character escapes
+
+The characters `$@();:` can all be escaped by preceding the character with a dollar sign.
+This is useful to avoid invoking a function or using a token where you don't intend to.
+
+For example, `$$pi()` would result in `$pi()`.

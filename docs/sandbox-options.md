@@ -3,61 +3,11 @@
 In order to be as configurable as possible, this mod offers a *lot* of sandbox options.
 This document serves as an explanation of these options.
 
-## Tokens
+Many of the sandbox options accept [format strings](./format-strings.md).
+The dollar-sign-prefixed *tokens* that these format strings accept are listed in their documentation.
+For a list of available tokens, see [Tokens](./format-string-tokens.md).
 
-Many of the sandbox options accept [format strings](./format-strings.md); the dollar-sign-prefixed *tokens* that these format strings accept are listed in their documentation.
-The full list of tokens follows.
-**Not all of these tokens are available to every sandbox option that uses format strings. Each relevant option lists the subset of tokens that it accepts.**
-
-- `$1`: The content of a message in limited format strings.
-    - See [Limited format strings](#limited-format-strings).
-- `$author`: The author of a message (usually a username). This will also include the name color, if one is included.
-- `$authorRaw`: The same as `$author`, but does not include name colors.
-- `$chatType`: The type of the chat in which the message was sent.
-    - One of `general`, `whisper`, `say`, `shout`, `faction`, `safehouse`, `radio`, `admin`, or `server`.
-    - Note that `whisper` refers to PM chats, not local whispers.
-- `$frequency`: The radio frequency the message was sent on.
-- `$forename`: The relevant player's character's forename.
-- `$H`: The hour in 24-hour format.
-- `$HH`: The zero-padded hour in 24-hour format.
-- `$h`: The hour in 12-hour format.
-- `$hh`: The zero-padded hour in 12-hour format.
-- `$hourFormatPref`: 12 if the user prefers 12-hour clock formats; otherwise, 24.
-- `$m`: The minute.
-- `$mm`: The zero-padded minute.
-- `$ampm`: `am` or `pm`, based on the hour.
-- `$AMPM`: `AM` or `PM`, based on the hour.
-- `$message`: The message content.
-- `$menuType`: The type of menu in which the format string will appear.
-    - One of `medical`, `trade`, or `mini_scoreboard`.
-- `$name`: The chat name of the relevant player. This will also include the name color, if one is included.
-    - Determined by the name set with [`/name`](#allowsetname) or the format specified by [`NameFormat`](#nameformat).
-- `$nameRaw`: The same as `$name`, but does not include name colors.
-- `$recipient`: The username of the recipient of a private message.
-- `$recipientName`: The name of the recipient of a private message.
-    - Determined in the same way as `$name`.
-- `$surname`: The relevant player's character's surname.
-- `$tag`: The title of the chat type associated with the message.
-- `$username`: The relevant player's username.
-
-
-## Limited format strings
-*This currently only applies to overhead format strings: [`MeOverheadFormat`](#meoverheadformat), [`WhisperOverheadFormat`](#whisperchatformat), and [`LoocOverheadFormat`](#loocoverheadformat).*
-
-Due to necessity, some format strings are limited.
-The token `$1` (which specifies message content) is **required** by these format strings and is the **only** token that should be present.
-Invalid use will result in the format string being ignored.
-Additionally, these format strings **disallow** [functions](./format-string-functions.md) and [at-maps](./format-string-at-maps.md).
-
-When specifying sandbox options, the game strips out characters that aren't within a certain range, such as `«` and `»`.
-Regular format strings can use the `$char` function for this purpose, but this is not possible in limited format strings.
-
-To allow access to these characters, limited format strings accept numeric character references.
-These behave similarly to the `$char` function; the character with the number specified will be used in place of the reference.
-For example, `«$1»` can be specified as `&#171;$1&#187;`.
-
-This supports numbers in the [ISO-8859-1](https://www.w3schools.com/charsets/ref_html_8859.asp) character set.
-
+To include special characters, [numeric character references](./format-strings.md#numeric-character-references) may be used.
 
 ## Feature Flags
 Options within this set are used to enable or disable features of the mod.
