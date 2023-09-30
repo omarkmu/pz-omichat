@@ -312,7 +312,7 @@ Defines the format used for overhead speech bubbles of local out-of-character `/
 If blank, `/looc` messages will not display overhead.
 
 ### MeChatFormat
-`default → $char(171) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> $char(187)`  
+`default → &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/me` messages in chat.

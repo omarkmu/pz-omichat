@@ -52,6 +52,17 @@ function Interpolator:getTopLevelTokens()
     return tokens
 end
 
+---Sets the interpolation pattern to use and builds the interpolation tree.
+---@param pattern string
+function Interpolator:setPattern(pattern)
+    pattern = (pattern or ''):gsub('&#(%d+);', function(x)
+        local s, c = pcall(string.char, tonumber(x))
+        return s and c or ''
+    end)
+
+    BaseInterpolator.setPattern(self, pattern)
+end
+
 ---Creates a new interpolator.
 ---@param options omi.interpolate.Options
 ---@return omichat.Interpolator

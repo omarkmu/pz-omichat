@@ -27,17 +27,6 @@ local interpolateOptions = {
     allowFunctions = false
 }
 
----Replaces numeric character entities in text.
----@param text string
----@return string
-local function replaceNumericEntities(text)
-    text = text:gsub('&#(%d+);', function(x)
-        local s, c = pcall(string.char, tonumber(x))
-        return s and c or ''
-    end)
-
-    return text
-end
 
 ---Formats the text according to the formatter's format string.
 ---This encodes invisible characters for later identification.
@@ -129,7 +118,6 @@ end
 function MetaFormatter:setFormatString(format)
     local validFormat = true
 
-    format = replaceNumericEntities(format)
     self.interpolator:setPattern(format)
     local tokens = self.interpolator:getTopLevelTokens()
 
