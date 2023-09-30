@@ -288,7 +288,7 @@ OmiChat.transformers = {
             for name, streamData in pairs(customStreamData) do
                 local formatter = OmiChat.getFormatter(name)
                 local isValidStream = OmiChat.isCustomStreamEnabled(name) and streamData.chatTypes[info.chatType]
-                local isMatch = formatter:isMatch(isRadio and info.content or info.rawText)
+                local isMatch = formatter:isMatch(info.content or info.rawText)
 
                 if isMatch and isRadio then
                     if streamData.showOnRadio then
@@ -297,7 +297,7 @@ OmiChat.transformers = {
                         info.formatOptions.showInChat = false
                     end
                 elseif isValidStream and isMatch then
-                    info.rawText = formatter:read(info.rawText)
+                    info.content = formatter:read(info.rawText)
                     info.format = Option[streamData.chatFormatOpt]
                     info.context.ocCustomStream = name
 
@@ -410,12 +410,14 @@ OmiChat.transformers = {
                 return
             end
 
-            -- grab text after the author
-            local authorPattern = concat { '%[', utils.escape(info.author), '%]:' }
-            local _, authorEnd = info.rawText:find(authorPattern)
+            if not info.content then
+                -- grab text after the author
+                local authorPattern = concat { '%[', utils.escape(info.author), '%]:' }
+                local _, authorEnd = info.rawText:find(authorPattern)
 
-            if authorEnd then
-                info.content = info.rawText:sub(authorEnd + 1)
+                if authorEnd then
+                    info.content = info.rawText:sub(authorEnd + 1)
+                end
             end
 
             if info.message:isFromDiscord() then
@@ -754,7 +756,7 @@ local function createFormatter(fmt, id)
     ---@type omichat.MetaFormatter
     local formatter = setmetatable({}, OmiChat.MetaFormatter)
 
-    formatter:init(fmt)
+    formatter:init({ format = fmt })
     formatter:setID(id)
 
     return formatter
