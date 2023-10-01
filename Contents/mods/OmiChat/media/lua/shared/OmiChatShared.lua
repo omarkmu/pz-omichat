@@ -124,7 +124,7 @@ function OmiChat.getNameInChat(username, chatType)
 
     local modData = OmiChat.getModData()
     if Option.AllowSetName and modData.nicknames[username] then
-        return modData.nicknames[username]
+        return utils.escapeRichText(modData.nicknames[username])
     end
 
     local tokens = OmiChat.getPlayerSubstitutions(getPlayerFromUsername(username))

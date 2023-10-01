@@ -555,7 +555,6 @@ do
         local name = ctx and ctx.formatterName or self.name
 
         local formatted = OmiChat.getFormatter(name):format(command)
-        formatted = formatted:gsub('&gt;', '>'):gsub('&lt;', '<')
 
         chatOnUse(self, formatted)
     end

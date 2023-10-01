@@ -22,16 +22,17 @@ For more information, see [Functions](./format-string-functions.md).
 
 For more information, see [At-maps](./format-string-at-maps.md).
 
-## Numeric character references
+## Character references
 
 While handling sandbox options, the game removes characters that aren't within a certain range, such as `«` and `»`.
 The `$char` function can be used to include these characters, but this is not possible in limited format strings.
 
-To allow access to these characters, format strings accept **numeric character references**.
-These are specified as `&#nnn;`, where `nnn` is a number, and behave similarly to the `$char` function; the character with the number specified will be used in place of the reference.
+To allow access to these characters, format strings accept **character references**.
+These behave similarly to the `$char` function; the character with the number specified will be used in place of the reference.
+Both named references and numeric references are supported.
 
-The numbers map to the characters in the [ISO-8859-1](https://www.w3schools.com/charsets/ref_html_8859.asp) character set.
-For example, `« $1 »` can be specified as `&#171; $1 &#187;`.
+The available characters are limited to those in the [ISO-8859-1](https://www.w3schools.com/charsets/ref_html_8859.asp) character set.
+For example, `« $1 »` can be specified as `&#171; $1 &#187;` or `&laquo; $1 &raquo;`.
 
 ## Character escapes
 

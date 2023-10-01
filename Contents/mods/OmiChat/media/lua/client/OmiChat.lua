@@ -232,8 +232,8 @@ local function processTransforms(message, skipFormatting)
         substitutions = {
             author = utils.escapeRichText(author),
             authorRaw = author,
-            name = utils.escapeRichText(meta.name or author),
-            nameRaw = utils.escapeRichText(meta.name or author),
+            name = meta.name or utils.escapeRichText(author),
+            nameRaw = meta.name or utils.escapeRichText(author),
         },
         formatOptions = {
             font = instance.chatFont,
@@ -973,7 +973,11 @@ function ISChat.addLineInChat(message, tabID)
         end
     end
 
-    return _addLineInChat(message, tabID)
+    local s, e = pcall(_addLineInChat, message, tabID)
+    if not s then
+        print(('[OmiChat] error while adding message %s: %s'):format(tostring(message), e))
+        return
+    end
 end
 
 --#endregion

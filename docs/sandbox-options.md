@@ -7,7 +7,7 @@ Many of the sandbox options accept [format strings](./format-strings.md).
 The dollar-sign-prefixed *tokens* that these format strings accept are listed in their documentation.
 For a list of available tokens, see [Tokens](./format-string-tokens.md).
 
-To include special characters, [numeric character references](./format-strings.md#numeric-character-references) may be used.
+To include special characters, [character references](./format-strings.md#character-references) may be used.
 
 ## Feature Flags
 Options within this set are used to enable or disable features of the mod.
@@ -174,7 +174,7 @@ These options define the default colors for the chat types added by the mod.
 Numbers should be in RGB format, space- or comma-delimited.
 
 ### LoocColor
-`default → 0 128 128`
+`default → 48 128 128`
 
 The default color used for [`/looc`](#loocchatformat) messages, unless overriden using the settings.
 

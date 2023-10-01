@@ -285,4 +285,6 @@ function utils.kvp.decode(text)
 end
 
 
+utils.replaceEntities = OmiChatInterpolator.replaceEntities
+
 return utils
