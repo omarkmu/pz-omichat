@@ -55,6 +55,9 @@ Sandbox_EN = {
     Sandbox_OCNameMaxLength = "Maximum /name Length",
     Sandbox_OCNameMaxLength_tooltip = "The maximum length of chat names set with /name. Must be between 0 and 50.",
 
+    Sandbox_OCRangeLooc = "/looc Range",
+    Sandbox_OCRangeLooc_tooltip = "The maximum distance between players for /looc messages to be visible.",
+
     Sandbox_OCRangeMe = "/me Range",
     Sandbox_OCRangeMe_tooltip = "The maximum distance between players for /me messages to be visible.",
 
@@ -73,8 +76,44 @@ Sandbox_EN = {
     Sandbox_OCColorMe = "/me Color",
     Sandbox_OCColorMe_tooltip = "The default color used for /me messages, unless overriden using the setting.",
 
+    Sandbox_OCColorWhisperMe = "/whisperme Color",
+    Sandbox_OCColorWhisperMe_tooltip = "The default color used for /whisperme messages, unless overriden using the setting.",
+
+    Sandbox_OCColorYellMe = "/yellme Color",
+    Sandbox_OCColorYellMe_tooltip = "The default color used for /yellme messages, unless overriden using the setting.",
+
+    Sandbox_OCColorSay = "/say Color",
+    Sandbox_OCColorSay_tooltip = "The default color used for /say messages, unless overriden using the setting.",
+
     Sandbox_OCColorWhisper = "/whisper Color",
     Sandbox_OCColorWhisper_tooltip = "The default color used for local /whisper messages, unless overriden using the setting.",
+
+    Sandbox_OCColorYell = "/yell Color",
+    Sandbox_OCColorYell_tooltip = "The default color used for /yell messages, unless overriden using the setting.",
+
+    Sandbox_OCColorAdmin = "/admin Color",
+    Sandbox_OCColorAdmin_tooltip = "The default color used for /admin messages, unless overriden using the setting.",
+
+    Sandbox_OCColorGeneral = "/all Color",
+    Sandbox_OCColorGeneral_tooltip = "The default color used for /all messages, unless overriden using the setting.",
+
+    Sandbox_OCColorDiscord = "Discord Message Color",
+    Sandbox_OCColorDiscord_tooltip = "The default color used for messages from Discord, unless overriden using the setting.",
+
+    Sandbox_OCColorRadio = "Radio Message Color",
+    Sandbox_OCColorRadio_tooltip = "The default color used for radio messages, unless overriden using the setting.",
+
+    Sandbox_OCColorFaction = "/faction Color",
+    Sandbox_OCColorFaction_tooltip = "The default color used for /faction messages, unless overriden using the setting.",
+
+    Sandbox_OCColorSafehouse = "/safehouse Color",
+    Sandbox_OCColorSafehouse_tooltip = "The default color used for /safehouse messages, unless overriden using the setting.",
+
+    Sandbox_OCColorPrivate = "/pm Color",
+    Sandbox_OCColorPrivate_tooltip = "The default color used for /pm messages, unless overriden using the setting.",
+
+    Sandbox_OCColorServer = "Server Message Color",
+    Sandbox_OCColorServer_tooltip = "The default color used for server messages, unless overriden using the setting.",
 
     Sandbox_OCFormatName = "Chat Name Format",
     Sandbox_OCFormatName_tooltip = "The format used for names in chat, unless explicitly set with /name. May include $forename, $surname, $username, and $chatType substitutions.",
@@ -94,6 +133,12 @@ Sandbox_EN = {
     Sandbox_OCOverheadFormatMe = "/me Overhead Format",
     Sandbox_OCOverheadFormatMe_tooltip = "The format used for /me messages in overhead messages. Must include $1 substitution unless blank. If blank, /me messages will not display overhead.",
 
+    Sandbox_OCOverheadFormatWhisperMe = "/whisperme Overhead Format",
+    Sandbox_OCOverheadFormatWhisperMe_tooltip = "The format used for /whisperme messages in overhead messages. Must include $1 substitution unless blank. If blank, /whisperme messages will not display overhead.",
+
+    Sandbox_OCOverheadFormatYellMe = "/yellme Overhead Format",
+    Sandbox_OCOverheadFormatYellMe_tooltip = "The format used for /yellme messages in overhead messages. Must include $1 substitution unless blank. If blank, /yellme messages will not display overhead.",
+
     Sandbox_OCOverheadFormatWhisper_tooltip = "The format used for local /whisper messages in overhead messages. Must include $1 substitution unless blank. If blank, /whisper messages will not display overhead.",
     Sandbox_OCOverheadFormatWhisper = "/whisper Overhead Format",
 
@@ -102,6 +147,12 @@ Sandbox_EN = {
 
     Sandbox_OCChatFormatMe = "/me Chat Format",
     Sandbox_OCChatFormatMe_tooltip = "The format used for /me messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
+
+    Sandbox_OCChatFormatWhisperMe = "/whisperme Chat Format",
+    Sandbox_OCChatFormatWhisperMe_tooltip = "The format used for /wme messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
+
+    Sandbox_OCChatFormatYellMe = "/yellme Chat Format",
+    Sandbox_OCChatFormatYellMe_tooltip = "The format used for /yme messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
 
     Sandbox_OCChatFormatWhisper = "Whisper Chat Format",
     Sandbox_OCChatFormatWhisper_tooltip = "The format used for local /whisper messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",

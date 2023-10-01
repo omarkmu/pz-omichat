@@ -1,4 +1,4 @@
-# Sandbox options
+# Sandbox Options
 
 In order to be as configurable as possible, this mod offers a *lot* of sandbox options.
 This document serves as an explanation of these options.
@@ -153,8 +153,8 @@ The maximum distance between players for `/say` messages to be visible.
 ### RangeWhisper
 `default → 3, minimum → 1, maximum → 30`
 
-The maximum distance between players for local `/whisper` messages to be visible.
-This applies to the local [`/whisper`](#chatformatwhisper) chat, not the default whisper chat.
+The maximum distance between players for local [`/whisper`](#chatformatwhisper)  messages to be visible.
+This does not apply to the default whisper chat.
 
 ### RangeYell
 `default → 60, minimum → 1, maximum → 60`
@@ -166,21 +166,83 @@ The maximum distance between players for `/yell` messages to be visible.
 Options that define the default colors for the chat types added by the mod.
 Colors should be in RGB format, space- or comma-delimited.
 
+These colors will be used unless overriden by a player's chat color settings.
+
+### ColorAdmin
+`default → 255 255 255`
+
+The default color used for `/admin` messages.
+
+### ColorDiscord
+`default → 144 137 218`
+
+The default color used for messages from Discord.
+
+### ColorFaction
+`default → 22 113 20`
+
+The default color used for `/faction` messages.
+
+### ColorGeneral
+`default → 255 165 0`
+
+The default color used for `/all` messages.
+
 ### ColorLooc
 `default → 48 128 128`
 
-The default color used for [`/looc`](#chatformatlooc) messages, unless overriden using the settings.
+The default color used for [`/looc`](#chatformatlooc) messages.
 
 ### ColorMe
 `default → 130 130 130`
 
-The default color used for [`/me`](#chatformatme) messages, unless overriden using the settings.
+The default color used for [`/me`](#chatformatme) messages.
+
+### ColorPrivate
+`default → 85 26 139`
+
+The default color used for `/pm` (vanilla whisper) messages.
+
+### ColorRadio
+`default → 178 178 178`
+
+The default color used for radio messages.
+
+### ColorSafehouse
+`default → 22 113 20`
+
+The default color used for `/safehouse` messages.
+
+### ColorSay
+`default → 255 255 255`
+
+The default color used for `/say` messages.
+
+### ColorServer
+`default → 0 128 255`
+
+The default color used for server messages.
 
 ### ColorWhisper
 `default → 85 48 139`
 
-The default color used for local `/whisper` messages, unless overriden using the settings.
-This applies to the local [`/whisper`](#chatformatwhisper) chat, not the default whisper chat.
+The default color used for local [`/whisper`](#chatformatwhisper) messages.
+This does not apply to the [default](#colorprivate) whisper chat.
+
+### ColorWhisperMe
+`default → 85 48 139`
+
+The default color used for [`/whisperme`](#chatformatwhisperme) messages.
+
+### ColorYell
+`default → 255 51 51`
+
+The default color used for `/yell` messages.
+
+### ColorYellMe
+`default → 255 51 51`
+
+The default color used for [`/yellme`](#chatformatyellme) messages.
 
 
 ## Component Formats
@@ -240,6 +302,20 @@ If blank, `/me` messages will not display overhead.
 Defines the format used for overhead speech bubbles of local [`/whisper`](#chatformatwhisper) messages.
 If blank, `/whisper` messages will not display overhead.
 This does not apply to the default whisper chat.
+
+### OverheadFormatWhisperMe
+`default → &#171; $1 &#187;` (`« $1 »`)  
+`tokens → $1`
+
+Defines the format used for overhead speech bubbles of [`/whisperme`](#chatformatwhisperme) messages.
+If blank, `/whisperme` messages will not display overhead.
+
+### OverheadFormatYellMe
+`default → &#171; $1 &#187;` (`« $1 »`)  
+`tokens → $1`
+
+Defines the format used for overhead speech bubbles of [`/yellme`](#chatformatyellme) messages.
+If blank, `/yellme` messages will not display overhead.
 
 
 ## Chat Formats
@@ -322,12 +398,6 @@ The format used for `/say` messages in chat.
 
 The format used for server messages in chat.
 
-### ChatFormatYell
-`default → $name: <SPACE> $message`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message`
-
-The format used for `/yell` messages in chat.
-
 ### ChatFormatWhisper
 `default → $name: <SPACE> $message`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
@@ -339,3 +409,28 @@ If populated, the existing `/whisper` is changed to `/pm` (`/private`).
 If blank, local whisper will be disabled and the default `/whisper` will not be renamed.
 
 *See also: [`RangeWhisper`](#rangewhisper), [`OverheadFormatWhisper`](#overheadformatwhisper).*
+
+### ChatFormatWhisperMe
+`default → &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
+`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+
+The format used for `/whisperme` (`/wme`) messages in chat.
+This behaves similarly to [`/me`](#chatformatme), but uses whisper [range](#rangewhisper).
+
+If blank, `/wme` messages will be disabled.
+
+### ChatFormatYell
+`default → $name: <SPACE> $message`  
+`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+
+The format used for `/yell` messages in chat.
+
+### ChatFormatYellMe
+`default → &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
+`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+
+The format used for `/yellme` (`/yme`) messages in chat.
+This behaves similarly to [`/me`](#chatformatme), but uses yell [range](#rangeyell).
+
+If blank, `/yme` messages will be disabled.
+

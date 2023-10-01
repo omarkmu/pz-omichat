@@ -295,7 +295,7 @@ OmiChat.transformers = {
                     info.format = Option[streamData.chatFormatOpt]
                     info.context.ocCustomStream = name
 
-                    info.formatOptions.color = OmiChat.getColor(name) or Option:getDefaultColor(name)
+                    info.formatOptions.color = OmiChat.getColorTable(name)
                     info.formatOptions.useChatColor = false
                     info.formatOptions.useNameColor = info.formatOptions.useNameColor and Option.EnableNameColorInAllChats
 
@@ -381,11 +381,8 @@ OmiChat.transformers = {
                 info.context.ocIsIncomingPM = true
             end
 
-            local color = OmiChat.getColor('private')
-            if color then
-                info.formatOptions.color = color
-                info.formatOptions.useChatColor = false
-            end
+            info.formatOptions.color = OmiChat.getColorTable('private')
+            info.formatOptions.useChatColor = false
         end,
     },
     {
@@ -1474,9 +1471,9 @@ function OmiChat.applyFormatOptions(info)
         local color
         if options.useChatColor then
             if message:isFromDiscord() then
-                color = OmiChat.getColor('discord')
+                color = OmiChat.getColorTable('discord')
             else
-                color = OmiChat.getColor(info.chatType)
+                color = OmiChat.getColorTable(info.chatType)
             end
         end
 

@@ -91,7 +91,7 @@ end
 ---@param username string
 ---@return omichat.ColorTable?
 function OmiChat.getNameColor(username)
-    if not Option.EnableSetNameColor then
+    if not Option.EnableSetNameColor or not username then
         return
     end
 

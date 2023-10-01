@@ -27,15 +27,31 @@ local lib = require 'OmiChat/lib'
 ---@field RangeYell integer
 ---@field ColorLooc string
 ---@field ColorMe string
+---@field ColorWhisperMe string
+---@field ColorYellMe string
+---@field ColorSay string
 ---@field ColorWhisper string
+---@field ColorYell string
+---@field ColorAdmin string
+---@field ColorGeneral string
+---@field ColorDiscord string
+---@field ColorRadio string
+---@field ColorFaction string
+---@field ColorSafehouse string
+---@field ColorPrivate string
+---@field ColorServer string
 ---@field FormatMenuName string
 ---@field FormatName string
 ---@field FormatTag string
 ---@field FormatTimestamp string
 ---@field OverheadFormatMe string
 ---@field OverheadFormatWhisper string
+---@field OverheadFormatWhisperMe string
+---@field OverheadFormatYellMe string
 ---@field OverheadFormatLooc string
 ---@field ChatFormatMe string
+---@field ChatFormatWhisperMe string
+---@field ChatFormatYellMe string
 ---@field ChatFormatSay string
 ---@field ChatFormatLooc string
 ---@field ChatFormatWhisper string
@@ -55,19 +71,18 @@ local floor = math.floor
 local utils = require 'OmiChat/util'
 local customStreams = require 'OmiChat/CustomStreamData'
 
----@type table<omichat.ColorCategory, omichat.ColorTable>
-local colorDefaults = {
-    name      = {r = 255, g = 255, b = 255},
-    admin     = {r = 255, g = 255, b = 255},
-    say       = {r = 255, g = 255, b = 255},
-    shout     = {r = 255, g =  51, b =  51},
-    private   = {r =  85, g =  26, b = 139}, -- /pm whisper
-    general   = {r = 255, g = 165, b =   0},
-    discord   = {r = 114, g = 137, b = 218},
-    radio     = {r = 178, g = 178, b = 178},
-    faction   = {r =  22, g = 113, b =  20},
-    safehouse = {r =  55, g = 148, b =  53},
-    server    = {r =   0, g = 128, b = 255},
+---@type table<omichat.ColorCategory, string>
+local colorOpts = {
+    admin     = 'ColorAdmin',
+    say       = 'ColorSay',
+    shout     = 'ColorYell',
+    private   = 'ColorPrivate',
+    general   = 'ColorGeneral',
+    discord   = 'ColorDiscord',
+    radio     = 'ColorRadio',
+    faction   = 'ColorFaction',
+    safehouse = 'ColorSafehouse',
+    server    = 'ColorServer',
 }
 
 ---Returns the default color associated with a category.
@@ -119,21 +134,35 @@ function Option:getDefaultColor(category, username)
     ---@type omichat.CustomStreamInfo?
     local custom = customStreams[category]
     if custom then
-        local settingDefault = utils.stringToColor(custom and custom.colorOpt)
-        if settingDefault then
-            return settingDefault
+        local colorOpt = custom and custom.colorOpt
+        local settingColor = utils.stringToColor(self[colorOpt])
+        if settingColor then
+            return settingColor
         end
 
-        if custom.defaultColor then
-            return custom.defaultColor
+        local defaultStr = colorOpt and self:getDefault(colorOpt)
+        local defaultColor = defaultStr and utils.stringToColor(defaultStr)
+
+        if defaultColor then
+            return defaultColor
         end
     end
 
-    if colorDefaults[category] then
-        return colorDefaults[category]
+    local optName = colorOpts[category]
+    if optName then
+        local optColor = utils.stringToColor(self[optName])
+        if optColor then
+            return optColor
+        end
+
+        local optDefault = self:getDefault(optName)
+        local optDefaultColor = optDefault and utils.stringToColor(optDefault)
+        if optDefaultColor then
+            return optDefaultColor
+        end
     end
 
-    error(string.format('invalid color category: %s', category))
+    return {r = 255, g = 255, b = 255}
 end
 
 
