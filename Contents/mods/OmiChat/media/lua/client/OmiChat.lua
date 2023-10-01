@@ -840,22 +840,34 @@ function ISChat:onCommandEntered()
 
     -- handle emotes specified with .emote
     if allowEmotes and Option.EnableEmotes then
-        local start, finish, whitespace, emote = command:find('(%s*)%.([%w_]+)')
-        if start and whitespace and start ~= 1 and #whitespace == 0 then
-            -- require whitespace unless the emote is at the start
-            emote = nil
-        end
-
-        local emoteToPlay = emote and OmiChat.getEmote(emote:lower())
-        if type(emoteToPlay) == 'string' then
-            -- remove the emote text and ignore subsequent emotes
-            shouldHandle = true
-            command = utils.trim(command:sub(1, start - 1) .. command:sub(finish + 1))
-
-            local player = getSpecificPlayer(0)
-            if player then
-                player:playEmote(emoteToPlay)
+        local startPos = 1
+        while startPos < #command do
+            local start, finish, whitespace, emote = command:find('(%s*)%.([%w_]+)', startPos)
+            if not start then
+                break
             end
+
+            -- require whitespace unless the emote is at the start
+            if start ~= 1 and #whitespace == 0 then
+                emote = nil
+            end
+
+            local emoteToPlay = emote and OmiChat.getEmote(emote:lower())
+            if type(emoteToPlay) == 'string' then
+                -- remove the emote text
+                shouldHandle = true
+                command = utils.trim(command:sub(1, start - 1) .. command:sub(finish + 1))
+
+                local player = getSpecificPlayer(0)
+                if player then
+                    player:playEmote(emoteToPlay)
+
+                    -- ignore subsequent emotes
+                    break
+                end
+            end
+
+            startPos = finish + 1
         end
     end
 
