@@ -11,10 +11,10 @@ local floor = math.floor
 
 ---Handles formatting for special chat messages with invisible characters.
 ---@class omichat.MetaFormatter : omi.Class
----@field protected id integer
----@field protected formatString string
----@field protected idPrefix string
----@field protected idSuffix string
+---@field protected _id integer
+---@field protected _formatString string
+---@field protected _idPrefix string
+---@field protected _idSuffix string
 ---@field private _nextID integer
 local MetaFormatter = lib.class()
 MetaFormatter._nextID = 101
@@ -30,7 +30,7 @@ local formatters = {}
 ---@return string
 function MetaFormatter:format(text)
     text = self:wrap(text)
-    local formatted = utils.interpolate(self.formatString, { text })
+    local formatted = utils.interpolate(self._formatString, { text })
 
     if not self:isMatch(formatted) then
         return text
@@ -43,7 +43,7 @@ end
 ---@param text string
 ---@return string
 function MetaFormatter:wrap(text)
-    return concat { self.idPrefix, text, self.idSuffix }
+    return concat { self._idPrefix, text, self._idSuffix }
 end
 
 ---Retrieves the text that was formatted using this formatter.
@@ -67,9 +67,9 @@ function MetaFormatter:getPattern(exact)
     exact = utils.default(exact, false)
     return concat {
         exact and '^' or '',
-        self.idPrefix,
+        self._idPrefix,
         '(.+)',
-        self.idSuffix,
+        self._idSuffix,
         exact and '$' or '',
     }
 end
@@ -77,7 +77,7 @@ end
 ---Returns the formatter's format string.
 ---@return string
 function MetaFormatter:getFormatString()
-    return self.formatString
+    return self._formatString
 end
 
 ---Sets the ID of the formatter.
@@ -90,12 +90,12 @@ function MetaFormatter:setID(id)
     end
 
     local old
-    if self.id then
-        old = formatters[self.id]
-        formatters[self.id] = nil
+    if self._id then
+        old = formatters[self._id]
+        formatters[self._id] = nil
     end
 
-    self.id = id
+    self._id = id
 
     -- taking advantage of the ISO-8859-1 character set
     -- 128–160 are unused and are invisible ingame
@@ -103,10 +103,10 @@ function MetaFormatter:setID(id)
     local c1 = char(128 + floor(n / 32))
     local c2 = char(128 + (n % 32))
 
-    self.idPrefix = c1 .. c2
-    self.idSuffix = c2 .. c1
+    self._idPrefix = c1 .. c2
+    self._idSuffix = c2 .. c1
 
-    formatters[self.id] = self
+    formatters[self._id] = self
 
     if id > MetaFormatter._nextID then
         MetaFormatter._nextID = id + 1
@@ -121,7 +121,7 @@ end
 ---Sets the format string to the given string.
 ---@param format string
 function MetaFormatter:setFormatString(format)
-    self.formatString = format
+    self._formatString = format
 end
 
 ---Initializes formatter values.

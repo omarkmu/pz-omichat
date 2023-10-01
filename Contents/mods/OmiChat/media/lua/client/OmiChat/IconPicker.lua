@@ -14,7 +14,7 @@
 ---@field icons table
 ---@field exclude table
 ---@field categoryOrder table
----@field protected rowContents table
+---@field protected _rowContents table
 local IconPicker = ISPanel:derive('IconPicker')
 
 local icons = require 'OmiChat/IconLists'
@@ -89,7 +89,7 @@ function IconPicker:getGridCoordinates(x, y)
 
 	local row = math.ceil((y - self.borderSize) / self.buttonSize)
 	local column = math.ceil((x - self.borderSize) / self.buttonSize)
-	local selected = type(self.rowContents[row]) == 'table' and self.rowContents[row][column]
+	local selected = type(self._rowContents[row]) == 'table' and self._rowContents[row][column]
 
 	if not selected then
 		return
@@ -210,7 +210,7 @@ function IconPicker:updateIcons()
 		end
 	end
 
-	self.rowContents = contents
+	self._rowContents = contents
 end
 
 ---Fires when a mouse down occurs in the icon picker.
@@ -252,7 +252,7 @@ function IconPicker:render()
 	end
 
 	local maxRow = 0
-	for row, value in ipairs(self.rowContents) do
+	for row, value in ipairs(self._rowContents) do
 		if type(value) == 'string' then
 			local catName = getText(value)
 			local textHeight = getTextManager():MeasureStringY(self.categoryFont, catName)
@@ -311,7 +311,7 @@ function IconPicker:new(x, y, target, onclick)
     o.icons = {}
 	o.exclude = {}
 	o.categoryOrder = {}
-	o.rowContents = {}
+	o._rowContents = {}
 
 	o:addScrollBars()
 	o:setWidth(width + o.vscroll.width)

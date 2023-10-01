@@ -115,10 +115,10 @@ end
 local function updateFormatters()
     for fmtName, info in pairs(customStreamData) do
         local opt = Option[info.overheadFormatOpt]
-        if OmiChat.formatters[fmtName] then
-            OmiChat.formatters[fmtName]:setFormatString(opt)
+        if OmiChat._formatters[fmtName] then
+            OmiChat._formatters[fmtName]:setFormatString(opt)
         else
-            OmiChat.formatters[fmtName] = createFormatter(opt, info.formatID)
+            OmiChat._formatters[fmtName] = createFormatter(opt, info.formatID)
         end
     end
 end
@@ -253,7 +253,7 @@ local function updateEmojiComponents()
         instance.emojiButton:bringToTop()
 
         instance.emojiPicker = IconPicker:new(0, 0, instance, ISChat.onEmojiClick)
-        instance.emojiPicker.exclude = OmiChat.iconsToExclude
+        instance.emojiPicker.exclude = OmiChat._iconsToExclude
         instance.emojiPicker.includeUnknownAsMiscellaneous = OmiChat.Option.EnableMiscellaneousIcons
 
         instance.emojiPicker:initialise()
@@ -334,7 +334,7 @@ function OmiChat.addCommand(stream)
     end
 
     stream.omichat.isCommand = true
-    OmiChat.commandStreams[#OmiChat.commandStreams+1] = stream
+    OmiChat._commandStreams[#OmiChat._commandStreams+1] = stream
 end
 
 ---Removes a stream from the list of available chat commands.
@@ -344,7 +344,7 @@ function OmiChat.removeCommand(stream)
         return
     end
 
-    remove(OmiChat.commandStreams, stream)
+    remove(OmiChat._commandStreams, stream)
 end
 
 ---Adds a chat stream.
@@ -405,26 +405,26 @@ end
 ---@param emoteOrGetter string | omichat.EmoteGetter The string to associate with the emote, or a function which retrieves one.
 function OmiChat.addEmote(name, emoteOrGetter)
     if type(emoteOrGetter) == 'function' then
-        OmiChat.emotes[name] = emoteOrGetter
+        OmiChat._emotes[name] = emoteOrGetter
     elseif emoteOrGetter then
-        OmiChat.emotes[name] = tostring(emoteOrGetter)
+        OmiChat._emotes[name] = tostring(emoteOrGetter)
     end
 end
 
 ---Removes an emote from the registry.
 ---@param name string
 function OmiChat.removeEmote(name)
-    OmiChat.emotes[name] = nil
+    OmiChat._emotes[name] = nil
 end
 
 ---Adds a message transformer which can act on message information
 ---to modify display or behavior.
 ---@param transformer omichat.MessageTransformer
 function OmiChat.addMessageTransform(transformer)
-    OmiChat.transformers[#OmiChat.transformers+1] = transformer
+    OmiChat._transformers[#OmiChat._transformers+1] = transformer
 
     -- not stable sorting
-    table.sort(OmiChat.transformers, function(a, b)
+    table.sort(OmiChat._transformers, function(a, b)
         local aPri = a.priority or 1
         local bPri = b.priority or 1
 
@@ -435,14 +435,14 @@ end
 ---Removes a message transformer.
 ---@param transformer omichat.MessageTransformer
 function OmiChat.removeMessageTransform(transformer)
-    remove(OmiChat.transformers, transformer)
+    remove(OmiChat._transformers, transformer)
 end
 
 ---Removes the first message transformer with the provided name.
 ---@param name string
 function OmiChat.removeMessageTransformByName(name)
     local target
-    for i, v in ipairs(OmiChat.transformers) do
+    for i, v in ipairs(OmiChat._transformers) do
         if v.name and v.name == name then
             target = i
             break
@@ -450,7 +450,7 @@ function OmiChat.removeMessageTransformByName(name)
     end
 
     if target then
-        table.remove(OmiChat.transformers, target)
+        table.remove(OmiChat._transformers, target)
     end
 end
 
@@ -554,7 +554,7 @@ end
 ---Applies message transforms.
 ---@param info omichat.MessageInfo
 function OmiChat.applyTransforms(info)
-    for _, transformer in ipairs(OmiChat.transformers) do
+    for _, transformer in ipairs(OmiChat._transformers) do
         if transformer.transform and transformer:transform(info) == true then
             break
         end
@@ -581,7 +581,7 @@ function OmiChat.chatCommandToStream(command, includeCommands)
 
     local i = 1
     local numStreams = #ISChat.allChatStreams
-    local numCommands = #OmiChat.commandStreams
+    local numCommands = #OmiChat._commandStreams
     while i <= numStreams + numCommands do
         local stream
         if i <= numStreams then
@@ -591,7 +591,7 @@ function OmiChat.chatCommandToStream(command, includeCommands)
                 break
             end
 
-            stream = OmiChat.commandStreams[i - numStreams]
+            stream = OmiChat._commandStreams[i - numStreams]
         end
 
         chatCommand = nil
@@ -687,7 +687,7 @@ end
 ---@param emote string
 ---@return string?
 function OmiChat.getEmote(emote)
-    local value = OmiChat.emotes[emote]
+    local value = OmiChat._emotes[emote]
     if type(value) == 'function' then
         return value(emote)
     end
@@ -699,7 +699,7 @@ end
 ---@param name omichat.CustomStreamName
 ---@return omichat.MetaFormatter
 function OmiChat.getFormatter(name)
-    return OmiChat.formatters[name]
+    return OmiChat._formatters[name]
 end
 
 ---Redraws the current chat messages.
@@ -759,7 +759,7 @@ end
 ---@see omichat.IconPicker.updateIcons
 ---@param icons table<string, true>?
 function OmiChat.setIconsToExclude(icons)
-    OmiChat.iconsToExclude = icons or {}
+    OmiChat._iconsToExclude = icons or {}
 end
 
 ---Adds an info message to chat.

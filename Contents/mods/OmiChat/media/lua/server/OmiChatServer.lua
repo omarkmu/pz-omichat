@@ -9,7 +9,7 @@ local OmiChat = require 'OmiChatShared'
 ---Transmits mod data to clients.
 function OmiChat.transmitModData()
     OmiChat.getModData()
-    ModData.transmit(OmiChat.modDataKey)
+    ModData.transmit(OmiChat._modDataKey)
 end
 
 

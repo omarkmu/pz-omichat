@@ -17,8 +17,8 @@ local shoutOpts = {
 ---Gets or creates the player preferences table.
 ---@return omichat.PlayerPreferences
 function OmiChat.getPlayerPreferences()
-    if OmiChat.playerPrefs then
-        return OmiChat.playerPrefs
+    if OmiChat._playerPrefs then
+        return OmiChat._playerPrefs
     end
 
     ---@type omichat.PlayerPreferences
@@ -30,7 +30,7 @@ function OmiChat.getPlayerPreferences()
     }
 
     local line, dest
-    local inFile = getFileReader(OmiChat.iniName, true)
+    local inFile = getFileReader(OmiChat._iniName, true)
     while true do
         line = inFile:readLine()
         if line == nil then
@@ -62,30 +62,30 @@ function OmiChat.getPlayerPreferences()
         end
     end
 
-    OmiChat.playerPrefs = prefs
+    OmiChat._playerPrefs = prefs
 end
 
 ---Saves current player preferences to a file.
 function OmiChat.savePlayerPreferences()
-    if not OmiChat.playerPrefs then
+    if not OmiChat._playerPrefs then
         return
     end
 
-    local outFile = getFileWriter(OmiChat.iniName, true, false)
-    outFile:write(concat { 'VERSION=', tostring(OmiChat.iniVersion), '\n' })
+    local outFile = getFileWriter(OmiChat._iniName, true, false)
+    outFile:write(concat { 'VERSION=', tostring(OmiChat._iniVersion), '\n' })
 
-    outFile:write(concat { 'showNameColors=', tostring(OmiChat.playerPrefs.showNameColors), '\n' })
+    outFile:write(concat { 'showNameColors=', tostring(OmiChat._playerPrefs.showNameColors), '\n' })
 
     outFile:write(concat {'[colors]\n'})
-    for cat, color in pairs(OmiChat.playerPrefs.colors) do
+    for cat, color in pairs(OmiChat._playerPrefs.colors) do
         outFile:write(concat { cat, '=', utils.colorToHexString(color), '\n' })
     end
 
     for _, name in pairs({ 'callouts', 'sneakcallouts' }) do
-        if OmiChat.playerPrefs[name] then
+        if OmiChat._playerPrefs[name] then
             outFile:write(concat {'[', name, ']\n'})
 
-            for k, v in pairs(OmiChat.playerPrefs[name]) do
+            for k, v in pairs(OmiChat._playerPrefs[name]) do
                 outFile:write(concat { tostring(k), '=', tostring(v), '\n' })
             end
         end
@@ -165,7 +165,7 @@ function OmiChat.setNickname(nickname)
     if #nickname == 0 then
         modData.nicknames[username] = nil
         modData._updates = { nicknameToClear = username }
-        ModData.transmit(OmiChat.modDataKey)
+        ModData.transmit(OmiChat._modDataKey)
 
         if Option.EnableChatNameAsCharacterName then
             return false, getText('UI_OmiChat_set_name_empty')
@@ -181,7 +181,7 @@ function OmiChat.setNickname(nickname)
 
     modData.nicknames[username] = nickname
     modData._updates = { nicknameToUpdate = username }
-    ModData.transmit(OmiChat.modDataKey)
+    ModData.transmit(OmiChat._modDataKey)
     return true, getText('UI_OmiChat_set_name_success', utils.escapeRichText(nickname))
 end
 
@@ -243,7 +243,7 @@ function OmiChat.changeColor(category, color)
     modData.nameColors[username] = color and utils.colorToHexString(color) or nil
     modData._updates = { nameColorToUpdate = username }
 
-    ModData.transmit(OmiChat.modDataKey)
+    ModData.transmit(OmiChat._modDataKey)
 end
 
 ---Gets a color table for the current player, or nil if unset.

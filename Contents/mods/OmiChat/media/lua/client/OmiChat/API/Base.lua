@@ -13,31 +13,31 @@ local getText = getText
 local ISChat = ISChat
 
 ---@class omichat.api.client : omichat.api.shared
----@field private commandStreams omichat.CommandStream[]
----@field private emotes table<string, string | omichat.EmoteGetter>
----@field private formatters table<string, omichat.MetaFormatter>
----@field private iconsToExclude table<string, true>
----@field private transformers omichat.MessageTransformer[]
----@field private iniVersion integer
----@field private iniName string
----@field private playerPrefs omichat.PlayerPreferences
+---@field private _commandStreams omichat.CommandStream[]
+---@field private _emotes table<string, string | omichat.EmoteGetter>
+---@field private _formatters table<string, omichat.MetaFormatter>
+---@field private _iconsToExclude table<string, true>
+---@field private _transformers omichat.MessageTransformer[]
+---@field private _iniVersion integer
+---@field private _iniName string
+---@field private _playerPrefs omichat.PlayerPreferences
 local OmiChat = require 'OmiChatShared'
 local Option = OmiChat.Option
 
 OmiChat.ColorModal = require 'OmiChat/ColorModal'
 OmiChat.IconPicker = require 'OmiChat/IconPicker'
 
-OmiChat.iniVersion = 1
-OmiChat.iniName = 'omichat.ini'
+OmiChat._iniVersion = 1
+OmiChat._iniName = 'omichat.ini'
 
 ---@type table<string, true>
-OmiChat.iconsToExclude = {}
+OmiChat._iconsToExclude = {}
 
 ---@type table<string, omichat.MetaFormatter>
-OmiChat.formatters = {}
+OmiChat._formatters = {}
 
 ---@type omichat.CommandStream[]
-OmiChat.commandStreams = {
+OmiChat._commandStreams = {
     {
         name = 'name',
         command = '/name ',
@@ -72,7 +72,7 @@ OmiChat.commandStreams = {
             onHelp = function()
                 -- collect currently available emotes
                 local emotes = {}
-                for k, v in pairs(OmiChat.emotes) do
+                for k, v in pairs(OmiChat._emotes) do
                     if type(v) ~= 'function' or v(k) then
                         emotes[#emotes+1] = k
                     end
@@ -182,7 +182,7 @@ OmiChat.commandStreams = {
                     ---@type omichat.CommandStream?
                     local helpStream
 
-                    for _, stream in pairs(OmiChat.commandStreams) do
+                    for _, stream in pairs(OmiChat._commandStreams) do
                         if stream.name == command then
                             local isEnabled = stream.omichat and stream.omichat.isEnabled
                             if stream.omichat and (not isEnabled or isEnabled(stream)) then
@@ -210,7 +210,7 @@ OmiChat.commandStreams = {
                 local seen = {}
                 local commands = {} ---@type omichat.VanillaCommandEntry[]
 
-                for _, stream in pairs(OmiChat.commandStreams) do
+                for _, stream in pairs(OmiChat._commandStreams) do
                     if stream.omichat then
                         local isEnabled = stream.omichat.isEnabled
                         local helpText = stream.omichat.helpText
@@ -251,7 +251,7 @@ OmiChat.commandStreams = {
 }
 
 ---@type omichat.MessageTransformer[]
-OmiChat.transformers = {
+OmiChat._transformers = {
     {
         name = 'radio-chat',
         priority = 8,
@@ -455,7 +455,7 @@ OmiChat.transformers = {
 }
 
 ---@type table<string, string | omichat.EmoteGetter>
-OmiChat.emotes = {
+OmiChat._emotes = {
     yes = 'yes',
     no = 'no',
     ok = 'signalok',

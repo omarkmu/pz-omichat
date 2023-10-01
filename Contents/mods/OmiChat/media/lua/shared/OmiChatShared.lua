@@ -6,12 +6,12 @@ local customStreamData = require 'OmiChat/CustomStreamData'
 
 ---Provides client and server API access to OmiChat.
 ---@class omichat.api.shared
----@field protected modDataKey string
----@field protected modDataVersion integer
+---@field protected _modDataKey string
+---@field protected _modDataVersion integer
 local OmiChat = {}
 
-OmiChat.modDataVersion = 1
-OmiChat.modDataKey = 'omichat'
+OmiChat._modDataVersion = 1
+OmiChat._modDataKey = 'omichat'
 OmiChat.utils = utils
 OmiChat.Option = Option
 OmiChat.MetaFormatter = MetaFormatter
@@ -22,7 +22,7 @@ OmiChat.MetaFormatter = MetaFormatter
 ---@param newData omichat.ModData
 ---@protected
 function OmiChat._onReceiveGlobalModData(key, newData)
-    if key ~= OmiChat.modDataKey or type(newData) ~= 'table' then
+    if key ~= OmiChat._modDataKey or type(newData) ~= 'table' then
         return
     end
 
@@ -51,7 +51,7 @@ function OmiChat._onReceiveGlobalModData(key, newData)
     modData._updates = nil
 
     if isServer() then
-        ModData.transmit(OmiChat.modDataKey)
+        ModData.transmit(OmiChat._modDataKey)
     end
 end
 
@@ -77,9 +77,9 @@ end
 ---@return omichat.ModData
 function OmiChat.getModData()
     ---@type omichat.ModData
-    local modData = ModData.getOrCreate(OmiChat.modDataKey)
+    local modData = ModData.getOrCreate(OmiChat._modDataKey)
 
-    modData.version = OmiChat.modDataVersion
+    modData.version = OmiChat._modDataVersion
     modData.nicknames = modData.nicknames or {}
     modData.nameColors = modData.nameColors or {}
 
