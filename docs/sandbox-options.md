@@ -75,16 +75,6 @@ By default, only icons that are known to work in chat are included when [`Enable
 If this option is enabled, icons that are unknown will be added to a 'Miscellaneous' category of the icon picker.
 This may result in icons that do not work properly, including icons from other mods.
 
-### EnableNameColorInAllChats
-`default → false`
-
-By default, name colors only display in `/say` chat.
-If this is enabled, it will be respected for all chat types.
-
-See also:
-- [`EnableSetNameColor`](#enablesetnamecolor)
-- [`EnableSpeechColorAsDefaultNameColor`](#enablespeechcolorasdefaultnamecolor)
-
 ### EnableSetName
 `default → true`
 
@@ -343,6 +333,21 @@ The default color used for `/yell` messages.
 See also: [`ChatFormatYell`](#chatformatyell).
 
 
+## Predicates
+Options that are used to define logic for mod functionality.
+Any value other than the empty string is considered `true`.
+
+### PredicateUseNameColor
+`default → $eq($stream say)`  
+`tokens → $stream, $chatType, $author, $authorRaw, $name, $nameRaw`
+
+Determines whether name colors are used for a message.
+
+See also:
+- [`EnableSetNameColor`](#enablesetnamecolor)
+- [`EnableSpeechColorAsDefaultNameColor`](#enablespeechcolorasdefaultnamecolor)
+
+
 ## Component Formats
 Options that define the string formats used for purposes other than overhead speech bubbles and chat messages.
 
@@ -361,14 +366,14 @@ The format used to determine the values of `$name` and `$nameRaw` in other forma
 
 ### FormatTag
 `default → [$tag]$if($eq($chatType server) :&#32;<SPACE>&#32;)`  
-`tokens → $chatType, $tag`
+`tokens → $chatType, $stream, $tag`
 
 The format used when `Enable tags` is selected in the chat settings menu.
 This describes the chat title that shows up to the left of messages (e.g., `[Local]`).
 
 ### FormatTimestamp
 `default → [$ifelse($eq($hourFormatPref 12) $h $H):$mm]`  
-`tokens → $chatType, $H, $HH, $h, $hh, $m, $mm, $ampm, $AMPM, $hourFormatPref`
+`tokens → $chatType, $stream, $H, $HH, $h, $hh, $m, $mm, $ampm, $AMPM, $hourFormatPref`
 
 The format used when `Enable timestamps` is selected in the chat settings menu.
 
@@ -463,7 +468,7 @@ If blank, `/do` messages will be disabled.
 
 Allows players to use `/do` to narrate events.
 `/do` allow players to narrate events.
-If a player uses `/do the lights flicker` it will appear in chat as `« The lights flicker. »` with the default settings.
+With the default setting, `/do the lights flicker` will appear in chat as `« The lights flicker. »`.
 
 See also:
 - [`ColorDo`](#colordo)
@@ -540,7 +545,7 @@ The format used for `/me` messages in chat.
 If blank, `/me` messages will be disabled.
 
 `/me` messages allow players to describe their actions.
-If a player with a character named Jane uses `/me smiles` it will appear in chat as `« Jane smiles. »` with the default settings.
+With the default settings, if a player with a character named “Jane” uses `/me smiles` it will appear in chat as `« Jane smiles. »`.
 
 See also:
 - [`ColorMe`](#colorme)

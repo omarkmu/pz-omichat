@@ -15,7 +15,27 @@ The full list of tokens accepted by the various sandbox options follows.
 - `$authorRaw`: The same as `$author`, but does not include name colors.
 - `$chatType`: The type of the chat in which the message was sent.
     - One of `general`, `whisper`, `say`, `shout`, `faction`, `safehouse`, `radio`, `admin`, or `server`.
-    - Note that `whisper` refers to PM chats, not local whispers.
+    - Note that `whisper` refers to PM chats, not [local whispers](./sandbox-options.md#chatformatwhisper).
+- `$stream`: The stream in which the message was sent.
+    - One of:
+        - `general`
+        - `private` (vanilla whisper)
+        - `say`
+        - `shout`
+        - `faction`
+        - `safehouse`
+        - `radio`
+        - `admin`
+        - `server`
+        - `discord`
+        - `looc`
+        - `whisper` (local whisper)
+        - `do`
+        - `doloud`
+        - `doquiet`
+        - `me`
+        - `meloud`
+        - `mequiet`
 - `$frequency`: The radio frequency the message was sent on.
 - `$forename`: The relevant player's character's forename.
 - `$H`: The hour in 24-hour format.

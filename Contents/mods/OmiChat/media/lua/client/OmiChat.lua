@@ -207,9 +207,17 @@ local function processTransforms(message, skipFormatting)
     local text = _getTextWithPrefix(message)
 
     local chat = message:getChat()
+    local chatType = tostring(getType(chat))
     local author = message:getAuthor() or ''
     local textColor = message:getTextColor()
     local meta = decodeTag(message:getCustomTag())
+
+    local streamName = chatType
+    if chatType == 'whisper' then
+        streamName = 'private'
+    elseif message:isFromDiscord() then
+        streamName = 'discord'
+    end
 
     ---@type omichat.MessageInfo
     local info = {
@@ -218,11 +226,12 @@ local function processTransforms(message, skipFormatting)
         rawText = text,
         author = author,
         titleID = getTitleID(chat),
-        chatType = tostring(getType(chat)),
+        chatType = chatType,
         textColor = textColor,
 
         context = {},
         substitutions = {
+            stream = streamName,
             author = utils.escapeRichText(author),
             authorRaw = author,
             name = meta.name or utils.escapeRichText(author),
@@ -234,7 +243,6 @@ local function processTransforms(message, skipFormatting)
             showTitle = instance.showTitle,
             showTimestamp = instance.showTimestamp,
             useChatColor = true,
-            useNameColor = Option.EnableSpeechColorAsDefaultNameColor or (Option.EnableSetNameColor and meta.nameColor),
             stripColors = false,
         },
     }

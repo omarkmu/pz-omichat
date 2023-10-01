@@ -146,6 +146,11 @@ option OmiChat.ColorYell
 { type = string, default = 255 51 51, page = OmiChat, translation = OCColorYell, }
 
 
+/* Predicates */
+option OmiChat.PredicateUseNameColor
+{ type = string, default = $eq($stream say), page = OmiChat, translation = OCPredicateUseNameColor, }
+
+
 /* Component Formats */
 option OmiChat.FormatName
 { type = string, default = $forename, page = OmiChat, translation = OCFormatName, }

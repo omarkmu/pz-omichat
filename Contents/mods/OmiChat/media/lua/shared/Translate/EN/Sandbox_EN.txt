@@ -51,6 +51,8 @@ Sandbox_EN = {
     Sandbox_OCColorWhisper = "/whisper Color",
     Sandbox_OCColorYell = "/yell Color",
 
+    Sandbox_OCPredicateUseNameColor = "Use Name Color Predicate",
+
     Sandbox_OCFormatMenuName = "Menu Name Format",
     Sandbox_OCFormatName = "Chat Name Format",
     Sandbox_OCFormatTag = "Chat Tag Format",

@@ -70,17 +70,17 @@ UI_EN = {
     -- %1 = the private message recipient.
     UI_OmiChat_private_chat_to = "to %1",
 
-    --- commands  ---
+    --- commands ---
     UI_OmiChat_clear_message = "Console cleared",
     UI_OmiChat_available_emotes = "Trigger emote animations in local chats by including one of the following emotes in your message. Available emotes:",
     UI_OmiChat_list_of_commands = "List of commands:"
 
-    --- help text  ---
+    --- help text ---
     UI_OmiChat_helptext_emotes = "Get a list of available chat emotes",
     UI_OmiChat_helptext_name = "To set your name in chat, use: /name Name. Example: /name Bob. To reset your name, use /name"
     UI_OmiChat_helptext_name_no_reset = "To set your name in chat, use: /name Name. Example: /name Bob"
 
-    --- TAD compat  ---
+    --- TAD compat ---
     UI_OmiChat_helptext_dance = "Use /dance to do a random dance. Use /dance followed by the name of the dance to do a specific dance. To see a list of dances, use /dance list",
     UI_OmiChat_available_dances = "Available dances:",
 

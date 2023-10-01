@@ -39,6 +39,7 @@ local lib = require 'OmiChat/lib'
 ---@field ColorSafehouse string
 ---@field ColorPrivate string
 ---@field ColorServer string
+---@field PredicateUseNameColor string
 ---@field FormatMenuName string
 ---@field FormatName string
 ---@field FormatTag string

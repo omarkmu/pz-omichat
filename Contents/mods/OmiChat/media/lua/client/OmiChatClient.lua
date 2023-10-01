@@ -43,7 +43,6 @@ require 'OmiChat/API/Chat'
 ---@field showTitle boolean
 ---@field showTimestamp boolean
 ---@field useChatColor boolean
----@field useNameColor boolean
 ---@field stripColors boolean
 ---@field font omichat.ChatFont
 ---@field color omichat.ColorTable?
@@ -62,7 +61,7 @@ require 'OmiChat/API/Chat'
 ---@field titleID string The string ID of the chat type's tag.
 ---@field chatType omichat.ChatTypeString The chat type of the message's chat.
 ---@field context table Table for arbitrary context data.
----@field substitutions table<string, any> Message substitution values.
+---@field substitutions table<string, unknown> Token substitution values.
 ---@field formatOptions omichat.MessageFormatOptions
 
 ---Transforms messages based on context and format strings.

@@ -32,6 +32,7 @@ local InfoMessage = {
         if instance.showTitle then
             tag = utils.interpolate(Option.FormatTag, {
                 chatType = 'server',
+                stream = 'server',
                 tag = getText('UI_chat_server_chat_title_id'),
             })
         end
@@ -305,6 +306,25 @@ local function remove(tab, target)
     return found
 end
 
+---Returns whether name colors should be used given message info.
+---@param info omichat.MessageInfo
+---@return boolean
+local function shouldUseNameColor(info)
+    if not OmiChat.getNameColorsEnabled() then
+        return false
+    end
+
+    local pred = Option.PredicateUseNameColor
+    if pred == '' then
+        return false
+    end
+
+    local tokens = utils.copy(info.substitutions)
+    tokens.chatType = info.chatType
+
+    return utils.interpolate(pred, tokens) ~= ''
+end
+
 
 ---Adds information about a command that can be triggered from chat.
 ---@param stream omichat.CommandStream
@@ -463,6 +483,7 @@ function OmiChat.applyFormatOptions(info)
             local ampm = hour < 12 and 'am' or 'pm'
             info.timestamp = utils.interpolate(Option.FormatTimestamp, {
                 chatType = info.chatType,
+                stream = info.substitutions.stream,
                 H = format('%d', hour),
                 HH = format('%02d', hour),
                 h = format('%d', hour12),
@@ -479,6 +500,7 @@ function OmiChat.applyFormatOptions(info)
     if options.showTitle then
         info.tag = utils.interpolate(Option.FormatTag, {
             chatType = info.chatType,
+            stream = info.substitutions.stream,
             tag = getText(info.titleID),
         })
     end
@@ -487,22 +509,24 @@ function OmiChat.applyFormatOptions(info)
         msg = msg:gsub('<RGB:%d%.%d+,%d%.%d+,%d%.%d+>', '')
     end
 
-    local shouldUseNameColor = info.chatType == 'say' or Option.EnableNameColorInAllChats
-    if shouldUseNameColor and options.useNameColor and OmiChat.getNameColorsEnabled() then
-        local selectedColor = Option.EnableSetNameColor and meta.nameColor
+    local selectedColor = Option.EnableSetNameColor and meta.nameColor
+    local hasNameColor = selectedColor or Option.EnableSpeechColorAsDefaultNameColor
+    if hasNameColor and shouldUseNameColor(info) then
         local colorToUse = selectedColor or Option:getDefaultColor('name', message:getAuthor())
         local nameColor = utils.toChatColor(colorToUse, true)
 
-        info.substitutions.name = concat {
-            nameColor,
-            info.substitutions.name,
-            ' <POPRGB> '
-        }
-        info.substitutions.author = concat {
-            nameColor,
-            info.substitutions.author,
-            ' <POPRGB> '
-        }
+        if nameColor ~= '' then
+            info.substitutions.name = concat {
+                nameColor,
+                info.substitutions.name,
+                ' <POPRGB> '
+            }
+            info.substitutions.author = concat {
+                nameColor,
+                info.substitutions.author,
+                ' <POPRGB> '
+            }
+        end
     end
 
     msg = utils.trim(msg)

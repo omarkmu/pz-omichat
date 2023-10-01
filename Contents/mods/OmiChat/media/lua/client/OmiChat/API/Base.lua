@@ -272,7 +272,7 @@ OmiChat.transformers = {
         end
     },
     {
-        name = 'decode-custom-stream',
+        name = 'decode-stream',
         priority = 6,
         transform = function(self, info)
             local isRadio = info.context.ocIsRadio
@@ -291,10 +291,10 @@ OmiChat.transformers = {
                     info.content = formatter:read(info.rawText)
                     info.format = Option[streamData.chatFormatOpt]
                     info.context.ocCustomStream = name
+                    info.substitutions.stream = name
 
                     info.formatOptions.color = OmiChat.getColorTable(name)
                     info.formatOptions.useChatColor = false
-                    info.formatOptions.useNameColor = info.formatOptions.useNameColor and Option.EnableNameColorInAllChats
 
                     if streamData.stripColors then
                         info.formatOptions.stripColors = true
@@ -410,9 +410,6 @@ OmiChat.transformers = {
 
             if info.message:isFromDiscord() then
                 info.format = Option.ChatFormatDiscord
-
-                -- avoid applying name colors to discord usernames that match player usernames
-                info.formatOptions.useNameColor = false
             end
 
             if not info.format then
