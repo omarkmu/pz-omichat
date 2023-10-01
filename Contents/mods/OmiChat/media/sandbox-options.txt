@@ -38,12 +38,6 @@ option OmiChat.EnableMiscellaneousIcons
 option OmiChat.EnableRangedMe
 { type = boolean, default = true, page = OmiChat, translation = OCEnableRangedMe, }
 
-option OmiChat.UppercaseCustomShouts
-{ type = boolean, default = true, page = OmiChat, translation = OCUppercaseCustomShouts, }
-
-option OmiChat.LowercaseCustomSneakShouts
-{ type = boolean, default = true, page = OmiChat, translation = OCLowercaseCustomSneakShouts, }
-
 option OmiChat.EnableChatNameAsCharacterName
 { type = boolean, default = false, page = OmiChat, translation = OCEnableChatNameAsCharacterName, }
 

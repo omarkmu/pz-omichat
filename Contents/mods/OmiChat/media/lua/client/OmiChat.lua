@@ -451,8 +451,8 @@ function ISChat.onCustomCalloutMenu(target, category)
 
     modal.entry:setMaxLines(numLines)
     if category == 'callouts' then
-        modal.entry:setForceUpperCase(Option.UppercaseCustomShouts)
-    elseif Option.LowercaseCustomSneakShouts then
+        modal.entry:setForceUpperCase(true)
+    else
         modal.entry.onTextChange = forceLowercase
     end
 
@@ -550,10 +550,10 @@ function _IsoPlayer:Callout(playEmote)
     local shoutMax = Option.MaximumCustomShouts > 0 and math.min(#shouts, Option.MaximumCustomShouts) or #shouts
 
     local shout = shouts[ZombRand(1, shoutMax + 1)]
-    if not isSneaking and Option.UppercaseCustomShouts then
-        shout = shout:upper()
-    elseif isSneaking and Option.LowercaseCustomSneakShouts then
+    if isSneaking then
         shout = shout:lower()
+    else
+        shout = shout:upper()
     end
 
     processShoutMessage(shout)

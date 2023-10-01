@@ -31,12 +31,6 @@ Sandbox_EN = {
     Sandbox_OCEnableRangedMe = "Ranged /me (/wme, /yme)",
     Sandbox_OCEnableRangedMe_tooltip = "Enables the /whisperme and /yellme commands. If /me is disabled, this has no effect.",
 
-    Sandbox_OCUppercaseCustomShouts = "Uppercase Custom Shouts",
-    Sandbox_OCUppercaseCustomShouts_tooltip = "Whether custom shouts should use all uppercase letters.",
-
-    Sandbox_OCLowercaseCustomSneakShouts = "Lowercase Custom Sneak Shouts",
-    Sandbox_OCLowercaseCustomSneakShouts_tooltip = "Whether custom sneak shouts should use all lowercase letters.",
-
     Sandbox_OCEnableNameColorInAllChats = "Name Color in All Chats",
     Sandbox_OCEnableNameColorInAllChats_tooltip = "Whether to respect the name color setting in all chats, rather than only /say chat.",
 

@@ -14,8 +14,6 @@ local lib = require 'OmiChat/lib'
 ---@field EnableRangedMe boolean
 ---@field EnableMiscellaneousIcons boolean
 ---@field EnableCompatTAD boolean
----@field UppercaseCustomShouts boolean
----@field LowercaseCustomSneakShouts boolean
 ---@field EnableChatNameAsCharacterName boolean
 ---@field CustomShoutMaxLength integer
 ---@field MaximumCustomShouts integer

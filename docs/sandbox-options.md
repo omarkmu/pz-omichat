@@ -64,16 +64,6 @@ By default, only icons that are known to work in chat are included when [`Enable
 If this option is enabled, icons that are unknown will be added to a 'Miscellaneous' category of the icon picker.
 This may result in icons that do not work properly, including icons from other mods.
 
-### LowercaseCustomSneakShouts
-`default → true`
-
-If enabled, [custom sneak shouts](#allowcustomsneakshouts) will be coerced into all lowercase letters.
-
-### UppercaseCustomShouts
-`default → true`
-
-If enabled, [custom shouts](#allowcustomshouts) will be coerced into all uppercase letters.
-
 ### EnableNameColorInAllChats
 `default → false`
 
