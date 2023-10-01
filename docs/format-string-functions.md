@@ -1,8 +1,8 @@
 # Functions
 
 Advanced users have access to various [format string](./format-strings.md) functions.
-These are specified using a dollar sign before the function name and a matched set of parentheses (e.g., `$pi()`).
-The convention of these functions is to return the empty string for invalid or missing inputs.
+These are specified using a dollar sign before the function name and a set of parentheses to enclose arguments (e.g., `$pi()`).
+If invalid inputs are given, the convention of these functions is to return the empty string.
 
 Functions can accept an arbitrary number of arguments, which are delimited by spaces.
 These arguments may be tokens, text, or the results of other functions.
@@ -11,24 +11,25 @@ Unlike [tokens](./format-string-tokens.md), functions are case-insensitive.
 Note that functions that return multiple values return them as an [at-map](./format-string-at-maps.md).
 Individual return values can be accessed using the `$nthvalue(o n)` function.
 
-To include a literal space or multiple words in a single argument, text can be enclosed within parentheses.
+To include a literal space or multiple words in a single argument, text within functions can be enclosed within parentheses.
 Escapes will still function within parentheses, but they are only necessary to escape `)`.
 
 > `$set(_token (hello world))$_token` → `hello world`  
 > `$reverse( ($)$() )` → `()`  
 > `$len(($@-sign))` → `6`
 
-Other mods can [extend](./format-string-extensions.md) the available functions using the API.
+Other mods can [extend](./format-string-extensions.md) the list of available functions using the API.
 
-### Set function
+## Set Function
 
-The `$set(token ...)` function is a special function that can set the value of a token. It sets the value of the token `token` to `$concat(...)` and returns the empty string.
+The `$set(token ...)` function is a special function that can set the value of a token.
+It sets the value of the token `token` to `$concat(...)` and returns the empty string.
 
 This can be used to redefine existing tokens, or to define entirely new tokens within the string.
 To avoid collisions with tokens that may be added in the future, however, custom tokens **require** an underscore prefix.
 > `$set(_value 2)$_value frog$if($gt($_value 1) s)` → `2 frogs`
 
-### Math functions
+## Math Functions
 
 The majority of these functions map directly to their [Lua counterparts](https://www.lua.org/manual/5.1/manual.html#5.6).
 Functions that do not are noted as such.
@@ -69,7 +70,7 @@ Functions that do not are noted as such.
 - [`$tan(x)`](https://www.lua.org/manual/5.1/manual.html#pdf-math.tan)
 - [`$tanh(x)`](https://www.lua.org/manual/5.1/manual.html#pdf-math.tanh)
 
-### String functions
+## String Functions
 
 - `$str(s)`: Converts given arguments into a single string.
 - `$lower(s)`: Converts given arguments into a lowercase string.
@@ -101,7 +102,7 @@ Functions that do not are noted as such.
 - `$byte(s i j)`: Returns a list of character codes in `s`, from indices `i` (default `1`) to `j` (default `i`).
 - `$rep(s n)`: Returns a string made up of `n` concatenated copies of `s`.
 
-### Boolean functions
+## Boolean Functions
 
 - `$not(value)`: Returns `true` if `value` is the empty string. Otherwise, returns the empty string.
 - `$eq(this other)`: Returns `true` if `this` is equivalent to `other`. Otherwise, returns the empty string.
@@ -116,7 +117,7 @@ Functions that do not are noted as such.
 - `$unless(condition ...)`: Returns `$concat(...)` if `condition` is the empty string.
 - `$ifelse(condition yes ...)`: Returns `yes` if `condition` is anything other than the empty string. Otherwise, returns `$concat(...)`.
 
-### At-Map functions
+## At-Map Functions
 
 These functions are related to working with [at-maps](./format-string-at-maps.md).
 
@@ -133,7 +134,7 @@ These functions are related to working with [at-maps](./format-string-at-maps.md
 - `$unique(o)`: Returns an at-map with only the unique values in the at-map `o`.
 
 
-### Translation functions
+## Translation Functions
 
 These are direct aliases for the built-in `getText` and `getTextOrNull` functions.
 Due to a limitation of these functions, only up to 4 additional substitution arguments are allowed; arguments beyond this limit will be ignored.

@@ -9,6 +9,8 @@ local pairs = pairs
 local ipairs = ipairs
 local getText = getText
 
+---@class omichat.ISChat
+local ISChat = ISChat
 
 ---@class omichat.api.client : omichat.api.shared
 ---@field private commandStreams omichat.CommandStream[]

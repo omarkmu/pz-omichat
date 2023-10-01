@@ -3,6 +3,9 @@ local utils = require 'OmiChat/util'
 
 local concat = table.concat
 
+---@class omichat.ISChat
+local ISChat = ISChat
+
 
 ---Helper for checking if a basic chat stream is enabled.
 ---@param self omichat.BaseStream

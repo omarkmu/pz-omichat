@@ -8,6 +8,9 @@ local pairs = pairs
 local ipairs = ipairs
 local getText = getText
 
+---@class omichat.ISChat
+local ISChat = ISChat
+
 
 ---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Base'

@@ -2,20 +2,23 @@ version=1
 id=3040299907
 title=OmiChat (Beta)
 description=It's a chat mod.
+description=This mod can be added or removed mid-save.
 description=
 description=[h2]Features[/h2]
-description=This mod aims to be as configurable as possible. All of the features listed below can be configured or completely disabled via sandbox options.
+description=This mod aims to be as configurable as possible. The vast majority of the features listed below can be configured or completely disabled via [url=https://github.com/omarkmu/pz-omichat/blob/main/docs/sandbox-options.md]sandbox options.[/url]
 description=
 description=The default settings are tailored to usage for roleplay chat; by default, local chats will use character forenames instead of usernames. Additionally, chat will use a colon for names instead of square brackets. Both of these can be reverted using the sandbox options.
 description=
 description=Features for players: [list]
 description=[*]Chat color customization
 description=[*]Name color customization
+description=[*]Speech bubble color customization
 description=[*]Callout customization
 description=[*]Character naming with /name
 description=[*]Chat names in menus (Trading, Medical Check)
-description=[*]Roleplay emotes with /me
 description=[*]Local /whisper chat
+description=[*]Roleplay descriptions with /me and /do
+description=[*]Versions of /me and /do with larger and smaller ranges: /mequiet, /meloud, /doquiet, and /doloud
 description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556]True Actions Act 3 - Dancing[/url] compatibility with /dance
 description=[*]Icon picker for local chats
 description=[*]Emote animation shortcuts (.clap, .salute, .surrender, etc.) + /emotes command to display a list of emotes
@@ -23,8 +26,8 @@ description=[/list]
 description=
 description=Features for server operators: [list]
 description=[*]Chat range options
-description=[*]Customizable chat [url=https://github.com/omarkmu/pz-omichat/blob/main/docs/format-strings.md]formats[/url] for names, timestamps, and all chat types
-description=[*][url=https://github.com/omarkmu/pz-omichat/blob/main/docs/sandbox-options.md]Sandbox options[/url] to control all of the features listed above
+description=[*]Customizable, robust chat [url=https://github.com/omarkmu/pz-omichat/blob/main/docs/format-strings.md]formats[/url] for names, timestamps, and all chat types
+description=[*]Sandbox options to control the features listed above
 description=[/list]
 description=
 description=[h2]Compatibility[/h2]

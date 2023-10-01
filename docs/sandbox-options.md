@@ -10,7 +10,7 @@ For a list of available tokens, see [Tokens](./format-string-tokens.md).
 To include special characters, [character references](./format-strings.md#character-references) may be used.
 
 
-## Compatibility Features
+## Compatibility Feature Flags
 Flags for enabling or disable compatibility patches for other mods.
 These have no effect if the relevant mod is not active.
 
@@ -28,23 +28,32 @@ Options used to enable or disable features of the mod.
 ### EnableChatNameAsCharacterName
 `default → false`
 
-Uses players' names set with [`/name`](#enablesetname) as their character names.
+Uses players' names set with `/name` as their character names.
 Note that this sets the forename and potentially the surname of the player character; the `$forename` and `$surname` tokens will reflect this.
 **Enabling this disables resetting names with `/name`.**
+
+See also: [`EnableSetName`](#enablesetname).
 
 ### EnableCustomShouts
 `default → true`
 
 This allows players to specify a list of custom shouts that are used when pressing the shout key (default `Q`).
-The number of shouts that can be listed and their maximum lengths can be configured using [`MaximumCustomShouts`](#maximumcustomshouts) and [`CustomShoutMaxLength`](#customshoutmaxlength), respectively.
-
 Players can configure custom shouts using an option in the chat settings.
+
+See also:
+- [`EnableCustomSneakShouts`](#enablecustomsneakshouts)
+- [`MaximumCustomShouts`](#maximumcustomshouts)
+- [`CustomShoutMaxLength`](#customshoutmaxlength)
 
 ### EnableCustomSneakShouts
 `default → true`
 
 This is similar to [`EnableCustomShouts`](#enablecustomshouts), but allows specifying a list of shouts used when pressing the shout key *while sneaking*.
 Length limits are controlled by the same options as `EnableCustomShouts`.
+
+See also:
+- [`MaximumCustomShouts`](#maximumcustomshouts)
+- [`CustomShoutMaxLength`](#customshoutmaxlength)
 
 ### EnableEmotes
 `default → true`
@@ -55,7 +64,9 @@ These are enabled only in local chats.
 ### EnableIconPicker
 `default → false`
 
-Enables a button for local chats that allows players to select icons that show up in chat.
+Enables a button that allows players to adds icons that show up in chat to their messages.
+
+See also: [`EnableMiscellaneousIcons`](#enablemiscellaneousicons).
 
 ### EnableMiscellaneousIcons
 `default → false`
@@ -70,13 +81,17 @@ This may result in icons that do not work properly, including icons from other m
 By default, name colors only display in `/say` chat.
 If this is enabled, it will be respected for all chat types.
 
-*See also: [`EnableSetNameColor`](#enablesetnamecolor) and [`EnableSpeechColorAsDefaultNameColor`](#enablespeechcolorasdefaultnamecolor).*
+See also:
+- [`EnableSetNameColor`](#enablesetnamecolor)
+- [`EnableSpeechColorAsDefaultNameColor`](#enablespeechcolorasdefaultnamecolor)
 
 ### EnableSetName
 `default → true`
 
-Allows players to set their name in chat using `/name <Name>`.
+Allows players to set their name in chat using `/name Name`.
 Chat names can be reset by using the same command without a name, unless the [`EnableChatNameAsCharacterName`](#enablechatnameascharactername) option is enabled.
+
+See also: [`NameMaxLength`](#namemaxlength).
 
 ### EnableSetNameColor
 `default → false`
@@ -84,50 +99,71 @@ Chat names can be reset by using the same command without a name, unless the [`E
 Allows players to set their name color using the chat settings menu.
 Other players will be able to see chat name colors.
 
+See also:
+- [`EnableSetName`](#enablesetname)
+- [`EnableNameColorInAllChats`](#enablenamecolorinallchats)
+- [`EnableSetSpeechColor`](#enablesetspeechcolor)
+- [`EnableSpeechColorAsDefaultNameColor`](#enablespeechcolorasdefaultnamecolor)
+
 ### EnableSetSpeechColor
 `default → true`
 
 Allows players to customize the color used for overhead speech bubbles.
 This affects the existing in-game option within the Multiplayer tab of the settings.
 
-If `/me` is not enabled, this has no effect.
+See also:
+- [`EnableSetNameColor`](#enablesetnamecolor)
+- [`EnableNameColorInAllChats`](#enablenamecolorinallchats)
+- [`EnableSpeechColorAsDefaultNameColor`](#enablespeechcolorasdefaultnamecolor)
 
 ### EnableSpeechColorAsDefaultNameColor
 `default → true`
 
 If enabled, players' overhead speech color will be used as their default name color.
-This can be used alongside or independently of [`EnableSetNameColor`](#enablesetnamecolor).
+This can be used alongside with or independently of [`EnableSetNameColor`](#enablesetnamecolor).
+
+See also:
+- [`EnableNameColorInAllChats`](#enablenamecolorinallchats)
+- [`EnableSetSpeechColor`](#enablesetspeechcolor)
 
 
-## Limits and Ranges
-Numeric options that define limits and ranges for various functionality.
+## Limits
+Numeric options that define limits for various functionality.
 
 ### CustomShoutMaxLength
 `default → 30, minimum → 1, maximum → 200`
 
-The maximum length for individual [custom shouts](#enablecustomshouts).
+The maximum length for individual custom [shouts](#enablecustomshouts) and [sneak shouts](#enablecustomsneakshouts).
 
 ### MaximumCustomShouts
 `default → 10, minimum → 1, maximum → 20`
 
-The maximum number of [custom shouts](#enablecustomshouts) that players are allowed to define.
+The maximum number of custom [shouts](#enablecustomshouts) and [sneak shouts](#enablecustomsneakshouts) that players are allowed to define.
+
+Note that the two maximums are separate; a value of `10` means a player can specify 10 shouts and 10 sneak shouts.
 
 ### MaximumColorValue
 `default → 255, minimum → 0, maximum → 255`
 
-This dictates the maximum value for R, G, and B components of chat colors.
-It applies to all chat color customization settings.
+The maximum value for R, G, and B components of chat colors.
+Applies to all chat color customization settings.
 
 ### MinimumColorValue
 `default → 48, minimum → 0, maximum → 255`
 
-This dictates the minimum value for R, G, and B components of chat colors.
-It applies to all chat color customization settings.
+The minimum value for R, G, and B components of chat colors.
+Applies to all chat color customization settings.
 
 ### NameMaxLength
 `default → 50, minimum → 0, maximum → 50`
 
 The maximum length of chat names set with `/name`.
+
+See also: [`EnableSetName`](#enablesetname).
+
+
+## Ranges
+Numeric options that define distance ranges for chat messages.
 
 ### RangeDo
 `default → 30, minimum → 1, maximum → 30`
@@ -173,7 +209,8 @@ The maximum distance between players for `/say` messages to be visible.
 `default → 3, minimum → 1, maximum → 30`
 
 The maximum distance between players for local [`/whisper`](#chatformatwhisper)  messages to be visible.
-This does not apply to the default whisper chat.
+
+This does **not** apply to the vanilla whisper chat.
 
 ### RangeYell
 `default → 60, minimum → 1, maximum → 60`
@@ -185,17 +222,21 @@ The maximum distance between players for `/yell` messages to be visible.
 Options that define the default colors for the chat types added by the mod.
 Colors should be in RGB format, space- or comma-delimited.
 
-These colors will be used unless overriden by a player's chat color settings.
+These colors will be used unless overriden by a player's client-side chat color settings.
 
 ### ColorAdmin
 `default → 255 255 255`
 
 The default color used for `/admin` messages.
 
+See also: [`ChatFormatAdmin`](#chatformatadmin).
+
 ### ColorDiscord
 `default → 144 137 218`
 
 The default color used for messages from Discord.
+
+See also: [`ChatFormatDiscord`](#chatformatdiscord).
 
 ### ColorDo
 `default → 130 130 130`
@@ -217,10 +258,14 @@ The default color used for [`/doquiet`](#chatformatdoquiet) messages.
 
 The default color used for `/faction` messages.
 
+See also: [`ChatFormatFaction`](#chatformatfaction).
+
 ### ColorGeneral
 `default → 255 165 0`
 
 The default color used for `/all` messages.
+
+See also: [`ChatFormatGeneral`](#chatformatgeneral).
 
 ### ColorLooc
 `default → 48 128 128`
@@ -245,38 +290,57 @@ The default color used for [`/mequiet`](#chatformatmequiet) messages.
 ### ColorPrivate
 `default → 85 26 139`
 
-The default color used for `/pm` (vanilla `/whisper`) messages.
+The default color used for private messages.
+This applies to the vanilla `/whisper`, which is `/pm` if [local whisper](#chatformatwhisper) is enabled.
+
+See also
+- [`ColorWhisper`](#colorwhisper)
+- [`ChatFormatIncomingPrivate`](#chatformatincomingprivate)
+- [`ChatFormatOutgoingPrivate`](#chatformatoutgoingprivate)
 
 ### ColorRadio
 `default → 178 178 178`
 
 The default color used for radio messages.
 
+See also: [`ChatFormatRadio`](#chatformatradio).
+
 ### ColorSafehouse
 `default → 22 113 20`
 
 The default color used for `/safehouse` messages.
+
+See also: [`ChatFormatSafehouse`](#chatformatsafehouse).
 
 ### ColorSay
 `default → 255 255 255`
 
 The default color used for `/say` messages.
 
+See also: [`ChatFormatSay`](#chatformatsay).
+
 ### ColorServer
 `default → 0 128 255`
 
 The default color used for server messages.
 
+See also: [`ChatFormatServer`](#chatformatserver).
+
 ### ColorWhisper
 `default → 85 48 139`
 
 The default color used for local [`/whisper`](#chatformatwhisper) messages.
-This does not apply to the [default](#colorprivate) whisper chat.
+
+This does **not** apply to the vanilla whisper chat.
+
+See also: [`ColorPrivate`](#colorprivate).
 
 ### ColorYell
 `default → 255 51 51`
 
 The default color used for `/yell` messages.
+
+See also: [`ChatFormatYell`](#chatformatyell).
 
 
 ## Component Formats
@@ -286,7 +350,7 @@ Options that define the string formats used for purposes other than overhead spe
 `default → $ifelse($neq($menuType mini_scoreboard) $name $username &#32;[ $name ])`  
 `tokens → $menuType, $forename, $surname, $username, $name`
 
-The format used for displaying character names within in-game menus such as Trading and Medical Check.
+The format used for displaying character names within in-game menus such as the trading window, medical check, and the admin mini-scoreboard.
 If blank, menus will not be affected.
 
 ### FormatName
@@ -310,7 +374,7 @@ The format used when `Enable timestamps` is selected in the chat settings menu.
 
 
 ## Overhead Formats
-Options used to determine the content that displays in speech bubbles that appear over a character's head.
+Options that the content that displays in speech bubbles that appear over a character's head.
 
 **These formats can have an effect on chat formats.**
 For example, reversing the overhead text will result in the message content being reversed in chat.
@@ -368,13 +432,14 @@ If blank, `/mequiet` messages will not display overhead.
 `default → ($1)`  
 `tokens → $1`
 
-Defines the format used for overhead speech bubbles of local [`/whisper`](#chatformatwhisper) messages.
+Defines the format used for overhead speech bubbles of [`local /whisper`](#chatformatwhisper) messages.
 If blank, `/whisper` messages will not display overhead.
-This does not apply to the default whisper chat.
+
+This does **not** apply to the vanilla whisper chat.
 
 
 ## Chat Formats
-These options are used to determine the content that displays in chat.
+Options that determine the content that displays in chat.
 
 ### ChatFormatAdmin
 `default → $author: <SPACE> $message`  
@@ -394,27 +459,45 @@ Messages from Discord will not apply name colors.
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/do` messages in chat.
+If blank, `/do` messages will be disabled.
 
 Allows players to use `/do` to narrate events.
-If blank, `/do` messages will be disabled.
+`/do` allow players to narrate events.
+If a player uses `/do the lights flicker` it will appear in chat as `« The lights flicker. »` with the default settings.
+
+See also:
+- [`ColorDo`](#colordo)
+- [`RangeDo`](#rangedo)
+- [`OverheadFormatDo`](#overheadformatdo)
+- [`ChatFormatMe`](#chatformatme)
 
 ### ChatFormatDoLoud
 `default → &#171; <SPACE> $punctuate($capitalize($trim($message))) <SPACE> &#187;`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/doloud` (`/dl`) messages in chat.
-This behaves similarly to [`/do`](#chatformatdo), but has a larger range.
-
 If blank, `/doloud` messages will be disabled.
+
+`/doloud` behaves similarly to [`/do`](#chatformatdo), but has a larger range.
+
+See also:
+- [`ColorDoLoud`](#colordoloud)
+- [`RangeDoLoud`](#rangedoloud)
+- [`OverheadFormatDoLoud`](#overheadformatdoloud)
 
 ### ChatFormatDoQuiet
 `default → &#171; <SPACE> $punctuate($capitalize($trim($message))) <SPACE> &#187;`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/doquiet` (`/dq`) messages in chat.
-This behaves similarly to [`/do`](#chatformatdo), but has a smaller range.
-
 If blank, `/doquiet` messages will be disabled.
+
+`/doquiet` behaves similarly to [`/do`](#chatformatdo), but has a smaller range.
+
+See also:
+- [`ColorDoQuiet`](#colordoquiet)
+- [`RangeDoQuiet`](#rangedoquiet)
+- [`OverheadFormatDoQuiet`](#overheadformatdoquiet)
 
 ### ChatFormatFaction
 `default → $author: <SPACE> $message`  
@@ -434,45 +517,74 @@ The format used for `/all` messages in chat.
 
 The format used for incoming private messages in chat.
 
+See also
+- [`ColorPrivate`](#colorprivate)
+- [`ChatFormatOutgoingPrivate`](#chatformatoutgoingprivate)
+
 ### ChatFormatLooc
 `default → $name: <SPACE> (( $message ))`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/looc` (local out-of-character) messages in chat.
 
+See also:
+- [`ColorLooc`](#colorlooc)
+- [`RangeLooc`](#rangelooc)
+- [`OverheadFormatLooc`](#overheadformatlooc)
+
 ### ChatFormatMe
 `default → &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/me` messages in chat.
-
-Allows players to use `/me` to describe their actions.
 If blank, `/me` messages will be disabled.
-How these messages appear overhead is controlled by [`OverheadFormatMe`](#overheadformatme).
+
+`/me` messages allow players to describe their actions.
+If a player with a character named Jane uses `/me smiles` it will appear in chat as `« Jane smiles. »` with the default settings.
+
+See also:
+- [`ColorMe`](#colorme)
+- [`RangeMe`](#rangeme)
+- [`OverheadFormatMe`](#overheadformatme)
+- [`ChatFormatDo`](#chatformatdo)
 
 ### ChatFormatMeLoud
 `default → &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/meloud` (`/ml`) messages in chat.
-This behaves similarly to [`/me`](#chatformatme), but has a larger range.
-
 If blank, `/meloud` messages will be disabled.
+
+`/meloud` behaves similarly to [`/me`](#chatformatme), but has a larger range.
+
+See also:
+- [`ColorMeLoud`](#colormeloud)
+- [`RangeMeLoud`](#rangemeloud)
+- [`OverheadFormatMeLoud`](#overheadformatmeloud)
 
 ### ChatFormatMeQuiet
 `default → &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/mequiet` (`/mq`) messages in chat.
-This behaves similarly to [`/me`](#chatformatme), but has a smaller range.
-
 If blank, `/mequiet` messages will be disabled.
+
+`/mequiet` behaves similarly to [`/me`](#chatformatme), but has a smaller range.
+
+See also:
+- [`ColorMeQuiet`](#colormequiet)
+- [`RangeMeQuiet`](#rangemequiet)
+- [`OverheadFormatMeQuiet`](#overheadformatmequiet)
 
 ### ChatFormatOutgoingPrivate
 `default → $gettext(UI_OmiChat_private_chat_to $recipient): <SPACE> $message`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $recipient, $recipientName, $message`
 
 The format used for outgoing private messages in chat.
+
+See also
+- [`ColorPrivate`](#colorprivate)
+- [`ChatFormatIncomingPrivate`](#chatformatincomingprivate)
 
 ### ChatFormatRadio
 `default → $gettext(UI_OmiChat_radio $frequency): <SPACE> $message`  
@@ -485,6 +597,8 @@ The format used for radio messages in chat.
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/safehouse` messages in chat.
+
+See also: [`ColorSafehouse`](#colorsafehouse).
 
 ### ChatFormatSay
 `default → $name: <SPACE> $message`  

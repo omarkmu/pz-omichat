@@ -1,9 +1,9 @@
-## At-maps
+# At-maps
 
 **At-maps** are multimaps that can be declared and used in [format strings](./format-strings.md).
 Their keys can be associated with multiple values.
-
 When used with [functions](./format-string-functions.md#at-map-functions) that accept at-maps, the objects are used directly.
+
 When converted to a string, at-maps use the stringified version of the first available value.
 This behavior allows use of at-maps to represent logic branches in a straightforward fashion.
 For example, the following expressions have equivalent results:
@@ -12,10 +12,10 @@ For example, the following expressions have equivalent results:
 > `@($token:$token;1:$otherToken)`  
 > `@($token;$otherToken)`
 
-### Defining at-maps
+## Defining At-maps
 
 At-maps are defined with an `@` sign and enclosed by parentheses.
-Entries are separated by a semicolon, and keys and values are separated by a colon.
+Keys and values are separated by a colon, and entries are separated by a semicolon.
 
 > `@()`  
 > An empty at-map.

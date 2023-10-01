@@ -1,11 +1,15 @@
 # Extensions
 
-Other mods may include additional [functions](./format-string-functions.md) or override existing functions by calling `OmiChat.registerInterpolatorFunction`.
+[Format strings](./format-strings.md) can be extended by other mods.
+Additional [functions](./format-string-functions.md) or overrides of existing functions can be included by calling `OmiChat.registerInterpolatorFunction`.
 
-Extensions should adhere to this convention of returning the empty string for invalid inputs.
-Falsy return values will be treated as the empty string.
+OmiChat does not perform error handling while performing interpolation.
+Extensions should adhere to this convention of returning the empty string for invalid inputs rather than causing an error.
+Return values of `nil` or `false` will be treated as the empty string.
 
 If you think your extension should instead be included in the mod, feel free to [contribute](../.github/CONTRIBUTING.md#contributing-code)!
+
+## Example
 
 ```lua
 -- $example(hello) → hello5
