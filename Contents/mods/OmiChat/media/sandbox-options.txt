@@ -82,7 +82,7 @@ option OmiChat.ShoutRange
 
 /* Colors */
 option OmiChat.LoocColor
-{ type = string, default = 0 128 128, page = OmiChat, translation = OCLoocColor, }
+{ type = string, default = 48 128 128, page = OmiChat, translation = OCLoocColor, }
 
 option OmiChat.MeColor
 { type = string, default = 130 130 130, page = OmiChat, translation = OCMeColor, }
