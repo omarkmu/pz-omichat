@@ -73,11 +73,11 @@ Sandbox_EN = {
     Sandbox_OCColorMe = "/me Color",
     Sandbox_OCColorMe_tooltip = "The default color used for /me messages, unless overriden using the setting.",
 
-    Sandbox_OCColorWhisperMe = "/whisperme Color",
-    Sandbox_OCColorWhisperMe_tooltip = "The default color used for /whisperme messages, unless overriden using the setting.",
+    Sandbox_OCColorMeWhisper = "/mewhisper Color",
+    Sandbox_OCColorMeWhisper_tooltip = "The default color used for /mewhisper messages, unless overriden using the setting.",
 
-    Sandbox_OCColorYellMe = "/yellme Color",
-    Sandbox_OCColorYellMe_tooltip = "The default color used for /yellme messages, unless overriden using the setting.",
+    Sandbox_OCColorMeYell = "/meyell Color",
+    Sandbox_OCColorMeYell_tooltip = "The default color used for /meyell messages, unless overriden using the setting.",
 
     Sandbox_OCColorSay = "/say Color",
     Sandbox_OCColorSay_tooltip = "The default color used for /say messages, unless overriden using the setting.",
@@ -130,11 +130,11 @@ Sandbox_EN = {
     Sandbox_OCOverheadFormatMe = "/me Overhead Format",
     Sandbox_OCOverheadFormatMe_tooltip = "The format used for /me messages in overhead messages. Must include $1 substitution unless blank. If blank, /me messages will not display overhead.",
 
-    Sandbox_OCOverheadFormatWhisperMe = "/whisperme Overhead Format",
-    Sandbox_OCOverheadFormatWhisperMe_tooltip = "The format used for /whisperme messages in overhead messages. Must include $1 substitution unless blank. If blank, /whisperme messages will not display overhead.",
+    Sandbox_OCOverheadFormatMeWhisper = "/mewhisper Overhead Format",
+    Sandbox_OCOverheadFormatMeWhisper_tooltip = "The format used for /mewhisper messages in overhead messages. Must include $1 substitution unless blank. If blank, /mewhisper messages will not display overhead.",
 
-    Sandbox_OCOverheadFormatYellMe = "/yellme Overhead Format",
-    Sandbox_OCOverheadFormatYellMe_tooltip = "The format used for /yellme messages in overhead messages. Must include $1 substitution unless blank. If blank, /yellme messages will not display overhead.",
+    Sandbox_OCOverheadFormatMeYell = "/meyell Overhead Format",
+    Sandbox_OCOverheadFormatMeYell_tooltip = "The format used for /meyell messages in overhead messages. Must include $1 substitution unless blank. If blank, /meyell messages will not display overhead.",
 
     Sandbox_OCOverheadFormatWhisper_tooltip = "The format used for local /whisper messages in overhead messages. Must include $1 substitution unless blank. If blank, /whisper messages will not display overhead.",
     Sandbox_OCOverheadFormatWhisper = "/whisper Overhead Format",
@@ -145,11 +145,11 @@ Sandbox_EN = {
     Sandbox_OCChatFormatMe = "/me Chat Format",
     Sandbox_OCChatFormatMe_tooltip = "The format used for /me messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
 
-    Sandbox_OCChatFormatWhisperMe = "/whisperme Chat Format",
-    Sandbox_OCChatFormatWhisperMe_tooltip = "The format used for /wme messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
+    Sandbox_OCChatFormatMeWhisper = "/mewhisper Chat Format",
+    Sandbox_OCChatFormatMeWhisper_tooltip = "The format used for /mewhisper messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
 
-    Sandbox_OCChatFormatYellMe = "/yellme Chat Format",
-    Sandbox_OCChatFormatYellMe_tooltip = "The format used for /yme messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
+    Sandbox_OCChatFormatMeYell = "/meyell Chat Format",
+    Sandbox_OCChatFormatMeYell_tooltip = "The format used for /meyell messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
 
     Sandbox_OCChatFormatWhisper = "Whisper Chat Format",
     Sandbox_OCChatFormatWhisper_tooltip = "The format used for local /whisper messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",

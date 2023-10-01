@@ -192,10 +192,20 @@ The default color used for [`/looc`](#chatformatlooc) messages.
 
 The default color used for [`/me`](#chatformatme) messages.
 
+### ColorMeWhisper
+`default → 85 48 139`
+
+The default color used for [`/mewhisper`](#chatformatmewhisper) messages.
+
+### ColorMeYell
+`default → 255 51 51`
+
+The default color used for [`/meyell`](#chatformatmeyell) messages.
+
 ### ColorPrivate
 `default → 85 26 139`
 
-The default color used for `/pm` (vanilla whisper) messages.
+The default color used for `/pm` (vanilla `/whisper`) messages.
 
 ### ColorRadio
 `default → 178 178 178`
@@ -223,20 +233,10 @@ The default color used for server messages.
 The default color used for local [`/whisper`](#chatformatwhisper) messages.
 This does not apply to the [default](#colorprivate) whisper chat.
 
-### ColorWhisperMe
-`default → 85 48 139`
-
-The default color used for [`/whisperme`](#chatformatwhisperme) messages.
-
 ### ColorYell
 `default → 255 51 51`
 
 The default color used for `/yell` messages.
-
-### ColorYellMe
-`default → 255 51 51`
-
-The default color used for [`/yellme`](#chatformatyellme) messages.
 
 
 ## Component Formats
@@ -289,6 +289,20 @@ If blank, `/looc` messages will not display overhead.
 Defines the format used for overhead speech bubbles of [`/me`](#chatformatme) messages.
 If blank, `/me` messages will not display overhead.
 
+### OverheadFormatMeWhisper
+`default → &#171; $1 &#187;` (`« $1 »`)  
+`tokens → $1`
+
+Defines the format used for overhead speech bubbles of [`/mewhisper`](#chatformatmewhisper) messages.
+If blank, `/mewhisper` messages will not display overhead.
+
+### OverheadFormatMeYell
+`default → &#171; $1 &#187;` (`« $1 »`)  
+`tokens → $1`
+
+Defines the format used for overhead speech bubbles of [`/meyell`](#chatformatmeyell) messages.
+If blank, `/meyell` messages will not display overhead.
+
 ### OverheadFormatWhisper
 `default → ($1)`  
 `tokens → $1`
@@ -296,20 +310,6 @@ If blank, `/me` messages will not display overhead.
 Defines the format used for overhead speech bubbles of local [`/whisper`](#chatformatwhisper) messages.
 If blank, `/whisper` messages will not display overhead.
 This does not apply to the default whisper chat.
-
-### OverheadFormatWhisperMe
-`default → &#171; $1 &#187;` (`« $1 »`)  
-`tokens → $1`
-
-Defines the format used for overhead speech bubbles of [`/whisperme`](#chatformatwhisperme) messages.
-If blank, `/whisperme` messages will not display overhead.
-
-### OverheadFormatYellMe
-`default → &#171; $1 &#187;` (`« $1 »`)  
-`tokens → $1`
-
-Defines the format used for overhead speech bubbles of [`/yellme`](#chatformatyellme) messages.
-If blank, `/yellme` messages will not display overhead.
 
 
 ## Chat Formats
@@ -362,6 +362,24 @@ Allows players to use `/me` to describe their actions.
 If blank, `/me` messages will be disabled.
 How these messages appear overhead is controlled by [`OverheadFormatMe`](#overheadformatme).
 
+### ChatFormatMeWhisper
+`default → &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
+`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+
+The format used for `/mewhisper` (`/mew`) messages in chat.
+This behaves similarly to [`/me`](#chatformatme), but uses whisper [range](#rangewhisper).
+
+If blank, `/mewhisper` messages will be disabled.
+
+### ChatFormatMeYell
+`default → &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
+`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+
+The format used for `/meyell` (`/mey`) messages in chat.
+This behaves similarly to [`/me`](#chatformatme), but uses yell [range](#rangeyell).
+
+If blank, `/meyell` messages will be disabled.
+
 ### ChatFormatOutgoingPrivate
 `default → $gettext(UI_OmiChat_private_chat_to $recipient): <SPACE> $message`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $recipient, $recipientName, $message`
@@ -404,27 +422,8 @@ If blank, local whisper will be disabled and the default `/whisper` will not be 
 
 *See also: [`RangeWhisper`](#rangewhisper), [`OverheadFormatWhisper`](#overheadformatwhisper).*
 
-### ChatFormatWhisperMe
-`default → &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message`
-
-The format used for `/whisperme` (`/wme`) messages in chat.
-This behaves similarly to [`/me`](#chatformatme), but uses whisper [range](#rangewhisper).
-
-If blank, `/wme` messages will be disabled.
-
 ### ChatFormatYell
 `default → $name: <SPACE> $message`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/yell` messages in chat.
-
-### ChatFormatYellMe
-`default → &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message`
-
-The format used for `/yellme` (`/yme`) messages in chat.
-This behaves similarly to [`/me`](#chatformatme), but uses yell [range](#rangeyell).
-
-If blank, `/yme` messages will be disabled.
-

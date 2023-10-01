@@ -3,8 +3,8 @@
 ---| 'looc'
 ---| 'me'
 ---| 'whisper'
----| 'whisperme'
----| 'yellme'
+---| 'mewhisper'
+---| 'meyell'
 
 ---@class omichat.CustomStreamInfo
 ---@field formatID integer
@@ -59,12 +59,12 @@ return {
         attractZombies = false,
         showOnRadio = false,
     },
-    whisperme = {
+    mewhisper = {
         formatID = 4,
-        colorOpt = 'ColorWhisperMe',
+        colorOpt = 'ColorMeWhisper',
         rangeOpt = 'RangeWhisper',
-        chatFormatOpt = 'ChatFormatWhisperMe',
-        overheadFormatOpt = 'OverheadFormatWhisperMe',
+        chatFormatOpt = 'ChatFormatMeWhisper',
+        overheadFormatOpt = 'OverheadFormatMeWhisper',
         titleID = 'UI_OmiChat_whisper_chat_title_id',
         chatTypes = { say = true },
         stripColors = true,
@@ -72,13 +72,13 @@ return {
         attractZombies = false,
         showOnRadio = false,
     },
-    yellme = {
+    meyell = {
         formatID = 5,
-        colorOpt = 'ColorYellMe',
+        colorOpt = 'ColorMeYell',
         rangeOpt = 'RangeYell',
         defaultRangeOpt = 'RangeYell',
-        chatFormatOpt = 'ChatFormatYellMe',
-        overheadFormatOpt = 'OverheadFormatYellMe',
+        chatFormatOpt = 'ChatFormatMeYell',
+        overheadFormatOpt = 'OverheadFormatMeYell',
         chatTypes = { shout = true },
         stripColors = true,
         allowColorCustomization = true,

@@ -516,6 +516,13 @@ do
         return checkPlayerCanUseChat(self.command)
     end
 
+    ---Helper for checking if a custom chat stream is enabled.
+    ---@param self omichat.BaseStream
+    ---@return boolean
+    local function customChatIsEnabled(self)
+        return OmiChat.isCustomStreamEnabled(self.name)
+    end
+
     ---Helper for handling basic chat stream use.
     ---@param self omichat.ChatStream
     ---@param command string
@@ -606,7 +613,20 @@ do
             omichat = {
                 allowEmotes = true,
                 allowEmojiPicker = true,
-                isEnabled = function() return OmiChat.isCustomStreamEnabled('looc') end,
+                isEnabled = customChatIsEnabled,
+                onUse = formattedChatOnUse,
+            }
+        },
+        whisper = {
+            name = 'whisper',
+            command = '/whisper ',
+            shortCommand = '/w ',
+            tabID = 1,
+            omichat = {
+                allowEmotes = true,
+                allowEmojiPicker = true,
+                context = { ocIsLocalWhisper = true },
+                isEnabled = customChatIsEnabled,
                 onUse = formattedChatOnUse,
             }
         },
@@ -618,45 +638,32 @@ do
             omichat = {
                 allowEmotes = true,
                 allowEmojiPicker = true,
-                isEnabled = function() return OmiChat.isCustomStreamEnabled('me') end,
+                isEnabled = customChatIsEnabled,
                 onUse = formattedChatOnUse,
             },
         },
-        whisper = {
-            name = 'whisper',
-            command = '/whisper ',
-            shortCommand = '/w ',
+        mewhisper = {
+            name = 'mewhisper',
+            command = '/mewhisper ',
+            shortCommand = '/mew ',
             tabID = 1,
             omichat = {
                 allowEmotes = true,
                 allowEmojiPicker = true,
-                context = { ocIsLocalWhisper = true },
-                isEnabled = function() return OmiChat.isCustomStreamEnabled('whisper') end,
+                isEnabled = customChatIsEnabled,
                 onUse = formattedChatOnUse,
             }
         },
-        whisperme = {
-            name = 'whisperme',
-            command = '/whisperme ',
-            shortCommand = '/wme ',
-            tabID = 1,
-            omichat = {
-                allowEmotes = true,
-                allowEmojiPicker = true,
-                isEnabled = function() return OmiChat.isCustomStreamEnabled('whisperme') end,
-                onUse = formattedChatOnUse,
-            }
-        },
-        yellme = {
-            name = 'yellme',
-            command = '/yellme ',
-            shortCommand = '/yme ',
+        meyell = {
+            name = 'meyell',
+            command = '/meyell ',
+            shortCommand = '/mey ',
             tabID = 1,
             omichat = {
                 context = { ocProcess = processShoutMessage },
                 allowEmotes = true,
                 allowEmojiPicker = false,
-                isEnabled = function() return OmiChat.isCustomStreamEnabled('yellme') end,
+                isEnabled = customChatIsEnabled,
                 onUse = formattedChatOnUse,
             }
         },
@@ -798,12 +805,12 @@ local function updateStreams()
         OmiChat.addStreamAfter(customStreams.looc, custom.me)
     end
 
-    if not custom.yellme then
-        OmiChat.addStreamAfter(customStreams.yellme, custom.me)
+    if not custom.meyell then
+        OmiChat.addStreamAfter(customStreams.meyell, custom.me)
     end
 
-    if not custom.whisperme then
-        OmiChat.addStreamAfter(customStreams.whisperme, custom.me)
+    if not custom.mewhisper then
+        OmiChat.addStreamAfter(customStreams.mewhisper, custom.me)
     end
 
     local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')

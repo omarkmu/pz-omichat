@@ -80,11 +80,11 @@ option OmiChat.ColorLooc
 option OmiChat.ColorMe
 { type = string, default = 130 130 130, page = OmiChat, translation = OCColorMe, }
 
-option OmiChat.ColorWhisperMe
-{ type = string, default = 85 48 139, page = OmiChat, translation = OCColorWhisperMe, }
+option OmiChat.ColorMeWhisper
+{ type = string, default = 85 48 139, page = OmiChat, translation = OCColorMeWhisper, }
 
-option OmiChat.ColorYellMe
-{ type = string, default = 255 51 51, page = OmiChat, translation = OCColorYellMe, }
+option OmiChat.ColorMeYell
+{ type = string, default = 255 51 51, page = OmiChat, translation = OCColorMeYell, }
 
 option OmiChat.ColorSay
 { type = string, default = 255 255 255, page = OmiChat, translation = OCColorSay, }
@@ -144,11 +144,11 @@ option OmiChat.OverheadFormatMe
 option OmiChat.OverheadFormatWhisper
 { type = string, default = ($1), page = OmiChat, translation = OCOverheadFormatWhisper, }
 
-option OmiChat.OverheadFormatWhisperMe
-{ type = string, default = &#171; $1 &#187;, page = OmiChat, translation = OCOverheadFormatWhisperMe, }
+option OmiChat.OverheadFormatMeWhisper
+{ type = string, default = &#171; $1 &#187;, page = OmiChat, translation = OCOverheadFormatMeWhisper, }
 
-option OmiChat.OverheadFormatYellMe
-{ type = string, default = &#171; $1 &#187;, page = OmiChat, translation = OCOverheadFormatYellMe, }
+option OmiChat.OverheadFormatMeYell
+{ type = string, default = &#171; $1 &#187;, page = OmiChat, translation = OCOverheadFormatMeYell, }
 
 
 /* Chat Message Formats*/
@@ -158,11 +158,11 @@ option OmiChat.ChatFormatLooc
 option OmiChat.ChatFormatMe
 { type = string, default = &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatMe, }
 
-option OmiChat.ChatFormatWhisperMe
-{ type = string, default = &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatWhisperMe, }
+option OmiChat.ChatFormatMeWhisper
+{ type = string, default = &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatMeWhisper, }
 
-option OmiChat.ChatFormatYellMe
-{ type = string, default = &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatYellMe, }
+option OmiChat.ChatFormatMeYell
+{ type = string, default = &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatMeYell, }
 
 option OmiChat.ChatFormatSay
 { type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatSay, }
