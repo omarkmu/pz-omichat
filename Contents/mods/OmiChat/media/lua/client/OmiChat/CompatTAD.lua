@@ -318,7 +318,7 @@ local recipeDances = {
 ---Checks whether the patch is in effect.
 ---@return boolean
 local function isPatchEnabled()
-    return OmiChat.Option.EnableTADCompat and getActivatedMods():contains('TrueActionsDancing')
+    return OmiChat.Option.EnableCompatTAD and getActivatedMods():contains('TrueActionsDancing')
 end
 
 ---Returns a list of available dances that are provided by inventory items.

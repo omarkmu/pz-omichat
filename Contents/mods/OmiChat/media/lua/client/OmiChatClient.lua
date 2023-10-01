@@ -47,7 +47,7 @@ OmiChat.commandStreams = {
         omichat = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_name_no_reset',
-            isEnabled = function() return Option.AllowSetName end,
+            isEnabled = function() return Option.EnableSetName end,
             onUse = function(self, command)
                 local op, name = OmiChat.setNickname(command)
 
@@ -62,7 +62,7 @@ OmiChat.commandStreams = {
             end,
             onHelp = function()
                 local msg = 'UI_OmiChat_helptext_name'
-                if Option.UseChatNameAsCharacterName then
+                if Option.EnableChatNameAsCharacterName then
                     msg = 'UI_OmiChat_helptext_name_no_reset'
                 end
 
@@ -76,7 +76,7 @@ OmiChat.commandStreams = {
         omichat = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_emotes',
-            isEnabled = function() return Option.AllowEmotes end,
+            isEnabled = function() return Option.EnableEmotes end,
             onUse = function(self) self.omichat.onHelp() end,
             onHelp = function()
                 -- collect currently available emotes
@@ -276,7 +276,7 @@ OmiChat.transformers = {
 
             info.context.ocIsRadio = true
             info.content = info.rawText:sub(msgStart + 1)
-            info.format = Option.RadioChatFormat
+            info.format = Option.ChatFormatRadio
             info.substitutions.frequency = freq
         end
     },
@@ -303,7 +303,7 @@ OmiChat.transformers = {
 
                     info.formatOptions.color = OmiChat.getColor(name) or Option:getDefaultColor(name)
                     info.formatOptions.useChatColor = false
-                    info.formatOptions.useNameColor = info.formatOptions.useNameColor and Option.UseNameColorInAllChats
+                    info.formatOptions.useNameColor = info.formatOptions.useNameColor and Option.EnableNameColorInAllChats
 
                     if streamData.stripColors then
                         info.formatOptions.stripColors = true
@@ -333,13 +333,13 @@ OmiChat.transformers = {
             local streamData = info.context.ocCustomStream and customStreamData[info.context.ocCustomStream]
             if streamData then
                 range = Option[streamData.rangeOpt]
-                defaultRange = Option:getDefault(streamData.defaultRangeOpt or 'SayRange')
+                defaultRange = Option:getDefault(streamData.defaultRangeOpt or 'RangeSay')
             elseif info.chatType == 'say' then
-                range = Option.SayRange
-                defaultRange = Option:getDefault('SayRange')
+                range = Option.RangeSay
+                defaultRange = Option:getDefault('RangeSay')
             elseif info.chatType == 'shout' then
-                range = Option.ShoutRange
-                defaultRange = Option:getDefault('ShoutRange')
+                range = Option.RangeYell
+                defaultRange = Option:getDefault('RangeYell')
             else
                 return
             end
@@ -379,7 +379,7 @@ OmiChat.transformers = {
             local bracketStart, msgStart, other = info.rawText:find('%[to ([^%]]+)%]:')
             if other and bracketStart == info.rawText:find('%[') then
                 info.content = info.rawText:sub(msgStart + 1)
-                info.format = Option.OutgoingPrivateChatFormat
+                info.format = Option.ChatFormatOutgoingPrivate
                 info.substitutions.recipient = other
                 info.substitutions.recipientName = OmiChat.getNameInChat(other, 'whisper') or other
             else
@@ -398,12 +398,12 @@ OmiChat.transformers = {
         name = 'basic-chats',
         priority = 2,
         basicChatFormats = {
-            say = 'SayChatFormat',
-            shout = 'ShoutChatFormat',
-            general = 'GeneralChatFormat',
-            admin = 'AdminChatFormat',
-            faction = 'FactionChatFormat',
-            safehouse = 'SafehouseChatFormat',
+            say = 'ChatFormatSay',
+            shout = 'ChatFormatYell',
+            general = 'ChatFormatGeneral',
+            admin = 'ChatFormatAdmin',
+            faction = 'ChatFormatFaction',
+            safehouse = 'ChatFormatSafehouse',
         },
         transform = function(self, info)
             if not self.basicChatFormats[info.chatType] and not info.context.ocIsIncomingPM then
@@ -421,7 +421,7 @@ OmiChat.transformers = {
             end
 
             if info.message:isFromDiscord() then
-                info.format = Option.DiscordChatFormat
+                info.format = Option.ChatFormatDiscord
 
                 -- avoid applying name colors to discord usernames that match player usernames
                 info.formatOptions.useNameColor = false
@@ -429,7 +429,7 @@ OmiChat.transformers = {
 
             if not info.format then
                 if info.context.ocIsIncomingPM then
-                    info.format = Option.IncomingPrivateChatFormat
+                    info.format = Option.ChatFormatIncomingPrivate
                 else
                     info.format = Option[self.basicChatFormats[info.chatType]]
                 end
@@ -464,7 +464,7 @@ OmiChat.transformers = {
 
             -- mirroring ServerChat settings
             info.formatOptions.showTimestamp = false
-            info.format = Option.ServerChatFormat
+            info.format = Option.ChatFormatServer
         end,
     },
 }
@@ -681,7 +681,7 @@ local InfoMessage = {
 
         local tag
         if instance.showTitle then
-            tag = utils.interpolate(Option.TagFormat, {
+            tag = utils.interpolate(Option.FormatTag, {
                 chatType = 'server',
                 tag = getText('UI_chat_server_chat_title_id'),
             })
@@ -691,7 +691,7 @@ local InfoMessage = {
             utils.toChatColor(OmiChat.getColorTable('server')),
             '<SIZE:', instance.chatFont or 'medium', '> ',
             tag or '',
-            utils.interpolate(Option.ServerChatFormat, { message = self.text })
+            utils.interpolate(Option.ChatFormatServer, { message = self.text })
         }
     end,
     new = function(self, text, isServerAlert)
@@ -841,11 +841,11 @@ end
 
 ---Creates or removes the emoji button and picker from the chat box based on sandbox options.
 local function updateEmojiComponents()
-    local add = Option.EnableEmojiPicker
+    local add = Option.EnableIconPicker
     local instance = ISChat.instance
 
     local epIncludeMisc = instance.emojiPicker and instance.emojiPicker.includeUnknownAsMiscellaneous
-    local includeMisc = Option.IncludeMiscellaneousEmoji
+    local includeMisc = Option.EnableMiscellaneousIcons
     if instance.emojiPicker and epIncludeMisc ~= includeMisc then
         instance.emojiPicker.includeUnknownAsMiscellaneous = includeMisc
         instance.emojiPicker:updateIcons()
@@ -892,7 +892,7 @@ local function updateEmojiComponents()
 
         instance.emojiPicker = IconPicker:new(0, 0, instance, ISChat.onEmojiClick)
         instance.emojiPicker.exclude = OmiChat.iconsToExclude
-        instance.emojiPicker.includeUnknownAsMiscellaneous = OmiChat.Option.IncludeMiscellaneousEmoji
+        instance.emojiPicker.includeUnknownAsMiscellaneous = OmiChat.Option.EnableMiscellaneousIcons
 
         instance.emojiPicker:initialise()
         instance.emojiPicker:addToUIManager()
@@ -950,8 +950,8 @@ end
 
 ---@type table<omichat.CalloutCategory, string>
 local shoutOpts = {
-    callouts = 'AllowCustomShouts',
-    sneakcallouts = 'AllowCustomSneakShouts',
+    callouts = 'EnableCustomShouts',
+    sneakcallouts = 'EnableCustomSneakShouts',
 }
 
 ---Gets or creates the player preferences table.
@@ -1107,7 +1107,7 @@ function OmiChat.setNickname(nickname)
         modData._updates = { nicknameToClear = username }
         ModData.transmit(OmiChat.modDataKey)
 
-        if Option.UseChatNameAsCharacterName then
+        if Option.EnableChatNameAsCharacterName then
             -- should display as failure, since this should usually be a no-op
             return
         end
@@ -1115,7 +1115,7 @@ function OmiChat.setNickname(nickname)
         return 'reset'
     end
 
-    if Option.UseChatNameAsCharacterName then
+    if Option.EnableChatNameAsCharacterName then
         OmiChat.updateCharacterName(nickname)
         return 'set', nickname
     end
@@ -1130,7 +1130,7 @@ end
 ---This will set the speech color in-game option.
 ---@param color omichat.ColorTable?
 function OmiChat.changeSpeechColor(color)
-    if not color or not Option.AllowSetSpeechColor then
+    if not color or not Option.EnableSetSpeechColor then
         return
     end
 
@@ -1169,7 +1169,7 @@ function OmiChat.changeColor(category, color)
         return
     end
 
-    if not Option.AllowSetNameColor then
+    if not Option.EnableSetNameColor then
         return
     end
 
@@ -1432,7 +1432,7 @@ function OmiChat.applyFormatOptions(info)
             end
 
             local ampm = hour < 12 and 'am' or 'pm'
-            info.timestamp = utils.interpolate(Option.TimestampFormat, {
+            info.timestamp = utils.interpolate(Option.FormatTimestamp, {
                 chatType = info.chatType,
                 H = format('%d', hour),
                 HH = format('%02d', hour),
@@ -1448,7 +1448,7 @@ function OmiChat.applyFormatOptions(info)
     end
 
     if options.showTitle then
-        info.tag = utils.interpolate(Option.TagFormat, {
+        info.tag = utils.interpolate(Option.FormatTag, {
             chatType = info.chatType,
             tag = getText(info.titleID),
         })
@@ -1458,9 +1458,9 @@ function OmiChat.applyFormatOptions(info)
         msg = msg:gsub('<RGB:%d%.%d+,%d%.%d+,%d%.%d+>', '')
     end
 
-    local shouldUseNameColor = info.chatType == 'say' or Option.UseNameColorInAllChats
+    local shouldUseNameColor = info.chatType == 'say' or Option.EnableNameColorInAllChats
     if shouldUseNameColor and options.useNameColor and OmiChat.getNameColorsEnabled() then
-        local selectedColor = Option.AllowSetNameColor and meta.nameColor
+        local selectedColor = Option.EnableSetNameColor and meta.nameColor
         local colorToUse = selectedColor or Option:getDefaultColor('name', message:getAuthor())
         local nameColor = utils.toChatColor(colorToUse, true)
 
@@ -1850,7 +1850,7 @@ end
 function OmiChat._onGameStart()
     OmiChat.updateState()
 
-    local name = Option.UseChatNameAsCharacterName and OmiChat.getNickname()
+    local name = Option.EnableChatNameAsCharacterName and OmiChat.getNickname()
     if name then
         -- set existing nickname to character name and clear it
         OmiChat.setNickname()

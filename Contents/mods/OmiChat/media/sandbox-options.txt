@@ -2,38 +2,38 @@ VERSION = 1,
 
 
 /* Feature Flags */
-option OmiChat.AllowCustomShouts
-{ type = boolean, default = true, page = OmiChat, translation = OCAllowCustomShouts, }
+option OmiChat.EnableCompatTAD
+{ type = boolean, default = true, page = OmiChat, translation = OCEnableCompatTAD, }
 
-option OmiChat.AllowCustomSneakShouts
-{ type = boolean, default = true, page = OmiChat, translation = OCAllowCustomSneakShouts, }
+option OmiChat.EnableCustomShouts
+{ type = boolean, default = true, page = OmiChat, translation = OCEnableCustomShouts, }
 
-option OmiChat.AllowEmotes
-{ type = boolean, default = true, page = OmiChat, translation = OCAllowEmotes, }
+option OmiChat.EnableCustomSneakShouts
+{ type = boolean, default = true, page = OmiChat, translation = OCEnableCustomSneakShouts, }
 
-option OmiChat.AllowSetName
-{ type = boolean, default = true, page = OmiChat, translation = OCAllowSetName, }
+option OmiChat.EnableEmotes
+{ type = boolean, default = true, page = OmiChat, translation = OCEnableEmotes, }
 
-option OmiChat.AllowSetNameColor
-{ type = boolean, default = false, page = OmiChat, translation = OCAllowSetNameColor, }
+option OmiChat.EnableSetName
+{ type = boolean, default = true, page = OmiChat, translation = OCEnableSetName, }
 
-option OmiChat.UseNameColorInAllChats
-{ type = boolean, default = false, page = OmiChat, translation = OCUseNameColorInAllChats, }
+option OmiChat.EnableSetNameColor
+{ type = boolean, default = false, page = OmiChat, translation = OCEnableSetNameColor, }
 
-option OmiChat.UseSpeechColorAsDefaultNameColor
-{ type = boolean, default = true, page = OmiChat, translation = OCUseSpeechColorAsDefaultNameColor, }
+option OmiChat.EnableNameColorInAllChats
+{ type = boolean, default = false, page = OmiChat, translation = OCEnableNameColorInAllChats, }
 
-option OmiChat.AllowSetSpeechColor
-{ type = boolean, default = true, page = OmiChat, translation = OCAllowSetSpeechColor, }
+option OmiChat.EnableSpeechColorAsDefaultNameColor
+{ type = boolean, default = true, page = OmiChat, translation = OCEnableSpeechColorAsDefaultNameColor, }
 
-option OmiChat.EnableEmojiPicker
-{ type = boolean, default = false, page = OmiChat, translation = OCEnableEmojiPicker, }
+option OmiChat.EnableSetSpeechColor
+{ type = boolean, default = true, page = OmiChat, translation = OCEnableSetSpeechColor, }
 
-option OmiChat.IncludeMiscellaneousEmoji
-{ type = boolean, default = false, page = OmiChat, translation = OCIncludeMiscellaneousEmoji, }
+option OmiChat.EnableIconPicker
+{ type = boolean, default = false, page = OmiChat, translation = OCEnableIconPicker, }
 
-option OmiChat.EnableTADCompat
-{ type = boolean, default = true, page = OmiChat, translation = OCEnableTADCompat, }
+option OmiChat.EnableMiscellaneousIcons
+{ type = boolean, default = false, page = OmiChat, translation = OCEnableMiscellaneousIcons, }
 
 option OmiChat.EnableRangedMe
 { type = boolean, default = true, page = OmiChat, translation = OCEnableRangedMe, }
@@ -44,11 +44,11 @@ option OmiChat.UppercaseCustomShouts
 option OmiChat.LowercaseCustomSneakShouts
 { type = boolean, default = true, page = OmiChat, translation = OCLowercaseCustomSneakShouts, }
 
-option OmiChat.UseChatNameAsCharacterName
-{ type = boolean, default = false, page = OmiChat, translation = OCUseChatNameAsCharacterName, }
+option OmiChat.EnableChatNameAsCharacterName
+{ type = boolean, default = false, page = OmiChat, translation = OCEnableChatNameAsCharacterName, }
 
 
-/* Limits and Ranges */
+/* Limits */
 option OmiChat.CustomShoutMaxLength
 { type = integer, default = 30, min = 1, max = 200, page = OmiChat, translation = OCCustomShoutMaxLength, }
 
@@ -64,95 +64,99 @@ option OmiChat.MaximumColorValue
 option OmiChat.NameMaxLength
 { type = integer, default = 50, min = 0, max = 50, page = OmiChat, translation = OCNameMaxLength, }
 
-option OmiChat.LoocRange
-{ type = integer, default = 30, min = 1, max = 30, page = OmiChat, translation = OCLoocRange, }
 
-option OmiChat.MeRange
-{ type = integer, default = 30, min = 1, max = 30, page = OmiChat, translation = OCMeRange, }
+/* Ranges */
+option OmiChat.RangeLooc
+{ type = integer, default = 30, min = 1, max = 30, page = OmiChat, translation = OCRangeLooc, }
 
-option OmiChat.SayRange
-{ type = integer, default = 30, min = 1, max = 30, page = OmiChat, translation = OCSayRange, }
+option OmiChat.RangeMe
+{ type = integer, default = 30, min = 1, max = 30, page = OmiChat, translation = OCRangeMe, }
 
-option OmiChat.WhisperRange
-{ type = integer, default = 3, min = 1, max = 30, page = OmiChat, translation = OCWhisperRange, }
+option OmiChat.RangeSay
+{ type = integer, default = 30, min = 1, max = 30, page = OmiChat, translation = OCRangeSay, }
 
-option OmiChat.ShoutRange
-{ type = integer, default = 60, min = 1, max = 60, page = OmiChat, translation = OCShoutRange, }
+option OmiChat.RangeWhisper
+{ type = integer, default = 3, min = 1, max = 30, page = OmiChat, translation = OCRangeWhisper, }
+
+option OmiChat.RangeYell
+{ type = integer, default = 60, min = 1, max = 60, page = OmiChat, translation = OCRangeYell, }
 
 
 /* Colors */
-option OmiChat.LoocColor
-{ type = string, default = 48 128 128, page = OmiChat, translation = OCLoocColor, }
+option OmiChat.ColorLooc
+{ type = string, default = 48 128 128, page = OmiChat, translation = OCColorLooc, }
 
-option OmiChat.MeColor
-{ type = string, default = 130 130 130, page = OmiChat, translation = OCMeColor, }
+option OmiChat.ColorMe
+{ type = string, default = 130 130 130, page = OmiChat, translation = OCColorMe, }
 
-option OmiChat.WhisperColor
-{ type = string, default = 85 48 139, page = OmiChat, translation = OCWhisperColor, }
-
-
-/* Message Component Formats */
-option OmiChat.NameFormat
-{ type = string, default = $forename, page = OmiChat, translation = OCNameFormat, }
-
-option OmiChat.TagFormat
-{ type = string, default = [$tag]$if($eq($chatType server) (: <SPACE> )), page = OmiChat, translation = OCTagFormat, }
-
-option OmiChat.TimestampFormat
-{ type = string, default = [$ifelse($eq($hourFormatPref 12) $h $H):$mm], page = OmiChat, translation = OCTimestampFormat, }
+option OmiChat.ColorWhisper
+{ type = string, default = 85 48 139, page = OmiChat, translation = OCColorWhisper, }
 
 
-/* Message Formats */
-option OmiChat.LoocOverheadFormat
-{ type = string, default = (( $1 )), page = OmiChat, translation = OCLoocOverheadFormat, }
+/* Component Formats */
+option OmiChat.FormatName
+{ type = string, default = $forename, page = OmiChat, translation = OCFormatName, }
 
-option OmiChat.MeOverheadFormat
-{ type = string, default = &#171; $1 &#187;, page = OmiChat, translation = OCMeOverheadFormat, }
+option OmiChat.FormatTag
+{ type = string, default = [$tag]$if($eq($chatType server) (: <SPACE> )), page = OmiChat, translation = OCFormatTag, }
 
-option OmiChat.WhisperOverheadFormat
-{ type = string, default = ($1), page = OmiChat, translation = OCWhisperOverheadFormat, }
+option OmiChat.FormatTimestamp
+{ type = string, default = [$ifelse($eq($hourFormatPref 12) $h $H):$mm], page = OmiChat, translation = OCFormatTimestamp, }
 
-option OmiChat.LoocChatFormat
-{ type = string, default = $name: <SPACE> (( $message )), page = OmiChat, translation = OCLoocChatFormat, }
+option OmiChat.FormatMenuName
+{ type = string, default = $ifelse($neq($menuType mini_scoreboard) $name $username ( [) $name ]), page = OmiChat, translation = OCFormatMenuName, }
 
-option OmiChat.MeChatFormat
-{ type = string, default = &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;, page = OmiChat, translation = OCMeChatFormat, }
 
-option OmiChat.SayChatFormat
-{ type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCSayChatFormat, }
+/* Overhead Message Formats */
+option OmiChat.OverheadFormatLooc
+{ type = string, default = (( $1 )), page = OmiChat, translation = OCOverheadFormatLooc, }
 
-option OmiChat.WhisperChatFormat
-{ type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCWhisperChatFormat, }
+option OmiChat.OverheadFormatMe
+{ type = string, default = &#171; $1 &#187;, page = OmiChat, translation = OCOverheadFormatMe, }
 
-option OmiChat.ShoutChatFormat
-{ type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCShoutChatFormat, }
+option OmiChat.OverheadFormatWhisper
+{ type = string, default = ($1), page = OmiChat, translation = OCOverheadFormatWhisper, }
 
-option OmiChat.AdminChatFormat
-{ type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCAdminChatFormat, }
 
-option OmiChat.GeneralChatFormat
-{ type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCGeneralChatFormat, }
+/* Chat Message Formats*/
+option OmiChat.ChatFormatLooc
+{ type = string, default = $name: <SPACE> (( $message )), page = OmiChat, translation = OCChatFormatLooc, }
 
-option OmiChat.DiscordChatFormat
-{ type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCDiscordChatFormat, }
+option OmiChat.ChatFormatMe
+{ type = string, default = &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatMe, }
 
-option OmiChat.RadioChatFormat
-{ type = string, default = $gettext(UI_OmiChat_radio $frequency): <SPACE> $message, page = OmiChat, translation = OCRadioChatFormat, }
+option OmiChat.ChatFormatSay
+{ type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatSay, }
 
-option OmiChat.FactionChatFormat
-{ type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCFactionChatFormat, }
+option OmiChat.ChatFormatWhisper
+{ type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatWhisper, }
 
-option OmiChat.SafehouseChatFormat
-{ type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCSafehouseChatFormat, }
+option OmiChat.ChatFormatYell
+{ type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatYell, }
 
-option OmiChat.IncomingPrivateChatFormat
-{ type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCIncomingPrivateChatFormat, }
+option OmiChat.ChatFormatAdmin
+{ type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCChatFormatAdmin, }
 
-option OmiChat.OutgoingPrivateChatFormat
-{ type = string, default = $gettext(UI_OmiChat_private_chat_to $recipient): <SPACE> $message, page = OmiChat, translation = OCOutgoingPrivateChatFormat, }
+option OmiChat.ChatFormatGeneral
+{ type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCChatFormatGeneral, }
 
-option OmiChat.ServerChatFormat
-{ type = string, default = $message, page = OmiChat, translation = OCServerChatFormat, }
+option OmiChat.ChatFormatDiscord
+{ type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCChatFormatDiscord, }
 
-option OmiChat.MenuNameFormat
-{ type = string, default = $ifelse($neq($menuType mini_scoreboard) $name $username ( [) $name ]), page = OmiChat, translation = OCMenuNameFormat, }
+option OmiChat.ChatFormatRadio
+{ type = string, default = $gettext(UI_OmiChat_radio $frequency): <SPACE> $message, page = OmiChat, translation = OCChatFormatRadio, }
+
+option OmiChat.ChatFormatFaction
+{ type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCChatFormatFaction, }
+
+option OmiChat.ChatFormatSafehouse
+{ type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCChatFormatSafehouse, }
+
+option OmiChat.ChatFormatIncomingPrivate
+{ type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCChatFormatIncomingPrivate, }
+
+option OmiChat.ChatFormatOutgoingPrivate
+{ type = string, default = $gettext(UI_OmiChat_private_chat_to $recipient): <SPACE> $message, page = OmiChat, translation = OCChatFormatOutgoingPrivate, }
+
+option OmiChat.ChatFormatServer
+{ type = string, default = $message, page = OmiChat, translation = OCChatFormatServer, }

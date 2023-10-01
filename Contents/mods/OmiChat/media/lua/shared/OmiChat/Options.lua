@@ -2,54 +2,55 @@ local lib = require 'OmiChat/lib'
 
 ---Helper for retrieving sandbox variables and their defaults.
 ---@class omichat.Options : omi.Sandbox
----@field AllowCustomShouts boolean
----@field AllowCustomSneakShouts boolean
----@field AllowEmotes boolean
----@field AllowSetName boolean
----@field AllowSetNameColor boolean
----@field UseNameColorInAllChats boolean
----@field UseSpeechColorAsDefaultNameColor boolean
----@field AllowSetSpeechColor boolean
----@field EnableEmojiPicker boolean
+---@field EnableCustomShouts boolean
+---@field EnableCustomSneakShouts boolean
+---@field EnableEmotes boolean
+---@field EnableSetName boolean
+---@field EnableSetNameColor boolean
+---@field EnableNameColorInAllChats boolean
+---@field EnableSpeechColorAsDefaultNameColor boolean
+---@field EnableSetSpeechColor boolean
+---@field EnableIconPicker boolean
 ---@field EnableRangedMe boolean
----@field IncludeMiscellaneousEmoji boolean
----@field EnableTADCompat boolean
+---@field EnableMiscellaneousIcons boolean
+---@field EnableCompatTAD boolean
 ---@field UppercaseCustomShouts boolean
 ---@field LowercaseCustomSneakShouts boolean
----@field UseChatNameAsCharacterName boolean
+---@field EnableChatNameAsCharacterName boolean
 ---@field CustomShoutMaxLength integer
 ---@field MaximumCustomShouts integer
 ---@field MinimumColorValue integer
 ---@field MaximumColorValue integer
 ---@field NameMaxLength integer
----@field MeRange integer
----@field LoocRange integer
----@field SayRange integer
----@field WhisperRange integer
----@field ShoutRange integer
----@field MeColor string
----@field WhisperColor string
----@field NameFormat string
----@field TagFormat string
----@field TimestampFormat string
----@field MeOverheadFormat string
----@field WhisperOverheadFormat string
----@field LoocOverheadFormat string
----@field MeChatFormat string
----@field SayChatFormat string
----@field LoocChatFormat string
----@field WhisperChatFormat string
----@field ShoutChatFormat string
----@field AdminChatFormat string
----@field GeneralChatFormat string
----@field DiscordChatFormat string
----@field RadioChatFormat string
----@field FactionChatFormat string
----@field SafehouseChatFormat string
----@field IncomingPrivateChatFormat string
----@field OutgoingPrivateChatFormat string
----@field ServerChatFormat string
----@field MenuNameFormat string
+---@field RangeMe integer
+---@field RangeLooc integer
+---@field RangeSay integer
+---@field RangeWhisper integer
+---@field RangeYell integer
+---@field ColorLooc string
+---@field ColorMe string
+---@field ColorWhisper string
+---@field FormatMenuName string
+---@field FormatName string
+---@field FormatTag string
+---@field FormatTimestamp string
+---@field OverheadFormatMe string
+---@field OverheadFormatWhisper string
+---@field OverheadFormatLooc string
+---@field ChatFormatMe string
+---@field ChatFormatSay string
+---@field ChatFormatLooc string
+---@field ChatFormatWhisper string
+---@field ChatFormatYell string
+---@field ChatFormatAdmin string
+---@field ChatFormatGeneral string
+---@field ChatFormatDiscord string
+---@field ChatFormatRadio string
+---@field ChatFormatFaction string
+---@field ChatFormatSafehouse string
+---@field ChatFormatIncomingPrivate string
+---@field ChatFormatOutgoingPrivate string
+---@field ChatFormatServer string
 local Option = lib.sandbox('OmiChat')
 
 local floor = math.floor
@@ -76,7 +77,7 @@ local colorDefaults = {
 ---@param username string? The username of the user to use for getting defaults, if applicable.
 ---@return omichat.ColorTable
 function Option:getDefaultColor(category, username)
-    if category == 'speech' or (category == 'name' and self.UseSpeechColorAsDefaultNameColor) then
+    if category == 'speech' or (category == 'name' and self.EnableSpeechColorAsDefaultNameColor) then
         local speechColor
         if username then
             local player = getPlayerFromUsername(username)

@@ -34,7 +34,7 @@ function OmiChat._onReceiveGlobalModData(key, newData)
         modData.nameColors = newData.nameColors
     elseif newData._updates then
         local user = newData._updates.nicknameToUpdate
-        if user and Option.AllowSetName then
+        if user and Option.EnableSetName then
             modData.nicknames[user] = newData.nicknames[user]
         end
 
@@ -44,7 +44,7 @@ function OmiChat._onReceiveGlobalModData(key, newData)
         end
 
         user = newData._updates.nameColorToUpdate
-        if user and Option.AllowSetNameColor then
+        if user and Option.EnableSetNameColor then
             modData.nameColors[user] = newData.nameColors[user]
         end
     end
@@ -87,11 +87,11 @@ function OmiChat.getModData()
     return modData
 end
 
----Returns the color table for a user's name color, or nil if unset.
+---Returns the color table for a user's name color, or `nil` if unset.
 ---@param username string
 ---@return omichat.ColorTable?
 function OmiChat.getNameColor(username)
-    if not Option.AllowSetNameColor then
+    if not Option.EnableSetNameColor then
         return
     end
 
@@ -99,7 +99,7 @@ function OmiChat.getNameColor(username)
 end
 
 ---Returns the color table used for a user's name color in chat, or nil if unset.
----This respects the UseSpeechColorAsDefaultNameColor option.
+---This respects the `EnableSpeechColorAsDefaultNameColor` option.
 ---@param username string
 ---@return omichat.ColorTable?
 function OmiChat.getNameColorInChat(username)
@@ -108,7 +108,7 @@ function OmiChat.getNameColorInChat(username)
         return nameColor
     end
 
-    if Option.UseSpeechColorAsDefaultNameColor then
+    if Option.EnableSpeechColorAsDefaultNameColor then
         return Option:getDefaultColor('name', username)
     end
 end
@@ -116,14 +116,14 @@ end
 ---Retrieves the name that should be used in chat for a given username.
 ---@param username string
 ---@param chatType omichat.ChatTypeString? The chat type to use in format string interpolation.
----@return string? #The name to use in chat, or nil if unable to retrieve information about the user.
+---@return string? name The name to use in chat, or `nil` if unable to retrieve information about the user.
 function OmiChat.getNameInChat(username, chatType)
     if not username then
         return
     end
 
     local modData = OmiChat.getModData()
-    if Option.AllowSetName and modData.nicknames[username] then
+    if Option.EnableSetName and modData.nicknames[username] then
         return utils.escapeRichText(modData.nicknames[username])
     end
 
@@ -134,7 +134,7 @@ function OmiChat.getNameInChat(username, chatType)
 
     tokens.username = username
     tokens.chatType = chatType
-    return utils.interpolate(Option.NameFormat, tokens)
+    return utils.interpolate(Option.FormatName, tokens)
 end
 
 ---Adds a function that should be available to all interpolator patterns.

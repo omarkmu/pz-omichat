@@ -31,7 +31,7 @@ The full list of tokens accepted by the various sandbox options follows.
 - `$menuType`: The type of menu in which the format string will appear.
     - One of `medical`, `trade`, or `mini_scoreboard`.
 - `$name`: The chat name of the relevant player. This will also include the name color, if one is included.
-    - Determined by the name set with [`/name`](#allowsetname) or the format specified by [`NameFormat`](#nameformat).
+    - Determined by the name set with [`/name`](./sandbox-options.md#enablesetname) or the format specified by [`FormatName`](./sandbox-options.md#formatname).
 - `$nameRaw`: The same as `$name`, but does not include name colors.
 - `$recipient`: The username of the recipient of a private message.
 - `$recipientName`: The name of the recipient of a private message.

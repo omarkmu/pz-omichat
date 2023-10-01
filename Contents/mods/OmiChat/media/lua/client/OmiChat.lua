@@ -241,7 +241,7 @@ local function processTransforms(message, skipFormatting)
             showTitle = instance.showTitle,
             showTimestamp = instance.showTimestamp,
             useChatColor = true,
-            useNameColor = Option.UseSpeechColorAsDefaultNameColor or (Option.AllowSetNameColor and meta.nameColor),
+            useNameColor = Option.EnableSpeechColorAsDefaultNameColor or (Option.EnableSetNameColor and meta.nameColor),
             stripColors = false,
         },
     }
@@ -533,9 +533,9 @@ function _IsoPlayer:Callout(playEmote)
     local range = isSneaking and 6 or 30
 
     local shouts
-    if isSneaking and Option.AllowCustomSneakShouts then
+    if isSneaking and Option.EnableCustomSneakShouts then
         shouts = OmiChat.getCustomShouts('sneakcallouts')
-    elseif not isSneaking and Option.AllowCustomShouts then
+    elseif not isSneaking and Option.EnableCustomShouts then
         shouts = OmiChat.getCustomShouts('callouts')
     end
 
@@ -644,13 +644,13 @@ function ISChat:onGearButtonClick()
     end
 
     -- for enabling/disabling name colors
-    local showNameColorOption = Option.AllowSetNameColor or Option.UseSpeechColorAsDefaultNameColor
+    local showNameColorOption = Option.EnableSetNameColor or Option.EnableSpeechColorAsDefaultNameColor
 
     local colorOpts = {}
-    if Option.AllowSetNameColor then
+    if Option.EnableSetNameColor then
         colorOpts[#colorOpts+1] = 'name'
     end
-    if Option.AllowSetSpeechColor then
+    if Option.EnableSetSpeechColor then
         colorOpts[#colorOpts+1] = 'speech'
     end
 
@@ -707,10 +707,10 @@ function ISChat:onGearButtonClick()
     end
 
     local shoutOpts = {}
-    if Option.AllowCustomShouts then
+    if Option.EnableCustomShouts then
         shoutOpts[#shoutOpts+1] = 'callouts'
     end
-    if Option.AllowCustomSneakShouts then
+    if Option.EnableCustomSneakShouts then
         shoutOpts[#shoutOpts+1] = 'sneakcallouts'
     end
 
@@ -836,7 +836,7 @@ function ISChat:onCommandEntered()
     end
 
     -- handle emotes specified with .emote
-    if allowEmotes and Option.AllowEmotes then
+    if allowEmotes and Option.EnableEmotes then
         local start, finish, whitespace, emote = command:find('(%s*)%.([%w_]+)')
         if start and whitespace and start ~= 1 and #whitespace == 0 then
             -- require whitespace unless the emote is at the start

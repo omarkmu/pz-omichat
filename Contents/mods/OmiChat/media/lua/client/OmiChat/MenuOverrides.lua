@@ -8,7 +8,7 @@ local OmiChat = require 'OmiChatClient'
 ---@param menuType 'trade' | 'medical' | 'mini_scoreboard'
 ---@return string?
 local function getMenuName(player, menuType)
-    local nameFormat = OmiChat.Option.MenuNameFormat
+    local nameFormat = OmiChat.Option.FormatMenuName
     if not nameFormat or nameFormat == '' then
         return
     end
