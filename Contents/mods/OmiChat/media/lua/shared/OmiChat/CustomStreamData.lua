@@ -62,7 +62,7 @@ return {
     mewhisper = {
         formatID = 4,
         colorOpt = 'ColorMeWhisper',
-        rangeOpt = 'RangeWhisper',
+        rangeOpt = 'RangeMeWhisper',
         chatFormatOpt = 'ChatFormatMeWhisper',
         overheadFormatOpt = 'OverheadFormatMeWhisper',
         titleID = 'UI_OmiChat_whisper_chat_title_id',
@@ -75,7 +75,7 @@ return {
     meyell = {
         formatID = 5,
         colorOpt = 'ColorMeYell',
-        rangeOpt = 'RangeYell',
+        rangeOpt = 'RangeMeYell',
         defaultRangeOpt = 'RangeYell',
         chatFormatOpt = 'ChatFormatMeYell',
         overheadFormatOpt = 'OverheadFormatMeYell',

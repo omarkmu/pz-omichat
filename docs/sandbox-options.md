@@ -139,6 +139,16 @@ The maximum distance between players for [`/looc`](#chatformatlooc) messages to 
 
 The maximum distance between players for [`/me`](#chatformatme) messages to be visible.
 
+### RangeMeWhisper
+`default → 3, minimum → 1, maximum → 30`
+
+The maximum distance between players for [`/mewhisper`](#chatformatmewhisper) messages to be visible.
+
+### RangeMeYell
+`default → 60, minimum → 1, maximum → 60`
+
+The maximum distance between players for [`/meyell`](#chatformatmeyell) messages to be visible.
+
 ### RangeSay
 `default → 30, minimum → 1, maximum → 30`
 
@@ -279,7 +289,7 @@ For example, reversing the overhead text will result in the message content bein
 `default → (( $1 ))`  
 `tokens → $1`
 
-Defines the format used for overhead speech bubbles of local out-of-character [`/looc`](#chatformatlooc) messages.
+Defines the format used for overhead speech bubbles of [`/looc`](#chatformatlooc) messages.
 If blank, `/looc` messages will not display overhead.
 
 ### OverheadFormatMe
@@ -350,7 +360,7 @@ The format used for incoming private messages in chat.
 `default → $name: <SPACE> (( $message ))`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
-The format used for local out-of-character `/looc` messages in chat.
+The format used for `/looc` (local out-of-character) messages in chat.
 
 ### ChatFormatMe
 `default → &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
@@ -367,7 +377,7 @@ How these messages appear overhead is controlled by [`OverheadFormatMe`](#overhe
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/mewhisper` (`/mew`) messages in chat.
-This behaves similarly to [`/me`](#chatformatme), but uses whisper [range](#rangewhisper).
+This behaves similarly to [`/me`](#chatformatme), but has a smaller range.
 
 If blank, `/mewhisper` messages will be disabled.
 
@@ -376,7 +386,7 @@ If blank, `/mewhisper` messages will be disabled.
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/meyell` (`/mey`) messages in chat.
-This behaves similarly to [`/me`](#chatformatme), but uses yell [range](#rangeyell).
+This behaves similarly to [`/me`](#chatformatme), but has a larger range.
 
 If blank, `/meyell` messages will be disabled.
 

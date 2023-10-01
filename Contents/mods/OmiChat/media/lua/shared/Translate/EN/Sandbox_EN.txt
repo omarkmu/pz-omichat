@@ -58,6 +58,12 @@ Sandbox_EN = {
     Sandbox_OCRangeMe = "/me Range",
     Sandbox_OCRangeMe_tooltip = "The maximum distance between players for /me messages to be visible.",
 
+    Sandbox_OCRangeMeWhisper = "/mewhisper Range",
+    Sandbox_OCRangeMeWhisper_tooltip = "The maximum distance between players for /mewhisper messages to be visible.",
+
+    Sandbox_OCRangeMeYell = "/meyell Range",
+    Sandbox_OCRangeMeYell_tooltip = "The maximum distance between players for /meyell messages to be visible.",
+
     Sandbox_OCRangeSay = "/say Range",
     Sandbox_OCRangeSay_tooltip = "The maximum distance between players for /say messages to be visible. This does not affect the range at which zombies react.",
 

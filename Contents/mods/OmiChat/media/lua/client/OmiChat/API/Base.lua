@@ -319,23 +319,23 @@ OmiChat.transformers = {
         priority = 4,
         transform = function(self, info)
             local range
-            local defaultRange
+            local chatRange
             local streamData = info.context.ocCustomStream and customStreamData[info.context.ocCustomStream]
             if streamData then
                 range = Option[streamData.rangeOpt]
-                defaultRange = Option:getDefault(streamData.defaultRangeOpt or 'RangeSay')
+                chatRange = Option:getDefault(streamData.defaultRangeOpt or 'RangeSay')
             elseif info.chatType == 'say' then
                 range = Option.RangeSay
-                defaultRange = Option:getDefault('RangeSay')
+                chatRange = Option:getDefault('RangeSay')
             elseif info.chatType == 'shout' then
                 range = Option.RangeYell
-                defaultRange = Option:getDefault('RangeYell')
+                chatRange = Option:getDefault('RangeYell')
             else
                 return
             end
 
             -- default ranges are existing chat ranges, so this avoids unnecessary work
-            if range == defaultRange then
+            if range == chatRange then
                 return
             end
 
