@@ -49,16 +49,10 @@ OmiChat.commandStreams = {
             helpText = 'UI_OmiChat_helptext_name_no_reset',
             isEnabled = function() return Option.EnableSetName end,
             onUse = function(self, command)
-                local op, name = OmiChat.setNickname(command)
-
-                local feedback
-                if op then
-                    feedback = concat { 'UI_OmiChat_', op, '_name_success' }
-                else
-                    feedback = 'UI_OmiChat_set_name_failure'
+                local _, feedback = OmiChat.setNickname(command)
+                if feedback then
+                    OmiChat.showInfoMessage(feedback)
                 end
-
-                OmiChat.showInfoMessage(getText(feedback, name and utils.escapeRichText(name)))
             end,
             onHelp = function()
                 local msg = 'UI_OmiChat_helptext_name'
@@ -664,7 +658,7 @@ do
             omichat = {
                 context = { ocProcess = processShoutMessage },
                 allowEmotes = true,
-                allowEmojiPicker = true,
+                allowEmojiPicker = false,
                 isEnabled = function() return OmiChat.isCustomStreamEnabled('yellme') end,
                 onUse = formattedChatOnUse,
             }
@@ -818,17 +812,17 @@ local function updateStreams()
     local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
     if useLocalWhisper and not whisper then
         if private then
-            -- modify /whisper to be /private
+            -- modify /whisper to be /pm
             private.name = 'private'
-            private.command = '/private '
-            private.shortCommand = '/pm '
+            private.command = '/pm '
+            private.shortCommand = '/private '
         end
 
         -- add custom /whisper
         OmiChat.addStreamBefore(customStreams.whisper, custom.me or private)
     elseif not useLocalWhisper and whisper then
         if private then
-            -- revert /private to /whisper
+            -- revert /pm to /whisper
             private.name = 'whisper'
             private.command = '/whisper '
             private.shortCommand = '/w '
@@ -1084,15 +1078,15 @@ end
 
 ---Sets the nickname of the current player.
 ---@param nickname string? The nickname to set. A nil or empty value will unset the nickname.
----@return 'reset' | 'set' | nil #The operation that was completed.
----@return string? #The nickname that was set.
+---@return boolean success
+---@return string? status
 function OmiChat.setNickname(nickname)
     nickname = utils.trim(nickname or '')
 
     local player = getSpecificPlayer(0)
     local username = player and player:getUsername()
     if not username then
-        return
+        return false
     end
 
     local maxLength = Option.NameMaxLength
@@ -1108,22 +1102,21 @@ function OmiChat.setNickname(nickname)
         ModData.transmit(OmiChat.modDataKey)
 
         if Option.EnableChatNameAsCharacterName then
-            -- should display as failure, since this should usually be a no-op
-            return
+            return false, getText('UI_OmiChat_set_name_empty')
         end
 
-        return 'reset'
+        return true, getText('UI_OmiChat_reset_name_success')
     end
 
     if Option.EnableChatNameAsCharacterName then
         OmiChat.updateCharacterName(nickname)
-        return 'set', nickname
+        return true, getText('UI_OmiChat_set_name_success', utils.escapeRichText(nickname))
     end
 
     modData.nicknames[username] = nickname
     modData._updates = { nicknameToUpdate = username }
     ModData.transmit(OmiChat.modDataKey)
-    return 'set', nickname
+    return true, getText('UI_OmiChat_set_name_success', utils.escapeRichText(nickname))
 end
 
 ---Sets the color used for overhead chat bubbles.

@@ -7,8 +7,7 @@ A mod for [Project Zomboid](https://projectzomboid.com) that extends chat functi
 ## Features
 
 This mod aims to be as extensible and configurable as possible.
-With the exception of chat color customization, all of the features listed below
-can be configured or completely disabled via [sandbox options](docs/sandbox-options.md).
+The vast majority of the features listed below can be configured or completely disabled via [sandbox options](docs/sandbox-options.md).
 
 - Customizable [formats](docs/format-strings.md) for names, timestamps, and all chat types
 - Chat color customization

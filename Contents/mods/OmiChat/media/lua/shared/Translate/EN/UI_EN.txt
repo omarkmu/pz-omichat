@@ -37,6 +37,7 @@ UI_EN = {
     -- %1 = the name that the player set with /name
     UI_OmiChat_set_name_success = "Name has been set to '%1'.",
     UI_OmiChat_set_name_failure = "Failed to set name.",
+    UI_OmiChat_set_name_empty = "No name specified. Use /name Name",
     UI_OmiChat_reset_name_success = "Name has been reset.",
 
     UI_OmiChat_error_invalid_color = "Input must be a hexadecimal color value or three numbers separated by commas or spaces.",

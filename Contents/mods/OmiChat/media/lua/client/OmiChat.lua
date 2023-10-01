@@ -193,13 +193,6 @@ local function decodeTag(tag)
     }
 end
 
----onTextChange handler which forces lowercase text.
----Used in sneak callout customization modal.
----@param entry ISTextEntryBox
-local function forceLowercase(entry)
-    entry:setText(entry:getInternalText():lower())
-end
-
 ---Applies message transforms and format options to a message.
 ---This does not build the final string; if a string is returned,
 ---it's the original message text.
@@ -263,7 +256,7 @@ local function getColorCatStreamCommand(cat)
     end
 
     if cat == 'private' then
-        return OmiChat.isCustomStreamEnabled('whisper') and '/private' or '/whisper'
+        return OmiChat.isCustomStreamEnabled('whisper') and '/pm' or '/whisper'
     end
 
     if cat == 'general' then
@@ -412,6 +405,12 @@ function ISChat.onCustomCalloutClick(target, button, category)
         lines = nil
     end
 
+    if lines and category == 'sneakcallouts' then
+        for i = 1, #lines do
+            lines[i] = lines[i]:lower()
+        end
+    end
+
     OmiChat.setCustomShouts(lines, category)
 end
 
@@ -452,8 +451,6 @@ function ISChat.onCustomCalloutMenu(target, category)
     modal.entry:setMaxLines(numLines)
     if category == 'callouts' then
         modal.entry:setForceUpperCase(true)
-    else
-        modal.entry.onTextChange = forceLowercase
     end
 
     modal:addToUIManager()
@@ -593,10 +590,12 @@ end
 ---Override to correct the chat stream and enable the emoji button on focus.
 function ISChat:focus()
     _focus(self)
-    updateEmojiComponents()
+
+    local text = ISChat.instance.textEntry:getInternalText()
+    updateEmojiComponents(text)
 
     -- correct the stream ID to the current stream
-    local currentStreamName = OmiChat.chatCommandToStreamName(ISChat.instance.textEntry:getInternalText())
+    local currentStreamName = OmiChat.chatCommandToStreamName(text)
     if currentStreamName then
         OmiChat.cycleStream(currentStreamName)
     end
@@ -606,10 +605,6 @@ end
 function ISChat:unfocus()
     _unfocus(self)
     setEmojiButtonEnabled(false)
-
-    if self.emojiPicker then
-        self.emojiPicker:setVisible(false)
-    end
 end
 
 ---Override to unfocus on close.
@@ -701,7 +696,7 @@ function ISChat:onGearButtonClick()
         colorOpts[#colorOpts+1] = 'safehouse'
     end
 
-    -- add renamed /private at the end
+    -- add renamed /pm at the end
     if useLocalWhisper and checkPlayerCanUseChat('/w') then
         colorOpts[#colorOpts+1] = 'private'
     end

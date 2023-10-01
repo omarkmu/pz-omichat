@@ -335,7 +335,7 @@ The format used for `/yell` messages in chat.
 The format used for local `/whisper` messages in chat.
 
 Modifies `/whisper` chat to act as local chat which doesn't attract zombies and has a very short range.
-If populated, the existing `/whisper` is changed to `/private` (`/pm`).
+If populated, the existing `/whisper` is changed to `/pm` (`/private`).
 If blank, local whisper will be disabled and the default `/whisper` will not be renamed.
 
 *See also: [`RangeWhisper`](#rangewhisper), [`OverheadFormatWhisper`](#overheadformatwhisper).*
