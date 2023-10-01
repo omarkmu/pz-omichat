@@ -114,7 +114,7 @@ end
 
 ---Retrieves the name that should be used in chat for a given username.
 ---@param username string
----@param chatType omichat.ChatTypeString? The chat type to use in format string interpolation.
+---@param chatType omichat.ChatTypeString The chat type to use in format string interpolation.
 ---@return string? name The name to use in chat, or `nil` if unable to retrieve information about the user.
 function OmiChat.getNameInChat(username, chatType)
     if not username then

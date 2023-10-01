@@ -166,6 +166,9 @@ function Interpolator:token(token)
     return BaseInterpolator.token(self, token)
 end
 
+---Performs string interpolation.
+---@param tokens table? Interpolation tokens. If excluded, the current tokens will be unchanged.
+---@return string
 function Interpolator:interpolate(tokens)
     return Interpolator.replaceEntities(BaseInterpolator.interpolate(self, tokens))
 end

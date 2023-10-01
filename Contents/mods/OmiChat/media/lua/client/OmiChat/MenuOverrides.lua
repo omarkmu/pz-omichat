@@ -13,7 +13,7 @@ local function getMenuName(player, menuType)
         return
     end
 
-    local chatName = OmiChat.getNameInChat(player:getUsername())
+    local chatName = OmiChat.getNameInChat(player:getUsername(), 'say')
     local tokens = chatName and OmiChat.getPlayerSubstitutions(player)
     if not chatName or not tokens then
         return
