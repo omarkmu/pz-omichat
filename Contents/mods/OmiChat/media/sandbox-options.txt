@@ -57,6 +57,15 @@ option OmiChat.NameMaxLength
 
 
 /* Ranges */
+option OmiChat.RangeDo
+{ type = integer, default = 30, min = 1, max = 30, page = OmiChat, translation = OCRangeDo, }
+
+option OmiChat.RangeDoWhisper
+{ type = integer, default = 3, min = 1, max = 30, page = OmiChat, translation = OCRangeDoWhisper, }
+
+option OmiChat.RangeDoYell
+{ type = integer, default = 60, min = 1, max = 60, page = OmiChat, translation = OCRangeDoYell, }
+
 option OmiChat.RangeLooc
 { type = integer, default = 30, min = 1, max = 30, page = OmiChat, translation = OCRangeLooc, }
 
@@ -80,6 +89,15 @@ option OmiChat.RangeYell
 
 
 /* Default Colors */
+option OmiChat.ColorDo
+{ type = string, default = 130 130 130, page = OmiChat, translation = OCColorDo, }
+
+option OmiChat.ColorDoWhisper
+{ type = string, default = 85 48 139, page = OmiChat, translation = OCColorDoWhisper, }
+
+option OmiChat.ColorDoYell
+{ type = string, default = 255 51 51, page = OmiChat, translation = OCColorDoYell, }
+
 option OmiChat.ColorLooc
 { type = string, default = 48 128 128, page = OmiChat, translation = OCColorLooc, }
 
@@ -141,14 +159,20 @@ option OmiChat.FormatMenuName
 
 
 /* Overhead Message Formats */
+option OmiChat.OverheadFormatDo
+{ type = string, default =, page = OmiChat, translation = OCOverheadFormatDo, }
+
+option OmiChat.OverheadFormatDoWhisper
+{ type = string, default =, page = OmiChat, translation = OCOverheadFormatDoWhisper, }
+
+option OmiChat.OverheadFormatDoYell
+{ type = string, default =, page = OmiChat, translation = OCOverheadFormatDoYell, }
+
 option OmiChat.OverheadFormatLooc
 { type = string, default = (( $1 )), page = OmiChat, translation = OCOverheadFormatLooc, }
 
 option OmiChat.OverheadFormatMe
 { type = string, default = &#171; $1 &#187;, page = OmiChat, translation = OCOverheadFormatMe, }
-
-option OmiChat.OverheadFormatWhisper
-{ type = string, default = ($1), page = OmiChat, translation = OCOverheadFormatWhisper, }
 
 option OmiChat.OverheadFormatMeWhisper
 { type = string, default = &#171; $1 &#187;, page = OmiChat, translation = OCOverheadFormatMeWhisper, }
@@ -156,8 +180,20 @@ option OmiChat.OverheadFormatMeWhisper
 option OmiChat.OverheadFormatMeYell
 { type = string, default = &#171; $1 &#187;, page = OmiChat, translation = OCOverheadFormatMeYell, }
 
+option OmiChat.OverheadFormatWhisper
+{ type = string, default = ($1), page = OmiChat, translation = OCOverheadFormatWhisper, }
+
 
 /* Chat Message Formats*/
+option OmiChat.ChatFormatDo
+{ type = string, default = &#171; <SPACE> $punctuate($capitalize($trim($message))) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatDo, }
+
+option OmiChat.ChatFormatDoWhisper
+{ type = string, default = &#171; <SPACE> $punctuate($capitalize($trim($message))) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatDoWhisper, }
+
+option OmiChat.ChatFormatDoYell
+{ type = string, default = &#171; <SPACE> $punctuate($capitalize($trim($message))) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatDoYell, }
+
 option OmiChat.ChatFormatLooc
 { type = string, default = $name: <SPACE> (( $message )), page = OmiChat, translation = OCChatFormatLooc, }
 

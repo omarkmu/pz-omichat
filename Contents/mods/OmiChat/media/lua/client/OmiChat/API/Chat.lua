@@ -153,6 +153,18 @@ local function updateStreams()
         OmiChat.addStreamAfter(customStreams.looc, custom.me)
     end
 
+    if not custom.doyell then
+        OmiChat.addStreamAfter(customStreams.doyell, custom.me)
+    end
+
+    if not custom.dowhisper then
+        OmiChat.addStreamAfter(customStreams.dowhisper, custom.me)
+    end
+
+    if not custom['do'] then
+        OmiChat.addStreamAfter(customStreams['do'], custom.me)
+    end
+
     if not custom.meyell then
         OmiChat.addStreamAfter(customStreams.meyell, custom.me)
     end
@@ -167,7 +179,7 @@ local function updateStreams()
             -- modify /whisper to be /pm
             private.name = 'private'
             private.command = '/pm '
-            private.shortCommand = '/private '
+            private.shortCommand = '/pm '
         end
 
         -- add custom /whisper

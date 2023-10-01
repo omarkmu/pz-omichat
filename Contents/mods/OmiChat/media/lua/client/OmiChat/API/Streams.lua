@@ -127,6 +127,43 @@ local customStreams = {
             onUse = formattedChatOnUse,
         }
     },
+    ['do'] = {
+        name = 'do',
+        command = '/do ',
+        shortCommand = '/d ',
+        tabID = 1,
+        omichat = {
+            allowEmotes = true,
+            allowEmojiPicker = true,
+            isEnabled = customChatIsEnabled,
+            onUse = formattedChatOnUse,
+        },
+    },
+    dowhisper = {
+        name = 'dowhisper',
+        command = '/dowhisper ',
+        shortCommand = '/dw ',
+        tabID = 1,
+        omichat = {
+            allowEmotes = true,
+            allowEmojiPicker = true,
+            isEnabled = customChatIsEnabled,
+            onUse = formattedChatOnUse,
+        },
+    },
+    doyell = {
+        name = 'doyell',
+        command = '/doyell ',
+        shortCommand = '/dy ',
+        tabID = 1,
+        omichat = {
+            context = { ocProcess = processShoutMessage },
+            allowEmotes = true,
+            allowEmojiPicker = false,
+            isEnabled = customChatIsEnabled,
+            onUse = formattedChatOnUse,
+        },
+    },
     me = {
         name = 'me',
         command = '/me ',
@@ -142,7 +179,7 @@ local customStreams = {
     mewhisper = {
         name = 'mewhisper',
         command = '/mewhisper ',
-        shortCommand = '/mew ',
+        shortCommand = '/mw ',
         tabID = 1,
         omichat = {
             allowEmotes = true,
@@ -154,7 +191,7 @@ local customStreams = {
     meyell = {
         name = 'meyell',
         command = '/meyell ',
-        shortCommand = '/mey ',
+        shortCommand = '/my ',
         tabID = 1,
         omichat = {
             context = { ocProcess = processShoutMessage },

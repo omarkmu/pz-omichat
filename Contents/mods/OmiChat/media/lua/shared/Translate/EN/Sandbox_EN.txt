@@ -52,6 +52,15 @@ Sandbox_EN = {
     Sandbox_OCNameMaxLength = "Maximum /name Length",
     Sandbox_OCNameMaxLength_tooltip = "The maximum length of chat names set with /name. Must be between 0 and 50.",
 
+    Sandbox_OCRangeDo = "/do Range",
+    Sandbox_OCRangeDo_tooltip = "The maximum distance between players for /do messages to be visible.",
+
+    Sandbox_OCRangeDoWhisper = "/dowhisper Range",
+    Sandbox_OCRangeDoWhisper_tooltip = "The maximum distance between players for /dowhisper messages to be visible.",
+
+    Sandbox_OCRangeDoYell = "/doyell Range",
+    Sandbox_OCRangeDoYell_tooltip = "The maximum distance between players for /doyell messages to be visible.",
+
     Sandbox_OCRangeLooc = "/looc Range",
     Sandbox_OCRangeLooc_tooltip = "The maximum distance between players for /looc messages to be visible.",
 
@@ -72,6 +81,15 @@ Sandbox_EN = {
 
     Sandbox_OCRangeYell = "/yell Range",
     Sandbox_OCRangeYell_tooltip = "The maximum distance between players for /yell messages to be visible. This does not affect the range at which zombies react.",
+
+    Sandbox_OCColorDo = "/do Color",
+    Sandbox_OCColorDo_tooltip = "The default color used for /do messages, unless overriden using the setting.",
+
+    Sandbox_OCColorDoWhisper = "/dowhisper Color",
+    Sandbox_OCColorDoWhisper_tooltip = "The default color used for /dowhisper messages, unless overriden using the setting.",
+
+    Sandbox_OCColorDoYell = "/doyell Color",
+    Sandbox_OCColorDoYell_tooltip = "The default color used for /doyell messages, unless overriden using the setting.",
 
     Sandbox_OCColorLooc = "/looc Color",
     Sandbox_OCColorLooc_tooltip = "The default color used for /looc messages, unless overriden using the setting.",
@@ -130,6 +148,15 @@ Sandbox_EN = {
     Sandbox_OCFormatMenuName = "Menu Name Format",
     Sandbox_OCFormatMenuName_tooltip = "The format used for names in menus such as the Medical Check and Trade window. If blank, these menus will be unaffected.",
 
+    Sandbox_OCOverheadFormatDo = "/do Overhead Format",
+    Sandbox_OCOverheadFormatDo_tooltip = "The format used for /do messages in overhead messages. Must include $1 substitution unless blank. If blank, /do messages will not display overhead.",
+
+    Sandbox_OCOverheadFormatDoWhisper = "/dowhisper Overhead Format",
+    Sandbox_OCOverheadFormatDoWhisper_tooltip = "The format used for /dowhisper messages in overhead messages. Must include $1 substitution unless blank. If blank, /dowhisper messages will not display overhead.",
+
+    Sandbox_OCOverheadFormatDoYell = "/doyell Overhead Format",
+    Sandbox_OCOverheadFormatDoYell_tooltip = "The format used for /doyell messages in overhead messages. Must include $1 substitution unless blank. If blank, /doyell messages will not display overhead.",
+
     Sandbox_OCOverheadFormatLooc = "/looc Overhead Format",
     Sandbox_OCOverheadFormatLooc_tooltip = "The format used for /looc messages in overhead messages. Must include $1 substitution unless blank. If blank, /looc messages will not display overhead.",
 
@@ -144,6 +171,15 @@ Sandbox_EN = {
 
     Sandbox_OCOverheadFormatWhisper_tooltip = "The format used for local /whisper messages in overhead messages. Must include $1 substitution unless blank. If blank, /whisper messages will not display overhead.",
     Sandbox_OCOverheadFormatWhisper = "/whisper Overhead Format",
+
+    Sandbox_OCChatFormatDo = "/do Chat Format",
+    Sandbox_OCChatFormatDo_tooltip = "The format used for /do messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
+
+    Sandbox_OCChatFormatDoWhisper = "/dowhisper Chat Format",
+    Sandbox_OCChatFormatDoWhisper_tooltip = "The format used for /dowhisper messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
+
+    Sandbox_OCChatFormatDoYell = "/doyell Chat Format",
+    Sandbox_OCChatFormatDoYell_tooltip = "The format used for /doyell messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
 
     Sandbox_OCChatFormatLooc = "/looc Chat Format",
     Sandbox_OCChatFormatLooc_tooltip = "The format used for /looc messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",

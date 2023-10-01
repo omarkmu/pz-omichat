@@ -129,6 +129,21 @@ It applies to all chat color customization settings.
 
 The maximum length of chat names set with `/name`.
 
+### RangeDo
+`default → 30, minimum → 1, maximum → 30`
+
+The maximum distance between players for [`/do`](#chatformatdo) messages to be visible.
+
+### RangeDoWhisper
+`default → 3, minimum → 1, maximum → 30`
+
+The maximum distance between players for [`/dowhisper`](#chatformatdowhisper) messages to be visible.
+
+### RangeDoYell
+`default → 60, minimum → 1, maximum → 60`
+
+The maximum distance between players for [`/doyell`](#chatformatdoyell) messages to be visible.
+
 ### RangeLooc
 `default → 30, minimum → 1, maximum → 30`
 
@@ -181,6 +196,21 @@ The default color used for `/admin` messages.
 `default → 144 137 218`
 
 The default color used for messages from Discord.
+
+### ColorDo
+`default → 130 130 130`
+
+The default color used for [`/do`](#chatformatdo) messages.
+
+### ColorDoWhisper
+`default → 85 48 139`
+
+The default color used for [`/dowhisper`](#chatformatdowhisper) messages.
+
+### ColorDoYell
+`default → 255 51 51`
+
+The default color used for [`/doyell`](#chatformatdoyell) messages.
 
 ### ColorFaction
 `default → 22 113 20`
@@ -285,6 +315,27 @@ Options used to determine the content that displays in speech bubbles that appea
 **These formats can have an effect on chat formats.**
 For example, reversing the overhead text will result in the message content being reversed in chat.
 
+### OverheadFormatDo
+`(blank by default)`  
+`tokens → $1`
+
+Defines the format used for overhead speech bubbles of [`/do`](#chatformatdo) messages.
+If blank, `/do` messages will not display overhead.
+
+### OverheadFormatDoWhisper
+`(blank by default)`  
+`tokens → $1`
+
+Defines the format used for overhead speech bubbles of [`/dowhisper`](#chatformatdowhisper) messages.
+If blank, `/dowhisper` messages will not display overhead.
+
+### OverheadFormatDoYell
+`(blank by default)`  
+`tokens → $1`
+
+Defines the format used for overhead speech bubbles of [`/doyell`](#chatformatdoyell) messages.
+If blank, `/doyell` messages will not display overhead.
+
 ### OverheadFormatLooc
 `default → (( $1 ))`  
 `tokens → $1`
@@ -338,6 +389,33 @@ The format used for `/admin` messages in chat.
 The format used for messages from Discord in chat.
 Messages from Discord will not apply name colors.
 
+### ChatFormatDo
+`default → &#171; <SPACE> $punctuate($capitalize($trim($message))) <SPACE> &#187;`  
+`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+
+The format used for `/do` messages in chat.
+
+Allows players to use `/do` to narrate events.
+If blank, `/do` messages will be disabled.
+
+### ChatFormatDoWhisper
+`default → &#171; <SPACE> $punctuate($capitalize($trim($message))) <SPACE> &#187;`  
+`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+
+The format used for `/dowhisper` (`/dw`) messages in chat.
+This behaves similarly to [`/do`](#chatformatdo), but has a smaller range.
+
+If blank, `/dowhisper` messages will be disabled.
+
+### ChatFormatDoYell
+`default → &#171; <SPACE> $punctuate($capitalize($trim($message))) <SPACE> &#187;`  
+`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+
+The format used for `/doyell` (`/dy`) messages in chat.
+This behaves similarly to [`/do`](#chatformatdo), but has a larger range.
+
+If blank, `/doyell` messages will be disabled.
+
 ### ChatFormatFaction
 `default → $author: <SPACE> $message`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
@@ -376,7 +454,7 @@ How these messages appear overhead is controlled by [`OverheadFormatMe`](#overhe
 `default → &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
-The format used for `/mewhisper` (`/mew`) messages in chat.
+The format used for `/mewhisper` (`/mw`) messages in chat.
 This behaves similarly to [`/me`](#chatformatme), but has a smaller range.
 
 If blank, `/mewhisper` messages will be disabled.
@@ -385,7 +463,7 @@ If blank, `/mewhisper` messages will be disabled.
 `default → &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
-The format used for `/meyell` (`/mey`) messages in chat.
+The format used for `/meyell` (`/my`) messages in chat.
 This behaves similarly to [`/me`](#chatformatme), but has a larger range.
 
 If blank, `/meyell` messages will be disabled.
@@ -427,7 +505,7 @@ The format used for server messages in chat.
 The format used for local `/whisper` messages in chat.
 
 Modifies `/whisper` chat to act as local chat which doesn't attract zombies and has a very short range.
-If populated, the existing `/whisper` is changed to `/pm` (`/private`).
+If populated, the existing `/whisper` is changed to `/pm`.
 If blank, local whisper will be disabled and the default `/whisper` will not be renamed.
 
 *See also: [`RangeWhisper`](#rangewhisper), [`OverheadFormatWhisper`](#overheadformatwhisper).*
