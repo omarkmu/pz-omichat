@@ -28,9 +28,6 @@ Sandbox_EN = {
     Sandbox_OCEnableCompatTAD = "True Actions Act 3 - Dancing Compatibility",
     Sandbox_OCEnableCompatTAD_tooltip = "Enables the /dance command.",
 
-    Sandbox_OCEnableRangedMe = "Ranged /me (/wme, /yme)",
-    Sandbox_OCEnableRangedMe_tooltip = "Enables the /whisperme and /yellme commands. If /me is disabled, this has no effect.",
-
     Sandbox_OCEnableNameColorInAllChats = "Name Color in All Chats",
     Sandbox_OCEnableNameColorInAllChats_tooltip = "Whether to respect the name color setting in all chats, rather than only /say chat.",
 

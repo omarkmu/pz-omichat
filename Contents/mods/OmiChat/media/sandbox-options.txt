@@ -35,9 +35,6 @@ option OmiChat.EnableIconPicker
 option OmiChat.EnableMiscellaneousIcons
 { type = boolean, default = false, page = OmiChat, translation = OCEnableMiscellaneousIcons, }
 
-option OmiChat.EnableRangedMe
-{ type = boolean, default = true, page = OmiChat, translation = OCEnableRangedMe, }
-
 option OmiChat.EnableChatNameAsCharacterName
 { type = boolean, default = false, page = OmiChat, translation = OCEnableChatNameAsCharacterName, }
 

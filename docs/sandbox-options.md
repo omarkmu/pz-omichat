@@ -72,12 +72,6 @@ If this is enabled, it will be respected for all chat types.
 
 *See also: [`EnableSetNameColor`](#enablesetnamecolor) and [`EnableSpeechColorAsDefaultNameColor`](#enablespeechcolorasdefaultnamecolor).*
 
-### EnableRangedMe
-`default → true`
-
-Enables the ranged counterparts of the [`/me`](#chatformatme) command: `/whisperme` (`/wme`) and `/yellme` (`/yme`).
-These behave similarly to `/me`, but use the chat ranges specified by [`RangeWhisper`](#rangewhisper) and [`RangeYell`](#rangeyell).
-
 ### EnableSetName
 `default → true`
 

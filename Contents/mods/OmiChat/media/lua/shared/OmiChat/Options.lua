@@ -11,7 +11,6 @@ local lib = require 'OmiChat/lib'
 ---@field EnableSpeechColorAsDefaultNameColor boolean
 ---@field EnableSetSpeechColor boolean
 ---@field EnableIconPicker boolean
----@field EnableRangedMe boolean
 ---@field EnableMiscellaneousIcons boolean
 ---@field EnableCompatTAD boolean
 ---@field EnableChatNameAsCharacterName boolean
