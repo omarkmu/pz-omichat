@@ -243,7 +243,7 @@ The default color used for `/yell` messages.
 Options that define the string formats used for purposes other than overhead speech bubbles and chat messages.
 
 ### FormatMenuName
-`default → $ifelse($neq($menuType mini_scoreboard) $name $username ( [) $name ])`  
+`default → $ifelse($neq($menuType mini_scoreboard) $name $username &#32;[ $name ])`  
 `tokens → $menuType, $forename, $surname, $username, $name`
 
 The format used for displaying character names within in-game menus such as Trading and Medical Check.
@@ -256,7 +256,7 @@ If blank, menus will not be affected.
 The format used to determine the values of `$name` and `$nameRaw` in other format strings.
 
 ### FormatTag
-`default → [$tag]$if($eq($chatType server) (: <SPACE> ))`  
+`default → [$tag]$if($eq($chatType server) :&#32;<SPACE>&#32;)`  
 `tokens → $chatType, $tag`
 
 The format used when `Enable tags` is selected in the chat settings menu.

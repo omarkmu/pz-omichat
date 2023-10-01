@@ -125,13 +125,13 @@ option OmiChat.FormatName
 { type = string, default = $forename, page = OmiChat, translation = OCFormatName, }
 
 option OmiChat.FormatTag
-{ type = string, default = [$tag]$if($eq($chatType server) (: <SPACE> )), page = OmiChat, translation = OCFormatTag, }
+{ type = string, default = [$tag]$if($eq($chatType server) :&#32;<SPACE>&#32;), page = OmiChat, translation = OCFormatTag, }
 
 option OmiChat.FormatTimestamp
 { type = string, default = [$ifelse($eq($hourFormatPref 12) $h $H):$mm], page = OmiChat, translation = OCFormatTimestamp, }
 
 option OmiChat.FormatMenuName
-{ type = string, default = $ifelse($neq($menuType mini_scoreboard) $name $username ( [) $name ]), page = OmiChat, translation = OCFormatMenuName, }
+{ type = string, default = $ifelse($neq($menuType mini_scoreboard) $name $username &#32;[ $name ]), page = OmiChat, translation = OCFormatMenuName, }
 
 
 /* Overhead Message Formats */

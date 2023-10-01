@@ -110,8 +110,8 @@ local namedEntities = {
 }
 
 
----Returns a character given information about a numeric character reference.
----If the arguments are invalid, the original string is returned.
+---Returns a character given a numeric character reference.
+---If the argument is invalid, the original string is returned.
 ---@param s string A numeric character reference.
 ---@return string
 local function resolveNumericEntity(s)
@@ -126,7 +126,8 @@ local function resolveNumericEntity(s)
     return success and char or s
 end
 
----Returns a character given information about a named character reference.
+---Returns a character given a named character reference.
+---If the argument is invalid, the original string is returned.
 ---@param s string A named character reference.
 local function resolveNamedEntity(s)
     local value = namedEntities[s:sub(2, #s - 1)]
@@ -165,10 +166,8 @@ function Interpolator:token(token)
     return BaseInterpolator.token(self, token)
 end
 
----Sets the interpolation pattern to use and builds the interpolation tree.
----@param pattern string
-function Interpolator:setPattern(pattern)
-    BaseInterpolator.setPattern(self, Interpolator.replaceEntities(pattern or ''))
+function Interpolator:interpolate(tokens)
+    return Interpolator.replaceEntities(BaseInterpolator.interpolate(self, tokens))
 end
 
 ---Creates a new interpolator.
@@ -189,10 +188,7 @@ function Interpolator.replaceEntities(text)
         return text
     end
 
-    text = text:gsub('&%a+;', resolveNamedEntity)
-    text = text:gsub('&#x?%d+;', resolveNumericEntity)
-
-    return text
+    return (text:gsub('&%a+;', resolveNamedEntity):gsub('&#x?%d+;', resolveNumericEntity))
 end
 
 
