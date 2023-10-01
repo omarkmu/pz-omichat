@@ -153,24 +153,24 @@ local function updateStreams()
         OmiChat.addStreamAfter(customStreams.looc, custom.me)
     end
 
-    if not custom.doyell then
-        OmiChat.addStreamAfter(customStreams.doyell, custom.me)
+    if not custom.doloud then
+        OmiChat.addStreamAfter(customStreams.doloud, custom.me)
     end
 
-    if not custom.dowhisper then
-        OmiChat.addStreamAfter(customStreams.dowhisper, custom.me)
+    if not custom.doquiet then
+        OmiChat.addStreamAfter(customStreams.doquiet, custom.me)
     end
 
     if not custom['do'] then
         OmiChat.addStreamAfter(customStreams['do'], custom.me)
     end
 
-    if not custom.meyell then
-        OmiChat.addStreamAfter(customStreams.meyell, custom.me)
+    if not custom.meloud then
+        OmiChat.addStreamAfter(customStreams.meloud, custom.me)
     end
 
-    if not custom.mewhisper then
-        OmiChat.addStreamAfter(customStreams.mewhisper, custom.me)
+    if not custom.mequiet then
+        OmiChat.addStreamAfter(customStreams.mequiet, custom.me)
     end
 
     local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')

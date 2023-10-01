@@ -139,10 +139,10 @@ local customStreams = {
             onUse = formattedChatOnUse,
         },
     },
-    dowhisper = {
-        name = 'dowhisper',
-        command = '/dowhisper ',
-        shortCommand = '/dw ',
+    doquiet = {
+        name = 'doquiet',
+        command = '/doquiet ',
+        shortCommand = '/dq ',
         tabID = 1,
         omichat = {
             allowEmotes = true,
@@ -151,10 +151,10 @@ local customStreams = {
             onUse = formattedChatOnUse,
         },
     },
-    doyell = {
-        name = 'doyell',
-        command = '/doyell ',
-        shortCommand = '/dy ',
+    doloud = {
+        name = 'doloud',
+        command = '/doloud ',
+        shortCommand = '/dl ',
         tabID = 1,
         omichat = {
             context = { ocProcess = processShoutMessage },
@@ -176,10 +176,10 @@ local customStreams = {
             onUse = formattedChatOnUse,
         },
     },
-    mewhisper = {
-        name = 'mewhisper',
-        command = '/mewhisper ',
-        shortCommand = '/mw ',
+    mequiet = {
+        name = 'mequiet',
+        command = '/mequiet ',
+        shortCommand = '/mq ',
         tabID = 1,
         omichat = {
             allowEmotes = true,
@@ -188,10 +188,10 @@ local customStreams = {
             onUse = formattedChatOnUse,
         }
     },
-    meyell = {
-        name = 'meyell',
-        command = '/meyell ',
-        shortCommand = '/my ',
+    meloud = {
+        name = 'meloud',
+        command = '/meloud ',
+        shortCommand = '/ml ',
         tabID = 1,
         omichat = {
             context = { ocProcess = processShoutMessage },

@@ -55,11 +55,11 @@ Sandbox_EN = {
     Sandbox_OCRangeDo = "/do Range",
     Sandbox_OCRangeDo_tooltip = "The maximum distance between players for /do messages to be visible.",
 
-    Sandbox_OCRangeDoWhisper = "/dowhisper Range",
-    Sandbox_OCRangeDoWhisper_tooltip = "The maximum distance between players for /dowhisper messages to be visible.",
+    Sandbox_OCRangeDoQuiet = "/doquiet Range",
+    Sandbox_OCRangeDoQuiet_tooltip = "The maximum distance between players for /doquiet messages to be visible.",
 
-    Sandbox_OCRangeDoYell = "/doyell Range",
-    Sandbox_OCRangeDoYell_tooltip = "The maximum distance between players for /doyell messages to be visible.",
+    Sandbox_OCRangeDoLoud = "/doloud Range",
+    Sandbox_OCRangeDoLoud_tooltip = "The maximum distance between players for /doloud messages to be visible.",
 
     Sandbox_OCRangeLooc = "/looc Range",
     Sandbox_OCRangeLooc_tooltip = "The maximum distance between players for /looc messages to be visible.",
@@ -67,11 +67,11 @@ Sandbox_EN = {
     Sandbox_OCRangeMe = "/me Range",
     Sandbox_OCRangeMe_tooltip = "The maximum distance between players for /me messages to be visible.",
 
-    Sandbox_OCRangeMeWhisper = "/mewhisper Range",
-    Sandbox_OCRangeMeWhisper_tooltip = "The maximum distance between players for /mewhisper messages to be visible.",
+    Sandbox_OCRangeMeQuiet = "/mequiet Range",
+    Sandbox_OCRangeMeQuiet_tooltip = "The maximum distance between players for /mequiet messages to be visible.",
 
-    Sandbox_OCRangeMeYell = "/meyell Range",
-    Sandbox_OCRangeMeYell_tooltip = "The maximum distance between players for /meyell messages to be visible.",
+    Sandbox_OCRangeMeLoud = "/meloud Range",
+    Sandbox_OCRangeMeLoud_tooltip = "The maximum distance between players for /meloud messages to be visible.",
 
     Sandbox_OCRangeSay = "/say Range",
     Sandbox_OCRangeSay_tooltip = "The maximum distance between players for /say messages to be visible. This does not affect the range at which zombies react.",
@@ -85,11 +85,11 @@ Sandbox_EN = {
     Sandbox_OCColorDo = "/do Color",
     Sandbox_OCColorDo_tooltip = "The default color used for /do messages, unless overriden using the setting.",
 
-    Sandbox_OCColorDoWhisper = "/dowhisper Color",
-    Sandbox_OCColorDoWhisper_tooltip = "The default color used for /dowhisper messages, unless overriden using the setting.",
+    Sandbox_OCColorDoQuiet = "/doquiet Color",
+    Sandbox_OCColorDoQuiet_tooltip = "The default color used for /doquiet messages, unless overriden using the setting.",
 
-    Sandbox_OCColorDoYell = "/doyell Color",
-    Sandbox_OCColorDoYell_tooltip = "The default color used for /doyell messages, unless overriden using the setting.",
+    Sandbox_OCColorDoLoud = "/doloud Color",
+    Sandbox_OCColorDoLoud_tooltip = "The default color used for /doloud messages, unless overriden using the setting.",
 
     Sandbox_OCColorLooc = "/looc Color",
     Sandbox_OCColorLooc_tooltip = "The default color used for /looc messages, unless overriden using the setting.",
@@ -97,11 +97,11 @@ Sandbox_EN = {
     Sandbox_OCColorMe = "/me Color",
     Sandbox_OCColorMe_tooltip = "The default color used for /me messages, unless overriden using the setting.",
 
-    Sandbox_OCColorMeWhisper = "/mewhisper Color",
-    Sandbox_OCColorMeWhisper_tooltip = "The default color used for /mewhisper messages, unless overriden using the setting.",
+    Sandbox_OCColorMeQuiet = "/mequiet Color",
+    Sandbox_OCColorMeQuiet_tooltip = "The default color used for /mequiet messages, unless overriden using the setting.",
 
-    Sandbox_OCColorMeYell = "/meyell Color",
-    Sandbox_OCColorMeYell_tooltip = "The default color used for /meyell messages, unless overriden using the setting.",
+    Sandbox_OCColorMeLoud = "/meloud Color",
+    Sandbox_OCColorMeLoud_tooltip = "The default color used for /meloud messages, unless overriden using the setting.",
 
     Sandbox_OCColorSay = "/say Color",
     Sandbox_OCColorSay_tooltip = "The default color used for /say messages, unless overriden using the setting.",
@@ -151,11 +151,11 @@ Sandbox_EN = {
     Sandbox_OCOverheadFormatDo = "/do Overhead Format",
     Sandbox_OCOverheadFormatDo_tooltip = "The format used for /do messages in overhead messages. Must include $1 substitution unless blank. If blank, /do messages will not display overhead.",
 
-    Sandbox_OCOverheadFormatDoWhisper = "/dowhisper Overhead Format",
-    Sandbox_OCOverheadFormatDoWhisper_tooltip = "The format used for /dowhisper messages in overhead messages. Must include $1 substitution unless blank. If blank, /dowhisper messages will not display overhead.",
+    Sandbox_OCOverheadFormatDoQuiet = "/doquiet Overhead Format",
+    Sandbox_OCOverheadFormatDoQuiet_tooltip = "The format used for /doquiet messages in overhead messages. Must include $1 substitution unless blank. If blank, /doquiet messages will not display overhead.",
 
-    Sandbox_OCOverheadFormatDoYell = "/doyell Overhead Format",
-    Sandbox_OCOverheadFormatDoYell_tooltip = "The format used for /doyell messages in overhead messages. Must include $1 substitution unless blank. If blank, /doyell messages will not display overhead.",
+    Sandbox_OCOverheadFormatDoLoud = "/doloud Overhead Format",
+    Sandbox_OCOverheadFormatDoLoud_tooltip = "The format used for /doloud messages in overhead messages. Must include $1 substitution unless blank. If blank, /doloud messages will not display overhead.",
 
     Sandbox_OCOverheadFormatLooc = "/looc Overhead Format",
     Sandbox_OCOverheadFormatLooc_tooltip = "The format used for /looc messages in overhead messages. Must include $1 substitution unless blank. If blank, /looc messages will not display overhead.",
@@ -163,11 +163,11 @@ Sandbox_EN = {
     Sandbox_OCOverheadFormatMe = "/me Overhead Format",
     Sandbox_OCOverheadFormatMe_tooltip = "The format used for /me messages in overhead messages. Must include $1 substitution unless blank. If blank, /me messages will not display overhead.",
 
-    Sandbox_OCOverheadFormatMeWhisper = "/mewhisper Overhead Format",
-    Sandbox_OCOverheadFormatMeWhisper_tooltip = "The format used for /mewhisper messages in overhead messages. Must include $1 substitution unless blank. If blank, /mewhisper messages will not display overhead.",
+    Sandbox_OCOverheadFormatMeQuiet = "/mequiet Overhead Format",
+    Sandbox_OCOverheadFormatMeQuiet_tooltip = "The format used for /mequiet messages in overhead messages. Must include $1 substitution unless blank. If blank, /mequiet messages will not display overhead.",
 
-    Sandbox_OCOverheadFormatMeYell = "/meyell Overhead Format",
-    Sandbox_OCOverheadFormatMeYell_tooltip = "The format used for /meyell messages in overhead messages. Must include $1 substitution unless blank. If blank, /meyell messages will not display overhead.",
+    Sandbox_OCOverheadFormatMeLoud = "/meloud Overhead Format",
+    Sandbox_OCOverheadFormatMeLoud_tooltip = "The format used for /meloud messages in overhead messages. Must include $1 substitution unless blank. If blank, /meloud messages will not display overhead.",
 
     Sandbox_OCOverheadFormatWhisper_tooltip = "The format used for local /whisper messages in overhead messages. Must include $1 substitution unless blank. If blank, /whisper messages will not display overhead.",
     Sandbox_OCOverheadFormatWhisper = "/whisper Overhead Format",
@@ -175,11 +175,11 @@ Sandbox_EN = {
     Sandbox_OCChatFormatDo = "/do Chat Format",
     Sandbox_OCChatFormatDo_tooltip = "The format used for /do messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
 
-    Sandbox_OCChatFormatDoWhisper = "/dowhisper Chat Format",
-    Sandbox_OCChatFormatDoWhisper_tooltip = "The format used for /dowhisper messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
+    Sandbox_OCChatFormatDoQuiet = "/doquiet Chat Format",
+    Sandbox_OCChatFormatDoQuiet_tooltip = "The format used for /doquiet messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
 
-    Sandbox_OCChatFormatDoYell = "/doyell Chat Format",
-    Sandbox_OCChatFormatDoYell_tooltip = "The format used for /doyell messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
+    Sandbox_OCChatFormatDoLoud = "/doloud Chat Format",
+    Sandbox_OCChatFormatDoLoud_tooltip = "The format used for /doloud messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
 
     Sandbox_OCChatFormatLooc = "/looc Chat Format",
     Sandbox_OCChatFormatLooc_tooltip = "The format used for /looc messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
@@ -187,11 +187,11 @@ Sandbox_EN = {
     Sandbox_OCChatFormatMe = "/me Chat Format",
     Sandbox_OCChatFormatMe_tooltip = "The format used for /me messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
 
-    Sandbox_OCChatFormatMeWhisper = "/mewhisper Chat Format",
-    Sandbox_OCChatFormatMeWhisper_tooltip = "The format used for /mewhisper messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
+    Sandbox_OCChatFormatMeQuiet = "/mequiet Chat Format",
+    Sandbox_OCChatFormatMeQuiet_tooltip = "The format used for /mequiet messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
 
-    Sandbox_OCChatFormatMeYell = "/meyell Chat Format",
-    Sandbox_OCChatFormatMeYell_tooltip = "The format used for /meyell messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
+    Sandbox_OCChatFormatMeLoud = "/meloud Chat Format",
+    Sandbox_OCChatFormatMeLoud_tooltip = "The format used for /meloud messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",
 
     Sandbox_OCChatFormatWhisper = "Whisper Chat Format",
     Sandbox_OCChatFormatWhisper_tooltip = "The format used for local /whisper messages in chat. May include $author, $authorRaw, $name, $nameRaw, and $message substitutions.",

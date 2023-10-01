@@ -1,12 +1,12 @@
 ---@see omichat.api.client.getFormatter
 ---@alias omichat.CustomStreamName
 ---| 'do'
----| 'dowhisper'
----| 'doyell'
+---| 'doquiet'
+---| 'doloud'
 ---| 'looc'
 ---| 'me'
----| 'mewhisper'
----| 'meyell'
+---| 'mequiet'
+---| 'meloud'
 ---| 'whisper'
 
 ---@class omichat.CustomStreamInfo
@@ -59,12 +59,12 @@ return {
         attractZombies = false,
         showOnRadio = false,
     },
-    mewhisper = {
+    mequiet = {
         formatID = 4,
-        colorOpt = 'ColorMeWhisper',
-        rangeOpt = 'RangeMeWhisper',
-        chatFormatOpt = 'ChatFormatMeWhisper',
-        overheadFormatOpt = 'OverheadFormatMeWhisper',
+        colorOpt = 'ColorMeQuiet',
+        rangeOpt = 'RangeMeQuiet',
+        chatFormatOpt = 'ChatFormatMeQuiet',
+        overheadFormatOpt = 'OverheadFormatMeQuiet',
         titleID = 'UI_OmiChat_whisper_chat_title_id',
         chatTypes = { say = true },
         stripColors = true,
@@ -72,13 +72,13 @@ return {
         attractZombies = false,
         showOnRadio = false,
     },
-    meyell = {
+    meloud = {
         formatID = 5,
-        colorOpt = 'ColorMeYell',
-        rangeOpt = 'RangeMeYell',
+        colorOpt = 'ColorMeLoud',
+        rangeOpt = 'RangeMeLoud',
         defaultRangeOpt = 'RangeYell',
-        chatFormatOpt = 'ChatFormatMeYell',
-        overheadFormatOpt = 'OverheadFormatMeYell',
+        chatFormatOpt = 'ChatFormatMeLoud',
+        overheadFormatOpt = 'OverheadFormatMeLoud',
         chatTypes = { shout = true },
         stripColors = true,
         allowColorCustomization = true,
@@ -97,12 +97,12 @@ return {
         attractZombies = false,
         showOnRadio = false,
     },
-    dowhisper = {
+    doquiet = {
         formatID = 7,
-        colorOpt = 'ColorDoWhisper',
-        rangeOpt = 'RangeDoWhisper',
-        chatFormatOpt = 'ChatFormatDoWhisper',
-        overheadFormatOpt = 'OverheadFormatDoWhisper',
+        colorOpt = 'ColorDoQuiet',
+        rangeOpt = 'RangeDoQuiet',
+        chatFormatOpt = 'ChatFormatDoQuiet',
+        overheadFormatOpt = 'OverheadFormatDoQuiet',
         titleID = 'UI_OmiChat_whisper_chat_title_id',
         chatTypes = { say = true },
         stripColors = true,
@@ -110,12 +110,12 @@ return {
         attractZombies = false,
         showOnRadio = false,
     },
-    doyell = {
+    doloud = {
         formatID = 8,
-        colorOpt = 'ColorDoYell',
-        rangeOpt = 'RangeDoYell',
-        chatFormatOpt = 'ChatFormatDoYell',
-        overheadFormatOpt = 'OverheadFormatDoYell',
+        colorOpt = 'ColorDoLoud',
+        rangeOpt = 'RangeDoLoud',
+        chatFormatOpt = 'ChatFormatDoLoud',
+        overheadFormatOpt = 'OverheadFormatDoLoud',
         defaultRangeOpt = 'RangeYell',
         chatTypes = { shout = true },
         stripColors = true,

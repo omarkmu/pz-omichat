@@ -26,8 +26,8 @@ local lib = require 'OmiChat/lib'
 ---@field RangeYell integer
 ---@field ColorLooc string
 ---@field ColorMe string
----@field ColorMeWhisper string
----@field ColorMeYell string
+---@field ColorMeQuiet string
+---@field ColorMeLoud string
 ---@field ColorSay string
 ---@field ColorWhisper string
 ---@field ColorYell string
@@ -45,12 +45,12 @@ local lib = require 'OmiChat/lib'
 ---@field FormatTimestamp string
 ---@field OverheadFormatMe string
 ---@field OverheadFormatWhisper string
----@field OverheadFormatMeWhisper string
----@field OverheadFormatMeYell string
+---@field OverheadFormatMeQuiet string
+---@field OverheadFormatMeLoud string
 ---@field OverheadFormatLooc string
 ---@field ChatFormatMe string
----@field ChatFormatMeWhisper string
----@field ChatFormatMeYell string
+---@field ChatFormatMeQuiet string
+---@field ChatFormatMeLoud string
 ---@field ChatFormatSay string
 ---@field ChatFormatLooc string
 ---@field ChatFormatWhisper string
