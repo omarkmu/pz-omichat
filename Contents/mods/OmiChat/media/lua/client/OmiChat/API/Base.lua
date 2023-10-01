@@ -1,6 +1,5 @@
 require 'Chat/ISChat'
 
-local OmiChatShared = require 'OmiChatShared'
 local utils = require 'OmiChat/util'
 local vanillaCommands = require 'OmiChat/VanillaCommandList'
 local customStreamData = require 'OmiChat/CustomStreamData'
@@ -20,7 +19,7 @@ local getText = getText
 ---@field private iniVersion integer
 ---@field private iniName string
 ---@field private playerPrefs omichat.PlayerPreferences
-local OmiChat = OmiChatShared:derive()
+local OmiChat = require 'OmiChatShared'
 local Option = OmiChat.Option
 
 OmiChat.ColorModal = require 'OmiChat/ColorModal'

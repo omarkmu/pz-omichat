@@ -1,4 +1,3 @@
-local lib = require 'OmiChat/lib'
 local utils = require 'OmiChat/util'
 local Option = require 'OmiChat/Options'
 local MetaFormatter = require 'OmiChat/MetaFormatter'
@@ -6,10 +5,10 @@ local customStreamData = require 'OmiChat/CustomStreamData'
 
 
 ---Provides client and server API access to OmiChat.
----@class omichat.api.shared : omi.Class
+---@class omichat.api.shared
 ---@field protected modDataKey string
 ---@field protected modDataVersion integer
-local OmiChat = lib.class()
+local OmiChat = {}
 
 OmiChat.modDataVersion = 1
 OmiChat.modDataKey = 'omichat'
