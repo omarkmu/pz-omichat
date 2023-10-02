@@ -1,5 +1,5 @@
 local utils = require 'OmiChat/util'
-local IconPicker = require 'OmiChat/IconPicker'
+local MimicMessage = require 'OmiChat/MimicMessage'
 local customStreamData = require 'OmiChat/CustomStreamData'
 
 local format = string.format
@@ -14,6 +14,7 @@ local ISChat = ISChat
 
 ---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Base'
+OmiChat.MimicMessage = MimicMessage
 local Option = OmiChat.Option
 local IconPicker = OmiChat.IconPicker
 
@@ -21,38 +22,13 @@ local streamDefs = require 'OmiChat/API/Streams'
 local streamOverrides = streamDefs.streamOverrides
 local customStreams = streamDefs.customStreams
 
+local _ChatBase = __classmetatables[ChatBase.class].__index
+local _ChatMessage = __classmetatables[ChatMessage.class].__index
 
----Fake server message.
-local InfoMessage = {
-    isServerAlert = function() return false end,
-    getText = function(self) return self.text end,
-    getTextWithPrefix = function(self)
-        local instance = ISChat.instance
-
-        local tag
-        if instance.showTitle then
-            tag = utils.interpolate(Option.FormatTag, {
-                chatType = 'server',
-                stream = 'server',
-                tag = getText('UI_chat_server_chat_title_id'),
-            })
-        end
-
-        return concat {
-            utils.toChatColor(OmiChat.getColorTable('server')),
-            '<SIZE:', instance.chatFont or 'medium', '> ',
-            tag or '',
-            utils.interpolate(Option.ChatFormatServer, { message = self.text })
-        }
-    end,
-    new = function(self, text, isServerAlert)
-        return setmetatable({
-            text = tostring(text),
-            isServerAlert = isServerAlert
-        }, self)
-    end,
-}
-InfoMessage.__index = InfoMessage
+-- can't call directly on ChatBase subclasses, so have to grab these like this
+local _getTextWithPrefix = _ChatMessage.getTextWithPrefix
+local _getChatTitleID = _ChatBase.getTitleID
+local _getChatType = _ChatBase.getType
 
 
 ---Creates a built-in formatter and assigns a constant ID.
@@ -415,7 +391,7 @@ function OmiChat.applyFormatOptions(info)
     end
 
     if options.showTimestamp then
-        local hour, minute = tostring(message:getDatetime()):match('[^T]*T(%d%d):(%d%d)')
+        local hour, minute = tostring(message:getDatetime()):match('(%d%d):(%d%d)')
 
         hour = tonumber(hour)
         minute = tonumber(minute)
@@ -505,6 +481,108 @@ function OmiChat.applyTransforms(info)
             break
         end
     end
+end
+
+---Applies message transforms and format options to a message.
+---Returns information about the parsed message.
+---If building the message fails, `nil` is returned and the original
+---text is returned instead.
+---@see omichat.api.client.buildMessageText
+---@see omichat.api.client.buildMessageTextFromInfo
+---@param message omichat.Message
+---@param skipFormatting boolean?
+---@return omichat.MessageInfo?
+---@return string
+function OmiChat.buildMessageInfo(message, skipFormatting)
+    local instance = ISChat.instance or {}
+
+    local text
+    local titleID
+    if utils.isinstance(message, MimicMessage) then
+        ---@cast message omichat.MimicMessage
+        text = message:getTextWithPrefixBase()
+        titleID = message:getTitleID()
+    else
+        -- `getText` doesn't handle color & image formatting.
+        -- would just use that otherwise
+        ---@cast message ChatMessage
+        local chat = message:getChat()
+        text = _getTextWithPrefix(message)
+        titleID = _getChatTitleID(chat)
+    end
+
+    local chatType = OmiChat.getMessageChatType(message)
+    local author = message:getAuthor() or ''
+    local textColor = message:getTextColor()
+    local meta = OmiChat.decodeMessageTag(message:getCustomTag())
+
+    local streamName = chatType
+    if chatType == 'whisper' then
+        streamName = 'private'
+    elseif message:isFromDiscord() then
+        streamName = 'discord'
+    end
+
+    ---@type omichat.MessageInfo
+    local info = {
+        message = message,
+        meta = meta,
+        rawText = text,
+        author = author,
+        titleID = titleID,
+        chatType = chatType,
+        textColor = textColor,
+
+        context = {},
+        substitutions = {
+            stream = streamName,
+            author = utils.escapeRichText(author),
+            authorRaw = author,
+            name = meta.name or utils.escapeRichText(author),
+            nameRaw = meta.name or utils.escapeRichText(author),
+        },
+        formatOptions = {
+            font = instance.chatFont,
+            showInChat = true,
+            showTitle = instance.showTitle,
+            showTimestamp = instance.showTimestamp,
+            useChatColor = true,
+            stripColors = false,
+        },
+    }
+
+    OmiChat.applyTransforms(info)
+    if not skipFormatting and not OmiChat.applyFormatOptions(info) then
+        return nil, text
+    end
+
+    return info, text
+end
+
+---Builds the prefixed text for a message.
+---@param message omichat.Message
+---@return string
+function OmiChat.buildMessageText(message)
+    local info, original = OmiChat.buildMessageInfo(message)
+    local result = info and OmiChat.buildMessageTextFromInfo(info)
+    return result or original
+end
+
+---Builds the prefixed text for a message from message information.
+---@param info omichat.MessageInfo
+---@return string?
+function OmiChat.buildMessageTextFromInfo(info)
+    if not info or not info.format then
+        return
+    end
+
+    return concat {
+        utils.toChatColor(info.formatOptions.color),
+        '<SIZE:', info.formatOptions.font or 'medium', '> ',
+        info.timestamp or '',
+        info.tag or '',
+        utils.interpolate(info.format, info.substitutions),
+    }
 end
 
 ---Determines stream information given a chat command.
@@ -620,6 +698,38 @@ function OmiChat.cycleStream(target)
     return curChatText.chatStreams[curChatText.streamID].command
 end
 
+---Decodes message metadata from an encoded tag.
+---@param tag string
+---@return omichat.MessageMetadata
+function OmiChat.decodeMessageTag(tag)
+    if not tag then
+        return {}
+    end
+
+    local values = utils.kvp.decode(tag)
+    return {
+        name = values.n,
+        nameColor = utils.stringToColor(values.cn),
+    }
+end
+
+---Encodes message information including chat name and colors into a string.
+---@param message omichat.Message
+---@return string
+function OmiChat.encodeMessageTag(message)
+    local author = message:getAuthor()
+    if not author then
+        return ''
+    end
+
+    local color = OmiChat.getNameColorInChat(author)
+    local chatType = OmiChat.getMessageChatType(message)
+    return utils.kvp.encode {
+        n = OmiChat.getNameInChat(author, chatType),
+        cn = color and utils.colorToHexString(color) or nil,
+    }
+end
+
 ---Returns a color table associated with the current player,
 ---or the default color table if there isn't one.
 ---@param category omichat.ColorCategory
@@ -646,6 +756,19 @@ end
 ---@return omichat.MetaFormatter
 function OmiChat.getFormatter(name)
     return OmiChat._formatters[name]
+end
+
+---Returns the chat type of a chat message.
+---@param message omichat.Message
+function OmiChat.getMessageChatType(message)
+    if utils.isinstance(message, MimicMessage) then
+        ---@cast message omichat.MimicMessage
+        return message:getChatType()
+    end
+
+    ---@cast message ChatMessage
+    local chat = message:getChat()
+    return tostring(_getChatType(chat))
 end
 
 ---Removes a stream from the list of available chat commands.
@@ -763,11 +886,16 @@ function OmiChat.setIconsToExclude(icons)
     OmiChat._iconsToExclude = icons or {}
 end
 
----Adds an info message to chat.
----This displays only for the local user.
+---Adds an info message to chat that displays only for the local user.
 ---@param text string
-function OmiChat.showInfoMessage(text)
-    ISChat.addLineInChat(InfoMessage:new(text), ISChat.instance.currentTabID - 1)
+---@param serverAlert boolean?
+function OmiChat.showInfoMessage(text, serverAlert)
+    local message = MimicMessage:new(text)
+    message:setChatType('server')
+    message:setTitleID('UI_chat_server_chat_title_id')
+    message:setServerAlert(serverAlert or false)
+
+    ISChat.addLineInChat(message, ISChat.instance.currentTabID - 1)
 end
 
 ---Updates state to match sandbox variables.

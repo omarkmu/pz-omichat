@@ -2,15 +2,14 @@
 
 local OmiChat = require 'OmiChatClient'
 local customStreamData = require 'OmiChat/CustomStreamData'
+
 local utils = OmiChat.utils
 local Option = OmiChat.Option
 local ColorModal = OmiChat.ColorModal
-
-
---#region definitions
-
-local table = table
-local math = math
+local getText = getText
+local getTextOrNull = getTextOrNull
+local max = math.max
+local min = math.min
 local concat = table.concat
 local split = luautils.split
 
@@ -23,8 +22,6 @@ local split = luautils.split
 ---@field defaultTabStream table<integer, omichat.ChatStream?>
 local ISChat = ISChat
 
-local getText = getText
-local getTextOrNull = getTextOrNull
 
 -- references for overrides
 local _addLineInChat = ISChat.addLineInChat
@@ -39,69 +36,19 @@ local _onPressDown = ISChat.onPressDown
 local _onPressUp = ISChat.onPressUp
 local _onTextChange = ISChat.onTextChange
 
-local _ChatBase = __classmetatables[ChatBase.class].__index
 local _ChatMessage = __classmetatables[ChatMessage.class].__index
 local _ServerChatMessage = __classmetatables[ServerChatMessage.class].__index
 local _IsoPlayer = __classmetatables[IsoPlayer.class].__index
-
 local _Callout = _IsoPlayer.Callout
-local _getTextWithPrefix = _ChatMessage.getTextWithPrefix
 
--- can't call directly on ChatBase subclasses, so have to grab these like this
-local getTitleID = _ChatBase.getTitleID
-local getType = _ChatBase.getType
+_ChatMessage.getTextWithPrefix = OmiChat.buildMessageText
+_ServerChatMessage.getTextWithPrefix = OmiChat.buildMessageText
 
--- color categories that aren't associated with a usable chat stream
-local noStream = {
-    radio = true,
-    server = true,
-    discord = true,
-    -- name and speech colors are not chat colors
-    name = true,
-    speech = true,
-}
-
-
-
----Encodes message information, including chat name and colors.
----@param author string The username of the message author.
----@param chatType omichat.ChatTypeString The chat type of the chat in which the message was sent.
----@return string
-local function encodeTag(author, chatType)
-    if not author then
-        return ''
-    end
-
-    local color = OmiChat.getNameColorInChat(author)
-    return utils.kvp.encode {
-        n = OmiChat.getNameInChat(author, chatType),
-        cn = color and utils.colorToHexString(color) or nil
-    }
-end
-
----Decodes message information.
----@param tag string The encoded message tag.
----@return table
-local function decodeTag(tag)
-    if not tag then
-        return {}
-    end
-
-    local values = utils.kvp.decode(tag)
-    return {
-        name = values.n,
-        nameColor = utils.stringToColor(values.cn),
-    }
-end
 
 ---Gets the command associated with a color category.
 ---@param cat omichat.ColorCategory
 ---@return string?
 local function getColorCatStreamCommand(cat)
-    if noStream[cat] then
-        return
-    end
-
     if cat == 'private' then
         return OmiChat.isCustomStreamEnabled('whisper') and '/pm' or '/whisper'
     end
@@ -144,70 +91,8 @@ local function getLines(text, maxLen)
     return lines
 end
 
----Applies message transforms and format options to a message.
----This does not build the final string; if a string is returned,
----it's the original message text.
----@param message ChatMessage
----@param skipFormatting boolean?
----@return string | omichat.MessageInfo
-local function processTransforms(message, skipFormatting)
-    local instance = ISChat.instance or {}
-
-    -- :getText() doesn't handle color & image formatting.
-    -- would just use that otherwise
-    local text = _getTextWithPrefix(message)
-
-    local chat = message:getChat()
-    local chatType = tostring(getType(chat))
-    local author = message:getAuthor() or ''
-    local textColor = message:getTextColor()
-    local meta = decodeTag(message:getCustomTag())
-
-    local streamName = chatType
-    if chatType == 'whisper' then
-        streamName = 'private'
-    elseif message:isFromDiscord() then
-        streamName = 'discord'
-    end
-
-    ---@type omichat.MessageInfo
-    local info = {
-        message = message,
-        meta = meta,
-        rawText = text,
-        author = author,
-        titleID = getTitleID(chat),
-        chatType = chatType,
-        textColor = textColor,
-
-        context = {},
-        substitutions = {
-            stream = streamName,
-            author = utils.escapeRichText(author),
-            authorRaw = author,
-            name = meta.name or utils.escapeRichText(author),
-            nameRaw = meta.name or utils.escapeRichText(author),
-        },
-        formatOptions = {
-            font = instance.chatFont,
-            showInChat = true,
-            showTitle = instance.showTitle,
-            showTimestamp = instance.showTimestamp,
-            useChatColor = true,
-            stripColors = false,
-        },
-    }
-
-    OmiChat.applyTransforms(info)
-    if not skipFormatting and not OmiChat.applyFormatOptions(info) then
-        return text
-    end
-
-    return info
-end
-
----Sets whether the emoji button is enabled.
----This also hides the emoji picker if the button is disabled.
+---Sets whether the icon picker button is enabled.
+---This also hides the icon picker if the button is disabled.
 ---@param enable boolean?
 local function setEmojiButtonEnabled(enable)
     local chat = ISChat.instance
@@ -248,9 +133,47 @@ local function updateEmojiComponents(text)
     setEmojiButtonEnabled(enable)
 end
 
---#endregion
+---Override to enable custom callouts.
+---@param playEmote boolean
+function _IsoPlayer:Callout(playEmote)
+    if getCore():getGameMode() == 'Tutorial' then
+        return _Callout(self, playEmote)
+    end
 
---#region handler functions
+    local isSneaking = self:isSneaking()
+    local range = isSneaking and 6 or 30
+
+    local shouts
+    if isSneaking and Option.EnableCustomSneakShouts then
+        shouts = OmiChat.getCustomShouts('sneakcallouts')
+    elseif not isSneaking and Option.EnableCustomShouts then
+        shouts = OmiChat.getCustomShouts('callouts')
+    end
+
+    if not shouts or #shouts == 0 then
+        return _Callout(self, playEmote)
+    end
+
+    -- this doesn't set .callOut, so minor boredom reduction will occur from shouting
+    -- already possible to use chat for that purpose, so this isn't really problematic
+    addSound(self, self:getX(), self:getY(), self:getY(), range, range)
+
+    local shoutMax = Option.MaximumCustomShouts > 0 and min(#shouts, Option.MaximumCustomShouts) or #shouts
+
+    local shout = shouts[ZombRand(1, shoutMax + 1)]
+    if isSneaking then
+        shout = shout:lower()
+    else
+        shout = shout:upper()
+    end
+
+    processShoutMessage(shout)
+
+    if playEmote then
+        self:playEmote('shout')
+    end
+end
+
 
 ---Event handler for color picker selection.
 ---@param target omichat.ISChat
@@ -281,7 +204,7 @@ function ISChat.onCustomColorMenu(target, category)
         text = getText('UI_OmiChat_context_color_desc', catName)
     end
 
-    local width = math.max(450, getTextManager():MeasureStringX(UIFont.Small, text) + 60)
+    local width = max(450, getTextManager():MeasureStringX(UIFont.Small, text) + 60)
     local modal = ColorModal:new(0, 0, width, 250, text, color, target, ISChat.onCustomColorMenuClick, 0, category)
 
     local minVal = Option.MinimumColorValue
@@ -450,72 +373,6 @@ function ISChat.onEmojiClick(target, icon)
     local addSpace = #text > 0 and text:sub(-1) ~= ' '
     target.textEntry:setText(concat { text, addSpace and ' *' or '*', icon, '*' })
 end
-
---#endregion
-
---#region overrides
-
----Override to enable custom callouts.
----@param playEmote boolean
-function _IsoPlayer:Callout(playEmote)
-    if getCore():getGameMode() == 'Tutorial' then
-        return _Callout(self, playEmote)
-    end
-
-    local isSneaking = self:isSneaking()
-    local range = isSneaking and 6 or 30
-
-    local shouts
-    if isSneaking and Option.EnableCustomSneakShouts then
-        shouts = OmiChat.getCustomShouts('sneakcallouts')
-    elseif not isSneaking and Option.EnableCustomShouts then
-        shouts = OmiChat.getCustomShouts('callouts')
-    end
-
-    if not shouts or #shouts == 0 then
-        return _Callout(self, playEmote)
-    end
-
-    -- this doesn't set .callOut, so minor boredom reduction will occur from shouting
-    -- already possible to use chat for that purpose, so this isn't really problematic
-    addSound(self, self:getX(), self:getY(), self:getY(), range, range)
-
-    local shoutMax = Option.MaximumCustomShouts > 0 and math.min(#shouts, Option.MaximumCustomShouts) or #shouts
-
-    local shout = shouts[ZombRand(1, shoutMax + 1)]
-    if isSneaking then
-        shout = shout:lower()
-    else
-        shout = shout:upper()
-    end
-
-    processShoutMessage(shout)
-
-    if playEmote then
-        self:playEmote('shout')
-    end
-end
-
----Override to modify chat format.
----@return string
-function _ChatMessage:getTextWithPrefix()
-    local info = processTransforms(self)
-    if type(info) == 'string' then
-        return info
-    end
-
-    -- rebuild the string with the desired format
-    return concat {
-        utils.toChatColor(info.formatOptions.color),
-        '<SIZE:', info.formatOptions.font or 'medium', '> ',
-        info.timestamp or '',
-        info.tag or '',
-        utils.interpolate(info.format, info.substitutions),
-    }
-end
-
----Override also applies to ServerChatMessage.
-_ServerChatMessage.getTextWithPrefix = _ChatMessage.getTextWithPrefix
 
 ---Override to add emoji button and picker.
 function ISChat:createChildren()
@@ -897,7 +754,7 @@ function ISChat.onTextChange()
 end
 
 ---Override to add information to chat messages and remove blank lines.
----@param message ChatMessage
+---@param message omichat.Message
 ---@param tabID integer
 function ISChat.addLineInChat(message, tabID)
     if not message then
@@ -905,13 +762,12 @@ function ISChat.addLineInChat(message, tabID)
     end
 
     local mtIndex = (getmetatable(message) or {}).__index
-    if mtIndex == _ChatMessage or mtIndex == _ServerChatMessage then
-        local chatType = tostring(getType(message:getChat()))
-        message:setCustomTag(encodeTag(message:getAuthor(), chatType))
+    if mtIndex == _ChatMessage or mtIndex == _ServerChatMessage or utils.isinstance(message, OmiChat.MimicMessage) then
+        message:setCustomTag(OmiChat.encodeMessageTag(message))
 
         -- necessary to process transforms so we know whether this message should be added to chat
-        local info = processTransforms(message, true)
-        if type(info) == 'table' and not info.formatOptions.showInChat then
+        local info = OmiChat.buildMessageInfo(message, true)
+        if info and not info.formatOptions.showInChat then
             return
         end
     end
@@ -922,8 +778,6 @@ function ISChat.addLineInChat(message, tabID)
         return
     end
 end
-
---#endregion
 
 
 return OmiChat

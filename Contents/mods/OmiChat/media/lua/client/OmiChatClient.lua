@@ -31,6 +31,9 @@ require 'OmiChat/API/Chat'
 ---Valid values for the chat's font.
 ---@alias omichat.ChatFont 'small' | 'medium' | 'large'
 
+---A message type that the mod can handle.
+---@alias omichat.Message ChatMessage | omichat.MimicMessage
+
 
 ---Metadata that can be attached to a message.
 ---@class omichat.MessageMetadata
@@ -49,7 +52,7 @@ require 'OmiChat/API/Chat'
 
 ---Information used during message transformation and formatting.
 ---@class omichat.MessageInfo
----@field message ChatMessage
+---@field message omichat.Message
 ---@field content string? The message content to display in chat. Set by transformers.
 ---@field format string? The string format to use for the message. Set by transformers.
 ---@field tag string?
