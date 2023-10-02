@@ -1,21 +1,73 @@
 local lib = require 'OmiChat/lib'
-local OmiChatInterpolator = require 'OmiChat/Interpolator'
+local Interpolator = require 'OmiChat/Interpolator'
+
+local format = string.format
+local concat = table.concat
 
 
 ---Utility functions.
 ---@class omichat.utils : omi.utils
 local utils = lib.utils.copy(lib.utils)
 utils.kvp = {}
-utils.Interpolator = OmiChatInterpolator
-
-local string = string
-local format = string.format
-local concat = table.concat
+utils.Interpolator = Interpolator
+utils.replaceEntities = Interpolator.replaceEntities
 
 local shortHexPattern = '^%s*#?(%x)(%x)(%x)%s*$'
 local fullHexPattern = '^%s*#?(%x%x)%s*(%x%x)%s*(%x%x)%s*$'
 local rgbPattern = '^%s*(%d%d?%d?)[,%s]+(%d%d?%d?)[,%s]+(%d%d?%d?)%s*$'
 
+
+---Checks a color table for validity.
+---@param color table
+---@return boolean
+local function checkColorTable(color)
+    if type(color) ~= 'table' then
+        return false
+    end
+
+    local r = color.r
+    local g = color.g
+    local b = color.b
+
+    if type(r) ~= 'number' or r < 0 or r > 255 then
+        return false
+    end
+    if type(g) ~= 'number' or g < 0 or g > 255 then
+        return false
+    end
+    if type(b) ~= 'number' or b < 0 or b > 255 then
+        return false
+    end
+
+    return true
+end
+
+---Attempts to read an RGB or hex color from a string.
+---@param text string
+---@return number?
+---@return number?
+---@return number?
+local function readColor(text)
+    local r, g, b = text:match(rgbPattern)
+    if r then
+        return tonumber(r), tonumber(g), tonumber(b)
+    end
+
+    r, g, b = text:match(shortHexPattern)
+    if r then
+        r = r .. r
+        g = g .. g
+        b = b .. b
+    else
+        r, g, b = text:match(fullHexPattern)
+    end
+
+    if not r then
+        return
+    end
+
+    return tonumber(r, 16), tonumber(g, 16), tonumber(b, 16)
+end
 
 ---Encodes a string for use as a key or value in kvp format.
 ---@param text string
@@ -78,60 +130,29 @@ local function kvpReadString(text, i)
     return concat(value), i + 1
 end
 
----Attempts to read an RGB or hex color from a string.
+
+---Converts a color table to a hex string.
+---@param color omichat.ColorTable
+---@return string
+function utils.colorToHexString(color)
+    return format('%02x%02x%02x', color.r, color.g, color.b)
+end
+
+---Converts a color table to an RGB string.
+---@param color omichat.ColorTable
+---@return string
+function utils.colorToRGBString(color)
+    return format('%d,%d,%d', color.r, color.g, color.b)
+end
+
+---Escapes a string for use in a rich text panel.
+---@see ISRichTextPanel
 ---@param text string
----@return number?
----@return number?
----@return number?
-local function readColor(text)
-    local r, g, b = text:match(rgbPattern)
-    if r then
-        return tonumber(r), tonumber(g), tonumber(b)
-    end
-
-    r, g, b = text:match(shortHexPattern)
-    if r then
-        r = r .. r
-        g = g .. g
-        b = b .. b
-    else
-        r, g, b = text:match(fullHexPattern)
-    end
-
-    if not r then
-        return
-    end
-
-    return tonumber(r, 16), tonumber(g, 16), tonumber(b, 16)
+function utils.escapeRichText(text)
+    return (text:gsub('<', '&lt;'):gsub('>', '&gt;'))
 end
 
----Checks a color table for validity.
----@param color table
----@return boolean
-local function checkColorTable(color)
-    if type(color) ~= 'table' then
-        return false
-    end
-
-    local r = color.r
-    local g = color.g
-    local b = color.b
-
-    if type(r) ~= 'number' or r < 0 or r > 255 then
-        return false
-    end
-    if type(g) ~= 'number' or g < 0 or g > 255 then
-        return false
-    end
-    if type(b) ~= 'number' or b < 0 or b > 255 then
-        return false
-    end
-
-    return true
-end
-
-
----Interpolates substitutions into a string with format strings using $var format.
+---Interpolates substitutions into a string with format strings using `$var` format.
 ---Functions are referenced using `$func(...)` syntax.
 ---@param text string The format string.
 ---@param tokens table A table of format substitution strings.
@@ -147,55 +168,13 @@ function utils.interpolate(text, tokens, options)
     options.libraryExclude['mutators.randomseed'] = true
 
     ---@type omichat.Interpolator
-    local interpolator = OmiChatInterpolator:new(options)
+    local interpolator = Interpolator:new(options)
     interpolator:setPattern(text)
 
     return interpolator:interpolate(tokens)
 end
 
----Converts a color table to an RGB string.
----@param color omichat.ColorTable
----@return string
-function utils.colorToRGBString(color)
-    return string.format('%d,%d,%d', color.r, color.g, color.b)
-end
-
----Converts a color table to a hex string.
----@param color omichat.ColorTable
----@return string
-function utils.colorToHexString(color)
-    return string.format('%02x%02x%02x', color.r, color.g, color.b)
-end
-
----Attempts to convert a color string to a color. Returns false and an error message on failure.
----@param text string A color string, in RGB or hex.
----@param minColor integer? Minimum color value [0, 255].
----@param maxColor integer? Maximum color value [0, 255].
----@return omi.Result<omichat.ColorTable>
-function utils.tryStringToColor(text, minColor, maxColor)
-    if not text then
-        return { success = false, error = getText('UI_OmiChat_error_invalid_color') }
-    end
-
-    local r, g, b = readColor(text)
-    if not r then
-        return { success = false, error = getText('UI_OmiChat_error_invalid_color') }
-    end
-
-    maxColor = maxColor or 255
-    if r > maxColor or g > maxColor or b > maxColor then
-        return { success = false, error = getText('UI_OmiChat_error_color_max', tostring(maxColor)) }
-    end
-
-    minColor = minColor or 0
-    if r < minColor or g < minColor or b < minColor then
-        return { success = false, error = getText('UI_OmiChat_error_color_min', tostring(minColor)) }
-    end
-
-    return { success = true, value = { r = r, g = g, b = b } }
-end
-
----Converts a color string to a color. Returns nil on failure.
+---Converts a color string to a color. Returns `nil` on failure.
 ---@param text string A color string, in RGB or hex.
 ---@return omichat.ColorTable?
 function utils.stringToColor(text)
@@ -244,12 +223,34 @@ function utils.toOverheadColor(color, bbCodeFormat)
     }
 end
 
----Escapes a string for use in a rich text panel.
----@see ISRichTextPanel
----@param text string
-function utils.escapeRichText(text)
-    return (text:gsub('<', '&lt;'):gsub('>', '&gt;'))
+---Attempts to convert a color string to a color. Returns false and an error message on failure.
+---@param text string A color string, in RGB or hex.
+---@param minColor integer? Minimum color value [0, 255].
+---@param maxColor integer? Maximum color value [0, 255].
+---@return omi.Result<omichat.ColorTable>
+function utils.tryStringToColor(text, minColor, maxColor)
+    if not text then
+        return { success = false, error = getText('UI_OmiChat_error_invalid_color') }
+    end
+
+    local r, g, b = readColor(text)
+    if not r then
+        return { success = false, error = getText('UI_OmiChat_error_invalid_color') }
+    end
+
+    maxColor = maxColor or 255
+    if r > maxColor or g > maxColor or b > maxColor then
+        return { success = false, error = getText('UI_OmiChat_error_color_max', tostring(maxColor)) }
+    end
+
+    minColor = minColor or 0
+    if r < minColor or g < minColor or b < minColor then
+        return { success = false, error = getText('UI_OmiChat_error_color_min', tostring(minColor)) }
+    end
+
+    return { success = true, value = { r = r, g = g, b = b } }
 end
+
 
 ---Encodes a table as a string of key-value pairs.
 ---Keys and values are converted to strings.
@@ -284,7 +285,5 @@ function utils.kvp.decode(text)
     return result
 end
 
-
-utils.replaceEntities = OmiChatInterpolator.replaceEntities
 
 return utils

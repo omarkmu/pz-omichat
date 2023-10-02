@@ -1,10 +1,12 @@
 local lib = require 'OmiChat/lib'
 local BaseInterpolator = lib.interpolate.Interpolator
 
+
 ---@class omichat.Interpolator : omi.interpolate.Interpolator
 ---@field private _registeredFunctions table<string, function>
 local Interpolator = BaseInterpolator:derive()
 Interpolator._registeredFunctions = {}
+
 
 local namedEntities = {
     quot = 34,
@@ -110,6 +112,18 @@ local namedEntities = {
 }
 
 
+---Returns a character given a named character reference.
+---If the argument is invalid, the original string is returned.
+---@param s string A named character reference.
+local function resolveNamedEntity(s)
+    local value = namedEntities[s:sub(2, #s - 1)]
+    if value then
+        return string.char(value)
+    end
+
+    return s
+end
+
 ---Returns a character given a numeric character reference.
 ---If the argument is invalid, the original string is returned.
 ---@param s string A numeric character reference.
@@ -126,16 +140,16 @@ local function resolveNumericEntity(s)
     return success and char or s
 end
 
----Returns a character given a named character reference.
----If the argument is invalid, the original string is returned.
----@param s string A named character reference.
-local function resolveNamedEntity(s)
-    local value = namedEntities[s:sub(2, #s - 1)]
-    if value then
-        return string.char(value)
+
+---Replaces character entities with the characters that they represent.
+---Numeric entities and named entities in ISO-8859-1 are supported.
+---@param text string
+function Interpolator.replaceEntities(text)
+    if not text then
+        return text
     end
 
-    return s
+    return (text:gsub('&%a+;', resolveNamedEntity):gsub('&#x?%d+;', resolveNumericEntity))
 end
 
 
@@ -148,6 +162,13 @@ function Interpolator:getFunction(name)
     end
 
     return BaseInterpolator.getFunction(self, name)
+end
+
+---Performs string interpolation.
+---@param tokens table? Interpolation tokens. If excluded, the current tokens will be unchanged.
+---@return string
+function Interpolator:interpolate(tokens)
+    return Interpolator.replaceEntities(BaseInterpolator.interpolate(self, tokens))
 end
 
 ---Gets the value of an interpolation token.
@@ -166,12 +187,6 @@ function Interpolator:token(token)
     return BaseInterpolator.token(self, token)
 end
 
----Performs string interpolation.
----@param tokens table? Interpolation tokens. If excluded, the current tokens will be unchanged.
----@return string
-function Interpolator:interpolate(tokens)
-    return Interpolator.replaceEntities(BaseInterpolator.interpolate(self, tokens))
-end
 
 ---Creates a new interpolator.
 ---@param options omi.interpolate.Options
@@ -181,17 +196,6 @@ function Interpolator:new(options)
 
     ---@cast this omichat.Interpolator
     return this
-end
-
----Replaces character entities with the characters that they represent.
----Numeric entities and named entities in ISO-8859-1 are supported.
----@param text string
-function Interpolator.replaceEntities(text)
-    if not text then
-        return text
-    end
-
-    return (text:gsub('&%a+;', resolveNamedEntity):gsub('&#x?%d+;', resolveNumericEntity))
 end
 
 

@@ -56,23 +56,6 @@ function OmiChat._onReceiveGlobalModData(key, newData)
 end
 
 
----Gets substitution tokens to use in interpolation for a given player.
----If the player descriptor could not be obtained, returns `nil`.
----@param player IsoPlayer
----@return table?
-function OmiChat.getPlayerSubstitutions(player)
-    local desc = player and player:getDescriptor()
-    if not desc then
-        return
-    end
-
-    return {
-        forename = desc:getForename(),
-        surname = desc:getSurname(),
-        username = player:getUsername(),
-    }
-end
-
 ---Gets or creates the global mod data table.
 ---@return omichat.ModData
 function OmiChat.getModData()
@@ -136,12 +119,21 @@ function OmiChat.getNameInChat(username, chatType)
     return utils.interpolate(Option.FormatName, tokens)
 end
 
----Adds a function that should be available to all interpolator patterns.
----@param name string
----@param func function
-function OmiChat.registerInterpolatorFunction(name, func)
-    ---@diagnostic disable-next-line: invisible
-    utils.Interpolator._registeredFunctions[name:lower()] = func
+---Gets substitution tokens to use in interpolation for a given player.
+---If the player descriptor could not be obtained, returns `nil`.
+---@param player IsoPlayer
+---@return table?
+function OmiChat.getPlayerSubstitutions(player)
+    local desc = player and player:getDescriptor()
+    if not desc then
+        return
+    end
+
+    return {
+        forename = desc:getForename(),
+        surname = desc:getSurname(),
+        username = player:getUsername(),
+    }
 end
 
 ---Returns true if the custom chat stream specified is enabled.
@@ -155,6 +147,14 @@ function OmiChat.isCustomStreamEnabled(name)
 
     local value = Option[opts.chatFormatOpt]
     return value and value ~= ''
+end
+
+---Adds a function that should be available to all interpolator patterns.
+---@param name string
+---@param func function
+function OmiChat.registerInterpolatorFunction(name, func)
+    ---@diagnostic disable-next-line: invisible
+    utils.Interpolator._registeredFunctions[name:lower()] = func
 end
 
 
@@ -195,5 +195,4 @@ end
 
 
 Events.OnReceiveGlobalModData.Add(OmiChat._onReceiveGlobalModData)
-
 return OmiChat

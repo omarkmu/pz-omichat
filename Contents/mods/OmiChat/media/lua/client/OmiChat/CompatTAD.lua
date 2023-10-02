@@ -315,12 +315,6 @@ local recipeDances = {
 }
 
 
----Checks whether the patch is in effect.
----@return boolean
-local function isPatchEnabled()
-    return OmiChat.Option.EnableCompatTAD and getActivatedMods():contains('TrueActionsDancing')
-end
-
 ---Returns a list of available dances that are provided by inventory items.
 ---@param player IsoPlayer The player to check.
 ---@param search string? If provided, the index of the dance with this emote in the result will be returned.
@@ -393,6 +387,12 @@ local function getAvailableDanceHelpText(player)
     return concat(parts)
 end
 
+---Checks whether the patch is in effect.
+---@return boolean
+local function isPatchEnabled()
+    return OmiChat.Option.EnableCompatTAD and getActivatedMods():contains('TrueActionsDancing')
+end
+
 ---Returns a dance emote given command input, or information
 ---used to display an error message.
 ---@param name string
@@ -407,13 +407,13 @@ local function processDanceCommand(name, player)
 
     -- get a random known dance
     if #name == 0 then
-        local dances, lastIdx = getAvailableDances(player, player:getVariableString('emote'))
+        local dances, currentDanceIdx = getAvailableDances(player, player:getVariableString('emote'))
 
         local idx
-        if lastIdx then
+        if currentDanceIdx then
             -- avoid doing the same dance
             idx = ZombRand(1, #dances)
-            if idx == lastIdx then
+            if idx == currentDanceIdx then
                 idx = #dances
             end
         else
@@ -498,6 +498,7 @@ local function onUseDanceCommand(_, command)
         OmiChat.showInfoMessage(feedback)
     end
 end
+
 
 ---Applies the TAD patch.
 local function applyPatch()

@@ -14,13 +14,6 @@ local function chatIsEnabled(self)
     return checkPlayerCanUseChat(self.command)
 end
 
----Helper for checking if a custom chat stream is enabled.
----@param self omichat.BaseStream
----@return boolean
-local function customChatIsEnabled(self)
-    return OmiChat.isCustomStreamEnabled(self.name)
-end
-
 ---Helper for handling basic chat stream use.
 ---@param self omichat.ChatStream
 ---@param command string
@@ -38,21 +31,23 @@ local function chatOnUse(self, command)
     end
 end
 
+---Helper for checking if a custom chat stream is enabled.
+---@param self omichat.BaseStream
+---@return boolean
+local function customChatIsEnabled(self)
+    return OmiChat.isCustomStreamEnabled(self.name)
+end
+
 ---Helper for handling formatted chat stream use.
 ---@param self omichat.ChatStream
 ---@param command string
-local function formattedChatOnUse(self, command)
+local function customChatOnUse(self, command)
     command = utils.trim(command)
     if #command == 0 then
         return
     end
 
-    local ctx = self.omichat.context
-    local name = ctx and ctx.formatterName or self.name
-
-    local formatted = OmiChat.getFormatter(name):format(command)
-
-    chatOnUse(self, formatted)
+    chatOnUse(self, OmiChat.getFormatter(self.name):format(command))
 end
 
 ---@type table<string, omichat.ChatStreamConfig>
@@ -114,7 +109,7 @@ local customStreams = {
             allowEmotes = true,
             allowEmojiPicker = true,
             isEnabled = customChatIsEnabled,
-            onUse = formattedChatOnUse,
+            onUse = customChatOnUse,
         }
     },
     whisper = {
@@ -127,7 +122,7 @@ local customStreams = {
             allowEmojiPicker = true,
             context = { ocIsLocalWhisper = true },
             isEnabled = customChatIsEnabled,
-            onUse = formattedChatOnUse,
+            onUse = customChatOnUse,
         }
     },
     ['do'] = {
@@ -139,7 +134,7 @@ local customStreams = {
             allowEmotes = true,
             allowEmojiPicker = true,
             isEnabled = customChatIsEnabled,
-            onUse = formattedChatOnUse,
+            onUse = customChatOnUse,
         },
     },
     doquiet = {
@@ -151,7 +146,7 @@ local customStreams = {
             allowEmotes = true,
             allowEmojiPicker = true,
             isEnabled = customChatIsEnabled,
-            onUse = formattedChatOnUse,
+            onUse = customChatOnUse,
         },
     },
     doloud = {
@@ -164,7 +159,7 @@ local customStreams = {
             allowEmotes = true,
             allowEmojiPicker = false,
             isEnabled = customChatIsEnabled,
-            onUse = formattedChatOnUse,
+            onUse = customChatOnUse,
         },
     },
     me = {
@@ -176,7 +171,7 @@ local customStreams = {
             allowEmotes = true,
             allowEmojiPicker = true,
             isEnabled = customChatIsEnabled,
-            onUse = formattedChatOnUse,
+            onUse = customChatOnUse,
         },
     },
     mequiet = {
@@ -188,7 +183,7 @@ local customStreams = {
             allowEmotes = true,
             allowEmojiPicker = true,
             isEnabled = customChatIsEnabled,
-            onUse = formattedChatOnUse,
+            onUse = customChatOnUse,
         }
     },
     meloud = {
@@ -201,7 +196,7 @@ local customStreams = {
             allowEmotes = true,
             allowEmojiPicker = false,
             isEnabled = customChatIsEnabled,
-            onUse = formattedChatOnUse,
+            onUse = customChatOnUse,
         }
     },
 }

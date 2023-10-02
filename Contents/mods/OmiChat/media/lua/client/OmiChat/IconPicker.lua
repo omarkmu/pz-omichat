@@ -1,3 +1,12 @@
+local icons = require 'OmiChat/IconLists'
+
+local pairs = pairs
+local ipairs = ipairs
+local getText = getText
+local getTextManager = getTextManager
+local ISPanel_render = ISPanel.render
+
+
 ---UI element for choosing an icon.
 ---@class omichat.IconPicker : ISPanel
 ---@field includeDefaults boolean
@@ -17,16 +26,10 @@
 ---@field protected _rowContents table
 local IconPicker = ISPanel:derive('IconPicker')
 
-local icons = require 'OmiChat/IconLists'
 
-local pairs = pairs
-local ipairs = ipairs
-local getText = getText
-local getTextManager = getTextManager
-local ISPanel_render = ISPanel.render
-
+---@type table<string, string>
+local iconToTextureNameMap = {}
 local loadedIcons = false
-local iconToTextureNameMap = {} ---@type table<string, string>
 
 
 ---Collects valid icons and builds a map of icon names to texture names.
@@ -67,52 +70,6 @@ local function loadIcons(picker)
 	loadedIcons = true
 end
 
-
----Returns the row and column in the icon picker given an x and y position.
----This only returns grid positions of valid icon positions; an x and y
----outside of the bounds or over a category will return nil.
----@param x number
----@param y number
----@return integer?
----@return integer?
----@return table?
-function IconPicker:getGridCoordinates(x, y)
-	local absX = x - self:getXScroll()
-	local absY = y - self:getYScroll()
-	if absY <= self.borderSize or absX <= self.borderSize then
-		return
-	end
-
-	if x >= self.buttonSize * self.columns + self.borderSize * 2 then
-		return
-	end
-
-	local row = math.ceil((y - self.borderSize) / self.buttonSize)
-	local column = math.ceil((x - self.borderSize) / self.buttonSize)
-	local selected = type(self._rowContents[row]) == 'table' and self._rowContents[row][column]
-
-	if not selected then
-		return
-	end
-
-	return row, column, selected
-end
-
----Returns the row and column in the icon picker that's being hovered over.
----If no icon is being hovered, returns nil.
----@return integer?
----@return integer?
----@return table?
-function IconPicker:getMouseCoordinates()
-	if not self:isMouseOver() then
-		return
-	end
-
-	local x = self:getMouseX()
-	local y = self:getMouseY()
-
-	return self:getGridCoordinates(x, y)
-end
 
 ---Builds a table containing information about the current icons.
 ---@return table
@@ -186,31 +143,56 @@ function IconPicker:buildIconList()
     return result
 end
 
----Updates icon information.
-function IconPicker:updateIcons()
-	local iconInfo = self:buildIconList()
-	local contents = {}
+---Initializes the icon picker, setting up its icons.
+function IconPicker:initialise()
+	ISPanel.initialise(self)
+	self:updateIcons()
+end
 
-	local row = 0
-	for _, info in ipairs(iconInfo) do
-		if #info.list > 0 then
-			row = row + 1
-			contents[row] = 'UI_OmiChat_icon_cat_' .. info.category
-
-			local rowIcons = {}
-			for i, icon in ipairs(info.list) do
-				if i % self.columns == 1 then
-					row = row + 1
-					rowIcons = {}
-					contents[row] = rowIcons
-				end
-
-				rowIcons[#rowIcons+1] = icon
-			end
-		end
+---Returns the row and column in the icon picker given an x and y position.
+---This only returns grid positions of valid icon positions; an x and y
+---outside of the bounds or over a category will return nil.
+---@param x number
+---@param y number
+---@return integer?
+---@return integer?
+---@return table?
+function IconPicker:getGridCoordinates(x, y)
+	local absX = x - self:getXScroll()
+	local absY = y - self:getYScroll()
+	if absY <= self.borderSize or absX <= self.borderSize then
+		return
 	end
 
-	self._rowContents = contents
+	if x >= self.buttonSize * self.columns + self.borderSize * 2 then
+		return
+	end
+
+	local row = math.ceil((y - self.borderSize) / self.buttonSize)
+	local column = math.ceil((x - self.borderSize) / self.buttonSize)
+	local selected = type(self._rowContents[row]) == 'table' and self._rowContents[row][column]
+
+	if not selected then
+		return
+	end
+
+	return row, column, selected
+end
+
+---Returns the row and column in the icon picker that's being hovered over.
+---If no icon is being hovered, returns nil.
+---@return integer?
+---@return integer?
+---@return table?
+function IconPicker:getMouseCoordinates()
+	if not self:isMouseOver() then
+		return
+	end
+
+	local x = self:getMouseX()
+	local y = self:getMouseY()
+
+	return self:getGridCoordinates(x, y)
 end
 
 ---Fires when a mouse down occurs in the icon picker.
@@ -275,11 +257,33 @@ function IconPicker:render()
 	self:setScrollHeight(self.borderSize * 2 + maxRow * self.buttonSize)
 end
 
----Initializes the icon picker, setting up its icons.
-function IconPicker:initialise()
-	ISPanel.initialise(self)
-	self:updateIcons()
+---Updates icon information.
+function IconPicker:updateIcons()
+	local iconInfo = self:buildIconList()
+	local contents = {}
+
+	local row = 0
+	for _, info in ipairs(iconInfo) do
+		if #info.list > 0 then
+			row = row + 1
+			contents[row] = 'UI_OmiChat_icon_cat_' .. info.category
+
+			local rowIcons = {}
+			for i, icon in ipairs(info.list) do
+				if i % self.columns == 1 then
+					row = row + 1
+					rowIcons = {}
+					contents[row] = rowIcons
+				end
+
+				rowIcons[#rowIcons+1] = icon
+			end
+		end
+	end
+
+	self._rowContents = contents
 end
+
 
 ---Creates a new icon picker.
 ---@param x number

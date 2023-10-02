@@ -1,4 +1,9 @@
 local lib = require 'OmiChat/lib'
+local utils = require 'OmiChat/util'
+local customStreams = require 'OmiChat/CustomStreamData'
+
+local floor = math.floor
+
 
 ---Helper for retrieving sandbox variables and their defaults.
 ---@class omichat.Options : omi.Sandbox
@@ -67,9 +72,6 @@ local lib = require 'OmiChat/lib'
 ---@field ChatFormatServer string
 local Option = lib.sandbox('OmiChat')
 
-local floor = math.floor
-local utils = require 'OmiChat/util'
-local customStreams = require 'OmiChat/CustomStreamData'
 
 ---@type table<omichat.ColorCategory, string>
 local colorOpts = {
@@ -84,6 +86,36 @@ local colorOpts = {
     safehouse = 'ColorSafehouse',
     server    = 'ColorServer',
 }
+
+---@type table<omichat.CalloutCategory, string>
+local calloutOpts = {
+    callouts      = 'EnableCustomShouts',
+    sneakcallouts = 'EnableCustomSneakShouts',
+}
+
+
+---@param options omichat.Options
+---@param colorOpt string?
+---@return omichat.ColorTable?
+local function getColorOrDefault(options, colorOpt)
+    if not colorOpt then
+        return
+    end
+
+    local value = options[colorOpt]
+    local settingColor = value and utils.stringToColor(value)
+    if settingColor then
+        return settingColor
+    end
+
+    local defaultStr = options:getDefault(colorOpt)
+    local defaultColor = defaultStr and utils.stringToColor(defaultStr)
+
+    if defaultColor then
+        return defaultColor
+    end
+end
+
 
 ---Returns the default color associated with a category.
 ---@param category omichat.ColorCategory
@@ -133,36 +165,16 @@ function Option:getDefaultColor(category, username)
 
     ---@type omichat.CustomStreamInfo?
     local custom = customStreams[category]
-    if custom then
-        local colorOpt = custom and custom.colorOpt
-        local settingColor = utils.stringToColor(self[colorOpt])
-        if settingColor then
-            return settingColor
-        end
 
-        local defaultStr = colorOpt and self:getDefault(colorOpt)
-        local defaultColor = defaultStr and utils.stringToColor(defaultStr)
+    return getColorOrDefault(self, custom and custom.colorOpt)
+        or getColorOrDefault(self, colorOpts[category])
+        or {r = 255, g = 255, b = 255}
+end
 
-        if defaultColor then
-            return defaultColor
-        end
-    end
-
-    local optName = colorOpts[category]
-    if optName then
-        local optColor = utils.stringToColor(self[optName])
-        if optColor then
-            return optColor
-        end
-
-        local optDefault = self:getDefault(optName)
-        local optDefaultColor = optDefault and utils.stringToColor(optDefault)
-        if optDefaultColor then
-            return optDefaultColor
-        end
-    end
-
-    return {r = 255, g = 255, b = 255}
+---Returns whether the provided callout category type is enabled.
+---@param category omichat.CalloutCategory
+function Option:isCustomCalloutTypeEnabled(category)
+    return self[calloutOpts[category]]
 end
 
 

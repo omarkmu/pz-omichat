@@ -61,106 +61,7 @@ local noStream = {
     speech = true,
 }
 
-OmiChat.setIconsToExclude({
-    -- shadowed by colors
-    thistle = true,
-    salmon = true,
-    tomato = true,
-    orange = true,
 
-    -- doesn't work/often not included by collectAllIcons
-    boilersuitblue = true,
-    boilersuitred = true,
-    glovesleatherbrown = true,
-    jumpsuitprisonkhaki = true,
-    jumpsuitprisonorange = true,
-    jacketgreen = true,
-    jacketlongblack = true,
-    jacketlongbrown = true,
-    jacketvarsity_alpha = true,
-    jacketvarsity_ky = true,
-    shirtdenimblue = true,
-    shirtdenimlightblue = true,
-    shirtdenimlightblack = true,
-    shirtlumberjackblue = true,
-    shirtlumberjackgreen = true,
-    shirtlumberjackgrey = true,
-    shirtlumberjackred = true,
-    shirtlumberjackyellow = true,
-    shirtscrubsblue = true,
-    shirtscrubsgreen = true,
-    shortsathleticblue = true,
-    shortsathleticgreen = true,
-    shortsathleticred = true,
-    shortsathleticyellow = true,
-    shortsdenimblack = true,
-    shortslongathleticgreen = true,
-    tshirtathleticblue = true,
-    tshirtathleticred = true,
-    tshirtathleticyellow = true,
-    tshirtathleticgreen = true,
-    trousersscrubsblue = true,
-    trousersscrubsgreen = true,
-
-    -- visually identical to other icons
-    tz_mayonnaisefullrotten = true,
-    tz_mayonnaisehalf = true,
-    tz_mayonnaisehalfrotten = true,
-    tz_remouladefullrotten = true,
-    tz_remouladehalf = true,
-    tz_remouladehalfrotten = true,
-    glovecompartment = true,
-    truckbed = true,
-    fishcatfishcooked = true,
-    fishcatfishoverdone = true,
-    fishcrappiecooked = true,
-    fishpanfishcooked = true,
-    fishpanfishoverdone = true,
-    fishperchcooked = true,
-    fishperchoverdone = true,
-    fishpikecooked = true,
-    fishpikeoverdone = true,
-    fishtroutcooked = true,
-    fishtroutoverdone = true,
-    tvdinnerburnt = true,
-    tvdinnerrotten = true,
-
-    -- shows up overhead as text
-    composter = true,
-    clothingdryer = true,
-    clothingwasher = true,
-    mailbox = true,
-    mannequin = true,
-    toolcabinet = true,
-})
-
-
----Returns the non-empty lines of a string.
----If there are no non-empty lines, returns nil.
----@param text string
----@param maxLen integer?
----@return string[]?
-local function getLines(text, maxLen)
-    if not text then
-        return
-    end
-
-    local lines = {}
-    for line in text:gmatch('[^\n]+\n?') do
-        line = utils.trim(line)
-        if maxLen and #line > maxLen then
-            lines[#lines+1] = line:sub(1, maxLen)
-        elseif #line > 0 then
-            lines[#lines+1] = line
-        end
-    end
-
-    if #lines == 0 then
-        return
-    end
-
-    return lines
-end
 
 ---Encodes message information, including chat name and colors.
 ---@param author string The username of the message author.
@@ -191,6 +92,56 @@ local function decodeTag(tag)
         name = values.n,
         nameColor = utils.stringToColor(values.cn),
     }
+end
+
+---Gets the command associated with a color category.
+---@param cat omichat.ColorCategory
+---@return string?
+local function getColorCatStreamCommand(cat)
+    if noStream[cat] then
+        return
+    end
+
+    if cat == 'private' then
+        return OmiChat.isCustomStreamEnabled('whisper') and '/pm' or '/whisper'
+    end
+
+    if cat == 'general' then
+        return '/all'
+    end
+
+    if cat == 'shout' then
+        return '/yell'
+    end
+
+    return '/' .. cat
+end
+
+---Returns the non-empty lines of a string.
+---If there are no non-empty lines, returns nil.
+---@param text string
+---@param maxLen integer?
+---@return string[]?
+local function getLines(text, maxLen)
+    if not text then
+        return
+    end
+
+    local lines = {}
+    for line in text:gmatch('[^\n]+\n?') do
+        line = utils.trim(line)
+        if maxLen and #line > maxLen then
+            lines[#lines+1] = line:sub(1, maxLen)
+        elseif #line > 0 then
+            lines[#lines+1] = line
+        end
+    end
+
+    if #lines == 0 then
+        return
+    end
+
+    return lines
 end
 
 ---Applies message transforms and format options to a message.
@@ -253,29 +204,6 @@ local function processTransforms(message, skipFormatting)
     end
 
     return info
-end
-
----Gets the command associated with a color category.
----@param cat omichat.ColorCategory
----@return string?
-local function getColorCatStreamCommand(cat)
-    if noStream[cat] then
-        return
-    end
-
-    if cat == 'private' then
-        return OmiChat.isCustomStreamEnabled('whisper') and '/pm' or '/whisper'
-    end
-
-    if cat == 'general' then
-        return '/all'
-    end
-
-    if cat == 'shout' then
-        return '/yell'
-    end
-
-    return '/' .. cat
 end
 
 ---Sets whether the emoji button is enabled.

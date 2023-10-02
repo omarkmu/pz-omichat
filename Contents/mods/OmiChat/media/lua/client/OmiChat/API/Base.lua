@@ -12,6 +12,7 @@ local getText = getText
 ---@class omichat.ISChat
 local ISChat = ISChat
 
+
 ---@class omichat.api.client : omichat.api.shared
 ---@field private _commandStreams omichat.CommandStream[]
 ---@field private _emotes table<string, string | omichat.EmoteGetter>
@@ -31,7 +32,78 @@ OmiChat._iniVersion = 1
 OmiChat._iniName = 'omichat.ini'
 
 ---@type table<string, true>
-OmiChat._iconsToExclude = {}
+OmiChat._iconsToExclude = {
+    -- shadowed by colors
+    thistle = true,
+    salmon = true,
+    tomato = true,
+    orange = true,
+
+    -- doesn't work/often not included by collectAllIcons
+    boilersuitblue = true,
+    boilersuitred = true,
+    glovesleatherbrown = true,
+    jumpsuitprisonkhaki = true,
+    jumpsuitprisonorange = true,
+    jacketgreen = true,
+    jacketlongblack = true,
+    jacketlongbrown = true,
+    jacketvarsity_alpha = true,
+    jacketvarsity_ky = true,
+    shirtdenimblue = true,
+    shirtdenimlightblue = true,
+    shirtdenimlightblack = true,
+    shirtlumberjackblue = true,
+    shirtlumberjackgreen = true,
+    shirtlumberjackgrey = true,
+    shirtlumberjackred = true,
+    shirtlumberjackyellow = true,
+    shirtscrubsblue = true,
+    shirtscrubsgreen = true,
+    shortsathleticblue = true,
+    shortsathleticgreen = true,
+    shortsathleticred = true,
+    shortsathleticyellow = true,
+    shortsdenimblack = true,
+    shortslongathleticgreen = true,
+    tshirtathleticblue = true,
+    tshirtathleticred = true,
+    tshirtathleticyellow = true,
+    tshirtathleticgreen = true,
+    trousersscrubsblue = true,
+    trousersscrubsgreen = true,
+
+    -- visually identical to other icons
+    tz_mayonnaisefullrotten = true,
+    tz_mayonnaisehalf = true,
+    tz_mayonnaisehalfrotten = true,
+    tz_remouladefullrotten = true,
+    tz_remouladehalf = true,
+    tz_remouladehalfrotten = true,
+    glovecompartment = true,
+    truckbed = true,
+    fishcatfishcooked = true,
+    fishcatfishoverdone = true,
+    fishcrappiecooked = true,
+    fishpanfishcooked = true,
+    fishpanfishoverdone = true,
+    fishperchcooked = true,
+    fishperchoverdone = true,
+    fishpikecooked = true,
+    fishpikeoverdone = true,
+    fishtroutcooked = true,
+    fishtroutoverdone = true,
+    tvdinnerburnt = true,
+    tvdinnerrotten = true,
+
+    -- shows up overhead as text
+    composter = true,
+    clothingdryer = true,
+    clothingwasher = true,
+    mailbox = true,
+    mannequin = true,
+    toolcabinet = true,
+}
 
 ---@type table<string, omichat.MetaFormatter>
 OmiChat._formatters = {}
@@ -254,7 +326,7 @@ OmiChat._commandStreams = {
 OmiChat._transformers = {
     {
         name = 'radio-chat',
-        priority = 8,
+        priority = 10,
         transform = function(self, info)
             if info.chatType ~= 'radio' then
                 return
@@ -273,7 +345,7 @@ OmiChat._transformers = {
     },
     {
         name = 'decode-stream',
-        priority = 6,
+        priority = 8,
         transform = function(self, info)
             local isRadio = info.context.ocIsRadio
             for name, streamData in pairs(customStreamData) do
@@ -317,7 +389,7 @@ OmiChat._transformers = {
     },
     {
         name = 'set-range',
-        priority = 4,
+        priority = 6,
         transform = function(self, info)
             local range
             local chatRange
@@ -361,7 +433,7 @@ OmiChat._transformers = {
     },
     {
         name = 'private-chat',
-        priority = 2,
+        priority = 4,
         transform = function(self, info)
             if info.chatType ~= 'whisper' then
                 return
@@ -380,6 +452,37 @@ OmiChat._transformers = {
 
             info.formatOptions.color = OmiChat.getColorTable('private')
             info.formatOptions.useChatColor = false
+        end,
+    },
+    {
+        name = 'server-chat',
+        priority = 2,
+        transform = function(self, info)
+            if info.chatType ~= 'server' then
+                return
+            end
+
+            if ISChat.instance.showTitle then
+                -- not great, but can't access the real isShowTitle chat setting to do this in a safer way
+                local patt = concat { '%[', getText('UI_chat_server_chat_title_id'), '%]:' }
+                local _, serverMsgStart = info.rawText:find(patt)
+                if serverMsgStart then
+                    info.content = info.rawText:sub(serverMsgStart + 1)
+                end
+            else
+                -- server messages can be only their text, if not set to show title
+                -- still have to extract text due to the existing rich text
+
+                local _, sizeEnd = info.rawText:find('<SIZE:')
+                local start = sizeEnd ~= -1 and info.rawText:find('>', sizeEnd)
+                if start then
+                    info.content = info.rawText:sub(start + 1)
+                end
+            end
+
+            -- mirroring ServerChat settings
+            info.formatOptions.showTimestamp = false
+            info.format = Option.ChatFormatServer
         end,
     },
     {
@@ -421,37 +524,6 @@ OmiChat._transformers = {
             end
         end,
     },
-    {
-        name = 'server-chat',
-        priority = 2,
-        transform = function(self, info)
-            if info.chatType ~= 'server' then
-                return
-            end
-
-            if ISChat.instance.showTitle then
-                -- not great, but can't access the real isShowTitle chat setting to do this in a safer way
-                local patt = concat { '%[', getText('UI_chat_server_chat_title_id'), '%]:' }
-                local _, serverMsgStart = info.rawText:find(patt)
-                if serverMsgStart then
-                    info.content = info.rawText:sub(serverMsgStart + 1)
-                end
-            else
-                -- server messages can be only their text, if not set to show title
-                -- still have to extract text due to the existing rich text
-
-                local _, sizeEnd = info.rawText:find('<SIZE:')
-                local start = sizeEnd ~= -1 and info.rawText:find('>', sizeEnd)
-                if start then
-                    info.content = info.rawText:sub(start + 1)
-                end
-            end
-
-            -- mirroring ServerChat settings
-            info.formatOptions.showTimestamp = false
-            info.format = Option.ChatFormatServer
-        end,
-    },
 }
 
 ---@type table<string, string | omichat.EmoteGetter>
@@ -488,6 +560,7 @@ OmiChat._emotes = {
     fire = 'signalfire',
 }
 
+
 ---@protected
 function OmiChat._onGameStart()
     OmiChat.updateState()
@@ -499,6 +572,7 @@ function OmiChat._onGameStart()
         OmiChat.updateCharacterName(name)
     end
 end
+
 
 Events.OnGameStart.Add(OmiChat._onGameStart)
 return OmiChat

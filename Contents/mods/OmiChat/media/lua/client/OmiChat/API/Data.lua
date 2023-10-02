@@ -8,11 +8,120 @@ local getText = getText
 local OmiChat = require 'OmiChat/API/Base'
 local Option = OmiChat.Option
 
----@type table<omichat.CalloutCategory, string>
-local shoutOpts = {
-    callouts = 'EnableCustomShouts',
-    sneakcallouts = 'EnableCustomSneakShouts',
-}
+
+---Sets the color associated with a given color category for the current player,
+---if the related option is enabled.
+---Client only.
+---@param category omichat.ColorCategory
+---@param color omichat.ColorTable?
+function OmiChat.changeColor(category, color)
+    if category == 'speech' then
+        return OmiChat.changeSpeechColor(color)
+    end
+
+    if category ~= 'name' then
+        -- no syncing necessary for chat colors; just set in player preferences
+        local prefs = OmiChat.getPlayerPreferences()
+        prefs.colors[category] = color
+        OmiChat.savePlayerPreferences()
+
+        return
+    end
+
+    if not Option.EnableSetNameColor then
+        return
+    end
+
+    local player = getSpecificPlayer(0)
+    local username = player and player:getUsername()
+    if not username then
+        return
+    end
+
+    local modData = OmiChat.getModData()
+
+    modData.nameColors[username] = color and utils.colorToHexString(color) or nil
+    modData._updates = { nameColorToUpdate = username }
+
+    ModData.transmit(OmiChat._modDataKey)
+end
+
+---Sets the color used for overhead chat bubbles.
+---This will set the speech color in-game option.
+---@param color omichat.ColorTable?
+function OmiChat.changeSpeechColor(color)
+    if not color or not Option.EnableSetSpeechColor then
+        return
+    end
+
+    local player = getSpecificPlayer(0)
+    if not player then
+        return
+    end
+
+    local r = color.r / 255
+    local g = color.g / 255
+    local b = color.b / 255
+
+    local core = getCore()
+    core:setMpTextColor(ColorInfo.new(r, g, b, 1))
+    core:saveOptions()
+    player:setSpeakColourInfo(core:getMpTextColor())
+    sendPersonalColor(player)
+end
+
+---Gets a color table for the current player, or nil if unset.
+---@param category omichat.ColorCategory
+---@return omichat.ColorTable?
+function OmiChat.getColor(category)
+    if category == 'name' then
+        local player = getSpecificPlayer(0)
+        return OmiChat.getNameColor(player and player:getUsername())
+    end
+
+    if category == 'speech' then
+        return OmiChat.getSpeechColor()
+    end
+
+    local prefs = OmiChat.getPlayerPreferences()
+    return prefs.colors[category]
+end
+
+---Retrieves the player's custom shouts.
+---@param shoutType omichat.CalloutCategory The type of shouts to retrieve.
+---@return string[]?
+function OmiChat.getCustomShouts(shoutType)
+    if not Option:isCustomCalloutTypeEnabled(shoutType) then
+        return
+    end
+
+    local player = getSpecificPlayer(0)
+    if not player then
+        return
+    end
+
+    local prefs = OmiChat.getPlayerPreferences()
+    return prefs[shoutType]
+end
+
+---Retrieves a boolean for whether the current player has name colors enabled.
+---@return boolean
+function OmiChat.getNameColorsEnabled()
+    return OmiChat.getPlayerPreferences().showNameColors
+end
+
+---Gets the nickname for the current player, if one is set.
+---@return string?
+function OmiChat.getNickname()
+    local player = getSpecificPlayer(0)
+    local username = player and player:getUsername()
+    if not username then
+        return
+    end
+
+    local modData = OmiChat.getModData()
+    return modData.nicknames[username]
+end
 
 ---Gets or creates the player preferences table.
 ---@return omichat.PlayerPreferences
@@ -65,7 +174,27 @@ function OmiChat.getPlayerPreferences()
     OmiChat._playerPrefs = prefs
 end
 
----Saves current player preferences to a file.
+---Returns a color table for the current player's speech color.
+---@return omichat.ColorTable?
+function OmiChat.getSpeechColor()
+    local player = getSpecificPlayer(0)
+    if not player then
+        return
+    end
+
+    local speechColor = player:getSpeakColour()
+    if not speechColor then
+        return
+    end
+
+    return {
+        r = speechColor:getRed(),
+        g = speechColor:getGreen(),
+        b = speechColor:getBlue(),
+    }
+end
+
+---Saves the current player preferences to a file.
 function OmiChat.savePlayerPreferences()
     if not OmiChat._playerPrefs then
         return
@@ -94,52 +223,30 @@ function OmiChat.savePlayerPreferences()
     outFile:close()
 end
 
----Updates the current player's character name.
----@param name string The new full name of the character. This will be split into forename and surname.
----@param surname string? The character surname. If provided, `name` will be interpreted as the forename.
-function OmiChat.updateCharacterName(name, surname)
-    if #name == 0 then
+---Sets the player's custom shouts.
+---@param shouts string[]?
+---@param shoutType omichat.CalloutCategory The type of shouts to set.
+function OmiChat.setCustomShouts(shouts, shoutType)
+    if not Option:isCustomCalloutTypeEnabled(shoutType) then
         return
     end
 
-    local player = getSpecificPlayer(0)
-    local desc = player and player:getDescriptor()
-    if not desc then
-        return
+    local prefs = OmiChat.getPlayerPreferences()
+
+    if not shouts then
+        prefs[shoutType] = {}
+    else
+        prefs[shoutType] = shouts
     end
 
-    local forename = name
-    if not surname then
-        surname = ''
-
-        local parts = name:split(' ')
-        if #parts > 1 then
-            forename = concat(parts, ' ', 1, #parts - 1)
-            surname = parts[#parts]
-        end
-    end
-
-    desc:setForename(forename)
-    desc:setSurname(surname)
-
-    -- update name in inventory
-    player:getInventory():setDrawDirty(true)
-    getPlayerData(player:getPlayerNum()).playerInventory:refreshBackpacks()
-
-    sendPlayerStatsChange(player)
+    OmiChat.savePlayerPreferences()
 end
 
----Gets the nickname for the current player, if one is set.
----@return string?
-function OmiChat.getNickname()
-    local player = getSpecificPlayer(0)
-    local username = player and player:getUsername()
-    if not username then
-        return
-    end
-
-    local modData = OmiChat.getModData()
-    return modData.nicknames[username]
+---Sets whether the current player has name colors enabled.
+---@param enabled boolean True to enable, false to disable.
+function OmiChat.setNameColorEnabled(enabled)
+    OmiChat.getPlayerPreferences().showNameColors = not not enabled
+    OmiChat.savePlayerPreferences()
 end
 
 ---Sets the nickname of the current player.
@@ -185,151 +292,40 @@ function OmiChat.setNickname(nickname)
     return true, getText('UI_OmiChat_set_name_success', utils.escapeRichText(nickname))
 end
 
----Sets the color used for overhead chat bubbles.
----This will set the speech color in-game option.
----@param color omichat.ColorTable?
-function OmiChat.changeSpeechColor(color)
-    if not color or not Option.EnableSetSpeechColor then
+---Updates the current player's character name.
+---@param name string The new full name of the character. This will be split into forename and surname.
+---@param surname string? The character surname. If provided, `name` will be interpreted as the forename.
+function OmiChat.updateCharacterName(name, surname)
+    if #name == 0 then
         return
     end
 
     local player = getSpecificPlayer(0)
-    if not player then
+    local desc = player and player:getDescriptor()
+    if not desc then
         return
     end
 
-    local r = color.r / 255
-    local g = color.g / 255
-    local b = color.b / 255
+    local forename = name
+    if not surname then
+        surname = ''
 
-    local core = getCore()
-    core:setMpTextColor(ColorInfo.new(r, g, b, 1))
-    core:saveOptions()
-    player:setSpeakColourInfo(core:getMpTextColor())
-    sendPersonalColor(player)
+        local parts = name:split(' ')
+        if #parts > 1 then
+            forename = concat(parts, ' ', 1, #parts - 1)
+            surname = parts[#parts]
+        end
+    end
+
+    desc:setForename(forename)
+    desc:setSurname(surname)
+
+    -- update name in inventory
+    player:getInventory():setDrawDirty(true)
+    getPlayerData(player:getPlayerNum()).playerInventory:refreshBackpacks()
+
+    sendPlayerStatsChange(player)
 end
 
----Sets the color associated with a given color category for the current player,
----if the related option is enabled.
----Client only.
----@param category omichat.ColorCategory
----@param color omichat.ColorTable?
-function OmiChat.changeColor(category, color)
-    if category == 'speech' then
-        return OmiChat.changeSpeechColor(color)
-    end
-
-    if category ~= 'name' then
-        -- no syncing necessary for chat colors; just set in player preferences
-        local prefs = OmiChat.getPlayerPreferences()
-        prefs.colors[category] = color
-        OmiChat.savePlayerPreferences()
-
-        return
-    end
-
-    if not Option.EnableSetNameColor then
-        return
-    end
-
-    local player = getSpecificPlayer(0)
-    local username = player and player:getUsername()
-    if not username then
-        return
-    end
-
-    local modData = OmiChat.getModData()
-
-    modData.nameColors[username] = color and utils.colorToHexString(color) or nil
-    modData._updates = { nameColorToUpdate = username }
-
-    ModData.transmit(OmiChat._modDataKey)
-end
-
----Gets a color table for the current player, or nil if unset.
----@param category omichat.ColorCategory
----@return omichat.ColorTable?
-function OmiChat.getColor(category)
-    if category == 'name' then
-        local player = getSpecificPlayer(0)
-        return OmiChat.getNameColor(player and player:getUsername())
-    end
-
-    if category == 'speech' then
-        return OmiChat.getSpeechColor()
-    end
-
-    local prefs = OmiChat.getPlayerPreferences()
-    return prefs.colors[category]
-end
-
----Retrieves the player's custom shouts.
----@param shoutType omichat.CalloutCategory The type of shouts to retrieve.
----@return string[]?
-function OmiChat.getCustomShouts(shoutType)
-    if not Option[shoutOpts[shoutType]] then
-        return
-    end
-
-    local player = getSpecificPlayer(0)
-    if not player then
-        return
-    end
-
-    local prefs = OmiChat.getPlayerPreferences()
-    return prefs[shoutType]
-end
-
----Retrieves a boolean for whether the current player has name colors enabled.
----@return boolean
-function OmiChat.getNameColorsEnabled()
-    return OmiChat.getPlayerPreferences().showNameColors
-end
-
----Returns a color table for the current player's speech color.
----@return omichat.ColorTable?
-function OmiChat.getSpeechColor()
-    local player = getSpecificPlayer(0)
-    if not player then
-        return
-    end
-
-    local speechColor = player:getSpeakColour()
-    if not speechColor then
-        return
-    end
-
-    return {
-        r = speechColor:getRed(),
-        g = speechColor:getGreen(),
-        b = speechColor:getBlue(),
-    }
-end
-
----Sets the player's custom shouts.
----@param shouts string[]?
----@param shoutType omichat.CalloutCategory The type of shouts to set.
-function OmiChat.setCustomShouts(shouts, shoutType)
-    if not Option[shoutOpts[shoutType]] then
-        return
-    end
-
-    local prefs = OmiChat.getPlayerPreferences()
-
-    if not shouts then
-        prefs[shoutType] = {}
-    else
-        prefs[shoutType] = shouts
-    end
-
-    OmiChat.savePlayerPreferences()
-end
-
----Sets whether the current player has name colors enabled.
----@param enabled boolean True to enable, false to disable.
-function OmiChat.setNameColorEnabled(enabled)
-    OmiChat.getPlayerPreferences().showNameColors = not not enabled
-    OmiChat.savePlayerPreferences()
-end
 
 return OmiChat

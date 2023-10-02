@@ -19,8 +19,10 @@ local floor = math.floor
 local MetaFormatter = lib.class()
 MetaFormatter._nextID = 101
 
+
 ---@type omichat.MetaFormatter[]
 local formatters = {}
+
 
 ---Formats the text according to the formatter's format string.
 ---This encodes invisible characters for later identification.

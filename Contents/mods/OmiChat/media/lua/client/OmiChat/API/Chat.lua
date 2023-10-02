@@ -15,6 +15,7 @@ local ISChat = ISChat
 ---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Base'
 local Option = OmiChat.Option
+local IconPicker = OmiChat.IconPicker
 
 local streamDefs = require 'OmiChat/API/Streams'
 local streamOverrides = streamDefs.streamOverrides
@@ -53,6 +54,20 @@ local InfoMessage = {
 }
 InfoMessage.__index = InfoMessage
 
+
+---Creates a built-in formatter and assigns a constant ID.
+---@param fmt string
+---@param id integer
+local function createFormatter(fmt, id)
+    -- not using `new` directly to avoid automatic ID assignment
+    ---@type omichat.MetaFormatter
+    local formatter = setmetatable({}, OmiChat.MetaFormatter)
+
+    formatter:init({ format = fmt })
+    formatter:setID(id)
+
+    return formatter
+end
 
 ---Inserts a chat stream relative to another.
 ---If the other chat stream isn't found, inserts at the end.
@@ -97,18 +112,81 @@ local function insertStreamRelative(stream, other, value)
     return stream
 end
 
----Creates a built-in formatter and assigns a constant ID.
----@param fmt string
----@param id integer
-local function createFormatter(fmt, id)
-    -- not using `new` directly to avoid automatic ID assignment
-    ---@type omichat.MetaFormatter
-    local formatter = setmetatable({}, OmiChat.MetaFormatter)
+---Creates or removes the emoji button and picker from the chat box based on sandbox options.
+local function updateEmojiComponents()
+    local add = Option.EnableIconPicker
+    local instance = ISChat.instance
 
-    formatter:init({ format = fmt })
-    formatter:setID(id)
+    local epIncludeMisc = instance.emojiPicker and instance.emojiPicker.includeUnknownAsMiscellaneous
+    local includeMisc = Option.EnableMiscellaneousIcons
+    if instance.emojiPicker and epIncludeMisc ~= includeMisc then
+        instance.emojiPicker.includeUnknownAsMiscellaneous = includeMisc
+        instance.emojiPicker:updateIcons()
+    end
 
-    return formatter
+    if add and instance.emojiButton then
+        return
+    end
+
+    if not add and not instance.emojiButton then
+        return
+    end
+
+    if add then
+        local size = math.floor(instance.textEntry.height * 0.75)
+        instance.emojiButton = ISButton:new(
+            instance.width - size * 1.25 - 2.5,
+            instance.textEntry.y + instance.textEntry.height * 0.5 - size * 0.5 + 1,
+            size,
+            size,
+            '',
+            instance,
+            ISChat.onEmojiButtonClick
+        )
+
+        instance.textEntry.width = instance.textEntry.width - size * 1.5
+        instance.textEntry.javaObject:setWidth(instance.textEntry.width)
+
+        instance.emojiButton.anchorRight = true
+        instance.emojiButton.anchorBottom = true
+        instance.emojiButton.anchorLeft = false
+        instance.emojiButton.anchorTop = false
+
+        instance.emojiButton:initialise()
+        instance.emojiButton.borderColor.a = 0
+        instance.emojiButton.backgroundColor.a = 0
+        instance.emojiButton.backgroundColorMouseOver.a = 0
+        instance.emojiButton:setImage(getTexture('Item_PlushSpiffo'))
+        instance.emojiButton:setTextureRGBA(0.3, 0.3, 0.3, 1)
+        instance.emojiButton:setUIName('chat emoji button')
+        instance:addChild(instance.emojiButton)
+
+        instance.emojiButton:bringToTop()
+
+        instance.emojiPicker = IconPicker:new(0, 0, instance, ISChat.onEmojiClick)
+        instance.emojiPicker.exclude = OmiChat._iconsToExclude
+        instance.emojiPicker.includeUnknownAsMiscellaneous = OmiChat.Option.EnableMiscellaneousIcons
+
+        instance.emojiPicker:initialise()
+        instance.emojiPicker:addToUIManager()
+        instance.emojiPicker:setVisible(false)
+
+        return
+    end
+
+    instance.textEntry.width = instance:getWidth() - instance.inset * 2
+    instance.textEntry.javaObject:setWidth(instance.textEntry.width)
+
+    instance:removeChild(instance.emojiButton)
+    instance.emojiButton:setVisible(false)
+    instance.emojiButton:removeFromUIManager()
+    instance.emojiButton = nil
+
+    if instance.emojiPicker then
+        instance.emojiPicker:setVisible(false)
+        instance.emojiPicker:removeFromUIManager()
+        instance.emojiPicker = nil
+    end
 end
 
 ---Creates or updates built-in formatters.
@@ -201,83 +279,6 @@ local function updateStreams()
     end
 end
 
----Creates or removes the emoji button and picker from the chat box based on sandbox options.
-local function updateEmojiComponents()
-    local add = Option.EnableIconPicker
-    local instance = ISChat.instance
-
-    local epIncludeMisc = instance.emojiPicker and instance.emojiPicker.includeUnknownAsMiscellaneous
-    local includeMisc = Option.EnableMiscellaneousIcons
-    if instance.emojiPicker and epIncludeMisc ~= includeMisc then
-        instance.emojiPicker.includeUnknownAsMiscellaneous = includeMisc
-        instance.emojiPicker:updateIcons()
-    end
-
-    if add and instance.emojiButton then
-        return
-    end
-
-    if not add and not instance.emojiButton then
-        return
-    end
-
-    if add then
-        local size = math.floor(instance.textEntry.height * 0.75)
-        instance.emojiButton = ISButton:new(
-            instance.width - size * 1.25 - 2.5,
-            instance.textEntry.y + instance.textEntry.height * 0.5 - size * 0.5 + 1,
-            size,
-            size,
-            '',
-            instance,
-            ISChat.onEmojiButtonClick
-        )
-
-        instance.textEntry.width = instance.textEntry.width - size * 1.5
-        instance.textEntry.javaObject:setWidth(instance.textEntry.width)
-
-        instance.emojiButton.anchorRight = true
-        instance.emojiButton.anchorBottom = true
-        instance.emojiButton.anchorLeft = false
-        instance.emojiButton.anchorTop = false
-
-        instance.emojiButton:initialise()
-        instance.emojiButton.borderColor.a = 0
-        instance.emojiButton.backgroundColor.a = 0
-        instance.emojiButton.backgroundColorMouseOver.a = 0
-        instance.emojiButton:setImage(getTexture('Item_PlushSpiffo'))
-        instance.emojiButton:setTextureRGBA(0.3, 0.3, 0.3, 1)
-        instance.emojiButton:setUIName('chat emoji button')
-        instance:addChild(instance.emojiButton)
-
-        instance.emojiButton:bringToTop()
-
-        instance.emojiPicker = IconPicker:new(0, 0, instance, ISChat.onEmojiClick)
-        instance.emojiPicker.exclude = OmiChat._iconsToExclude
-        instance.emojiPicker.includeUnknownAsMiscellaneous = OmiChat.Option.EnableMiscellaneousIcons
-
-        instance.emojiPicker:initialise()
-        instance.emojiPicker:addToUIManager()
-        instance.emojiPicker:setVisible(false)
-
-        return
-    end
-
-    instance.textEntry.width = instance:getWidth() - instance.inset * 2
-    instance.textEntry.javaObject:setWidth(instance.textEntry.width)
-
-    instance:removeChild(instance.emojiButton)
-    instance.emojiButton:setVisible(false)
-    instance.emojiButton:removeFromUIManager()
-    instance.emojiButton = nil
-
-    if instance.emojiPicker then
-        instance.emojiPicker:setVisible(false)
-        instance.emojiPicker:removeFromUIManager()
-        instance.emojiPicker = nil
-    end
-end
-
 ---Removes an element from a table, shifting subsequent elements.
 ---@param tab table
 ---@param target unknown
@@ -337,14 +338,30 @@ function OmiChat.addCommand(stream)
     OmiChat._commandStreams[#OmiChat._commandStreams+1] = stream
 end
 
----Removes a stream from the list of available chat commands.
----@param stream omichat.CommandStream
-function OmiChat.removeCommand(stream)
-    if not stream then
-        return
+---Adds an emote that is playable from chat with the .emote syntax.
+---@param name string The name of the emote, as it can be used from chat.
+---@param emoteOrGetter string | omichat.EmoteGetter The string to associate with the emote, or a function which retrieves one.
+function OmiChat.addEmote(name, emoteOrGetter)
+    if type(emoteOrGetter) == 'function' then
+        OmiChat._emotes[name] = emoteOrGetter
+    elseif emoteOrGetter then
+        OmiChat._emotes[name] = tostring(emoteOrGetter)
     end
+end
 
-    remove(OmiChat._commandStreams, stream)
+---Adds a message transformer which can act on message information
+---to modify display or behavior.
+---@param transformer omichat.MessageTransformer
+function OmiChat.addMessageTransform(transformer)
+    OmiChat._transformers[#OmiChat._transformers+1] = transformer
+
+    -- not stable sorting
+    table.sort(OmiChat._transformers, function(a, b)
+        local aPri = a.priority or 1
+        local bPri = b.priority or 1
+
+        return aPri > bPri
+    end)
 end
 
 ---Adds a chat stream.
@@ -381,77 +398,6 @@ end
 ---@param otherStream omichat.ChatStream?
 function OmiChat.addStreamBefore(stream, otherStream)
     return insertStreamRelative(stream, otherStream, 0)
-end
-
----Removes a stream from the list of available chat streams.
----@param stream omichat.ChatStream
-function OmiChat.removeStream(stream)
-    if not stream then
-        return
-    end
-
-    -- remove from all streams table
-    remove(ISChat.allChatStreams, stream)
-
-    -- remove from tab streams
-    local tabs = ISChat.instance.tabs
-    if tabs then
-        remove(tabs, stream)
-    end
-end
-
----Adds an emote that is playable from chat with the .emote syntax.
----@param name string The name of the emote, as it can be used from chat.
----@param emoteOrGetter string | omichat.EmoteGetter The string to associate with the emote, or a function which retrieves one.
-function OmiChat.addEmote(name, emoteOrGetter)
-    if type(emoteOrGetter) == 'function' then
-        OmiChat._emotes[name] = emoteOrGetter
-    elseif emoteOrGetter then
-        OmiChat._emotes[name] = tostring(emoteOrGetter)
-    end
-end
-
----Removes an emote from the registry.
----@param name string
-function OmiChat.removeEmote(name)
-    OmiChat._emotes[name] = nil
-end
-
----Adds a message transformer which can act on message information
----to modify display or behavior.
----@param transformer omichat.MessageTransformer
-function OmiChat.addMessageTransform(transformer)
-    OmiChat._transformers[#OmiChat._transformers+1] = transformer
-
-    -- not stable sorting
-    table.sort(OmiChat._transformers, function(a, b)
-        local aPri = a.priority or 1
-        local bPri = b.priority or 1
-
-        return aPri > bPri
-    end)
-end
-
----Removes a message transformer.
----@param transformer omichat.MessageTransformer
-function OmiChat.removeMessageTransform(transformer)
-    remove(OmiChat._transformers, transformer)
-end
-
----Removes the first message transformer with the provided name.
----@param name string
-function OmiChat.removeMessageTransformByName(name)
-    local target
-    for i, v in ipairs(OmiChat._transformers) do
-        if v.name and v.name == name then
-            target = i
-            break
-        end
-    end
-
-    if target then
-        table.remove(OmiChat._transformers, target)
-    end
 end
 
 ---Applies format options from a message information table.
@@ -700,6 +646,61 @@ end
 ---@return omichat.MetaFormatter
 function OmiChat.getFormatter(name)
     return OmiChat._formatters[name]
+end
+
+---Removes a stream from the list of available chat commands.
+---@param stream omichat.CommandStream
+function OmiChat.removeCommand(stream)
+    if not stream then
+        return
+    end
+
+    remove(OmiChat._commandStreams, stream)
+end
+
+---Removes an emote from the registry.
+---@param name string
+function OmiChat.removeEmote(name)
+    OmiChat._emotes[name] = nil
+end
+
+---Removes a stream from the list of available chat streams.
+---@param stream omichat.ChatStream
+function OmiChat.removeStream(stream)
+    if not stream then
+        return
+    end
+
+    -- remove from all streams table
+    remove(ISChat.allChatStreams, stream)
+
+    -- remove from tab streams
+    local tabs = ISChat.instance.tabs
+    if tabs then
+        remove(tabs, stream)
+    end
+end
+
+---Removes a message transformer.
+---@param transformer omichat.MessageTransformer
+function OmiChat.removeMessageTransform(transformer)
+    remove(OmiChat._transformers, transformer)
+end
+
+---Removes the first message transformer with the provided name.
+---@param name string
+function OmiChat.removeMessageTransformByName(name)
+    local target
+    for i, v in ipairs(OmiChat._transformers) do
+        if v.name and v.name == name then
+            target = i
+            break
+        end
+    end
+
+    if target then
+        table.remove(OmiChat._transformers, target)
+    end
 end
 
 ---Redraws the current chat messages.
