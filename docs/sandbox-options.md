@@ -132,18 +132,6 @@ The maximum number of custom [shouts](#enablecustomshouts) and [sneak shouts](#e
 
 Note that the two maximums are separate; a value of `10` means a player can specify 10 shouts and 10 sneak shouts.
 
-### MaximumColorValue
-`default → 255, minimum → 0, maximum → 255`
-
-The maximum value for R, G, and B components of chat colors.
-Applies to all chat color customization settings.
-
-### MinimumColorValue
-`default → 48, minimum → 0, maximum → 255`
-
-The minimum value for R, G, and B components of chat colors.
-Applies to all chat color customization settings.
-
 ### NameMaxLength
 `default → 50, minimum → 0, maximum → 50`
 

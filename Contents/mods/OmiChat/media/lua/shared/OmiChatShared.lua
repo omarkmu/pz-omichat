@@ -172,6 +172,26 @@ end
 ---| 'admin'
 ---| 'server'
 
+---Categories for custom callouts.
+---@alias omichat.CalloutCategory 'callouts' | 'sneakcallouts'
+
+---Categories for colors that can be customized by players.
+---@alias omichat.ColorCategory
+---| omichat.CustomStreamName
+---| 'general'
+---| 'say'
+---| 'shout'
+---| 'faction'
+---| 'safehouse'
+---| 'radio'
+---| 'admin'
+---| 'server'
+---| 'private'
+---| 'discord'
+---| 'name'
+---| 'speech'
+
+
 ---A table containing color values in [0, 255].
 ---@class omichat.ColorTable
 ---@field r integer

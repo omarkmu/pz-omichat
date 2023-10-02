@@ -17,8 +17,6 @@ Sandbox_EN = {
 
     Sandbox_OCCustomShoutMaxLength = "Custom Shout Maximum Length",
     Sandbox_OCMaximumCustomShouts = "Maximum Custom Shouts",
-    Sandbox_OCMaximumColorValue = "Maximum Color Value",
-    Sandbox_OCMinimumColorValue = "Minimum Color Value",
     Sandbox_OCNameMaxLength = "Maximum /name Length",
 
     Sandbox_OCRangeDo = "/do Range",

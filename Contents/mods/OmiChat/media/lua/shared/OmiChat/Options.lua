@@ -21,8 +21,6 @@ local floor = math.floor
 ---@field EnableChatNameAsCharacterName boolean
 ---@field CustomShoutMaxLength integer
 ---@field MaximumCustomShouts integer
----@field MinimumColorValue integer
----@field MaximumColorValue integer
 ---@field NameMaxLength integer
 ---@field RangeMe integer
 ---@field RangeLooc integer

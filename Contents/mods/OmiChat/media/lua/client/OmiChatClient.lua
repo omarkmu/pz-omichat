@@ -9,25 +9,6 @@ require 'OmiChat/API/Chat'
 ---Function to retrieve a playable emote string given an emote name.
 ---@alias omichat.EmoteGetter fun(emoteName: string): string?
 
----Categories for custom callouts.
----@alias omichat.CalloutCategory 'callouts' | 'sneakcallouts'
-
----Categories for colors that can be customized by players.
----@alias omichat.ColorCategory
----| omichat.CustomStreamName
----| 'general'
----| 'say'
----| 'shout'
----| 'faction'
----| 'safehouse'
----| 'radio'
----| 'admin'
----| 'server'
----| 'private'
----| 'discord'
----| 'name'
----| 'speech'
-
 ---Valid values for the chat's font.
 ---@alias omichat.ChatFont 'small' | 'medium' | 'large'
 

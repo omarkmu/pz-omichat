@@ -1,3 +1,6 @@
+local math = math
+local utils = require 'OmiChat/util'
+
 ---Color selection modal.
 ---Includes a text field for RGB input and a color picker.
 ---@class omichat.ColorModal : ISTextBox
@@ -7,9 +10,6 @@
 ---@field maximumValue integer
 ---@field requireValue boolean
 local ColorModal = ISTextBox:derive('ColorModal')
-
-local math = math
-local utils = require 'OmiChat/util'
 
 
 ---Clamps the RGB color values in `color` to within the provided range.

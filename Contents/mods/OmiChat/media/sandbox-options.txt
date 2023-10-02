@@ -48,12 +48,6 @@ option OmiChat.CustomShoutMaxLength
 option OmiChat.MaximumCustomShouts
 { type = integer, default = 10, min = 1, max = 20, page = OmiChat, translation = OCMaximumCustomShouts, }
 
-option OmiChat.MaximumColorValue
-{ type = integer, default = 255, min = 0, max = 255, page = OmiChat, translation = OCMaximumColorValue, }
-
-option OmiChat.MinimumColorValue
-{ type = integer, default = 48, min = 0, max = 255, page = OmiChat, translation = OCMinimumColorValue, }
-
 option OmiChat.NameMaxLength
 { type = integer, default = 50, min = 0, max = 50, page = OmiChat, translation = OCNameMaxLength, }
 

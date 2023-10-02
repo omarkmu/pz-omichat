@@ -207,16 +207,7 @@ function ISChat.onCustomColorMenu(target, category)
     local width = max(450, getTextManager():MeasureStringX(UIFont.Small, text) + 60)
     local modal = ColorModal:new(0, 0, width, 250, text, color, target, ISChat.onCustomColorMenuClick, 0, category)
 
-    local minVal = Option.MinimumColorValue
-    local maxVal = Option.MaximumColorValue
-    if minVal > maxVal then
-        local temp = minVal
-        minVal = maxVal
-        maxVal = temp
-    end
-
-    modal:setMinValue(minVal)
-    modal:setMaxValue(maxVal)
+    modal:setMinValue(category == 'speech' and 48 or 0)
     modal:setEmptyColor(Option:getDefaultColor(category))
     modal:initialise()
     modal:addToUIManager()
