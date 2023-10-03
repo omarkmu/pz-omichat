@@ -32,7 +32,6 @@ local ISChat = ISChat
 ---@field private titleID string
 ---@field private recipientName string?
 local MimicMessage = lib.class()
-MimicMessage.getTextWithPrefix = OmiChat.buildMessageText
 
 
 ---@return string
@@ -136,6 +135,11 @@ end
 ---@return Color
 function MimicMessage:getTextColor()
     return self.textColor
+end
+
+---@return string
+function MimicMessage:getTextWithPrefix()
+    return OmiChat.buildMessageText(self)
 end
 
 ---@return string
