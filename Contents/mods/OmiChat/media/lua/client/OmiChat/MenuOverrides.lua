@@ -19,7 +19,7 @@ local function getMenuName(player, menuType)
         return
     end
 
-    tokens.name = OmiChat.utils.replaceEntities(chatName)
+    tokens.name = OmiChat.utils.unescapeRichText(chatName)
     tokens.menuType = menuType
     local result = OmiChat.utils.interpolate(nameFormat, tokens)
 

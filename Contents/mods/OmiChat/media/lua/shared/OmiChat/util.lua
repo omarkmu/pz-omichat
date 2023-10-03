@@ -10,7 +10,6 @@ local concat = table.concat
 local utils = lib.utils.copy(lib.utils)
 utils.kvp = {}
 utils.Interpolator = Interpolator
-utils.replaceEntities = Interpolator.replaceEntities
 
 local shortHexPattern = '^%s*#?(%x)(%x)(%x)%s*$'
 local fullHexPattern = '^%s*#?(%x%x)%s*(%x%x)%s*(%x%x)%s*$'
@@ -174,6 +173,18 @@ function utils.isValidColor(color)
     return true
 end
 
+---Replaces character entities with the characters that they represent.
+---Numeric entities and named entities in ISO-8859-1 are supported.
+---@param text string
+---@return string
+function utils.replaceEntities(text)
+    text = text:gsub('(&#?x?[%a%d]+;)', function(entity)
+        return utils.getEntityValue(entity) or entity
+    end)
+
+    return text
+end
+
 ---Converts a color string to a color. Returns `nil` on failure.
 ---@param text string A color string, in RGB or hex.
 ---@return omichat.ColorTable?
@@ -249,6 +260,14 @@ function utils.tryStringToColor(text, minColor, maxColor)
     end
 
     return { success = true, value = { r = r, g = g, b = b } }
+end
+
+---Reverses the operation of escaping text for use in a rich text panel.
+---@see ISRichTextPanel
+---@see omichat.utils.escapeRichText
+---@param text string
+function utils.unescapeRichText(text)
+    return (text:gsub('&lt;', '<'):gsub('&gt;', '>'))
 end
 
 
