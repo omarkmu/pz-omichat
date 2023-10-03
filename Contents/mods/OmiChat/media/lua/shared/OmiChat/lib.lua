@@ -174,9 +174,22 @@ function MultiMap:has(key)
     return self._map[key] ~= nil
 end
 
+---Gets the first value associated with a key.
+---@param key unknown The key to query.
+---@param default unknown? A default value to return if there are no entries associated with the key.
+---@return unknown?
+function MultiMap:get(key, default)
+    local list = self._map[key]
+    if not list then
+        return default
+    end
+
+    return list[1].value
+end
+
 ---Gets a MultiMap of entries associated with a key.
 ---@param key unknown The key to query.
----@param default unknown? A default value to return if there is no nth value.
+---@param default unknown? A default value to return if there are no entries associated with the key.
 ---@return unknown?
 function MultiMap:index(key, default)
     if not self:has(key) then
@@ -690,6 +703,110 @@ __bundle_register("utils/string", function(require)
 local utils = {}
 
 
+local iso8859Entities = {
+    quot = 34,
+    amp = 38,
+    lt = 60,
+    gt = 62,
+    nbsp = 160,
+    iexcl = 161,
+    cent = 162,
+    pound = 163,
+    curren = 164,
+    yen = 165,
+    brvbar = 166,
+    sect = 167,
+    uml = 168,
+    copy = 169,
+    ordf = 170,
+    laquo = 171,
+    ['not'] = 172,
+    shy = 173,
+    reg = 174,
+    macr = 175,
+    deg = 176,
+    plusmn = 177,
+    sup2 = 178,
+    sup3 = 179,
+    acute = 180,
+    micro = 181,
+    para = 182,
+    middot = 183,
+    cedil = 184,
+    sup1 = 185,
+    ordm = 186,
+    raquo = 187,
+    frac14 = 188,
+    frac12 = 189,
+    frac34 = 190,
+    iquest = 191,
+    Agrave = 192,
+    Aacute = 193,
+    Acirc = 194,
+    Atilde = 195,
+    Auml = 196,
+    Aring = 197,
+    AElig = 198,
+    Ccedil = 199,
+    Egrave = 200,
+    Eacute = 201,
+    Ecirc = 202,
+    Euml = 203,
+    Igrave = 204,
+    Iacute = 205,
+    Icirc = 206,
+    Iuml = 207,
+    ETH = 208,
+    Ntilde = 209,
+    Ograve = 210,
+    Oacute = 211,
+    Ocirc = 212,
+    Otilde = 213,
+    Ouml = 214,
+    times = 215,
+    Oslash = 216,
+    Ugrave = 217,
+    Uacute = 218,
+    Ucirc = 219,
+    Uuml = 220,
+    Yacute = 221,
+    THORN = 222,
+    szlig = 223,
+    agrave = 224,
+    aacute = 225,
+    acirc = 226,
+    atilde = 227,
+    auml = 228,
+    aring = 229,
+    aelig = 230,
+    ccedil = 231,
+    egrave = 232,
+    eacute = 233,
+    ecirc = 234,
+    euml = 235,
+    igrave = 236,
+    iacute = 237,
+    icirc = 238,
+    iuml = 239,
+    eth = 240,
+    ntilde = 241,
+    ograve = 242,
+    oacute = 243,
+    ocirc = 244,
+    otilde = 245,
+    ouml = 246,
+    divide = 247,
+    oslash = 248,
+    ugrave = 249,
+    uacute = 250,
+    ucirc = 251,
+    uuml = 252,
+    yacute = 253,
+    thorn = 254,
+    yuml = 255,
+}
+
+
 ---Tests if a table is empty or has only keys from 1 to #t.
 ---@param t table
 local function isArray(t)
@@ -790,6 +907,39 @@ end
 ---@return string
 function utils.escape(text)
     return (text:gsub('([[%]%+-*?().^$])', '%%%1'))
+end
+
+---Returns the value of a numeric character reference or character entity reference.
+---If the value cannot be resolved, returns `nil`.
+---@param entity string
+---@return string?
+function utils.getEntityValue(entity)
+    if entity:sub(1, 1) ~= '&' or entity:sub(#entity) ~= ';' then
+        return
+    end
+
+    entity = entity:sub(2, #entity - 1)
+    if entity:sub(1, 1) ~= '#' then
+        local value = iso8859Entities[entity]
+        if value then
+            return string.char(value)
+        end
+    end
+
+    local hex = entity:sub(2, 2) == 'x'
+    local num = entity:sub(hex and 3 or 2)
+
+    local value = tonumber(num, hex and 16 or 10)
+    if not value then
+        return
+    end
+
+    local success, char = pcall(string.char, value)
+    if not success then
+        return
+    end
+
+    return char
 end
 
 ---Removes whitespace from either side of a string.
@@ -893,6 +1043,7 @@ local NodeType = InterpolationParser.NodeType
 ---@field protected _allowTokens boolean
 ---@field protected _allowMultiMaps boolean
 ---@field protected _allowFunctions boolean
+---@field protected _allowCharacterEntities boolean
 ---@field protected _requireCustomTokenUnderscore boolean
 ---@field protected _parser omi.interpolate.Parser
 ---@field protected _rand Random?
@@ -904,8 +1055,9 @@ Interpolator.Libraries = InterpolatorLibraries
 ---@class omi.interpolate.Options
 ---@field pattern string? The initial format string of the interpolator.
 ---@field allowTokens boolean? Whether tokens should be interpreted. If false, tokens will be treated as text.
----@field allowMultiMaps boolean? Whether at-maps should be interpreted. If false, they are ignored.
----@field allowFunctions boolean? Whether functions should be interpreted. If false, they are ignored.
+---@field allowCharacterEntities boolean? Whether character entities should be interpreted. If false, they will be treated as text.
+---@field allowMultiMaps boolean? Whether at-maps should be interpreted. If false, they will be treated as text.
+---@field allowFunctions boolean? Whether functions should be interpreted. If false, they will be treated as text.
 ---@field requireCustomTokenUnderscore boolean? Whether custom tokens should require a leading underscore.
 ---@field libraryInclude table<string, boolean>? Set of library functions or modules to allow. If absent, all will be allowed.
 ---@field libraryExclude table<string, boolean>? Set of library functions or modules to exclude. If absent, none will be excluded.
@@ -1231,7 +1383,8 @@ function Interpolator:createParser(pattern)
     return InterpolationParser:new(pattern, {
         allowTokens = self._allowTokens,
         allowFunctions = self._allowFunctions,
-        allowAtExpressions = self._allowMultiMaps
+        allowAtExpressions = self._allowMultiMaps,
+        allowCharacterEntities = self._allowCharacterEntities,
     })
 end
 
@@ -1251,6 +1404,7 @@ function Interpolator:new(options)
     this._allowTokens = utils.default(options.allowTokens, true)
     this._allowMultiMaps = utils.default(options.allowMultiMaps, true)
     this._allowFunctions = utils.default(options.allowFunctions, true)
+    this._allowCharacterEntities = utils.default(options.allowCharacterEntities, true)
     this._requireCustomTokenUnderscore = utils.default(options.requireCustomTokenUnderscore, true)
 
     this:loadLibraries(options.libraryInclude, options.libraryExclude)
@@ -1272,6 +1426,7 @@ local utils = require("utils")
 ---@field protected _allowTokens boolean
 ---@field protected _allowAtExpr boolean
 ---@field protected _allowFunctions boolean
+---@field protected _allowCharEntities boolean
 local InterpolationParser = BaseParser:derive()
 
 
@@ -1279,6 +1434,7 @@ local InterpolationParser = BaseParser:derive()
 ---@field allowTokens boolean?
 ---@field allowFunctions boolean?
 ---@field allowAtExpressions boolean?
+---@field allowCharacterEntities boolean?
 
 
 ---@enum omi.interpolate.NodeType
@@ -1330,13 +1486,13 @@ local NodeType = InterpolationParser.NodeType
 
 -- text patterns for node types
 local TEXT_PATTERNS = {
-    -- $ = token/escape/call start, space = delimiter, ( = string start, ) = call end
-    [NodeType.argument] = '^([^ $()]+)[ $()]?',
-    -- $ = token/escape/call start, @ = at-expression start, ; = delim, : = delimiter, ( = string start, ) = expression end
-    [NodeType.at_key] = '^([^:;$@()]+)[:;$@()]?',
-    [NodeType.at_value] = '^([^:;$@()]+)[:;$@()]?',
+    -- $ = token/escape/call start, space = delimiter, ( = string start, ) = call end, & = entity start
+    [NodeType.argument] = ' $%(%)&',
+    -- $ = token/escape/call start, @ = at-expression start, ; = delim, : = delimiter, ( = string start, ) = expression end, & = entity start
+    [NodeType.at_key] = ':;$@%(%)&',
+    [NodeType.at_value] = ':;$@%(%)&',
     -- $ = escape start, ) = string end
-    [NodeType.string] = '^([^$)]+)[$)]?',
+    [NodeType.string] = '$%)',
 }
 
 local SPECIAL = {
@@ -1346,6 +1502,7 @@ local SPECIAL = {
     [';'] = true,
     ['('] = true,
     [')'] = true,
+    ['&'] = true,
 }
 
 ---Returns a table with consecutive text nodes merged.
@@ -1482,18 +1639,23 @@ postprocessNode = function(node)
 end
 
 
+---@protected
+---Gets the value of a named or numeric entity.
+---@protected
+---@param entity string
+function InterpolationParser:getEntityValue(entity)
+    return utils.getEntityValue(entity) or entity
+end
+
 ---Gets the pattern for text nodes given the current node type.
 ---@return string
 ---@protected
 function InterpolationParser:getTextPattern()
     local type = self._node and self._node.type
 
-    if TEXT_PATTERNS[type] then
-        return TEXT_PATTERNS[type]
-    end
-
-    -- $ = token/escape/call start, @ = at-expression start
-    return '^([^$@]+)[$@]?'
+    -- $ = token/escape/call start, @ = at-expression start, & = entity start
+    local patt = TEXT_PATTERNS[type] or '$@&'
+    return string.format('^([^%s])[%s]?', patt, patt)
 end
 
 ---Reads space characters and returns a literal string of spaces.
@@ -1513,7 +1675,7 @@ end
 ---@return omi.fmt.ParseTreeNode?
 ---@protected
 function InterpolationParser:readEscape()
-    local value = self._text:match('^$([$@();:])', self:pos())
+    local value = self._text:match('^$([$@();:&])', self:pos())
     if not value then
         return
     end
@@ -1612,6 +1774,35 @@ function InterpolationParser:readVariable()
     end
 
     local node = self:createNode(NodeType.token, { value = name })
+    self:setNodeEnd(node, pos - 1)
+    self:pos(pos)
+
+    return self:addNode(node)
+end
+
+---Reads a character entity (e.g., `&#171;`)
+---@return omi.fmt.ParseTreeNode?
+---@protected
+function InterpolationParser:readCharacterEntity()
+    if not self._allowCharEntities then
+        return
+    end
+
+    local entity, pos = self._text:match('^(&#x?%d+;)()', self:pos())
+
+    if not entity then
+        entity, pos = self._text:match('^(&%a+;)()', self:pos())
+        if not entity then
+            return
+        end
+    end
+
+    local value = self:getEntityValue(entity)
+    if not value then
+        return
+    end
+
+    local node = self:createNode(NodeType.text, { value = value })
     self:setNodeEnd(node, pos - 1)
     self:pos(pos)
 
@@ -1798,6 +1989,7 @@ function InterpolationParser:readExpression()
         or self:readFunction()
         or self:readVariable()
         or self:readAtExpression()
+        or self:readCharacterEntity()
         or self:readText()
         or self:readSpecialText()
 end
@@ -1834,6 +2026,7 @@ function InterpolationParser:new(text, options)
     this._allowTokens = utils.default(options.allowTokens, true)
     this._allowAtExpr = utils.default(options.allowAtExpressions, true)
     this._allowFunctions = utils.default(options.allowFunctions, true)
+    this._allowCharEntities = utils.default(options.allowCharacterEntities, true)
 
     return this
 end
@@ -2682,6 +2875,22 @@ functions.map = {
         return o:last()
     end,
     ---@param interpolator omi.interpolate.Interpolator
+    has = function(interpolator, o, k)
+        if not o or not utils.isinstance(o, MultiMap) then
+            return
+        end
+
+        return o:has(k)
+    end,
+    ---@param interpolator omi.interpolate.Interpolator
+    get = function(interpolator, o, k, d)
+        if not o or not utils.isinstance(o, MultiMap) then
+            return
+        end
+
+        return o:get(k, d)
+    end,
+    ---@param interpolator omi.interpolate.Interpolator
     index = function(interpolator, o, i, d)
         if not utils.isinstance(o, MultiMap) then
             return functions.string.index(interpolator, o, i, d)
@@ -2889,7 +3098,7 @@ end)
 ---@class omi.lib
 local OmiLib = {}
 
-OmiLib.VERSION = '1.0.0'
+OmiLib.VERSION = '1.1.0'
 
 ---@type omi.class | (fun(cls: table?): omi.Class)
 OmiLib.class = require("class")
