@@ -1,3 +1,5 @@
+---Client API functionality related to manipulating the chat.
+
 local utils = require 'OmiChat/util'
 local MimicMessage = require 'OmiChat/MimicMessage'
 local customStreamData = require 'OmiChat/CustomStreamData'
@@ -13,8 +15,10 @@ local ISChat = ISChat
 
 
 ---@class omichat.api.client
-local OmiChat = require 'OmiChat/API/Base'
+local OmiChat = require 'OmiChat/API/Client'
 OmiChat.MimicMessage = MimicMessage
+
+
 local Option = OmiChat.Option
 local IconPicker = OmiChat.IconPicker
 
@@ -915,6 +919,3 @@ function OmiChat.updateState(redraw)
         OmiChat.redrawMessages(false)
     end
 end
-
-
-return OmiChat

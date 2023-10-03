@@ -17,31 +17,6 @@ local fullHexPattern = '^%s*#?(%x%x)%s*(%x%x)%s*(%x%x)%s*$'
 local rgbPattern = '^%s*(%d%d?%d?)[,%s]+(%d%d?%d?)[,%s]+(%d%d?%d?)%s*$'
 
 
----Checks a color table for validity.
----@param color table
----@return boolean
-local function checkColorTable(color)
-    if type(color) ~= 'table' then
-        return false
-    end
-
-    local r = color.r
-    local g = color.g
-    local b = color.b
-
-    if type(r) ~= 'number' or r < 0 or r > 255 then
-        return false
-    end
-    if type(g) ~= 'number' or g < 0 or g > 255 then
-        return false
-    end
-    if type(b) ~= 'number' or b < 0 or b > 255 then
-        return false
-    end
-
-    return true
-end
-
 ---Attempts to read an RGB or hex color from a string.
 ---@param text string
 ---@return number?
@@ -174,6 +149,31 @@ function utils.interpolate(text, tokens, options)
     return interpolator:interpolate(tokens)
 end
 
+---Checks a color table for validity.
+---@param color omichat.ColorTable?
+---@return boolean
+function utils.isValidColor(color)
+    if type(color) ~= 'table' then
+        return false
+    end
+
+    local r = color.r
+    local g = color.g
+    local b = color.b
+
+    if type(r) ~= 'number' or r < 0 or r > 255 then
+        return false
+    end
+    if type(g) ~= 'number' or g < 0 or g > 255 then
+        return false
+    end
+    if type(b) ~= 'number' or b < 0 or b > 255 then
+        return false
+    end
+
+    return true
+end
+
 ---Converts a color string to a color. Returns `nil` on failure.
 ---@param text string A color string, in RGB or hex.
 ---@return omichat.ColorTable?
@@ -186,7 +186,7 @@ end
 ---@param pushFormat boolean? If true, PUSHRGB format will be used.
 ---@return string
 function utils.toChatColor(color, pushFormat)
-    if not checkColorTable(color) then
+    if not utils.isValidColor(color) then
         return ''
     end
 
@@ -208,7 +208,7 @@ end
 ---@param bbCodeFormat boolean? If true, BBCode format will be used.
 ---@return string
 function utils.toOverheadColor(color, bbCodeFormat)
-    if not checkColorTable(color) then
+    if not utils.isValidColor(color) then
         return ''
     end
 

@@ -1,4 +1,4 @@
-local OmiChat = require 'OmiChat/API/Base'
+local OmiChat = require 'OmiChat/API/Client'
 local utils = require 'OmiChat/util'
 
 local concat = table.concat

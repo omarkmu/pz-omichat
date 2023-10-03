@@ -1,6 +1,6 @@
 local lib = require 'OmiChat/lib'
 local utils = require 'OmiChat/util'
-local OmiChat = require 'OmiChat/API/Base'
+local OmiChat = require 'OmiChat/API/Client'
 
 local format = string.format
 local concat = table.concat

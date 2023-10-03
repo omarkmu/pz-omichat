@@ -1,10 +1,17 @@
 ---Provides client API access to OmiChat.
----Includes utilities for interfacing with the chat and extending mod functionality.
 ---@class omichat.api.client
-local OmiChat = require 'OmiChat/API/Base'
+local OmiChat = require 'OmiChat/API/Client'
 
-require 'OmiChat/API/Data'
 require 'OmiChat/API/Chat'
+require 'OmiChat/API/ClientData'
+require 'OmiChat/API/ClientDispatch'
+
+Events.OnGameStart.Add(OmiChat._onGameStart)
+Events.OnCreatePlayer.Add(OmiChat._onCreatePlayer)
+Events.OnReceiveGlobalModData.Add(OmiChat._onReceiveGlobalModData)
+
+return OmiChat
+
 
 ---Function to retrieve a playable emote string given an emote name.
 ---@alias omichat.EmoteGetter fun(emoteName: string): string?
@@ -93,5 +100,3 @@ require 'OmiChat/API/Chat'
 ---@field callouts string[]
 ---@field sneakcallouts string[]
 ---@field colors table<omichat.ColorCategory, omichat.ColorTable>
-
-return OmiChat

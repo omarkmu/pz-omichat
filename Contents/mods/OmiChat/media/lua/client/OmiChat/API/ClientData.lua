@@ -1,3 +1,5 @@
+---Client API functionality related to handling player data.
+
 local utils = require 'OmiChat/util'
 
 local concat = table.concat
@@ -5,13 +7,12 @@ local pairs = pairs
 local getText = getText
 
 ---@class omichat.api.client
-local OmiChat = require 'OmiChat/API/Base'
+local OmiChat = require 'OmiChat/API/Client'
 local Option = OmiChat.Option
 
 
 ---Sets the color associated with a given color category for the current player,
 ---if the related option is enabled.
----Client only.
 ---@param category omichat.ColorCategory
 ---@param color omichat.ColorTable?
 function OmiChat.changeColor(category, color)
@@ -28,10 +29,6 @@ function OmiChat.changeColor(category, color)
         return
     end
 
-    if not Option.EnableSetNameColor then
-        return
-    end
-
     local player = getSpecificPlayer(0)
     local username = player and player:getUsername()
     if not username then
@@ -39,18 +36,21 @@ function OmiChat.changeColor(category, color)
     end
 
     local modData = OmiChat.getModData()
+    local value = color and utils.colorToHexString(color) or nil
 
-    modData.nameColors[username] = color and utils.colorToHexString(color) or nil
-    modData._updates = { nameColorToUpdate = username }
-
-    ModData.transmit(OmiChat._modDataKey)
+    modData.nameColors[username] = value
+    OmiChat.requestDataUpdate(player, {
+        target = username,
+        field = 'nameColors',
+        value = value,
+    })
 end
 
 ---Sets the color used for overhead chat bubbles.
 ---This will set the speech color in-game option.
 ---@param color omichat.ColorTable?
 function OmiChat.changeSpeechColor(color)
-    if not color or not Option.EnableSetSpeechColor then
+    if not utils.isValidColor(color) then
         return
     end
 
@@ -59,6 +59,7 @@ function OmiChat.changeSpeechColor(color)
         return
     end
 
+    ---@cast color omichat.ColorTable
     local r = color.r / 255
     local g = color.g / 255
     local b = color.b / 255
@@ -271,8 +272,10 @@ function OmiChat.setNickname(nickname)
 
     if #nickname == 0 then
         modData.nicknames[username] = nil
-        modData._updates = { nicknameToClear = username }
-        ModData.transmit(OmiChat._modDataKey)
+        OmiChat.requestDataUpdate(player, {
+            target = username,
+            field = 'nicknames',
+        })
 
         if Option.EnableChatNameAsCharacterName then
             return false, getText('UI_OmiChat_set_name_empty')
@@ -287,23 +290,28 @@ function OmiChat.setNickname(nickname)
     end
 
     modData.nicknames[username] = nickname
-    modData._updates = { nicknameToUpdate = username }
-    ModData.transmit(OmiChat._modDataKey)
+    OmiChat.requestDataUpdate(player, {
+        value = nickname,
+        target = username,
+        field = 'nicknames',
+    })
+
     return true, getText('UI_OmiChat_set_name_success', utils.escapeRichText(nickname))
 end
 
 ---Updates the current player's character name.
 ---@param name string The new full name of the character. This will be split into forename and surname.
 ---@param surname string? The character surname. If provided, `name` will be interpreted as the forename.
+---@return boolean success
 function OmiChat.updateCharacterName(name, surname)
     if #name == 0 then
-        return
+        return false
     end
 
     local player = getSpecificPlayer(0)
     local desc = player and player:getDescriptor()
     if not desc then
-        return
+        return false
     end
 
     local forename = name
@@ -325,7 +333,6 @@ function OmiChat.updateCharacterName(name, surname)
     getPlayerData(player:getPlayerNum()).playerInventory:refreshBackpacks()
 
     sendPlayerStatsChange(player)
+
+    return true
 end
-
-
-return OmiChat

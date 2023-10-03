@@ -1,3 +1,5 @@
+---Base client API.
+
 require 'Chat/ISChat'
 
 local utils = require 'OmiChat/util'
@@ -562,17 +564,48 @@ OmiChat._emotes = {
 
 
 ---@protected
-function OmiChat._onGameStart()
-    OmiChat.updateState()
-
-    local name = Option.EnableChatNameAsCharacterName and OmiChat.getNickname()
-    if name then
-        -- set existing nickname to character name and clear it
-        OmiChat.setNickname()
-        OmiChat.updateCharacterName(name)
+---@param idx integer
+---@param player IsoPlayer
+function OmiChat._onCreatePlayer(idx, player)
+    if idx ~= 0 then
+        return
     end
+
+    if Option.EnableChatNameAsCharacterName then
+        local name = OmiChat.getNickname()
+        if not name then
+            return
+        end
+
+        -- set existing nickname to character name
+        -- server will handle clearing nickname
+        if name then
+            OmiChat.updateCharacterName(name)
+        end
+    end
+
+    OmiChat.informPlayerCreated(player)
+end
+
+---Event handler that runs on game start.
+---@protected
+function OmiChat._onGameStart()
+    OmiChat.updateState(true)
+end
+
+---Event handler for retrieving global mod data.
+---@param key string
+---@param newData omichat.ModData
+---@protected
+function OmiChat._onReceiveGlobalModData(key, newData)
+    if key ~= OmiChat._modDataKey or type(newData) ~= 'table' then
+        return
+    end
+
+    local modData = OmiChat.getModData()
+    modData.nicknames = newData.nicknames
+    modData.nameColors = newData.nameColors
 end
 
 
-Events.OnGameStart.Add(OmiChat._onGameStart)
 return OmiChat
