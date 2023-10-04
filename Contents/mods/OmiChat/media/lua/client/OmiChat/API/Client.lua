@@ -350,7 +350,7 @@ OmiChat._transformers = {
         priority = 8,
         transform = function(self, info)
             local isRadio = info.context.ocIsRadio
-            for name, streamData in pairs(customStreamData) do
+            for name, streamData in pairs(customStreamData.table) do
                 local formatter = OmiChat.getFormatter(name)
                 local isValidStream = OmiChat.isCustomStreamEnabled(name) and streamData.chatTypes[info.chatType]
                 local isMatch = formatter:isMatch(info.content or info.rawText)
@@ -395,7 +395,7 @@ OmiChat._transformers = {
         transform = function(self, info)
             local range
             local chatRange
-            local streamData = info.context.ocCustomStream and customStreamData[info.context.ocCustomStream]
+            local streamData = info.context.ocCustomStream and customStreamData.table[info.context.ocCustomStream]
             if streamData then
                 range = Option[streamData.rangeOpt]
                 chatRange = Option:getDefault(streamData.defaultRangeOpt or 'RangeSay')

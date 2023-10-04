@@ -462,7 +462,7 @@ function ISChat:onGearButtonClick()
         colorOpts[#colorOpts+1] = 'shout'
     end
 
-    for name, streamInfo in pairs(customStreamData) do
+    for name, streamInfo in pairs(customStreamData.table) do
         if name ~= 'whisper' and streamInfo.allowColorCustomization and OmiChat.isCustomStreamEnabled(name) then
             colorOpts[#colorOpts+1] = name
         end

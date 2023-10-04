@@ -100,7 +100,7 @@ end
 ---@param name omichat.CustomStreamName
 ---@return boolean
 function OmiChat.isCustomStreamEnabled(name)
-    local opts = customStreamData[name]
+    local opts = customStreamData.table[name]
     if not opts then
         return false
     end

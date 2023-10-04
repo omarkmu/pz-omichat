@@ -171,7 +171,7 @@ end
 
 ---Creates or updates built-in formatters.
 local function updateFormatters()
-    for fmtName, info in pairs(customStreamData) do
+    for fmtName, info in pairs(customStreamData.table) do
         local opt = Option[info.overheadFormatOpt]
         if OmiChat._formatters[fmtName] then
             OmiChat._formatters[fmtName]:setFormatString(opt)
@@ -183,79 +183,52 @@ end
 
 ---Updates streams based on sandbox options.
 local function updateStreams()
-    -- grab references to insert new streams before default /whisper
-    local private, whisper
+    local vanillaWhisper
     local custom = {}
     for _, stream in ipairs(ISChat.allChatStreams) do
         if stream.omichat then
+            local data = customStreamData.table[stream.name]
             if stream.name == 'private' then
-                private = stream
+                vanillaWhisper = stream
             elseif stream.name == 'whisper' then
                 if stream.omichat.context and stream.omichat.context.ocIsLocalWhisper then
-                    whisper = stream
+                    custom[data] = stream
                 else
-                    private = stream
+                    vanillaWhisper = stream
                 end
-            elseif customStreamData[stream.name] then
-                custom[stream.name] = stream
+            elseif data then
+                custom[data] = stream
             end
         elseif stream.name == 'whisper' then
-            private = stream
-            private.omichat = streamOverrides.private
+            vanillaWhisper = stream
+            vanillaWhisper.omichat = streamOverrides.private
         elseif streamOverrides[stream.name] then
             stream.omichat = streamOverrides[stream.name]
         end
     end
 
-    if not custom.me then
-        custom.me = OmiChat.addStreamBefore(customStreams.me, private)
+    for i = 1, #customStreamData.list do
+        local data = customStreamData.list[i]
+        if not custom[data] and data.name then
+            OmiChat.addStreamBefore(customStreams[data.name], vanillaWhisper)
+        end
     end
 
-    if not custom.looc then
-        OmiChat.addStreamAfter(customStreams.looc, custom.me)
-    end
-
-    if not custom.doloud then
-        OmiChat.addStreamAfter(customStreams.doloud, custom.me)
-    end
-
-    if not custom.doquiet then
-        OmiChat.addStreamAfter(customStreams.doquiet, custom.me)
-    end
-
-    if not custom['do'] then
-        OmiChat.addStreamAfter(customStreams['do'], custom.me)
-    end
-
-    if not custom.meloud then
-        OmiChat.addStreamAfter(customStreams.meloud, custom.me)
-    end
-
-    if not custom.mequiet then
-        OmiChat.addStreamAfter(customStreams.mequiet, custom.me)
+    if not vanillaWhisper then
+        return
     end
 
     local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
-    if useLocalWhisper and not whisper then
-        if private then
-            -- modify /whisper to be /pm
-            private.name = 'private'
-            private.command = '/pm '
-            private.shortCommand = '/pm '
-        end
-
-        -- add custom /whisper
-        OmiChat.addStreamBefore(customStreams.whisper, custom.me or private)
-    elseif not useLocalWhisper and whisper then
-        if private then
-            -- revert /pm to /whisper
-            private.name = 'whisper'
-            private.command = '/whisper '
-            private.shortCommand = '/w '
-        end
-
-        -- remove custom /whisper
-        OmiChat.removeStream(whisper)
+    if useLocalWhisper and vanillaWhisper.name == 'whisper' then
+        -- modify /whisper to be /pm
+        vanillaWhisper.name = 'private'
+        vanillaWhisper.command = '/pm '
+        vanillaWhisper.shortCommand = '/pm '
+    elseif not useLocalWhisper and vanillaWhisper.name == 'private' then
+        -- revert /pm to /whisper
+        vanillaWhisper.name = 'whisper'
+        vanillaWhisper.command = '/whisper '
+        vanillaWhisper.shortCommand = '/w '
     end
 end
 

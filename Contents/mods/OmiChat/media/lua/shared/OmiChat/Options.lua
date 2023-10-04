@@ -162,7 +162,7 @@ function Option:getDefaultColor(category, username)
     end
 
     ---@type omichat.CustomStreamInfo?
-    local custom = customStreams[category]
+    local custom = customStreams.table[category]
 
     return getColorOrDefault(self, custom and custom.colorOpt)
         or getColorOrDefault(self, colorOpts[category])

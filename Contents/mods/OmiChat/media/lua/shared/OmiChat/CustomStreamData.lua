@@ -1,15 +1,18 @@
+---Information about custom streams added by OmiChat.
+
 ---@see omichat.api.client.getFormatter
 ---@alias omichat.CustomStreamName
+---| 'whisper'
+---| 'me'
+---| 'mequiet'
+---| 'meloud'
 ---| 'do'
 ---| 'doquiet'
 ---| 'doloud'
 ---| 'looc'
----| 'me'
----| 'mequiet'
----| 'meloud'
----| 'whisper'
 
 ---@class omichat.CustomStreamInfo
+---@field name string
 ---@field formatID integer
 ---@field colorOpt string
 ---@field rangeOpt string
@@ -21,22 +24,15 @@
 ---@field titleID string?
 ---@field attractZombies boolean?
 
----Information about custom streams added by OmiChat.
+
 ---@type table<omichat.CustomStreamName, omichat.CustomStreamInfo>
-return {
-    looc = {
+local customStreamTable = {}
+
+---@type omichat.CustomStreamInfo[]
+local customStreamList = {
+    {
+        name = 'whisper',
         formatID = 1,
-        colorOpt = 'ColorLooc',
-        rangeOpt = 'RangeLooc',
-        chatFormatOpt = 'ChatFormatLooc',
-        overheadFormatOpt = 'OverheadFormatLooc',
-        chatTypes = { say = true },
-        allowColorCustomization = true,
-        attractZombies = false,
-        showOnRadio = false,
-    },
-    whisper = {
-        formatID = 2,
         colorOpt = 'ColorWhisper',
         rangeOpt = 'RangeWhisper',
         chatFormatOpt = 'ChatFormatWhisper',
@@ -47,8 +43,9 @@ return {
         attractZombies = false,
         showOnRadio = true,
     },
-    me = {
-        formatID = 3,
+    {
+        name = 'me',
+        formatID = 2,
         colorOpt = 'ColorMe',
         rangeOpt = 'RangeMe',
         chatFormatOpt = 'ChatFormatMe',
@@ -59,8 +56,9 @@ return {
         attractZombies = false,
         showOnRadio = false,
     },
-    mequiet = {
-        formatID = 4,
+    {
+        name = 'mequiet',
+        formatID = 3,
         colorOpt = 'ColorMeQuiet',
         rangeOpt = 'RangeMeQuiet',
         chatFormatOpt = 'ChatFormatMeQuiet',
@@ -72,8 +70,9 @@ return {
         attractZombies = false,
         showOnRadio = false,
     },
-    meloud = {
-        formatID = 5,
+    {
+        name = 'meloud',
+        formatID = 4,
         colorOpt = 'ColorMeLoud',
         rangeOpt = 'RangeMeLoud',
         defaultRangeOpt = 'RangeYell',
@@ -85,8 +84,9 @@ return {
         attractZombies = false,
         showOnRadio = false,
     },
-    ['do'] = {
-        formatID = 6,
+    {
+        name = 'do',
+        formatID = 5,
         colorOpt = 'ColorDo',
         rangeOpt = 'RangeDo',
         chatFormatOpt = 'ChatFormatDo',
@@ -97,8 +97,9 @@ return {
         attractZombies = false,
         showOnRadio = false,
     },
-    doquiet = {
-        formatID = 7,
+    {
+        name = 'doquiet',
+        formatID = 6,
         colorOpt = 'ColorDoQuiet',
         rangeOpt = 'RangeDoQuiet',
         chatFormatOpt = 'ChatFormatDoQuiet',
@@ -110,8 +111,9 @@ return {
         attractZombies = false,
         showOnRadio = false,
     },
-    doloud = {
-        formatID = 8,
+    {
+        name = 'doloud',
+        formatID = 7,
         colorOpt = 'ColorDoLoud',
         rangeOpt = 'RangeDoLoud',
         chatFormatOpt = 'ChatFormatDoLoud',
@@ -123,4 +125,25 @@ return {
         attractZombies = false,
         showOnRadio = false,
     },
+    {
+        name = 'looc',
+        formatID = 8,
+        colorOpt = 'ColorLooc',
+        rangeOpt = 'RangeLooc',
+        chatFormatOpt = 'ChatFormatLooc',
+        overheadFormatOpt = 'OverheadFormatLooc',
+        chatTypes = { say = true },
+        allowColorCustomization = true,
+        attractZombies = false,
+        showOnRadio = false,
+    },
+}
+
+for _, v in pairs(customStreamList) do
+    customStreamTable[v.name] = v
+end
+
+return {
+    list = customStreamList,
+    table = customStreamTable,
 }
