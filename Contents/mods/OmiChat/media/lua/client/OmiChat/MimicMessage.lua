@@ -15,6 +15,7 @@ local ISChat = ISChat
 ---@field private overHeadSpeech boolean
 ---@field private showInChat boolean
 ---@field private fromDiscord boolean
+---@field private alreadyEscaped boolean
 ---@field private serverAlert boolean
 ---@field private radioChannel integer
 ---@field private _local boolean
@@ -33,6 +34,11 @@ local ISChat = ISChat
 ---@field private recipientName string?
 local MimicMessage = lib.class()
 
+
+---@return boolean
+function MimicMessage:getAlreadyEscaped()
+    return self.alreadyEscaped
+end
 
 ---@return string
 function MimicMessage:getAuthor()
@@ -153,6 +159,10 @@ end
 
 ---@return string
 function MimicMessage:getTextWithReplacedParentheses()
+    if self:getAlreadyEscaped() then
+        return self.text
+    end
+
     return utils.escapeRichText(self.text)
 end
 
@@ -213,6 +223,11 @@ end
 
 function MimicMessage:makeFromDiscord()
     self.fromDiscord = true
+end
+
+---@param escaped boolean
+function MimicMessage:setAlreadyEscaped(escaped)
+    self.alreadyEscaped = escaped
 end
 
 ---@param author string
@@ -314,6 +329,7 @@ function MimicMessage:new(text, datetime, textColor)
     this.overHeadSpeech = true
     this.showInChat = true
     this.fromDiscord = false
+    this.alreadyEscaped = false
     this.serverAlert = false
     this.radioChannel = -1
     this.chatID = -1

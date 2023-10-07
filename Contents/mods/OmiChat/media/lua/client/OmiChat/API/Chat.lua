@@ -889,6 +889,7 @@ function OmiChat.showInfoMessage(text, serverAlert)
     message:setChatType('server')
     message:setTitleID('UI_chat_server_chat_title_id')
     message:setServerAlert(serverAlert or false)
+    message:setAlreadyEscaped(true)
 
     ISChat.addLineInChat(message, ISChat.instance.currentTabID - 1)
 end
