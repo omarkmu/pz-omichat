@@ -92,64 +92,64 @@ local function insertStreamRelative(stream, other, value)
     return stream
 end
 
----Creates or removes the emoji button and picker from the chat box based on sandbox options.
-local function updateEmojiComponents()
+---Creates or removes the icon button and picker from the chat box based on sandbox options.
+local function updateIconComponents()
     local add = Option.EnableIconPicker
     local instance = ISChat.instance
 
-    local epIncludeMisc = instance.emojiPicker and instance.emojiPicker.includeUnknownAsMiscellaneous
+    local epIncludeMisc = instance.iconPicker and instance.iconPicker.includeUnknownAsMiscellaneous
     local includeMisc = Option.EnableMiscellaneousIcons
-    if instance.emojiPicker and epIncludeMisc ~= includeMisc then
-        instance.emojiPicker.includeUnknownAsMiscellaneous = includeMisc
-        instance.emojiPicker:updateIcons()
+    if instance.iconPicker and epIncludeMisc ~= includeMisc then
+        instance.iconPicker.includeUnknownAsMiscellaneous = includeMisc
+        instance.iconPicker:updateIcons()
     end
 
-    if add and instance.emojiButton then
+    if add and instance.iconButton then
         return
     end
 
-    if not add and not instance.emojiButton then
+    if not add and not instance.iconButton then
         return
     end
 
     if add then
         local size = math.floor(instance.textEntry.height * 0.75)
-        instance.emojiButton = ISButton:new(
+        instance.iconButton = ISButton:new(
             instance.width - size * 1.25 - 2.5,
             instance.textEntry.y + instance.textEntry.height * 0.5 - size * 0.5 + 1,
             size,
             size,
             '',
             instance,
-            ISChat.onEmojiButtonClick
+            ISChat.onIconButtonClick
         )
 
         instance.textEntry.width = instance.textEntry.width - size * 1.5
         instance.textEntry.javaObject:setWidth(instance.textEntry.width)
 
-        instance.emojiButton.anchorRight = true
-        instance.emojiButton.anchorBottom = true
-        instance.emojiButton.anchorLeft = false
-        instance.emojiButton.anchorTop = false
+        instance.iconButton.anchorRight = true
+        instance.iconButton.anchorBottom = true
+        instance.iconButton.anchorLeft = false
+        instance.iconButton.anchorTop = false
 
-        instance.emojiButton:initialise()
-        instance.emojiButton.borderColor.a = 0
-        instance.emojiButton.backgroundColor.a = 0
-        instance.emojiButton.backgroundColorMouseOver.a = 0
-        instance.emojiButton:setImage(getTexture('Item_PlushSpiffo'))
-        instance.emojiButton:setTextureRGBA(0.3, 0.3, 0.3, 1)
-        instance.emojiButton:setUIName('chat emoji button')
-        instance:addChild(instance.emojiButton)
+        instance.iconButton:initialise()
+        instance.iconButton.borderColor.a = 0
+        instance.iconButton.backgroundColor.a = 0
+        instance.iconButton.backgroundColorMouseOver.a = 0
+        instance.iconButton:setImage(getTexture('Item_PlushSpiffo'))
+        instance.iconButton:setTextureRGBA(0.3, 0.3, 0.3, 1)
+        instance.iconButton:setUIName('chat icon button')
+        instance:addChild(instance.iconButton)
 
-        instance.emojiButton:bringToTop()
+        instance.iconButton:bringToTop()
 
-        instance.emojiPicker = IconPicker:new(0, 0, instance, ISChat.onEmojiClick)
-        instance.emojiPicker.exclude = OmiChat._iconsToExclude
-        instance.emojiPicker.includeUnknownAsMiscellaneous = OmiChat.Option.EnableMiscellaneousIcons
+        instance.iconPicker = IconPicker:new(0, 0, instance, ISChat.onIconClick)
+        instance.iconPicker.exclude = OmiChat._iconsToExclude
+        instance.iconPicker.includeUnknownAsMiscellaneous = OmiChat.Option.EnableMiscellaneousIcons
 
-        instance.emojiPicker:initialise()
-        instance.emojiPicker:addToUIManager()
-        instance.emojiPicker:setVisible(false)
+        instance.iconPicker:initialise()
+        instance.iconPicker:addToUIManager()
+        instance.iconPicker:setVisible(false)
 
         return
     end
@@ -157,15 +157,15 @@ local function updateEmojiComponents()
     instance.textEntry.width = instance:getWidth() - instance.inset * 2
     instance.textEntry.javaObject:setWidth(instance.textEntry.width)
 
-    instance:removeChild(instance.emojiButton)
-    instance.emojiButton:setVisible(false)
-    instance.emojiButton:removeFromUIManager()
-    instance.emojiButton = nil
+    instance:removeChild(instance.iconButton)
+    instance.iconButton:setVisible(false)
+    instance.iconButton:removeFromUIManager()
+    instance.iconButton = nil
 
-    if instance.emojiPicker then
-        instance.emojiPicker:setVisible(false)
-        instance.emojiPicker:removeFromUIManager()
-        instance.emojiPicker = nil
+    if instance.iconPicker then
+        instance.iconPicker:setVisible(false)
+        instance.iconPicker:removeFromUIManager()
+        instance.iconPicker = nil
     end
 end
 
@@ -885,7 +885,7 @@ function OmiChat.updateState(redraw)
     OmiChat.getPlayerPreferences()
     updateStreams()
     updateFormatters()
-    updateEmojiComponents()
+    updateIconComponents()
 
     if redraw then
         -- some sandbox vars affect how messages are drawn

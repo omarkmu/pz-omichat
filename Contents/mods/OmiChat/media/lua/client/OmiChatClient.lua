@@ -68,7 +68,7 @@ return OmiChat
 ---@field isEnabled (fun(self: table): boolean)? Returns a boolean representing whether the stream is enabled.
 ---@field onUse fun(self: table, command: string)? Callback triggered when the stream is used.
 ---@field allowEmotes boolean? Whether to allow emotes on this stream. Defaults to true for non-commands and false for commands.
----@field allowEmojiPicker boolean? Whether to enable the emoji button for this stream. Defaults to false.
+---@field allowIconPicker boolean? Whether to enable the icon button for this stream. Defaults to false.
 ---@field allowRetain boolean? Whether to allow retaining this stream's command for subsequent inputs. Defaults to true for non-commands and false for commands.
 
 ---Description of the `omichat` field on chat stream tables.

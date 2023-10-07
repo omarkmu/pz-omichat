@@ -54,7 +54,7 @@ end
 local streamOverrides = {
     say = {
         context = { ocProcess = processSayMessage },
-        allowEmojiPicker = true,
+        allowIconPicker = true,
         isEnabled = chatIsEnabled,
         onUse = chatOnUse,
     },
@@ -107,7 +107,7 @@ local customStreams = {
         tabID = 1,
         omichat = {
             allowEmotes = true,
-            allowEmojiPicker = true,
+            allowIconPicker = true,
             isEnabled = customChatIsEnabled,
             onUse = customChatOnUse,
         }
@@ -119,7 +119,7 @@ local customStreams = {
         tabID = 1,
         omichat = {
             allowEmotes = true,
-            allowEmojiPicker = true,
+            allowIconPicker = true,
             context = { ocIsLocalWhisper = true },
             isEnabled = customChatIsEnabled,
             onUse = customChatOnUse,
@@ -132,7 +132,7 @@ local customStreams = {
         tabID = 1,
         omichat = {
             allowEmotes = true,
-            allowEmojiPicker = true,
+            allowIconPicker = true,
             isEnabled = customChatIsEnabled,
             onUse = customChatOnUse,
         },
@@ -144,7 +144,7 @@ local customStreams = {
         tabID = 1,
         omichat = {
             allowEmotes = true,
-            allowEmojiPicker = true,
+            allowIconPicker = true,
             isEnabled = customChatIsEnabled,
             onUse = customChatOnUse,
         },
@@ -157,7 +157,7 @@ local customStreams = {
         omichat = {
             context = { ocProcess = processShoutMessage },
             allowEmotes = true,
-            allowEmojiPicker = false,
+            allowIconPicker = false,
             isEnabled = customChatIsEnabled,
             onUse = customChatOnUse,
         },
@@ -169,7 +169,7 @@ local customStreams = {
         tabID = 1,
         omichat = {
             allowEmotes = true,
-            allowEmojiPicker = true,
+            allowIconPicker = true,
             isEnabled = customChatIsEnabled,
             onUse = customChatOnUse,
         },
@@ -181,7 +181,7 @@ local customStreams = {
         tabID = 1,
         omichat = {
             allowEmotes = true,
-            allowEmojiPicker = true,
+            allowIconPicker = true,
             isEnabled = customChatIsEnabled,
             onUse = customChatOnUse,
         }
@@ -194,7 +194,7 @@ local customStreams = {
         omichat = {
             context = { ocProcess = processShoutMessage },
             allowEmotes = true,
-            allowEmojiPicker = false,
+            allowIconPicker = false,
             isEnabled = customChatIsEnabled,
             onUse = customChatOnUse,
         }

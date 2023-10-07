@@ -16,8 +16,8 @@ local split = luautils.split
 ---Extended fields for ISChat.
 ---@class omichat.ISChat : ISChat
 ---@field instance omichat.ISChat
----@field emojiPicker omichat.IconPicker
----@field emojiButton ISButton
+---@field iconPicker omichat.IconPicker
+---@field iconButton ISButton
 ---@field allChatStreams omichat.ChatStream[]
 ---@field defaultTabStream table<integer, omichat.ChatStream?>
 local ISChat = ISChat
@@ -94,26 +94,26 @@ end
 ---Sets whether the icon picker button is enabled.
 ---This also hides the icon picker if the button is disabled.
 ---@param enable boolean?
-local function setEmojiButtonEnabled(enable)
+local function setIconButtonEnabled(enable)
     local chat = ISChat.instance
-    if not chat.emojiButton then
+    if not chat.iconButton then
         return
     end
 
     local value = enable and 0.8 or 0.3
-    chat.emojiButton:setTextureRGBA(value, value, value, 1)
-    chat.emojiButton.enable = enable
+    chat.iconButton:setTextureRGBA(value, value, value, 1)
+    chat.iconButton.enable = enable
 
-    if not enable and chat.emojiPicker then
-        chat.emojiPicker:setVisible(false)
+    if not enable and chat.iconPicker then
+        chat.iconPicker:setVisible(false)
     end
 end
 
----Enables or disables the emoji picker based on the current input.
+---Enables or disables the icon picker based on the current input.
 ---@param text string? The current text entry text.
-local function updateEmojiComponents(text)
+local function updateIconComponents(text)
     local chat = ISChat.instance
-    if not chat.emojiButton then
+    if not chat.iconButton then
         return
     end
 
@@ -125,12 +125,12 @@ local function updateEmojiComponents(text)
     end
 
     local enable = false
-    if stream and stream.omichat and stream.omichat.allowEmojiPicker ~= nil then
-        -- enable emoji button for custom chats where appropriate
-        enable = stream.omichat.allowEmojiPicker
+    if stream and stream.omichat and stream.omichat.allowIconPicker ~= nil then
+        -- enable icon button for custom chats where appropriate
+        enable = stream.omichat.allowIconPicker
     end
 
-    setEmojiButtonEnabled(enable)
+    setIconButtonEnabled(enable)
 end
 
 ---Override to enable custom callouts.
@@ -314,17 +314,17 @@ function ISChat.onToggleShowNameColor(target)
     OmiChat.redrawMessages()
 end
 
----Event handler for emoji button click.
+---Event handler for icon button click.
 ---@param target omichat.ISChat
 ---@return boolean
-function ISChat.onEmojiButtonClick(target)
-    if not ISChat.focused or not target.emojiPicker then
+function ISChat.onIconButtonClick(target)
+    if not ISChat.focused or not target.iconPicker then
         return false
     end
 
     local yDelta = 0
     local height = target:getHeight()
-    local pickerHeight = target.emojiPicker:getHeight()
+    local pickerHeight = target.iconPicker:getHeight()
     if height > pickerHeight then
         yDelta = height - pickerHeight
     end
@@ -333,7 +333,7 @@ function ISChat.onEmojiButtonClick(target)
     local y = target:getY() + yDelta
 
     -- avoid covering the button
-    if x + target.emojiPicker:getWidth() >= getPlayerScreenWidth(0) then
+    if x + target.iconPicker:getWidth() >= getPlayerScreenWidth(0) then
         y = y - target.textEntry:getHeight() - target.inset * 2 - 5
 
         if y <= 0 then
@@ -341,18 +341,18 @@ function ISChat.onEmojiButtonClick(target)
         end
     end
 
-    target.emojiPicker:setX(x)
-    target.emojiPicker:setY(y)
-    target.emojiPicker:bringToTop()
-    target.emojiPicker:setVisible(not target.emojiPicker:isVisible())
+    target.iconPicker:setX(x)
+    target.iconPicker:setY(y)
+    target.iconPicker:bringToTop()
+    target.iconPicker:setVisible(not target.iconPicker:isVisible())
 
     return true
 end
 
----Event handler for emoji picker selection.
+---Event handler for icon picker selection.
 ---@param target omichat.ISChat
----@param icon string The emoji that was selected.
-function ISChat.onEmojiClick(target, icon)
+---@param icon string The icon that was selected.
+function ISChat.onIconClick(target, icon)
     if not ISChat.focused then
         target:focus()
     elseif not ISChat.instance.textEntry:isFocused() then
@@ -365,18 +365,18 @@ function ISChat.onEmojiClick(target, icon)
     target.textEntry:setText(concat { text, addSpace and ' *' or '*', icon, '*' })
 end
 
----Override to add emoji button and picker.
+---Override to add icon button and picker.
 function ISChat:createChildren()
     _createChildren(self)
     OmiChat.updateState()
 end
 
----Override to correct the chat stream and enable the emoji button on focus.
+---Override to correct the chat stream and enable the icon button on focus.
 function ISChat:focus()
     _focus(self)
 
     local text = ISChat.instance.textEntry:getInternalText()
-    updateEmojiComponents(text)
+    updateIconComponents(text)
 
     -- correct the stream ID to the current stream
     local currentStreamName = OmiChat.chatCommandToStreamName(text)
@@ -385,10 +385,10 @@ function ISChat:focus()
     end
 end
 
----Override to hide emoji picker and disable button on unfocus.
+---Override to hide icon picker and disable button on unfocus.
 function ISChat:unfocus()
     _unfocus(self)
-    setEmojiButtonEnabled(false)
+    setIconButtonEnabled(false)
 end
 
 ---Override to unfocus on close.
@@ -679,7 +679,7 @@ function ISChat:onCommandEntered()
     ISChat.instance.timerTextEntry = 20
 end
 
----Override to hide emoji picker on text panel or entry click.
+---Override to hide icon picker on text panel or entry click.
 ---@param target unknown
 ---@param x number
 ---@param y number
@@ -688,13 +688,13 @@ function ISChat.onMouseDown(target, x, y)
     local handled = _onMouseDown(target, x, y)
     local instance = ISChat.instance
 
-    if not handled or not instance.emojiPicker or not instance.emojiPicker:isVisible() then
+    if not handled or not instance.iconPicker or not instance.iconPicker:isVisible() then
         return handled
     end
 
     local name = target:getUIName()
     if name == ISChat.textPanelName or name == ISChat.textEntryName then
-        instance.emojiPicker:setVisible(false)
+        instance.iconPicker:setVisible(false)
     end
 
     return handled
@@ -723,25 +723,25 @@ function ISChat.onSwitchStream()
 
     local text = OmiChat.cycleStream()
     entry:setText(text)
-    updateEmojiComponents(text)
+    updateIconComponents(text)
 end
 
----Override to update emoji button.
+---Override to update icon button.
 function ISChat.onPressDown()
     _onPressDown()
-    updateEmojiComponents()
+    updateIconComponents()
 end
 
----Override to update emoji button.
+---Override to update icon button.
 function ISChat.onPressUp()
     _onPressUp()
-    updateEmojiComponents()
+    updateIconComponents()
 end
 
----Override to update emoji button.
+---Override to update icon button.
 function ISChat.onTextChange()
     _onTextChange()
-    updateEmojiComponents()
+    updateIconComponents()
 end
 
 ---Override to add information to chat messages and remove blank lines.
