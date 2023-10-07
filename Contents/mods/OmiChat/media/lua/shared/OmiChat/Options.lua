@@ -43,6 +43,7 @@ local floor = math.floor
 ---@field ColorServer string
 ---@field FilterNickname string
 ---@field PredicateUseNameColor string
+---@field FormatInfo string
 ---@field FormatMenuName string
 ---@field FormatName string
 ---@field FormatTag string

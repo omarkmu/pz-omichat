@@ -735,6 +735,24 @@ function OmiChat.getFormatter(name)
     return OmiChat._formatters[name]
 end
 
+---Gets the text that should display when clicking the info button.
+---@return string
+function OmiChat.getInfoText()
+    local player = getSpecificPlayer(0)
+    if not player then
+        return ''
+    end
+
+    local name = OmiChat.getNameInChat(player:getUsername(), 'say')
+    local tokens = name and OmiChat.getPlayerSubstitutions(player)
+    if not name or not tokens then
+        return ''
+    end
+
+    tokens.name = name
+    return utils.interpolate(Option.FormatInfo, tokens)
+end
+
 ---Returns the chat type of a chat message.
 ---@param message omichat.Message
 function OmiChat.getMessageChatType(message)
@@ -886,6 +904,8 @@ function OmiChat.updateState(redraw)
     updateStreams()
     updateFormatters()
     updateIconComponents()
+
+    ISChat.instance:setInfo(OmiChat.getInfoText())
 
     if redraw then
         -- some sandbox vars affect how messages are drawn

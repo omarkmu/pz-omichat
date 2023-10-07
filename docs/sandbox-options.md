@@ -321,7 +321,7 @@ Filters are used to transform input values.
 For predicates, any value other than the empty string is considered `true`.
 
 ### FilterNickname
-`default → $sub($name 1 50)`
+`default → $sub($name 1 50)`  
 `tokens → $name`
 
 Transforms names set by players with `/name`.
@@ -344,6 +344,13 @@ See also:
 
 ## Component Formats
 Options that define the string formats used for purposes other than overhead speech bubbles and chat messages.
+
+### FormatInfo
+`(blank by default)`  
+`tokens → $forename, $surname, $username, $name`
+
+Information that can be accessed by clicking an info button on the chat.
+If blank, the info button will not be visible.
 
 ### FormatMenuName
 `default → $ifelse($neq($menuType mini_scoreboard) $name $username &#32;[ $name ])`  

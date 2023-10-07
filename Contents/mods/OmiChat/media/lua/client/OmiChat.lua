@@ -35,6 +35,7 @@ local _onMouseDown = ISChat.onMouseDown
 local _onPressDown = ISChat.onPressDown
 local _onPressUp = ISChat.onPressUp
 local _onTextChange = ISChat.onTextChange
+local _onInfo = ISChat.onInfo
 
 local _ChatMessage = __classmetatables[ChatMessage.class].__index
 local _ServerChatMessage = __classmetatables[ServerChatMessage.class].__index
@@ -365,9 +366,35 @@ function ISChat.onIconClick(target, icon)
     target.textEntry:setText(concat { text, addSpace and ' *' or '*', icon, '*' })
 end
 
----Override to add icon button and picker.
+---Event handler for clicking on the info button.
+function ISChat:onInfo()
+    local text = OmiChat.getInfoText()
+    self:setInfo(text)
+
+    if text == '' and self.infoRichText then
+        self.infoRichText:removeFromUIManager()
+        return
+    end
+
+    _onInfo(self)
+end
+
+---Override to add icon picker components and info button.
 function ISChat:createChildren()
     _createChildren(self)
+
+    local th = self:titleBarHeight()
+    self.infoButton = ISButton:new(self.gearButton:getX() - th / 2 - th, 0, th, th, '', self, self.onInfo)
+    self.infoButton.anchorRight = true
+    self.infoButton.anchorLeft = false
+    self.infoButton:initialise()
+    self.infoButton.borderColor.a = 0.0
+    self.infoButton.backgroundColor.a = 0.0
+    self.infoButton.backgroundColorMouseOver.a = 0.7
+    self.infoButton:setImage(self.infoBtn)
+    self:addChild(self.infoButton)
+    self.infoButton:setVisible(false)
+
     OmiChat.updateState()
 end
 

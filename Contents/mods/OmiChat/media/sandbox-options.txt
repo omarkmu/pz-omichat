@@ -146,6 +146,9 @@ option OmiChat.PredicateUseNameColor
 
 
 /* Component Formats */
+option OmiChat.FormatInfo
+{ type = string, default =, page = OmiChat, translation = OCFormatInfo, }
+
 option OmiChat.FormatName
 { type = string, default = $forename, page = OmiChat, translation = OCFormatName, }
 
