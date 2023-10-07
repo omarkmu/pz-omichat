@@ -18,7 +18,7 @@ UI_EN = {
     UI_OmiChat_context_message_type_discord = "Discord",
     UI_OmiChat_context_message_type_server = "server",
 
-    -- %1 = the chat stream (e.g., /say, /yell), or one of the `context_message_type` strings
+    -- %1 = the chat stream (e.g., /say, /yell)
     UI_OmiChat_context_color = "Set %1 color",
     UI_OmiChat_context_color_name = "Set name color",
     UI_OmiChat_context_color_speech = "Set speech color",

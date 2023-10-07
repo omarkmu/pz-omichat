@@ -20,9 +20,11 @@
 ---@field overheadFormatOpt string
 ---@field showOnRadio boolean
 ---@field chatTypes table<omichat.ChatTypeString, boolean>
+---@field stripColors boolean?
+---@field allowColorCustomization false?
 ---@field defaultRangeOpt string?
 ---@field titleID string?
----@field attractZombies boolean?
+---@field attractZombies true?
 
 
 ---@type table<omichat.CustomStreamName, omichat.CustomStreamInfo>
@@ -39,8 +41,6 @@ local customStreamList = {
         overheadFormatOpt = 'OverheadFormatWhisper',
         titleID = 'UI_OmiChat_whisper_chat_title_id',
         chatTypes = { say = true },
-        allowColorCustomization = true,
-        attractZombies = false,
         showOnRadio = true,
     },
     {
@@ -52,8 +52,6 @@ local customStreamList = {
         overheadFormatOpt = 'OverheadFormatMe',
         chatTypes = { say = true },
         stripColors = true,
-        allowColorCustomization = true,
-        attractZombies = false,
         showOnRadio = false,
     },
     {
@@ -66,8 +64,6 @@ local customStreamList = {
         titleID = 'UI_OmiChat_whisper_chat_title_id',
         chatTypes = { say = true },
         stripColors = true,
-        allowColorCustomization = true,
-        attractZombies = false,
         showOnRadio = false,
     },
     {
@@ -80,8 +76,6 @@ local customStreamList = {
         overheadFormatOpt = 'OverheadFormatMeLoud',
         chatTypes = { shout = true },
         stripColors = true,
-        allowColorCustomization = true,
-        attractZombies = false,
         showOnRadio = false,
     },
     {
@@ -93,8 +87,6 @@ local customStreamList = {
         overheadFormatOpt = 'OverheadFormatDo',
         chatTypes = { say = true },
         stripColors = true,
-        allowColorCustomization = true,
-        attractZombies = false,
         showOnRadio = false,
     },
     {
@@ -107,8 +99,6 @@ local customStreamList = {
         titleID = 'UI_OmiChat_whisper_chat_title_id',
         chatTypes = { say = true },
         stripColors = true,
-        allowColorCustomization = true,
-        attractZombies = false,
         showOnRadio = false,
     },
     {
@@ -121,8 +111,6 @@ local customStreamList = {
         defaultRangeOpt = 'RangeYell',
         chatTypes = { shout = true },
         stripColors = true,
-        allowColorCustomization = true,
-        attractZombies = false,
         showOnRadio = false,
     },
     {
@@ -133,8 +121,6 @@ local customStreamList = {
         chatFormatOpt = 'ChatFormatLooc',
         overheadFormatOpt = 'OverheadFormatLooc',
         chatTypes = { say = true },
-        allowColorCustomization = true,
-        attractZombies = false,
         showOnRadio = false,
     },
 }

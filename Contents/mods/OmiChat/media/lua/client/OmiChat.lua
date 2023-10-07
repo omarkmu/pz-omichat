@@ -426,6 +426,7 @@ function ISChat:onGearButtonClick()
     local showNameColorOption = Option.EnableSetNameColor or Option.EnableSpeechColorAsDefaultNameColor
 
     local colorOpts = {}
+    local canUsePM = checkPlayerCanUseChat('/w')
     if Option.EnableSetNameColor then
         colorOpts[#colorOpts+1] = 'name'
     end
@@ -451,19 +452,21 @@ function ISChat:onGearButtonClick()
         colorOpts[#colorOpts+1] = 'admin'
     end
 
-    local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
-    if useLocalWhisper then
-        colorOpts[#colorOpts+1] = 'whisper'
-    elseif checkPlayerCanUseChat('/w') then
-        colorOpts[#colorOpts+1] = 'private'
-    end
-
     if checkPlayerCanUseChat('/y') then
         colorOpts[#colorOpts+1] = 'shout'
     end
 
-    for name, streamInfo in pairs(customStreamData.table) do
-        if name ~= 'whisper' and streamInfo.allowColorCustomization and OmiChat.isCustomStreamEnabled(name) then
+    local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
+    if useLocalWhisper then
+        colorOpts[#colorOpts+1] = 'whisper'
+    elseif canUsePM then
+        colorOpts[#colorOpts+1] = 'private'
+    end
+
+    for i = 1, #customStreamData.list do
+        local streamInfo = customStreamData.list[i]
+        local name = streamInfo.name
+        if name ~= 'whisper' and streamInfo.allowColorCustomization ~= false and OmiChat.isCustomStreamEnabled(name) then
             colorOpts[#colorOpts+1] = name
         end
     end
@@ -481,7 +484,7 @@ function ISChat:onGearButtonClick()
     end
 
     -- add renamed /pm at the end
-    if useLocalWhisper and checkPlayerCanUseChat('/w') then
+    if useLocalWhisper and canUsePM then
         colorOpts[#colorOpts+1] = 'private'
     end
 
@@ -493,19 +496,16 @@ function ISChat:onGearButtonClick()
         shoutOpts[#shoutOpts+1] = 'sneakcallouts'
     end
 
-    local subMenuName
-    if #colorOpts > 0 or #shoutOpts > 0 or showNameColorOption then
-        -- insert new options before the first submenu
-        local firstSubMenu
-        for _, opt in ipairs(context.options) do
-            if opt.subOption and opt.subOption > 0 then
-                firstSubMenu = opt
-                break
-            end
+    -- insert new options before the first submenu
+    local firstSubMenu
+    for _, opt in ipairs(context.options) do
+        if opt.subOption and opt.subOption > 0 then
+            firstSubMenu = opt
+            break
         end
-
-        subMenuName = firstSubMenu and firstSubMenu.name or ''
     end
+
+    local subMenuName = firstSubMenu and firstSubMenu.name or ''
 
     if showNameColorOption then
         local nameColorOptionName

@@ -378,7 +378,7 @@ OmiChat._transformers = {
                         info.titleID = streamData.titleID
                     end
 
-                    info.message:setShouldAttractZombies(streamData.attractZombies)
+                    info.message:setShouldAttractZombies(not not streamData.attractZombies)
 
                     if Option[streamData.overheadFormatOpt] == '' then
                         info.message:setOverHeadSpeech(false)
