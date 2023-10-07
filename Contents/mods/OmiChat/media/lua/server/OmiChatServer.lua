@@ -5,8 +5,9 @@ if not isServer() then return end
 ---@class omichat.api.server
 local OmiChat = require 'OmiChat/API/Server'
 
-require 'OmiChat/API/ServerCommands'
 require 'OmiChat/API/ServerData'
+require 'OmiChat/API/ServerDispatch'
+require 'OmiChat/API/ServerCommands'
 
 Events.OnClientCommand.Add(OmiChat._onClientCommand)
 Events.SendCustomModData.Add(OmiChat.transmitModData)

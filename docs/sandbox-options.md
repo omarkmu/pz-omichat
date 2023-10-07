@@ -125,6 +125,18 @@ Numeric options that define limits for various functionality.
 
 The maximum length for individual custom [shouts](#enablecustomshouts) and [sneak shouts](#enablecustomsneakshouts).
 
+### MinimumCommandAccessLevel
+`default → 16`
+
+The minimum access level needed to execute commands such as `/setname`.
+
+- Admin: 32
+- Moderator: 16
+- Overseer: 8
+- GM: 4
+- Observer: 2
+- Player: 1
+
 ### MaximumCustomShouts
 `default → 10, minimum → 1, maximum → 20`
 

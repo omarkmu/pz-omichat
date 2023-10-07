@@ -22,8 +22,7 @@ The vast majority of the features listed below can be configured or completely d
 [`/mequiet`](docs/sandbox-options.md#chatformatmequiet),
 [`/meloud`](docs/sandbox-options.md#chatformatmeloud),
 [`/doquiet`](docs/sandbox-options.md#chatformatdoquiet),
-[`/doloud`](docs/sandbox-options.md#chatformatdoloud)
-)
+[`/doloud`](docs/sandbox-options.md#chatformatdoloud))
 - [Icon picker](docs/sandbox-options.md#enableiconpicker)
 - Emote animation [shortcuts](docs/emotes.md) (.clap, .salute, .surrrender, etc.)
 - Compatibility with [True Actions Act 3 - Dancing](https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556) with [`/dance`](docs/sandbox-options.md#enablecompattad)

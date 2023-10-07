@@ -20,6 +20,7 @@ local floor = math.floor
 ---@field EnableCompatTAD boolean
 ---@field EnableChatNameAsCharacterName boolean
 ---@field CustomShoutMaxLength integer
+---@field MinimumCommandAccessLevel integer
 ---@field MaximumCustomShouts integer
 ---@field RangeMe integer
 ---@field RangeLooc integer

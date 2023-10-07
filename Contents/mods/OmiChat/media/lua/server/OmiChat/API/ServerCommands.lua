@@ -9,47 +9,66 @@ OmiChat.Commands = {}
 
 
 local Option = OmiChat.Option
+local utils = OmiChat.utils
 
 
 ---Checks whether a player has permission to execute a command for the given target.
 ---@param player IsoPlayer
 ---@param target string
+---@param isCommand boolean?
 ---@return boolean
-local function canAccessTarget(player, target)
+local function canAccessTarget(player, target, isCommand)
     if not target then
         return false
     end
 
-    local playerAccess = player:getAccessLevel() == 'None'
-    local targetOtherPlayer = target ~= player:getUsername()
+    local access = utils.getNumericAccessLevel(player:getAccessLevel())
+    if isCommand and access < Option.MinimumCommandAccessLevel then
+        return false
+    end
 
-    if playerAccess and targetOtherPlayer then
+    if access == 1 and target ~= player:getUsername() then
         return false
     end
 
     return true
 end
 
----@param player IsoPlayer
----@param args ModDataUpdateRequest
-local function updateModDataNameColor(player, args)
-    if not Option.EnableSetNameColor and player:getAccessLevel() == 'None' then
-        return
+---@param args omichat.ModDataUpdateRequest
+---@return boolean
+local function updateModDataNameColor(args)
+    if not Option.EnableSetNameColor and not args.fromCommand then
+        return false
     end
 
     OmiChat.setNameColorString(args.target, args.value and tostring(args.value) or nil)
+    return true
 end
 
----@param player IsoPlayer
----@param args ModDataUpdateRequest
-local function updateModDataNickname(player, args)
-    if not Option.EnableSetName and player:getAccessLevel() == 'None' then
-        return
+---@param args omichat.ModDataUpdateRequest
+---@return boolean
+local function updateModDataNickname(args)
+    if not Option.EnableSetName and not args.fromCommand then
+        return false
     end
 
     OmiChat.setNickname(args.target, args.value and tostring(args.value) or nil)
+    return true
 end
 
+
+---Handles the /clearnames command.
+---@param player IsoPlayer
+function OmiChat.Commands.clearNames(player)
+    local access = utils.getNumericAccessLevel(player:getAccessLevel())
+    if access < Option.MinimumCommandAccessLevel then
+        return
+    end
+
+    OmiChat.clearNicknames()
+    OmiChat.transmitModData()
+    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_clear_names_success')
+end
 
 ---Handles side-effects of the `OnCreatePlayer` event.
 ---@param player IsoPlayer
@@ -61,19 +80,75 @@ function OmiChat.Commands.informPlayerCreated(player)
     OmiChat.transmitModData()
 end
 
+---Handles the /resetname command.
+---@param player IsoPlayer
+---@param args table
+function OmiChat.Commands.resetName(player, args)
+    args = utils.parseCommandArgs(args.command)
+    local username = args[1]
+
+    local success = false
+    if username then
+        success = OmiChat.Commands.requestDataUpdate(player, {
+            target = username,
+            field = 'nicknames',
+            fromCommand = true,
+        })
+    end
+
+    if not success then
+        OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_resetname')
+        return
+    end
+
+    username = utils.escapeRichText(username)
+    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_reset_other_name_success', { username })
+end
+
 ---Updates global mod data.
 ---@param player IsoPlayer
----@param args ModDataUpdateRequest
+---@param args omichat.ModDataUpdateRequest
+---@return boolean
 function OmiChat.Commands.requestDataUpdate(player, args)
-    if canAccessTarget(player, args.target) then
+    local success = false
+    if canAccessTarget(player, args.target, args.fromCommand) then
         if args.field == 'nicknames' then
-            updateModDataNickname(player, args)
+            success = updateModDataNickname(args)
         elseif args.field == 'nameColors' then
-            updateModDataNameColor(player, args)
+            success = updateModDataNameColor(args)
         end
     end
 
     OmiChat.transmitModData()
+    return success
+end
+
+---Handles the /setname command.
+---@param player IsoPlayer
+---@param args table
+function OmiChat.Commands.setName(player, args)
+    args = utils.parseCommandArgs(args.command)
+    local username = args[1]
+    local name = args[2]
+
+    local success = false
+    if username and name then
+        success = OmiChat.Commands.requestDataUpdate(player, {
+            target = username,
+            field = 'nicknames',
+            value = name,
+            fromCommand = true,
+        })
+    end
+
+    if not success then
+        OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_setname')
+        return
+    end
+
+    username = utils.escapeRichText(username)
+    name = utils.escapeRichText(name)
+    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_set_other_name_success', { username, name })
 end
 
 

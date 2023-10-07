@@ -14,6 +14,13 @@ utils.Interpolator = Interpolator
 local shortHexPattern = '^%s*#?(%x)(%x)(%x)%s*$'
 local fullHexPattern = '^%s*#?(%x%x)%s*(%x%x)%s*(%x%x)%s*$'
 local rgbPattern = '^%s*(%d%d?%d?)[,%s]+(%d%d?%d?)[,%s]+(%d%d?%d?)%s*$'
+local accessLevels = {
+    admin = 32,
+    moderator = 16,
+    overseer = 8,
+    gm = 4,
+    observer = 2
+}
 
 
 ---Attempts to read an RGB or hex color from a string.
@@ -126,6 +133,13 @@ function utils.escapeRichText(text)
     return (text:gsub('<', '&lt;'):gsub('>', '&gt;'))
 end
 
+---Gets a numeric access level given an access level string.
+---@param access string
+---@return integer
+function utils.getNumericAccessLevel(access)
+    return accessLevels[access and access:lower()] or 1
+end
+
 ---Interpolates substitutions into a string with format strings using `$var` format.
 ---Functions are referenced using `$func(...)` syntax.
 ---@param text string The format string.
@@ -171,6 +185,52 @@ function utils.isValidColor(color)
     end
 
     return true
+end
+
+---Parses arguments for a chat command.
+---@param text string?
+---@return string[]
+function utils.parseCommandArgs(text)
+    if not text then
+        return {}
+    end
+
+    local i = 1
+    local inQuote = false
+    local current = {}
+    local args = {}
+
+    while i <= #text do
+        local c = text:sub(i, i)
+        local next = text:sub(i + 1, i + 1)
+
+        if c == '\\' and next == '"' then
+            current[#current+1] = '"'
+            i = i + 1
+        elseif c == '"' then
+            if #current > 0 then
+                args[#args+1] = concat(current)
+                current = {}
+            end
+
+            inQuote = not inQuote
+        elseif not inQuote and c == ' ' then
+            if #current > 0 then
+                args[#args+1] = concat(current)
+                current = {}
+            end
+        else
+            current[#current+1] = c
+        end
+
+        i = i + 1
+    end
+
+    if #current > 0 then
+        args[#args+1] = concat(current)
+    end
+
+    return args
 end
 
 ---Replaces character entities with the characters that they represent.

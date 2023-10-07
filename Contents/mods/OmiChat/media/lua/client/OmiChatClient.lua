@@ -5,9 +5,11 @@ local OmiChat = require 'OmiChat/API/Client'
 require 'OmiChat/API/Chat'
 require 'OmiChat/API/ClientData'
 require 'OmiChat/API/ClientDispatch'
+require 'OmiChat/API/ClientCommands'
 
 Events.OnGameStart.Add(OmiChat._onGameStart)
 Events.OnCreatePlayer.Add(OmiChat._onCreatePlayer)
+Events.OnServerCommand.Add(OmiChat._onServerCommand)
 Events.OnReceiveGlobalModData.Add(OmiChat._onReceiveGlobalModData)
 
 return OmiChat
@@ -76,7 +78,7 @@ return OmiChat
 
 ---Description of the `omichat` field on command stream tables.
 ---@class omichat.CommandStreamConfig : omichat.BaseStreamConfig
----@field helpText string? Summary of the command's purpose. Displays when the /help command is used.
+---@field helpText string? String ID of the summary of the command's purpose. Displays when the /help command is used.
 ---@field onHelp fun(self: table)? Callback triggered when /help is used with this command.
 
 ---Base stream object for chat and command streams.

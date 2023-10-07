@@ -33,6 +33,13 @@ OmiChat.IconPicker = require 'OmiChat/IconPicker'
 OmiChat._iniVersion = 1
 OmiChat._iniName = 'omichat.ini'
 
+
+local function canUseCommands()
+    local player = getSpecificPlayer(0)
+    local access = player and player:getAccessLevel() or 0
+    return utils.getNumericAccessLevel(access) >= Option.MinimumCommandAccessLevel
+end
+
 ---@type table<string, true>
 OmiChat._iconsToExclude = {
     -- shadowed by colors
@@ -134,6 +141,44 @@ OmiChat._commandStreams = {
                 OmiChat.showInfoMessage(getText(msg))
             end,
         },
+    },
+    {
+        name = 'clearnames',
+        command = '/clearnames ',
+        omichat = {
+            isCommand = true,
+            helpText = 'UI_OmiChat_helptext_clearnames',
+            isEnabled = canUseCommands,
+            onUse = function(self, command)
+                OmiChat.sendClearNames(getSpecificPlayer(0))
+            end,
+        }
+    },
+    {
+        name = 'setname',
+        command = '/setname ',
+        omichat = {
+            isCommand = true,
+            helpText = 'UI_OmiChat_helptext_setname',
+            isEnabled = canUseCommands,
+            onUse = function(self, command)
+                local player = getSpecificPlayer(0)
+                OmiChat.sendSetName(player, command)
+            end,
+        }
+    },
+    {
+        name = 'resetname',
+        command = '/resetname ',
+        omichat = {
+            isCommand = true,
+            helpText = 'UI_OmiChat_helptext_resetname',
+            isEnabled = canUseCommands,
+            onUse = function(self, command)
+                local player = getSpecificPlayer(0)
+                OmiChat.sendResetName(player, command)
+            end,
+        }
     },
     {
         name = 'emotes',

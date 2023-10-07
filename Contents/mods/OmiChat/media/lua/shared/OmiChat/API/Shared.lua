@@ -65,7 +65,7 @@ function OmiChat.getNameInChat(username, chatType)
     end
 
     local modData = OmiChat.getModData()
-    if Option.EnableSetName and modData.nicknames[username] then
+    if modData.nicknames[username] then
         return utils.escapeRichText(modData.nicknames[username])
     end
 

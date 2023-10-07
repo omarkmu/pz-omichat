@@ -45,6 +45,9 @@ option OmiChat.EnableCompatTAD
 option OmiChat.CustomShoutMaxLength
 { type = integer, default = 30, min = 1, max = 200, page = OmiChat, translation = OCCustomShoutMaxLength, }
 
+option OmiChat.MinimumCommandAccessLevel
+{ type = integer, default = 16, min = 1, max = 32, page = OmiChat, translation = OCMinimumCommandAccessLevel, }
+
 option OmiChat.MaximumCustomShouts
 { type = integer, default = 10, min = 1, max = 20, page = OmiChat, translation = OCMaximumCustomShouts, }
 

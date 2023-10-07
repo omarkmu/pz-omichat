@@ -7,6 +7,14 @@ if not isServer() then return end
 local OmiChat = require 'OmiChat/API/Server'
 
 
+---Clears all player nicknames.
+---This does not transmit changes to clients.
+---@see omichat.api.server.transmitModData
+function OmiChat.clearNicknames()
+    local modData = OmiChat.getModData()
+    modData.nicknames = {}
+end
+
 ---Gets the nickname for the player with the given username.
 ---If no nickname is set for the given username, returns `nil`.
 ---@return string?

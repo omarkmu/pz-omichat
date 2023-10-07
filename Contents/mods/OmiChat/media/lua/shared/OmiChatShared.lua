@@ -45,10 +45,17 @@ return require 'OmiChat/API/Shared'
 ---@field g integer
 ---@field b integer
 
----@class ModDataUpdateRequest
+---@class omichat.ModDataUpdateRequest
 ---@field target string
 ---@field field omichat.ModDataField
+---@field fromCommand boolean?
 ---@field value unknown?
+
+---@class omichat.InfoMessageRequest
+---@field text string?
+---@field stringID string?
+---@field args table?
+---@field serverAlert boolean?
 
 ---Mod data fields.
 ---@class omichat.ModData
