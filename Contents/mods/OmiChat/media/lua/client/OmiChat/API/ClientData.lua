@@ -263,13 +263,7 @@ function OmiChat.setNickname(nickname)
         return false
     end
 
-    local maxLength = Option.NameMaxLength
-    if maxLength > 0 and #nickname > maxLength then
-        nickname = nickname:sub(1, maxLength)
-    end
-
     local modData = OmiChat.getModData()
-
     if #nickname == 0 then
         modData.nicknames[username] = nil
         OmiChat.requestDataUpdate(player, {
@@ -282,6 +276,11 @@ function OmiChat.setNickname(nickname)
         end
 
         return true, getText('UI_OmiChat_reset_name_success')
+    end
+
+    nickname = utils.interpolate(Option.FilterNickname, { name = nickname })
+    if nickname == '' then
+        return false, getText('UI_OmiChat_set_name_failure')
     end
 
     if Option.EnableChatNameAsCharacterName then

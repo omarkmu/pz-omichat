@@ -51,7 +51,7 @@ local function updateModDataNickname(player, args)
 end
 
 
----Handles character creation.
+---Handles side-effects of the `OnCreatePlayer` event.
 ---@param player IsoPlayer
 function OmiChat.Commands.informPlayerCreated(player)
     if Option.EnableChatNameAsCharacterName then

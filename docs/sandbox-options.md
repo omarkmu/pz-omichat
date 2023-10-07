@@ -81,7 +81,7 @@ This may result in icons that do not work properly, including icons from other m
 Allows players to set their name in chat using `/name Name`.
 Chat names can be reset by using the same command without a name, unless the [`EnableChatNameAsCharacterName`](#enablechatnameascharactername) option is enabled.
 
-See also: [`NameMaxLength`](#namemaxlength).
+See also: [`FilterNickname`](#filternickname).
 
 ### EnableSetNameColor
 `default → false`
@@ -131,13 +131,6 @@ The maximum length for individual custom [shouts](#enablecustomshouts) and [snea
 The maximum number of custom [shouts](#enablecustomshouts) and [sneak shouts](#enablecustomsneakshouts) that players are allowed to define.
 
 Note that the two maximums are separate; a value of `10` means a player can specify 10 shouts and 10 sneak shouts.
-
-### NameMaxLength
-`default → 50, minimum → 0, maximum → 50`
-
-The maximum length of chat names set with `/name`.
-
-See also: [`EnableSetName`](#enablesetname).
 
 
 ## Ranges
@@ -321,9 +314,22 @@ The default color used for `/yell` messages.
 See also: [`ChatFormatYell`](#chatformatyell).
 
 
-## Predicates
+## Filters & Predicates
 Options that are used to define logic for mod functionality.
-Any value other than the empty string is considered `true`.
+
+Filters are used to transform input values.
+For predicates, any value other than the empty string is considered `true`.
+
+### FilterNickname
+`default → $sub($name 1 50)`
+`tokens → $name`
+
+Transforms names set by players with `/name`.
+The default option will limit names to 50 characters.
+
+If the empty string is returned, the `/name` command will fail.
+
+See also [`EnableSetName`](#enablesetname).
 
 ### PredicateUseNameColor
 `default → $eq($stream say)`  

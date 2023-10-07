@@ -17,7 +17,6 @@ Sandbox_EN = {
 
     Sandbox_OCCustomShoutMaxLength = "Custom Shout Maximum Length",
     Sandbox_OCMaximumCustomShouts = "Maximum Custom Shouts",
-    Sandbox_OCNameMaxLength = "Maximum /name Length",
 
     Sandbox_OCRangeDo = "/do Range",
     Sandbox_OCRangeDoLoud = "/doloud Range",
@@ -49,6 +48,7 @@ Sandbox_EN = {
     Sandbox_OCColorWhisper = "/whisper Color",
     Sandbox_OCColorYell = "/yell Color",
 
+    Sandbox_OCFilterNickname = "Name Filter",
     Sandbox_OCPredicateUseNameColor = "Use Name Color Predicate",
 
     Sandbox_OCFormatMenuName = "Menu Name Format",
