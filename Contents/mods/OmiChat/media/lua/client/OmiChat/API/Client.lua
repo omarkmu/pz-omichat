@@ -680,7 +680,7 @@ OmiChat._transformers = {
                     if streamData.showOnRadio then
                         info.content = formatter:read(info.content)
                     else
-                        info.formatOptions.showInChat = false
+                        info.message:setShowInChat(false)
                     end
 
                     break
@@ -750,7 +750,7 @@ OmiChat._transformers = {
 
             if math.sqrt(xDiff*xDiff + yDiff*yDiff) > range then
                 info.message:setOverHeadSpeech(false)
-                info.formatOptions.showInChat = false
+                info.message:setShowInChat(false)
                 info.context.ocOutOfRange = true
                 return true
             end

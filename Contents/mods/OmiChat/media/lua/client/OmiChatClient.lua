@@ -31,7 +31,6 @@ return OmiChat
 
 ---Options for how to format a message in chat.
 ---@class omichat.MessageFormatOptions
----@field showInChat boolean
 ---@field showTitle boolean
 ---@field showTimestamp boolean
 ---@field useDefaultChatColor boolean

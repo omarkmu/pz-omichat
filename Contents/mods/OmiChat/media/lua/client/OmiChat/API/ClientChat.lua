@@ -540,7 +540,6 @@ function OmiChat.buildMessageInfo(message, skipFormatting)
         },
         formatOptions = {
             font = instance.chatFont,
-            showInChat = true,
             showTitle = instance.showTitle,
             showTimestamp = instance.showTimestamp,
             useDefaultChatColor = true,
