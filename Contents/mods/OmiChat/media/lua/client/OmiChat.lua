@@ -484,7 +484,7 @@ function ISChat:createChildren()
     self.infoButton:initialise()
     self.infoButton.borderColor.a = 0.0
     self.infoButton.backgroundColor.a = 0.0
-    self.infoButton.backgroundColorMouseOver.a = 0.7
+    self.infoButton.backgroundColorMouseOver.a = 0
     self.infoButton:setImage(self.infoBtn)
     self.infoButton:setUIName('chat info button')
     self:addChild(self.infoButton)
