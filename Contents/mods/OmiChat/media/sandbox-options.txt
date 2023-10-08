@@ -153,7 +153,7 @@ option OmiChat.FormatInfo
 { type = string, default =, page = OmiChat, translation = OCFormatInfo, }
 
 option OmiChat.FormatName
-{ type = string, default = $forename, page = OmiChat, translation = OCFormatName, }
+{ type = string, default = $ifelse($has(@(general;admin;safehouse;faction;whisper) $chatType) $username $forename), page = OmiChat, translation = OCFormatName, }
 
 option OmiChat.FormatTag
 { type = string, default = [$tag]$if($eq($chatType server) :&#32;<SPACE>&#32;), page = OmiChat, translation = OCFormatTag, }
@@ -191,15 +191,15 @@ option OmiChat.OverheadFormatWhisper
 { type = string, default = ($1), page = OmiChat, translation = OCOverheadFormatWhisper, }
 
 
-/* Chat Message Formats*/
+/* Chat Message Formats */
 option OmiChat.ChatFormatDiscord
 { type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCChatFormatDiscord, }
 
 option OmiChat.ChatFormatIncomingPrivate
-{ type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCChatFormatIncomingPrivate, }
+{ type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatIncomingPrivate, }
 
 option OmiChat.ChatFormatOutgoingPrivate
-{ type = string, default = $gettext(UI_OmiChat_private_chat_to $recipient): <SPACE> $message, page = OmiChat, translation = OCChatFormatOutgoingPrivate, }
+{ type = string, default = $gettext(UI_OmiChat_private_chat_to $recipientName): <SPACE> $message, page = OmiChat, translation = OCChatFormatOutgoingPrivate, }
 
 option OmiChat.ChatFormatServer
 { type = string, default = $message, page = OmiChat, translation = OCChatFormatServer, }
@@ -208,7 +208,7 @@ option OmiChat.ChatFormatRadio
 { type = string, default = $gettext(UI_OmiChat_radio $frequency): <SPACE> $message, page = OmiChat, translation = OCChatFormatRadio, }
 
 option OmiChat.ChatFormatAdmin
-{ type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCChatFormatAdmin, }
+{ type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatAdmin, }
 
 option OmiChat.ChatFormatDo
 { type = string, default = &#171; <SPACE> $punctuate($capitalize($trim($message))) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatDo, }
@@ -220,7 +220,7 @@ option OmiChat.ChatFormatDoQuiet
 { type = string, default = &#171; <SPACE> $punctuate($capitalize($trim($message))) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatDoQuiet, }
 
 option OmiChat.ChatFormatGeneral
-{ type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCChatFormatGeneral, }
+{ type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatGeneral, }
 
 option OmiChat.ChatFormatLooc
 { type = string, default = $name: <SPACE> (( $message )), page = OmiChat, translation = OCChatFormatLooc, }
@@ -235,13 +235,13 @@ option OmiChat.ChatFormatMeQuiet
 { type = string, default = &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatMeQuiet, }
 
 option OmiChat.ChatFormatSafehouse
-{ type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCChatFormatSafehouse, }
+{ type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatSafehouse, }
 
 option OmiChat.ChatFormatSay
 { type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatSay, }
 
 option OmiChat.ChatFormatFaction
-{ type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCChatFormatFaction, }
+{ type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatFaction, }
 
 option OmiChat.ChatFormatWhisper
 { type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatWhisper, }

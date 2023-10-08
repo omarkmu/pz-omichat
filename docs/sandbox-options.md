@@ -372,7 +372,7 @@ The format used for displaying character names within in-game menus such as the 
 If blank, menus will not be affected.
 
 ### FormatName
-`default → $forename`  
+`default → $ifelse($has(@(general;admin;safehouse;faction;whisper) $chatType) $username $forename)`  
 `tokens → $chatType, $forename, $surname, $username`
 
 The format used to determine the values of `$name` and `$nameRaw` in other format strings.
@@ -460,7 +460,7 @@ This does **not** apply to the vanilla whisper chat.
 Options that determine the content that displays in chat.
 
 ### ChatFormatAdmin
-`default → $author: <SPACE> $message`  
+`default → $name: <SPACE> $message`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/admin` messages in chat.
@@ -518,19 +518,19 @@ See also:
 - [`OverheadFormatDoQuiet`](#overheadformatdoquiet)
 
 ### ChatFormatFaction
-`default → $author: <SPACE> $message`  
+`default → $name: <SPACE> $message`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/faction` messages in chat.
 
 ### ChatFormatGeneral
-`default → $author: <SPACE> $message`  
+`default → $name: <SPACE> $message`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/all` messages in chat.
 
 ### ChatFormatIncomingPrivate
-`default → $author: <SPACE> $message`  
+`default → $name: <SPACE> $message`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for incoming private messages in chat.
@@ -595,7 +595,7 @@ See also:
 - [`OverheadFormatMeQuiet`](#overheadformatmequiet)
 
 ### ChatFormatOutgoingPrivate
-`default → $gettext(UI_OmiChat_private_chat_to $recipient): <SPACE> $message`  
+`default → $gettext(UI_OmiChat_private_chat_to $recipientName): <SPACE> $message`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $recipient, $recipientName, $message`
 
 The format used for outgoing private messages in chat.
@@ -611,7 +611,7 @@ See also
 The format used for radio messages in chat.
 
 ### ChatFormatSafehouse
-`default → $author: <SPACE> $message`  
+`default → $name: <SPACE> $message`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/safehouse` messages in chat.
