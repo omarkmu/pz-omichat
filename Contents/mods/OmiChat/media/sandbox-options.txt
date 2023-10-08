@@ -146,17 +146,11 @@ option OmiChat.PredicateUseNameColor
 
 
 /* Component Formats */
-option OmiChat.FormatCard
-{ type = string, default = $gettext(UI_OmiChat_card_local $card), page = OmiChat, translation = OCFormatCard, }
-
 option OmiChat.FormatInfo
 { type = string, default =, page = OmiChat, translation = OCFormatInfo, }
 
 option OmiChat.FormatName
 { type = string, default = $ifelse($has(@(general;admin;safehouse;faction;whisper) $chatType) $username $forename), page = OmiChat, translation = OCFormatName, }
-
-option OmiChat.FormatRoll
-{ type = string, default = $gettext(UI_OmiChat_roll_local $roll $sides), page = OmiChat, translation = OCFormatRoll, }
 
 option OmiChat.FormatTag
 { type = string, default = [$tag]$if($eq($chatType server) :&#32;<SPACE>&#32;), page = OmiChat, translation = OCFormatTag, }
@@ -166,6 +160,12 @@ option OmiChat.FormatTimestamp
 
 option OmiChat.FormatMenuName
 { type = string, default = $ifelse($neq($menuType mini_scoreboard) $name $username &#32;[ $name ]), page = OmiChat, translation = OCFormatMenuName, }
+
+option OmiChat.FormatCard
+{ type = string, default = $gettext(UI_OmiChat_card_local $card), page = OmiChat, translation = OCFormatCard, }
+
+option OmiChat.FormatRoll
+{ type = string, default = $gettext(UI_OmiChat_roll_local $roll $sides), page = OmiChat, translation = OCFormatRoll, }
 
 
 /* Overhead Message Formats */
@@ -201,6 +201,9 @@ option OmiChat.OverheadFormatRoll
 
 
 /* Chat Message Formats */
+option OmiChat.ChatFormatFull
+{ type = string, default = $if($neq($stream server) $timestamp)$tag$content, page = OmiChat, translation = OCChatFormatFull, }
+
 option OmiChat.ChatFormatDiscord
 { type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCChatFormatDiscord, }
 

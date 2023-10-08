@@ -566,6 +566,12 @@ The format used for `/faction` messages in chat.
 
 See also: [`ColorFaction`](#colorfaction).
 
+### ChatFormatFull
+`default → $if($neq($stream server) $timestamp)$tag$content`  
+`tokens → $tag, $timestamp, $content, $chatType, $stream`
+
+The format used for the final chat message, after all other formats have been applied.
+
 ### ChatFormatGeneral
 `default → $name: <SPACE> $message`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`

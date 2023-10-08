@@ -68,6 +68,7 @@ local floor = math.floor
 ---@field OverheadFormatMeQuiet string
 ---@field OverheadFormatMeLoud string
 ---@field OverheadFormatLooc string
+---@field ChatFormatFull string
 ---@field ChatFormatCard string
 ---@field ChatFormatRoll string
 ---@field ChatFormatDo string

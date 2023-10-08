@@ -55,6 +55,8 @@ This document serves as a complete list of tokens accepted by the various sandbo
 - `$ss`: The zero-padded second.
 - `$AMPM`: `AM` or `PM`, based on the hour.
 - `$ampm`: `am` or `pm`, based on the hour.
+- `$content`: The full chat message content, after formatting has occurred.
+    - This is used only by [`ChatFormatFull`](./sandbox-options.md#chatformatfull).
 - `$message`: The message content.
 - `$menuType`: The type of menu in which the format string will appear.
     - One of `medical`, `trade`, or `mini_scoreboard`.

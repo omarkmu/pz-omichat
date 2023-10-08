@@ -834,8 +834,6 @@ OmiChat._transformers = {
                 end
             end
 
-            -- mirroring ServerChat settings
-            info.formatOptions.showTimestamp = false
             info.format = Option.ChatFormatServer
         end,
     },

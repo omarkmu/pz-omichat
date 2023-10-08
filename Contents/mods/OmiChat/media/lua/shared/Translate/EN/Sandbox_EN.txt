@@ -77,6 +77,7 @@ Sandbox_EN = {
     Sandbox_OCChatFormatDoLoud = "/doloud Chat Format",
     Sandbox_OCChatFormatDoQuiet = "/doquiet Chat Format",
     Sandbox_OCChatFormatFaction = "/faction Chat Format",
+    Sandbox_OCChatFormatFull = "Full Chat Format",
     Sandbox_OCChatFormatGeneral = "/all Chat Format",
     Sandbox_OCChatFormatIncomingPrivate = "Incoming Private Chat Format",
     Sandbox_OCChatFormatLooc = "/looc Chat Format",

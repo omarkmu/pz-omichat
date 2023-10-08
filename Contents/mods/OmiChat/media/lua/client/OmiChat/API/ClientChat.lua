@@ -578,9 +578,13 @@ function OmiChat.buildMessageTextFromInfo(info)
     return concat {
         utils.toChatColor(info.formatOptions.color),
         '<SIZE:', info.formatOptions.font or 'medium', '> ',
-        info.timestamp or '',
-        info.tag or '',
-        utils.interpolate(info.format, info.substitutions),
+        utils.interpolate(Option.ChatFormatFull, {
+            chatType = info.chatType,
+            stream = info.substitutions.stream,
+            timestamp = info.timestamp or '',
+            tag = info.tag or '',
+            content = utils.interpolate(info.format, info.substitutions)
+        }),
     }
 end
 
