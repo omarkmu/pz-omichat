@@ -375,10 +375,12 @@ The format used for displaying character names within in-game menus such as the 
 If blank, menus will not be affected.
 
 ### FormatName
-`default → $ifelse($has(@(general;admin;safehouse;faction;whisper) $chatType) $username $forename)`  
-`tokens → $chatType, $forename, $surname, $username`
+`default → $ifelse($has(@(general;admin;whisper) $chatType) $username @($name;$forename))`  
+`tokens → $chatType, $forename, $surname, $username, $name`
 
 The format used to determine the values of `$name` and `$nameRaw` in other format strings.
+
+If `$name` is specified, it is a name that was set with [`/name`](./sandbox-options.md#enablesetname).
 
 ### FormatRoll
 `default → $gettext(UI_OmiChat_roll_local $roll $sides)`  

@@ -82,15 +82,15 @@ function OmiChat.getNameInChat(username, chatType)
         return
     end
 
-    local modData = OmiChat.getModData()
-    if modData.nicknames[username] then
-        return utils.escapeRichText(modData.nicknames[username])
-    end
-
     local player = getPlayerByUsername(username)
     local tokens = player and OmiChat.getPlayerSubstitutions(player)
     if not tokens then
         return
+    end
+
+    local modData = OmiChat.getModData()
+    if modData.nicknames[username] then
+        tokens.name = utils.escapeRichText(modData.nicknames[username])
     end
 
     tokens.username = username

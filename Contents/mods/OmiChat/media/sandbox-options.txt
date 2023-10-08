@@ -150,7 +150,7 @@ option OmiChat.FormatInfo
 { type = string, default =, page = OmiChat, translation = OCFormatInfo, }
 
 option OmiChat.FormatName
-{ type = string, default = $ifelse($has(@(general;admin;safehouse;faction;whisper) $chatType) $username $forename), page = OmiChat, translation = OCFormatName, }
+{ type = string, default = $ifelse($has(@(general;admin;whisper) $chatType) $username @($name;$forename)), page = OmiChat, translation = OCFormatName, }
 
 option OmiChat.FormatTag
 { type = string, default = [$tag]$if($eq($chatType server) :&#32;<SPACE>&#32;), page = OmiChat, translation = OCFormatTag, }
