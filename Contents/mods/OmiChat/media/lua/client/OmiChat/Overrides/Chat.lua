@@ -15,6 +15,7 @@ local getTextOrNull = getTextOrNull
 local _addLineInChat = ISChat.addLineInChat
 local _onCommandEntered = ISChat.onCommandEntered
 local _onGearButtonClick = ISChat.onGearButtonClick
+local _logChatCommand = ISChat.logChatCommand
 local _createChildren = ISChat.createChildren
 local _focus = ISChat.focus
 local _unfocus = ISChat.unfocus
@@ -129,6 +130,18 @@ function ISChat:focus()
     if currentStreamName then
         OmiChat.cycleStream(currentStreamName)
     end
+end
+
+---Override to avoid adding sequential duplicates to the history log.
+---@param command string
+function ISChat:logChatCommand(command)
+    local log = self.chatText.log
+    self.chatText.logIndex = 0
+    if log[1] == command then
+        return
+    end
+
+    _logChatCommand(self, command)
 end
 
 ---Override to support custom commands and emote shortcuts.
