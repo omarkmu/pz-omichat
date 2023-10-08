@@ -10,9 +10,7 @@ local concat = table.concat
 local pairs = pairs
 local ipairs = ipairs
 local getText = getText
-
----@class omichat.ISChat
-local ISChat = ISChat
+local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
 
 ---@class omichat.api.client : omichat.api.shared

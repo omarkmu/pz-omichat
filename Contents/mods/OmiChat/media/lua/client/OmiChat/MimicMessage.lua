@@ -4,9 +4,7 @@ local OmiChat = require 'OmiChat/API/Client'
 
 local format = string.format
 local concat = table.concat
-
----@class omichat.ISChat
-local ISChat = ISChat
+local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
 
 ---Fake ChatMessage object for creating messages in chat.

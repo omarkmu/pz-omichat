@@ -15,12 +15,12 @@ local concat = table.concat
 
 ---Extended fields for ISChat.
 ---@class omichat.ISChat : ISChat
----@field instance omichat.ISChat
----@field iconPicker omichat.IconPicker
----@field suggesterBox omichat.SuggesterBox
----@field iconButton ISButton
+---@field instance omichat.ISChat?
 ---@field allChatStreams omichat.ChatStream[]
 ---@field defaultTabStream table<integer, omichat.ChatStream?>
+---@field iconButton ISButton?
+---@field iconPicker omichat.IconPicker?
+---@field suggesterBox omichat.SuggesterBox?
 local ISChat = ISChat
 
 
@@ -99,16 +99,18 @@ end
 ---@param enable boolean?
 local function setIconButtonEnabled(enable)
     local instance = ISChat.instance
-    if not instance.iconButton then
+    local iconButton = instance and instance.iconButton
+    if not instance or not iconButton then
         return
     end
 
     local value = enable and 0.8 or 0.3
-    instance.iconButton:setTextureRGBA(value, value, value, 1)
-    instance.iconButton.enable = enable
+    iconButton:setTextureRGBA(value, value, value, 1)
+    iconButton.enable = enable
 
-    if not enable and instance.iconPicker then
-        instance.iconPicker:setVisible(false)
+    local iconPicker = instance.iconPicker
+    if not enable and iconPicker then
+        iconPicker:setVisible(false)
     end
 end
 
@@ -116,8 +118,9 @@ end
 ---@param show boolean
 local function setShowSuggesterBox(show)
     local instance = ISChat.instance
-    if instance and instance.suggesterBox then
-        instance.suggesterBox:setVisible(show)
+    local suggesterBox = instance and instance.suggesterBox
+    if suggesterBox then
+        suggesterBox:setVisible(show)
     end
 end
 
@@ -125,10 +128,15 @@ end
 ---@return boolean didSet
 local function tryEnterSuggestedItem()
     local instance = ISChat.instance
-    local sbVisible = instance and instance.suggesterBox:isVisible()
-    local sbItem = sbVisible and instance.suggesterBox:getSelectedItem()
-    if sbItem then
-        instance:onSuggesterSelect(sbItem)
+    local suggesterBox = instance and instance.suggesterBox
+    local visible = suggesterBox and suggesterBox:isVisible()
+    if not instance or not suggesterBox or not visible then
+        return false
+    end
+
+    local item = suggesterBox:getSelectedItem()
+    if item then
+        instance:onSuggesterSelect(item)
         return true
     end
 
@@ -139,7 +147,7 @@ end
 ---@param text string? The current text entry text.
 local function updateIconComponents(text)
     local instance = ISChat.instance
-    if not instance.iconButton then
+    if not instance or not instance.iconButton then
         return
     end
 
@@ -163,36 +171,37 @@ end
 ---@param text string? The current text entry text.
 local function updateSuggesterComponent(text)
     local instance = ISChat.instance
-    if not instance or not instance.suggesterBox then
+    local suggesterBox = instance and instance.suggesterBox
+    if not instance or not suggesterBox then
         return
     end
 
     if not OmiChat.getUseSuggester() then
-        instance.suggesterBox:setVisible(false)
+        suggesterBox:setVisible(false)
         return
     end
 
     text = text or instance.textEntry:getInternalText()
     local suggestions = OmiChat.getSuggestions(text)
     if #suggestions == 0 then
-        instance.suggesterBox:setVisible(false)
+        suggesterBox:setVisible(false)
         return
     end
 
-    instance.suggesterBox:setSuggestions(suggestions)
+    suggesterBox:setSuggestions(suggestions)
     if #suggestions > 0 then
-        instance.suggesterBox:setWidth(instance:getWidth())
-        instance.suggesterBox:setHeight(instance.suggesterBox.itemheight * math.min(#suggestions, 5))
-        instance.suggesterBox:setX(instance:getX())
-        instance.suggesterBox:setY(instance:getY() + instance.textEntry:getY() - instance.suggesterBox.height)
-        instance.suggesterBox:setVisible(true)
-        instance.suggesterBox:bringToTop()
+        suggesterBox:setWidth(instance:getWidth())
+        suggesterBox:setHeight(suggesterBox.itemheight * math.min(#suggestions, 5))
+        suggesterBox:setX(instance:getX())
+        suggesterBox:setY(instance:getY() + instance.textEntry:getY() - suggesterBox.height)
+        suggesterBox:setVisible(true)
+        suggesterBox:bringToTop()
 
-        if instance.suggesterBox.vscroll then
-            instance.suggesterBox.vscroll:setHeight(instance.suggesterBox.height)
+        if suggesterBox.vscroll then
+            suggesterBox.vscroll:setHeight(suggesterBox.height)
         end
     else
-        instance.suggesterBox:setVisible(false)
+        suggesterBox:setVisible(false)
     end
 end
 
@@ -200,6 +209,10 @@ end
 ---@param text string? The current text entry text.
 local function updateComponents(text)
     local instance = ISChat.instance
+    if not instance then
+        return
+    end
+
     text = text or instance.textEntry:getInternalText()
 
     updateIconComponents(text)
@@ -399,13 +412,14 @@ end
 ---@param target omichat.ISChat
 ---@return boolean
 function ISChat.onIconButtonClick(target)
-    if not ISChat.focused or not target.iconPicker then
+    local iconPicker = target.iconPicker
+    if not ISChat.focused or not iconPicker then
         return false
     end
 
     local yDelta = 0
     local height = target:getHeight()
-    local pickerHeight = target.iconPicker:getHeight()
+    local pickerHeight = iconPicker:getHeight()
     if height > pickerHeight then
         yDelta = height - pickerHeight
     end
@@ -414,7 +428,7 @@ function ISChat.onIconButtonClick(target)
     local y = target:getY() + yDelta
 
     -- avoid covering the button
-    if x + target.iconPicker:getWidth() >= getPlayerScreenWidth(0) then
+    if x + iconPicker:getWidth() >= getPlayerScreenWidth(0) then
         y = y - target.textEntry:getHeight() - target.inset * 2 - 5
 
         if y <= 0 then
@@ -422,10 +436,10 @@ function ISChat.onIconButtonClick(target)
         end
     end
 
-    target.iconPicker:setX(x)
-    target.iconPicker:setY(y)
-    target.iconPicker:bringToTop()
-    target.iconPicker:setVisible(not target.iconPicker:isVisible())
+    iconPicker:setX(x)
+    iconPicker:setY(y)
+    iconPicker:bringToTop()
+    iconPicker:setVisible(not iconPicker:isVisible())
     setShowSuggesterBox(false)
 
     return true
@@ -468,7 +482,7 @@ end
 function ISChat:onSuggesterSelect(suggestion)
     local entry = ISChat.instance.textEntry
 
-    self.suggesterBox:setVisible(false)
+    setShowSuggesterBox(false)
     entry:setText(suggestion.suggestion)
     updateSuggesterComponent()
 end
@@ -697,8 +711,8 @@ function ISChat:onCommandEntered()
         return
     end
 
-    local chat = ISChat.instance
-    local input = chat.textEntry:getText()
+    local instance = ISChat.instance ---@cast instance omichat.ISChat
+    local input = instance.textEntry:getText()
     local stream, command, chatCommand = OmiChat.chatCommandToStream(input)
 
     local useCallback
@@ -715,7 +729,7 @@ function ISChat:onCommandEntered()
         allowEmotes = not isCommand
         command = input
 
-        local default = ISChat.defaultTabStream[chat.currentTabID]
+        local default = ISChat.defaultTabStream[instance.currentTabID]
         if not isCommand and default then
             stream = default
             isDefault = true
@@ -723,9 +737,9 @@ function ISChat:onCommandEntered()
     end
 
     if stream then
-        if stream.tabID and chat.currentTabID ~= stream.tabID then
+        if stream.tabID and instance.currentTabID ~= stream.tabID then
             -- wrong chat tab
-            showWrongChatTabMessage(chat.currentTabID - 1, stream.tabID - 1, chatCommand or '')
+            showWrongChatTabMessage(instance.currentTabID - 1, stream.tabID - 1, chatCommand or '')
             stream = nil
             allowEmotes = false
             shouldHandle = true
@@ -784,15 +798,15 @@ function ISChat:onCommandEntered()
         return _onCommandEntered(self)
     end
 
-    chat:unfocus()
-    chat:logChatCommand(input)
+    instance:unfocus()
+    instance:logChatCommand(input)
     OmiChat.scrollToBottom()
 
     if allowRetain and stream then
-        chat.chatText.lastChatCommand = chatCommand
+        instance.chatText.lastChatCommand = chatCommand
     elseif stream then
         -- if the used stream shouldn't be set as the last, cycle to the previous command
-        local lastChatStream = OmiChat.chatCommandToStreamName(chat.chatText.lastChatCommand)
+        local lastChatStream = OmiChat.chatCommandToStreamName(instance.chatText.lastChatCommand)
         if lastChatStream then
             OmiChat.cycleStream(lastChatStream)
         end
@@ -814,16 +828,20 @@ end
 function ISChat.onMouseDown(target, x, y)
     local handled = _onMouseDown(target, x, y)
     local instance = ISChat.instance
+    if not instance then
+        return handled
+    end
 
+    local iconPicker = instance.iconPicker
     setShowSuggesterBox(false)
 
-    if not handled or not instance.iconPicker or not instance.iconPicker:isVisible() then
+    if not handled or not iconPicker or not iconPicker:isVisible() then
         return handled
     end
 
     local name = target:getUIName()
     if name == ISChat.textPanelName or name == ISChat.textEntryName then
-        instance.iconPicker:setVisible(false)
+        iconPicker:setVisible(false)
     end
 
     return handled
@@ -831,7 +849,7 @@ end
 
 ---Override to control custom components and allow switching to custom streams.
 function ISChat.onSwitchStream()
-    if not ISChat.focused then
+    if not ISChat.focused or not ISChat.instance then
         return
     end
 
@@ -848,8 +866,9 @@ end
 ---Override to update custom components.
 function ISChat.onPressDown()
     local instance = ISChat.instance
-    if instance and instance.suggesterBox:isVisible() then
-        instance.suggesterBox:selectNext()
+    local suggesterBox = instance and instance.suggesterBox
+    if suggesterBox and suggesterBox:isVisible() then
+        suggesterBox:selectNext()
         return
     end
 
@@ -860,8 +879,9 @@ end
 ---Override to update custom components.
 function ISChat.onPressUp()
     local instance = ISChat.instance
-    if instance and instance.suggesterBox:isVisible() then
-        instance.suggesterBox:selectPrevious()
+    local suggesterBox = instance and instance.suggesterBox
+    if suggesterBox and suggesterBox:isVisible() then
+        suggesterBox:selectPrevious()
         return
     end
 
@@ -872,7 +892,8 @@ end
 ---Override to update custom components.
 function ISChat:onOtherKey(key)
     local instance = ISChat.instance
-    if instance and instance.suggesterBox:isVisible() and key == Keyboard.KEY_ESCAPE then
+    local suggesterBox = instance and instance.suggesterBox
+    if suggesterBox and suggesterBox:isVisible() and key == Keyboard.KEY_ESCAPE then
         setShowSuggesterBox(false)
     else
         _onOtherKey(self, key)

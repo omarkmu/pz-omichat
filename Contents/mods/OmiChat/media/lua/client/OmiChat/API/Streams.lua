@@ -2,9 +2,7 @@ local OmiChat = require 'OmiChat/API/Client'
 local utils = require 'OmiChat/util'
 
 local concat = table.concat
-
----@class omichat.ISChat
-local ISChat = ISChat
+local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
 
 ---Helper for checking if a basic chat stream is enabled.

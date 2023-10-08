@@ -9,9 +9,7 @@ local concat = table.concat
 local pairs = pairs
 local ipairs = ipairs
 local getText = getText
-
----@class omichat.ISChat
-local ISChat = ISChat
+local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
 
 ---@class omichat.api.client
@@ -106,27 +104,32 @@ end
 
 ---Creates or removes the icon button and picker from the chat box based on sandbox options.
 local function updateIconComponents()
-    local add = Option.EnableIconPicker
     local instance = ISChat.instance
-
-    local epIncludeMisc = instance.iconPicker and instance.iconPicker.includeUnknownAsMiscellaneous
-    local includeMisc = Option.EnableMiscellaneousIcons
-    if instance.iconPicker and epIncludeMisc ~= includeMisc then
-        instance.iconPicker.includeUnknownAsMiscellaneous = includeMisc
-        instance.iconPicker:updateIcons()
-    end
-
-    if add and instance.iconButton then
+    if not instance then
         return
     end
 
-    if not add and not instance.iconButton then
+    local add = Option.EnableIconPicker
+    local iconPicker = instance.iconPicker
+    local iconButton = instance.iconButton
+    local epIncludeMisc = iconPicker and iconPicker.includeUnknownAsMiscellaneous
+    local includeMisc = Option.EnableMiscellaneousIcons
+    if iconPicker and epIncludeMisc ~= includeMisc then
+        iconPicker.includeUnknownAsMiscellaneous = includeMisc
+        iconPicker:updateIcons()
+    end
+
+    if add and iconButton then
+        return
+    end
+
+    if not add and not iconButton then
         return
     end
 
     if add then
         local size = math.floor(instance.textEntry.height * 0.75)
-        instance.iconButton = ISButton:new(
+        iconButton = ISButton:new(
             instance.width - size * 1.25 - 2.5,
             instance.textEntry.y + instance.textEntry.height * 0.5 - size * 0.5 + 1,
             size,
@@ -139,29 +142,32 @@ local function updateIconComponents()
         instance.textEntry.width = instance.textEntry.width - size * 1.5
         instance.textEntry.javaObject:setWidth(instance.textEntry.width)
 
-        instance.iconButton.anchorRight = true
-        instance.iconButton.anchorBottom = true
-        instance.iconButton.anchorLeft = false
-        instance.iconButton.anchorTop = false
+        iconButton.anchorRight = true
+        iconButton.anchorBottom = true
+        iconButton.anchorLeft = false
+        iconButton.anchorTop = false
 
-        instance.iconButton:initialise()
-        instance.iconButton.borderColor.a = 0
-        instance.iconButton.backgroundColor.a = 0
-        instance.iconButton.backgroundColorMouseOver.a = 0
-        instance.iconButton:setImage(getTexture('Item_PlushSpiffo'))
-        instance.iconButton:setTextureRGBA(0.3, 0.3, 0.3, 1)
-        instance.iconButton:setUIName('chat icon button')
-        instance:addChild(instance.iconButton)
+        iconButton:initialise()
+        iconButton.borderColor.a = 0
+        iconButton.backgroundColor.a = 0
+        iconButton.backgroundColorMouseOver.a = 0
+        iconButton:setImage(getTexture('Item_PlushSpiffo'))
+        iconButton:setTextureRGBA(0.3, 0.3, 0.3, 1)
+        iconButton:setUIName('chat icon button')
+        instance:addChild(iconButton)
 
-        instance.iconButton:bringToTop()
+        iconButton:bringToTop()
 
-        instance.iconPicker = IconPicker:new(0, 0, instance, ISChat.onIconClick)
-        instance.iconPicker.exclude = OmiChat._iconsToExclude
-        instance.iconPicker.includeUnknownAsMiscellaneous = OmiChat.Option.EnableMiscellaneousIcons
+        iconPicker = IconPicker:new(0, 0, instance, ISChat.onIconClick)
+        iconPicker.exclude = OmiChat._iconsToExclude
+        iconPicker.includeUnknownAsMiscellaneous = OmiChat.Option.EnableMiscellaneousIcons
 
-        instance.iconPicker:initialise()
-        instance.iconPicker:addToUIManager()
-        instance.iconPicker:setVisible(false)
+        iconPicker:initialise()
+        iconPicker:addToUIManager()
+        iconPicker:setVisible(false)
+
+        instance.iconButton = iconButton
+        instance.iconPicker = iconPicker
 
         return
     end
@@ -169,15 +175,17 @@ local function updateIconComponents()
     instance.textEntry.width = instance:getWidth() - instance.inset * 2
     instance.textEntry.javaObject:setWidth(instance.textEntry.width)
 
-    instance:removeChild(instance.iconButton)
-    instance.iconButton:setVisible(false)
-    instance.iconButton:removeFromUIManager()
-    instance.iconButton = nil
+    if iconButton then
+        instance:removeChild(iconButton)
+        iconButton:setVisible(false)
+        iconButton:removeFromUIManager()
+        iconButton = nil
+    end
 
-    if instance.iconPicker then
-        instance.iconPicker:setVisible(false)
-        instance.iconPicker:removeFromUIManager()
-        instance.iconPicker = nil
+    if iconPicker then
+        iconPicker:setVisible(false)
+        iconPicker:removeFromUIManager()
+        iconPicker = nil
     end
 end
 
