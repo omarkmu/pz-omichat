@@ -442,7 +442,6 @@ OmiChat._suggesters = {
     {
         name = 'commands',
         priority = 10,
-        ---@param self table
         ---@param tab (omichat.ChatStream | omichat.CommandStream)[]
         ---@param command string
         ---@param fullCommand string
@@ -589,17 +588,45 @@ OmiChat._suggesters = {
         name = 'emotes',
         priority = 6,
         suggest = function(self, info)
+            local instance = ISChat.instance
+            if not instance then
+                return
+            end
+
+            local currentTabID = instance.currentTabID
             local stream = OmiChat.chatCommandToStream(info.input)
-            if stream and not stream.omichat then
+            local allowEmotes = false
+            if not stream then
+                local isCommand = utils.startsWith(info.input, '/')
+                local default = ISChat.defaultTabStream[currentTabID]
+                allowEmotes = not isCommand
+
+                if not isCommand and default then
+                    stream = default
+                else
+                    return
+                end
+            end
+
+            if stream.tabID and currentTabID ~= stream.tabID then
                 return
             end
 
-            local def = stream and stream.omichat
-            if def and ((def.allowEmotes == nil and def.isCommand) or def.allowEmotes == false) then
-                return
+            local def = stream.omichat
+            if def then
+                if def.isEnabled and not def.isEnabled(stream) then
+                    return
+                end
+
+                allowEmotes = true
+                if def.allowEmotes ~= nil then
+                    allowEmotes = def.allowEmotes
+                elseif def.isCommand then
+                    allowEmotes = false
+                end
             end
 
-            if not stream and utils.startsWith(info.input, '/') then
+            if not allowEmotes then
                 return
             end
 
