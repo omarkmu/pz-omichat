@@ -17,6 +17,7 @@ The vast majority of the features listed below can be configured or completely d
 - Character naming with [`/name`](docs/sandbox-options.md#enablesetname)
 - Chat names in [menus](docs/sandbox-options.md#formatmenuname) (Trading, Medical Check)
 - Local [`/whisper`](docs/sandbox-options.md#chatformatwhisper) chat
+- Local [`/card`](docs/sandbox-options.md#chatformatcard) and [`/roll`](docs/sandbox-options.md#chatformatroll)
 - Roleplay descriptions with [`/me`](docs/sandbox-options.md#chatformatme) and [`/do`](docs/sandbox-options.md#chatformatdo)
 - Versions of `/me` and `/do` with larger and smaller ranges (
 [`/mequiet`](docs/sandbox-options.md#chatformatmequiet),
@@ -24,9 +25,11 @@ The vast majority of the features listed below can be configured or completely d
 [`/doquiet`](docs/sandbox-options.md#chatformatdoquiet),
 [`/doloud`](docs/sandbox-options.md#chatformatdoloud))
 - [Icon picker](docs/sandbox-options.md#enableiconpicker)
+- Text suggestion box
 - Emote animation [shortcuts](docs/emotes.md) (.clap, .salute, .surrrender, etc.)
 - Compatibility with [True Actions Act 3 - Dancing](https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556) with [`/dance`](docs/sandbox-options.md#enablecompattad)
 - Chat range [options](docs/sandbox-options.md#ranges)
+- Info text [option](Docs/sandbox-options.md#formatinfo)
 
 ---
 Poster image adapted from the Messenger icon by [Freepik on Flaticon](https://www.flaticon.com/free-icons/message).

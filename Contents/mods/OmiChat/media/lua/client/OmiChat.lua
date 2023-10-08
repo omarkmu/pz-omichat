@@ -15,18 +15,22 @@ local concat = table.concat
 
 ---Extended fields for ISChat.
 ---@class omichat.ISChat : ISChat
----@field instance omichat.ISChat?
----@field focused boolean
----@field tabs omichat.ChatTab[]
----@field allChatStreams omichat.ChatStream[]
----@field defaultTabStream table<integer, omichat.ChatStream?>
----@field gearButton ISButton
----@field textEntry ISTextEntryBox
----@field currentTabID integer
----@field tabCnt integer
----@field iconButton ISButton?
----@field iconPicker omichat.IconPicker?
----@field suggesterBox omichat.SuggesterBox?
+---@field instance omichat.ISChat? The ISChat instance.
+---@field focused boolean Whether the chat is currently focused.
+---@field showTitle boolean Whether chat type titles should display.
+---@field showTimestamp boolean Whether timestamps should display.
+---@field chatFont omichat.ChatFont The current font of the chat.
+---@field chatText omichat.ChatTab The current chat tabs.
+---@field tabs omichat.ChatTab[] List of available chat tabs.
+---@field allChatStreams omichat.ChatStream[] List of all available chat streams.
+---@field defaultTabStream table<integer, omichat.ChatStream?> An association of 1-indexed tab IDs to default streams.
+---@field gearButton ISButton The settings button.
+---@field textEntry ISTextEntryBox The text entry UI element.
+---@field currentTabID integer The 1-indexed tab ID of the current tab.
+---@field tabCnt integer The number of available tabs.
+---@field iconButton ISButton? The icon button UI element.
+---@field iconPicker omichat.IconPicker? The icon picker UI element.
+---@field suggesterBox omichat.SuggesterBox? The suggester box UI element.
 local ISChat = ISChat
 
 

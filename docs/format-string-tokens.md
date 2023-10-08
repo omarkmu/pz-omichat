@@ -1,17 +1,17 @@
 # Tokens
 
-The [format strings](./format-strings.md) that some sandbox options accept can include *tokens*, which are replaced with a relevant value when they're used.
+The [format strings](./format-strings.md) that some sandbox options accept can include **tokens**, which are replaced with a relevant value when they're used.
 These are specified with a dollar sign followed by the name of the token (e.g., `$author`).
 Unlike [functions](./format-string-functions.md), tokens are case-sensitive; `$author` is not the same as `$Author`.
 
-The full list of tokens accepted by the various sandbox options follows.
-**Not all of these tokens are available to every sandbox option that uses format strings. See [Sandbox Options](./sandbox-options.md) for details about the tokens that each option accepts.**
+This document serves as a complete list of tokens accepted by the various sandbox options.
+**Not all of these tokens are available to every sandbox option that uses format strings.** See [Sandbox Options](./sandbox-options.md) for details about the tokens that each option accepts.
 
 - `$1`: The content of a message wrapped in invisible special characters.
     - When this token is used by a format string, it **must** be included.
     If it isn't, the format string will behave as if only `$1` had been specified.
     - The invisible characters included in this token are used to encode information for mod functionality.
-- `$author`: The author of a message (usually a username). This will also include the name color, if one is included.
+- `$author`: The author of a message (usually a username). This may include the name color, if one is included.
 - `$authorRaw`: The same as `$author`, but does not include name colors.
 - `$card`: The card that was drawn, for a local [`/card`](./sandbox-options.md#chatformatcard) command.
     - This is only used by [`FormatCard`](./sandbox-options.md#formatcard).
@@ -21,7 +21,7 @@ The full list of tokens accepted by the various sandbox options follows.
     - This is only used by [`FormatRoll`](./sandbox-options.md#formatroll).
 - `$chatType`: The type of the chat in which the message was sent.
     - One of `general`, `whisper`, `say`, `shout`, `faction`, `safehouse`, `radio`, `admin`, or `server`.
-    - Note that `whisper` refers to PM chats, not [local whispers](./sandbox-options.md#chatformatwhisper).
+    - Note that `whisper` refers to private chats, not [local whispers](./sandbox-options.md#chatformatwhisper).
 - `$stream`: The stream in which the message was sent.
     - One of:
         - `general`
@@ -56,7 +56,7 @@ The full list of tokens accepted by the various sandbox options follows.
 - `$message`: The message content.
 - `$menuType`: The type of menu in which the format string will appear.
     - One of `medical`, `trade`, or `mini_scoreboard`.
-- `$name`: The chat name of the relevant player. This will also include the name color, if one is included.
+- `$name`: The chat name of the relevant player. This may include the name color, if one is included.
     - Determined by the name set with [`/name`](./sandbox-options.md#enablesetname) or the format specified by [`FormatName`](./sandbox-options.md#formatname).
 - `$nameRaw`: The same as `$name`, but does not include name colors.
 - `$recipient`: The username of the recipient of a private message.

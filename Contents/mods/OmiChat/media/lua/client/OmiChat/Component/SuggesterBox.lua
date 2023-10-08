@@ -1,6 +1,6 @@
 ---UI element for offerring text suggestions.
 ---@class omichat.SuggesterBox : ISScrollingListBox
----@field maximumVisibleItems integer
+---@field maximumVisibleItems integer The number of items to show without scrolling.
 local SuggesterBox = ISScrollingListBox:derive('SuggesterBox')
 
 

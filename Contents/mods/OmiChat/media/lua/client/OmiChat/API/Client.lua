@@ -2,7 +2,6 @@
 
 require 'Chat/ISChat'
 
-local utils = require 'OmiChat/util'
 local vanillaCommands = require 'OmiChat/Data/VanillaCommandList'
 local customStreamData = require 'OmiChat/Data/CustomStreams'
 
@@ -24,6 +23,7 @@ local ISChat = ISChat ---@cast ISChat omichat.ISChat
 ---@field private _playerPrefs omichat.PlayerPreferences
 local OmiChat = require 'OmiChatShared'
 local Option = OmiChat.Option
+local utils = OmiChat.utils
 
 OmiChat.ColorModal = require 'OmiChat/Component/ColorModal'
 OmiChat.IconPicker = require 'OmiChat/Component/IconPicker'
@@ -395,7 +395,7 @@ OmiChat._commandStreams = {
                 end
 
                 local seen = {}
-                local commands = {} ---@type omichat.VanillaCommandEntry[]
+                local commands = {} ---@type omichat.VanillaCommand[]
 
                 for _, stream in pairs(OmiChat._commandStreams) do
                     if stream.omichat then

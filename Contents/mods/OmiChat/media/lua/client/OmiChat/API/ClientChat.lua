@@ -1,6 +1,5 @@
 ---Client API functionality related to manipulating the chat.
 
-local utils = require 'OmiChat/util'
 local MimicMessage = require 'OmiChat/Component/MimicMessage'
 local customStreamData = require 'OmiChat/Data/CustomStreams'
 
@@ -18,6 +17,7 @@ local OmiChat = require 'OmiChat/API/Client'
 OmiChat.MimicMessage = MimicMessage
 
 
+local utils = OmiChat.utils
 local Option = OmiChat.Option
 local IconPicker = OmiChat.IconPicker
 
@@ -1038,7 +1038,7 @@ function OmiChat.showInfoMessage(text, serverAlert)
     message:setChatType('server')
     message:setTitleID('UI_chat_server_chat_title_id')
     message:setServerAlert(serverAlert or false)
-    message:setAlreadyEscaped(true)
+    message:setIsRichText(true)
 
     ISChat.addLineInChat(message, ISChat.instance.currentTabID - 1)
 end

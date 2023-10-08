@@ -69,7 +69,7 @@ function ISChat.addLineInChat(message, tabID)
 
         -- necessary to process transforms so we know whether this message should be added to chat
         local info = OmiChat.buildMessageInfo(message, true)
-        if info and not info.formatOptions.showInChat then
+        if info and not message:isShowInChat() then
             return
         end
     end

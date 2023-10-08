@@ -14,21 +14,21 @@
 ---| 'roll'
 
 ---@class omichat.CustomStreamInfo
----@field name string
----@field formatID integer
----@field colorOpt string
----@field rangeOpt string
----@field chatFormatOpt string
----@field overheadFormatOpt string
----@field showOnRadio boolean
----@field chatTypes table<omichat.ChatTypeString, boolean>
----@field isCommand true?
----@field streamAlias string?
----@field stripColors boolean?
----@field allowColorCustomization false?
----@field defaultRangeOpt string?
----@field titleID string?
----@field attractZombies true?
+---@field name string The name of the custom stream.
+---@field formatID integer The constant ID to use for message formatting.
+---@field colorOpt string The name of the option used to determine message color.
+---@field rangeOpt string The name of the option used to determine message range.
+---@field chatFormatOpt string The name of the option used for the chat format.
+---@field overheadFormatOpt string The name of the option used for the overhead format.
+---@field showOnRadio boolean Whether messages sent on this stream should be visible over the radio.
+---@field chatTypes table<omichat.ChatTypeString, true?> Chat types for which this stream is enabled.
+---@field isCommand true? Whether this stream is a command stream.
+---@field streamAlias string? An alias to use for determining color and range.
+---@field stripColors boolean? Whether to strip colors from messages sent via this stream.
+---@field allowColorCustomization false? Whether to allow color customization for this stream.
+---@field defaultRangeOpt string? The option used for the default message range. Defaults to `RangeSay`.
+---@field titleID string? The string ID to use for chat tags associated with this stream.
+---@field attractZombies true? Whether messages sent with this stream should attract zombies.
 
 
 ---@type table<omichat.CustomStreamName, omichat.CustomStreamInfo>

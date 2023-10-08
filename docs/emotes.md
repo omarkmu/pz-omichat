@@ -4,7 +4,7 @@ The `EnableEmotes` [option](./sandbox-options.md#enableemotes) allows players to
 These emote shortcuts cause a player's character to play the animation associated with the emote, but they don't show up in the chat message.
 
 The following table contains the available emotes.
-Players can use the `/emotes` command to view a list in-game.
+Players can use the `/emotes` command to view a list in-game, or enter them using the suggestion box.
 
 | Emote           | Animation                           |
 | --------------- | ----------------------------------- |

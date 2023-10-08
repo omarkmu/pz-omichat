@@ -91,7 +91,6 @@ Other players will be able to see chat name colors.
 
 See also:
 - [`EnableSetName`](#enablesetname)
-- [`EnableNameColorInAllChats`](#enablenamecolorinallchats)
 - [`EnableSetSpeechColor`](#enablesetspeechcolor)
 - [`EnableSpeechColorAsDefaultNameColor`](#enablespeechcolorasdefaultnamecolor)
 
@@ -103,7 +102,6 @@ This affects the existing in-game option within the Multiplayer tab of the setti
 
 See also:
 - [`EnableSetNameColor`](#enablesetnamecolor)
-- [`EnableNameColorInAllChats`](#enablenamecolorinallchats)
 - [`EnableSpeechColorAsDefaultNameColor`](#enablespeechcolorasdefaultnamecolor)
 
 ### EnableSpeechColorAsDefaultNameColor
@@ -113,7 +111,6 @@ If enabled, players' overhead speech color will be used as their default name co
 This can be used alongside with or independently of [`EnableSetNameColor`](#enablesetnamecolor).
 
 See also:
-- [`EnableNameColorInAllChats`](#enablenamecolorinallchats)
 - [`EnableSetSpeechColor`](#enablesetspeechcolor)
 
 
@@ -394,7 +391,7 @@ The format used for local [`/roll`](#chatformatroll) message content.
 `tokens → $chatType, $stream, $tag`
 
 The format used when `Enable tags` is selected in the chat settings menu.
-This describes the chat title that shows up to the left of messages (e.g., `[Local]`).
+This describes the chat title that displays to the left of messages (e.g., `[Local]`).
 
 ### FormatTimestamp
 `default → [$ifelse($eq($hourFormatPref 12) $h $H):$mm]`  
@@ -491,6 +488,8 @@ Options that determine the content that displays in chat.
 
 The format used for `/admin` messages in chat.
 
+See also: [`ColorAdmin`](#coloradmin).
+
 ### ChatFormatCard
 `default → &#32;<IMAGE:Item_CardDeck&#44;15&#44;14> <SPACE> &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
@@ -498,7 +497,7 @@ The format used for `/admin` messages in chat.
 The format used for local `/card` messages in chat.
 This respects the range and color options of [`/me`](#chatformatme).
 
-If blank, `/card` messages will be global instead of local. In this case, related options will be ignored.
+If blank, `/card` messages will be global instead of local and related options will be ignored.
 
 See also:
 - [`OverheadFormatCard`](#overheadformatcard)
@@ -511,6 +510,8 @@ See also:
 
 The format used for messages from Discord in chat.
 Messages from Discord will not apply name colors.
+
+See also: [`ColorDiscord`](#colordiscord).
 
 ### ChatFormatDo
 `default → &#171; <SPACE> $punctuate($capitalize($trim($message))) <SPACE> &#187;`  
@@ -563,11 +564,15 @@ See also:
 
 The format used for `/faction` messages in chat.
 
+See also: [`ColorFaction`](#colorfaction).
+
 ### ChatFormatGeneral
 `default → $name: <SPACE> $message`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/all` messages in chat.
+
+See also: [`ColorGeneral`](#colorgeneral).
 
 ### ChatFormatIncomingPrivate
 `default → $name: <SPACE> $message`  
@@ -650,6 +655,8 @@ See also
 
 The format used for radio messages in chat.
 
+See also: [`ColorRadio`](#colorradio).
+
 ### ChatFormatRoll
 `default → &#32;<IMAGE:Item_Dice&#44;15&#44;14> <SPACE> &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
@@ -657,7 +664,7 @@ The format used for radio messages in chat.
 The format used for local `/roll` messages in chat.
 This respects the range and color options of [`/me`](#chatformatme).
 
-If blank, `/roll` messages will be global instead of local. In this case, related options will be ignored.
+If blank, `/roll` messages will be global instead of local and related options will be ignored.
 
 See also:
 - [`OverheadFormatRoll`](#overheadformatroll)
@@ -678,11 +685,15 @@ See also: [`ColorSafehouse`](#colorsafehouse).
 
 The format used for `/say` messages in chat.
 
+See also: [`ColorSay`](#colorsay).
+
 ### ChatFormatServer
 `default → $message`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for server messages in chat.
+
+See also: [`ColorServer`](#colorserver).
 
 ### ChatFormatWhisper
 `default → $name: <SPACE> $message`  
@@ -694,10 +705,15 @@ Modifies `/whisper` chat to act as local chat which doesn't attract zombies and 
 If populated, the existing `/whisper` is changed to `/pm`.
 If blank, local whisper will be disabled and the default `/whisper` will not be renamed.
 
-*See also: [`RangeWhisper`](#rangewhisper), [`OverheadFormatWhisper`](#overheadformatwhisper).*
+See also:
+- [`ColorWhisper`](#colorwhisper)
+- [`RangeWhisper`](#rangewhisper)
+- [`OverheadFormatWhisper`](#overheadformatwhisper)
 
 ### ChatFormatYell
 `default → $name: <SPACE> $message`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/yell` messages in chat.
+
+See also: [`ColorYell`](#coloryell).

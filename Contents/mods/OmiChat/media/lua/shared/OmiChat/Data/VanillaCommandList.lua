@@ -1,12 +1,12 @@
----@class omichat.VanillaCommandEntry
----@field name string
----@field helpText string
----@field access integer
----@field helpTextArgs string[]?
+---@class omichat.VanillaCommand
+---@field name string The name of the command.
+---@field helpText string The string ID of the command's help text.
+---@field access integer Access requirements to use the command.
+---@field helpTextArgs string[]? Arguments to supply to the command's help text.
 
 ---List of vanilla commands used for extending the /help command.
 ---Excludes disabled commands and commands without help text.
----@type omichat.VanillaCommandEntry[]
+---@type omichat.VanillaCommand[]
 return {
     {
         name = 'additem',

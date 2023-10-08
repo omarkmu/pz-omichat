@@ -6,11 +6,11 @@ local floor = math.floor
 ---Modal for color selection.
 ---Includes a text field for RGB input and a color picker.
 ---@class omichat.ColorModal : ISTextBox
----@field defaultColor omichat.ColorTable
----@field emptyColor omichat.ColorTable
----@field minimumValue integer
----@field maximumValue integer
----@field requireValue boolean
+---@field defaultColor omichat.ColorTable The default color to set on the modal during initialization.
+---@field emptyColor omichat.ColorTable The color that will be used if the entry is blank.
+---@field minimumValue integer The minimum RGB value of each color component.
+---@field maximumValue integer The maximum RGB value of each color component.
+---@field requireValue boolean If true, the text entry will not be valid if empty.
 local ColorModal = ISTextBox:derive('ColorModal')
 
 

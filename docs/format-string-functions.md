@@ -132,6 +132,8 @@ These functions are related to working with [at-maps](./format-string-at-maps.md
 - `$last(o)`: Returns the value of the last entry in the at-map `o`.
 - `$index(s key default)`: Returns a list of entries associated with `key`, or `default` if there are none.
 - `$unique(o)`: Returns an at-map with only the unique values in the at-map `o`.
+- `$get(o key default)`: Returns the first value associated with `key`, or `default` if there are none.
+- `$has(o key)`: Returns `true` if the at-map contains the key `key`. Otherwise, returns the empty string.
 
 
 ## Translation Functions
