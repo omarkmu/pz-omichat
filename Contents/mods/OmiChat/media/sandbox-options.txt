@@ -149,11 +149,17 @@ option OmiChat.PredicateUseNameColor
 
 
 /* Component Formats */
+option OmiChat.FormatCard
+{ type = string, default = $gettext(UI_OmiChat_card_local $card), page = OmiChat, translation = OCFormatCard, }
+
 option OmiChat.FormatInfo
 { type = string, default =, page = OmiChat, translation = OCFormatInfo, }
 
 option OmiChat.FormatName
 { type = string, default = $ifelse($has(@(general;admin;safehouse;faction;whisper) $chatType) $username $forename), page = OmiChat, translation = OCFormatName, }
+
+option OmiChat.FormatRoll
+{ type = string, default = $gettext(UI_OmiChat_roll_local $roll $sides), page = OmiChat, translation = OCFormatRoll, }
 
 option OmiChat.FormatTag
 { type = string, default = [$tag]$if($eq($chatType server) :&#32;<SPACE>&#32;), page = OmiChat, translation = OCFormatTag, }
@@ -190,6 +196,12 @@ option OmiChat.OverheadFormatMeQuiet
 option OmiChat.OverheadFormatWhisper
 { type = string, default = ($1), page = OmiChat, translation = OCOverheadFormatWhisper, }
 
+option OmiChat.OverheadFormatCard
+{ type = string, default = &#171; $1 &#187;, page = OmiChat, translation = OCOverheadFormatCard, }
+
+option OmiChat.OverheadFormatRoll
+{ type = string, default = &#171; $1 &#187;, page = OmiChat, translation = OCOverheadFormatRoll, }
+
 
 /* Chat Message Formats */
 option OmiChat.ChatFormatDiscord
@@ -209,6 +221,12 @@ option OmiChat.ChatFormatRadio
 
 option OmiChat.ChatFormatAdmin
 { type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatAdmin, }
+
+option OmiChat.ChatFormatCard
+{ type = string, default = &#32;<IMAGE:Item_CardDeck&#44;15&#44;14> <SPACE> &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatCard, }
+
+option OmiChat.ChatFormatRoll
+{ type = string, default = &#32;<IMAGE:Item_Dice&#44;15&#44;14> <SPACE> &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatRoll, }
 
 option OmiChat.ChatFormatDo
 { type = string, default = &#171; <SPACE> $punctuate($capitalize($trim($message))) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatDo, }

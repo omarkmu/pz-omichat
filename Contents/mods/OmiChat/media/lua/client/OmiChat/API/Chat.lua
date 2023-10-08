@@ -221,7 +221,7 @@ local function updateStreams()
 
     for i = 1, #customStreamData.list do
         local data = customStreamData.list[i]
-        if not custom[data] and data.name then
+        if not custom[data] and data.name and not data.isCommand then
             OmiChat.addStreamBefore(customStreams[data.name], vanillaWhisper)
         end
     end

@@ -23,6 +23,21 @@ local function dispatchCommandToAll(command, args)
 end
 
 
+---Instructs the client to report the result of drawing a card.
+---@param player IsoPlayer
+---@param card string
+function OmiChat.reportDrawCard(player, card)
+    dispatchCommand('reportDrawCard', player, { card = card })
+end
+
+---Instructs the client to report the result of a dice roll.
+---@param player IsoPlayer
+---@param roll string
+---@param sides integer
+function OmiChat.reportRoll(player, roll, sides)
+    dispatchCommand('reportRoll', player, { roll = roll, sides = sides })
+end
+
 ---Sends an info message that will show only for the specified player.
 ---@param player IsoPlayer
 ---@param text string

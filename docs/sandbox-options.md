@@ -357,6 +357,12 @@ See also:
 ## Component Formats
 Options that define the string formats used for purposes other than overhead speech bubbles and chat messages.
 
+### FormatCard
+`default → $gettext(UI_OmiChat_card_local $card)`  
+`tokens → $card`
+
+The format used for local [`/card`](#chatformatcard) message content.
+
 ### FormatInfo
 `(blank by default)`  
 `tokens → $forename, $surname, $username, $name`
@@ -377,6 +383,12 @@ If blank, menus will not be affected.
 
 The format used to determine the values of `$name` and `$nameRaw` in other format strings.
 
+### FormatRoll
+`default → $gettext(UI_OmiChat_roll_local $roll $sides)`  
+`tokens → $roll, $sides`
+
+The format used for local [`/roll`](#chatformatroll) message content.
+
 ### FormatTag
 `default → [$tag]$if($eq($chatType server) :&#32;<SPACE>&#32;)`  
 `tokens → $chatType, $stream, $tag`
@@ -396,6 +408,13 @@ Options that the content that displays in speech bubbles that appear over a char
 
 **These formats can have an effect on chat formats.**
 For example, reversing the overhead text will result in the message content being reversed in chat.
+
+### OverheadFormatCard
+`default → &#171; $1 &#187;` (`« $1 »`)  
+`tokens → $1`
+
+The overhead format used for local [`/card`](#chatformatcard) messages.
+If blank, `/card` messages will not display overhead.
 
 ### OverheadFormatDo
 `(blank by default)`  
@@ -446,6 +465,13 @@ If blank, `/meloud` messages will not display overhead.
 Defines the format used for overhead speech bubbles of [`/mequiet`](#chatformatmequiet) messages.
 If blank, `/mequiet` messages will not display overhead.
 
+### OverheadFormatRoll
+`default → &#171; $1 &#187;` (`« $1 »`)  
+`tokens → $1`
+
+The overhead format used for local [`/roll`](#chatformatroll) messages.
+If blank, `/roll` messages will not display overhead.
+
 ### OverheadFormatWhisper
 `default → ($1)`  
 `tokens → $1`
@@ -464,6 +490,20 @@ Options that determine the content that displays in chat.
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/admin` messages in chat.
+
+### ChatFormatCard
+`default → &#32;<IMAGE:Item_CardDeck&#44;15&#44;14> <SPACE> &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
+`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+
+The format used for local `/card` messages in chat.
+This respects the range and color options of [`/me`](#chatformatme).
+
+If blank, `/card` messages will be global instead of local. In this case, related options will be ignored.
+
+See also:
+- [`OverheadFormatCard`](#overheadformatcard)
+- [`ColorMe`](#colorme)
+- [`RangeMe`](#rangeme)
 
 ### ChatFormatDiscord
 `default → $author: <SPACE> $message`  
@@ -609,6 +649,20 @@ See also
 `tokens → $author, $authorRaw, $name, $nameRaw, $frequency, $message`
 
 The format used for radio messages in chat.
+
+### ChatFormatRoll
+`default → &#32;<IMAGE:Item_Dice&#44;15&#44;14> <SPACE> &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
+`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+
+The format used for local `/roll` messages in chat.
+This respects the range and color options of [`/me`](#chatformatme).
+
+If blank, `/roll` messages will be global instead of local. In this case, related options will be ignored.
+
+See also:
+- [`OverheadFormatRoll`](#overheadformatroll)
+- [`ColorMe`](#colorme)
+- [`RangeMe`](#rangeme)
 
 ### ChatFormatSafehouse
 `default → $name: <SPACE> $message`  

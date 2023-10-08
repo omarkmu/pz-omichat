@@ -10,6 +10,8 @@
 ---| 'doquiet'
 ---| 'doloud'
 ---| 'looc'
+---| 'card'
+---| 'roll'
 
 ---@class omichat.CustomStreamInfo
 ---@field name string
@@ -20,6 +22,8 @@
 ---@field overheadFormatOpt string
 ---@field showOnRadio boolean
 ---@field chatTypes table<omichat.ChatTypeString, boolean>
+---@field isCommand true?
+---@field streamAlias string?
 ---@field stripColors boolean?
 ---@field allowColorCustomization false?
 ---@field defaultRangeOpt string?
@@ -32,6 +36,7 @@ local customStreamTable = {}
 
 ---@type omichat.CustomStreamInfo[]
 local customStreamList = {
+    -- chat streams
     {
         name = 'whisper',
         formatID = 1,
@@ -122,6 +127,34 @@ local customStreamList = {
         overheadFormatOpt = 'OverheadFormatLooc',
         chatTypes = { say = true },
         showOnRadio = false,
+    },
+
+    -- command streams
+    {
+        name = 'roll',
+        formatID = 51,
+        isCommand = true,
+        colorAlias = 'me',
+        colorOpt = 'ColorMe',
+        rangeOpt = 'RangeMe',
+        chatFormatOpt = 'ChatFormatRoll',
+        overheadFormatOpt = 'OverheadFormatRoll',
+        chatTypes = { say = true },
+        showOnRadio = false,
+        allowColorCustomization = false,
+    },
+    {
+        name = 'card',
+        formatID = 52,
+        isCommand = true,
+        colorAlias = 'me',
+        colorOpt = 'ColorMe',
+        rangeOpt = 'RangeMe',
+        chatFormatOpt = 'ChatFormatCard',
+        overheadFormatOpt = 'OverheadFormatCard',
+        chatTypes = { say = true },
+        showOnRadio = false,
+        allowColorCustomization = false,
     },
 }
 

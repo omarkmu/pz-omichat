@@ -13,6 +13,12 @@ The full list of tokens accepted by the various sandbox options follows.
     - The invisible characters included in this token are used to encode information for mod functionality.
 - `$author`: The author of a message (usually a username). This will also include the name color, if one is included.
 - `$authorRaw`: The same as `$author`, but does not include name colors.
+- `$card`: The card that was drawn, for a local [`/card`](./sandbox-options.md#chatformatcard) command.
+    - This is only used by [`FormatCard`](./sandbox-options.md#formatcard).
+- `$roll`: The number that was rolled, for a local [`/roll`](./sandbox-options.md#chatformatroll) command.
+    - This is only used by [`FormatRoll`](./sandbox-options.md#formatroll).
+- `$sides`: The number of sides on the die that was rolled, for a local [`/roll`](./sandbox-options.md#chatformatroll) command.
+    - This is only used by [`FormatRoll`](./sandbox-options.md#formatroll).
 - `$chatType`: The type of the chat in which the message was sent.
     - One of `general`, `whisper`, `say`, `shout`, `faction`, `safehouse`, `radio`, `admin`, or `server`.
     - Note that `whisper` refers to PM chats, not [local whispers](./sandbox-options.md#chatformatwhisper).

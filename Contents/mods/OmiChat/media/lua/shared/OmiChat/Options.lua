@@ -52,11 +52,15 @@ local floor = math.floor
 ---@field ColorServer string
 ---@field FilterNickname string
 ---@field PredicateUseNameColor string
+---@field FormatCard string
+---@field FormatRoll string
 ---@field FormatInfo string
 ---@field FormatMenuName string
 ---@field FormatName string
 ---@field FormatTag string
 ---@field FormatTimestamp string
+---@field OverheadFormatCard string
+---@field OverheadFormatRoll string
 ---@field OverheadFormatDo string
 ---@field OverheadFormatDoLoud string
 ---@field OverheadFormatDoQuiet string
@@ -65,6 +69,8 @@ local floor = math.floor
 ---@field OverheadFormatMeQuiet string
 ---@field OverheadFormatMeLoud string
 ---@field OverheadFormatLooc string
+---@field ChatFormatCard string
+---@field ChatFormatRoll string
 ---@field ChatFormatDo string
 ---@field ChatFormatDoQuiet string
 ---@field ChatFormatDoLoud string

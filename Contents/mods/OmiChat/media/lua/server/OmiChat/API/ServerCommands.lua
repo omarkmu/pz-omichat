@@ -157,8 +157,13 @@ end
 ---Handles the /card command.
 ---@param player IsoPlayer
 function OmiChat.Commands.requestDrawCard(player)
-    local name = OmiChat.getNameInChat(player:getUsername(), 'general') or player:getUsername()
-    OmiChat.sendTranslatedServerMessage('UI_OmiChat_card', { name, getRandomCard() })
+    local card = getRandomCard()
+    if OmiChat.isCustomStreamEnabled('card') then
+        OmiChat.reportDrawCard(player, card)
+    else
+        local name = OmiChat.getNameInChat(player:getUsername(), 'general') or player:getUsername()
+        OmiChat.sendTranslatedServerMessage('UI_OmiChat_card', { name, card })
+    end
 end
 
 ---Handles the /roll command.
@@ -171,10 +176,13 @@ function OmiChat.Commands.requestRollDice(player, args)
         return
     end
 
-    local name = OmiChat.getNameInChat(player:getUsername(), 'general') or player:getUsername()
     local roll = tostring(1 + ZombRand(sides))
-
-    OmiChat.sendTranslatedServerMessage('UI_OmiChat_roll', { name, roll, tostring(sides) })
+    if OmiChat.isCustomStreamEnabled('roll') then
+        OmiChat.reportRoll(player, roll, sides)
+    else
+        local name = OmiChat.getNameInChat(player:getUsername(), 'general') or player:getUsername()
+        OmiChat.sendTranslatedServerMessage('UI_OmiChat_roll', { name, roll, tostring(sides) })
+    end
 end
 
 ---Handles the /setname command.

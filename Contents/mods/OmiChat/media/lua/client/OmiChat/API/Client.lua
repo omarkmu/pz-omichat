@@ -720,10 +720,10 @@ OmiChat._transformers = {
                 elseif isValidStream and isMatch then
                     info.content = formatter:read(info.rawText)
                     info.format = Option[streamData.chatFormatOpt]
-                    info.context.ocCustomStream = name
+                    info.context.ocCustomStream = streamData.streamAlias or name
                     info.substitutions.stream = name
 
-                    info.formatOptions.color = OmiChat.getColorTable(name)
+                    info.formatOptions.color = OmiChat.getColorTable(info.context.ocCustomStream)
                     info.formatOptions.useChatColor = false
 
                     if streamData.stripColors then
