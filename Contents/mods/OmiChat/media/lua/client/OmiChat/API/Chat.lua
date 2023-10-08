@@ -442,7 +442,7 @@ function OmiChat.applyFormatOptions(info)
     msg = utils.trim(msg)
     if not options.color then
         local color
-        if options.useChatColor then
+        if options.useDefaultChatColor then
             if message:isFromDiscord() then
                 color = OmiChat.getColorTable('discord')
             else
@@ -534,7 +534,7 @@ function OmiChat.buildMessageInfo(message, skipFormatting)
             showInChat = true,
             showTitle = instance.showTitle,
             showTimestamp = instance.showTimestamp,
-            useChatColor = true,
+            useDefaultChatColor = true,
             stripColors = false,
         },
     }

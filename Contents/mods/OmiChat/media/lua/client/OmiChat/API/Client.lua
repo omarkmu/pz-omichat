@@ -724,7 +724,7 @@ OmiChat._transformers = {
                     info.substitutions.stream = name
 
                     info.formatOptions.color = OmiChat.getColorTable(info.context.ocCustomStream)
-                    info.formatOptions.useChatColor = false
+                    info.formatOptions.useDefaultChatColor = false
 
                     if streamData.stripColors then
                         info.formatOptions.stripColors = true
@@ -809,7 +809,7 @@ OmiChat._transformers = {
             end
 
             info.formatOptions.color = OmiChat.getColorTable('private')
-            info.formatOptions.useChatColor = false
+            info.formatOptions.useDefaultChatColor = false
         end,
     },
     {

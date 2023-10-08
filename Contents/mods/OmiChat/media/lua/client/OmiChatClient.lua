@@ -35,7 +35,7 @@ return OmiChat
 ---@field showInChat boolean
 ---@field showTitle boolean
 ---@field showTimestamp boolean
----@field useChatColor boolean
+---@field useDefaultChatColor boolean
 ---@field stripColors boolean
 ---@field font omichat.ChatFont
 ---@field color omichat.ColorTable?
