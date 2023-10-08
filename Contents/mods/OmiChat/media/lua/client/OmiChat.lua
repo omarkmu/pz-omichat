@@ -6,17 +6,18 @@ local customStreamData = require 'OmiChat/CustomStreamData'
 local utils = OmiChat.utils
 local Option = OmiChat.Option
 local ColorModal = OmiChat.ColorModal
+local SuggesterBox = OmiChat.SuggesterBox
 local getText = getText
 local getTextOrNull = getTextOrNull
 local max = math.max
 local min = math.min
 local concat = table.concat
-local split = luautils.split
 
 ---Extended fields for ISChat.
 ---@class omichat.ISChat : ISChat
 ---@field instance omichat.ISChat
 ---@field iconPicker omichat.IconPicker
+---@field suggesterBox omichat.SuggesterBox
 ---@field iconButton ISButton
 ---@field allChatStreams omichat.ChatStream[]
 ---@field defaultTabStream table<integer, omichat.ChatStream?>
@@ -34,6 +35,7 @@ local _close = ISChat.close
 local _onMouseDown = ISChat.onMouseDown
 local _onPressDown = ISChat.onPressDown
 local _onPressUp = ISChat.onPressUp
+local _onOtherKey = ISChat.onOtherKey
 local _onTextChange = ISChat.onTextChange
 local _onInfo = ISChat.onInfo
 
@@ -96,33 +98,56 @@ end
 ---This also hides the icon picker if the button is disabled.
 ---@param enable boolean?
 local function setIconButtonEnabled(enable)
-    local chat = ISChat.instance
-    if not chat.iconButton then
+    local instance = ISChat.instance
+    if not instance.iconButton then
         return
     end
 
     local value = enable and 0.8 or 0.3
-    chat.iconButton:setTextureRGBA(value, value, value, 1)
-    chat.iconButton.enable = enable
+    instance.iconButton:setTextureRGBA(value, value, value, 1)
+    instance.iconButton.enable = enable
 
-    if not enable and chat.iconPicker then
-        chat.iconPicker:setVisible(false)
+    if not enable and instance.iconPicker then
+        instance.iconPicker:setVisible(false)
     end
+end
+
+---Sets whether the suggester box should show.
+---@param show boolean
+local function setShowSuggesterBox(show)
+    local instance = ISChat.instance
+    if instance and instance.suggesterBox then
+        instance.suggesterBox:setVisible(show)
+    end
+end
+
+---Attempts to set the current text with the currently selected suggester box item.
+---@return boolean didSet
+local function tryEnterSuggestedItem()
+    local instance = ISChat.instance
+    local sbVisible = instance and instance.suggesterBox:isVisible()
+    local sbItem = sbVisible and instance.suggesterBox:getSelectedItem()
+    if sbItem then
+        instance:onSuggesterSelect(sbItem)
+        return true
+    end
+
+    return false
 end
 
 ---Enables or disables the icon picker based on the current input.
 ---@param text string? The current text entry text.
 local function updateIconComponents(text)
-    local chat = ISChat.instance
-    if not chat.iconButton then
+    local instance = ISChat.instance
+    if not instance.iconButton then
         return
     end
 
-    text = text or chat.textEntry:getInternalText()
+    text = text or instance.textEntry:getInternalText()
     local stream = OmiChat.chatCommandToStream(text)
 
     if not stream then
-        stream = ISChat.defaultTabStream[chat.currentTabID]
+        stream = ISChat.defaultTabStream[instance.currentTabID]
     end
 
     local enable = false
@@ -133,6 +158,54 @@ local function updateIconComponents(text)
 
     setIconButtonEnabled(enable)
 end
+
+---Shows or hides the suggester based on the current input.
+---@param text string? The current text entry text.
+local function updateSuggesterComponent(text)
+    local instance = ISChat.instance
+    if not instance or not instance.suggesterBox then
+        return
+    end
+
+    if not OmiChat.getUseSuggester() then
+        instance.suggesterBox:setVisible(false)
+        return
+    end
+
+    text = text or instance.textEntry:getInternalText()
+    local suggestions = OmiChat.getSuggestions(text)
+    if #suggestions == 0 then
+        instance.suggesterBox:setVisible(false)
+        return
+    end
+
+    instance.suggesterBox:setSuggestions(suggestions)
+    if #suggestions > 0 then
+        instance.suggesterBox:setWidth(instance:getWidth())
+        instance.suggesterBox:setHeight(instance.suggesterBox.itemheight * math.min(#suggestions, 5))
+        instance.suggesterBox:setX(instance:getX())
+        instance.suggesterBox:setY(instance:getY() + instance.textEntry:getY() - instance.suggesterBox.height)
+        instance.suggesterBox:setVisible(true)
+        instance.suggesterBox:bringToTop()
+
+        if instance.suggesterBox.vscroll then
+            instance.suggesterBox.vscroll:setHeight(instance.suggesterBox.height)
+        end
+    else
+        instance.suggesterBox:setVisible(false)
+    end
+end
+
+---Updates custom chat components.
+---@param text string? The current text entry text.
+local function updateComponents(text)
+    local instance = ISChat.instance
+    text = text or instance.textEntry:getInternalText()
+
+    updateIconComponents(text)
+    updateSuggesterComponent(text)
+end
+
 
 ---Override to enable custom callouts.
 ---@param playEmote boolean
@@ -241,7 +314,7 @@ function ISChat.validateCustomCalloutText(target, text)
     return true
 end
 
----Event handler for custom callout click.
+---Event handler for accepting the custom callout dialog.
 ---@param target omichat.ISChat
 ---@param button table
 ---@param category omichat.CalloutCategory
@@ -308,11 +381,18 @@ function ISChat.onCustomCalloutMenu(target, category)
     target.activeCalloutModal = modal
 end
 
----Event handler for toggling name colors.
+---Event handler for toggling showing name colors.
 ---@param target omichat.ISChat
 function ISChat.onToggleShowNameColor(target)
     OmiChat.setNameColorEnabled(not OmiChat.getNameColorsEnabled())
     OmiChat.redrawMessages()
+end
+
+---Event handler for toggling using the suggester.
+---@param target omichat.ISChat
+function ISChat.onToggleUseSuggester(target)
+    OmiChat.setUseSuggester(not OmiChat.getUseSuggester())
+    updateSuggesterComponent()
 end
 
 ---Event handler for icon button click.
@@ -346,6 +426,7 @@ function ISChat.onIconButtonClick(target)
     target.iconPicker:setY(y)
     target.iconPicker:bringToTop()
     target.iconPicker:setVisible(not target.iconPicker:isVisible())
+    setShowSuggesterBox(false)
 
     return true
 end
@@ -364,10 +445,13 @@ function ISChat.onIconClick(target, icon)
 
     local addSpace = #text > 0 and text:sub(-1) ~= ' '
     target.textEntry:setText(concat { text, addSpace and ' *' or '*', icon, '*' })
+    updateSuggesterComponent()
 end
 
 ---Event handler for clicking on the info button.
 function ISChat:onInfo()
+    setShowSuggesterBox(false)
+
     local text = OmiChat.getInfoText()
     self:setInfo(text)
 
@@ -379,7 +463,17 @@ function ISChat:onInfo()
     _onInfo(self)
 end
 
----Override to add icon picker components and info button.
+---Event handler for selecting a suggestion.
+---@param suggestion omichat.Suggestion
+function ISChat:onSuggesterSelect(suggestion)
+    local entry = ISChat.instance.textEntry
+
+    self.suggesterBox:setVisible(false)
+    entry:setText(suggestion.suggestion)
+    updateSuggesterComponent()
+end
+
+---Override to add custom components.
 function ISChat:createChildren()
     _createChildren(self)
 
@@ -392,8 +486,16 @@ function ISChat:createChildren()
     self.infoButton.backgroundColor.a = 0.0
     self.infoButton.backgroundColorMouseOver.a = 0.7
     self.infoButton:setImage(self.infoBtn)
+    self.infoButton:setUIName('chat info button')
     self:addChild(self.infoButton)
     self.infoButton:setVisible(false)
+
+    self.suggesterBox = SuggesterBox:new(0, 0, 0, 0)
+    self.suggesterBox:setOnMouseDownFunction(self, self.onSuggesterSelect)
+    self.suggesterBox:setAlwaysOnTop(true)
+    self.suggesterBox:setUIName('chat suggester box')
+    self.suggesterBox:addToUIManager()
+    self.suggesterBox:setVisible(false)
 
     OmiChat.updateState()
 end
@@ -403,7 +505,7 @@ function ISChat:focus()
     _focus(self)
 
     local text = ISChat.instance.textEntry:getInternalText()
-    updateIconComponents(text)
+    updateComponents(text)
 
     -- correct the stream ID to the current stream
     local currentStreamName = OmiChat.chatCommandToStreamName(text)
@@ -415,6 +517,7 @@ end
 ---Override to hide icon picker and disable button on unfocus.
 function ISChat:unfocus()
     _unfocus(self)
+    setShowSuggesterBox(false)
     setIconButtonEnabled(false)
 end
 
@@ -436,6 +539,7 @@ end
 ---Override to add additional settings.
 function ISChat:onGearButtonClick()
     _onGearButtonClick(self)
+    setShowSuggesterBox(false)
 
     -- grab and modify the context menu that the default onGearButtonClick creates
     local context = getPlayerContextMenu(0)
@@ -545,6 +649,15 @@ function ISChat:onGearButtonClick()
         context:insertOptionBefore(subMenuName, nameColorOptionName, ISChat.instance, ISChat.onToggleShowNameColor)
     end
 
+    local suggesterOptionName
+    if OmiChat.getUseSuggester() then
+        suggesterOptionName = getText('UI_OmiChat_context_disable_suggestions')
+    else
+        suggesterOptionName = getText('UI_OmiChat_context_enable_suggestions')
+    end
+
+    context:insertOptionBefore(subMenuName, suggesterOptionName, ISChat.instance, ISChat.onToggleUseSuggester)
+
     for _, shoutType in ipairs(shoutOpts) do
         local shoutOptionName = getText('UI_OmiChat_context_set_custom_' .. shoutType)
         context:insertOptionBefore(subMenuName, shoutOptionName, ISChat.instance, ISChat.onCustomCalloutMenu, shoutType)
@@ -579,6 +692,11 @@ end
 
 ---Override to support custom commands and emote shortcuts.
 function ISChat:onCommandEntered()
+    if tryEnterSuggestedItem() then
+        updateComponents()
+        return
+    end
+
     local chat = ISChat.instance
     local input = chat.textEntry:getText()
     local stream, command, chatCommand = OmiChat.chatCommandToStream(input)
@@ -643,34 +761,16 @@ function ISChat:onCommandEntered()
 
     -- handle emotes specified with .emote
     if allowEmotes and Option.EnableEmotes then
-        local startPos = 1
-        while startPos < #command do
-            local start, finish, whitespace, emote = command:find('(%s*)%.([%w_]+)', startPos)
-            if not start then
-                break
+        local emoteToPlay, start, finish = OmiChat.getEmoteFromCommand(command)
+        if emoteToPlay then
+            -- remove the emote text
+            shouldHandle = true
+            command = utils.trim(command:sub(1, start - 1) .. command:sub(finish + 1))
+
+            local player = getSpecificPlayer(0)
+            if player then
+                player:playEmote(emoteToPlay)
             end
-
-            -- require whitespace unless the emote is at the start
-            if start ~= 1 and #whitespace == 0 then
-                emote = nil
-            end
-
-            local emoteToPlay = emote and OmiChat.getEmote(emote:lower())
-            if type(emoteToPlay) == 'string' then
-                -- remove the emote text
-                shouldHandle = true
-                command = utils.trim(command:sub(1, start - 1) .. command:sub(finish + 1))
-
-                local player = getSpecificPlayer(0)
-                if player then
-                    player:playEmote(emoteToPlay)
-
-                    -- ignore subsequent emotes
-                    break
-                end
-            end
-
-            startPos = finish + 1
         end
     end
 
@@ -706,7 +806,7 @@ function ISChat:onCommandEntered()
     ISChat.instance.timerTextEntry = 20
 end
 
----Override to hide icon picker on text panel or entry click.
+---Override to hide components on text panel or entry click.
 ---@param target unknown
 ---@param x number
 ---@param y number
@@ -714,6 +814,8 @@ end
 function ISChat.onMouseDown(target, x, y)
     local handled = _onMouseDown(target, x, y)
     local instance = ISChat.instance
+
+    setShowSuggesterBox(false)
 
     if not handled or not instance.iconPicker or not instance.iconPicker:isVisible() then
         return handled
@@ -727,48 +829,60 @@ function ISChat.onMouseDown(target, x, y)
     return handled
 end
 
----Override to allow switching to custom streams.
+---Override to control custom components and allow switching to custom streams.
 function ISChat.onSwitchStream()
     if not ISChat.focused then
         return
     end
 
-    local entry = ISChat.instance.textEntry
-    local parts = split(entry:getInternalText(), ' ')
-
-    if #parts > 1 then
-        local onlineUsers = getOnlinePlayers()
-        for i = 0, onlineUsers:size() - 1 do
-            local username = onlineUsers:get(i):getUsername()
-            if username:lower():match(parts[#parts]:lower()) then
-                parts[#parts] = username
-                entry:setText(concat(parts, ' '))
-                return
-            end
-        end
+    local text
+    if not tryEnterSuggestedItem() then
+        text = OmiChat.cycleStream()
+        local entry = ISChat.instance.textEntry
+        entry:setText(text)
     end
 
-    local text = OmiChat.cycleStream()
-    entry:setText(text)
-    updateIconComponents(text)
+    updateComponents(text)
 end
 
----Override to update icon button.
+---Override to update custom components.
 function ISChat.onPressDown()
+    local instance = ISChat.instance
+    if instance and instance.suggesterBox:isVisible() then
+        instance.suggesterBox:selectNext()
+        return
+    end
+
     _onPressDown()
-    updateIconComponents()
+    updateComponents()
 end
 
----Override to update icon button.
+---Override to update custom components.
 function ISChat.onPressUp()
+    local instance = ISChat.instance
+    if instance and instance.suggesterBox:isVisible() then
+        instance.suggesterBox:selectPrevious()
+        return
+    end
+
     _onPressUp()
-    updateIconComponents()
+    updateComponents()
 end
 
----Override to update icon button.
+---Override to update custom components.
+function ISChat:onOtherKey(key)
+    local instance = ISChat.instance
+    if instance and instance.suggesterBox:isVisible() and key == Keyboard.KEY_ESCAPE then
+        setShowSuggesterBox(false)
+    else
+        _onOtherKey(self, key)
+    end
+end
+
+---Override to update custom components.
 function ISChat.onTextChange()
     _onTextChange()
-    updateIconComponents()
+    updateComponents()
 end
 
 ---Override to add information to chat messages and remove blank lines.

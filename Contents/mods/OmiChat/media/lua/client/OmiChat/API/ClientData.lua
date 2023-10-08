@@ -134,6 +134,7 @@ function OmiChat.getPlayerPreferences()
     ---@type omichat.PlayerPreferences
     local prefs = {
         showNameColors = true,
+        useSuggester = true,
         colors = {},
         callouts = {},
         sneakcallouts = {},
@@ -161,6 +162,8 @@ function OmiChat.getPlayerPreferences()
 
             if not dest and key == 'showNameColors'then
                 prefs.showNameColors = value == 'true'
+            elseif not dest and key == 'useSuggester' then
+                prefs.useSuggester = value == 'true'
             elseif dest == prefs.colors then
                 dest[key] = utils.stringToColor(value)
             elseif dest and tonumber(key) then
@@ -195,6 +198,12 @@ function OmiChat.getSpeechColor()
     }
 end
 
+---Sets whether the current player wants to use chat suggestions.
+---@return boolean
+function OmiChat.getUseSuggester()
+    return OmiChat.getPlayerPreferences().useSuggester
+end
+
 ---Saves the current player preferences to a file.
 function OmiChat.savePlayerPreferences()
     if not OmiChat._playerPrefs then
@@ -205,6 +214,7 @@ function OmiChat.savePlayerPreferences()
     outFile:write(concat { 'VERSION=', tostring(OmiChat._iniVersion), '\n' })
 
     outFile:write(concat { 'showNameColors=', tostring(OmiChat._playerPrefs.showNameColors), '\n' })
+    outFile:write(concat { 'useSuggester=', tostring(OmiChat._playerPrefs.useSuggester), '\n' })
 
     outFile:write(concat {'[colors]\n'})
     for cat, color in pairs(OmiChat._playerPrefs.colors) do
@@ -296,6 +306,13 @@ function OmiChat.setNickname(nickname)
     })
 
     return true, getText('UI_OmiChat_set_name_success', utils.escapeRichText(nickname))
+end
+
+---Sets whether the current player wants to use chat suggestions.
+---@param useSuggester boolean
+function OmiChat.setUseSuggester(useSuggester)
+    OmiChat.getPlayerPreferences().useSuggester = not not useSuggester
+    OmiChat.savePlayerPreferences()
 end
 
 ---Updates the current player's character name.

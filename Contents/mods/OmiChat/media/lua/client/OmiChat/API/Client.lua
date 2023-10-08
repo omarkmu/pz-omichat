@@ -29,16 +29,62 @@ local Option = OmiChat.Option
 
 OmiChat.ColorModal = require 'OmiChat/ColorModal'
 OmiChat.IconPicker = require 'OmiChat/IconPicker'
+OmiChat.SuggesterBox = require 'OmiChat/SuggesterBox'
 
 OmiChat._iniVersion = 1
 OmiChat._iniName = 'omichat.ini'
 
 
-local function canUseCommands()
+local function canUseAdminCommands()
     local player = getSpecificPlayer(0)
     local access = player and player:getAccessLevel() or 0
     return utils.getNumericAccessLevel(access) >= Option.MinimumCommandAccessLevel
 end
+
+local function hasAccess(access, accessLevel)
+    if access >= 32 then
+        if accessLevel == 'admin' then
+            return true
+        end
+
+        access = access - 32
+    end
+
+    if access >= 16 then
+        if accessLevel == 'moderator' then
+            return true
+        end
+
+        access = access - 16
+    end
+
+    if access >= 8 then
+        if accessLevel == 'overseer' then
+            return true
+        end
+
+        access = access - 8
+    end
+
+    if access >= 4 then
+        if accessLevel == 'gm' then
+            return true
+        end
+
+        access = access - 4
+    end
+
+    if access >= 2 then
+        if accessLevel == 'observer' then
+            return true
+        end
+
+        access = access - 2
+    end
+
+    return access == 1
+end
+
 
 ---@type table<string, true>
 OmiChat._iconsToExclude = {
@@ -148,7 +194,7 @@ OmiChat._commandStreams = {
         omichat = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_clearnames',
-            isEnabled = canUseCommands,
+            isEnabled = canUseAdminCommands,
             onUse = function(self, command)
                 OmiChat.sendClearNames(getSpecificPlayer(0))
             end,
@@ -160,7 +206,7 @@ OmiChat._commandStreams = {
         omichat = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_setname',
-            isEnabled = canUseCommands,
+            isEnabled = canUseAdminCommands,
             onUse = function(self, command)
                 local player = getSpecificPlayer(0)
                 OmiChat.sendSetName(player, command)
@@ -173,7 +219,7 @@ OmiChat._commandStreams = {
         omichat = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_resetname',
-            isEnabled = canUseCommands,
+            isEnabled = canUseAdminCommands,
             onUse = function(self, command)
                 local player = getSpecificPlayer(0)
                 OmiChat.sendResetName(player, command)
@@ -235,49 +281,6 @@ OmiChat._commandStreams = {
         command = '/help ',
         omichat = {
             isCommand = true,
-            checkHasAccess = function(access, accessLevel)
-                if access >= 32 then
-                    if accessLevel == 'admin' then
-                        return true
-                    end
-
-                    access = access - 32
-                end
-
-                if access >= 16 then
-                    if accessLevel == 'moderator' then
-                        return true
-                    end
-
-                    access = access - 16
-                end
-
-                if access >= 8 then
-                    if accessLevel == 'overseer' then
-                        return true
-                    end
-
-                    access = access - 8
-                end
-
-                if access >= 4 then
-                    if accessLevel == 'gm' then
-                        return true
-                    end
-
-                    access = access - 4
-                end
-
-                if access >= 2 then
-                    if accessLevel == 'observer' then
-                        return true
-                    end
-
-                    access = access - 2
-                end
-
-                return access == 1
-            end,
             onUse = function(self, command)
                 local accessLevel
                 if isCoopHost() then
@@ -342,7 +345,7 @@ OmiChat._commandStreams = {
 
                 for _, info in ipairs(vanillaCommands) do
                     if info.name and info.helpText and not seen[info.name] then
-                        if not info.access or self.omichat.checkHasAccess(info.access, accessLevel) then
+                        if not info.access or hasAccess(info.access, accessLevel) then
                             commands[#commands+1] = info
                         end
                     end
@@ -366,6 +369,250 @@ OmiChat._commandStreams = {
                 OmiChat.showInfoMessage(concat(result))
             end,
         },
+    },
+}
+
+---@type omichat.Suggester[]
+OmiChat._suggesters = {
+    {
+        name = 'commands',
+        priority = 10,
+        suggest = function(self, info)
+            if OmiChat.chatCommandToStream(info.input) then
+                return
+            end
+
+            local player = getSpecificPlayer(0)
+            local accessLevel = player and player:getAccessLevel()
+            if isCoopHost() then
+                accessLevel = 'admin'
+            end
+            if not accessLevel then
+                return
+            end
+
+            local command = info.input:match('^/(%S*)$')
+            if not command then
+                return
+            end
+
+            command = command:lower()
+            local fullCommand = '/' .. command
+
+            local startsWith = {}
+            local contains = {}
+
+            -- chat streams
+            for _, stream in ipairs(ISChat.allChatStreams) do
+                local isEnabled = stream.omichat and stream.omichat.isEnabled
+                if not isEnabled or isEnabled(stream) then
+                    if utils.startsWith(stream.command, fullCommand) then
+                        startsWith[#startsWith+1] = stream.command
+                    elseif stream.shortCommand and utils.startsWith(stream.shortCommand, fullCommand) then
+                        startsWith[#startsWith+1] = stream.shortCommand
+                    elseif utils.contains(stream.command, command) then
+                        contains[#contains+1] = stream.command
+                    elseif stream.shortCommand and utils.contains(stream.shortCommand, command) then
+                        contains[#contains+1] = stream.shortCommand
+                    end
+                end
+            end
+
+            -- command streams
+            for _, stream in ipairs(OmiChat._commandStreams) do
+                local isEnabled = stream.omichat and stream.omichat.isEnabled
+                if not isEnabled or isEnabled(stream) then
+                    if utils.startsWith(stream.command, fullCommand) then
+                        startsWith[#startsWith+1] = stream.command
+                    elseif stream.shortCommand and utils.startsWith(stream.shortCommand, fullCommand) then
+                        startsWith[#startsWith+1] = stream.shortCommand
+                    elseif utils.contains(stream.command, command) then
+                        contains[#contains+1] = stream.command
+                    elseif stream.shortCommand and utils.contains(stream.shortCommand, command) then
+                        contains[#contains+1] = stream.shortCommand
+                    end
+                end
+            end
+
+            -- vanilla command streams
+            for _, commandInfo in ipairs(vanillaCommands) do
+                if not commandInfo.access or hasAccess(commandInfo.access, accessLevel) then
+                    local vanillaCommand = concat { '/', commandInfo.name, ' ' }
+                    if utils.startsWith(vanillaCommand, fullCommand) then
+                        startsWith[#startsWith+1] = vanillaCommand
+                    elseif utils.contains(vanillaCommand, command) then
+                        contains[#contains+1] = vanillaCommand
+                    end
+                end
+            end
+
+            local i = 1
+            local seen = {}
+            while i <= #startsWith + #contains do
+                local cmd
+                if i <= #startsWith then
+                    cmd = startsWith[i]
+                else
+                    cmd = contains[i - #startsWith]
+                end
+
+                if not cmd then
+                    break
+                end
+
+                if not seen[cmd] then
+                    info.suggestions[#info.suggestions+1] = {
+                        type = 'command',
+                        display = cmd,
+                        suggestion = cmd,
+                    }
+                end
+
+                i = i + 1
+                seen[cmd] = true
+            end
+        end,
+    },
+    {
+        name = 'online-usernames',
+        priority = 8,
+        suggest = function(self, info)
+            if #info.input < 2 then
+                return
+            end
+
+            local stream = OmiChat.chatCommandToStream(info.input)
+            local context = stream and stream.omichat and stream.omichat.context
+            local wantsSuggestions = context and context.ocSuggestUsernames
+            local unknownCommand = not stream and info.input:sub(1, 1) == '/'
+
+            if not wantsSuggestions and not unknownCommand then
+                return
+            end
+
+            local onlinePlayers = getOnlinePlayers()
+            local parts = luautils.split(info.input, ' ')
+            if #parts == 0 or (unknownCommand and #parts == 1) then
+                return
+            end
+
+            local startsWith = {}
+            local contains = {}
+
+            local last = parts[#parts]:lower()
+            for i = 0, onlinePlayers:size() - 1 do
+                local player = onlinePlayers:get(i)
+                local username = player and player:getUsername()
+                local usernameLower = username and username:lower()
+
+                if #parts == 1 then
+                    contains[#contains+1] = username
+                elseif usernameLower == last then
+                    -- exact match
+                    return
+                elseif usernameLower and utils.startsWith(usernameLower, last) then
+                    startsWith[#startsWith+1] = username
+                elseif usernameLower and utils.contains(usernameLower, last) then
+                    contains[#contains+1] = username
+                end
+            end
+
+            local i = 1
+            local prefix = concat(parts, ' ', 1, #parts == 1 and 1 or #parts - 1)
+            while i <= #startsWith + #contains do
+                local username
+                if i <= #startsWith then
+                    username = startsWith[i]
+                else
+                    username = contains[i - #startsWith]
+                end
+
+                if not username then
+                    break
+                end
+
+                if utils.contains(username, ' ') then
+                    username = concat({ '"', username:gsub('"', '\\"'), '"' })
+                end
+
+                info.suggestions[#info.suggestions+1] = {
+                    type = 'user',
+                    display = username,
+                    suggestion = concat({ prefix, username }, ' ') .. ' '
+                }
+
+                i = i + 1
+            end
+        end
+    },
+    {
+        name = 'emotes',
+        priority = 6,
+        suggest = function(self, info)
+            local stream = OmiChat.chatCommandToStream(info.input)
+            if stream and not stream.omichat then
+                return
+            end
+
+            local def = stream and stream.omichat
+            if def and (def.isCommand or def.allowEmotes == false) then
+                return
+            end
+
+            if not stream and utils.startsWith(info.input, '/') then
+                return
+            end
+
+            local existingEmote = OmiChat.getEmoteFromCommand(info.input)
+            if existingEmote then
+                return
+            end
+
+            local start, _, whitespace, period, text = info.input:find('(%s*)()%.([%w_]*)$')
+
+            -- require whitespace unless the emote is at the start
+            if not start or (start ~= 1 and #whitespace == 0) then
+                return
+            end
+
+            text = text:lower()
+            local startsWith = {}
+            local contains = {}
+
+            for k in pairs(OmiChat._emotes) do
+                if k:lower() == text then
+                    -- exact message
+                    return
+                elseif utils.startsWith(k, text) then
+                    startsWith[#startsWith+1] = k
+                elseif utils.contains(k, text) then
+                    contains[#contains+1] = k
+                end
+            end
+
+            local i = 1
+            local prefix = info.input:sub(1, period)
+            while i <= #startsWith + #contains do
+                local emote
+                if i <= #startsWith then
+                    emote = startsWith[i]
+                else
+                    emote = contains[i - #startsWith]
+                end
+
+                if not emote then
+                    break
+                end
+
+                info.suggestions[#info.suggestions+1] = {
+                    type = 'emote',
+                    display = '.' .. emote,
+                    suggestion = concat({ prefix, emote })
+                }
+
+                i = i + 1
+            end
+        end,
     },
 }
 

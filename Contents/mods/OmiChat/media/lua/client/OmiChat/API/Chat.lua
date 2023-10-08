@@ -728,6 +728,33 @@ function OmiChat.getEmote(emote)
     return value
 end
 
+---Returns the first emote found from an emote shortcut in the provided text.
+---@param text string
+---@return string? emote
+---@return integer? start
+---@return integer? finish
+function OmiChat.getEmoteFromCommand(text)
+    local startPos = 1
+    while startPos < #text do
+        local start, finish, whitespace, emote = text:find('(%s*)%.([%w_]+)', startPos)
+        if not start then
+            break
+        end
+
+        -- require whitespace unless the emote is at the start
+        if start ~= 1 and #whitespace == 0 then
+            emote = nil
+        end
+
+        local emoteToPlay = emote and OmiChat.getEmote(emote:lower())
+        if type(emoteToPlay) == 'string' then
+            return emoteToPlay, start, finish
+        end
+
+        startPos = finish + 1
+    end
+end
+
 ---Gets a named formatter.
 ---@param name omichat.CustomStreamName
 ---@return omichat.MetaFormatter
@@ -764,6 +791,30 @@ function OmiChat.getMessageChatType(message)
     ---@cast message ChatMessage
     local chat = message:getChat()
     return tostring(_getChatType(chat))
+end
+
+---Suggests text based on the provided input text.
+---@param text string
+---@return omichat.Suggestion[]
+function OmiChat.getSuggestions(text)
+    if not text or text == '' then
+        return {}
+    end
+
+    ---@type omichat.SuggestionInfo
+    local info = {
+        input = text,
+        context = {},
+        suggestions = {},
+    }
+
+    for _, suggester in ipairs(OmiChat._suggesters) do
+        if suggester.suggest then
+            suggester:suggest(info)
+        end
+    end
+
+    return info.suggestions
 end
 
 ---Removes a stream from the list of available chat commands.

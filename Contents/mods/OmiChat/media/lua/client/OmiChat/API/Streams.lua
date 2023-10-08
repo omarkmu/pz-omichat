@@ -65,6 +65,7 @@ local streamOverrides = {
     },
     private = {
         allowEmotes = false,
+        context = { ocSuggestUsernames = true },
         isEnabled = function() return checkPlayerCanUseChat('/w') end,
         onUse = function(self, command)
             local username = proceedPM(command)

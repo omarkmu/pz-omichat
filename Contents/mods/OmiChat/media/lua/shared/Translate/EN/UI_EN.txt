@@ -4,6 +4,8 @@ UI_EN = {
 
     UI_OmiChat_context_enable_name_colors = "Enable name colors",
     UI_OmiChat_context_disable_name_colors = "Disable name colors",
+    UI_OmiChat_context_enable_suggestions = "Enable suggestions",
+    UI_OmiChat_context_disable_suggestions = "Disable suggestions",
     UI_OmiChat_context_colors_submenu_name = "Set chat colors",
 
     -- %1 = the chat stream (e.g., /say, /yell)

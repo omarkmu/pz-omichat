@@ -57,10 +57,28 @@ return OmiChat
 ---@field substitutions table<string, unknown> Token substitution values.
 ---@field formatOptions omichat.MessageFormatOptions
 
+---A suggestion that can display to the player.
+---@class omichat.Suggestion
+---@field type string
+---@field display string
+---@field suggestion string
+
+---Information used during suggestion building.
+---@class omichat.SuggestionInfo
+---@field input string The current input text.
+---@field context table Table for arbitrary context data.
+---@field suggestions omichat.Suggestion[] The current list of suggestions.
+
 ---Transforms messages based on context and format strings.
 ---@class omichat.MessageTransformer
 ---@field name string?
 ---@field transform fun(self: table, info: omichat.MessageInfo): true?
+---@field priority integer?
+
+---Suggests message content based on text input.
+---@class omichat.Suggester
+---@field name string?
+---@field suggest fun(self: table, info: omichat.SuggestionInfo)
 ---@field priority integer?
 
 ---Description of the `omichat` field on stream tables.
@@ -99,6 +117,7 @@ return OmiChat
 ---Player preferences.
 ---@class omichat.PlayerPreferences
 ---@field showNameColors boolean
+---@field useSuggester boolean
 ---@field callouts string[]
 ---@field sneakcallouts string[]
 ---@field colors table<omichat.ColorCategory, omichat.ColorTable>
