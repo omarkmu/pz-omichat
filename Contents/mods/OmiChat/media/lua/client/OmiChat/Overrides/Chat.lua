@@ -57,8 +57,8 @@ _ServerChatMessage.getTextWithPrefix = OmiChat.buildMessageText
 
 
 ---Override to add information to chat messages and remove blank lines.
----@param message omichat.Message
----@param tabID integer
+---@param message omichat.Message The new chat message.
+---@param tabID integer 0-indexed tab ID.
 function ISChat.addLineInChat(message, tabID)
     if not message then
         return

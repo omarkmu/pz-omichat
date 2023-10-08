@@ -82,10 +82,12 @@ end
 ---Sets the ID of the formatter.
 ---This should not be used under normal circumstances; an ID is automatically assigned in `new`.
 ---IDs 1 to 100 are reserved by OmiChat.
----@param id integer
+---@param id integer An ID for the formatter, in [1, 1024].
 function MetaFormatter:setID(id)
     if id < 1 then
         error('id must be a positive integer')
+    elseif id > 1024 then
+        error('id is too large')
     end
 
     local old

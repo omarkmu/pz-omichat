@@ -714,10 +714,10 @@ function OmiChat.decodeMessageTag(tag)
         return {}
     end
 
-    local values = utils.kvp.decode(tag)
+    local decoded = utils.kvp.decode(tag)
     return {
-        name = values.n,
-        nameColor = utils.stringToColor(values.cn),
+        name = decoded.ocName,
+        nameColor = utils.stringToColor(decoded.ocNameColor),
     }
 end
 
@@ -733,8 +733,8 @@ function OmiChat.encodeMessageTag(message)
     local color = OmiChat.getNameColorInChat(author)
     local chatType = OmiChat.getMessageChatType(message)
     return utils.kvp.encode {
-        n = OmiChat.getNameInChat(author, chatType),
-        cn = color and utils.colorToHexString(color) or nil,
+        ocName = OmiChat.getNameInChat(author, chatType),
+        ocNameColor = color and utils.colorToHexString(color) or nil,
     }
 end
 

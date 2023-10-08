@@ -17,6 +17,7 @@ OmiChat.utils = utils
 OmiChat._modDataKey = 'omichat'
 OmiChat._modDataVersion = 1
 
+
 ---Gets a player given their username.
 ---@param username string
 ---@return IsoPlayer?
@@ -33,6 +34,7 @@ local function getPlayerByUsername(username)
         end
     end
 end
+
 
 ---Gets or creates the global mod data table.
 ---@return omichat.ModData
