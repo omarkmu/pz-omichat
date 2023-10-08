@@ -707,6 +707,7 @@ OmiChat._transformers = {
                     if streamData.showOnRadio then
                         info.content = formatter:read(info.content)
                     else
+                        info.message:setOverHeadSpeech(false)
                         info.message:setShowInChat(false)
                     end
 
