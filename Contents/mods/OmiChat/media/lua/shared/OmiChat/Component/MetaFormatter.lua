@@ -6,9 +6,6 @@ local concat = table.concat
 local floor = math.floor
 
 
----@class omichat.MetaFormatterOptions
----@field format string
-
 ---Handles formatting for special chat messages with invisible characters.
 ---@class omichat.MetaFormatter : omi.Class
 ---@field protected _id integer
@@ -100,7 +97,7 @@ function MetaFormatter:setID(id)
     self._id = id
 
     -- taking advantage of the ISO-8859-1 character set
-    -- 128–160 are unused and are invisible ingame
+    -- 128–159 are unused and are invisible ingame
     local n = id - 1
     local c1 = char(128 + floor(n / 32))
     local c2 = char(128 + (n % 32))

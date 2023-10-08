@@ -1,7 +1,9 @@
-local math = math
 local utils = require 'OmiChat/util'
+local min = math.min
+local max = math.max
+local floor = math.floor
 
----Color selection modal.
+---Modal for color selection.
 ---Includes a text field for RGB input and a color picker.
 ---@class omichat.ColorModal : ISTextBox
 ---@field defaultColor omichat.ColorTable
@@ -22,9 +24,9 @@ local function clamp(color, minVal, maxVal)
     maxVal = maxVal / 255
 
     return {
-        r = math.min(math.max(color.r, minVal), maxVal),
-        g = math.min(math.max(color.g, minVal), maxVal),
-        b = math.min(math.max(color.b, minVal), maxVal),
+        r = min(max(color.r, minVal), maxVal),
+        g = min(max(color.g, minVal), maxVal),
+        b = min(max(color.b, minVal), maxVal),
     }
 end
 
@@ -132,9 +134,9 @@ function ColorModal:selectColor(color)
     self.colorPicker:setVisible(false)
 
     self.entry:setText(utils.colorToRGBString({
-        r = math.floor(color.r * 255),
-        g = math.floor(color.g * 255),
-        b = math.floor(color.b * 255),
+        r = floor(color.r * 255),
+        g = floor(color.g * 255),
+        b = floor(color.b * 255),
     }))
 end
 
@@ -148,17 +150,18 @@ function ColorModal:updateColorPickerColors()
     local maxVal = self.maximumValue
 
     local colors = {}
-    local delta = math.floor((maxVal - minVal) / 5)
+    local delta = floor((maxVal - minVal) / 5)
 
     --#region modified code from ISColorPicker
+
     local i = 0
     local newColor = Color.new(1, 1, 1, 1)
     for red = minVal, maxVal, delta do
         for green = minVal, maxVal, delta do
             for blue = minVal, maxVal, delta do
                 local col = i % columns
-				local row = math.floor(i / columns)
-				if row % 2 == 0 then row = row / 2 else row = math.floor(row / 2) + 6 end
+				local row = floor(i / columns)
+				if row % 2 == 0 then row = row / 2 else row = floor(row / 2) + 6 end
 
                 ---@diagnostic disable-next-line: redundant-parameter
 				newColor:set(red / 255, green / 255, blue / 255, 1.0)
@@ -172,6 +175,7 @@ function ColorModal:updateColorPickerColors()
             end
         end
     end
+
     --#endregion
 
     self.colorPicker:setColors(colors, columns, rows)

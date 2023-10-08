@@ -1,7 +1,6 @@
 local lib = require 'OmiChat/lib'
 local utils = require 'OmiChat/util'
 local OmiChat = require 'OmiChat/API/Client'
-
 local format = string.format
 local concat = table.concat
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
@@ -79,11 +78,11 @@ end
 ---@return string
 function MimicMessage:getPrefix()
     local instance = ISChat.instance
-    local isServer = self.chatType == 'server'
     if not instance then
         return ''
     end
 
+    local isServer = self.chatType == 'server'
     local color = self.textColor
     local result = {
         utils.toChatColor({

@@ -1,5 +1,5 @@
 local lib = require 'OmiChat/lib'
-local Interpolator = require 'OmiChat/Interpolator'
+local Interpolator = require 'OmiChat/Component/Interpolator'
 
 local format = string.format
 local concat = table.concat
@@ -67,7 +67,7 @@ end
 ---@param text string
 ---@param i integer Current character index.
 ---@return string decodedValue
----@return integer index
+---@return integer newIndex
 local function kvpReadString(text, i)
     local escape = false
     local value = {}
@@ -137,7 +137,11 @@ end
 ---@param access string
 ---@return integer
 function utils.getNumericAccessLevel(access)
-    return accessLevels[access and access:lower()] or 1
+    if not access then
+        return 1
+    end
+
+    return accessLevels[access:lower()] or 1
 end
 
 ---Interpolates substitutions into a string with format strings using `$var` format.

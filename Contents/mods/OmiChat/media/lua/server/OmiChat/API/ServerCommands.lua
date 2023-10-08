@@ -10,7 +10,6 @@ OmiChat.Commands = {}
 
 local Option = OmiChat.Option
 local utils = OmiChat.utils
-
 local suits = {
     'Clubs',
     'Diamonds',

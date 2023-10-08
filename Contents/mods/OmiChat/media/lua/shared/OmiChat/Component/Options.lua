@@ -1,6 +1,6 @@
 local lib = require 'OmiChat/lib'
 local utils = require 'OmiChat/util'
-local customStreams = require 'OmiChat/CustomStreamData'
+local customStreams = require 'OmiChat/Data/CustomStreams'
 
 local floor = math.floor
 
@@ -12,7 +12,6 @@ local floor = math.floor
 ---@field EnableEmotes boolean
 ---@field EnableSetName boolean
 ---@field EnableSetNameColor boolean
----@field EnableNameColorInAllChats boolean
 ---@field EnableSpeechColorAsDefaultNameColor boolean
 ---@field EnableSetSpeechColor boolean
 ---@field EnableIconPicker boolean

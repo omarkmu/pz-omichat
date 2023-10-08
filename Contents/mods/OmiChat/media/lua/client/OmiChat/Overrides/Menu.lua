@@ -352,7 +352,7 @@ local function onContextMenu(_, context)
         local opt = context.options[i]
 
         local player = opt.param2
-        local isParamPlayer = instanceof(player, 'IsoPlayer')
+        local isParamPlayer = player and instanceof(player, 'IsoPlayer')
         if isParamPlayer and opt.onSelect == ISWorldObjectContextMenu.onTrade then
             local name = getMenuName(player, 'trade')
             if name then

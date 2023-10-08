@@ -1,14 +1,13 @@
 ---Client API functionality related to handling player data.
 
-local utils = require 'OmiChat/util'
+---@class omichat.api.client
+local OmiChat = require 'OmiChat/API/Client'
 
+local utils = OmiChat.utils
+local Option = OmiChat.Option
 local concat = table.concat
 local pairs = pairs
 local getText = getText
-
----@class omichat.api.client
-local OmiChat = require 'OmiChat/API/Client'
-local Option = OmiChat.Option
 
 
 ---Sets the color associated with a given color category for the current player,

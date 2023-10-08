@@ -1,6 +1,5 @@
 ---Client API functionality related to dispatching commands to the server.
 
-
 ---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Client'
 

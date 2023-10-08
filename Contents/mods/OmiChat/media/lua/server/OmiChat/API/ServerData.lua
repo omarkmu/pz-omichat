@@ -42,3 +42,10 @@ function OmiChat.setNickname(username, nickname)
     local modData = OmiChat.getModData()
     modData.nicknames[username] = nickname
 end
+
+---Transmits mod data to clients.
+function OmiChat.transmitModData()
+    OmiChat.getModData()
+    ModData.transmit(OmiChat._modDataKey)
+end
+

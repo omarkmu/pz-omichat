@@ -1,9 +1,9 @@
 ---Client command handling.
 
-
 ---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Client'
 OmiChat.Commands = {}
+
 
 local utils = OmiChat.utils
 local Option = OmiChat.Option

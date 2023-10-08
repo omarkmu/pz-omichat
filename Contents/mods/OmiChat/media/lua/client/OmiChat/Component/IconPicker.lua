@@ -1,5 +1,4 @@
-local icons = require 'OmiChat/IconLists'
-
+local icons = require 'OmiChat/Data/IconLists'
 local pairs = pairs
 local ipairs = ipairs
 local getText = getText

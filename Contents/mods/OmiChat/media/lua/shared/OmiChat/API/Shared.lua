@@ -1,7 +1,9 @@
+---Base shared API.
+
 local utils = require 'OmiChat/util'
-local Option = require 'OmiChat/Options'
-local MetaFormatter = require 'OmiChat/MetaFormatter'
-local customStreamData = require 'OmiChat/CustomStreamData'
+local Option = require 'OmiChat/Component/Options'
+local MetaFormatter = require 'OmiChat/Component/MetaFormatter'
+local customStreamData = require 'OmiChat/Data/CustomStreams'
 
 
 ---@class omichat.api.shared

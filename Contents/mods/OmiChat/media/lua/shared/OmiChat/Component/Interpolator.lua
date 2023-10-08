@@ -7,6 +7,7 @@ local BaseInterpolator = lib.interpolate.Interpolator
 local Interpolator = BaseInterpolator:derive()
 Interpolator._registeredFunctions = {}
 
+
 ---Resolves a function given its name.
 ---@param name string
 ---@return function?
@@ -33,7 +34,6 @@ function Interpolator:token(token)
 
     return BaseInterpolator.token(self, token)
 end
-
 
 ---Creates a new interpolator.
 ---@param options omi.interpolate.Options

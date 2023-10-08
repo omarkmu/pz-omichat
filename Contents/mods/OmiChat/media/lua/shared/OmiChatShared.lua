@@ -42,6 +42,10 @@ return require 'OmiChat/API/Shared'
 ---| 'nameColors'
 
 
+---Options for initializing formatters.
+---@class omichat.MetaFormatterOptions
+---@field format string
+
 ---A table containing color values in [0, 255].
 ---@class omichat.ColorTable
 ---@field r integer

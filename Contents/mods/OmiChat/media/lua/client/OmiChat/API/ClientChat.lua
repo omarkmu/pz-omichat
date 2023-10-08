@@ -1,8 +1,8 @@
 ---Client API functionality related to manipulating the chat.
 
 local utils = require 'OmiChat/util'
-local MimicMessage = require 'OmiChat/MimicMessage'
-local customStreamData = require 'OmiChat/CustomStreamData'
+local MimicMessage = require 'OmiChat/Component/MimicMessage'
+local customStreamData = require 'OmiChat/Data/CustomStreams'
 
 local format = string.format
 local concat = table.concat
@@ -21,8 +21,8 @@ local Option = OmiChat.Option
 local IconPicker = OmiChat.IconPicker
 
 local streamDefs = require 'OmiChat/API/Streams'
-local streamOverrides = streamDefs.streamOverrides
-local customStreams = streamDefs.customStreams
+local streamConfigs = streamDefs.vanillaStreamConfigs
+local customChatStreams = streamDefs.chatStreams
 
 local _ChatBase = __classmetatables[ChatBase.class].__index
 local _ChatMessage = __classmetatables[ChatMessage.class].__index
@@ -221,16 +221,16 @@ local function updateStreams()
             end
         elseif stream.name == 'whisper' then
             vanillaWhisper = stream
-            vanillaWhisper.omichat = streamOverrides.private
-        elseif streamOverrides[stream.name] then
-            stream.omichat = streamOverrides[stream.name]
+            vanillaWhisper.omichat = streamConfigs.private
+        elseif streamConfigs[stream.name] then
+            stream.omichat = streamConfigs[stream.name]
         end
     end
 
     for i = 1, #customStreamData.list do
         local data = customStreamData.list[i]
         if not custom[data] and data.name and not data.isCommand then
-            OmiChat.addStreamBefore(customStreams[data.name], vanillaWhisper)
+            OmiChat.addStreamBefore(customChatStreams[data.name], vanillaWhisper)
         end
     end
 

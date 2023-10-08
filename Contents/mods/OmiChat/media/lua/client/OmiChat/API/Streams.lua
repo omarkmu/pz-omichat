@@ -1,3 +1,5 @@
+---Chat stream definitions.
+
 local OmiChat = require 'OmiChat/API/Client'
 local utils = require 'OmiChat/util'
 
@@ -48,8 +50,9 @@ local function customChatOnUse(self, command)
     chatOnUse(self, OmiChat.getFormatter(self.name):format(command))
 end
 
+
 ---@type table<string, omichat.ChatStreamConfig>
-local streamOverrides = {
+local vanillaStreamConfigs = {
     say = {
         context = { ocProcess = processSayMessage },
         allowIconPicker = true,
@@ -98,7 +101,7 @@ local streamOverrides = {
 }
 
 ---@type table<string, omichat.ChatStream>
-local customStreams = {
+local chatStreams = {
     looc = {
         name = 'looc',
         command = '/looc ',
@@ -201,6 +204,6 @@ local customStreams = {
 }
 
 return {
-    streamOverrides = streamOverrides,
-    customStreams = customStreams
+    vanillaStreamConfigs = vanillaStreamConfigs,
+    chatStreams = chatStreams
 }

@@ -1,7 +1,7 @@
 ---Chat overrides and extensions.
 
 local OmiChat = require 'OmiChatClient'
-local customStreamData = require 'OmiChat/CustomStreamData'
+local customStreamData = require 'OmiChat/Data/CustomStreams'
 
 local utils = OmiChat.utils
 local Option = OmiChat.Option
@@ -191,7 +191,7 @@ local function updateSuggesterComponent(text)
     suggesterBox:setSuggestions(suggestions)
     if #suggestions > 0 then
         suggesterBox:setWidth(instance:getWidth())
-        suggesterBox:setHeight(suggesterBox.itemheight * math.min(#suggestions, 5))
+        suggesterBox:setHeight(suggesterBox.itemheight * min(#suggestions, 5))
         suggesterBox:setX(instance:getX())
         suggesterBox:setY(instance:getY() + instance.textEntry:getY() - suggesterBox.height)
         suggesterBox:setVisible(true)

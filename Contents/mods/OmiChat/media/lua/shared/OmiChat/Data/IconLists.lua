@@ -1,4 +1,4 @@
----Very large icon list. Necessary to categorize & control icon order.
+---Very large icon list. Necessary to categorize icons and control icon order.
 return {
 	{
 		'nature',

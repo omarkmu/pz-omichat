@@ -1,4 +1,4 @@
----Sets up compatibility with True Actions Act 3 - Dancing.
+---Compatibility patch for True Actions Act 3 - Dancing.
 
 local OmiChat = require 'OmiChatClient'
 
