@@ -388,12 +388,13 @@ function OmiChat.applyFormatOptions(info)
     end
 
     if options.showTimestamp then
-        local hour, minute = tostring(message:getDatetime()):match('(%d%d):(%d%d)')
+        local hour, minute, second = tostring(message:getDatetime()):match('(%d%d):(%d%d):(%d%d)')
 
         hour = tonumber(hour)
         minute = tonumber(minute)
+        second = tonumber(second)
 
-        if hour and minute then
+        if hour and minute and second then
             local hour12 = hour % 12
             if hour12 == 0 then
                 hour12 = 12
@@ -409,6 +410,8 @@ function OmiChat.applyFormatOptions(info)
                 hh = format('%02d', hour12),
                 m = format('%d', minute),
                 mm = format('%02d', minute),
+                s = format('%d', second),
+                ss = format('%02d', second),
                 ampm = ampm,
                 AMPM = ampm:upper(),
                 hourFormatPref = getCore():getOptionClock24Hour() and 24 or 12,

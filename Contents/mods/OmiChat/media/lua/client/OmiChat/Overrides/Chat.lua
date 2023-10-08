@@ -244,7 +244,7 @@ function ISChat:onCommandEntered()
     end
 
     doKeyPress(false)
-    ISChat.instance.timerTextEntry = 20
+    instance.timerTextEntry = 20
 end
 
 ---Override to add additional settings.

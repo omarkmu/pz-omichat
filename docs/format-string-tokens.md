@@ -51,6 +51,8 @@ This document serves as a complete list of tokens accepted by the various sandbo
 - `$hourFormatPref`: 12 if the user prefers 12-hour clock formats; otherwise, 24.
 - `$m`: The minute.
 - `$mm`: The zero-padded minute.
+- `$s`: The second.
+- `$ss`: The zero-padded second.
 - `$AMPM`: `AM` or `PM`, based on the hour.
 - `$ampm`: `am` or `pm`, based on the hour.
 - `$message`: The message content.

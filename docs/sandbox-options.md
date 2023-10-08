@@ -395,7 +395,7 @@ This describes the chat title that displays to the left of messages (e.g., `[Loc
 
 ### FormatTimestamp
 `default → [$ifelse($eq($hourFormatPref 12) $h $H):$mm]`  
-`tokens → $chatType, $stream, $H, $HH, $h, $hh, $m, $mm, $ampm, $AMPM, $hourFormatPref`
+`tokens → $chatType, $stream, $H, $HH, $h, $hh, $m, $mm, $s, $ss, $ampm, $AMPM, $hourFormatPref`
 
 The format used when `Enable timestamps` is selected in the chat settings menu.
 
