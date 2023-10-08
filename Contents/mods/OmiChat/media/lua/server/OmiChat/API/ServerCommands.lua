@@ -11,6 +11,28 @@ OmiChat.Commands = {}
 local Option = OmiChat.Option
 local utils = OmiChat.utils
 
+local suits = {
+    'Clubs',
+    'Diamonds',
+    'Hearts',
+    'Spades'
+}
+local cards = {
+    'the Ace',
+    'a Two',
+    'a Three',
+    'a Four',
+    'a Five',
+    'a Six',
+    'a Seven',
+    'an Eight',
+    'a Nine',
+    'a Ten',
+    'the Jack',
+    'the Queen',
+    'the King',
+}
+
 
 ---Checks whether a player has permission to execute a command for the given target.
 ---@param player IsoPlayer
@@ -54,6 +76,15 @@ local function updateModDataNickname(args)
 
     OmiChat.setNickname(args.target, args.value and tostring(args.value) or nil)
     return true
+end
+
+---Gets a random card name.
+---@return string
+local function getRandomCard()
+    local card = cards[1 + ZombRand(#cards)]
+    local suit = suits[1 + ZombRand(#suits)]
+
+    return table.concat({ card, ' of ', suit })
 end
 
 
@@ -121,6 +152,29 @@ function OmiChat.Commands.requestDataUpdate(player, args)
 
     OmiChat.transmitModData()
     return success
+end
+
+---Handles the /card command.
+---@param player IsoPlayer
+function OmiChat.Commands.requestDrawCard(player)
+    local name = OmiChat.getNameInChat(player:getUsername(), 'general') or player:getUsername()
+    OmiChat.sendTranslatedServerMessage('UI_OmiChat_card', { name, getRandomCard() })
+end
+
+---Handles the /roll command.
+---@param player IsoPlayer
+---@param args table
+function OmiChat.Commands.requestRollDice(player, args)
+    local sides = args.sides and tonumber(args.sides)
+    if type(sides) ~= 'number' or sides < 1 or sides > 100 then
+        OmiChat.sendTranslatedInfoMessage(player, 'UI_ServerOptionDesc_Roll')
+        return
+    end
+
+    local name = OmiChat.getNameInChat(player:getUsername(), 'general') or player:getUsername()
+    local roll = tostring(1 + ZombRand(sides))
+
+    OmiChat.sendTranslatedServerMessage('UI_OmiChat_roll', { name, roll, tostring(sides) })
 end
 
 ---Handles the /setname command.

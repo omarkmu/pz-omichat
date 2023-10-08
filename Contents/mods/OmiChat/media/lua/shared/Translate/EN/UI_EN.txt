@@ -82,6 +82,9 @@ UI_EN = {
     UI_OmiChat_available_emotes = "Trigger emote animations in local chats by including one of the following emotes in your message. Available emotes:",
     UI_OmiChat_list_of_commands = "List of commands:"
 
+    UI_OmiChat_card = "%1 drew %2"
+    UI_OmiChat_roll = "%1 rolled a %2 on a %3-sided die"
+
     --- help text ---
     UI_OmiChat_helptext_emotes = "Get a list of available chat emotes",
     UI_OmiChat_helptext_name = "To set your name in chat, use: /name Name. To reset your name, use /name. Example: /name Bob"

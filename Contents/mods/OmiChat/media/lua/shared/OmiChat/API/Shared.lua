@@ -15,6 +15,22 @@ OmiChat.utils = utils
 OmiChat._modDataKey = 'omichat'
 OmiChat._modDataVersion = 1
 
+---Gets a player given their username.
+---@param username string
+---@return IsoPlayer?
+local function getPlayerByUsername(username)
+    if isClient() then
+        return getPlayerFromUsername(username)
+    end
+
+    local onlinePlayers = getOnlinePlayers()
+    for i = 0, onlinePlayers:size() do
+        local player = onlinePlayers:get(i)
+        if player:getUsername() == username then
+            return player
+        end
+    end
+end
 
 ---Gets or creates the global mod data table.
 ---@return omichat.ModData
@@ -69,7 +85,8 @@ function OmiChat.getNameInChat(username, chatType)
         return utils.escapeRichText(modData.nicknames[username])
     end
 
-    local tokens = OmiChat.getPlayerSubstitutions(getPlayerFromUsername(username))
+    local player = getPlayerByUsername(username)
+    local tokens = player and OmiChat.getPlayerSubstitutions(player)
     if not tokens then
         return
     end
@@ -81,11 +98,11 @@ end
 
 ---Gets substitution tokens to use in interpolation for a given player.
 ---If the player descriptor could not be obtained, returns `nil`.
----@param player IsoPlayer
+---@param player IsoPlayer?
 ---@return table?
 function OmiChat.getPlayerSubstitutions(player)
     local desc = player and player:getDescriptor()
-    if not desc then
+    if not player or not desc then
         return
     end
 

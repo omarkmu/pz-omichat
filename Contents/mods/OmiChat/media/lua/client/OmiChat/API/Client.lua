@@ -227,6 +227,70 @@ OmiChat._commandStreams = {
         }
     },
     {
+        name = 'card',
+        command = '/card ',
+        omichat = {
+            isCommand = true,
+            helpText = 'UI_ServerOptionDesc_Card',
+            isEnabled = function()
+                local player = getSpecificPlayer(0)
+                local inv = player:getInventory()
+                if not inv:contains('CardDeck') and player:getAccessLevel() == 'None' then
+                    return false
+                end
+
+                return true
+            end,
+            onUse = function(self)
+                local player = getSpecificPlayer(0)
+                local inv = player:getInventory()
+                if not inv:contains('CardDeck') and player:getAccessLevel() == 'None' then
+                    OmiChat.showInfoMessage(getText(self.omichat.helpText))
+                    return
+                end
+
+                OmiChat.requestDrawCard(player)
+            end,
+        }
+    },
+    {
+        name = 'roll',
+        command = '/roll ',
+        omichat = {
+            isCommand = true,
+            helpText = 'UI_ServerOptionDesc_Roll',
+            isEnabled = function()
+                local player = getSpecificPlayer(0)
+                local inv = player:getInventory()
+                if not inv:contains('Dice') and player:getAccessLevel() == 'None' then
+                    return false
+                end
+
+                return true
+            end,
+            onUse = function(self, command)
+                local player = getSpecificPlayer(0)
+                local inv = player:getInventory()
+                if not inv:contains('Dice') and player:getAccessLevel() == 'None' then
+                    OmiChat.showInfoMessage(getText(self.omichat.helpText))
+                    return
+                end
+
+                command = utils.trim(command)
+                local first = command:split(' ')[1]
+                local sides = first and tonumber(first)
+                if not sides and #command == 0 then
+                    sides = 6
+                elseif not sides or sides < 1 or sides > 100 then
+                    OmiChat.showInfoMessage(getText(self.omichat.helpText))
+                    return
+                end
+
+                OmiChat.requestRollDice(player, sides)
+            end,
+        }
+    },
+    {
         name = 'emotes',
         command = '/emotes ',
         omichat = {

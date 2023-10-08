@@ -24,7 +24,7 @@ local function dispatchCommand(command, player, args)
 end
 
 
----Executes the /setname command.
+---Executes the /clearnames command.
 ---@param player IsoPlayer
 function OmiChat.sendClearNames(player)
     return dispatchCommand('clearNames', player)
@@ -41,6 +41,20 @@ end
 ---@param updates omichat.ModDataUpdateRequest
 function OmiChat.requestDataUpdate(player, updates)
     return dispatchCommand('requestDataUpdate', player, updates)
+end
+
+---Requests drawing a card from a card deck in the player's inventory.
+---@param player IsoPlayer
+---@return boolean
+function OmiChat.requestDrawCard(player)
+    return dispatchCommand('requestDrawCard', player)
+end
+
+---Requests rolling dice in the player's inventory.
+---@param player IsoPlayer
+---@return boolean
+function OmiChat.requestRollDice(player, sides)
+    return dispatchCommand('requestRollDice', player, { sides = sides })
 end
 
 ---Executes the /setname command.
