@@ -1,5 +1,22 @@
-# 0.1.0
+# 0.2.0
+- Added local versions of `/card` and `/roll` and the following options to control them:
+	- `ChatFormatCard`
+	- `ChatFormatRoll`
+	- `OverheadFormatCard`
+	- `OverheadFormatRoll`
+	- `FormatCard`
+	- `FormatRoll`
+- Added `ChatFormatFull` option to customize the final display of chat messages
+- Added suggestion list and player preference to disable it
+- Added `/setname`, `/resetname`, and `/clearnames` admin commands
+- Added server API functions for manipulating nicknames and name colors
+- Added chat info button and `FormatInfo` option to control info text content
+- Added functionality to mimic various message types with `MimicMessage`
+- Removed `MinimumColorValue` and `MaximumColorValue` options
+- Removed `MessageFormatOptions.showInChat` in favor of the `setShowInChat` method on messages
+- Faction and safehouse chats will no longer use usernames by default
 
+# 0.1.0
 - Added the following streams and corresponding sandbox options:
     - `/looc` (`/l`)
     - `/meloud` (`/ml`)

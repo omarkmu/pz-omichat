@@ -21,7 +21,7 @@ description=[*]Local /card and /roll
 description=[*]Roleplay descriptions with /me and /do
 description=[*]Versions of /me and /do with larger and smaller ranges: /mequiet, /meloud, /doquiet, and /doloud
 description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556]True Actions Act 3 - Dancing[/url] compatibility with /dance
-description=[*]Icon picker for local chats
+description=[*]Icon picker for local chats (off by default)
 description=[*]Text suggestion box
 description=[*]Emote animation shortcuts (.clap, .salute, .surrender, etc.) + /emotes command to display a list of emotes
 description=[/list]
@@ -30,9 +30,9 @@ description=Features for server operators: [list]
 description=[*]/setname, /resetname, and /clearnames commands
 description=[*]Additional info text option
 description=[*]Chat range options
-description=[*]Customizable, robust chat [url=https://github.com/omarkmu/pz-omichat/blob/main/docs/format-strings.md]formats[/url] for names, timestamps, and all chat types
-description=[*]Further extension of functionality using the API
+description=[*]Customizable, robust chat [url=https://github.com/omarkmu/pz-omichat/blob/main/docs/format-strings.md]formats[/url] for names, timestamps, all chat types, and more
 description=[*]Sandbox options to control the features listed above
+description=[*]Further extension of functionality using the API
 description=[/list]
 description=
 description=[h2]Compatibility[/h2]
