@@ -27,15 +27,21 @@ end
 ---@param player IsoPlayer
 ---@param card string
 function OmiChat.reportDrawCard(player, card)
-    dispatchCommand('reportDrawCard', player, { card = card })
+    ---@type omichat.request.ReportDrawCard
+    local req = { card = card }
+
+    dispatchCommand('reportDrawCard', player, req)
 end
 
 ---Instructs the client to report the result of a dice roll.
 ---@param player IsoPlayer
----@param roll string
+---@param roll integer
 ---@param sides integer
 function OmiChat.reportRoll(player, roll, sides)
-    dispatchCommand('reportRoll', player, { roll = roll, sides = sides })
+    ---@type omichat.request.ReportRoll
+    local req = { roll = roll, sides = sides }
+
+    dispatchCommand('reportRoll', player, req)
 end
 
 ---Sends an info message that will show only for the specified player.
@@ -43,27 +49,41 @@ end
 ---@param text string
 ---@param serverAlert boolean?
 function OmiChat.sendInfoMessage(player, text, serverAlert)
-    dispatchCommand('showInfoMessage', player, { text = text, serverAlert = serverAlert, })
+    ---@type omichat.request.ShowMessage
+    local req = { text = text, serverAlert = serverAlert, }
+
+    dispatchCommand('showInfoMessage', player, req)
 end
 
----Sends an info message that will show only for the specified player.
+---Sends an info message that will show for all players.
 ---@param text string
 ---@param serverAlert boolean?
 function OmiChat.sendServerMessage(text, serverAlert)
-    dispatchCommandToAll('showInfoMessage', { text = text, serverAlert = serverAlert, })
+    ---@type omichat.request.ShowMessage
+    local req = { text = text, serverAlert = serverAlert, }
+
+    dispatchCommandToAll('showInfoMessage', req)
 end
 
 ---Sends an info message that will show only for the specified player.
 ---@param player IsoPlayer
 ---@param stringID string
 ---@param args string[]?
+---@param serverAlert boolean?
 function OmiChat.sendTranslatedInfoMessage(player, stringID, args, serverAlert)
-    dispatchCommand('showInfoMessage', player, { stringID = stringID, args = args, serverAlert = serverAlert, })
+    ---@type omichat.request.ShowMessage
+    local req = { stringID = stringID, args = args, serverAlert = serverAlert, }
+
+    dispatchCommand('showInfoMessage', player, req)
 end
 
 ---Sends an info message that will show for all players.
 ---@param stringID string
 ---@param args string[]?
+---@param serverAlert boolean?
 function OmiChat.sendTranslatedServerMessage(stringID, args, serverAlert)
-    dispatchCommandToAll('showInfoMessage', { stringID = stringID, args = args, serverAlert = serverAlert, })
+    ---@type omichat.request.ShowMessage
+    local req = { stringID = stringID, args = args, serverAlert = serverAlert, }
+
+    dispatchCommandToAll('showInfoMessage', req)
 end

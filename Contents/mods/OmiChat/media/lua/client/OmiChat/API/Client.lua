@@ -196,7 +196,7 @@ OmiChat._commandStreams = {
             helpText = 'UI_OmiChat_helptext_clearnames',
             isEnabled = canUseAdminCommands,
             onUse = function(self, command)
-                OmiChat.sendClearNames(getSpecificPlayer(0))
+                OmiChat.requestClearNames(getSpecificPlayer(0))
             end,
         }
     },
@@ -208,8 +208,7 @@ OmiChat._commandStreams = {
             helpText = 'UI_OmiChat_helptext_setname',
             isEnabled = canUseAdminCommands,
             onUse = function(self, command)
-                local player = getSpecificPlayer(0)
-                OmiChat.sendSetName(player, command)
+                OmiChat.requestSetName(getSpecificPlayer(0), command)
             end,
         }
     },
@@ -221,8 +220,7 @@ OmiChat._commandStreams = {
             helpText = 'UI_OmiChat_helptext_resetname',
             isEnabled = canUseAdminCommands,
             onUse = function(self, command)
-                local player = getSpecificPlayer(0)
-                OmiChat.sendResetName(player, command)
+                OmiChat.requestResetName(getSpecificPlayer(0), command)
             end,
         }
     },
@@ -235,21 +233,12 @@ OmiChat._commandStreams = {
             isEnabled = function()
                 local player = getSpecificPlayer(0)
                 local inv = player:getInventory()
-                if not inv:contains('CardDeck') and player:getAccessLevel() == 'None' then
-                    return false
-                end
-
-                return true
+                return inv:contains('CardDeck') or player:getAccessLevel() ~= 'None'
             end,
             onUse = function(self)
-                local player = getSpecificPlayer(0)
-                local inv = player:getInventory()
-                if not inv:contains('CardDeck') and player:getAccessLevel() == 'None' then
+                if not OmiChat.requestDrawCard(getSpecificPlayer(0)) then
                     OmiChat.showInfoMessage(getText(self.omichat.helpText))
-                    return
                 end
-
-                OmiChat.requestDrawCard(player)
             end,
         }
     },
@@ -262,31 +251,22 @@ OmiChat._commandStreams = {
             isEnabled = function()
                 local player = getSpecificPlayer(0)
                 local inv = player:getInventory()
-                if not inv:contains('Dice') and player:getAccessLevel() == 'None' then
-                    return false
-                end
-
-                return true
+                return inv:contains('Dice') or player:getAccessLevel() ~= 'None'
             end,
             onUse = function(self, command)
-                local player = getSpecificPlayer(0)
-                local inv = player:getInventory()
-                if not inv:contains('Dice') and player:getAccessLevel() == 'None' then
-                    OmiChat.showInfoMessage(getText(self.omichat.helpText))
-                    return
-                end
-
                 command = utils.trim(command)
                 local first = command:split(' ')[1]
                 local sides = first and tonumber(first)
                 if not sides and #command == 0 then
                     sides = 6
-                elseif not sides or sides < 1 or sides > 100 then
+                elseif not sides then
                     OmiChat.showInfoMessage(getText(self.omichat.helpText))
                     return
                 end
 
-                OmiChat.requestRollDice(player, sides)
+                if not OmiChat.requestRollDice(getSpecificPlayer(0), sides) then
+                    OmiChat.showInfoMessage(getText(self.omichat.helpText))
+                end
             end,
         }
     },

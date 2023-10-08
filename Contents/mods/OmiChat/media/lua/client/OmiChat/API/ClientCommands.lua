@@ -11,7 +11,7 @@ local unpack = unpack or table.unpack
 
 
 ---Reports the results of drawing a card.
----@param args table
+---@param args omichat.request.ReportDrawCard
 function OmiChat.Commands.reportDrawCard(args)
     local command = utils.interpolate(Option.FormatCard, { card = args.card })
     local formatted = OmiChat.getFormatter('card'):format(command)
@@ -20,7 +20,7 @@ function OmiChat.Commands.reportDrawCard(args)
 end
 
 ---Reports the results of a dice roll.
----@param args table
+---@param args omichat.request.ReportRoll
 function OmiChat.Commands.reportRoll(args)
     local command = utils.interpolate(Option.FormatRoll, { roll = args.roll, sides = args.sides })
     local formatted = OmiChat.getFormatter('roll'):format(command)
@@ -29,7 +29,7 @@ function OmiChat.Commands.reportRoll(args)
 end
 
 ---Adds an info message for the local player.
----@param args omichat.InfoMessageRequest
+---@param args omichat.request.ShowMessage
 function OmiChat.Commands.showInfoMessage(args)
     local text
     if args.text then
@@ -47,6 +47,7 @@ function OmiChat.Commands.showInfoMessage(args)
 end
 
 
+---Event handler for processing commands from the server.
 ---@param module string
 ---@param command string
 ---@param args table
