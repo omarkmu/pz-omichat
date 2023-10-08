@@ -8,22 +8,30 @@ local ISPanel_render = ISPanel.render
 
 ---UI element for choosing an icon.
 ---@class omichat.IconPicker : ISPanel
----@field includeDefaults boolean
----@field includeUnknownAsMiscellaneous boolean
----@field borderSize integer
----@field buttonSize integer
----@field backgroundColor table
----@field borderColor table
----@field columns integer
----@field scrollMultiplier integer
----@field target table?
----@field onclick function?
----@field categoryFont UIFont
----@field icons table
----@field exclude table
----@field categoryOrder table
+---@field includeDefaults boolean Whether to include default categories and icons.
+---@field includeUnknownAsMiscellaneous boolean Whether unknown icons should be added to a miscellaneous category.
+---@field padSize integer The size of the padding on all sides.
+---@field buttonSize integer The size of each icon button.
+---@field backgroundColor omichat.DecimalRGBAColorTable The background color of the panel.
+---@field borderColor omichat.DecimalRGBAColorTable The border color of the panel.
+---@field columns integer The number of columns to use.
+---@field scrollMultiplier integer Multiplier for scroll speed.
+---@field target unknown? Target object for callbacks.
+---@field onclick function? Callback to run when an icon button is clicked.
+---@field categoryFont UIFont The font to use for categories.
+---@field icons omichat.IconPickerIcon[] Icons to include.
+---@field exclude table<string, true> Icons to exclude from the picker.
+---@field categoryOrder string[] Categories in the order in which they should display.
 ---@field protected _rowContents table
 local IconPicker = ISPanel:derive('IconPicker')
+
+
+---Information about an icon.
+---@class omichat.IconPickerIcon
+---@field name string The icon name.
+---@field textureName string The name of the texture to use.
+---@field texture Texture? The texture to use.
+---@field category string? The category in which the icon should be included.
 
 
 ---@type table<string, string>
@@ -100,10 +108,12 @@ function IconPicker:buildIconList()
 			local info = iconsByCategory[cat]
 			for _, icon in ipairs(icons[cat]) do
 				local textureName = iconToTextureNameMap[icon]
+				local texture = getTexture(textureName)
 
-				if not self.exclude[icon] and textureName and getTexture(textureName) then
+				if not self.exclude[icon] and textureName and texture then
 					info.list[#info.list + 1] = {
 						name = icon,
+						texture = texture,
 						textureName = textureName,
 					}
 				end
@@ -112,7 +122,7 @@ function IconPicker:buildIconList()
 	end
 
 	for _, icon in ipairs(self.icons) do
-		local cat = icon.category
+		local cat = icon.category or 'miscellaneous'
 		local name = icon.name
 		local textureName = icon.textureName
 
@@ -125,10 +135,12 @@ function IconPicker:buildIconList()
 		end
 
 		local info = iconsByCategory[cat]
-		if not self.exclude[name] and textureName and getTexture(textureName) then
+		local texture = getTexture(textureName)
+		if not self.exclude[name] and textureName and texture then
 			info.list[#info.list + 1] = {
 				name = name,
 				textureName = textureName,
+				texture = texture,
 			}
 		end
 	end
@@ -159,16 +171,16 @@ end
 function IconPicker:getGridCoordinates(x, y)
 	local absX = x - self:getXScroll()
 	local absY = y - self:getYScroll()
-	if absY <= self.borderSize or absX <= self.borderSize then
+	if absY <= self.padSize or absX <= self.padSize then
 		return
 	end
 
-	if x >= self.buttonSize * self.columns + self.borderSize * 2 then
+	if x >= self.buttonSize * self.columns + self.padSize * 2 then
 		return
 	end
 
-	local row = math.ceil((y - self.borderSize) / self.buttonSize)
-	local column = math.ceil((x - self.borderSize) / self.buttonSize)
+	local row = math.ceil((y - self.padSize) / self.buttonSize)
+	local column = math.ceil((x - self.padSize) / self.buttonSize)
 	local selected = type(self._rowContents[row]) == 'table' and self._rowContents[row][column]
 
 	if not selected then
@@ -227,8 +239,8 @@ function IconPicker:render()
 	local hoverRow, hoverCol = self:getMouseCoordinates()
 	if hoverRow and hoverCol then
 		local size = self.buttonSize
-		local x = self.borderSize + (hoverCol - 1) * size
-		local y = self.borderSize + (hoverRow - 1) * size
+		local x = self.padSize + (hoverCol - 1) * size
+		local y = self.padSize + (hoverRow - 1) * size
 		self:drawRect(x, y, size, size, 0.5, 1, 1, 1)
 	end
 
@@ -238,14 +250,20 @@ function IconPicker:render()
 			local catName = getText(value)
 			local textHeight = getTextManager():MeasureStringY(self.categoryFont, catName)
 			local centerDelta = (self.buttonSize - textHeight) / 2
-			local catY = self.borderSize + (row - 1) * self.buttonSize + centerDelta
+			local catY = self.padSize + (row - 1) * self.buttonSize + centerDelta
 			self:drawTextCentre(catName, self.width / 2, catY, 1, 1, 1, 1, self.categoryFont)
 		else
 			for col, icon in ipairs(value) do
+				local texture = icon.texture
+				if not texture then
+					icon.texture = getTexture(icon.textureName)
+					texture = icon.texture
+				end
+
 				local size = self.buttonSize
-				local x = self.borderSize + (col - 1) * size
-				local y = self.borderSize + (row - 1) * size
-				self:drawTextureScaledAspect(getTexture(icon.textureName), x, y, size, size, 1)
+				local x = self.padSize + (col - 1) * size
+				local y = self.padSize + (row - 1) * size
+				self:drawTextureScaledAspect(texture, x, y, size, size, 1)
 			end
 		end
 
@@ -253,7 +271,7 @@ function IconPicker:render()
 	end
 
 	self:clearStencilRect()
-	self:setScrollHeight(self.borderSize * 2 + maxRow * self.buttonSize)
+	self:setScrollHeight(self.padSize * 2 + maxRow * self.buttonSize)
 end
 
 ---Updates icon information.
@@ -306,7 +324,7 @@ function IconPicker:new(x, y, target, onclick)
 	o.borderColor.a = 0.5
     o.columns = columns
     o.buttonSize = buttonSize
-    o.borderSize = borderSize
+    o.padSize = borderSize
 	o.scrollMultiplier = buttonSize * 2
 	o.target = target
 	o.onclick = onclick
