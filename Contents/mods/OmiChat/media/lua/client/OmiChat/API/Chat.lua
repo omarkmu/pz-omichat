@@ -92,6 +92,18 @@ local function insertStreamRelative(stream, other, value)
     return stream
 end
 
+---Sorts table items by priority.
+---Not stable sorting.
+---@param tab table
+local function prioritySort(tab)
+    table.sort(tab, function(a, b)
+        local aPri = a.priority or 1
+        local bPri = b.priority or 1
+
+        return aPri > bPri
+    end)
+end
+
 ---Creates or removes the icon button and picker from the chat box based on sandbox options.
 local function updateIconComponents()
     local add = Option.EnableIconPicker
@@ -302,19 +314,11 @@ function OmiChat.addEmote(name, emoteOrGetter)
     end
 end
 
----Adds a message transformer which can act on message information
----to modify display or behavior.
+---Adds a message transformer which can act on message information to modify display or behavior.
 ---@param transformer omichat.MessageTransformer
-function OmiChat.addMessageTransform(transformer)
+function OmiChat.addMessageTransformer(transformer)
     OmiChat._transformers[#OmiChat._transformers+1] = transformer
-
-    -- not stable sorting
-    table.sort(OmiChat._transformers, function(a, b)
-        local aPri = a.priority or 1
-        local bPri = b.priority or 1
-
-        return aPri > bPri
-    end)
+    prioritySort(OmiChat._transformers)
 end
 
 ---Adds a chat stream.
@@ -335,6 +339,13 @@ function OmiChat.addStream(stream)
     end
 
     return stream
+end
+
+---Adds a suggester which can suggest inputs to the player.
+---@param suggester omichat.Suggester
+function OmiChat.addSuggester(suggester)
+    OmiChat._suggesters[#OmiChat._suggesters+1] = suggester
+    prioritySort(OmiChat._suggesters)
 end
 
 ---Adds a chat stream after an existing stream.
@@ -833,6 +844,28 @@ function OmiChat.removeEmote(name)
     OmiChat._emotes[name] = nil
 end
 
+---Removes a message transformer.
+---@param transformer omichat.MessageTransformer
+function OmiChat.removeMessageTransformer(transformer)
+    remove(OmiChat._transformers, transformer)
+end
+
+---Removes the first message transformer with the provided name.
+---@param name string
+function OmiChat.removeMessageTransformerByName(name)
+    local target
+    for i, v in ipairs(OmiChat._transformers) do
+        if v.name and v.name == name then
+            target = i
+            break
+        end
+    end
+
+    if target then
+        table.remove(OmiChat._transformers, target)
+    end
+end
+
 ---Removes a stream from the list of available chat streams.
 ---@param stream omichat.ChatStream
 function OmiChat.removeStream(stream)
@@ -850,17 +883,17 @@ function OmiChat.removeStream(stream)
     end
 end
 
----Removes a message transformer.
----@param transformer omichat.MessageTransformer
-function OmiChat.removeMessageTransform(transformer)
-    remove(OmiChat._transformers, transformer)
+---Removes a suggester.
+---@param suggester omichat.Suggester
+function OmiChat.removeSuggester(suggester)
+    remove(OmiChat._suggesters, suggester)
 end
 
----Removes the first message transformer with the provided name.
+---Removes the first suggester with the provided name.
 ---@param name string
-function OmiChat.removeMessageTransformByName(name)
+function OmiChat.removeSuggesterByName(name)
     local target
-    for i, v in ipairs(OmiChat._transformers) do
+    for i, v in ipairs(OmiChat._suggesters) do
         if v.name and v.name == name then
             target = i
             break
@@ -868,7 +901,7 @@ function OmiChat.removeMessageTransformByName(name)
     end
 
     if target then
-        table.remove(OmiChat._transformers, target)
+        table.remove(OmiChat._suggesters, target)
     end
 end
 
