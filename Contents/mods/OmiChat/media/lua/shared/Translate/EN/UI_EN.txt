@@ -75,7 +75,10 @@ UI_EN = {
     UI_OmiChat_radio = "Radio (%1 MHz)",
 
     -- %1 = the private message recipient.
-    UI_OmiChat_private_chat_to = "to %1",
+    UI_OmiChat_private_chat_to = "PM to %1",
+
+    -- %1 = the private message sender.
+    UI_OmiChat_private_chat_from = "PM from %1",
 
     --- commands ---
     UI_OmiChat_clear_message = "Console cleared",

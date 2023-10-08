@@ -793,8 +793,8 @@ OmiChat._transformers = {
             end
 
             local text = info.content or info.rawText
-            local bracketStart, msgStart, other = text:find('%[to ([^%]]+)%]:')
-            if other and bracketStart == text:find('%[') then
+            local _, msgStart, other = text:find('%[to ([^%]]+)%]:')
+            if other then
                 info.content = text:sub(msgStart + 1)
                 info.format = Option.ChatFormatOutgoingPrivate
                 info.substitutions.recipient = other
@@ -817,13 +817,12 @@ OmiChat._transformers = {
             end
 
             local text = info.content or info.rawText
-            if ISChat.instance.showTitle then
-                -- not great, but can't access the real isShowTitle chat setting to do this in a safer way
-                local patt = concat { '%[', getText('UI_chat_server_chat_title_id'), '%]:' }
-                local _, serverMsgStart = text:find(patt)
-                if serverMsgStart then
-                    info.content = text:sub(serverMsgStart + 1)
-                end
+            -- not great, but can't access the isShowTitle chat setting to do this in a safer way
+            local patt = concat { '%[', getText('UI_chat_server_chat_title_id'), '%]:' }
+            local _, serverMsgStart = text:find(patt)
+
+            if serverMsgStart then
+                info.content = text:sub(serverMsgStart + 1)
             else
                 -- server messages can be only their text, if not set to show title
                 -- still have to extract text due to the existing rich text

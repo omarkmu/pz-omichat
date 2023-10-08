@@ -583,7 +583,7 @@ The format used for `/all` messages in chat.
 See also: [`ColorGeneral`](#colorgeneral).
 
 ### ChatFormatIncomingPrivate
-`default → $name: <SPACE> $message`  
+`default → $($gettext(UI_OmiChat_private_chat_from $name)$): <SPACE> $message`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for incoming private messages in chat.
@@ -648,7 +648,7 @@ See also:
 - [`OverheadFormatMeQuiet`](#overheadformatmequiet)
 
 ### ChatFormatOutgoingPrivate
-`default → $gettext(UI_OmiChat_private_chat_to $recipientName): <SPACE> $message`  
+`default → $($gettext(UI_OmiChat_private_chat_to $recipientName)$): <SPACE> $message`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $recipient, $recipientName, $message`
 
 The format used for outgoing private messages in chat.

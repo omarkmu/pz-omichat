@@ -208,10 +208,10 @@ option OmiChat.ChatFormatDiscord
 { type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCChatFormatDiscord, }
 
 option OmiChat.ChatFormatIncomingPrivate
-{ type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatIncomingPrivate, }
+{ type = string, default = $($gettext(UI_OmiChat_private_chat_from $name)$): <SPACE> $message, page = OmiChat, translation = OCChatFormatIncomingPrivate, }
 
 option OmiChat.ChatFormatOutgoingPrivate
-{ type = string, default = $gettext(UI_OmiChat_private_chat_to $recipientName): <SPACE> $message, page = OmiChat, translation = OCChatFormatOutgoingPrivate, }
+{ type = string, default = $($gettext(UI_OmiChat_private_chat_to $recipientName)$): <SPACE> $message, page = OmiChat, translation = OCChatFormatOutgoingPrivate, }
 
 option OmiChat.ChatFormatServer
 { type = string, default = $message, page = OmiChat, translation = OCChatFormatServer, }
