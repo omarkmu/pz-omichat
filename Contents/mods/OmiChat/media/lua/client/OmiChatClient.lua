@@ -8,7 +8,6 @@ require 'OmiChat/API/ClientDispatch'
 require 'OmiChat/API/ClientCommands'
 
 Events.OnGameStart.Add(OmiChat._onGameStart)
-Events.OnCreatePlayer.Add(OmiChat._onCreatePlayer)
 Events.OnServerCommand.Add(OmiChat._onServerCommand)
 Events.OnReceiveGlobalModData.Add(OmiChat._onReceiveGlobalModData)
 

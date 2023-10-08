@@ -897,30 +897,6 @@ OmiChat._emotes = {
 }
 
 
----@protected
----@param idx integer
----@param player IsoPlayer
-function OmiChat._onCreatePlayer(idx, player)
-    if idx ~= 0 then
-        return
-    end
-
-    if Option.EnableChatNameAsCharacterName then
-        local name = OmiChat.getNickname()
-        if not name then
-            return
-        end
-
-        -- set existing nickname to character name
-        -- server will handle clearing nickname
-        if name then
-            OmiChat.updateCharacterName(name)
-        end
-    end
-
-    OmiChat.informPlayerCreated(player)
-end
-
 ---Event handler that runs on game start.
 ---@protected
 function OmiChat._onGameStart()

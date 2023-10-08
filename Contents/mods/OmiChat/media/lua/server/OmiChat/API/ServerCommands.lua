@@ -88,16 +88,6 @@ local function updateModDataNickname(args)
 end
 
 
----Handles side-effects of the `OnCreatePlayer` event.
----@param player IsoPlayer
-function OmiChat.Commands.informPlayerCreated(player)
-    if Option.EnableChatNameAsCharacterName then
-        OmiChat.setNickname(player:getUsername(), nil)
-    end
-
-    OmiChat.transmitModData()
-end
-
 ---Handles the /clearnames command.
 ---@param player IsoPlayer
 function OmiChat.Commands.requestClearNames(player)

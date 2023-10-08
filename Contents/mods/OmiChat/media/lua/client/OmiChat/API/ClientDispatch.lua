@@ -21,12 +21,6 @@ local function dispatchCommand(command, player, args)
 end
 
 
----Informs the server that a player was created.
----@param player IsoPlayer
-function OmiChat.informPlayerCreated(player)
-    return dispatchCommand('informPlayerCreated', player)
-end
-
 ---Executes the /clearnames command.
 ---@param player IsoPlayer
 function OmiChat.requestClearNames(player)
