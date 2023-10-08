@@ -650,17 +650,18 @@ OmiChat._transformers = {
         name = 'radio-chat',
         priority = 10,
         transform = function(self, info)
+            local text = info.content or info.rawText
             if info.chatType ~= 'radio' then
                 return
             end
 
-            local _, msgStart, freq = info.rawText:find('Radio%s*%((%d+%.%d+)[^%)]+%)%s*:')
+            local _, msgStart, freq = text:find('Radio%s*%((%d+%.%d+)[^%)]+%)%s*:')
             if not msgStart then
                 return
             end
 
             info.context.ocIsRadio = true
-            info.content = info.rawText:sub(msgStart + 1)
+            info.content = text:sub(msgStart + 1)
             info.format = Option.ChatFormatRadio
             info.substitutions.frequency = freq
         end
@@ -681,6 +682,8 @@ OmiChat._transformers = {
                     else
                         info.formatOptions.showInChat = false
                     end
+
+                    break
                 elseif isValidStream and isMatch then
                     info.content = formatter:read(info.rawText)
                     info.format = Option[streamData.chatFormatOpt]
@@ -761,9 +764,10 @@ OmiChat._transformers = {
                 return
             end
 
-            local bracketStart, msgStart, other = info.rawText:find('%[to ([^%]]+)%]:')
-            if other and bracketStart == info.rawText:find('%[') then
-                info.content = info.rawText:sub(msgStart + 1)
+            local text = info.content or info.rawText
+            local bracketStart, msgStart, other = text:find('%[to ([^%]]+)%]:')
+            if other and bracketStart == text:find('%[') then
+                info.content = text:sub(msgStart + 1)
                 info.format = Option.ChatFormatOutgoingPrivate
                 info.substitutions.recipient = other
                 info.substitutions.recipientName = OmiChat.getNameInChat(other, 'whisper') or other
@@ -784,19 +788,20 @@ OmiChat._transformers = {
                 return
             end
 
+            local text = info.content or info.rawText
             if ISChat.instance.showTitle then
                 -- not great, but can't access the real isShowTitle chat setting to do this in a safer way
                 local patt = concat { '%[', getText('UI_chat_server_chat_title_id'), '%]:' }
-                local _, serverMsgStart = info.rawText:find(patt)
+                local _, serverMsgStart = text:find(patt)
                 if serverMsgStart then
-                    info.content = info.rawText:sub(serverMsgStart + 1)
+                    info.content = text:sub(serverMsgStart + 1)
                 end
             else
                 -- server messages can be only their text, if not set to show title
                 -- still have to extract text due to the existing rich text
 
-                local _, sizeEnd = info.rawText:find('<SIZE:')
-                local start = sizeEnd ~= -1 and info.rawText:find('>', sizeEnd)
+                local _, sizeEnd = text:find('<SIZE:')
+                local start = sizeEnd ~= -1 and text:find('>', sizeEnd)
                 if start then
                     info.content = info.rawText:sub(start + 1)
                 end
