@@ -9,6 +9,7 @@ local concat = table.concat
 local pairs = pairs
 local ipairs = ipairs
 local getText = getText
+local min = math.min
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
 
@@ -68,7 +69,7 @@ local function insertStreamRelative(stream, other, value)
 
     table.insert(ISChat.allChatStreams, pos, stream)
 
-    local tabs = ISChat.instance.tabs
+    local tabs = ISChat.instance and ISChat.instance.tabs
     if not tabs then
         return stream
     end
@@ -103,7 +104,7 @@ local function prioritySort(tab)
 end
 
 ---Creates or removes the icon button and picker from the chat box based on sandbox options.
-local function updateIconComponents()
+local function addOrRemoveIconComponents()
     local instance = ISChat.instance
     if not instance then
         return
@@ -650,7 +651,12 @@ end
 
 ---Clears all of the current chat messages.
 function OmiChat.clearMessages()
-    for _, chatText in ipairs(ISChat.instance.tabs) do
+    local tabs = ISChat.instance and ISChat.instance.tabs
+    if not tabs then
+        return
+    end
+
+    for _, chatText in ipairs(tabs) do
         chatText.chatMessages = {}
         chatText.chatTextLines = {}
         chatText.text = ''
@@ -724,6 +730,25 @@ function OmiChat.encodeMessageTag(message)
         n = OmiChat.getNameInChat(author, chatType),
         cn = color and utils.colorToHexString(color) or nil,
     }
+end
+
+---Gets the command associated with a color category.
+---@param cat omichat.ColorCategory
+---@return string
+function OmiChat.getColorCategoryCommand(cat)
+    if cat == 'private' then
+        return OmiChat.isCustomStreamEnabled('whisper') and '/pm' or '/whisper'
+    end
+
+    if cat == 'general' then
+        return '/all'
+    end
+
+    if cat == 'shout' then
+        return '/yell'
+    end
+
+    return '/' .. cat
 end
 
 ---Returns a color table associated with the current player,
@@ -836,6 +861,15 @@ function OmiChat.getSuggestions(text)
     return info.suggestions
 end
 
+---Hides the suggester box if it's currently visible.
+function OmiChat.hideSuggesterBox()
+    local instance = ISChat.instance
+    local suggesterBox = instance and instance.suggesterBox
+    if suggesterBox then
+        suggesterBox:setVisible(false)
+    end
+end
+
 ---Removes a stream from the list of available chat commands.
 ---@param stream omichat.CommandStream
 function OmiChat.removeCommand(stream)
@@ -885,7 +919,7 @@ function OmiChat.removeStream(stream)
     remove(ISChat.allChatStreams, stream)
 
     -- remove from tab streams
-    local tabs = ISChat.instance.tabs
+    local tabs = ISChat.instance and ISChat.instance.tabs
     if tabs then
         remove(tabs, stream)
     end
@@ -916,6 +950,10 @@ end
 ---Redraws the current chat messages.
 ---@param doScroll boolean? Whether the chat should also be scrolled to the bottom. Defaults to true.
 function OmiChat.redrawMessages(doScroll)
+    if not ISChat.instance then
+        return
+    end
+
     for _, chatText in ipairs(ISChat.instance.tabs) do
         local newText = {}
         local newLines = {}
@@ -956,12 +994,32 @@ end
 
 ---Sets the scroll position of all chat tabs to the top.
 function OmiChat.scrollToTop()
-    if not ISChat.instance.tabs then
+    if not ISChat.instance or not ISChat.instance.tabs then
         return
     end
 
     for _, tab in ipairs(ISChat.instance.tabs) do
         tab:setYScroll(0)
+    end
+end
+
+---Sets whether the icon picker button is enabled.
+---If the button is disabled, the icon picker component will also be hidden.
+---@param enable boolean?
+function OmiChat.setIconButtonEnabled(enable)
+    local instance = ISChat.instance
+    local iconButton = instance and instance.iconButton
+    if not instance or not iconButton then
+        return
+    end
+
+    local value = enable and 0.8 or 0.3
+    iconButton:setTextureRGBA(value, value, value, 1)
+    iconButton.enable = enable
+
+    local iconPicker = instance.iconPicker
+    if not enable and iconPicker then
+        iconPicker:setVisible(false)
     end
 end
 
@@ -986,6 +1044,44 @@ function OmiChat.showInfoMessage(text, serverAlert)
     ISChat.addLineInChat(message, ISChat.instance.currentTabID - 1)
 end
 
+---Updates the icon picker and suggester box based on the current input text.
+---@param text string? The current text entry text. If omitted, the current text will be retrieved.
+function OmiChat.updateCustomComponents(text)
+    local instance = ISChat.instance
+    if not instance then
+        return
+    end
+
+    text = text or instance.textEntry:getInternalText()
+
+    OmiChat.updateIconComponents(text)
+    OmiChat.updateSuggesterComponent(text)
+end
+
+---Enables or disables the icon picker based on the current input.
+---@param text string? The current text entry text.
+function OmiChat.updateIconComponents(text)
+    local instance = ISChat.instance
+    if not instance or not instance.iconButton then
+        return
+    end
+
+    text = text or instance.textEntry:getInternalText()
+    local stream = OmiChat.chatCommandToStream(text)
+
+    if not stream then
+        stream = ISChat.defaultTabStream[instance.currentTabID]
+    end
+
+    local enable = false
+    if stream and stream.omichat and stream.omichat.allowIconPicker ~= nil then
+        -- enable icon button for custom chats where appropriate
+        enable = stream.omichat.allowIconPicker
+    end
+
+    OmiChat.setIconButtonEnabled(enable)
+end
+
 ---Updates state to match sandbox variables.
 ---@param redraw boolean? If true, chat messages will be redrawn.
 function OmiChat.updateState(redraw)
@@ -996,12 +1092,50 @@ function OmiChat.updateState(redraw)
     OmiChat.getPlayerPreferences()
     updateStreams()
     updateFormatters()
-    updateIconComponents()
+    addOrRemoveIconComponents()
 
     ISChat.instance:setInfo(OmiChat.getInfoText())
 
     if redraw then
         -- some sandbox vars affect how messages are drawn
         OmiChat.redrawMessages(false)
+    end
+end
+
+---Shows or hides the suggester based on the current input.
+---@param text string? The current text entry text. If omitted, the current text will be retrieved.
+function OmiChat.updateSuggesterComponent(text)
+    local instance = ISChat.instance
+    local suggesterBox = instance and instance.suggesterBox
+    if not instance or not suggesterBox then
+        return
+    end
+
+    if not OmiChat.getUseSuggester() then
+        suggesterBox:setVisible(false)
+        return
+    end
+
+    text = text or instance.textEntry:getInternalText()
+    local suggestions = OmiChat.getSuggestions(text)
+    if #suggestions == 0 then
+        suggesterBox:setVisible(false)
+        return
+    end
+
+    suggesterBox:setSuggestions(suggestions)
+    if #suggestions > 0 then
+        suggesterBox:setWidth(instance:getWidth())
+        suggesterBox:setHeight(suggesterBox.itemheight * min(#suggestions, 5))
+        suggesterBox:setX(instance:getX())
+        suggesterBox:setY(instance:getY() + instance.textEntry:getY() - suggesterBox.height)
+        suggesterBox:setVisible(true)
+        suggesterBox:bringToTop()
+
+        if suggesterBox.vscroll then
+            suggesterBox.vscroll:setHeight(suggesterBox.height)
+        end
+    else
+        suggesterBox:setVisible(false)
     end
 end

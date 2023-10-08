@@ -120,3 +120,16 @@ return OmiChat
 ---@field callouts string[]
 ---@field sneakcallouts string[]
 ---@field colors table<omichat.ColorCategory, omichat.ColorTable>
+
+---Description of a chat tab object.
+---@class omichat.ChatTab : ISRichTextPanel
+---@field logIndex integer
+---@field tabID integer
+---@field text string
+---@field chatStreams omichat.ChatStream[]
+---@field chatTextLines string[]
+---@field chatMessages omichat.Message[]
+---@field log string[]
+---@field parent omichat.ISChat
+---@field tabTitle string
+---@field streamID integer
