@@ -144,6 +144,23 @@ function utils.getNumericAccessLevel(access)
     return accessLevels[access:lower()] or 1
 end
 
+---Gets a player given their username.
+---@param username string
+---@return IsoPlayer?
+function utils.getPlayerByUsername(username)
+    if isClient() then
+        return getPlayerFromUsername(username)
+    end
+
+    local onlinePlayers = getOnlinePlayers()
+    for i = 0, onlinePlayers:size() do
+        local player = onlinePlayers:get(i)
+        if player:getUsername() == username then
+            return player
+        end
+    end
+end
+
 ---Interpolates substitutions into a string with format strings using `$var` format.
 ---Functions are referenced using `$func(...)` syntax.
 ---@param text string The format string.

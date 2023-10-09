@@ -147,37 +147,30 @@ end
 ---@return omichat.ColorTable
 function Option:getDefaultColor(category, username)
     if category == 'speech' or (category == 'name' and self.EnableSpeechColorAsDefaultNameColor) then
-        local speechColor
-        if username then
-            local player = getPlayerFromUsername(username)
-            if player then
-                speechColor = player:getSpeakColour()
-                if not speechColor and category == 'speech' then
-                    speechColor = getCore():getMpTextColor()
-                end
-            end
-        else
-            speechColor = getCore():getMpTextColor()
+        local player = username and utils.getPlayerByUsername(username)
+        local speechColor = player and player:getSpeakColour()
+
+        if not speechColor then
+            return {r = 255, g = 255, b = 255}
         end
 
-        if speechColor then
-            return {
-                r = floor(speechColor:getR() * 255),
-                g = floor(speechColor:getG() * 255),
-                b = floor(speechColor:getB() * 255),
-            }
-        end
+        return {
+            r = floor(speechColor:getR() * 255),
+            g = floor(speechColor:getG() * 255),
+            b = floor(speechColor:getB() * 255),
+        }
     elseif category == 'faction' then
         local player
         if username then
-            player = getPlayerFromUsername(username)
+            player = utils.getPlayerByUsername(username)
         else
             player = getSpecificPlayer(0)
         end
 
         local playerFaction = player and Faction.getPlayerFaction(player)
-        if playerFaction then
-            local color = playerFaction:getTagColor():toColor()
+        local tagColor = playerFaction and playerFaction:getTagColor()
+        if tagColor then
+            local color = tagColor:toColor()
 
             return {
                 r = color:getRed(),

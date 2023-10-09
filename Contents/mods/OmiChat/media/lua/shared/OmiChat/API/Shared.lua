@@ -19,24 +19,6 @@ OmiChat._modDataKey = 'omichat'
 OmiChat._modDataVersion = 1
 
 
----Gets a player given their username.
----@param username string
----@return IsoPlayer?
-local function getPlayerByUsername(username)
-    if isClient() then
-        return getPlayerFromUsername(username)
-    end
-
-    local onlinePlayers = getOnlinePlayers()
-    for i = 0, onlinePlayers:size() do
-        local player = onlinePlayers:get(i)
-        if player:getUsername() == username then
-            return player
-        end
-    end
-end
-
-
 ---Gets or creates the global mod data table.
 ---@return omichat.ModData
 function OmiChat.getModData()
@@ -85,7 +67,7 @@ function OmiChat.getNameInChat(username, chatType)
         return
     end
 
-    local player = getPlayerByUsername(username)
+    local player = utils.getPlayerByUsername(username)
     local tokens = player and OmiChat.getPlayerSubstitutions(player)
     if not tokens then
         return
