@@ -7,7 +7,7 @@ OmiChat.Commands = {}
 
 local utils = OmiChat.utils
 local Option = OmiChat.Option
-local unpack = unpack or table.unpack
+local unpack = unpack
 
 
 ---Reports the results of drawing a card.

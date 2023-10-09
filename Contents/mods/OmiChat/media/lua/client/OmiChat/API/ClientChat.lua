@@ -435,10 +435,9 @@ function OmiChat.applyFormatOptions(info)
         msg = msg:gsub('<RGB:%d%.%d+,%d%.%d+,%d%.%d+>', '')
     end
 
-    local selectedColor = Option.EnableSetNameColor and meta.nameColor
-    local hasNameColor = selectedColor or Option.EnableSpeechColorAsDefaultNameColor
+    local hasNameColor = meta.nameColor or Option.EnableSpeechColorAsDefaultNameColor
     if hasNameColor and shouldUseNameColor(info) then
-        local colorToUse = selectedColor or Option:getDefaultColor('name', message:getAuthor())
+        local colorToUse = meta.nameColor or Option:getDefaultColor('name', message:getAuthor())
         local nameColor = utils.toChatColor(colorToUse, true)
 
         if nameColor ~= '' then
