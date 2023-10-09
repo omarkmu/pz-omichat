@@ -6,6 +6,7 @@ local format = string.format
 local concat = table.concat
 local getText = getText
 local min = math.min
+local max = math.max
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
 
@@ -970,16 +971,17 @@ function OmiChat.redrawMessages(doScroll)
 
     for i = 1, #ISChat.instance.tabs do
         local chatText = ISChat.instance.tabs[i]
+        local messages = chatText.chatMessages
         local newText = {}
         local newLines = {}
 
-        for j = 1, #chatText.chatMessages do
-            local msg = chatText.chatMessages[j]
-            local text = msg:getTextWithPrefix()
+        local start = 1 + max(0, #messages - ISChat.maxLine - 1)
+        for j = start, #messages do
+            local text = messages[j]:getTextWithPrefix()
 
             newText[#newText+1] = text
-            newLines[#newLines+1] = text .. ' <LINE> '
             newText[#newText+1] = ' <LINE> '
+            newLines[#newLines+1] = text .. ' <LINE> '
         end
 
         newText[#newText] = nil
