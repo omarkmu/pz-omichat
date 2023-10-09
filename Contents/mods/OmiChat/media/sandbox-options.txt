@@ -26,6 +26,9 @@ option OmiChat.EnableSetSpeechColor
 option OmiChat.EnableSpeechColorAsDefaultNameColor
 { type = boolean, default = true, page = OmiChat, translation = OCEnableSpeechColorAsDefaultNameColor, }
 
+option OmiChat.EnableFactionColorAsDefault
+{ type = boolean, default = false, page = OmiChat, translation = OCEnableFactionColorAsDefault, }
+
 option OmiChat.EnableIconPicker
 { type = boolean, default = false, page = OmiChat, translation = OCEnableIconPicker, }
 

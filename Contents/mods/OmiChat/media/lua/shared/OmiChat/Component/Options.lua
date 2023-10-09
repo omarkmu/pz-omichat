@@ -18,6 +18,7 @@ local floor = math.floor
 ---@field EnableMiscellaneousIcons boolean
 ---@field EnableCompatTAD boolean
 ---@field EnableChatNameAsCharacterName boolean
+---@field EnableFactionColorAsDefault boolean
 ---@field CustomShoutMaxLength integer
 ---@field MinimumCommandAccessLevel integer
 ---@field MaximumCustomShouts integer
@@ -159,7 +160,7 @@ function Option:getDefaultColor(category, username)
             g = floor(speechColor:getG() * 255),
             b = floor(speechColor:getB() * 255),
         }
-    elseif category == 'faction' then
+    elseif category == 'faction' and Option.EnableFactionColorAsDefault then
         local player
         if username then
             player = utils.getPlayerByUsername(username)

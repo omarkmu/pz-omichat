@@ -61,6 +61,12 @@ See also:
 Allows players to use [emote](./emotes.md) shortcuts in the form of `.emote`.
 These are enabled only in local chats.
 
+### EnableFactionColorAsDefault
+`default → false`
+
+If enabled, players' faction tag colors will be used as the default color for `/faction` messages.
+This takes precedence over the [`ColorFaction`](#colorfaction) setting.
+
 ### EnableIconPicker
 `default → false`
 

@@ -13,6 +13,7 @@ Sandbox_EN = {
     Sandbox_OCEnableSetNameColor = "Custom Name Colors",
     Sandbox_OCEnableSetSpeechColor = "Custom Speech Colors",
     Sandbox_OCEnableSpeechColorAsDefaultNameColor = "Use Speech Color as Default Name Color",
+    Sandbox_OCEnableFactionColorAsDefault = "Use Faction Tag Color as Default Chat Color",
 
     Sandbox_OCCustomShoutMaxLength = "Custom Shout Maximum Length",
     Sandbox_OCMinimumCommandAccessLevel = "Minimum Access Level for Commands",
