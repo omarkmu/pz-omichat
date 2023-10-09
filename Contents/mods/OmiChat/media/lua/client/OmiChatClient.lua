@@ -2,6 +2,7 @@
 ---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Client'
 
+require 'OmiChat/API/ClientStreams'
 require 'OmiChat/API/ClientChat'
 require 'OmiChat/API/ClientData'
 require 'OmiChat/API/ClientDispatch'

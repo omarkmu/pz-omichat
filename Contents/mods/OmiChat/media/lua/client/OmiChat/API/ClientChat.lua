@@ -19,10 +19,6 @@ local config = OmiChat.config
 local Option = OmiChat.Option
 local IconPicker = OmiChat.IconPicker
 
-local streamDefs = require 'OmiChat/API/Streams'
-local streamConfigs = streamDefs.vanillaStreamConfigs
-local customChatStreams = streamDefs.chatStreams
-
 local _ChatBase = __classmetatables[ChatBase.class].__index
 local _ChatMessage = __classmetatables[ChatMessage.class].__index
 
@@ -208,6 +204,7 @@ end
 local function updateStreams()
     local vanillaWhisper
     local exists = {}
+    local streamConfigs = OmiChat._vanillaStreamConfigs
 
     for i = 1, #ISChat.allChatStreams do
         local stream = ISChat.allChatStreams[i]
@@ -234,7 +231,7 @@ local function updateStreams()
     end
 
     for data in config:chatStreams() do
-        local stream = customChatStreams[data.name]
+        local stream = OmiChat._customChatStreams[data.name]
         if not exists[data.name] and stream then
             OmiChat.addStreamBefore(stream, vanillaWhisper)
         end

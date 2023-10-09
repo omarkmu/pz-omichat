@@ -8,6 +8,7 @@ local Configuration = {}
 Configuration._streamTable = {}
 Configuration._streamList = {}
 
+
 -- chat streams (1–25)
 Configuration._chatStreams = {
     {

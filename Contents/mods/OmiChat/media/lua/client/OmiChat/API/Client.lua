@@ -19,6 +19,8 @@ local ISChat = ISChat ---@cast ISChat omichat.ISChat
 ---@field private _iniVersion integer
 ---@field private _iniName string
 ---@field private _playerPrefs omichat.PlayerPreferences
+---@field private _customChatStreams table<string, omichat.ChatStream>
+---@field private _vanillaStreamConfigs table<string, omichat.ChatStreamConfig>
 local OmiChat = require 'OmiChatShared'
 local Option = OmiChat.Option
 local utils = OmiChat.utils
