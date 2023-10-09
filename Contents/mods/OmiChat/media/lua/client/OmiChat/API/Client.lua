@@ -715,8 +715,14 @@ OmiChat._transformers = {
                 if OmiChat.isCustomStreamEnabled('whisper') then
                     info.format = Option.ChatFormatWhisper
                     info.formatOptions.color = OmiChat.getColorTable('whisper')
+                    info.titleID = 'UI_OmiChat_whisper_chat_title_id'
                 end
+            else
+                return
             end
+
+            -- already created a sound for the callout
+            info.message:setShouldAttractZombies(false)
         end,
     },
     {
@@ -732,11 +738,14 @@ OmiChat._transformers = {
                 local isMatch = formatter:isMatch(text)
 
                 if isMatch and isRadio then
-                    if streamData.showOnRadio then
+                    if streamData.convertToRadio then
                         info.content = formatter:read(text)
                     else
-                        info.message:setOverHeadSpeech(false)
                         info.message:setShowInChat(false)
+
+                        -- the message showing overhead is hardcoded for radio messages,
+                        -- so this can't actually be prevented
+                        info.message:setOverHeadSpeech(false)
                     end
 
                     break

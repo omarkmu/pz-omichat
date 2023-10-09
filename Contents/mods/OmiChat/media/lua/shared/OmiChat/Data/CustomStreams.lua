@@ -25,7 +25,7 @@
 ---@field rangeOpt string The name of the option used to determine message range.
 ---@field chatFormatOpt string The name of the option used for the chat format.
 ---@field overheadFormatOpt string The name of the option used for the overhead format.
----@field showOnRadio boolean Whether messages sent on this stream should be visible over the radio.
+---@field convertToRadio true? Whether messages sent on this stream should show up in chat over the radio.
 ---@field chatTypes table<omichat.ChatTypeString, true?> Chat types for which this stream is enabled.
 ---@field isCommand true? Whether this stream is a command stream.
 ---@field streamAlias string? An alias to use for determining color and range.
@@ -51,7 +51,7 @@ local customStreamList = {
         overheadFormatOpt = 'OverheadFormatWhisper',
         titleID = 'UI_OmiChat_whisper_chat_title_id',
         chatTypes = { say = true },
-        showOnRadio = true,
+        convertToRadio = true,
     },
     {
         name = 'me',
@@ -62,7 +62,6 @@ local customStreamList = {
         overheadFormatOpt = 'OverheadFormatMe',
         chatTypes = { say = true },
         stripColors = true,
-        showOnRadio = false,
     },
     {
         name = 'mequiet',
@@ -74,7 +73,6 @@ local customStreamList = {
         titleID = 'UI_OmiChat_whisper_chat_title_id',
         chatTypes = { say = true },
         stripColors = true,
-        showOnRadio = false,
     },
     {
         name = 'meloud',
@@ -86,7 +84,6 @@ local customStreamList = {
         overheadFormatOpt = 'OverheadFormatMeLoud',
         chatTypes = { shout = true },
         stripColors = true,
-        showOnRadio = false,
     },
     {
         name = 'do',
@@ -97,7 +94,6 @@ local customStreamList = {
         overheadFormatOpt = 'OverheadFormatDo',
         chatTypes = { say = true },
         stripColors = true,
-        showOnRadio = false,
     },
     {
         name = 'doquiet',
@@ -109,7 +105,6 @@ local customStreamList = {
         titleID = 'UI_OmiChat_whisper_chat_title_id',
         chatTypes = { say = true },
         stripColors = true,
-        showOnRadio = false,
     },
     {
         name = 'doloud',
@@ -121,7 +116,6 @@ local customStreamList = {
         defaultRangeOpt = 'RangeYell',
         chatTypes = { shout = true },
         stripColors = true,
-        showOnRadio = false,
     },
     {
         name = 'looc',
@@ -131,7 +125,6 @@ local customStreamList = {
         chatFormatOpt = 'ChatFormatLooc',
         overheadFormatOpt = 'OverheadFormatLooc',
         chatTypes = { say = true },
-        showOnRadio = false,
     },
 
     -- command streams (26–50)
@@ -145,7 +138,6 @@ local customStreamList = {
         chatFormatOpt = 'ChatFormatRoll',
         overheadFormatOpt = 'OverheadFormatRoll',
         chatTypes = { say = true },
-        showOnRadio = false,
         allowColorCustomization = false,
     },
     {
@@ -158,14 +150,15 @@ local customStreamList = {
         chatFormatOpt = 'ChatFormatCard',
         overheadFormatOpt = 'OverheadFormatCard',
         chatTypes = { say = true },
-        showOnRadio = false,
         allowColorCustomization = false,
     },
 }
 
+
 for _, v in pairs(customStreamList) do
     customStreamTable[v.name] = v
 end
+
 
 return {
     list = customStreamList,
