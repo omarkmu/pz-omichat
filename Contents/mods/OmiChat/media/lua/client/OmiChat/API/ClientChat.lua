@@ -1,7 +1,7 @@
 ---Client API functionality related to manipulating the chat.
 
 local MimicMessage = require 'OmiChat/Component/MimicMessage'
-local customStreamData = require 'OmiChat/Data/CustomStreams'
+local customStreamData = require 'OmiChat/API/Configuration'
 
 local format = string.format
 local concat = table.concat

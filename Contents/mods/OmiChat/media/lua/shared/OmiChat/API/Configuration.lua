@@ -1,6 +1,8 @@
----Information about custom streams added by OmiChat.
+---Configuration of custom streams and formatters.
+---@class omichat.Configuration
+local Configuration = {}
 
----@see omichat.api.client.getFormatter
+
 ---@alias omichat.CustomStreamName
 ---| 'whisper'
 ---| 'me'
@@ -13,6 +15,7 @@
 ---| 'card'
 ---| 'roll'
 
+---@see omichat.api.client.getFormatter
 ---@alias omichat.FormatterName
 ---| omichat.CustomStreamName
 ---| 'callout'
@@ -176,9 +179,9 @@ for _, v in pairs(customStreamList) do
     customStreamTable[v.name] = v
 end
 
+Configuration.list = customStreamList
+Configuration.table = customStreamTable
+Configuration.otherFormatters = otherFormatters
 
-return {
-    list = customStreamList,
-    table = customStreamTable,
-    otherFormatters = otherFormatters,
-}
+
+return Configuration

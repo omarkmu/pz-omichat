@@ -3,7 +3,7 @@
 require 'Chat/ISChat'
 
 local vanillaCommands = require 'OmiChat/Data/VanillaCommandList'
-local customStreamData = require 'OmiChat/Data/CustomStreams'
+local customStreamData = require 'OmiChat/API/Configuration'
 
 local concat = table.concat
 local pairs = pairs

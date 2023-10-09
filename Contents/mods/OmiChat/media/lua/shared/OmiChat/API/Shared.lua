@@ -3,7 +3,7 @@
 local utils = require 'OmiChat/util'
 local Option = require 'OmiChat/Component/Options'
 local MetaFormatter = require 'OmiChat/Component/MetaFormatter'
-local customStreamData = require 'OmiChat/Data/CustomStreams'
+local customStreamData = require 'OmiChat/API/Configuration'
 
 
 ---@class omichat.api.shared

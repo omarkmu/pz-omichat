@@ -1,6 +1,6 @@
 local lib = require 'OmiChat/lib'
 local utils = require 'OmiChat/util'
-local customStreams = require 'OmiChat/Data/CustomStreams'
+local customStreams = require 'OmiChat/API/Configuration'
 
 local floor = math.floor
 

@@ -1,7 +1,7 @@
 ---Handles chat overrides.
 
 local OmiChat = require 'OmiChat/API/Client'
-local customStreamData = require 'OmiChat/Data/CustomStreams'
+local customStreamData = require 'OmiChat/API/Configuration'
 
 
 ---@class omichat.ISChat
