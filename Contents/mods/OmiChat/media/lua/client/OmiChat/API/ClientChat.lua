@@ -1,7 +1,6 @@
 ---Client API functionality related to manipulating the chat.
 
 local MimicMessage = require 'OmiChat/Component/MimicMessage'
-local customStreamData = require 'OmiChat/API/Configuration'
 
 local format = string.format
 local concat = table.concat
@@ -16,6 +15,7 @@ OmiChat.MimicMessage = MimicMessage
 
 
 local utils = OmiChat.utils
+local config = OmiChat.config
 local Option = OmiChat.Option
 local IconPicker = OmiChat.IconPicker
 
@@ -192,22 +192,14 @@ end
 
 ---Creates or updates built-in formatters.
 local function updateFormatters()
-    for i = 1, #customStreamData.list do
-        local info = customStreamData.list[i]
+    for info in config:formatters() do
         local name = info.name
-        local opt = Option[info.overheadFormatOpt]
+        local optName = config:getOverheadFormatOption(name)
+        local opt = optName and Option[optName] or '$1'
         if OmiChat._formatters[name] then
             OmiChat._formatters[name]:setFormatString(opt)
         else
             OmiChat._formatters[name] = createFormatter(opt, info.formatID)
-        end
-    end
-
-    for i = 1, #customStreamData.otherFormatters do
-        local info = customStreamData.otherFormatters[i]
-        local name = info.name
-        if not OmiChat._formatters[name] then
-            OmiChat._formatters[name] = createFormatter('$1', info.formatID)
         end
     end
 end
@@ -215,21 +207,23 @@ end
 ---Updates streams based on sandbox options.
 local function updateStreams()
     local vanillaWhisper
-    local custom = {}
+    local exists = {}
+
     for i = 1, #ISChat.allChatStreams do
         local stream = ISChat.allChatStreams[i]
         if stream.omichat then
-            local data = customStreamData.table[stream.name]
+            local data = config:getCustomStreamInfo(stream.name)
             if stream.name == 'private' then
                 vanillaWhisper = stream
             elseif stream.name == 'whisper' then
                 if stream.omichat.context and stream.omichat.context.ocIsLocalWhisper then
-                    custom[data] = stream
+                    ---@cast data omichat.CustomStreamInfo
+                    exists[data.name] = stream
                 else
                     vanillaWhisper = stream
                 end
             elseif data then
-                custom[data] = stream
+                exists[data.name] = stream
             end
         elseif stream.name == 'whisper' then
             vanillaWhisper = stream
@@ -239,10 +233,10 @@ local function updateStreams()
         end
     end
 
-    for i = 1, #customStreamData.list do
-        local data = customStreamData.list[i]
-        if not custom[data] and data.name and not data.isCommand then
-            OmiChat.addStreamBefore(customChatStreams[data.name], vanillaWhisper)
+    for data in config:chatStreams() do
+        local stream = customChatStreams[data.name]
+        if not exists[data.name] and stream then
+            OmiChat.addStreamBefore(stream, vanillaWhisper)
         end
     end
 

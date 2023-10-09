@@ -1,54 +1,15 @@
 ---Configuration of custom streams and formatters.
 ---@class omichat.Configuration
+---@field private _streamTable table<omichat.CustomStreamName, omichat.CustomStreamInfo>
+---@field private _streamList omichat.CustomStreamInfo[]
+---@field private _chatStreams omichat.CustomStreamInfo[]
+---@field private _formatters omichat.FormatterInfo[]
 local Configuration = {}
+Configuration._streamTable = {}
+Configuration._streamList = {}
 
-
----@alias omichat.CustomStreamName
----| 'whisper'
----| 'me'
----| 'mequiet'
----| 'meloud'
----| 'do'
----| 'doquiet'
----| 'doloud'
----| 'looc'
----| 'card'
----| 'roll'
-
----@see omichat.api.client.getFormatter
----@alias omichat.FormatterName
----| omichat.CustomStreamName
----| 'callout'
----| 'sneakcallout'
-
----@class omichat.CustomStreamInfo
----@field name string The name of the custom stream.
----@field formatID integer The constant ID to use for message formatting.
----@field colorOpt string The name of the option used to determine message color.
----@field rangeOpt string The name of the option used to determine message range.
----@field chatFormatOpt string The name of the option used for the chat format.
----@field overheadFormatOpt string The name of the option used for the overhead format.
----@field convertToRadio true? Whether messages sent on this stream should show up in chat over the radio.
----@field chatTypes table<omichat.ChatTypeString, true?> Chat types for which this stream is enabled.
----@field isCommand true? Whether this stream is a command stream.
----@field streamAlias string? An alias to use for determining color and range.
----@field stripColors boolean? Whether to strip colors from messages sent via this stream.
----@field allowColorCustomization false? Whether to allow color customization for this stream.
----@field defaultRangeOpt string? The option used for the default message range. Defaults to `RangeSay`.
----@field titleID string? The string ID to use for chat tags associated with this stream.
----@field attractZombies true? Whether messages sent with this stream should attract zombies.
-
----@class omichat.AdditionalFormatterInfo
----@field name string The name of the additional formatter.
----@field formatID integer The constant ID to use for formatting.
-
-
----@type table<omichat.CustomStreamName, omichat.CustomStreamInfo>
-local customStreamTable = {}
-
----@type omichat.CustomStreamInfo[]
-local customStreamList = {
-    -- chat streams (1–25)
+-- chat streams (1–25)
+Configuration._chatStreams = {
     {
         name = 'whisper',
         formatID = 1,
@@ -59,6 +20,7 @@ local customStreamList = {
         titleID = 'UI_OmiChat_whisper_chat_title_id',
         chatTypes = { say = true },
         convertToRadio = true,
+        autoColorOption = false,
     },
     {
         name = 'me',
@@ -133,37 +95,36 @@ local customStreamList = {
         overheadFormatOpt = 'OverheadFormatLooc',
         chatTypes = { say = true },
     },
+}
 
-    -- command streams (26–50)
+-- command streams (26–50)
+Configuration._commandStreams = {
     {
         name = 'roll',
         formatID = 26,
-        isCommand = true,
         streamAlias = 'me',
         colorOpt = 'ColorMe',
         rangeOpt = 'RangeMe',
         chatFormatOpt = 'ChatFormatRoll',
         overheadFormatOpt = 'OverheadFormatRoll',
         chatTypes = { say = true },
-        allowColorCustomization = false,
+        autoColorOption = false,
     },
     {
         name = 'card',
         formatID = 27,
-        isCommand = true,
         streamAlias = 'me',
         colorOpt = 'ColorMe',
         rangeOpt = 'RangeMe',
         chatFormatOpt = 'ChatFormatCard',
         overheadFormatOpt = 'OverheadFormatCard',
         chatTypes = { say = true },
-        allowColorCustomization = false,
+        autoColorOption = false,
     },
 }
 
----@type omichat.AdditionalFormatterInfo[]
-local otherFormatters = {
-    -- other formatters (51–100)
+-- other formatters (51–100)
+Configuration._formatters = {
     {
         name = 'callout',
         formatID = 51
@@ -171,17 +132,93 @@ local otherFormatters = {
     {
         name = 'sneakcallout',
         formatID = 52,
-    }
+    },
 }
 
 
-for _, v in pairs(customStreamList) do
-    customStreamTable[v.name] = v
+---Returns an iterator over custom formatter information.
+---@return fun(): omichat.FormatterInfo?
+function Configuration:formatters()
+    local i = 0
+    return function()
+        i = i + 1
+        local info
+        if i <= #self._streamList then
+            info = self._streamList[i]
+        elseif i - #self._streamList <= #self._formatters then
+            info = self._formatters[i - #self._streamList]
+        end
+
+        if info then
+            return {
+                name = info.name,
+                formatID = info.formatID,
+            }
+        end
+    end
 end
 
-Configuration.list = customStreamList
-Configuration.table = customStreamTable
-Configuration.otherFormatters = otherFormatters
+---Returns an iterator over custom chat stream information.
+---@return fun(): omichat.CustomStreamInfo?
+function Configuration:chatStreams()
+    local i = 0
+    return function()
+        i = i + 1
+        return self._chatStreams[i]
+    end
+end
+
+---Returns an iterator over custom command stream information.
+---@return fun(): omichat.CustomStreamInfo?
+function Configuration:commandStreams()
+    local i = 0
+    return function()
+        i = i + 1
+        return self._commandStreams[i]
+    end
+end
+
+---Returns an iterator over custom stream information.
+---@return fun(): omichat.CustomStreamInfo?
+function Configuration:streams()
+    local i = 0
+    return function()
+        i = i + 1
+        return self._streamList[i]
+    end
+end
+
+---Returns the overhead format option name for a custom stream.
+---@param streamName string
+---@return string?
+function Configuration:getOverheadFormatOption(streamName)
+    local stream = self._streamTable[streamName]
+    return stream and stream.overheadFormatOpt
+end
+
+---Returns information about a custom stream.
+---@param streamName string?
+---@return omichat.CustomStreamInfo?
+function Configuration:getCustomStreamInfo(streamName)
+    return self._streamTable[streamName]
+end
+
+---@private
+function Configuration:init()
+    for i = 1, #self._chatStreams do
+        self._streamList[#self._streamList+1] = self._chatStreams[i]
+    end
+
+    for i = 1, #self._commandStreams do
+        self._streamList[#self._streamList+1] = self._commandStreams[i]
+    end
+
+    for stream in Configuration:streams() do
+        self._streamTable[stream.name] = stream
+    end
+
+    return self
+end
 
 
-return Configuration
+return Configuration:init()

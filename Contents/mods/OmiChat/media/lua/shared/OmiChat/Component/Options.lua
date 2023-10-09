@@ -1,6 +1,6 @@
 local lib = require 'OmiChat/lib'
 local utils = require 'OmiChat/util'
-local customStreams = require 'OmiChat/API/Configuration'
+local config = require 'OmiChat/config'
 
 local floor = math.floor
 
@@ -187,9 +187,7 @@ function Option:getDefaultColor(category, username)
         end
     end
 
-    ---@type omichat.CustomStreamInfo?
-    local custom = customStreams.table[category]
-
+    local custom = config:getCustomStreamInfo(category)
     return getColorOrDefault(self, custom and custom.colorOpt)
         or getColorOrDefault(self, colorOpts[category])
         or {r = 255, g = 255, b = 255}

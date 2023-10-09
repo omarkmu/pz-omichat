@@ -3,7 +3,6 @@
 require 'Chat/ISChat'
 
 local vanillaCommands = require 'OmiChat/Data/VanillaCommandList'
-local customStreamData = require 'OmiChat/API/Configuration'
 
 local concat = table.concat
 local pairs = pairs
@@ -23,6 +22,7 @@ local ISChat = ISChat ---@cast ISChat omichat.ISChat
 local OmiChat = require 'OmiChatShared'
 local Option = OmiChat.Option
 local utils = OmiChat.utils
+local config = OmiChat.config
 
 OmiChat.ColorModal = require 'OmiChat/Component/ColorModal'
 OmiChat.IconPicker = require 'OmiChat/Component/IconPicker'
@@ -734,18 +734,17 @@ OmiChat._transformers = {
         priority = 8,
         transform = function(self, info)
             local isRadio = info.context.ocIsRadio
-            for i = 1, #customStreamData.list do
-                local streamData = customStreamData.list[i]
-                local name = streamData.name
+            for data in config:streams() do
+                local name = data.name
 
                 local formatter = OmiChat.getFormatter(name)
-                local isValidStream = streamData.chatTypes[info.chatType] and OmiChat.isCustomStreamEnabled(name)
+                local isValidStream = data.chatTypes[info.chatType] and OmiChat.isCustomStreamEnabled(name)
 
                 local text = info.content or info.rawText
                 local isMatch = formatter:isMatch(text)
 
                 if isMatch and isRadio then
-                    if streamData.convertToRadio then
+                    if data.convertToRadio then
                         info.content = formatter:read(text)
                     else
                         info.message:setShowInChat(false)
@@ -758,24 +757,24 @@ OmiChat._transformers = {
                     break
                 elseif isValidStream and isMatch then
                     info.content = formatter:read(text)
-                    info.format = Option[streamData.chatFormatOpt]
-                    info.context.ocCustomStream = streamData.streamAlias or name
+                    info.format = Option[data.chatFormatOpt]
+                    info.context.ocCustomStream = data.streamAlias or name
                     info.substitutions.stream = name
 
                     info.formatOptions.color = OmiChat.getColorTable(info.context.ocCustomStream)
                     info.formatOptions.useDefaultChatColor = false
 
-                    if streamData.stripColors then
+                    if data.stripColors then
                         info.formatOptions.stripColors = true
                     end
 
-                    if streamData.titleID then
-                        info.titleID = streamData.titleID
+                    if data.titleID then
+                        info.titleID = data.titleID
                     end
 
-                    info.message:setShouldAttractZombies(not not streamData.attractZombies)
+                    info.message:setShouldAttractZombies(not not data.attractZombies)
 
-                    if Option[streamData.overheadFormatOpt] == '' then
+                    if Option[data.overheadFormatOpt] == '' then
                         info.message:setOverHeadSpeech(false)
                     end
 
@@ -790,7 +789,7 @@ OmiChat._transformers = {
         transform = function(self, info)
             local range
             local chatRange
-            local streamData = info.context.ocCustomStream and customStreamData.table[info.context.ocCustomStream]
+            local streamData = config:getCustomStreamInfo(info.context.ocCustomStream)
             if streamData then
                 range = Option[streamData.rangeOpt]
                 chatRange = Option:getDefault(streamData.defaultRangeOpt or 'RangeSay')

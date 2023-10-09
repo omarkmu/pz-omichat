@@ -1,9 +1,9 @@
 ---Base shared API.
 
+local config = require 'OmiChat/config'
 local utils = require 'OmiChat/util'
 local Option = require 'OmiChat/Component/Options'
 local MetaFormatter = require 'OmiChat/Component/MetaFormatter'
-local customStreamData = require 'OmiChat/API/Configuration'
 
 
 ---@class omichat.api.shared
@@ -13,6 +13,7 @@ local OmiChat = {}
 
 OmiChat.Option = Option
 OmiChat.MetaFormatter = MetaFormatter
+OmiChat.config = config
 OmiChat.utils = utils
 OmiChat._modDataKey = 'omichat'
 OmiChat._modDataVersion = 1
@@ -121,12 +122,12 @@ end
 ---@param name omichat.CustomStreamName
 ---@return boolean
 function OmiChat.isCustomStreamEnabled(name)
-    local opts = customStreamData.table[name]
-    if not opts then
+    local info = config:getCustomStreamInfo(name)
+    if not info then
         return false
     end
 
-    local value = Option[opts.chatFormatOpt]
+    local value = Option[info.chatFormatOpt]
     return value and value ~= ''
 end
 

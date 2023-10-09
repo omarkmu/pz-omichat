@@ -1,12 +1,12 @@
 ---Handles chat overrides.
 
 local OmiChat = require 'OmiChat/API/Client'
-local customStreamData = require 'OmiChat/API/Configuration'
 
 
 ---@class omichat.ISChat
 local ISChat = ISChat
 local utils = OmiChat.utils
+local config = OmiChat.config
 local Option = OmiChat.Option
 local SuggesterBox = OmiChat.SuggesterBox
 local getText = getText
@@ -318,10 +318,9 @@ function ISChat:onGearButtonClick()
         colorOpts[#colorOpts+1] = 'private'
     end
 
-    for i = 1, #customStreamData.list do
-        local streamInfo = customStreamData.list[i]
-        local name = streamInfo.name
-        if name ~= 'whisper' and streamInfo.allowColorCustomization ~= false and OmiChat.isCustomStreamEnabled(name) then
+    for info in config:chatStreams() do
+        local name = info.name
+        if info.autoColorOption ~= false and OmiChat.isCustomStreamEnabled(name) then
             colorOpts[#colorOpts+1] = name
         end
     end
