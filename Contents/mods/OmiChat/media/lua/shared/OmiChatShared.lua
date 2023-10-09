@@ -3,7 +3,6 @@
 return require 'OmiChat/API/Shared'
 
 
----Chat types.
 ---@alias omichat.ChatTypeString
 ---| 'general'
 ---| 'whisper'
@@ -15,12 +14,10 @@ return require 'OmiChat/API/Shared'
 ---| 'admin'
 ---| 'server'
 
----Categories for custom callouts.
 ---@alias omichat.CalloutCategory
 ---| 'callouts'
 ---| 'sneakcallouts'
 
----Categories for colors that can be customized by players.
 ---@alias omichat.ColorCategory
 ---| omichat.CustomStreamName
 ---| 'general'
@@ -36,7 +33,6 @@ return require 'OmiChat/API/Shared'
 ---| 'name'
 ---| 'speech'
 
----A field in the global mod data table.
 ---@alias omichat.ModDataField
 ---| 'nicknames'
 ---| 'nameColors'

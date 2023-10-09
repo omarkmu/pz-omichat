@@ -14,13 +14,8 @@ Events.OnReceiveGlobalModData.Add(OmiChat._onReceiveGlobalModData)
 return OmiChat
 
 
----Function to retrieve a playable emote string given an emote name.
 ---@alias omichat.EmoteGetter fun(emoteName: string): string?
-
----Valid values for the chat's font.
 ---@alias omichat.ChatFont 'small' | 'medium' | 'large'
-
----A message type that the mod can handle.
 ---@alias omichat.Message ChatMessage | omichat.MimicMessage
 
 
