@@ -13,6 +13,11 @@
 ---| 'card'
 ---| 'roll'
 
+---@alias omichat.FormatterName
+---| omichat.CustomStreamName
+---| 'callout'
+---| 'sneakcallout'
+
 ---@class omichat.CustomStreamInfo
 ---@field name string The name of the custom stream.
 ---@field formatID integer The constant ID to use for message formatting.
@@ -36,7 +41,7 @@ local customStreamTable = {}
 
 ---@type omichat.CustomStreamInfo[]
 local customStreamList = {
-    -- chat streams
+    -- chat streams (1–25)
     {
         name = 'whisper',
         formatID = 1,
@@ -129,10 +134,10 @@ local customStreamList = {
         showOnRadio = false,
     },
 
-    -- command streams
+    -- command streams (26–50)
     {
         name = 'roll',
-        formatID = 51,
+        formatID = 26,
         isCommand = true,
         streamAlias = 'me',
         colorOpt = 'ColorMe',
@@ -145,7 +150,7 @@ local customStreamList = {
     },
     {
         name = 'card',
-        formatID = 52,
+        formatID = 27,
         isCommand = true,
         streamAlias = 'me',
         colorOpt = 'ColorMe',

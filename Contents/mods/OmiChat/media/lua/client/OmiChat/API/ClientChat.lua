@@ -33,6 +33,12 @@ local _getTextWithPrefix = _ChatMessage.getTextWithPrefix
 local _getChatTitleID = _ChatBase.getTitleID
 local _getChatType = _ChatBase.getType
 
+---@type table<omichat.FormatterName, integer>
+local otherFormatters = {
+    callout = 51,
+    sneakcallout = 52,
+}
+
 
 ---Creates a built-in formatter and assigns a constant ID.
 ---@param fmt string
@@ -198,6 +204,12 @@ local function updateFormatters()
             OmiChat._formatters[fmtName]:setFormatString(opt)
         else
             OmiChat._formatters[fmtName] = createFormatter(opt, info.formatID)
+        end
+    end
+
+    for name, id in pairs(otherFormatters) do
+        if not OmiChat._formatters[name] then
+            OmiChat._formatters[name] = createFormatter('$1', id)
         end
     end
 end
@@ -806,7 +818,7 @@ function OmiChat.getEmoteFromCommand(text)
 end
 
 ---Gets a named formatter.
----@param name omichat.CustomStreamName
+---@param name omichat.FormatterName
 ---@return omichat.MetaFormatter
 function OmiChat.getFormatter(name)
     return OmiChat._formatters[name]

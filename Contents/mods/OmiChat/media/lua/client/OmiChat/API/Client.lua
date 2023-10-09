@@ -694,18 +694,41 @@ OmiChat._transformers = {
         end
     },
     {
+        name = 'decode-callout',
+        priority = 8,
+        transform = function(self, info)
+            if info.chatType ~= 'shout' then
+                return
+            end
+
+            local text = info.content or info.rawText
+            local calloutFormatter = OmiChat.getFormatter('callout')
+            local sneakCalloutFormatter = OmiChat.getFormatter('sneakcallout')
+
+            if calloutFormatter:isMatch(text) then
+                info.content = calloutFormatter:read(text)
+                info.context.ocIsCallout = true
+            elseif sneakCalloutFormatter:isMatch(text) then
+                info.content = sneakCalloutFormatter:read(text)
+                info.context.ocIsSneakCallout = true
+            end
+        end,
+    },
+    {
         name = 'decode-stream',
         priority = 8,
         transform = function(self, info)
             local isRadio = info.context.ocIsRadio
             for name, streamData in pairs(customStreamData.table) do
                 local formatter = OmiChat.getFormatter(name)
-                local isValidStream = OmiChat.isCustomStreamEnabled(name) and streamData.chatTypes[info.chatType]
-                local isMatch = formatter:isMatch(info.content or info.rawText)
+                local isValidStream = streamData.chatTypes[info.chatType] and OmiChat.isCustomStreamEnabled(name)
+
+                local text = info.content or info.rawText
+                local isMatch = formatter:isMatch(text)
 
                 if isMatch and isRadio then
                     if streamData.showOnRadio then
-                        info.content = formatter:read(info.content)
+                        info.content = formatter:read(text)
                     else
                         info.message:setOverHeadSpeech(false)
                         info.message:setShowInChat(false)
@@ -713,7 +736,7 @@ OmiChat._transformers = {
 
                     break
                 elseif isValidStream and isMatch then
-                    info.content = formatter:read(info.rawText)
+                    info.content = formatter:read(text)
                     info.format = Option[streamData.chatFormatOpt]
                     info.context.ocCustomStream = streamData.streamAlias or name
                     info.substitutions.stream = name
@@ -750,6 +773,9 @@ OmiChat._transformers = {
             if streamData then
                 range = Option[streamData.rangeOpt]
                 chatRange = Option:getDefault(streamData.defaultRangeOpt or 'RangeSay')
+            elseif info.context.ocIsSneakCallout then
+                range = Option.RangeSay
+                chatRange = Option:getDefault('RangeYell')
             elseif info.chatType == 'say' then
                 range = Option.RangeSay
                 chatRange = Option:getDefault('RangeSay')
