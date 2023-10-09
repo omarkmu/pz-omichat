@@ -679,7 +679,7 @@ See also
 
 ### ChatFormatRadio
 `default → $gettext(UI_OmiChat_radio $frequency): <SPACE> $message`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $frequency, $message`
+`tokens → $frequency, $message`
 
 The format used for radio messages in chat.
 
