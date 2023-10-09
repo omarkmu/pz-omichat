@@ -5,8 +5,8 @@
 ---@field private _chatStreams omichat.CustomStreamInfo[]
 ---@field private _formatters omichat.FormatterInfo[]
 local Configuration = {}
-Configuration._streamTable = {}
 Configuration._streamList = {}
+Configuration._streamTable = {}
 
 
 -- chat streams (1–25)
@@ -137,6 +137,26 @@ Configuration._formatters = {
 }
 
 
+---Returns an iterator over custom chat stream information.
+---@return fun(): omichat.CustomStreamInfo?
+function Configuration:chatStreams()
+    local i = 0
+    return function()
+        i = i + 1
+        return self._chatStreams[i]
+    end
+end
+
+---Returns an iterator over custom command stream information.
+---@return fun(): omichat.CustomStreamInfo?
+function Configuration:commandStreams()
+    local i = 0
+    return function()
+        i = i + 1
+        return self._commandStreams[i]
+    end
+end
+
 ---Returns an iterator over custom formatter information.
 ---@return fun(): omichat.FormatterInfo?
 function Configuration:formatters()
@@ -159,34 +179,11 @@ function Configuration:formatters()
     end
 end
 
----Returns an iterator over custom chat stream information.
----@return fun(): omichat.CustomStreamInfo?
-function Configuration:chatStreams()
-    local i = 0
-    return function()
-        i = i + 1
-        return self._chatStreams[i]
-    end
-end
-
----Returns an iterator over custom command stream information.
----@return fun(): omichat.CustomStreamInfo?
-function Configuration:commandStreams()
-    local i = 0
-    return function()
-        i = i + 1
-        return self._commandStreams[i]
-    end
-end
-
----Returns an iterator over custom stream information.
----@return fun(): omichat.CustomStreamInfo?
-function Configuration:streams()
-    local i = 0
-    return function()
-        i = i + 1
-        return self._streamList[i]
-    end
+---Returns information about a custom stream.
+---@param streamName string?
+---@return omichat.CustomStreamInfo?
+function Configuration:getCustomStreamInfo(streamName)
+    return self._streamTable[streamName]
 end
 
 ---Returns the overhead format option name for a custom stream.
@@ -195,13 +192,6 @@ end
 function Configuration:getOverheadFormatOption(streamName)
     local stream = self._streamTable[streamName]
     return stream and stream.overheadFormatOpt
-end
-
----Returns information about a custom stream.
----@param streamName string?
----@return omichat.CustomStreamInfo?
-function Configuration:getCustomStreamInfo(streamName)
-    return self._streamTable[streamName]
 end
 
 ---@private
@@ -219,6 +209,16 @@ function Configuration:init()
     end
 
     return self
+end
+
+---Returns an iterator over custom stream information.
+---@return fun(): omichat.CustomStreamInfo?
+function Configuration:streams()
+    local i = 0
+    return function()
+        i = i + 1
+        return self._streamList[i]
+    end
 end
 
 
