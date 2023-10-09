@@ -1,3 +1,9 @@
+# 0.3.0
+- Added `RangeCallout`, `RangeSneakCallout`, `RangeCalloutZombies`, and`RangeSneakCalloutZombies` options
+- Improved default PM formats
+- Fixed radio messages showing overhead that shouldn't have
+- Fixed problems with `/pm` formatting
+
 # 0.2.0
 - Added local versions of `/card` and `/roll` and the following options to control them:
 	- `ChatFormatCard`
