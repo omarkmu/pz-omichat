@@ -1,7 +1,10 @@
+# 0.3.1
+- Clarify that radio messages can't be hidden overhead
+- Limit radio message tokens to `$frequency` and `$message`
+
 # 0.3.0
-- Added `RangeCallout`, `RangeSneakCallout`, `RangeCalloutZombies`, and`RangeSneakCalloutZombies` options
+- Added `RangeCallout`, `RangeSneakCallout`, `RangeCalloutZombies`, and `RangeSneakCalloutZombies` options
 - Improved default PM formats
-- Fixed radio messages showing overhead that shouldn't have
 - Fixed problems with `/pm` formatting
 
 # 0.2.0
