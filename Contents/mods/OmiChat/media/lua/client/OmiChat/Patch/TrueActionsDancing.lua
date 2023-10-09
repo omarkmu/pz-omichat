@@ -3,6 +3,7 @@
 local OmiChat = require 'OmiChatClient'
 
 local getText = getText
+local pairs = pairs
 local concat = table.concat
 local trim = OmiChat.utils.trim
 
@@ -379,9 +380,9 @@ local function getAvailableDanceHelpText(player)
         parts[#parts+1] = getText('UI_OmiChat_available_dances')
     end
 
-    for _, dance in ipairs(dances) do
+    for i = 1, #dances do
         parts[#parts+1] = ' <LINE> * '
-        parts[#parts+1] = dance.name:gsub('_', ' ')
+        parts[#parts+1] = dances[i].name:gsub('_', ' ')
     end
 
     return concat(parts)

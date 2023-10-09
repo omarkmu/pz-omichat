@@ -7,7 +7,6 @@ local customStreamData = require 'OmiChat/Data/CustomStreams'
 
 local concat = table.concat
 local pairs = pairs
-local ipairs = ipairs
 local getText = getText
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
@@ -320,9 +319,9 @@ OmiChat._commandStreams = {
                     getText('UI_OmiChat_available_emotes'),
                 }
 
-                for _, emote in ipairs(emotes) do
+                for i = 1, #emotes do
                     parts[#parts+1] = ' <LINE> * .'
-                    parts[#parts+1] = emote
+                    parts[#parts+1] = emotes[i]
                 end
 
                 OmiChat.showInfoMessage(concat(parts))
@@ -369,7 +368,8 @@ OmiChat._commandStreams = {
                     ---@type omichat.CommandStream?
                     local helpStream
 
-                    for _, stream in pairs(OmiChat._commandStreams) do
+                    for i = 1, #OmiChat._commandStreams do
+                        local stream = OmiChat._commandStreams[i]
                         if stream.name == command then
                             local isEnabled = stream.omichat and stream.omichat.isEnabled
                             if stream.omichat and (not isEnabled or isEnabled(stream)) then
@@ -397,7 +397,8 @@ OmiChat._commandStreams = {
                 local seen = {}
                 local commands = {} ---@type omichat.VanillaCommand[]
 
-                for _, stream in pairs(OmiChat._commandStreams) do
+                for i = 1, #OmiChat._commandStreams do
+                    local stream = OmiChat._commandStreams[i]
                     if stream.omichat then
                         local isEnabled = stream.omichat.isEnabled
                         local helpText = stream.omichat.helpText
@@ -408,7 +409,8 @@ OmiChat._commandStreams = {
                     end
                 end
 
-                for _, info in ipairs(vanillaCommands) do
+                for i = 1, #vanillaCommands do
+                    local info = vanillaCommands[i]
                     if info.name and info.helpText and not seen[info.name] then
                         if hasAccess(info.access, accessLevel) then
                             commands[#commands+1] = info
@@ -419,7 +421,8 @@ OmiChat._commandStreams = {
                 table.sort(commands, function(a, b) return a.name < b.name end)
 
                 local result = { getText('UI_OmiChat_list_of_commands') }
-                for _, cmd in ipairs(commands) do
+                for i = 1, #commands do
+                    local cmd = commands[i]
                     result[#result+1] = ' <LINE> * '
                     result[#result+1] = cmd.name
                     result[#result+1] = ' : '
@@ -496,7 +499,8 @@ OmiChat._suggesters = {
             self:collectStreamResults(OmiChat._commandStreams, command, fullCommand, startsWith, contains)
 
             -- vanilla command streams
-            for _, commandInfo in ipairs(vanillaCommands) do
+            for i = 1, #vanillaCommands do
+                local commandInfo = vanillaCommands[i]
                 if hasAccess(commandInfo.access, accessLevel) then
                     local vanillaCommand = concat { '/', commandInfo.name, ' ' }
                     if utils.startsWith(vanillaCommand, fullCommand) then
@@ -730,7 +734,10 @@ OmiChat._transformers = {
         priority = 8,
         transform = function(self, info)
             local isRadio = info.context.ocIsRadio
-            for name, streamData in pairs(customStreamData.table) do
+            for i = 1, #customStreamData.list do
+                local streamData = customStreamData.list[i]
+                local name = streamData.name
+
                 local formatter = OmiChat.getFormatter(name)
                 local isValidStream = streamData.chatTypes[info.chatType] and OmiChat.isCustomStreamEnabled(name)
 

@@ -117,8 +117,8 @@ function ISChat.validateCustomCalloutText(target, text)
         return false
     end
 
-    for _, line in pairs(lines) do
-        if #line > Option.CustomShoutMaxLength then
+    for i = 1, #lines do
+        if #lines[i] > Option.CustomShoutMaxLength then
             target:setValidateTooltipText(getText('UI_OmiChat_error_shout_too_long', tostring(Option.CustomShoutMaxLength)))
             return false
         end

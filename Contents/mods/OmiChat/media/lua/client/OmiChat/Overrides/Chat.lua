@@ -353,7 +353,8 @@ function ISChat:onGearButtonClick()
 
     -- insert new options before the first submenu
     local firstSubMenu
-    for _, opt in ipairs(context.options) do
+    for i = 1, #context.options do
+        local opt = context.options[i]
         if opt.subOption and opt.subOption > 0 then
             firstSubMenu = opt
             break
@@ -382,7 +383,8 @@ function ISChat:onGearButtonClick()
 
     context:insertOptionBefore(subMenuName, suggesterOptionName, ISChat.instance, ISChat.onToggleUseSuggester)
 
-    for _, shoutType in ipairs(shoutOpts) do
+    for i = 1, #shoutOpts do
+        local shoutType = shoutOpts[i]
         local shoutOptionName = getText('UI_OmiChat_context_set_custom_' .. shoutType)
         context:insertOptionBefore(subMenuName, shoutOptionName, ISChat.instance, ISChat.onCustomCalloutMenu, shoutType)
     end
@@ -394,7 +396,8 @@ function ISChat:onGearButtonClick()
         local colorSubMenu = context:getNew(context)
         context:addSubMenu(colorOption, colorSubMenu)
 
-        for _, category in ipairs(colorOpts) do
+        for i = 1, #colorOpts do
+            local category = colorOpts[i]
             local name = getTextOrNull('UI_OmiChat_context_submenu_color_' .. category)
             if not name then
                 name = getText('UI_OmiChat_context_submenu_color', OmiChat.getColorCategoryCommand(category))

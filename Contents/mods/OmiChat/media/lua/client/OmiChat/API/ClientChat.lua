@@ -5,8 +5,6 @@ local customStreamData = require 'OmiChat/Data/CustomStreams'
 
 local format = string.format
 local concat = table.concat
-local pairs = pairs
-local ipairs = ipairs
 local getText = getText
 local min = math.min
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
@@ -32,12 +30,6 @@ local _ChatMessage = __classmetatables[ChatMessage.class].__index
 local _getTextWithPrefix = _ChatMessage.getTextWithPrefix
 local _getChatTitleID = _ChatBase.getTitleID
 local _getChatType = _ChatBase.getType
-
----@type table<omichat.FormatterName, integer>
-local otherFormatters = {
-    callout = 51,
-    sneakcallout = 52,
-}
 
 
 ---Creates a built-in formatter and assigns a constant ID.
@@ -66,7 +58,8 @@ local function insertStreamRelative(stream, other, value)
     end
 
     local pos = #ISChat.allChatStreams + 1
-    for i, chatStream in ipairs(ISChat.allChatStreams) do
+    for i = 1, #ISChat.allChatStreams do
+        local chatStream = ISChat.allChatStreams[i]
         if chatStream == other then
             pos = i + value
             break
@@ -80,12 +73,13 @@ local function insertStreamRelative(stream, other, value)
         return stream
     end
 
-    for _, tab in ipairs(tabs) do
+    for i = 1, #tabs do
+        local tab = tabs[i]
         if stream.tabID == tab.tabID + 1 then
             pos = #tab.chatStreams + 1
-            for i, chatStream in ipairs(tab.chatStreams) do
-                if chatStream == other then
-                    pos = i + value
+            for j = 1, #tab.chatStreams do
+                if tab.chatStreams[i] == other then
+                    pos = j + value
                     break
                 end
             end
@@ -198,18 +192,22 @@ end
 
 ---Creates or updates built-in formatters.
 local function updateFormatters()
-    for fmtName, info in pairs(customStreamData.table) do
+    for i = 1, #customStreamData.list do
+        local info = customStreamData.list[i]
+        local name = info.name
         local opt = Option[info.overheadFormatOpt]
-        if OmiChat._formatters[fmtName] then
-            OmiChat._formatters[fmtName]:setFormatString(opt)
+        if OmiChat._formatters[name] then
+            OmiChat._formatters[name]:setFormatString(opt)
         else
-            OmiChat._formatters[fmtName] = createFormatter(opt, info.formatID)
+            OmiChat._formatters[name] = createFormatter(opt, info.formatID)
         end
     end
 
-    for name, id in pairs(otherFormatters) do
+    for i = 1, #customStreamData.otherFormatters do
+        local info = customStreamData.otherFormatters[i]
+        local name = info.name
         if not OmiChat._formatters[name] then
-            OmiChat._formatters[name] = createFormatter('$1', id)
+            OmiChat._formatters[name] = createFormatter('$1', info.formatID)
         end
     end
 end
@@ -218,7 +216,8 @@ end
 local function updateStreams()
     local vanillaWhisper
     local custom = {}
-    for _, stream in ipairs(ISChat.allChatStreams) do
+    for i = 1, #ISChat.allChatStreams do
+        local stream = ISChat.allChatStreams[i]
         if stream.omichat then
             local data = customStreamData.table[stream.name]
             if stream.name == 'private' then
@@ -348,12 +347,13 @@ end
 function OmiChat.addStream(stream)
     ISChat.allChatStreams[#ISChat.allChatStreams+1] = stream
 
-    local tabs = ISChat.instance.tabs
+    local tabs = ISChat.instance and ISChat.instance.tabs
     if not tabs then
         return stream
     end
 
-    for _, tab in ipairs(tabs) do
+    for i = 1, #tabs do
+        local tab = tabs[i]
         if stream.tabID == tab.tabID + 1 then
             tab.chatStreams[#tab.chatStreams+1] = stream
         end
@@ -488,7 +488,8 @@ end
 ---Applies message transforms.
 ---@param info omichat.MessageInfo
 function OmiChat.applyTransforms(info)
-    for _, transformer in ipairs(OmiChat._transformers) do
+    for i = 1, #OmiChat._transformers do
+        local transformer = OmiChat._transformers[i]
         if transformer.transform and transformer:transform(info) == true then
             break
         end
@@ -674,7 +675,8 @@ function OmiChat.clearMessages()
         return
     end
 
-    for _, chatText in ipairs(tabs) do
+    for i = 1, #tabs do
+        local chatText = tabs[i]
         chatText.chatMessages = {}
         chatText.chatTextLines = {}
         chatText.text = ''
@@ -870,7 +872,8 @@ function OmiChat.getSuggestions(text)
         suggestions = {},
     }
 
-    for _, suggester in ipairs(OmiChat._suggesters) do
+    for i = 1, #OmiChat._suggesters do
+        local suggester = OmiChat._suggesters[i]
         if suggester.suggest then
             suggester:suggest(info)
         end
@@ -914,8 +917,9 @@ end
 ---@param name string
 function OmiChat.removeMessageTransformerByName(name)
     local target
-    for i, v in ipairs(OmiChat._transformers) do
-        if v.name and v.name == name then
+    for i = 1, #OmiChat._transformers do
+        local transformer = OmiChat._transformers[i]
+        if transformer.name and transformer.name == name then
             target = i
             break
         end
@@ -953,8 +957,9 @@ end
 ---@param name string
 function OmiChat.removeSuggesterByName(name)
     local target
-    for i, v in ipairs(OmiChat._suggesters) do
-        if v.name and v.name == name then
+    for i = 1, #OmiChat._suggesters do
+        local suggester = OmiChat._suggesters[i]
+        if suggester.name and suggester.name == name then
             target = i
             break
         end
@@ -972,21 +977,21 @@ function OmiChat.redrawMessages(doScroll)
         return
     end
 
-    for _, chatText in ipairs(ISChat.instance.tabs) do
+    for i = 1, #ISChat.instance.tabs do
+        local chatText = ISChat.instance.tabs[i]
         local newText = {}
         local newLines = {}
 
-        for i, msg in ipairs(chatText.chatMessages) do
+        for j = 1, #chatText.chatMessages do
+            local msg = chatText.chatMessages[j]
             local text = msg:getTextWithPrefix()
 
             newText[#newText+1] = text
             newLines[#newLines+1] = text .. ' <LINE> '
-
-            if i ~= #chatText.chatMessages then
-                newText[#newText+1] = ' <LINE> '
-            end
+            newText[#newText+1] = ' <LINE> '
         end
 
+        newText[#newText] = nil
         chatText.chatTextLines = newLines
         chatText.text = concat(newText)
 
@@ -1001,11 +1006,12 @@ end
 
 ---Sets the scroll position of all chat tabs to the bottom.
 function OmiChat.scrollToBottom()
-    if not ISChat.instance.tabs then
+    if not ISChat.instance or not ISChat.instance.tabs then
         return
     end
 
-    for _, tab in ipairs(ISChat.instance.tabs) do
+    for i = 1, #ISChat.instance.tabs do
+        local tab = ISChat.instance.tabs[i]
         tab:setYScroll(-tab:getScrollHeight())
     end
 end
@@ -1016,7 +1022,8 @@ function OmiChat.scrollToTop()
         return
     end
 
-    for _, tab in ipairs(ISChat.instance.tabs) do
+    for i = 1, #ISChat.instance.tabs do
+        local tab = ISChat.instance.tabs[i]
         tab:setYScroll(0)
     end
 end

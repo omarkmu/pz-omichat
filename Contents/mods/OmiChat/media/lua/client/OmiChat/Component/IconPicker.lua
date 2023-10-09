@@ -1,6 +1,5 @@
 local icons = require 'OmiChat/Data/IconLists'
 local pairs = pairs
-local ipairs = ipairs
 local getText = getText
 local getTextManager = getTextManager
 local ISPanel_render = ISPanel.render
@@ -87,7 +86,8 @@ function IconPicker:buildIconList()
 
 	local categoryOrder = {}
 	local iconsByCategory = {}
-	for _, cat in ipairs(self.categoryOrder) do
+	for i = 1, #self.categoryOrder do
+	    local cat = self.categoryOrder[i]
 		categoryOrder[#categoryOrder+1] = cat
 		iconsByCategory[cat] = {
 			category = cat,
@@ -96,7 +96,8 @@ function IconPicker:buildIconList()
 	end
 
 	if self.includeDefaults then
-		for _, cat in ipairs(icons[1]) do
+		for i = 1, #icons[1] do
+		    local cat = icons[1][i]
 			if not iconsByCategory[cat] then
 				categoryOrder[#categoryOrder+1] = cat
 				iconsByCategory[cat] = {
@@ -106,7 +107,8 @@ function IconPicker:buildIconList()
 			end
 
 			local info = iconsByCategory[cat]
-			for _, icon in ipairs(icons[cat]) do
+			for j = 1, #icons[cat] do
+			    local icon = icons[cat][j]
 				local textureName = iconToTextureNameMap[icon]
 				local texture = getTexture(textureName)
 
@@ -121,7 +123,8 @@ function IconPicker:buildIconList()
 		end
 	end
 
-	for _, icon in ipairs(self.icons) do
+	for i = 1, #self.icons do
+	    local icon = self.icons[i]
 		local cat = icon.category or 'miscellaneous'
 		local name = icon.name
 		local textureName = icon.textureName
@@ -147,7 +150,8 @@ function IconPicker:buildIconList()
 
 	local result = {}
 
-	for _, cat in ipairs(categoryOrder) do
+	for i = 1, #categoryOrder do
+	    local cat = categoryOrder[i]
 		result[#result+1] = iconsByCategory[cat]
 	end
 
@@ -245,7 +249,8 @@ function IconPicker:render()
 	end
 
 	local maxRow = 0
-	for row, value in ipairs(self._rowContents) do
+	for row = 1, #self._rowContents do
+	    local value = self._rowContents[row]
 		if type(value) == 'string' then
 			local catName = getText(value)
 			local textHeight = getTextManager():MeasureStringY(self.categoryFont, catName)
@@ -253,7 +258,8 @@ function IconPicker:render()
 			local catY = self.padSize + (row - 1) * self.buttonSize + centerDelta
 			self:drawTextCentre(catName, self.width / 2, catY, 1, 1, 1, 1, self.categoryFont)
 		else
-			for col, icon in ipairs(value) do
+			for col = 1, #value do
+			    local icon = value[col]
 				local texture = icon.texture
 				if not texture then
 					icon.texture = getTexture(icon.textureName)
@@ -280,13 +286,15 @@ function IconPicker:updateIcons()
 	local contents = {}
 
 	local row = 0
-	for _, info in ipairs(iconInfo) do
+	for i = 1, #iconInfo do
+	    local info = iconInfo[i]
 		if #info.list > 0 then
 			row = row + 1
 			contents[row] = 'UI_OmiChat_icon_cat_' .. info.category
 
 			local rowIcons = {}
-			for i, icon in ipairs(info.list) do
+			for i = 1, #info.list do
+			    local icon = info.list[i]
 				if i % self.columns == 1 then
 					row = row + 1
 					rowIcons = {}

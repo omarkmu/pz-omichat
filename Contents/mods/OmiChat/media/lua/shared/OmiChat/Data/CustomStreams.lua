@@ -35,6 +35,10 @@
 ---@field titleID string? The string ID to use for chat tags associated with this stream.
 ---@field attractZombies true? Whether messages sent with this stream should attract zombies.
 
+---@class omichat.AdditionalFormatterInfo
+---@field name string The name of the additional formatter.
+---@field formatID integer The constant ID to use for formatting.
+
 
 ---@type table<omichat.CustomStreamName, omichat.CustomStreamInfo>
 local customStreamTable = {}
@@ -154,6 +158,19 @@ local customStreamList = {
     },
 }
 
+---@type omichat.AdditionalFormatterInfo[]
+local otherFormatters = {
+    -- other formatters (51–100)
+    {
+        name = 'callout',
+        formatID = 51
+    },
+    {
+        name = 'sneakcallout',
+        formatID = 52,
+    }
+}
+
 
 for _, v in pairs(customStreamList) do
     customStreamTable[v.name] = v
@@ -163,4 +180,5 @@ end
 return {
     list = customStreamList,
     table = customStreamTable,
+    otherFormatters = otherFormatters,
 }
