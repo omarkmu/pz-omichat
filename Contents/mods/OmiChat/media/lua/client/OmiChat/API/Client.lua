@@ -711,6 +711,11 @@ OmiChat._transformers = {
             elseif sneakCalloutFormatter:isMatch(text) then
                 info.content = sneakCalloutFormatter:read(text)
                 info.context.ocIsSneakCallout = true
+
+                if OmiChat.isCustomStreamEnabled('whisper') then
+                    info.format = Option.ChatFormatWhisper
+                    info.formatOptions.color = OmiChat.getColorTable('whisper')
+                end
             end
         end,
     },
@@ -773,8 +778,11 @@ OmiChat._transformers = {
             if streamData then
                 range = Option[streamData.rangeOpt]
                 chatRange = Option:getDefault(streamData.defaultRangeOpt or 'RangeSay')
+            elseif info.context.ocIsCallout then
+                range = Option.RangeCallout
+                chatRange = Option:getDefault('RangeYell')
             elseif info.context.ocIsSneakCallout then
-                range = Option.RangeSay
+                range = Option.RangeSneakCallout
                 chatRange = Option:getDefault('RangeYell')
             elseif info.chatType == 'say' then
                 range = Option.RangeSay

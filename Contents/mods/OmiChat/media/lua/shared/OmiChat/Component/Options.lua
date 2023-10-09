@@ -21,6 +21,10 @@ local floor = math.floor
 ---@field CustomShoutMaxLength integer
 ---@field MinimumCommandAccessLevel integer
 ---@field MaximumCustomShouts integer
+---@field RangeCallout integer
+---@field RangeSneakCallout integer
+---@field RangeCalloutZombies integer
+---@field RangeSneakCalloutZombies integer
 ---@field RangeDo integer
 ---@field RangeDoLoud integer
 ---@field RangeDoQuiet integer

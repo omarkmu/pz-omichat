@@ -30,7 +30,7 @@ function _IsoPlayer:Callout(playEmote)
     end
 
     local isSneaking = self:isSneaking()
-    local range = isSneaking and 6 or 30
+    local range = isSneaking and Option.RangeSneakCalloutZombies or Option.RangeCalloutZombies
 
     local shouts
     if isSneaking and Option.EnableCustomSneakShouts then

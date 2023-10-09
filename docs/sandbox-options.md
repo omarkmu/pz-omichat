@@ -145,6 +145,16 @@ Note that the two maximums are separate; a value of `10` means a player can spec
 ## Ranges
 Numeric options that define distance ranges for chat messages.
 
+### RangeCallout
+`default → 60, minimum → 1, maximum → 60`
+
+The maximum distance for a 'Q' callout to be heard by players.
+
+### RangeCalloutZombies
+`default → 30, minimum → 1, maximum → 60`
+
+The maximum distance for a 'Q' callout to be heard by zombies.
+
 ### RangeDo
 `default → 30, minimum → 1, maximum → 30`
 
@@ -184,6 +194,16 @@ The maximum distance between players for [`/mequiet`](#chatformatmequiet) messag
 `default → 30, minimum → 1, maximum → 30`
 
 The maximum distance between players for `/say` messages to be visible.
+
+### RangeSneakCallout
+`default → 6, minimum → 1, maximum → 60`
+
+The maximum distance for a 'Q' sneak callout to be heard by players.
+
+### RangeSneakCalloutZombies
+`default → 6, minimum → 1, maximum → 60`
+
+The maximum distance for a 'Q' sneak callout to be heard by zombies.
 
 ### RangeWhisper
 `default → 3, minimum → 1, maximum → 30`
