@@ -277,11 +277,12 @@ function ISChat:onGearButtonClick()
         return
     end
 
-    -- for enabling/disabling name colors
-    local showNameColorOption = Option.EnableSetNameColor or Option.EnableSpeechColorAsDefaultNameColor
+    local serverOptions = getServerOptions()
 
     local colorOpts = {}
     local canUsePM = checkPlayerCanUseChat('/w')
+    local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
+
     if Option.EnableSetNameColor then
         colorOpts[#colorOpts+1] = 'name'
     end
@@ -291,38 +292,21 @@ function ISChat:onGearButtonClick()
 
     colorOpts[#colorOpts+1] = 'server'
 
-    if getServerOptions():getBoolean('DiscordEnable') then
+    if serverOptions:getBoolean('DiscordEnable') then
         colorOpts[#colorOpts+1] = 'discord'
     end
 
-    if checkPlayerCanUseChat('/r') then
-        colorOpts[#colorOpts+1] = 'radio'
-    end
-
-    if checkPlayerCanUseChat('/s') then
-        colorOpts[#colorOpts+1] = 'say'
+    -- need to check the option because checkPlayerCanUseChat checks for a radio
+    local allowedStreams = serverOptions:getOption('ChatStreams'):split(',')
+    for i = 1, #allowedStreams do
+        if allowedStreams[i] == 'r' then
+            colorOpts[#colorOpts+1] = 'radio'
+            break
+        end
     end
 
     if checkPlayerCanUseChat('/a') then
         colorOpts[#colorOpts+1] = 'admin'
-    end
-
-    if checkPlayerCanUseChat('/y') then
-        colorOpts[#colorOpts+1] = 'shout'
-    end
-
-    local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
-    if useLocalWhisper then
-        colorOpts[#colorOpts+1] = 'whisper'
-    elseif canUsePM then
-        colorOpts[#colorOpts+1] = 'private'
-    end
-
-    for info in config:chatStreams() do
-        local name = info.name
-        if info.autoColorOption ~= false and OmiChat.isCustomStreamEnabled(name) then
-            colorOpts[#colorOpts+1] = name
-        end
     end
 
     if checkPlayerCanUseChat('/all') then
@@ -337,9 +321,29 @@ function ISChat:onGearButtonClick()
         colorOpts[#colorOpts+1] = 'safehouse'
     end
 
-    -- add renamed /pm at the end
     if useLocalWhisper and canUsePM then
+        -- /pm
         colorOpts[#colorOpts+1] = 'private'
+    end
+
+    if checkPlayerCanUseChat('/s') then
+        colorOpts[#colorOpts+1] = 'say'
+    end
+
+    if checkPlayerCanUseChat('/y') then
+        colorOpts[#colorOpts+1] = 'shout'
+    end
+
+    if not useLocalWhisper and canUsePM then
+        -- /whisper
+        colorOpts[#colorOpts+1] = 'private'
+    end
+
+    for info in config:chatStreams() do
+        local name = info.name
+        if info.autoColorOption ~= false and OmiChat.isCustomStreamEnabled(name) then
+            colorOpts[#colorOpts+1] = name
+        end
     end
 
     local shoutOpts = {}
@@ -362,7 +366,7 @@ function ISChat:onGearButtonClick()
 
     local subMenuName = firstSubMenu and firstSubMenu.name or ''
 
-    if showNameColorOption then
+    if Option.EnableSetNameColor or Option.EnableSpeechColorAsDefaultNameColor then
         local nameColorOptionName
         if OmiChat.getNameColorsEnabled() then
             nameColorOptionName = getText('UI_OmiChat_context_disable_name_colors')

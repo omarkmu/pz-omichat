@@ -21,7 +21,6 @@ Configuration._chatStreams = {
         titleID = 'UI_OmiChat_whisper_chat_title_id',
         chatTypes = { say = true },
         convertToRadio = true,
-        autoColorOption = false,
     },
     {
         name = 'me',
