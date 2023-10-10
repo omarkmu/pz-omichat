@@ -37,6 +37,7 @@ return OmiChat
 ---Information used during message transformation and formatting.
 ---@class omichat.MessageInfo
 ---@field message omichat.Message The message object.
+---@field attractRange integer? The range at which the message will be heard by zombies.
 ---@field content string? The message content to display in chat. Set by transformers.
 ---@field format string? The string format to use for the message. Set by transformers.
 ---@field tag string? The result of the `FormatTag` option.

@@ -23,6 +23,7 @@ Sandbox_EN = {
     Sandbox_OCRangeCalloutZombies = "Zombie Callout Range",
     Sandbox_OCRangeSneakCallout = "Sneak Callout Range",
     Sandbox_OCRangeSneakCalloutZombies = "Zombie Sneak Callout Range",
+    Sandbox_OCRangeMultiplierZombies = "Zombie Attraction Range Multiplier",
     Sandbox_OCRangeDo = "/do Range",
     Sandbox_OCRangeDoLoud = "/doloud Range",
     Sandbox_OCRangeDoQuiet = "/doquiet Range",

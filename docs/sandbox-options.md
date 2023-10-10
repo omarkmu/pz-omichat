@@ -196,6 +196,12 @@ The maximum distance between players for [`/meloud`](#chatformatmeloud) messages
 
 The maximum distance between players for [`/mequiet`](#chatformatmequiet) messages to be visible.
 
+### RangeMultiplierZombies
+`default → 0.0, minimum → 0.0, maximum → 10.0`
+
+The multiplier that will be applied to chat ranges to determine the zombie attraction range.
+If this is set to zero, chat messages will not attract zombies (with the exception of callouts).
+
 ### RangeSay
 `default → 30, minimum → 1, maximum → 30`
 

@@ -64,21 +64,39 @@ function ISChat.addLineInChat(message, tabID)
         return
     end
 
+    local player, soundRange
     local mtIndex = (getmetatable(message) or {}).__index
     if mtIndex == _ChatMessage or mtIndex == _ServerChatMessage or utils.isinstance(message, OmiChat.MimicMessage) then
         message:setCustomTag(OmiChat.encodeMessageTag(message))
 
         -- necessary to process transforms so we know whether this message should be added to chat
         local info = OmiChat.buildMessageInfo(message, true)
-        if info and not message:isShowInChat() then
-            return
+        if info then
+            if not message:isShowInChat() then
+                return
+            end
+
+            if message:isShouldAttractZombies() then
+                player = getSpecificPlayer(0)
+                local username = player and player:getUsername()
+                local author = message:getAuthor()
+
+                if username == author then
+                    soundRange = info.attractRange
+                end
+            end
         end
+
     end
 
     local s, e = pcall(_addLineInChat, message, tabID)
     if not s then
         print(('[OmiChat] error while adding message %s: %s'):format(tostring(message), e))
         return
+    end
+
+    if player and soundRange and soundRange > 0 then
+        addSound(player, player:getX(), player:getY(), player:getZ(), soundRange, soundRange)
     end
 end
 

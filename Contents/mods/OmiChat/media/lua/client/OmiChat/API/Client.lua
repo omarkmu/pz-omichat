@@ -811,6 +811,8 @@ OmiChat._transformers = {
                 return
             end
 
+            info.attractRange = range * Option.RangeMultiplierZombies
+
             -- default ranges are existing chat ranges, so this avoids unnecessary work
             if range == chatRange then
                 return

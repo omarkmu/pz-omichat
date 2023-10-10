@@ -32,6 +32,7 @@ local floor = math.floor
 ---@field RangeMe integer
 ---@field RangeMeLoud integer
 ---@field RangeMeQuiet integer
+---@field RangeMultiplierZombies number
 ---@field RangeLooc integer
 ---@field RangeSay integer
 ---@field RangeWhisper integer
