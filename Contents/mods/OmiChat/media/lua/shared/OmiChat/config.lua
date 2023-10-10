@@ -53,6 +53,7 @@ Configuration._chatStreams = {
         overheadFormatOpt = 'OverheadFormatMeLoud',
         chatTypes = { shout = true },
         stripColors = true,
+        attractZombies = true,
     },
     {
         name = 'do',
@@ -85,6 +86,7 @@ Configuration._chatStreams = {
         defaultRangeOpt = 'RangeYell',
         chatTypes = { shout = true },
         stripColors = true,
+        attractZombies = true,
     },
     {
         name = 'looc',
