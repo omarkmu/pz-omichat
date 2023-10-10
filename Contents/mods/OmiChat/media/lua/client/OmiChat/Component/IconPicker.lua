@@ -309,7 +309,6 @@ function IconPicker:updateIcons()
 	self._rowContents = contents
 end
 
-
 ---Creates a new icon picker.
 ---@param x number
 ---@param y number

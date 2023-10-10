@@ -77,12 +77,6 @@ function MimicMessage:getDatetimeStr()
     return str:match('%d+:%d+') or ''
 end
 
----Returns the radio channel on which the message was sent.
----@return integer
-function MimicMessage:getRadioChannel()
-    return self._radioChannel
-end
-
 ---Returns the message prefix.
 ---@return string
 function MimicMessage:getPrefix()
@@ -136,6 +130,12 @@ function MimicMessage:getPrefix()
     end
 
     return concat(result)
+end
+
+---Returns the radio channel on which the message was sent.
+---@return integer
+function MimicMessage:getRadioChannel()
+    return self._radioChannel
 end
 
 ---Returns the username of the private message recipient.
@@ -261,12 +261,6 @@ function MimicMessage:makeFromDiscord()
     self._fromDiscord = true
 end
 
----Sets whether the message content should be treated as rich text.
----@param richText boolean
-function MimicMessage:setIsRichText(richText)
-    self._richText = richText
-end
-
 ---Sets the message author.
 ---@param author string
 function MimicMessage:setAuthor(author)
@@ -297,16 +291,16 @@ function MimicMessage:setChatType(chatType)
     self._chatType = chatType
 end
 
+---Sets whether the message content should be treated as rich text.
+---@param richText boolean
+function MimicMessage:setIsRichText(richText)
+    self._richText = richText
+end
+
 ---Sets whether the message is local.
 ---@param isLocal boolean
 function MimicMessage:setLocal(isLocal)
     self._local = isLocal
-end
-
----Sets the title ID of the message.
----@param titleID string
-function MimicMessage:setTitleID(titleID)
-    self._titleID = titleID
 end
 
 ---Sets whether the message should display overhead.
@@ -368,6 +362,12 @@ end
 ---@param textColor Color
 function MimicMessage:setTextColor(textColor)
     self._textColor = textColor
+end
+
+---Sets the title ID of the message.
+---@param titleID string
+function MimicMessage:setTitleID(titleID)
+    self._titleID = titleID
 end
 
 ---Creates a new mimic message.

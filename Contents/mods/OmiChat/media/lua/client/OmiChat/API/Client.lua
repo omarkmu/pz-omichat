@@ -219,7 +219,7 @@ OmiChat._commandStreams = {
             helpText = 'UI_OmiChat_helptext_clearnames',
             isEnabled = canUseAdminCommands,
             onUse = function(self, command)
-                OmiChat.requestClearNames(getSpecificPlayer(0))
+                OmiChat.requestClearNames()
             end,
         }
     },
@@ -231,7 +231,7 @@ OmiChat._commandStreams = {
             helpText = 'UI_OmiChat_helptext_setname',
             isEnabled = canUseAdminCommands,
             onUse = function(self, command)
-                OmiChat.requestSetName(getSpecificPlayer(0), command)
+                OmiChat.requestSetName(command)
             end,
         }
     },
@@ -243,7 +243,7 @@ OmiChat._commandStreams = {
             helpText = 'UI_OmiChat_helptext_resetname',
             isEnabled = canUseAdminCommands,
             onUse = function(self, command)
-                OmiChat.requestResetName(getSpecificPlayer(0), command)
+                OmiChat.requestResetName(command)
             end,
         }
     },
@@ -259,7 +259,7 @@ OmiChat._commandStreams = {
                 return inv:contains('CardDeck') or player:getAccessLevel() ~= 'None'
             end,
             onUse = function(self)
-                if not OmiChat.requestDrawCard(getSpecificPlayer(0)) then
+                if not OmiChat.requestDrawCard() then
                     OmiChat.showInfoMessage(getText(self.omichat.helpText))
                 end
             end,
@@ -287,7 +287,7 @@ OmiChat._commandStreams = {
                     return
                 end
 
-                if not OmiChat.requestRollDice(getSpecificPlayer(0), sides) then
+                if not OmiChat.requestRollDice(sides) then
                     OmiChat.showInfoMessage(getText(self.omichat.helpText))
                 end
             end,
@@ -720,7 +720,7 @@ OmiChat._transformers = {
 
                 if OmiChat.isCustomStreamEnabled('whisper') then
                     info.format = Option.ChatFormatWhisper
-                    info.formatOptions.color = OmiChat.getColorTable('whisper')
+                    info.formatOptions.color = OmiChat.getColorOrDefault('whisper')
                     info.titleID = 'UI_OmiChat_whisper_chat_title_id'
                 end
             else
@@ -763,7 +763,7 @@ OmiChat._transformers = {
                     info.context.ocCustomStream = data.streamAlias or name
                     info.substitutions.stream = name
 
-                    info.formatOptions.color = OmiChat.getColorTable(info.context.ocCustomStream)
+                    info.formatOptions.color = OmiChat.getColorOrDefault(info.context.ocCustomStream)
                     info.formatOptions.useDefaultChatColor = false
 
                     if data.stripColors then
@@ -857,7 +857,7 @@ OmiChat._transformers = {
                 info.context.ocIsIncomingPM = true
             end
 
-            info.formatOptions.color = OmiChat.getColorTable('private')
+            info.formatOptions.color = OmiChat.getColorOrDefault('private')
             info.formatOptions.useDefaultChatColor = false
         end,
     },

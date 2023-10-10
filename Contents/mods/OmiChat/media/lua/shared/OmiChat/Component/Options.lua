@@ -190,6 +190,7 @@ end
 
 ---Returns whether the provided callout category type is enabled.
 ---@param category omichat.CalloutCategory
+---@return boolean
 function Option:isCustomCalloutTypeEnabled(category)
     return self[calloutOpts[category]]
 end

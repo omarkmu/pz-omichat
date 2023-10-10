@@ -26,7 +26,8 @@ end
 ---@param playEmote boolean
 function _IsoPlayer:Callout(playEmote)
     if getCore():getGameMode() == 'Tutorial' then
-        return _Callout(self, playEmote)
+        _Callout(self, playEmote)
+        return
     end
 
     local isSneaking = self:isSneaking()

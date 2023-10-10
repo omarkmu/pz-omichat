@@ -7,6 +7,7 @@ require 'OmiChat/API/ClientChat'
 require 'OmiChat/API/ClientData'
 require 'OmiChat/API/ClientDispatch'
 require 'OmiChat/API/ClientCommands'
+require 'OmiChat/API/ClientExtension'
 
 Events.OnGameStart.Add(OmiChat._onGameStart)
 Events.OnServerCommand.Add(OmiChat._onServerCommand)

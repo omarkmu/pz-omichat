@@ -1,9 +1,8 @@
 ---Chat stream definitions.
 
-
 ---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Client'
-local utils = require 'OmiChat/util'
+local utils = OmiChat.utils
 
 local concat = table.concat
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
@@ -11,7 +10,7 @@ local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
 ---Checks whether the stream associated with a basic chat is enabled.
 ---@param stream omichat.ChatStream
----@boolean
+---@return boolean
 local function isBasicChatEnabled(stream)
     local ctx = stream.omichat and stream.omichat.context
     local cmd = ctx and ctx.ocIsEnabledCommand or stream.command
@@ -58,70 +57,6 @@ local function useCustomChat(self, command)
     useBasicChat(self, OmiChat.getFormatter(self.name):format(command))
 end
 
-
-OmiChat._vanillaStreamConfigs = {
-    say = {
-        allowIconPicker = true,
-        isEnabled = isBasicChatEnabled,
-        onUse = useBasicChat,
-        context = { ocIsEnabledCommand = '/s', }
-    },
-    yell = {
-        isEnabled = isBasicChatEnabled,
-        onUse = useBasicChat,
-        context = {
-            ocIsEnabledCommand = '/y',
-            ocProcess = processShoutMessage,
-        },
-    },
-    private = {
-        allowEmotes = false,
-        isEnabled = isBasicChatEnabled,
-        onUse = useBasicChat,
-        context = {
-            ocSuggestUsernames = true,
-            ocAppendResultToLastCommand = true,
-            ocIsEnabledCommand = '/w',
-            ocProcess = proceedPM,
-        },
-    },
-    faction = {
-        allowEmotes = false,
-        isEnabled = isBasicChatEnabled,
-        onUse = useBasicChat,
-        context = {
-            ocIsEnabledCommand = '/f',
-            ocProcess = proceedFactionMessage,
-        },
-    },
-    safehouse = {
-        allowEmotes = false,
-        isEnabled = isBasicChatEnabled,
-        onUse = useBasicChat,
-        context = {
-            ocIsEnabledCommand = '/sh',
-            ocProcess = processSafehouseMessage,
-        },
-    },
-    general = {
-        allowEmotes = false,
-        isEnabled = isBasicChatEnabled,
-        onUse = useBasicChat,
-        context = {
-            ocIsEnabledCommand = '/all',
-            ocProcess = processGeneralMessage,
-        },
-    },
-    admin = {
-        allowEmotes = false,
-        isEnabled = isBasicChatEnabled,
-        onUse = useBasicChat,
-        context = {
-            ocIsEnabledCommand = '/a',
-            ocProcess = processAdminChatMessage,
-        },
-    }
-}
 
 OmiChat._customChatStreams = {
     looc = {
@@ -223,4 +158,68 @@ OmiChat._customChatStreams = {
             onUse = useCustomChat,
         }
     },
+}
+
+OmiChat._vanillaStreamConfigs = {
+    say = {
+        allowIconPicker = true,
+        isEnabled = isBasicChatEnabled,
+        onUse = useBasicChat,
+        context = { ocIsEnabledCommand = '/s', }
+    },
+    yell = {
+        isEnabled = isBasicChatEnabled,
+        onUse = useBasicChat,
+        context = {
+            ocIsEnabledCommand = '/y',
+            ocProcess = processShoutMessage,
+        },
+    },
+    private = {
+        allowEmotes = false,
+        isEnabled = isBasicChatEnabled,
+        onUse = useBasicChat,
+        context = {
+            ocSuggestUsernames = true,
+            ocAppendResultToLastCommand = true,
+            ocIsEnabledCommand = '/w',
+            ocProcess = proceedPM,
+        },
+    },
+    faction = {
+        allowEmotes = false,
+        isEnabled = isBasicChatEnabled,
+        onUse = useBasicChat,
+        context = {
+            ocIsEnabledCommand = '/f',
+            ocProcess = proceedFactionMessage,
+        },
+    },
+    safehouse = {
+        allowEmotes = false,
+        isEnabled = isBasicChatEnabled,
+        onUse = useBasicChat,
+        context = {
+            ocIsEnabledCommand = '/sh',
+            ocProcess = processSafehouseMessage,
+        },
+    },
+    general = {
+        allowEmotes = false,
+        isEnabled = isBasicChatEnabled,
+        onUse = useBasicChat,
+        context = {
+            ocIsEnabledCommand = '/all',
+            ocProcess = processGeneralMessage,
+        },
+    },
+    admin = {
+        allowEmotes = false,
+        isEnabled = isBasicChatEnabled,
+        onUse = useBasicChat,
+        context = {
+            ocIsEnabledCommand = '/a',
+            ocProcess = processAdminChatMessage,
+        },
+    }
 }

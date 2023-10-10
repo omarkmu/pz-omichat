@@ -45,6 +45,43 @@ function ColorModal:getColorTable()
     return result.value
 end
 
+---Sets up the color modal.
+function ColorModal:initialise()
+    ISTextBox.initialise(self)
+
+    self:setValidateFunction(self, self.validate)
+    self.colorBtn.onclick = self.onColorPicker
+    self.colorPicker.onMouseDownOutside = ColorModal.onColorPickerMouseDownOutside
+    self:enableColorPicker()
+
+    self.entry.onTextChange = utils.bind(self.onTextChange, self)
+
+    self:selectColor({
+        r = self.defaultColor.r / 255,
+        g = self.defaultColor.g / 255,
+        b = self.defaultColor.b / 255
+    })
+
+    if self.minimumValue ~= 0 or self.maximumValue ~= 255 then
+        self:updateColorPickerColors()
+    end
+end
+
+---Handler for when the color picker button is clicked.
+---@param button ISButton
+function ColorModal:onColorPicker(button)
+    self.colorPicker:setInitialColor(self.currentColor)
+    ISTextBox.onColorPicker(self, button)
+    self.colorPicker.pickedFunc = self.selectColor
+end
+
+---Callback for when a mouse click occurs outside of the color picker.
+---Hides the provided color picker.
+---@param colorPicker ISColorPicker
+function ColorModal.onColorPickerMouseDownOutside(colorPicker)
+    colorPicker:setVisible(false)
+end
+
 ---Modifies the color picker to match the input text.
 ---@param entry ISTextEntryBox
 function ColorModal:onTextChange(entry)
@@ -69,28 +106,6 @@ function ColorModal:onTextChange(entry)
     self.colorBtn.backgroundColor = { r = r, g = g, b = b, a = 1 }
 end
 
----Sets up the color modal.
-function ColorModal:initialise()
-    ISTextBox.initialise(self)
-
-    self:setValidateFunction(self, self.validate)
-    self.colorBtn.onclick = self.onColorPicker
-    self.colorPicker.onMouseDownOutside = ColorModal.onColorPickerMouseDownOutside
-    self:enableColorPicker()
-
-    self.entry.onTextChange = utils.bind(self.onTextChange, self)
-
-    self:selectColor({
-        r = self.defaultColor.r / 255,
-        g = self.defaultColor.g / 255,
-        b = self.defaultColor.b / 255
-    })
-
-    if self.minimumValue ~= 0 or self.maximumValue ~= 255 then
-        self:updateColorPickerColors()
-    end
-end
-
 ---Sets the color that is used when the input is empty.
 ---@param emptyColor omichat.ColorTable
 function ColorModal:setEmptyColor(emptyColor)
@@ -107,21 +122,6 @@ end
 ---@param val integer A number in the range [0, 255].
 function ColorModal:setMinValue(val)
     self.minimumValue = val
-end
-
----Handler for when the color picker button is clicked.
----@param button ISButton
-function ColorModal:onColorPicker(button)
-    self.colorPicker:setInitialColor(self.currentColor)
-    ISTextBox.onColorPicker(self, button)
-    self.colorPicker.pickedFunc = self.selectColor
-end
-
----Callback for when a mouse click occurs outside of the color picker.
----Hides the provided color picker.
----@param colorPicker ISColorPicker
-function ColorModal.onColorPickerMouseDownOutside(colorPicker)
-    colorPicker:setVisible(false)
 end
 
 ---Handler for when a color option in the color picker is clicked.
@@ -197,7 +197,6 @@ function ColorModal:validate(text)
 
     return result.success
 end
-
 
 ---Creates a new color modal.
 ---@param x number

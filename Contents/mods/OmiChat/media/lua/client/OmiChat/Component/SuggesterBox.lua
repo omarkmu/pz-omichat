@@ -15,24 +15,6 @@ function SuggesterBox:getSelectedItem()
     return selected.item
 end
 
----Populates the list with suggestions.
----@param suggestions omichat.Suggestion[]
-function SuggesterBox:setSuggestions(suggestions)
-    self:clear()
-    self:setYScroll(0)
-    if #suggestions == 0 then
-        self:setVisible(false)
-        return
-    end
-
-    for i = 1, #suggestions do
-        local suggestion = suggestions[i]
-        self:addItem(suggestion.display, suggestion)
-    end
-
-    self:setHeight(self.itemheight * math.min(#suggestions, self.maximumVisibleItems))
-end
-
 ---Selects the next item in the list.
 function SuggesterBox:selectNext()
     local selected = self.selected + 1
@@ -53,6 +35,24 @@ function SuggesterBox:selectPrevious()
 
     self.selected = selected
     self:ensureVisible(selected)
+end
+
+---Populates the list with suggestions.
+---@param suggestions omichat.Suggestion[]
+function SuggesterBox:setSuggestions(suggestions)
+    self:clear()
+    self:setYScroll(0)
+    if #suggestions == 0 then
+        self:setVisible(false)
+        return
+    end
+
+    for i = 1, #suggestions do
+        local suggestion = suggestions[i]
+        self:addItem(suggestion.display, suggestion)
+    end
+
+    self:setHeight(self.itemheight * math.min(#suggestions, self.maximumVisibleItems))
 end
 
 ---Creates a suggester box.

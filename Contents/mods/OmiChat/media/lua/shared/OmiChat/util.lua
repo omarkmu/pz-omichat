@@ -129,6 +129,7 @@ end
 ---Escapes a string for use in a rich text panel.
 ---@see ISRichTextPanel
 ---@param text string
+---@return string
 function utils.escapeRichText(text)
     return (text:gsub('<', '&lt;'):gsub('>', '&gt;'))
 end
@@ -347,6 +348,7 @@ end
 ---@see ISRichTextPanel
 ---@see omichat.utils.escapeRichText
 ---@param text string
+---@return string
 function utils.unescapeRichText(text)
     return (text:gsub('&lt;', '<'):gsub('&gt;', '>'))
 end

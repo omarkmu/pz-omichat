@@ -2,11 +2,11 @@
 
 local MimicMessage = require 'OmiChat/Component/MimicMessage'
 
-local format = string.format
-local concat = table.concat
 local getText = getText
 local min = math.min
 local max = math.max
+local format = string.format
+local concat = table.concat
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
 
@@ -32,6 +32,7 @@ local _getChatType = _ChatBase.getType
 ---Creates a built-in formatter and assigns a constant ID.
 ---@param fmt string
 ---@param id integer
+---@return omichat.MetaFormatter
 local function createFormatter(fmt, id)
     -- not using `new` directly to avoid automatic ID assignment
     ---@type omichat.MetaFormatter
@@ -41,63 +42,6 @@ local function createFormatter(fmt, id)
     formatter:setID(id)
 
     return formatter
-end
-
----Inserts a chat stream relative to another.
----If the other chat stream isn't found, inserts at the end.
----@param stream omichat.ChatStream
----@param other omichat.ChatStream?
----@param value integer The relative index.
----@return omichat.ChatStream
-local function insertStreamRelative(stream, other, value)
-    if not other then
-        return OmiChat.addStream(stream)
-    end
-
-    local pos = #ISChat.allChatStreams + 1
-    for i = 1, #ISChat.allChatStreams do
-        local chatStream = ISChat.allChatStreams[i]
-        if chatStream == other then
-            pos = i + value
-            break
-        end
-    end
-
-    table.insert(ISChat.allChatStreams, pos, stream)
-
-    local tabs = ISChat.instance and ISChat.instance.tabs
-    if not tabs then
-        return stream
-    end
-
-    for i = 1, #tabs do
-        local tab = tabs[i]
-        if stream.tabID == tab.tabID + 1 then
-            pos = #tab.chatStreams + 1
-            for j = 1, #tab.chatStreams do
-                if tab.chatStreams[i] == other then
-                    pos = j + value
-                    break
-                end
-            end
-
-            table.insert(tab.chatStreams, pos, stream)
-        end
-    end
-
-    return stream
-end
-
----Sorts table items by priority.
----Not stable sorting.
----@param tab table
-local function prioritySort(tab)
-    table.sort(tab, function(a, b)
-        local aPri = a.priority or 1
-        local bPri = b.priority or 1
-
-        return aPri > bPri
-    end)
 end
 
 ---Creates or removes the icon button and picker from the chat box based on sandbox options.
@@ -256,34 +200,6 @@ local function updateStreams()
     end
 end
 
----Removes an element from a table, shifting subsequent elements.
----@param tab table
----@param target unknown
----@return boolean
-local function remove(tab, target)
-    if target == nil then
-        return false
-    end
-
-    local i = 1
-    local found = false
-    while i <= #tab and not found do
-        found = tab[i] == target
-        i = i + 1
-    end
-
-    if found then
-        while i <= #tab do
-            tab[i - 1] = tab[i]
-            i = i + 1
-        end
-
-        tab[#tab] = nil
-    end
-
-    return found
-end
-
 ---Returns whether name colors should be used given message info.
 ---@param info omichat.MessageInfo
 ---@return boolean
@@ -303,79 +219,6 @@ local function shouldUseNameColor(info)
     return utils.interpolate(pred, tokens) ~= ''
 end
 
-
----Adds information about a command that can be triggered from chat.
----@param stream omichat.CommandStream
-function OmiChat.addCommand(stream)
-    if not stream.omichat then
-        stream.omichat = {}
-    end
-
-    stream.omichat.isCommand = true
-    OmiChat._commandStreams[#OmiChat._commandStreams+1] = stream
-end
-
----Adds an emote that is playable from chat with the .emote syntax.
----@param name string The name of the emote, as it can be used from chat.
----@param emoteOrGetter string | omichat.EmoteGetter The string to associate with the emote, or a function which retrieves one.
-function OmiChat.addEmote(name, emoteOrGetter)
-    if type(emoteOrGetter) == 'function' then
-        OmiChat._emotes[name] = emoteOrGetter
-    elseif emoteOrGetter then
-        OmiChat._emotes[name] = tostring(emoteOrGetter)
-    end
-end
-
----Adds a message transformer which can act on message information to modify display or behavior.
----@param transformer omichat.MessageTransformer
-function OmiChat.addMessageTransformer(transformer)
-    OmiChat._transformers[#OmiChat._transformers+1] = transformer
-    prioritySort(OmiChat._transformers)
-end
-
----Adds a chat stream.
----@param stream omichat.ChatStream
----@return omichat.ChatStream
-function OmiChat.addStream(stream)
-    ISChat.allChatStreams[#ISChat.allChatStreams+1] = stream
-
-    local tabs = ISChat.instance and ISChat.instance.tabs
-    if not tabs then
-        return stream
-    end
-
-    for i = 1, #tabs do
-        local tab = tabs[i]
-        if stream.tabID == tab.tabID + 1 then
-            tab.chatStreams[#tab.chatStreams+1] = stream
-        end
-    end
-
-    return stream
-end
-
----Adds a suggester which can suggest inputs to the player.
----@param suggester omichat.Suggester
-function OmiChat.addSuggester(suggester)
-    OmiChat._suggesters[#OmiChat._suggesters+1] = suggester
-    prioritySort(OmiChat._suggesters)
-end
-
----Adds a chat stream after an existing stream.
----If no stream is provided or it isn't found, the stream is added at the end.
----@param stream omichat.ChatStream The stream to add.
----@param otherStream omichat.ChatStream?
-function OmiChat.addStreamAfter(stream, otherStream)
-    return insertStreamRelative(stream, otherStream, 1)
-end
-
----Adds a chat stream before an existing stream.
----If no stream is provided or it isn't found, the stream is added at the end.
----@param stream omichat.ChatStream The stream to add.
----@param otherStream omichat.ChatStream?
-function OmiChat.addStreamBefore(stream, otherStream)
-    return insertStreamRelative(stream, otherStream, 0)
-end
 
 ---Applies format options from a message information table.
 ---This mutates `info`.
@@ -459,9 +302,9 @@ function OmiChat.applyFormatOptions(info)
         local color
         if options.useDefaultChatColor then
             if message:isFromDiscord() then
-                color = OmiChat.getColorTable('discord')
+                color = OmiChat.getColorOrDefault('discord')
             else
-                color = OmiChat.getColorTable(info.chatType)
+                color = OmiChat.getColorOrDefault(info.chatType)
             end
         end
 
@@ -762,14 +605,6 @@ function OmiChat.getColorCategoryCommand(cat)
     return '/' .. cat
 end
 
----Returns a color table associated with the current player,
----or the default color table if there isn't one.
----@param category omichat.ColorCategory
----@return omichat.ColorTable
-function OmiChat.getColorTable(category)
-    return OmiChat.getColor(category) or Option:getDefaultColor(category)
-end
-
 ---Returns a playable emote given an emote name.
 ---Returns nil if there is not an emote associated with the emote name.
 ---@param emote string
@@ -819,7 +654,7 @@ end
 
 ---Gets the text that should display when clicking the info button.
 ---@return string
-function OmiChat.getInfoText()
+function OmiChat.getInfoRichText()
     local player = getSpecificPlayer(0)
     if not player then
         return ''
@@ -837,6 +672,7 @@ end
 
 ---Returns the chat type of a chat message.
 ---@param message omichat.Message
+---@return string
 function OmiChat.getMessageChatType(message)
     if utils.isinstance(message, MimicMessage) then
         ---@cast message omichat.MimicMessage
@@ -844,8 +680,7 @@ function OmiChat.getMessageChatType(message)
     end
 
     ---@cast message ChatMessage
-    local chat = message:getChat()
-    return tostring(_getChatType(chat))
+    return tostring(_getChatType(message:getChat()))
 end
 
 ---Suggests text based on the provided input text.
@@ -879,85 +714,6 @@ function OmiChat.hideSuggesterBox()
     local suggesterBox = instance and instance.suggesterBox
     if suggesterBox then
         suggesterBox:setVisible(false)
-    end
-end
-
----Removes a stream from the list of available chat commands.
----@param stream omichat.CommandStream
-function OmiChat.removeCommand(stream)
-    if not stream then
-        return
-    end
-
-    remove(OmiChat._commandStreams, stream)
-end
-
----Removes an emote from the registry.
----@param name string
-function OmiChat.removeEmote(name)
-    OmiChat._emotes[name] = nil
-end
-
----Removes a message transformer.
----@param transformer omichat.MessageTransformer
-function OmiChat.removeMessageTransformer(transformer)
-    remove(OmiChat._transformers, transformer)
-end
-
----Removes the first message transformer with the provided name.
----@param name string
-function OmiChat.removeMessageTransformerByName(name)
-    local target
-    for i = 1, #OmiChat._transformers do
-        local transformer = OmiChat._transformers[i]
-        if transformer.name and transformer.name == name then
-            target = i
-            break
-        end
-    end
-
-    if target then
-        table.remove(OmiChat._transformers, target)
-    end
-end
-
----Removes a stream from the list of available chat streams.
----@param stream omichat.ChatStream
-function OmiChat.removeStream(stream)
-    if not stream then
-        return
-    end
-
-    -- remove from all streams table
-    remove(ISChat.allChatStreams, stream)
-
-    -- remove from tab streams
-    local tabs = ISChat.instance and ISChat.instance.tabs
-    if tabs then
-        remove(tabs, stream)
-    end
-end
-
----Removes a suggester.
----@param suggester omichat.Suggester
-function OmiChat.removeSuggester(suggester)
-    remove(OmiChat._suggesters, suggester)
-end
-
----Removes the first suggester with the provided name.
----@param name string
-function OmiChat.removeSuggesterByName(name)
-    local target
-    for i = 1, #OmiChat._suggesters do
-        local suggester = OmiChat._suggesters[i]
-        if suggester.name and suggester.name == name then
-            target = i
-            break
-        end
-    end
-
-    if target then
-        table.remove(OmiChat._suggesters, target)
     end
 end
 
@@ -1111,7 +867,7 @@ function OmiChat.updateState(redraw)
     updateFormatters()
     addOrRemoveIconComponents()
 
-    ISChat.instance:setInfo(OmiChat.getInfoText())
+    ISChat.instance:setInfo(OmiChat.getInfoRichText())
 
     if redraw then
         -- some sandbox vars affect how messages are drawn
@@ -1141,18 +897,14 @@ function OmiChat.updateSuggesterComponent(text)
     end
 
     suggesterBox:setSuggestions(suggestions)
-    if #suggestions > 0 then
-        suggesterBox:setWidth(instance:getWidth())
-        suggesterBox:setHeight(suggesterBox.itemheight * min(#suggestions, 5))
-        suggesterBox:setX(instance:getX())
-        suggesterBox:setY(instance:getY() + instance.textEntry:getY() - suggesterBox.height)
-        suggesterBox:setVisible(true)
-        suggesterBox:bringToTop()
+    suggesterBox:setWidth(instance:getWidth())
+    suggesterBox:setHeight(suggesterBox.itemheight * min(#suggestions, 5))
+    suggesterBox:setX(instance:getX())
+    suggesterBox:setY(instance:getY() + instance.textEntry:getY() - suggesterBox.height)
+    suggesterBox:setVisible(true)
+    suggesterBox:bringToTop()
 
-        if suggesterBox.vscroll then
-            suggesterBox.vscroll:setHeight(suggesterBox.height)
-        end
-    else
-        suggesterBox:setVisible(false)
+    if suggesterBox.vscroll then
+        suggesterBox.vscroll:setHeight(suggesterBox.height)
     end
 end

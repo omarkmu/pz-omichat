@@ -40,7 +40,7 @@ UI_EN = {
     UI_OmiChat_set_name_success = "Your name is now '%1'.",
     UI_OmiChat_set_name_failure = "Couldn't set name.",
     UI_OmiChat_set_name_empty = "No name specified. Use /name Name",
-    UI_OmiChat_reset_name_success = "Name has been reset.",
+    UI_OmiChat_reset_name_success = "Your name has been reset.",
     UI_OmiChat_clear_names_success = "Cleared all nicknames.",
 
     -- %1 = a player's username, %2 = the chat name that was set with /setname

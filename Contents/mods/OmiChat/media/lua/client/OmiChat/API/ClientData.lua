@@ -16,7 +16,8 @@ local getText = getText
 ---@param color omichat.ColorTable?
 function OmiChat.changeColor(category, color)
     if category == 'speech' then
-        return OmiChat.changeSpeechColor(color)
+        OmiChat.changeSpeechColor(color)
+        return
     end
 
     if category ~= 'name' then
@@ -38,7 +39,7 @@ function OmiChat.changeColor(category, color)
     local value = color and utils.colorToHexString(color) or nil
 
     modData.nameColors[username] = value
-    OmiChat.requestDataUpdate(player, {
+    OmiChat.requestDataUpdate({
         target = username,
         field = 'nameColors',
         value = value,
@@ -85,6 +86,14 @@ function OmiChat.getColor(category)
 
     local prefs = OmiChat.getPlayerPreferences()
     return prefs.colors[category]
+end
+
+---Returns a color table associated with the current player,
+---or the default color table if there isn't one.
+---@param category omichat.ColorCategory
+---@return omichat.ColorTable
+function OmiChat.getColorOrDefault(category)
+    return OmiChat.getColor(category) or Option:getDefaultColor(category)
 end
 
 ---Retrieves the player's custom shouts.
@@ -275,7 +284,7 @@ function OmiChat.setNickname(nickname)
     local modData = OmiChat.getModData()
     if #nickname == 0 then
         modData.nicknames[username] = nil
-        OmiChat.requestDataUpdate(player, {
+        OmiChat.requestDataUpdate({
             target = username,
             field = 'nicknames',
         })
@@ -298,7 +307,7 @@ function OmiChat.setNickname(nickname)
     end
 
     modData.nicknames[username] = nickname
-    OmiChat.requestDataUpdate(player, {
+    OmiChat.requestDataUpdate({
         value = nickname,
         target = username,
         field = 'nicknames',

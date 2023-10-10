@@ -17,6 +17,7 @@ end
 
 ---Gets the nickname for the player with the given username.
 ---If no nickname is set for the given username, returns `nil`.
+---@param username string
 ---@return string?
 function OmiChat.getNickname(username)
     local modData = OmiChat.getModData()

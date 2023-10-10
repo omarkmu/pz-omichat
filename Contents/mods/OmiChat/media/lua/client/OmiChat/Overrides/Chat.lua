@@ -442,7 +442,7 @@ end
 function ISChat:onInfo()
     OmiChat.hideSuggesterBox()
 
-    local text = OmiChat.getInfoText()
+    local text = OmiChat.getInfoRichText()
     self:setInfo(text)
 
     if text == '' and self.infoRichText then

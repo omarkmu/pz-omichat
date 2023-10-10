@@ -84,7 +84,7 @@ function ISChat.onCustomColorMenu(target, category)
         target.activeColorModal:destroy()
     end
 
-    local color = OmiChat.getColorTable(category)
+    local color = OmiChat.getColorOrDefault(category)
     local text = getTextOrNull('UI_OmiChat_context_color_desc_' .. category)
     if not text then
         local catName = getTextOrNull('UI_OmiChat_context_message_type_' .. category) or OmiChat.getColorCategoryCommand(category)
