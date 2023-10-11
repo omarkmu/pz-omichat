@@ -8,7 +8,6 @@ local concat = table.concat
 ---Utility functions.
 ---@class omichat.utils : omi.utils
 local utils = lib.utils.copy(lib.utils)
-utils.kvp = {}
 utils.Interpolator = Interpolator
 
 local shortHexPattern = '^%s*#?(%x)(%x)(%x)%s*$'
@@ -48,67 +47,6 @@ local function readColor(text)
     end
 
     return tonumber(r, 16), tonumber(g, 16), tonumber(b, 16)
-end
-
----Encodes a string for use as a key or value in kvp format.
----@param text string
----@param forceQuotes boolean?
----@return string
-local function kvpEncodeString(text, forceQuotes)
-    text = tostring(text)
-    if forceQuotes or #text == 0 or text:find('"') then
-        return concat { '"', text:gsub('([\\"])', '\\%1'), '"' }
-    end
-
-    return text
-end
-
----Reads a key or value from a kvp-encoded string.
----@param text string
----@param i integer Current character index.
----@return string decodedValue
----@return integer newIndex
-local function kvpReadString(text, i)
-    local escape = false
-    local value = {}
-
-    local current = text:sub(i, i)
-    if current == '"' then
-        i = i + 1
-    else
-        -- not quote-wrapped → skip to next quote if possible
-        local nextQuote = text:find('"', i)
-        if nextQuote then
-            return text:sub(i, nextQuote - 1), nextQuote
-        end
-    end
-
-    while i <= #text do
-        local c = text:sub(i, i)
-        if escape then
-            if c ~= '"' and c ~= '\\' then
-                value[#value + 1] = '\\'
-            end
-
-            value[#value + 1] = c
-            escape = false
-        elseif c == '"' then
-            break
-        elseif c == '\\' then
-            escape = true
-        else
-            value[#value + 1] = c
-        end
-
-        i = i + 1
-    end
-
-    if escape then
-        -- should not happen
-        value[#value + 1] = '\\'
-    end
-
-    return concat(value), i + 1
 end
 
 
@@ -209,6 +147,13 @@ function utils.isValidColor(color)
     end
 
     return true
+end
+
+---Logs a mod error.
+---@param err string
+---@param ... unknown
+function utils.logError(err, ...)
+    print('[OmiChat] ' .. string.format(err, ...))
 end
 
 ---Parses arguments for a chat command.
@@ -353,40 +298,6 @@ end
 ---@return string
 function utils.unescapeRichText(text)
     return (text:gsub('&lt;', '<'):gsub('&gt;', '>'))
-end
-
-
----Encodes a table as a string of key-value pairs.
----Keys and values are converted to strings.
----@param table table
----@return string
-function utils.kvp.encode(table)
-    local result = {}
-
-    for k, v in pairs(table) do
-        result[#result + 1] = kvpEncodeString(k)
-        result[#result + 1] = kvpEncodeString(v, true)
-    end
-
-    return concat(result)
-end
-
----Decodes a string of key-value pairs.
----@param text string
----@return table
-function utils.kvp.decode(text)
-    local result = {}
-
-    local i = 1
-    local key, value
-    while i <= #text do
-        key, i = kvpReadString(text, i)
-        value, i = kvpReadString(text, i)
-
-        result[key] = value
-    end
-
-    return result
 end
 
 

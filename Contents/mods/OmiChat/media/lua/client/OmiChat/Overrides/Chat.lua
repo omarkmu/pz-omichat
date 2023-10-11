@@ -90,7 +90,7 @@ function ISChat.addLineInChat(message, tabID)
 
     local s, e = pcall(_addLineInChat, message, tabID)
     if not s then
-        print(('[OmiChat] error while adding message %s: %s'):format(tostring(message), e))
+        utils.logError('error while adding message %s: %s', tostring(message), e)
         return
     end
 

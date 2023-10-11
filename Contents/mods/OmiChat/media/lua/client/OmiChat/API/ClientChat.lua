@@ -562,7 +562,11 @@ function OmiChat.decodeMessageTag(tag)
         return {}
     end
 
-    local decoded = utils.kvp.decode(tag)
+    local _, decoded = utils.json.tryDecode(tag)
+    if type(decoded) ~= 'table' then
+        return {}
+    end
+
     return {
         name = decoded.ocName,
         nameColor = utils.stringToColor(decoded.ocNameColor),
@@ -580,10 +584,16 @@ function OmiChat.encodeMessageTag(message)
 
     local color = OmiChat.getNameColorInChat(author)
     local chatType = OmiChat.getMessageChatType(message)
-    return utils.kvp.encode {
+    local success, encoded = utils.json.tryEncode {
         ocName = OmiChat.getNameInChat(author, chatType),
         ocNameColor = color and utils.colorToHexString(color) or nil,
     }
+
+    if not success then
+        return ''
+    end
+
+    return encoded
 end
 
 ---Gets the command associated with a color category.
