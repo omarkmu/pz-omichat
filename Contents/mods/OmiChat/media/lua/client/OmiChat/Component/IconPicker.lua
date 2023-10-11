@@ -293,9 +293,9 @@ function IconPicker:updateIcons()
 			contents[row] = 'UI_OmiChat_icon_cat_' .. info.category
 
 			local rowIcons = {}
-			for i = 1, #info.list do
-			    local icon = info.list[i]
-				if i % self.columns == 1 then
+			for j = 1, #info.list do
+			    local icon = info.list[j]
+				if j % self.columns == 1 then
 					row = row + 1
 					rowIcons = {}
 					contents[row] = rowIcons

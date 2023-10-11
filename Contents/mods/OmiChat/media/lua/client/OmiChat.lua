@@ -66,6 +66,7 @@ end
 ---@param target omichat.ISChat
 ---@param button table
 ---@param category omichat.ColorCategory The color category that has been changed.
+---@diagnostic disable-next-line: unused-local
 function ISChat.onCustomColorMenuClick(target, button, category)
     if button.internal == 'OK' then
         OmiChat.changeColor(category, button.parent:getColorTable())
@@ -131,6 +132,7 @@ end
 ---@param target omichat.ISChat
 ---@param button table
 ---@param category omichat.CalloutCategory
+---@diagnostic disable-next-line: unused-local
 function ISChat.onCustomCalloutClick(target, button, category)
     if button.internal ~= 'OK' then
         return
@@ -196,6 +198,7 @@ end
 
 ---Event handler for toggling showing name colors.
 ---@param target omichat.ISChat
+---@diagnostic disable-next-line: unused-local
 function ISChat.onToggleShowNameColor(target)
     OmiChat.setNameColorEnabled(not OmiChat.getNameColorsEnabled())
     OmiChat.redrawMessages()
@@ -203,6 +206,7 @@ end
 
 ---Event handler for toggling using the suggester.
 ---@param target omichat.ISChat
+---@diagnostic disable-next-line: unused-local
 function ISChat.onToggleUseSuggester(target)
     OmiChat.setUseSuggester(not OmiChat.getUseSuggester())
     OmiChat.updateSuggesterComponent()

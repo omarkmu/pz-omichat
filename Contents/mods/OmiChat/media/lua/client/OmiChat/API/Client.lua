@@ -195,7 +195,7 @@ OmiChat._commandStreams = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_name_no_reset',
             isEnabled = function() return Option.EnableSetName end,
-            onUse = function(self, command)
+            onUse = function(_, command)
                 local _, feedback = OmiChat.setNickname(command)
                 if feedback then
                     OmiChat.showInfoMessage(feedback)
@@ -218,7 +218,7 @@ OmiChat._commandStreams = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_clearnames',
             isEnabled = canUseAdminCommands,
-            onUse = function(self, command)
+            onUse = function()
                 OmiChat.requestClearNames()
             end,
         }
@@ -230,7 +230,7 @@ OmiChat._commandStreams = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_setname',
             isEnabled = canUseAdminCommands,
-            onUse = function(self, command)
+            onUse = function(_, command)
                 OmiChat.requestSetName(command)
             end,
         }
@@ -242,7 +242,7 @@ OmiChat._commandStreams = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_resetname',
             isEnabled = canUseAdminCommands,
-            onUse = function(self, command)
+            onUse = function(_, command)
                 OmiChat.requestResetName(command)
             end,
         }
@@ -348,7 +348,7 @@ OmiChat._commandStreams = {
         command = '/help ',
         omichat = {
             isCommand = true,
-            onUse = function(self, command)
+            onUse = function(_, command)
                 local accessLevel
                 if isCoopHost() then
                     accessLevel = 'admin'
@@ -452,7 +452,7 @@ OmiChat._suggesters = {
         ---@param fullCommand string
         ---@param startsWith string[]
         ---@param contains string[]
-        collectStreamResults = function(self, tab, command, fullCommand, startsWith, contains)
+        collectStreamResults = function(_, tab, command, fullCommand, startsWith, contains)
             for i = 1, #tab do
                 local stream = tab[i]
                 local isEnabled = stream.omichat and stream.omichat.isEnabled
@@ -532,7 +532,7 @@ OmiChat._suggesters = {
     {
         name = 'online-usernames',
         priority = 8,
-        suggest = function(self, info)
+        suggest = function(_, info)
             if #info.input < 2 then
                 return
             end
@@ -593,7 +593,7 @@ OmiChat._suggesters = {
     {
         name = 'emotes',
         priority = 6,
-        suggest = function(self, info)
+        suggest = function(_, info)
             local instance = ISChat.instance
             if not instance then
                 return
@@ -682,7 +682,7 @@ OmiChat._transformers = {
     {
         name = 'radio-chat',
         priority = 10,
-        transform = function(self, info)
+        transform = function(_, info)
             local text = info.content or info.rawText
             if info.chatType ~= 'radio' then
                 return
@@ -702,7 +702,7 @@ OmiChat._transformers = {
     {
         name = 'decode-callout',
         priority = 8,
-        transform = function(self, info)
+        transform = function(_, info)
             if info.chatType ~= 'shout' then
                 return
             end
@@ -734,7 +734,7 @@ OmiChat._transformers = {
     {
         name = 'decode-stream',
         priority = 8,
-        transform = function(self, info)
+        transform = function(_, info)
             local isRadio = info.context.ocIsRadio
             for data in config:streams() do
                 local name = data.name
@@ -788,7 +788,7 @@ OmiChat._transformers = {
     {
         name = 'set-range',
         priority = 6,
-        transform = function(self, info)
+        transform = function(_, info)
             local range
             local chatRange
             local streamData = config:getCustomStreamInfo(info.context.ocCustomStream)
@@ -840,7 +840,7 @@ OmiChat._transformers = {
     {
         name = 'private-chat',
         priority = 4,
-        transform = function(self, info)
+        transform = function(_, info)
             if info.chatType ~= 'whisper' then
                 return
             end
@@ -864,7 +864,7 @@ OmiChat._transformers = {
     {
         name = 'server-chat',
         priority = 2,
-        transform = function(self, info)
+        transform = function(_, info)
             if info.chatType ~= 'server' then
                 return
             end
