@@ -16,8 +16,8 @@ local ISChat = ISChat ---@cast ISChat omichat.ISChat
 ---@field private _formatters table<string, omichat.MetaFormatter>
 ---@field private _iconsToExclude table<string, true>
 ---@field private _transformers omichat.MessageTransformer[]
----@field private _iniVersion integer
----@field private _iniName string
+---@field private _prefsVersion integer
+---@field private _prefsFileName string
 ---@field private _playerPrefs omichat.PlayerPreferences
 ---@field private _customChatStreams table<string, omichat.ChatStream>
 ---@field private _vanillaStreamConfigs table<string, omichat.ChatStreamConfig>
@@ -30,8 +30,8 @@ OmiChat.ColorModal = require 'OmiChat/Component/ColorModal'
 OmiChat.IconPicker = require 'OmiChat/Component/IconPicker'
 OmiChat.SuggesterBox = require 'OmiChat/Component/SuggesterBox'
 
-OmiChat._iniVersion = 1
-OmiChat._iniName = 'omichat.ini'
+OmiChat._prefsVersion = 1
+OmiChat._prefsFileName = 'omichat.json'
 
 
 ---Checks whether the current player can use custom admin commands.

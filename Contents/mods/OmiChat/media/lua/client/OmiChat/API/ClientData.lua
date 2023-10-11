@@ -139,8 +139,7 @@ function OmiChat.getPlayerPreferences()
         return OmiChat._playerPrefs
     end
 
-    ---@type omichat.PlayerPreferences
-    local prefs = {
+    OmiChat._playerPrefs = {
         showNameColors = true,
         useSuggester = true,
         colors = {},
@@ -148,42 +147,59 @@ function OmiChat.getPlayerPreferences()
         sneakcallouts = {},
     }
 
-    local line, dest
-    local inFile = getFileReader(OmiChat._iniName, true)
+    local line
+    local content = {}
+    local prefsFile = getFileReader(OmiChat._prefsFileName, true)
     while true do
-        line = inFile:readLine()
+        line = prefsFile:readLine()
         if line == nil then
-            inFile:close()
+            prefsFile:close()
             break
         end
 
-        if line:sub(1, 1) == '[' then
-            local endBracket = line:find(']')
-            local target = endBracket and line:sub(2, endBracket - 1)
-            if target and prefs[target] then
-                dest = prefs[target]
-            end
-        else
-            local eq = line:find('=')
-            local key = line:sub(1, eq - 1)
-            local value = line:sub(eq + 1)
+        content[#content + 1] = line
+    end
 
-            if not dest and key == 'showNameColors' then
-                prefs.showNameColors = value == 'true'
-            elseif not dest and key == 'useSuggester' then
-                prefs.useSuggester = value == 'true'
-            elseif dest == prefs.colors then
-                dest[key] = utils.stringToColor(value)
-            elseif dest and tonumber(key) then
-                dest[tonumber(key)] = value
-            elseif dest then
-                ---@cast dest table
-                dest[key] = value
-            end
+    local prefs = OmiChat._playerPrefs
+    local encoded = utils.trim(concat(content))
+    if #encoded == 0 then
+        return prefs
+    end
+
+    local success, decoded = utils.json.tryDecode(encoded)
+    if type(decoded) ~= 'table' then
+        if success then
+            decoded = 'invalid file content'
+        end
+
+        utils.logError('failed to read preferences (%s)', decoded)
+
+        -- reset to default on failed read
+        return prefs
+    end
+
+    prefs.showNameColors = not not decoded.showNameColors
+    prefs.useSuggester = not not decoded.useSuggester
+
+    if type(decoded.callouts) == 'table' then
+        for i = 1, #decoded.callouts do
+            prefs.callouts[#prefs.callouts + 1] = tostring(decoded.callouts[i])
         end
     end
 
-    OmiChat._playerPrefs = prefs
+    if type(decoded.sneakcallouts) == 'table' then
+        for i = 1, #decoded.sneakcallouts do
+            prefs.sneakcallouts[#prefs.sneakcallouts + 1] = tostring(decoded.sneakcallouts[i])
+        end
+    end
+
+    if type(decoded.colors) == 'table' then
+        for k, v in pairs(decoded.colors) do
+            prefs.colors[k] = utils.stringToColor(v)
+        end
+    end
+
+    return prefs
 end
 
 ---Returns a color table for the current player's speech color.
@@ -218,27 +234,23 @@ function OmiChat.savePlayerPreferences()
         return
     end
 
-    local outFile = getFileWriter(OmiChat._iniName, true, false)
-    outFile:write(concat { 'VERSION=', tostring(OmiChat._iniVersion), '\n' })
+    local prefs = OmiChat._playerPrefs
+    local success, encoded = utils.json.tryEncode {
+        VERSION = OmiChat._prefsVersion,
+        useSuggester = prefs.useSuggester,
+        showNameColors = prefs.showNameColors,
+        colors = utils.pack(utils.map(utils.colorToHexString, prefs.colors)),
+        callouts = prefs.callouts,
+        sneakcallouts = prefs.sneakcallouts,
+    }
 
-    outFile:write(concat { 'showNameColors=', tostring(OmiChat._playerPrefs.showNameColors), '\n' })
-    outFile:write(concat { 'useSuggester=', tostring(OmiChat._playerPrefs.useSuggester), '\n' })
-
-    outFile:write(concat { '[colors]\n' })
-    for cat, color in pairs(OmiChat._playerPrefs.colors) do
-        outFile:write(concat { cat, '=', utils.colorToHexString(color), '\n' })
+    if not success or type(encoded) ~= 'string' then
+        utils.logError('failed to write preferences (%s)', encoded)
+        return
     end
 
-    for _, name in pairs({ 'callouts', 'sneakcallouts' }) do
-        if OmiChat._playerPrefs[name] then
-            outFile:write(concat { '[', name, ']\n' })
-
-            for k, v in pairs(OmiChat._playerPrefs[name]) do
-                outFile:write(concat { tostring(k), '=', tostring(v), '\n' })
-            end
-        end
-    end
-
+    local outFile = getFileWriter(OmiChat._prefsFileName, true, false)
+    outFile:write(encoded)
     outFile:close()
 end
 
