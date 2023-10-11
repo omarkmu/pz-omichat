@@ -1092,6 +1092,19 @@ local function encode_nil(val)
 end
 
 
+local function is_empty(tab)
+    if next then
+        return next(tab) == nil
+    end
+
+    for _ in pairs(tab) do
+        return false
+    end
+
+    return true
+end
+
+
 local function encode_table(val, stack)
     local res = {}
     stack = stack or {}
@@ -1101,7 +1114,7 @@ local function encode_table(val, stack)
 
     stack[val] = true
 
-    if rawget(val, 1) ~= nil or next(val) == nil then
+    if rawget(val, 1) ~= nil or is_empty(val) then
         -- Treat as array -- check keys are valid and it is not sparse
         local n = 0
         for k in pairs(val) do
@@ -3518,7 +3531,7 @@ end)
 ---@class omi.lib
 local OmiLib = {}
 
-OmiLib.VERSION = '1.2.0'
+OmiLib.VERSION = '1.2.1'
 
 ---@type omi.class | (fun(cls: table?): omi.Class)
 OmiLib.class = require("class")
