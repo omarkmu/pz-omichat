@@ -101,21 +101,21 @@ local Option = lib.sandbox('OmiChat')
 
 ---@type table<omichat.ColorCategory, string>
 local colorOpts = {
-    admin     = 'ColorAdmin',
-    say       = 'ColorSay',
-    shout     = 'ColorYell',
-    private   = 'ColorPrivate',
-    general   = 'ColorGeneral',
-    discord   = 'ColorDiscord',
-    radio     = 'ColorRadio',
-    faction   = 'ColorFaction',
+    admin = 'ColorAdmin',
+    say = 'ColorSay',
+    shout = 'ColorYell',
+    private = 'ColorPrivate',
+    general = 'ColorGeneral',
+    discord = 'ColorDiscord',
+    radio = 'ColorRadio',
+    faction = 'ColorFaction',
     safehouse = 'ColorSafehouse',
-    server    = 'ColorServer',
+    server = 'ColorServer',
 }
 
 ---@type table<omichat.CalloutCategory, string>
 local calloutOpts = {
-    callouts      = 'EnableCustomShouts',
+    callouts = 'EnableCustomShouts',
     sneakcallouts = 'EnableCustomSneakShouts',
 }
 
@@ -153,7 +153,7 @@ function Option:getDefaultColor(category, username)
         local speechColor = player and player:getSpeakColour()
 
         if not speechColor then
-            return {r = 255, g = 255, b = 255}
+            return { r = 255, g = 255, b = 255 }
         end
 
         return {
@@ -185,7 +185,7 @@ function Option:getDefaultColor(category, username)
     local custom = config:getCustomStreamInfo(category)
     return getColorOrDefault(self, custom and custom.colorOpt)
         or getColorOrDefault(self, colorOpts[category])
-        or {r = 255, g = 255, b = 255}
+        or { r = 255, g = 255, b = 255 }
 end
 
 ---Returns whether the provided callout category type is enabled.

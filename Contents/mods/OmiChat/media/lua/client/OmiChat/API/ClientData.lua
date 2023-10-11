@@ -168,7 +168,7 @@ function OmiChat.getPlayerPreferences()
             local key = line:sub(1, eq - 1)
             local value = line:sub(eq + 1)
 
-            if not dest and key == 'showNameColors'then
+            if not dest and key == 'showNameColors' then
                 prefs.showNameColors = value == 'true'
             elseif not dest and key == 'useSuggester' then
                 prefs.useSuggester = value == 'true'
@@ -224,14 +224,14 @@ function OmiChat.savePlayerPreferences()
     outFile:write(concat { 'showNameColors=', tostring(OmiChat._playerPrefs.showNameColors), '\n' })
     outFile:write(concat { 'useSuggester=', tostring(OmiChat._playerPrefs.useSuggester), '\n' })
 
-    outFile:write(concat {'[colors]\n'})
+    outFile:write(concat { '[colors]\n' })
     for cat, color in pairs(OmiChat._playerPrefs.colors) do
         outFile:write(concat { cat, '=', utils.colorToHexString(color), '\n' })
     end
 
     for _, name in pairs({ 'callouts', 'sneakcallouts' }) do
         if OmiChat._playerPrefs[name] then
-            outFile:write(concat {'[', name, ']\n'})
+            outFile:write(concat { '[', name, ']\n' })
 
             for k, v in pairs(OmiChat._playerPrefs[name]) do
                 outFile:write(concat { tostring(k), '=', tostring(v), '\n' })

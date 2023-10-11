@@ -93,40 +93,42 @@ function MimicMessage:getPrefix()
             g = color:getGreen(),
             b = color:getBlue(),
         }),
-        '<SIZE:', instance.chatFont or 'medium', '> '
+        '<SIZE:',
+        instance.chatFont or 'medium',
+        '> ',
     }
 
     local addColon = not isServer
     local titleID = self:getTitleID()
 
     if instance.showTimestamp and not isServer then
-        result[#result+1] = '['
+        result[#result + 1] = '['
 
         -- including the inaccurate time here like vanilla for consistency
         -- ultimately unused
-        result[#result+1] = getHourMinute()
+        result[#result + 1] = getHourMinute()
 
-        result[#result+1] = ']'
+        result[#result + 1] = ']'
     end
 
     if instance.showTitle and titleID then
         addColon = true
-        result[#result+1] = '['
-        result[#result+1] = getText(titleID)
-        result[#result+1] = ']'
+        result[#result + 1] = '['
+        result[#result + 1] = getText(titleID)
+        result[#result + 1] = ']'
     end
 
     if (not isServer or not self:isServerAuthor()) and self:isShowAuthor() then
         addColon = true
         local recipName = self:getRecipientName()
-        result[#result+1] = '['
-        result[#result+1] = recipName and 'to ' or ''
-        result[#result+1] = recipName or self:getAuthor()
-        result[#result+1] = ']'
+        result[#result + 1] = '['
+        result[#result + 1] = recipName and 'to ' or ''
+        result[#result + 1] = recipName or self:getAuthor()
+        result[#result + 1] = ']'
     end
 
     if addColon then
-        result[#result+1] = ': '
+        result[#result + 1] = ': '
     end
 
     return concat(result)
@@ -170,7 +172,7 @@ function MimicMessage:getTextWithPrefixBase()
     return concat {
         self:getPrefix(),
         ' ',
-        self:getTextWithReplacedParentheses()
+        self:getTextWithReplacedParentheses(),
     }
 end
 

@@ -287,12 +287,12 @@ function OmiChat.applyFormatOptions(info)
             info.substitutions.name = concat {
                 nameColor,
                 info.substitutions.name,
-                ' <POPRGB> '
+                ' <POPRGB> ',
             }
             info.substitutions.author = concat {
                 nameColor,
                 info.substitutions.author,
-                ' <POPRGB> '
+                ' <POPRGB> ',
             }
         end
     end
@@ -430,7 +430,7 @@ function OmiChat.buildMessageTextFromInfo(info)
             stream = info.substitutions.stream,
             timestamp = info.timestamp or '',
             tag = info.tag or '',
-            content = utils.interpolate(info.format, info.substitutions)
+            content = utils.interpolate(info.format, info.substitutions),
         }),
     }
 end
@@ -734,9 +734,9 @@ function OmiChat.redrawMessages(doScroll)
         for j = start, #messages do
             local text = messages[j]:getTextWithPrefix()
 
-            newText[#newText+1] = text
-            newText[#newText+1] = ' <LINE> '
-            newLines[#newLines+1] = text .. ' <LINE> '
+            newText[#newText + 1] = text
+            newText[#newText + 1] = ' <LINE> '
+            newLines[#newLines + 1] = text .. ' <LINE> '
         end
 
         newText[#newText] = nil
@@ -797,7 +797,7 @@ function OmiChat.setIconButtonEnabled(enable)
 end
 
 ---Sets the icons that should be excluded by the icon picker.
----This does not update the icon picker icons. 
+---This does not update the icon picker icons.
 ---@see omichat.IconPicker.updateIcons
 ---@param icons table<string, true>?
 function OmiChat.setIconsToExclude(icons)

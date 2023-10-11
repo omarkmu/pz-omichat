@@ -48,7 +48,7 @@ end
 ---@return unknown[]
 local function extend(t1, t2)
     for i = 1, #t2 do
-        t1[#t1+1] = t2[i]
+        t1[#t1 + 1] = t2[i]
     end
 
     return t1
@@ -221,7 +221,7 @@ OmiChat._commandStreams = {
             onUse = function()
                 OmiChat.requestClearNames()
             end,
-        }
+        },
     },
     {
         name = 'setname',
@@ -233,7 +233,7 @@ OmiChat._commandStreams = {
             onUse = function(_, command)
                 OmiChat.requestSetName(command)
             end,
-        }
+        },
     },
     {
         name = 'resetname',
@@ -245,7 +245,7 @@ OmiChat._commandStreams = {
             onUse = function(_, command)
                 OmiChat.requestResetName(command)
             end,
-        }
+        },
     },
     {
         name = 'card',
@@ -263,7 +263,7 @@ OmiChat._commandStreams = {
                     OmiChat.showInfoMessage(getText(self.omichat.helpText))
                 end
             end,
-        }
+        },
     },
     {
         name = 'roll',
@@ -291,7 +291,7 @@ OmiChat._commandStreams = {
                     OmiChat.showInfoMessage(getText(self.omichat.helpText))
                 end
             end,
-        }
+        },
     },
     {
         name = 'emotes',
@@ -306,7 +306,7 @@ OmiChat._commandStreams = {
                 local emotes = {}
                 for k, v in pairs(OmiChat._emotes) do
                     if type(v) ~= 'function' or v(k) then
-                        emotes[#emotes+1] = k
+                        emotes[#emotes + 1] = k
                     end
                 end
 
@@ -322,8 +322,8 @@ OmiChat._commandStreams = {
                 }
 
                 for i = 1, #emotes do
-                    parts[#parts+1] = ' <LINE> * .'
-                    parts[#parts+1] = emotes[i]
+                    parts[#parts + 1] = ' <LINE> * .'
+                    parts[#parts + 1] = emotes[i]
                 end
 
                 OmiChat.showInfoMessage(concat(parts))
@@ -341,7 +341,7 @@ OmiChat._commandStreams = {
                 OmiChat.clearMessages()
                 OmiChat.showInfoMessage(getText('UI_OmiChat_clear_message'))
             end,
-        }
+        },
     },
     {
         name = 'help',
@@ -406,7 +406,7 @@ OmiChat._commandStreams = {
                         local helpText = stream.omichat.helpText
                         if not seen[stream.name] and helpText and (not isEnabled or isEnabled(stream)) then
                             seen[stream.name] = true
-                            commands[#commands+1] = { name = stream.name, helpText = helpText, access = 0 }
+                            commands[#commands + 1] = { name = stream.name, helpText = helpText, access = 0 }
                         end
                     end
                 end
@@ -415,7 +415,7 @@ OmiChat._commandStreams = {
                     local info = vanillaCommands[i]
                     if info.name and info.helpText and not seen[info.name] then
                         if hasAccess(info.access, accessLevel) then
-                            commands[#commands+1] = info
+                            commands[#commands + 1] = info
                         end
                     end
                 end
@@ -425,14 +425,14 @@ OmiChat._commandStreams = {
                 local result = { getText('UI_OmiChat_list_of_commands') }
                 for i = 1, #commands do
                     local cmd = commands[i]
-                    result[#result+1] = ' <LINE> * '
-                    result[#result+1] = cmd.name
-                    result[#result+1] = ' : '
+                    result[#result + 1] = ' <LINE> * '
+                    result[#result + 1] = cmd.name
+                    result[#result + 1] = ' : '
 
                     if cmd.helpTextArgs then
-                        result[#result+1] = getText(cmd.helpText, unpack(cmd.helpTextArgs))
+                        result[#result + 1] = getText(cmd.helpText, unpack(cmd.helpTextArgs))
                     else
-                        result[#result+1] = getText(cmd.helpText)
+                        result[#result + 1] = getText(cmd.helpText)
                     end
                 end
 
@@ -458,13 +458,13 @@ OmiChat._suggesters = {
                 local isEnabled = stream.omichat and stream.omichat.isEnabled
                 if not isEnabled or isEnabled(stream) then
                     if utils.startsWith(stream.command, fullCommand) then
-                        startsWith[#startsWith+1] = stream.command
+                        startsWith[#startsWith + 1] = stream.command
                     elseif stream.shortCommand and utils.startsWith(stream.shortCommand, fullCommand) then
-                        startsWith[#startsWith+1] = stream.shortCommand
+                        startsWith[#startsWith + 1] = stream.shortCommand
                     elseif utils.contains(stream.command, command) then
-                        contains[#contains+1] = stream.command
+                        contains[#contains + 1] = stream.command
                     elseif stream.shortCommand and utils.contains(stream.shortCommand, command) then
-                        contains[#contains+1] = stream.shortCommand
+                        contains[#contains + 1] = stream.shortCommand
                     end
                 end
             end
@@ -506,9 +506,9 @@ OmiChat._suggesters = {
                 if hasAccess(commandInfo.access, accessLevel) then
                     local vanillaCommand = concat { '/', commandInfo.name, ' ' }
                     if utils.startsWith(vanillaCommand, fullCommand) then
-                        startsWith[#startsWith+1] = vanillaCommand
+                        startsWith[#startsWith + 1] = vanillaCommand
                     elseif utils.contains(vanillaCommand, command) then
-                        contains[#contains+1] = vanillaCommand
+                        contains[#contains + 1] = vanillaCommand
                     end
                 end
             end
@@ -518,7 +518,7 @@ OmiChat._suggesters = {
             for i = 1, #results do
                 local cmd = results[i]
                 if not seen[cmd] then
-                    info.suggestions[#info.suggestions+1] = {
+                    info.suggestions[#info.suggestions + 1] = {
                         type = 'command',
                         display = cmd,
                         suggestion = cmd,
@@ -563,14 +563,14 @@ OmiChat._suggesters = {
 
                 if #parts == 1 then
                     -- only command specified; include all options
-                    contains[#contains+1] = username
+                    contains[#contains + 1] = username
                 elseif usernameLower == last then
                     -- exact match
                     return
                 elseif usernameLower and utils.startsWith(usernameLower, last) then
-                    startsWith[#startsWith+1] = username
+                    startsWith[#startsWith + 1] = username
                 elseif usernameLower and utils.contains(usernameLower, last) then
-                    contains[#contains+1] = username
+                    contains[#contains + 1] = username
                 end
             end
 
@@ -582,13 +582,13 @@ OmiChat._suggesters = {
                     username = concat({ '"', username:gsub('"', '\\"'), '"' })
                 end
 
-                info.suggestions[#info.suggestions+1] = {
+                info.suggestions[#info.suggestions + 1] = {
                     type = 'user',
                     display = username,
-                    suggestion = concat({ prefix, username }, ' ') .. ' '
+                    suggestion = concat({ prefix, username }, ' ') .. ' ',
                 }
             end
-        end
+        end,
     },
     {
         name = 'emotes',
@@ -657,9 +657,9 @@ OmiChat._suggesters = {
                     -- exact match
                     return
                 elseif utils.startsWith(k, text) then
-                    startsWith[#startsWith+1] = k
+                    startsWith[#startsWith + 1] = k
                 elseif utils.contains(k, text) then
-                    contains[#contains+1] = k
+                    contains[#contains + 1] = k
                 end
             end
 
@@ -667,10 +667,10 @@ OmiChat._suggesters = {
             local results = extend(startsWith, contains)
             for i = 1, #results do
                 local emote = results[i]
-                info.suggestions[#info.suggestions+1] = {
+                info.suggestions[#info.suggestions + 1] = {
                     type = 'emote',
                     display = '.' .. emote,
-                    suggestion = concat({ prefix, emote })
+                    suggestion = concat({ prefix, emote }),
                 }
             end
         end,
@@ -697,7 +697,7 @@ OmiChat._transformers = {
             info.content = text:sub(msgStart + 1)
             info.format = Option.ChatFormatRadio
             info.substitutions.frequency = freq
-        end
+        end,
     },
     {
         name = 'decode-callout',
@@ -829,7 +829,7 @@ OmiChat._transformers = {
             local xDiff = authorPlayer:getX() - localPlayer:getX()
             local yDiff = authorPlayer:getY() - localPlayer:getY()
 
-            if math.sqrt(xDiff*xDiff + yDiff*yDiff) > range then
+            if math.sqrt(xDiff * xDiff + yDiff * yDiff) > range then
                 info.message:setOverHeadSpeech(false)
                 info.message:setShowInChat(false)
                 info.context.ocOutOfRange = true

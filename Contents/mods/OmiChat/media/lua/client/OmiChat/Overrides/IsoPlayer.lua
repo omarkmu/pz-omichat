@@ -15,7 +15,7 @@ local function getDefaultShouts(isSneaking)
     local result = {}
 
     for i = 1, 3 do
-        result[#result+1] = getText('IGUI_PlayerText_Callout' .. i .. (isSneaking and 'Sneak' or 'New'))
+        result[#result + 1] = getText('IGUI_PlayerText_Callout' .. i .. (isSneaking and 'Sneak' or 'New'))
     end
 
     return result

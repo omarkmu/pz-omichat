@@ -252,10 +252,15 @@ function ISTradingUI:prerender()
         return ISTradingUI_prerender(self)
     end
 
-    self:drawRect(0, 0, self.width, self.height, self.backgroundColor.a, self.backgroundColor.r, self.backgroundColor.g, self.backgroundColor.b)
-    self:drawText(getText('IGUI_TradingUI_Title'), self.width/2 - (getTextManager():MeasureStringX(UIFont.Medium, getText('IGUI_TradingUI_Title')) / 2), 15, 1, 1, 1, 1, UIFont.Medium)
-    self:drawText(getText('IGUI_TradingUI_YourOffer'), self.yourOfferDatas.x, self.yourOfferDatas.y - 32, 1, 1, 1, 1, UIFont.Small)
-    self:drawText(getText('IGUI_TradingUI_HisOffer', name), self.hisOfferDatas.x, self.hisOfferDatas.y - 32, 1, 1, 1, 1, UIFont.Small)
+    self:drawRect(0, 0, self.width, self.height, self.backgroundColor.a, self.backgroundColor.r, self.backgroundColor.g,
+        self.backgroundColor.b)
+    self:drawText(getText('IGUI_TradingUI_Title'),
+        self.width / 2 - (getTextManager():MeasureStringX(UIFont.Medium, getText('IGUI_TradingUI_Title')) / 2), 15, 1, 1,
+        1, 1, UIFont.Medium)
+    self:drawText(getText('IGUI_TradingUI_YourOffer'), self.yourOfferDatas.x, self.yourOfferDatas.y - 32, 1, 1, 1, 1,
+        UIFont.Small)
+    self:drawText(getText('IGUI_TradingUI_HisOffer', name), self.hisOfferDatas.x, self.hisOfferDatas.y - 32, 1, 1, 1, 1,
+        UIFont.Small)
 
     local yourItems = getText('IGUI_TradingUI_Items', #self.yourOfferDatas.items, ISTradingUI.MaxItems)
     local hisItems = getText('IGUI_TradingUI_Items', #self.hisOfferDatas.items, ISTradingUI.MaxItems)
@@ -263,7 +268,8 @@ function ISTradingUI:prerender()
     self:drawText(hisItems, self.hisOfferDatas.x, self.hisOfferDatas.y - 20, 1, 1, 1, 1, UIFont.Small)
 
     if self.otherSealedOffer then
-        self:drawText(getText('IGUI_TradingUI_OtherPlayerSealedOffer', name), self.sealOffer.x, self.sealOffer.y + self.sealOffer.height + 5, 0.2, 1, 0.2, 1, UIFont.Small)
+        self:drawText(getText('IGUI_TradingUI_OtherPlayerSealedOffer', name), self.sealOffer.x,
+            self.sealOffer.y + self.sealOffer.height + 5, 0.2, 1, 0.2, 1, UIFont.Small)
     end
 end
 
@@ -274,9 +280,12 @@ function ISTradingUIHistorical:prerender()
     end
 
     local title = getText('IGUI_ISTradingUIHistorical_Title', name)
-    self:drawRect(0, 0, self.width, self.height, self.backgroundColor.a, self.backgroundColor.r, self.backgroundColor.g, self.backgroundColor.b)
-    self:drawRectBorder(0, 0, self.width, self.height, self.borderColor.a, self.borderColor.r, self.borderColor.g, self.borderColor.b)
-    self:drawText(title, self.width/2 - (getTextManager():MeasureStringX(UIFont.Medium, title) / 2), 10, 1, 1, 1, 1, UIFont.Medium)
+    self:drawRect(0, 0, self.width, self.height, self.backgroundColor.a, self.backgroundColor.r, self.backgroundColor.g,
+        self.backgroundColor.b)
+    self:drawRectBorder(0, 0, self.width, self.height, self.borderColor.a, self.borderColor.r, self.borderColor.g,
+        self.borderColor.b)
+    self:drawText(title, self.width / 2 - (getTextManager():MeasureStringX(UIFont.Medium, title) / 2), 10, 1, 1, 1, 1,
+        UIFont.Medium)
 end
 
 ---@param worldobjects table

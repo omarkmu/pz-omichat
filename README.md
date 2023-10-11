@@ -19,11 +19,7 @@ The vast majority of the features listed below can be configured or completely d
 - Local [`/whisper`](docs/sandbox-options.md#chatformatwhisper) chat
 - Local [`/card`](docs/sandbox-options.md#chatformatcard) and [`/roll`](docs/sandbox-options.md#chatformatroll)
 - Roleplay descriptions with [`/me`](docs/sandbox-options.md#chatformatme) and [`/do`](docs/sandbox-options.md#chatformatdo)
-- Versions of `/me` and `/do` with larger and smaller ranges (
-[`/mequiet`](docs/sandbox-options.md#chatformatmequiet),
-[`/meloud`](docs/sandbox-options.md#chatformatmeloud),
-[`/doquiet`](docs/sandbox-options.md#chatformatdoquiet),
-[`/doloud`](docs/sandbox-options.md#chatformatdoloud))
+- Versions of `/me` and `/do` with larger and smaller ranges (`/mequiet`, `/meloud`, `/doquiet`, `/doloud`)
 - [Icon picker](docs/sandbox-options.md#enableiconpicker) (off by default)
 - Text suggestion box
 - Emote animation [shortcuts](docs/emotes.md) (.clap, .salute, .surrrender, etc.)

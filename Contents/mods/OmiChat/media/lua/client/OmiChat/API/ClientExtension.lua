@@ -98,7 +98,7 @@ function OmiChat.addCommand(stream)
     end
 
     stream.omichat.isCommand = true
-    OmiChat._commandStreams[#OmiChat._commandStreams+1] = stream
+    OmiChat._commandStreams[#OmiChat._commandStreams + 1] = stream
 end
 
 ---Adds an emote that is playable from chat with the .emote syntax.
@@ -115,7 +115,7 @@ end
 ---Adds a message transformer which can act on message information to modify display or behavior.
 ---@param transformer omichat.MessageTransformer
 function OmiChat.addMessageTransformer(transformer)
-    OmiChat._transformers[#OmiChat._transformers+1] = transformer
+    OmiChat._transformers[#OmiChat._transformers + 1] = transformer
     prioritySort(OmiChat._transformers)
 end
 
@@ -123,7 +123,7 @@ end
 ---@param stream omichat.ChatStream
 ---@return omichat.ChatStream
 function OmiChat.addStream(stream)
-    ISChat.allChatStreams[#ISChat.allChatStreams+1] = stream
+    ISChat.allChatStreams[#ISChat.allChatStreams + 1] = stream
 
     local tabs = ISChat.instance and ISChat.instance.tabs
     if not tabs then
@@ -133,7 +133,7 @@ function OmiChat.addStream(stream)
     for i = 1, #tabs do
         local tab = tabs[i]
         if stream.tabID == tab.tabID + 1 then
-            tab.chatStreams[#tab.chatStreams+1] = stream
+            tab.chatStreams[#tab.chatStreams + 1] = stream
         end
     end
 
@@ -161,7 +161,7 @@ end
 ---Adds a suggester which can suggest inputs to the player.
 ---@param suggester omichat.Suggester
 function OmiChat.addSuggester(suggester)
-    OmiChat._suggesters[#OmiChat._suggesters+1] = suggester
+    OmiChat._suggesters[#OmiChat._suggesters + 1] = suggester
     prioritySort(OmiChat._suggesters)
 end
 

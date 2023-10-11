@@ -49,4 +49,3 @@ function OmiChat.transmitModData()
     OmiChat.getModData()
     ModData.transmit(OmiChat._modDataKey)
 end
-

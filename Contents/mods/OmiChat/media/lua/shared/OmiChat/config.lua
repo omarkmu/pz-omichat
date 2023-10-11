@@ -129,7 +129,7 @@ Configuration._commandStreams = {
 Configuration._formatters = {
     {
         name = 'callout',
-        formatID = 51
+        formatID = 51,
     },
     {
         name = 'sneakcallout',
@@ -198,11 +198,11 @@ end
 ---@private
 function Configuration:init()
     for i = 1, #self._chatStreams do
-        self._streamList[#self._streamList+1] = self._chatStreams[i]
+        self._streamList[#self._streamList + 1] = self._chatStreams[i]
     end
 
     for i = 1, #self._commandStreams do
-        self._streamList[#self._streamList+1] = self._commandStreams[i]
+        self._streamList[#self._streamList + 1] = self._commandStreams[i]
     end
 
     for stream in Configuration:streams() do

@@ -48,9 +48,9 @@ local function getLines(text, maxLen)
     for line in text:gmatch('[^\n]+\n?') do
         line = utils.trim(line)
         if maxLen and #line > maxLen then
-            lines[#lines+1] = line:sub(1, maxLen)
+            lines[#lines + 1] = line:sub(1, maxLen)
         elseif #line > 0 then
-            lines[#lines+1] = line
+            lines[#lines + 1] = line
         end
     end
 
@@ -88,7 +88,8 @@ function ISChat.onCustomColorMenu(target, category)
     local color = OmiChat.getColorOrDefault(category)
     local text = getTextOrNull('UI_OmiChat_context_color_desc_' .. category)
     if not text then
-        local catName = getTextOrNull('UI_OmiChat_context_message_type_' .. category) or OmiChat.getColorCategoryCommand(category)
+        local catName = getTextOrNull('UI_OmiChat_context_message_type_' .. category) or
+            OmiChat.getColorCategoryCommand(category)
         text = getText('UI_OmiChat_context_color_desc', catName)
     end
 
@@ -120,7 +121,8 @@ function ISChat.validateCustomCalloutText(target, text)
 
     for i = 1, #lines do
         if #lines[i] > Option.CustomShoutMaxLength then
-            target:setValidateTooltipText(getText('UI_OmiChat_error_shout_too_long', tostring(Option.CustomShoutMaxLength)))
+            target:setValidateTooltipText(getText('UI_OmiChat_error_shout_too_long',
+                tostring(Option.CustomShoutMaxLength)))
             return false
         end
     end

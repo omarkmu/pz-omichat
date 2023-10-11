@@ -59,7 +59,7 @@ function ColorModal:initialise()
     self:selectColor({
         r = self.defaultColor.r / 255,
         g = self.defaultColor.g / 255,
-        b = self.defaultColor.b / 255
+        b = self.defaultColor.b / 255,
     })
 
     if self.minimumValue ~= 0 or self.maximumValue ~= 255 then
@@ -160,18 +160,18 @@ function ColorModal:updateColorPickerColors()
         for green = minVal, maxVal, delta do
             for blue = minVal, maxVal, delta do
                 local col = i % columns
-				local row = floor(i / columns)
-				if row % 2 == 0 then row = row / 2 else row = floor(row / 2) + 6 end
+                local row = floor(i / columns)
+                if row % 2 == 0 then row = row / 2 else row = floor(row / 2) + 6 end
 
                 ---@diagnostic disable-next-line: redundant-parameter
-				newColor:set(red / 255, green / 255, blue / 255, 1.0)
-				colors[col + row * columns + 1] = {
+                newColor:set(red / 255, green / 255, blue / 255, 1.0)
+                colors[col + row * columns + 1] = {
                     r = newColor:getRedFloat(),
                     g = newColor:getGreenFloat(),
-                    b = newColor:getBlueFloat()
+                    b = newColor:getBlueFloat(),
                 }
 
-				i = i + 1
+                i = i + 1
             end
         end
     end
@@ -223,7 +223,7 @@ function ColorModal:new(x, y, width, height, text, defaultColor, target, onclick
 
     local o = ISTextBox:new(x, y, width, height, text, '', target, onclick, player, ...)
 
-    o.defaultColor = defaultColor or {r=255,g=255,b=255}
+    o.defaultColor = defaultColor or { r = 255, g = 255, b = 255 }
     o.emptyColor = o.defaultColor
     o.minimumValue = 0
     o.maximumValue = 255

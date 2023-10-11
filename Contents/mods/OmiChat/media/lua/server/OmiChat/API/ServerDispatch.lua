@@ -50,7 +50,7 @@ end
 ---@param serverAlert boolean?
 function OmiChat.sendInfoMessage(player, text, serverAlert)
     ---@type omichat.request.ShowMessage
-    local req = { text = text, serverAlert = serverAlert, }
+    local req = { text = text, serverAlert = serverAlert }
 
     dispatchCommand('showInfoMessage', player, req)
 end
@@ -60,7 +60,7 @@ end
 ---@param serverAlert boolean?
 function OmiChat.sendServerMessage(text, serverAlert)
     ---@type omichat.request.ShowMessage
-    local req = { text = text, serverAlert = serverAlert, }
+    local req = { text = text, serverAlert = serverAlert }
 
     dispatchCommandToAll('showInfoMessage', req)
 end
@@ -72,7 +72,7 @@ end
 ---@param serverAlert boolean?
 function OmiChat.sendTranslatedInfoMessage(player, stringID, args, serverAlert)
     ---@type omichat.request.ShowMessage
-    local req = { stringID = stringID, args = args, serverAlert = serverAlert, }
+    local req = { stringID = stringID, args = args, serverAlert = serverAlert }
 
     dispatchCommand('showInfoMessage', player, req)
 end
@@ -83,7 +83,7 @@ end
 ---@param serverAlert boolean?
 function OmiChat.sendTranslatedServerMessage(stringID, args, serverAlert)
     ---@type omichat.request.ShowMessage
-    local req = { stringID = stringID, args = args, serverAlert = serverAlert, }
+    local req = { stringID = stringID, args = args, serverAlert = serverAlert }
 
     dispatchCommandToAll('showInfoMessage', req)
 end

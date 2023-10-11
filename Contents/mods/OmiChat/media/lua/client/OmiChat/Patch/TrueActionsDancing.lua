@@ -11,307 +11,307 @@ local trim = OmiChat.utils.trim
 -- dances from TAD
 local itemDanceByItemType = {}
 local itemDances = {
-	afoxe_samba_raggae = {
+    afoxe_samba_raggae = {
         item = 'TAD.BobTA_Afoxe_Samba_Raggae_card',
-        emote = 'BobTA_Afoxe_Samba_Raggae'
+        emote = 'BobTA_Afoxe_Samba_Raggae',
     },
-	belly_1 = {
+    belly_1 = {
         item = 'TAD.BobTA_Belly_Dancing_One_card',
-        emote = 'BobTA_Belly_Dancing_One'
+        emote = 'BobTA_Belly_Dancing_One',
     },
-	belly_2 = {
+    belly_2 = {
         item = 'TAD.BobTA_Belly_Dancing_Two_card',
-        emote = 'BobTA_Belly_Dancing_Two'
+        emote = 'BobTA_Belly_Dancing_Two',
     },
-	belly_3 = {
+    belly_3 = {
         item = 'TAD.BobTA_Belly_Dancing_Three_card',
-        emote = 'BobTA_Belly_Dancing_Three'
+        emote = 'BobTA_Belly_Dancing_Three',
     },
-	boogaloo = {
+    boogaloo = {
         item = 'TAD.BobTA_Boogaloo_card',
-        emote = 'BobTA_Boogaloo'
+        emote = 'BobTA_Boogaloo',
     },
-	breakdance_1990 = {
+    breakdance_1990 = {
         item = 'TAD.BobTA_Breakdance_1990_card',
-        emote = 'BobTA_Breakdance_1990'
+        emote = 'BobTA_Breakdance_1990',
     },
-	breakdance_freezes_combo = {
+    breakdance_freezes_combo = {
         item = 'TAD.BobTA_Breakdance_Freezes_Combo_card',
-        emote = 'BobTA_Breakdance_Freezes_Combo'
+        emote = 'BobTA_Breakdance_Freezes_Combo',
     },
-	charleston = {
+    charleston = {
         item = 'TAD.BobTA_Charleston_card',
-        emote = 'BobTA_Charleston'
+        emote = 'BobTA_Charleston',
     },
-	gandy = {
+    gandy = {
         item = 'TAD.BobTA_Gandy_card',
-        emote = 'BobTA_Gandy'
+        emote = 'BobTA_Gandy',
     },
-	house = {
+    house = {
         item = 'TAD.BobTA_House_Dancing_card',
-        emote = 'BobTA_House_Dancing'
+        emote = 'BobTA_House_Dancing',
     },
-	locking = {
+    locking = {
         item = 'TAD.BobTA_Locking_card',
-        emote = 'BobTA_Locking'
+        emote = 'BobTA_Locking',
     },
-	moonwalk_2 = {
+    moonwalk_2 = {
         item = 'TAD.BobTA_Moonwalk_Two_card',
-        emote = 'BobTA_Moonwalk_Two'
+        emote = 'BobTA_Moonwalk_Two',
     },
-	northern_soul_spin_and_floor_work = {
+    northern_soul_spin_and_floor_work = {
         item = 'TAD.BobTA_Northern_Soul_Spin_and_Floor_Work_card',
-        emote = 'BobTA_Northern_Soul_Spin_and_Floor_Work'
+        emote = 'BobTA_Northern_Soul_Spin_and_Floor_Work',
     },
-	northern_soul_spin_dip_and_splits = {
+    northern_soul_spin_dip_and_splits = {
         item = 'TAD.BobTA_Northern_Soul_Spin_Dip_and_Splits_card',
-        emote = 'BobTA_Northern_Soul_Spin_Dip_and_Splits'
+        emote = 'BobTA_Northern_Soul_Spin_Dip_and_Splits',
     },
-	rick = {
+    rick = {
         item = 'TAD.BobTA_Rick_Dancing_card',
-        emote = 'BobTA_Rick_Dancing'
+        emote = 'BobTA_Rick_Dancing',
     },
-	robot_1 = {
+    robot_1 = {
         item = 'TAD.BobTA_Robot_One_card',
-        emote = 'BobTA_Robot_One'
+        emote = 'BobTA_Robot_One',
     },
-	robot_2 = {
+    robot_2 = {
         item = 'TAD.BobTA_Robot_Two_card',
-        emote = 'BobTA_Robot_Two'
+        emote = 'BobTA_Robot_Two',
     },
-	salsa_2 = {
+    salsa_2 = {
         item = 'TAD.BobTA_Salsa_Two_card',
-        emote = 'BobTA_Salsa_Two'
+        emote = 'BobTA_Salsa_Two',
     },
-	samba_olodum = {
+    samba_olodum = {
         item = 'TAD.BobTA_Samba_Olodum_card',
-        emote = 'BobTA_Samba_Olodum'
+        emote = 'BobTA_Samba_Olodum',
     },
-	samba_pagode = {
+    samba_pagode = {
         item = 'TAD.BobTA_Samba_Pagode_card',
-        emote = 'BobTA_Samba_Pagode'
+        emote = 'BobTA_Samba_Pagode',
     },
-	slide_step = {
+    slide_step = {
         item = 'TAD.BobTA_Slide_Step_card',
-        emote = 'BobTA_Slide_Step'
+        emote = 'BobTA_Slide_Step',
     },
-	snake = {
+    snake = {
         item = 'TAD.BobTA_Snake_card',
-        emote = 'BobTA_Snake'
+        emote = 'BobTA_Snake',
     },
-	thriller_1 = {
+    thriller_1 = {
         item = 'TAD.BobTA_Thriller_One_card',
-        emote = 'BobTA_Thriller_One'
+        emote = 'BobTA_Thriller_One',
     },
-	thriller_2 = {
+    thriller_2 = {
         item = 'TAD.BobTA_Thriller_Two_card',
-        emote = 'BobTA_Thriller_Two'
+        emote = 'BobTA_Thriller_Two',
     },
-	thriller_3 = {
+    thriller_3 = {
         item = 'TAD.BobTA_Thriller_Three_card',
-        emote = 'BobTA_Thriller_Three'
+        emote = 'BobTA_Thriller_Three',
     },
-	thriller_4 = {
+    thriller_4 = {
         item = 'TAD.BobTA_Thriller_Four_card',
-        emote = 'BobTA_Thriller_Four'
+        emote = 'BobTA_Thriller_Four',
     },
-	tut_1 = {
+    tut_1 = {
         item = 'TAD.BobTA_Tut_One_card',
-        emote = 'BobTA_Tut_One'
+        emote = 'BobTA_Tut_One',
     },
-	tut_2 = {
+    tut_2 = {
         item = 'TAD.BobTA_Tut_Two_card',
-        emote = 'BobTA_Tut_Two'
+        emote = 'BobTA_Tut_Two',
     },
-	wave_1 = {
+    wave_1 = {
         item = 'TAD.BobTA_Wave_One_card',
-        emote = 'BobTA_Wave_One'
+        emote = 'BobTA_Wave_One',
     },
-	wave_2 = {
+    wave_2 = {
         item = 'TAD.BobTA_Wave_Two_card',
-        emote = 'BobTA_Wave_Two'
+        emote = 'BobTA_Wave_Two',
     },
 }
 local recipeDances = {
     african_noodle = {
         recipe = 'BobTA African Noodle',
-        emote = 'BobTA_African_Noodle'
+        emote = 'BobTA_African_Noodle',
     },
     african_rainbow = {
         recipe = 'BobTA African Rainbow',
-        emote = 'BobTA_African_Rainbow'
+        emote = 'BobTA_African_Rainbow',
     },
     arms_hip_hop = {
         recipe = 'BobTA Arms Hip Hop',
-        emote = 'BobTA_Arms_Hip_Hop'
+        emote = 'BobTA_Arms_Hip_Hop',
     },
     arm_push = {
         recipe = 'BobTA Arm Push',
-        emote = 'BobTA_Arm_Push'
+        emote = 'BobTA_Arm_Push',
     },
     arm_wave_1 = {
         recipe = 'BobTA Arm Wave One',
-        emote = 'BobTA_Arm_Wave_One'
+        emote = 'BobTA_Arm_Wave_One',
     },
     arm_wave_2 = {
         recipe = 'BobTA Arm Wave Two',
-        emote = 'BobTA_Arm_Wave_Two'
+        emote = 'BobTA_Arm_Wave_Two',
     },
     around_the_world = {
         recipe = 'BobTA Around The World',
-        emote = 'BobTA_Around_The_World'
+        emote = 'BobTA_Around_The_World',
     },
     bboy_hip_hop_1 = {
         recipe = 'BobTA Bboy Hip Hop One',
-        emote = 'BobTA_Bboy_Hip_Hop_One'
+        emote = 'BobTA_Bboy_Hip_Hop_One',
     },
     bboy_hip_hop_2 = {
         recipe = 'BobTA Bboy Hip Hop Two',
-        emote = 'BobTA_Bboy_Hip_Hop_Two'
+        emote = 'BobTA_Bboy_Hip_Hop_Two',
     },
     bboy_hip_hop_3 = {
         recipe = 'BobTA Bboy Hip Hop Three',
-        emote = 'BobTA_Bboy_Hip_Hop_Three'
+        emote = 'BobTA_Bboy_Hip_Hop_Three',
     },
     body_wave = {
         recipe = 'BobTA Body Wave',
-        emote = 'BobTA_Body_Wave'
+        emote = 'BobTA_Body_Wave',
     },
     booty_step = {
         recipe = 'BobTA Booty Step',
-        emote = 'BobTA_Booty_Step'
+        emote = 'BobTA_Booty_Step',
     },
     breakdance_brooklyn_uprock = {
         recipe = 'BobTA Breakdance Brooklyn Uprock',
-        emote = 'BobTA_Breakdance_Brooklyn_Uprock'
+        emote = 'BobTA_Breakdance_Brooklyn_Uprock',
     },
     cabbage_patch = {
         recipe = 'BobTA Cabbage Patch',
-        emote = 'BobTA_Cabbage_Patch'
+        emote = 'BobTA_Cabbage_Patch',
     },
     can_can = {
         recipe = 'BobTA Can Can',
-        emote = 'BobTA_Can_Can'
+        emote = 'BobTA_Can_Can',
     },
     chicken = {
         recipe = 'BobTA Chicken',
-        emote = 'BobTA_Chicken'
+        emote = 'BobTA_Chicken',
     },
     crazy_legs = {
         recipe = 'BobTA Crazy Legs',
-        emote = 'BobTA_Crazy_Legs'
+        emote = 'BobTA_Crazy_Legs',
     },
     defile_de_samba_parade = {
         recipe = 'BobTA Defile De Samba Parade',
-        emote = 'BobTA_Defile_De_Samba_Parade'
+        emote = 'BobTA_Defile_De_Samba_Parade',
     },
     hokey_pokey = {
         recipe = 'BobTA Hokey Pokey',
-        emote = 'BobTA_Hokey_Pokey'
+        emote = 'BobTA_Hokey_Pokey',
     },
     kick_step = {
         recipe = 'BobTA Kick Step',
-        emote = 'BobTA_Kick_Step'
+        emote = 'BobTA_Kick_Step',
     },
     macarena = {
         recipe = 'BobTA Macarena',
-        emote = 'BobTA_Macarena'
+        emote = 'BobTA_Macarena',
     },
     maraschino = {
         recipe = 'BobTA Maraschino',
-        emote = 'BobTA_Maraschino'
+        emote = 'BobTA_Maraschino',
     },
     moonwalk_1 = {
         recipe = 'BobTA MoonWalk One',
-        emote = 'BobTA_MoonWalk_One'
+        emote = 'BobTA_MoonWalk_One',
     },
     northern_soul_spin = {
         recipe = 'BobTA Northern Soul Spin',
-        emote = 'BobTA_Northern_Soul_Spin'
+        emote = 'BobTA_Northern_Soul_Spin',
     },
     northern_soul_spin_on_floor = {
         recipe = 'BobTA Northern Soul Spin On Floor',
-        emote = 'BobTA_Northern_Soul_Spin_On_Floor'
+        emote = 'BobTA_Northern_Soul_Spin_On_Floor',
     },
     raise_the_roof = {
         recipe = 'BobTA Raise The Roof',
-        emote = 'BobTA_Raise_The_Roof'
+        emote = 'BobTA_Raise_The_Roof',
     },
     really_twirl = {
         recipe = 'BobTA Really Twirl',
-        emote = 'BobTA_Really_Twirl'
+        emote = 'BobTA_Really_Twirl',
     },
     rip_pops = {
         recipe = 'BobTA Rib Pops',
-        emote = 'BobTA_Rib_Pops'
+        emote = 'BobTA_Rib_Pops',
     },
     rockette_kick = {
         recipe = 'BobTA Rockette Kick',
-        emote = 'BobTA_Rockette_Kick'
+        emote = 'BobTA_Rockette_Kick',
     },
     rumba = {
         recipe = 'BobTA Rumba Dancing',
-        emote = 'BobTA_Rumba_Dancing'
+        emote = 'BobTA_Rumba_Dancing',
     },
     running_man_1 = {
         recipe = 'BobTA Running Man One',
-        emote = 'BobTA_Running_Man_One'
+        emote = 'BobTA_Running_Man_One',
     },
     running_man_2 = {
         recipe = 'BobTA Running Man Two',
-        emote = 'BobTA_Running_Man_Two'
+        emote = 'BobTA_Running_Man_Two',
     },
     running_man_3 = {
         recipe = 'BobTA Running Man Three',
-        emote = 'BobTA_Running_Man_Three'
+        emote = 'BobTA_Running_Man_Three',
     },
     salsa = {
         recipe = 'BobTA Salsa',
-        emote = 'BobTA_Salsa'
+        emote = 'BobTA_Salsa',
     },
     salsa_double_twirl = {
         recipe = 'BobTA Salsa Double Twirl',
-        emote = 'BobTA_Salsa_Double_Twirl'
+        emote = 'BobTA_Salsa_Double_Twirl',
     },
     salsa_double_twirl_and_clap = {
         recipe = 'BobTA Salsa Double Twirl and Clap',
-        emote = 'BobTA_Salsa_Double_Twirl_and_Clap'
+        emote = 'BobTA_Salsa_Double_Twirl_and_Clap',
     },
     salsa_side_to_side = {
         recipe = 'BobTA Salsa Side to Side',
-        emote = 'BobTA_Salsa_Side_to_Side'
+        emote = 'BobTA_Salsa_Side_to_Side',
     },
     shimmy = {
         recipe = 'BobTA Shimmy',
-        emote = 'BobTA_Shimmy'
+        emote = 'BobTA_Shimmy',
     },
     shim_sham = {
         recipe = 'BobTA Shim Sham',
-        emote = 'BobTA_Shim_Sham'
+        emote = 'BobTA_Shim_Sham',
     },
     shuffling = {
         recipe = 'BobTA Shuffling',
-        emote = 'BobTA_Shuffling'
+        emote = 'BobTA_Shuffling',
     },
     side_to_side = {
         recipe = 'BobTA Side to Side',
-        emote = 'BobTA_Side_to_Side'
+        emote = 'BobTA_Side_to_Side',
     },
     twist_1 = {
         recipe = 'BobTA Twist One',
-        emote = 'BobTA_Twist_One'
+        emote = 'BobTA_Twist_One',
     },
     twist_2 = {
         recipe = 'BobTA Twist Two',
-        emote = 'BobTA_Twist_Two'
+        emote = 'BobTA_Twist_Two',
     },
     uprock_indian_step = {
         recipe = 'BobTA Uprock Indian Step',
-        emote = 'BobTA_Uprock_Indian_Step'
+        emote = 'BobTA_Uprock_Indian_Step',
     },
     ymca = {
         recipe = 'BobTA YMCA',
-        emote = 'BobTA_YMCA'
+        emote = 'BobTA_YMCA',
     },
 }
 
@@ -354,7 +354,7 @@ local function getAvailableDances(player, search)
 
     for _, dance in pairs(recipeDances) do
         if player:isRecipeKnown(dance.recipe) then
-            danceList[#danceList+1] = dance
+            danceList[#danceList + 1] = dance
 
             if search == dance.emote then
                 searchIdx = #danceList
@@ -377,12 +377,12 @@ local function getAvailableDanceHelpText(player)
     end)
 
     if #dances > 0 then
-        parts[#parts+1] = getText('UI_OmiChat_available_dances')
+        parts[#parts + 1] = getText('UI_OmiChat_available_dances')
     end
 
     for i = 1, #dances do
-        parts[#parts+1] = ' <LINE> * '
-        parts[#parts+1] = dances[i].name:gsub('_', ' ')
+        parts[#parts + 1] = ' <LINE> * '
+        parts[#parts + 1] = dances[i].name:gsub('_', ' ')
     end
 
     return concat(parts)
@@ -477,7 +477,7 @@ local function onUseDanceCommand(_, command)
     local info = processDanceCommand(command, player)
     if info.emote then
         player:setPrimaryHandItem(nil)
-		player:setSecondaryHandItem(nil)
+        player:setSecondaryHandItem(nil)
         player:playEmote(info.emote)
     elseif info.unknownRecipe then
         feedback = concat {

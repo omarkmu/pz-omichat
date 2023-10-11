@@ -14,7 +14,7 @@ local suits = {
     'Clubs',
     'Diamonds',
     'Hearts',
-    'Spades'
+    'Spades',
 }
 local cards = {
     'the Ace',

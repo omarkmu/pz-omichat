@@ -69,7 +69,7 @@ OmiChat._customChatStreams = {
             allowIconPicker = true,
             isEnabled = isCustomChatEnabled,
             onUse = useCustomChat,
-        }
+        },
     },
     whisper = {
         name = 'whisper',
@@ -82,7 +82,7 @@ OmiChat._customChatStreams = {
             context = { ocIsLocalWhisper = true },
             isEnabled = isCustomChatEnabled,
             onUse = useCustomChat,
-        }
+        },
     },
     ['do'] = {
         name = 'do',
@@ -143,7 +143,7 @@ OmiChat._customChatStreams = {
             allowIconPicker = true,
             isEnabled = isCustomChatEnabled,
             onUse = useCustomChat,
-        }
+        },
     },
     meloud = {
         name = 'meloud',
@@ -156,7 +156,7 @@ OmiChat._customChatStreams = {
             allowIconPicker = false,
             isEnabled = isCustomChatEnabled,
             onUse = useCustomChat,
-        }
+        },
     },
 }
 
@@ -165,7 +165,7 @@ OmiChat._vanillaStreamConfigs = {
         allowIconPicker = true,
         isEnabled = isBasicChatEnabled,
         onUse = useBasicChat,
-        context = { ocIsEnabledCommand = '/s', }
+        context = { ocIsEnabledCommand = '/s' },
     },
     yell = {
         isEnabled = isBasicChatEnabled,
@@ -221,5 +221,5 @@ OmiChat._vanillaStreamConfigs = {
             ocIsEnabledCommand = '/a',
             ocProcess = processAdminChatMessage,
         },
-    }
+    },
 }

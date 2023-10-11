@@ -86,7 +86,6 @@ function ISChat.addLineInChat(message, tabID)
                 end
             end
         end
-
     end
 
     local s, e = pcall(_addLineInChat, message, tabID)
@@ -302,74 +301,74 @@ function ISChat:onGearButtonClick()
     local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
 
     if Option.EnableSetNameColor then
-        colorOpts[#colorOpts+1] = 'name'
-    end
-    if Option.EnableSetSpeechColor then
-        colorOpts[#colorOpts+1] = 'speech'
+        colorOpts[#colorOpts + 1] = 'name'
     end
 
-    colorOpts[#colorOpts+1] = 'server'
+    if Option.EnableSetSpeechColor then
+        colorOpts[#colorOpts + 1] = 'speech'
+    end
+
+    colorOpts[#colorOpts + 1] = 'server'
 
     if serverOptions:getBoolean('DiscordEnable') then
-        colorOpts[#colorOpts+1] = 'discord'
+        colorOpts[#colorOpts + 1] = 'discord'
     end
 
     -- need to check the option because checkPlayerCanUseChat checks for a radio
     local allowedStreams = serverOptions:getOption('ChatStreams'):split(',')
     for i = 1, #allowedStreams do
         if allowedStreams[i] == 'r' then
-            colorOpts[#colorOpts+1] = 'radio'
+            colorOpts[#colorOpts + 1] = 'radio'
             break
         end
     end
 
     if checkPlayerCanUseChat('/a') then
-        colorOpts[#colorOpts+1] = 'admin'
+        colorOpts[#colorOpts + 1] = 'admin'
     end
 
     if checkPlayerCanUseChat('/all') then
-        colorOpts[#colorOpts+1] = 'general'
+        colorOpts[#colorOpts + 1] = 'general'
     end
 
     if checkPlayerCanUseChat('/f') then
-        colorOpts[#colorOpts+1] = 'faction'
+        colorOpts[#colorOpts + 1] = 'faction'
     end
 
     if checkPlayerCanUseChat('/sh') then
-        colorOpts[#colorOpts+1] = 'safehouse'
+        colorOpts[#colorOpts + 1] = 'safehouse'
     end
 
     if useLocalWhisper and canUsePM then
-        -- /pm
-        colorOpts[#colorOpts+1] = 'private'
+        colorOpts[#colorOpts + 1] = 'private' -- /pm
     end
 
     if checkPlayerCanUseChat('/s') then
-        colorOpts[#colorOpts+1] = 'say'
+        colorOpts[#colorOpts + 1] = 'say'
     end
 
     if checkPlayerCanUseChat('/y') then
-        colorOpts[#colorOpts+1] = 'shout'
+        colorOpts[#colorOpts + 1] = 'shout'
     end
 
     if not useLocalWhisper and canUsePM then
-        -- /whisper
-        colorOpts[#colorOpts+1] = 'private'
+        colorOpts[#colorOpts + 1] = 'private' -- /whisper
     end
 
     for info in config:chatStreams() do
         local name = info.name
         if info.autoColorOption ~= false and OmiChat.isCustomStreamEnabled(name) then
-            colorOpts[#colorOpts+1] = name
+            colorOpts[#colorOpts + 1] = name
         end
     end
 
     local shoutOpts = {}
     if Option.EnableCustomShouts then
-        shoutOpts[#shoutOpts+1] = 'callouts'
+        shoutOpts[#shoutOpts + 1] = 'callouts'
     end
+
     if Option.EnableCustomSneakShouts then
-        shoutOpts[#shoutOpts+1] = 'sneakcallouts'
+        shoutOpts[#shoutOpts + 1] = 'sneakcallouts'
     end
 
     -- insert new options before the first submenu

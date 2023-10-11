@@ -19,7 +19,7 @@ local accessLevels = {
     moderator = 16,
     overseer = 8,
     gm = 4,
-    observer = 2
+    observer = 2,
 }
 
 
@@ -87,17 +87,17 @@ local function kvpReadString(text, i)
         local c = text:sub(i, i)
         if escape then
             if c ~= '"' and c ~= '\\' then
-                value[#value+1] = '\\'
+                value[#value + 1] = '\\'
             end
 
-            value[#value+1] = c
+            value[#value + 1] = c
             escape = false
         elseif c == '"' then
             break
         elseif c == '\\' then
             escape = true
         else
-            value[#value+1] = c
+            value[#value + 1] = c
         end
 
         i = i + 1
@@ -105,7 +105,7 @@ local function kvpReadString(text, i)
 
     if escape then
         -- should not happen
-        value[#value+1] = '\\'
+        value[#value + 1] = '\\'
     end
 
     return concat(value), i + 1
@@ -199,9 +199,11 @@ function utils.isValidColor(color)
     if type(r) ~= 'number' or r < 0 or r > 255 then
         return false
     end
+
     if type(g) ~= 'number' or g < 0 or g > 255 then
         return false
     end
+
     if type(b) ~= 'number' or b < 0 or b > 255 then
         return false
     end
@@ -227,29 +229,29 @@ function utils.parseCommandArgs(text)
         local next = text:sub(i + 1, i + 1)
 
         if c == '\\' and next == '"' then
-            current[#current+1] = '"'
+            current[#current + 1] = '"'
             i = i + 1
         elseif c == '"' then
             if #current > 0 then
-                args[#args+1] = concat(current)
+                args[#args + 1] = concat(current)
                 current = {}
             end
 
             inQuote = not inQuote
         elseif not inQuote and c == ' ' then
             if #current > 0 then
-                args[#args+1] = concat(current)
+                args[#args + 1] = concat(current)
                 current = {}
             end
         else
-            current[#current+1] = c
+            current[#current + 1] = c
         end
 
         i = i + 1
     end
 
     if #current > 0 then
-        args[#args+1] = concat(current)
+        args[#args + 1] = concat(current)
     end
 
     return args
@@ -292,7 +294,7 @@ function utils.toChatColor(color, pushFormat)
         format('%.7f', color.g / 255):gsub('00+$', '0'),
         ',',
         format('%.7f', color.b / 255):gsub('00+$', '0'),
-        '> '
+        '> ',
     }
 end
 
@@ -312,7 +314,7 @@ function utils.toOverheadColor(color, bbCodeFormat)
         color.g,
         ',',
         color.b,
-        bbCodeFormat and ']' or '*'
+        bbCodeFormat and ']' or '*',
     }
 end
 
@@ -362,8 +364,8 @@ function utils.kvp.encode(table)
     local result = {}
 
     for k, v in pairs(table) do
-        result[#result+1] = kvpEncodeString(k)
-        result[#result+1] = kvpEncodeString(v, true)
+        result[#result + 1] = kvpEncodeString(k)
+        result[#result + 1] = kvpEncodeString(v, true)
     end
 
     return concat(result)
