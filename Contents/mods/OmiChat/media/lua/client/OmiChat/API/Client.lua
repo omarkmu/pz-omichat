@@ -548,22 +548,23 @@ OmiChat._suggesters = {
             local stream = OmiChat.chatCommandToStream(info.input)
             local context = stream and stream.omichat and stream.omichat.context
             local wantsSuggestions = context and context.ocSuggestUsernames
-            local unknownCommand = not stream and info.input:sub(1, 1) == '/'
 
-            if not wantsSuggestions and not unknownCommand then
+            local player = getSpecificPlayer(0)
+            local isCommand = not stream and info.input:sub(1, 1) == '/' and player and player:getAccessLevel() ~= 'None'
+
+            if not wantsSuggestions and not isCommand then
                 return
             end
 
             local onlinePlayers = getOnlinePlayers()
             local parts = luautils.split(info.input, ' ')
-            if #parts == 0 or (unknownCommand and #parts == 1) then
+            if #parts == 0 or (isCommand and #parts == 1) then
                 return
             end
 
             local startsWith = {}
             local contains = {}
 
-            local player = getSpecificPlayer(0)
             local ownUsername = player and player:getUsername()
             local includeSelf = utils.default(context and context.ocSuggestOwnUsername, true)
             local last = parts[#parts]:lower()
