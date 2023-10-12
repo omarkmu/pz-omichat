@@ -563,22 +563,27 @@ OmiChat._suggesters = {
             local startsWith = {}
             local contains = {}
 
+            local player = getSpecificPlayer(0)
+            local ownUsername = player and player:getUsername()
+            local includeSelf = utils.default(context and context.ocSuggestOwnUsername, true)
             local last = parts[#parts]:lower()
             for i = 0, onlinePlayers:size() - 1 do
-                local player = onlinePlayers:get(i)
-                local username = player and player:getUsername()
-                local usernameLower = username and username:lower()
+                local onlinePlayer = onlinePlayers:get(i)
+                local username = onlinePlayer and onlinePlayer:getUsername()
 
-                if #parts == 1 then
-                    -- only command specified; include all options
-                    contains[#contains + 1] = username
-                elseif usernameLower == last then
-                    -- exact match
-                    return
-                elseif usernameLower and utils.startsWith(usernameLower, last) then
-                    startsWith[#startsWith + 1] = username
-                elseif usernameLower and utils.contains(usernameLower, last) then
-                    contains[#contains + 1] = username
+                if includeSelf or username ~= ownUsername then
+                    local usernameLower = username and username:lower()
+                    if #parts == 1 then
+                        -- only command specified; include all options
+                        contains[#contains + 1] = username
+                    elseif usernameLower == last then
+                        -- exact match
+                        return
+                    elseif usernameLower and utils.startsWith(usernameLower, last) then
+                        startsWith[#startsWith + 1] = username
+                    elseif usernameLower and utils.contains(usernameLower, last) then
+                        contains[#contains + 1] = username
+                    end
                 end
             end
 

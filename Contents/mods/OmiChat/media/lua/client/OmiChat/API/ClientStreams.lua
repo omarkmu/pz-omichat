@@ -193,6 +193,7 @@ OmiChat._vanillaStreamConfigs = {
         onUse = useBasicChat,
         context = {
             ocSuggestUsernames = true,
+            ocSuggestOwnUsername = false,
             ocAppendResultToLastCommand = true,
             ocIsEnabledCommand = '/w',
             ocProcess = proceedPM,
