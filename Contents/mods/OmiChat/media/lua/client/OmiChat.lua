@@ -198,6 +198,39 @@ function ISChat.onCustomCalloutMenu(target, category)
     target.activeCalloutModal = modal
 end
 
+---Event handler for toggling command retaining.
+---@param target omichat.ISChat
+---@param type omichat.ChatCommandType
+---@diagnostic disable-next-line: unused-local
+function ISChat.onToggleRetainCommand(target, type)
+    local instance = ISChat.instance
+    if not instance then
+        return
+    end
+
+    local value = not OmiChat.getRetainCommand(type)
+    OmiChat.setRetainCommand(type, value)
+
+    if value then
+        -- don't need to clear the last command for enable
+        return
+    end
+
+    -- check to see whether the last command should be cleared based on this change
+    for i = 1, #instance.tabs do
+        local chatText = instance.tabs[i]
+        local lastChatCommand = chatText.lastChatCommand
+
+        if lastChatCommand then
+            local stream = OmiChat.chatCommandToStream(lastChatCommand, true)
+            local commandType = (stream and stream.omichat and stream.omichat.commandType) or 'other'
+            if commandType == type then
+                chatText.lastChatCommand = ''
+            end
+        end
+    end
+end
+
 ---Event handler for toggling showing name colors.
 ---@param target omichat.ISChat
 ---@diagnostic disable-next-line: unused-local
@@ -223,22 +256,16 @@ function ISChat.onIconButtonClick(target)
         return false
     end
 
-    local yDelta = 0
-    local height = target:getHeight()
-    local pickerHeight = iconPicker:getHeight()
-    if height > pickerHeight then
-        yDelta = height - pickerHeight
-    end
-
+    local targetHeight = target:getHeight()
     local x = target:getX() + target:getWidth()
-    local y = target:getY() + yDelta
+    local y = target:getY() + max(0, targetHeight - iconPicker:getHeight())
 
     -- avoid covering the button
     if x + iconPicker:getWidth() >= getPlayerScreenWidth(0) then
         y = y - target.textEntry:getHeight() - target.inset * 2 - 5
 
         if y <= 0 then
-            y = target:getHeight()
+            y = targetHeight
         end
     end
 

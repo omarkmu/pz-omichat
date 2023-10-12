@@ -36,7 +36,8 @@ local function useBasicChat(stream, command)
     local ctx = stream.omichat.context
     if ctx and ctx.ocProcess then
         local result = ctx.ocProcess(command)
-        if result and ctx.ocAppendResultToLastCommand then
+        local commandType = stream.omichat.commandType or 'other'
+        if result and ctx.ocAppendResultToLastCommand and OmiChat.getRetainCommand(commandType) then
             local chatText = ISChat.instance.chatText
             chatText.lastChatCommand = concat { chatText.lastChatCommand, result, ' ' }
         end
@@ -66,6 +67,7 @@ OmiChat._customChatStreams = {
         tabID = 1,
         omichat = {
             allowEmotes = true,
+            commandType = 'chat',
             allowIconPicker = true,
             isEnabled = isCustomChatEnabled,
             onUse = useCustomChat,
@@ -79,6 +81,7 @@ OmiChat._customChatStreams = {
         omichat = {
             allowEmotes = true,
             allowIconPicker = true,
+            commandType = 'chat',
             context = { ocIsLocalWhisper = true },
             isEnabled = isCustomChatEnabled,
             onUse = useCustomChat,
@@ -92,6 +95,7 @@ OmiChat._customChatStreams = {
         omichat = {
             allowEmotes = true,
             allowIconPicker = true,
+            commandType = 'rp',
             isEnabled = isCustomChatEnabled,
             onUse = useCustomChat,
         },
@@ -104,6 +108,7 @@ OmiChat._customChatStreams = {
         omichat = {
             allowEmotes = true,
             allowIconPicker = true,
+            commandType = 'rp',
             isEnabled = isCustomChatEnabled,
             onUse = useCustomChat,
         },
@@ -117,6 +122,7 @@ OmiChat._customChatStreams = {
             context = { ocProcess = processShoutMessage },
             allowEmotes = true,
             allowIconPicker = false,
+            commandType = 'rp',
             isEnabled = isCustomChatEnabled,
             onUse = useCustomChat,
         },
@@ -129,6 +135,7 @@ OmiChat._customChatStreams = {
         omichat = {
             allowEmotes = true,
             allowIconPicker = true,
+            commandType = 'rp',
             isEnabled = isCustomChatEnabled,
             onUse = useCustomChat,
         },
@@ -141,6 +148,7 @@ OmiChat._customChatStreams = {
         omichat = {
             allowEmotes = true,
             allowIconPicker = true,
+            commandType = 'rp',
             isEnabled = isCustomChatEnabled,
             onUse = useCustomChat,
         },
@@ -154,6 +162,7 @@ OmiChat._customChatStreams = {
             context = { ocProcess = processShoutMessage },
             allowEmotes = true,
             allowIconPicker = false,
+            commandType = 'rp',
             isEnabled = isCustomChatEnabled,
             onUse = useCustomChat,
         },
@@ -163,11 +172,13 @@ OmiChat._customChatStreams = {
 OmiChat._vanillaStreamConfigs = {
     say = {
         allowIconPicker = true,
+        commandType = 'chat',
         isEnabled = isBasicChatEnabled,
         onUse = useBasicChat,
         context = { ocIsEnabledCommand = '/s' },
     },
     yell = {
+        commandType = 'chat',
         isEnabled = isBasicChatEnabled,
         onUse = useBasicChat,
         context = {
@@ -177,6 +188,7 @@ OmiChat._vanillaStreamConfigs = {
     },
     private = {
         allowEmotes = false,
+        commandType = 'chat',
         isEnabled = isBasicChatEnabled,
         onUse = useBasicChat,
         context = {
@@ -188,6 +200,7 @@ OmiChat._vanillaStreamConfigs = {
     },
     faction = {
         allowEmotes = false,
+        commandType = 'chat',
         isEnabled = isBasicChatEnabled,
         onUse = useBasicChat,
         context = {
@@ -197,6 +210,7 @@ OmiChat._vanillaStreamConfigs = {
     },
     safehouse = {
         allowEmotes = false,
+        commandType = 'chat',
         isEnabled = isBasicChatEnabled,
         onUse = useBasicChat,
         context = {
@@ -206,6 +220,7 @@ OmiChat._vanillaStreamConfigs = {
     },
     general = {
         allowEmotes = false,
+        commandType = 'chat',
         isEnabled = isBasicChatEnabled,
         onUse = useBasicChat,
         context = {
@@ -215,6 +230,7 @@ OmiChat._vanillaStreamConfigs = {
     },
     admin = {
         allowEmotes = false,
+        commandType = 'chat',
         isEnabled = isBasicChatEnabled,
         onUse = useBasicChat,
         context = {

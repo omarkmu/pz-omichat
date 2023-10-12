@@ -16,8 +16,9 @@ Events.OnReceiveGlobalModData.Add(OmiChat._onReceiveGlobalModData)
 return OmiChat
 
 
----@alias omichat.EmoteGetter fun(emoteName: string): string?
+---@alias omichat.ChatCommandType 'chat' | 'rp' | 'other'
 ---@alias omichat.ChatFont 'small' | 'medium' | 'large'
+---@alias omichat.EmoteGetter fun(emoteName: string): string?
 ---@alias omichat.Message ChatMessage | omichat.MimicMessage
 
 
@@ -78,13 +79,13 @@ return OmiChat
 ---@field priority integer? The priority of the suggester. Higher numbers will run first.
 
 ---@class omichat.BaseStreamConfig
+---@field commandType omichat.ChatCommandType? The command type used to determine whether input should be retained.
 ---@field context table? Table for arbitrary context data.
 ---@field isCommand boolean? Indicates that the stream is a command.
 ---@field isEnabled (fun(self: table): boolean)? Returns a boolean representing whether the stream is enabled.
 ---@field onUse fun(self: table, command: string)? Callback triggered when the stream is used.
 ---@field allowEmotes boolean? Whether to allow emotes on this stream. Defaults to true for non-commands and false for commands.
 ---@field allowIconPicker boolean? Whether to enable the icon button for this stream. Defaults to false.
----@field allowRetain boolean? Whether to allow retaining this stream's command for subsequent inputs. Defaults to true for non-commands and false for commands.
 
 ---@class omichat.ChatStreamConfig : omichat.BaseStreamConfig
 
@@ -113,6 +114,9 @@ return OmiChat
 ---@field callouts string[] Custom callouts.
 ---@field sneakcallouts string[] Custom sneak callouts.
 ---@field colors table<omichat.ColorCategory, omichat.ColorTable> Custom chat colors.
+---@field retainChatInput boolean Whether to retain chat input for chat streams.
+---@field retainRPInput boolean Whether to retain chat input for roleplay streams (/me).
+---@field retainOtherInput boolean Whether to retain other chat input.
 
 ---Description of a chat tab object.
 ---@class omichat.ChatTab : ISRichTextPanel

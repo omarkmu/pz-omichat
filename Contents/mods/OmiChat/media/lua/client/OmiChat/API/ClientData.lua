@@ -6,7 +6,6 @@ local OmiChat = require 'OmiChat/API/Client'
 local utils = OmiChat.utils
 local Option = OmiChat.Option
 local concat = table.concat
-local pairs = pairs
 local getText = getText
 
 
@@ -142,6 +141,9 @@ function OmiChat.getPlayerPreferences()
     OmiChat._playerPrefs = {
         showNameColors = true,
         useSuggester = true,
+        retainChatInput = true,
+        retainRPInput = true,
+        retainOtherInput = false,
         colors = {},
         callouts = {},
         sneakcallouts = {},
@@ -180,26 +182,39 @@ function OmiChat.getPlayerPreferences()
 
     prefs.showNameColors = not not decoded.showNameColors
     prefs.useSuggester = not not decoded.useSuggester
+    prefs.retainChatInput = not not decoded.retainChatInput
+    prefs.retainRPInput = not not decoded.retainRPInput
+    prefs.retainOtherInput = not not decoded.retainOtherInput
 
     if type(decoded.callouts) == 'table' then
-        for i = 1, #decoded.callouts do
-            prefs.callouts[#prefs.callouts + 1] = tostring(decoded.callouts[i])
-        end
+        prefs.callouts = utils.pack(utils.mapList(tostring, decoded.callouts))
     end
 
     if type(decoded.sneakcallouts) == 'table' then
-        for i = 1, #decoded.sneakcallouts do
-            prefs.sneakcallouts[#prefs.sneakcallouts + 1] = tostring(decoded.sneakcallouts[i])
-        end
+        prefs.sneakcallouts = utils.pack(utils.mapList(tostring, decoded.sneakcallouts))
     end
 
     if type(decoded.colors) == 'table' then
-        for k, v in pairs(decoded.colors) do
-            prefs.colors[k] = utils.stringToColor(v)
-        end
+        prefs.colors = utils.pack(utils.mapList(utils.stringToColor, decoded.colors))
     end
 
     return prefs
+end
+
+---Gets whether a retain command category is set to retain commands.
+---@param category omichat.ChatCommandType
+---@return boolean
+function OmiChat.getRetainCommand(category)
+    local prefs = OmiChat.getPlayerPreferences()
+    if category == 'chat' then
+        return prefs.retainChatInput
+    elseif category == 'rp' then
+        return prefs.retainRPInput
+    elseif category == 'other' then
+        return prefs.retainOtherInput
+    end
+
+    return false
 end
 
 ---Returns a color table for the current player's speech color.
@@ -239,6 +254,9 @@ function OmiChat.savePlayerPreferences()
         VERSION = OmiChat._prefsVersion,
         useSuggester = prefs.useSuggester,
         showNameColors = prefs.showNameColors,
+        retainChatInput = prefs.retainChatInput,
+        retainRPInput = prefs.retainRPInput,
+        retainOtherInput = prefs.retainOtherInput,
         colors = utils.pack(utils.map(utils.colorToHexString, prefs.colors)),
         callouts = prefs.callouts,
         sneakcallouts = prefs.sneakcallouts,
@@ -326,6 +344,22 @@ function OmiChat.setNickname(nickname)
     })
 
     return true, getText('UI_OmiChat_set_name_success', utils.escapeRichText(nickname))
+end
+
+---Sets whether a retain command category will retain commands.
+---@param category omichat.ChatCommandType
+---@param value boolean
+function OmiChat.setRetainCommand(category, value)
+    local prefs = OmiChat.getPlayerPreferences()
+    if category == 'chat' then
+        prefs.retainChatInput = value
+    elseif category == 'rp' then
+        prefs.retainRPInput = value
+    elseif category == 'other' then
+        prefs.retainOtherInput = value
+    end
+
+    OmiChat.savePlayerPreferences()
 end
 
 ---Sets whether the current player wants to use chat suggestions.

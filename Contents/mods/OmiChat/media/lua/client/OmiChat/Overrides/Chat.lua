@@ -31,6 +31,149 @@ local _ChatMessage = __classmetatables[ChatMessage.class].__index
 local _ServerChatMessage = __classmetatables[ServerChatMessage.class].__index
 
 
+---Adds context menu options for chat colors.
+---@param context ISContextMenu
+---@param beforeOption string
+local function addColorOptions(context, beforeOption)
+    local colorOpts = {}
+    local canUsePM = checkPlayerCanUseChat('/w')
+    local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
+
+    if Option.EnableSetNameColor then
+        colorOpts[#colorOpts + 1] = 'name'
+    end
+
+    if Option.EnableSetSpeechColor then
+        colorOpts[#colorOpts + 1] = 'speech'
+    end
+
+    colorOpts[#colorOpts + 1] = 'server'
+
+    local serverOptions = getServerOptions()
+    if serverOptions:getBoolean('DiscordEnable') then
+        colorOpts[#colorOpts + 1] = 'discord'
+    end
+
+    -- need to check the option because checkPlayerCanUseChat checks for a radio
+    local allowedStreams = serverOptions:getOption('ChatStreams'):split(',')
+    for i = 1, #allowedStreams do
+        if allowedStreams[i] == 'r' then
+            colorOpts[#colorOpts + 1] = 'radio'
+            break
+        end
+    end
+
+    if checkPlayerCanUseChat('/a') then
+        colorOpts[#colorOpts + 1] = 'admin'
+    end
+
+    if checkPlayerCanUseChat('/all') then
+        colorOpts[#colorOpts + 1] = 'general'
+    end
+
+    if checkPlayerCanUseChat('/f') then
+        colorOpts[#colorOpts + 1] = 'faction'
+    end
+
+    if checkPlayerCanUseChat('/sh') then
+        colorOpts[#colorOpts + 1] = 'safehouse'
+    end
+
+    if useLocalWhisper and canUsePM then
+        colorOpts[#colorOpts + 1] = 'private' -- /pm
+    end
+
+    if checkPlayerCanUseChat('/s') then
+        colorOpts[#colorOpts + 1] = 'say'
+    end
+
+    if checkPlayerCanUseChat('/y') then
+        colorOpts[#colorOpts + 1] = 'shout'
+    end
+
+    if not useLocalWhisper and canUsePM then
+        colorOpts[#colorOpts + 1] = 'private' -- /whisper
+    end
+
+    for info in config:chatStreams() do
+        local name = info.name
+        if info.autoColorOption ~= false and OmiChat.isCustomStreamEnabled(name) then
+            colorOpts[#colorOpts + 1] = name
+        end
+    end
+
+    if #colorOpts > 1 then
+        local colorOptionName = getText('UI_OmiChat_context_colors_submenu_name')
+        local colorOption = context:insertOptionBefore(beforeOption, colorOptionName, ISChat.instance)
+
+        local colorSubMenu = context:getNew(context)
+        context:addSubMenu(colorOption, colorSubMenu)
+
+        for i = 1, #colorOpts do
+            local category = colorOpts[i]
+            local name = getTextOrNull('UI_OmiChat_context_submenu_color_' .. category)
+            if not name then
+                name = getText('UI_OmiChat_context_submenu_color', OmiChat.getColorCategoryCommand(category))
+            end
+
+            colorSubMenu:addOption(name, ISChat.instance, ISChat.onCustomColorMenu, category)
+        end
+    elseif #colorOpts == 1 then
+        local category = colorOpts[1]
+
+        local name = getTextOrNull('UI_OmiChat_context_color_' .. category)
+        if not name then
+            name = getText('UI_OmiChat_context_color', OmiChat.getColorCategoryCommand(category))
+        end
+
+        context:insertOptionBefore(beforeOption, name, ISChat.instance, ISChat.onCustomColorMenu, category)
+    end
+end
+
+---Adds the context menu options for custom callouts.
+---@param context ISContextMenu
+---@param beforeOption string
+local function addCustomCalloutOptions(context, beforeOption)
+    local shoutOpts = {}
+    if Option.EnableCustomShouts then
+        shoutOpts[#shoutOpts + 1] = 'callouts'
+    end
+
+    if Option.EnableCustomSneakShouts then
+        shoutOpts[#shoutOpts + 1] = 'sneakcallouts'
+    end
+
+    for i = 1, #shoutOpts do
+        local shoutType = shoutOpts[i]
+        local shoutOptionName = getText('UI_OmiChat_context_set_custom_' .. shoutType)
+        context:insertOptionBefore(beforeOption, shoutOptionName, ISChat.instance, ISChat.onCustomCalloutMenu, shoutType)
+    end
+end
+
+---Adds the context menu options for retaining commands.
+---@param context ISContextMenu
+---@param beforeOption string
+local function addRetainOptions(context, beforeOption)
+    local retainOptionName = getText('UI_OmiChat_context_retain_commands')
+    local retainOption = context:insertOptionBefore(beforeOption, retainOptionName, ISChat.instance)
+
+    local retainSubMenu = context:getNew(context)
+    context:addSubMenu(retainOption, retainSubMenu)
+
+    local categories = {
+        'chat',
+        'rp',
+        'other',
+    }
+
+    for i = 1, #categories do
+        local cat = categories[i]
+        local name = getText('UI_OmiChat_context_retain_commands_' .. cat)
+        local opt = retainSubMenu:addOption(name, ISChat.instance, ISChat.onToggleRetainCommand, cat)
+        retainSubMenu:setOptionChecked(opt, OmiChat.getRetainCommand(cat))
+    end
+end
+
 ---Attempts to set the current text with the currently selected suggester box item.
 ---@return boolean didSet
 local function tryInputSuggestedItem()
@@ -175,9 +318,9 @@ function ISChat:onCommandEntered()
     local useCallback
     local callbackStream
 
+    local commandType = 'other'
     local shouldHandle = false
     local allowEmotes = false
-    local allowRetain = true
     local isDefault = false
 
     if not stream then
@@ -217,10 +360,8 @@ function ISChat:onCommandEntered()
                     allowEmotes = false
                 end
 
-                if stream.omichat.allowRetain ~= nil then
-                    allowRetain = stream.omichat.allowRetain
-                elseif stream.omichat.isCommand then
-                    allowRetain = false
+                if stream.omichat.commandType ~= nil then
+                    commandType = stream.omichat.commandType
                 end
             end
         end
@@ -245,21 +386,28 @@ function ISChat:onCommandEntered()
         end
     end
 
-    if allowRetain and stream then
+    local shouldRetain = OmiChat.getRetainCommand(commandType or 'other')
+    if shouldRetain and stream then
         -- fix the switching functionality by updating to the used stream
         OmiChat.cycleStream(stream.name)
     end
 
     if not shouldHandle then
         -- no special handling, pass to original function
-        return _onCommandEntered(self)
+        _onCommandEntered(self)
+
+        if shouldRetain then
+            instance.chatText.lastChatCommand = command:sub(1, command:find(' ') or #command)
+        end
+
+        return
     end
 
     instance:unfocus()
     instance:logChatCommand(input)
     OmiChat.scrollToBottom()
 
-    if allowRetain and stream then
+    if shouldRetain and stream then
         instance.chatText.lastChatCommand = chatCommand
     elseif stream then
         -- if the used stream shouldn't be set as the last, cycle to the previous command
@@ -294,83 +442,6 @@ function ISChat:onGearButtonClick()
         return
     end
 
-    local serverOptions = getServerOptions()
-
-    local colorOpts = {}
-    local canUsePM = checkPlayerCanUseChat('/w')
-    local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
-
-    if Option.EnableSetNameColor then
-        colorOpts[#colorOpts + 1] = 'name'
-    end
-
-    if Option.EnableSetSpeechColor then
-        colorOpts[#colorOpts + 1] = 'speech'
-    end
-
-    colorOpts[#colorOpts + 1] = 'server'
-
-    if serverOptions:getBoolean('DiscordEnable') then
-        colorOpts[#colorOpts + 1] = 'discord'
-    end
-
-    -- need to check the option because checkPlayerCanUseChat checks for a radio
-    local allowedStreams = serverOptions:getOption('ChatStreams'):split(',')
-    for i = 1, #allowedStreams do
-        if allowedStreams[i] == 'r' then
-            colorOpts[#colorOpts + 1] = 'radio'
-            break
-        end
-    end
-
-    if checkPlayerCanUseChat('/a') then
-        colorOpts[#colorOpts + 1] = 'admin'
-    end
-
-    if checkPlayerCanUseChat('/all') then
-        colorOpts[#colorOpts + 1] = 'general'
-    end
-
-    if checkPlayerCanUseChat('/f') then
-        colorOpts[#colorOpts + 1] = 'faction'
-    end
-
-    if checkPlayerCanUseChat('/sh') then
-        colorOpts[#colorOpts + 1] = 'safehouse'
-    end
-
-    if useLocalWhisper and canUsePM then
-        colorOpts[#colorOpts + 1] = 'private' -- /pm
-    end
-
-    if checkPlayerCanUseChat('/s') then
-        colorOpts[#colorOpts + 1] = 'say'
-    end
-
-    if checkPlayerCanUseChat('/y') then
-        colorOpts[#colorOpts + 1] = 'shout'
-    end
-
-    if not useLocalWhisper and canUsePM then
-        colorOpts[#colorOpts + 1] = 'private' -- /whisper
-    end
-
-    for info in config:chatStreams() do
-        local name = info.name
-        if info.autoColorOption ~= false and OmiChat.isCustomStreamEnabled(name) then
-            colorOpts[#colorOpts + 1] = name
-        end
-    end
-
-    local shoutOpts = {}
-    if Option.EnableCustomShouts then
-        shoutOpts[#shoutOpts + 1] = 'callouts'
-    end
-
-    if Option.EnableCustomSneakShouts then
-        shoutOpts[#shoutOpts + 1] = 'sneakcallouts'
-    end
-
     -- insert new options before the first submenu
     local firstSubMenu
     for i = 1, #context.options do
@@ -403,38 +474,9 @@ function ISChat:onGearButtonClick()
 
     context:insertOptionBefore(subMenuName, suggesterOptionName, ISChat.instance, ISChat.onToggleUseSuggester)
 
-    for i = 1, #shoutOpts do
-        local shoutType = shoutOpts[i]
-        local shoutOptionName = getText('UI_OmiChat_context_set_custom_' .. shoutType)
-        context:insertOptionBefore(subMenuName, shoutOptionName, ISChat.instance, ISChat.onCustomCalloutMenu, shoutType)
-    end
-
-    if #colorOpts > 1 then
-        local colorOptionName = getText('UI_OmiChat_context_colors_submenu_name')
-        local colorOption = context:insertOptionBefore(subMenuName, colorOptionName, ISChat.instance)
-
-        local colorSubMenu = context:getNew(context)
-        context:addSubMenu(colorOption, colorSubMenu)
-
-        for i = 1, #colorOpts do
-            local category = colorOpts[i]
-            local name = getTextOrNull('UI_OmiChat_context_submenu_color_' .. category)
-            if not name then
-                name = getText('UI_OmiChat_context_submenu_color', OmiChat.getColorCategoryCommand(category))
-            end
-
-            colorSubMenu:addOption(name, ISChat.instance, ISChat.onCustomColorMenu, category)
-        end
-    elseif #colorOpts == 1 then
-        local category = colorOpts[1]
-
-        local name = getTextOrNull('UI_OmiChat_context_color_' .. category)
-        if not name then
-            name = getText('UI_OmiChat_context_color', OmiChat.getColorCategoryCommand(category))
-        end
-
-        context:insertOptionBefore(subMenuName, name, ISChat.instance, ISChat.onCustomColorMenu, category)
-    end
+    addCustomCalloutOptions(context, subMenuName)
+    addColorOptions(context, subMenuName)
+    addRetainOptions(context, subMenuName)
 end
 
 ---Override to handle custom info text.

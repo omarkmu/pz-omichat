@@ -7,6 +7,11 @@ UI_EN = {
     UI_OmiChat_context_enable_suggestions = "Enable suggestions",
     UI_OmiChat_context_disable_suggestions = "Disable suggestions",
     UI_OmiChat_context_colors_submenu_name = "Set chat colors",
+    UI_OmiChat_context_retain_commands = "Retain commands",
+
+    UI_OmiChat_context_retain_commands_chat = "Chat",
+    UI_OmiChat_context_retain_commands_rp = "RP",
+    UI_OmiChat_context_retain_commands_other = "Other",
 
     -- %1 = the chat stream (e.g., /say, /yell)
     UI_OmiChat_context_submenu_color = "%1 color",

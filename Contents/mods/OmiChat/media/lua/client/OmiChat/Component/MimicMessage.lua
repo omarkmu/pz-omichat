@@ -39,7 +39,8 @@ function MimicMessage:getAuthor()
     return self._author
 end
 
----Returns `nil`. Included for completeness of the `ChatMessage` interface.
+---Not implemented.
+---Included for completeness of the `ChatMessage` interface.
 ---@deprecated
 function MimicMessage:getChat() end
 
@@ -394,7 +395,7 @@ function MimicMessage:new(text, datetime, textColor)
     this._serverAuthor = false
     this._showAuthor = false
     this._datetime = datetime or PZCalendar:getInstance():getTime()
-    this._text = text
+    this._text = text or ''
     this._textColor = textColor or Color.new(255, 255, 255)
     this._customColor = false
     this._author = ''
@@ -408,7 +409,7 @@ end
 ---Converts the message to a debug string.
 ---@return string
 function MimicMessage.__tostring(self)
-    return format('MimicMessage{author=\'%s\', text=\'%s\'}', self._author, self._text)
+    return format('MimicMessage{author=\'%s\', text=\'%s\'}', tostring(self._author), tostring(self._text))
 end
 
 
