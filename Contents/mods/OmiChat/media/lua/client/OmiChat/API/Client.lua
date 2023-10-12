@@ -450,13 +450,15 @@ OmiChat._suggesters = {
         ---@param tab (omichat.ChatStream | omichat.CommandStream)[]
         ---@param command string
         ---@param fullCommand string
+        ---@param currentTabID integer
         ---@param startsWith string[]
         ---@param contains string[]
-        collectStreamResults = function(_, tab, command, fullCommand, startsWith, contains)
+        collectStreamResults = function(_, tab, command, fullCommand, currentTabID, startsWith, contains)
             for i = 1, #tab do
                 local stream = tab[i]
                 local isEnabled = stream.omichat and stream.omichat.isEnabled
-                if not isEnabled or isEnabled(stream) then
+                local matchingTab = currentTabID == stream.tabID
+                if matchingTab and (not isEnabled or isEnabled(stream)) then
                     if utils.startsWith(stream.command, fullCommand) then
                         startsWith[#startsWith + 1] = stream.command
                     elseif stream.shortCommand and utils.startsWith(stream.shortCommand, fullCommand) then
@@ -470,6 +472,12 @@ OmiChat._suggesters = {
             end
         end,
         suggest = function(self, info)
+            local instance = ISChat.instance
+            if not instance then
+                return
+            end
+
+            local currentTabID = instance.currentTabID
             if OmiChat.chatCommandToStream(info.input) then
                 return
             end
@@ -497,8 +505,8 @@ OmiChat._suggesters = {
             local contains = {}
 
             -- chat & command streams
-            self:collectStreamResults(ISChat.allChatStreams, command, fullCommand, startsWith, contains)
-            self:collectStreamResults(OmiChat._commandStreams, command, fullCommand, startsWith, contains)
+            self:collectStreamResults(ISChat.allChatStreams, command, fullCommand, currentTabID, startsWith, contains)
+            self:collectStreamResults(OmiChat._commandStreams, command, fullCommand, currentTabID, startsWith, contains)
 
             -- vanilla command streams
             for i = 1, #vanillaCommands do
