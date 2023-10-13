@@ -441,7 +441,7 @@ Options that the content that displays in speech bubbles that appear over a char
 For example, reversing the overhead text will result in the message content being reversed in chat.
 
 ### OverheadFormatCard
-`default → &#171; $1 &#187;` (`« $1 »`)  
+`default → $gettext(UI_OmiChat_rp_emote $1)` (`« $1 »`)  
 `tokens → $1`
 
 The overhead format used for local [`/card`](#chatformatcard) messages.
@@ -476,28 +476,28 @@ Defines the format used for overhead speech bubbles of [`/looc`](#chatformatlooc
 If blank, `/looc` messages will not display overhead.
 
 ### OverheadFormatMe
-`default → &#171; $1 &#187;` (`« $1 »`)  
+`default → $gettext(UI_OmiChat_rp_emote $1)` (`« $1 »`)  
 `tokens → $1`
 
 Defines the format used for overhead speech bubbles of [`/me`](#chatformatme) messages.
 If blank, `/me` messages will not display overhead.
 
 ### OverheadFormatMeLoud
-`default → &#171; $1 &#187;` (`« $1 »`)  
+`default → $gettext(UI_OmiChat_rp_emote $1)` (`« $1 »`)  
 `tokens → $1`
 
 Defines the format used for overhead speech bubbles of [`/meloud`](#chatformatmeloud) messages.
 If blank, `/meloud` messages will not display overhead.
 
 ### OverheadFormatMeQuiet
-`default → &#171; $1 &#187;` (`« $1 »`)  
+`default → $gettext(UI_OmiChat_rp_emote $1)` (`« $1 »`)  
 `tokens → $1`
 
 Defines the format used for overhead speech bubbles of [`/mequiet`](#chatformatmequiet) messages.
 If blank, `/mequiet` messages will not display overhead.
 
 ### OverheadFormatRoll
-`default → &#171; $1 &#187;` (`« $1 »`)  
+`default → $gettext(UI_OmiChat_rp_emote $1)` (`« $1 »`)  
 `tokens → $1`
 
 The overhead format used for local [`/roll`](#chatformatroll) messages.
@@ -525,7 +525,7 @@ The format used for `/admin` messages in chat.
 See also: [`ColorAdmin`](#coloradmin).
 
 ### ChatFormatCard
-`default → &#32;<IMAGE:Item_CardDeck&#44;15&#44;14> <SPACE> &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
+`default → &#32;<IMAGE:Item_CardDeck&#44;15&#44;14> <SPACE> $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>))`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for local `/card` messages in chat.
@@ -548,7 +548,7 @@ Messages from Discord will not apply name colors.
 See also: [`ColorDiscord`](#colordiscord).
 
 ### ChatFormatDo
-`default → &#171; <SPACE> $punctuate($capitalize($trim($message))) <SPACE> &#187;`  
+`default → $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $punctuate($capitalize($trim($message))) <SPACE>))`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/do` messages in chat.
@@ -565,7 +565,7 @@ See also:
 - [`ChatFormatMe`](#chatformatme)
 
 ### ChatFormatDoLoud
-`default → &#171; <SPACE> $punctuate($capitalize($trim($message))) <SPACE> &#187;`  
+`default → $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $punctuate($capitalize($trim($message))) <SPACE>))`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/doloud` (`/dl`) messages in chat.
@@ -579,7 +579,7 @@ See also:
 - [`OverheadFormatDoLoud`](#overheadformatdoloud)
 
 ### ChatFormatDoQuiet
-`default → &#171; <SPACE> $punctuate($capitalize($trim($message))) <SPACE> &#187;`  
+`default → $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $punctuate($capitalize($trim($message))) <SPACE>))`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/doquiet` (`/dq`) messages in chat.
@@ -636,7 +636,7 @@ See also:
 - [`OverheadFormatLooc`](#overheadformatlooc)
 
 ### ChatFormatMe
-`default → &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
+`default → $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>))`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/me` messages in chat.
@@ -652,7 +652,7 @@ See also:
 - [`ChatFormatDo`](#chatformatdo)
 
 ### ChatFormatMeLoud
-`default → &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
+`default → $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>))`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/meloud` (`/ml`) messages in chat.
@@ -666,7 +666,7 @@ See also:
 - [`OverheadFormatMeLoud`](#overheadformatmeloud)
 
 ### ChatFormatMeQuiet
-`default → &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
+`default → $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>))`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for `/mequiet` (`/mq`) messages in chat.
@@ -698,7 +698,7 @@ The format used for radio messages in chat.
 See also: [`ColorRadio`](#colorradio).
 
 ### ChatFormatRoll
-`default → &#32;<IMAGE:Item_Dice&#44;15&#44;14> <SPACE> &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;`  
+`default → &#32;<IMAGE:Item_Dice&#44;15&#44;14> <SPACE> $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>))`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $message`
 
 The format used for local `/roll` messages in chat.

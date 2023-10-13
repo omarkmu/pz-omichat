@@ -200,22 +200,22 @@ option OmiChat.OverheadFormatLooc
 { type = string, default = (( $1 )), page = OmiChat, translation = OCOverheadFormatLooc, }
 
 option OmiChat.OverheadFormatMe
-{ type = string, default = &#171; $1 &#187;, page = OmiChat, translation = OCOverheadFormatMe, }
+{ type = string, default = $gettext(UI_OmiChat_rp_emote $1), page = OmiChat, translation = OCOverheadFormatMe, }
 
 option OmiChat.OverheadFormatMeLoud
-{ type = string, default = &#171; $1 &#187;, page = OmiChat, translation = OCOverheadFormatMeLoud, }
+{ type = string, default = $gettext(UI_OmiChat_rp_emote $1), page = OmiChat, translation = OCOverheadFormatMeLoud, }
 
 option OmiChat.OverheadFormatMeQuiet
-{ type = string, default = &#171; $1 &#187;, page = OmiChat, translation = OCOverheadFormatMeQuiet, }
+{ type = string, default = $gettext(UI_OmiChat_rp_emote $1), page = OmiChat, translation = OCOverheadFormatMeQuiet, }
 
 option OmiChat.OverheadFormatWhisper
 { type = string, default = ($1), page = OmiChat, translation = OCOverheadFormatWhisper, }
 
 option OmiChat.OverheadFormatCard
-{ type = string, default = &#171; $1 &#187;, page = OmiChat, translation = OCOverheadFormatCard, }
+{ type = string, default = $gettext(UI_OmiChat_rp_emote $1), page = OmiChat, translation = OCOverheadFormatCard, }
 
 option OmiChat.OverheadFormatRoll
-{ type = string, default = &#171; $1 &#187;, page = OmiChat, translation = OCOverheadFormatRoll, }
+{ type = string, default = $gettext(UI_OmiChat_rp_emote $1), page = OmiChat, translation = OCOverheadFormatRoll, }
 
 
 /* Chat Message Formats */
@@ -241,19 +241,19 @@ option OmiChat.ChatFormatAdmin
 { type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatAdmin, }
 
 option OmiChat.ChatFormatCard
-{ type = string, default = &#32;<IMAGE:Item_CardDeck&#44;15&#44;14> <SPACE> &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatCard, }
+{ type = string, default = &#32;<IMAGE:Item_CardDeck&#44;15&#44;14> <SPACE> $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>)), page = OmiChat, translation = OCChatFormatCard, }
 
 option OmiChat.ChatFormatRoll
-{ type = string, default = &#32;<IMAGE:Item_Dice&#44;15&#44;14> <SPACE> &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatRoll, }
+{ type = string, default = &#32;<IMAGE:Item_Dice&#44;15&#44;14> <SPACE> $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>)), page = OmiChat, translation = OCChatFormatRoll, }
 
 option OmiChat.ChatFormatDo
-{ type = string, default = &#171; <SPACE> $punctuate($capitalize($trim($message))) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatDo, }
+{ type = string, default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $punctuate($capitalize($trim($message))) <SPACE>)), page = OmiChat, translation = OCChatFormatDo, }
 
 option OmiChat.ChatFormatDoLoud
-{ type = string, default = &#171; <SPACE> $punctuate($capitalize($trim($message))) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatDoLoud, }
+{ type = string, default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $punctuate($capitalize($trim($message))) <SPACE>)), page = OmiChat, translation = OCChatFormatDoLoud, }
 
 option OmiChat.ChatFormatDoQuiet
-{ type = string, default = &#171; <SPACE> $punctuate($capitalize($trim($message))) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatDoQuiet, }
+{ type = string, default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $punctuate($capitalize($trim($message))) <SPACE>)), page = OmiChat, translation = OCChatFormatDoQuiet, }
 
 option OmiChat.ChatFormatGeneral
 { type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatGeneral, }
@@ -262,13 +262,13 @@ option OmiChat.ChatFormatLooc
 { type = string, default = $name: <SPACE> (( $message )), page = OmiChat, translation = OCChatFormatLooc, }
 
 option OmiChat.ChatFormatMe
-{ type = string, default = &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatMe, }
+{ type = string, default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>)), page = OmiChat, translation = OCChatFormatMe, }
 
 option OmiChat.ChatFormatMeLoud
-{ type = string, default = &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatMeLoud, }
+{ type = string, default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>)), page = OmiChat, translation = OCChatFormatMeLoud, }
 
 option OmiChat.ChatFormatMeQuiet
-{ type = string, default = &#171; <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE> &#187;, page = OmiChat, translation = OCChatFormatMeQuiet, }
+{ type = string, default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>)), page = OmiChat, translation = OCChatFormatMeQuiet, }
 
 option OmiChat.ChatFormatSafehouse
 { type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatSafehouse, }

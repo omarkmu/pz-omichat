@@ -36,6 +36,9 @@ UI_EN = {
     -- %1 = the private message sender
     UI_OmiChat_private_chat_from = "PM from %1",
 
+    -- %1 = the action the player provided to the command (e.g., to /me)
+    UI_OmiChat_rp_emote = "« %1 »",
+
     -- %1 = the name of the player who drew the card, %2 = the name of the card that was drawn
     UI_OmiChat_card = "%1 drew %2",
     -- %1 = the name of the player who rolled, %2 = the number that was rolled, %3 = the number of sides on the dice
