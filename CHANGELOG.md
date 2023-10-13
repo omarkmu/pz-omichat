@@ -1,6 +1,20 @@
+# 0.4.0
+- Added `EnableFactionColorAsDefault` as an off-by-default option
+- Added `RangeMultiplierZombies` option to change zombie attraction behavior of chat messages
+- Added retain command options for players
+- `/meloud` and `/doloud` commands can now attract zombies
+- Client dispatch API functions no longer accept a player argument
+- Message tags and player preferences now use JSON
+- Arbitrary commands will now only suggest usernames to players with an access level
+- `/pm` command will no longer suggest the player's own username
+- Fixed command suggester suggesting commands unavailable in the current chat tab
+- Fixed message redraws not respecting `maxLine` setting
+- Fixed message name colors not being constant if `EnableSetNameColor` is off
+- Fixed radio message color option only showing if a radio is equipped and turned on
+
 # 0.3.1
-- Clarify that radio messages can't be hidden overhead
-- Limit radio message tokens to `$frequency` and `$message`
+- Added clarification that radio messages can't be hidden overhead
+- Radio messages can now only use `$frequency` and `$message` tokens
 
 # 0.3.0
 - Added `RangeCallout`, `RangeSneakCallout`, `RangeCalloutZombies`, and `RangeSneakCalloutZombies` options
