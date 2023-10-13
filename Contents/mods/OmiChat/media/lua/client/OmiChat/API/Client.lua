@@ -43,9 +43,9 @@ local function canUseAdminCommands()
 end
 
 ---Appends members of `t1` to `t2`.
----@param t1 unknown[]
----@param t2 unknown[]
----@return unknown[]
+---@param t1 string[]
+---@param t2 string[]
+---@return string[]
 local function extend(t1, t2)
     for i = 1, #t2 do
         t1[#t1 + 1] = t2[i]

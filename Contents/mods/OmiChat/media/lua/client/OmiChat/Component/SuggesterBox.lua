@@ -5,7 +5,7 @@ local SuggesterBox = ISScrollingListBox:derive('SuggesterBox')
 
 
 ---Gets the currently selected item.
----@return unknown?
+---@return omichat.Suggestion?
 function SuggesterBox:getSelectedItem()
     local selected = self.items[self.selected]
     if not selected then

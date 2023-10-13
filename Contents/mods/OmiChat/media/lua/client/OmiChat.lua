@@ -296,8 +296,10 @@ function ISChat.onIconClick(target, icon)
 end
 
 ---Event handler for selecting a suggestion.
+---@param target omichat.ISChat
 ---@param suggestion omichat.Suggestion
-function ISChat:onSuggesterSelect(suggestion)
+---@diagnostic disable-next-line: unused-local
+function ISChat.onSuggesterSelect(target, suggestion)
     local entry = ISChat.instance.textEntry
 
     OmiChat.hideSuggesterBox()

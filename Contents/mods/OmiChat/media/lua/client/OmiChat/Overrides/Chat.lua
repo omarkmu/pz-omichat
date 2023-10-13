@@ -360,8 +360,9 @@ function ISChat:onCommandEntered()
                     allowEmotes = false
                 end
 
-                if stream.omichat.commandType ~= nil then
-                    commandType = stream.omichat.commandType
+                local streamCommandType = stream.omichat.commandType
+                if streamCommandType then
+                    commandType = streamCommandType
                 end
             end
         end
@@ -386,7 +387,7 @@ function ISChat:onCommandEntered()
         end
     end
 
-    local shouldRetain = OmiChat.getRetainCommand(commandType or 'other')
+    local shouldRetain = OmiChat.getRetainCommand(commandType)
     if shouldRetain and stream then
         -- fix the switching functionality by updating to the used stream
         OmiChat.cycleStream(stream.name)
@@ -495,7 +496,7 @@ function ISChat:onInfo()
 end
 
 ---Override to hide components on text panel or entry click.
----@param target unknown
+---@param target ISUIElement
 ---@param x number
 ---@param y number
 ---@return boolean

@@ -15,7 +15,7 @@ local ISPanel_render = ISPanel.render
 ---@field borderColor omichat.DecimalRGBAColorTable The border color of the panel.
 ---@field columns integer The number of columns to use.
 ---@field scrollMultiplier integer Multiplier for scroll speed.
----@field target unknown? Target object for callbacks.
+---@field target ISUIElement? Target object for callbacks.
 ---@field onclick function? Callback to run when an icon button is clicked.
 ---@field categoryFont UIFont The font to use for categories.
 ---@field icons omichat.IconPickerIcon[] Icons to include.
