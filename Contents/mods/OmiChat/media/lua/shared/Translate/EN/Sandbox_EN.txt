@@ -1,8 +1,7 @@
 Sandbox_EN = {
     Sandbox_OmiChat = "OmiChat",
 
-    Sandbox_OCEnableCompatTAD = "True Actions Act 3 - Dancing Compatibility",
-
+    --[[ Feature Flags ]]--
     Sandbox_OCEnableChatNameAsCharacterName = "Use Chat Name as Character Name",
     Sandbox_OCEnableCustomShouts = "Enable Custom Shouts",
     Sandbox_OCEnableCustomSneakShouts = "Enable Custom Sneak Shouts",
@@ -15,10 +14,15 @@ Sandbox_EN = {
     Sandbox_OCEnableSpeechColorAsDefaultNameColor = "Use Speech Color as Default Name Color",
     Sandbox_OCEnableFactionColorAsDefault = "Use Faction Tag Color as Default Chat Color",
 
+    --[[ Compatibility Feature Flags ]]--
+    Sandbox_OCEnableCompatTAD = "True Actions Act 3 - Dancing Compatibility",
+
+    --[[ Limits ]]--
     Sandbox_OCCustomShoutMaxLength = "Custom Shout Maximum Length",
     Sandbox_OCMinimumCommandAccessLevel = "Minimum Access Level for Commands",
     Sandbox_OCMaximumCustomShouts = "Maximum Custom Shouts",
 
+    --[[ Ranges ]]--
     Sandbox_OCRangeCallout = "Callout Range",
     Sandbox_OCRangeCalloutZombies = "Zombie Callout Range",
     Sandbox_OCRangeSneakCallout = "Sneak Callout Range",
@@ -35,6 +39,7 @@ Sandbox_EN = {
     Sandbox_OCRangeWhisper = "/whisper Range",
     Sandbox_OCRangeYell = "/yell Range",
 
+    --[[ Default Colors ]]--
     Sandbox_OCColorAdmin = "/admin Color",
     Sandbox_OCColorDiscord = "Discord Message Color",
     Sandbox_OCColorDo = "/do Color",
@@ -54,9 +59,11 @@ Sandbox_EN = {
     Sandbox_OCColorWhisper = "/whisper Color",
     Sandbox_OCColorYell = "/yell Color",
 
+    --[[ Filters and Predicates ]]--
     Sandbox_OCFilterNickname = "Name Filter",
     Sandbox_OCPredicateUseNameColor = "Use Name Color Predicate",
 
+    --[[ Component Formats ]]--
     Sandbox_OCFormatCard = "/card Text Format",
     Sandbox_OCFormatRoll = "/roll Text Format",
     Sandbox_OCFormatInfo = "Info Button Text",
@@ -65,6 +72,7 @@ Sandbox_EN = {
     Sandbox_OCFormatTag = "Chat Tag Format",
     Sandbox_OCFormatTimestamp = "Chat Timestamp Format",
 
+    --[[ Overhead Message Formats ]]--
     Sandbox_OCOverheadFormatCard = "/card Overhead Format",
     Sandbox_OCOverheadFormatDo = "/do Overhead Format",
     Sandbox_OCOverheadFormatDoLoud = "/doloud Overhead Format",
@@ -76,6 +84,7 @@ Sandbox_EN = {
     Sandbox_OCOverheadFormatRoll = "/roll Overhead Format",
     Sandbox_OCOverheadFormatWhisper = "/whisper Overhead Format",
 
+    --[[ Chat Message Formats ]]--
     Sandbox_OCChatFormatAdmin = "/admin Chat Format",
     Sandbox_OCChatFormatCard = "/card Chat Format",
     Sandbox_OCChatFormatDiscord = "Discord Chat Format",

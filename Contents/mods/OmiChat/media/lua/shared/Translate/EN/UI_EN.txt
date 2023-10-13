@@ -1,7 +1,60 @@
 UI_EN = {
-    --- general ---
+    --[[ General ]]--
     UI_OmiChat_whisper_chat_title_id = "Whisper",
 
+    UI_OmiChat_icon_cat_clothing = "Clothing",
+    UI_OmiChat_icon_cat_cooking = "Cooking",
+    UI_OmiChat_icon_cat_food = "Food",
+    UI_OmiChat_icon_cat_items = "Items",
+    UI_OmiChat_icon_cat_miscellaneous = "Miscellaneous",
+    UI_OmiChat_icon_cat_nature = "Nature",
+    UI_OmiChat_icon_cat_objects = "Objects",
+    UI_OmiChat_icon_cat_tools = "Tools",
+    UI_OmiChat_icon_cat_weapons = "Weapons",
+
+    UI_OmiChat_error_invalid_color = "Input must be a hexadecimal color value or three numbers separated by commas or spaces.",
+
+    -- %1 = the maximum color value (number)
+    UI_OmiChat_error_color_max = "Values must be less than or equal to %1.",
+
+    -- %1 = the minimum color value (number)
+    UI_OmiChat_error_color_min = "Values must be greater than or equal to %1.",
+
+    -- %1 = the maximum amount of custom shouts (number)
+    UI_OmiChat_error_too_many_shouts = "Too many lines; up to %1 custom shouts can be specified.",
+
+    -- %1 = the maximum length of custom shouts (number)
+    UI_OmiChat_error_shout_too_long = "Shout text can only be up to %1 characters long.",
+
+    --[[ Chat Formats ]]--
+    -- %1 = a radio frequency, in the format `#.#`.
+    UI_OmiChat_radio = "Radio (%1 MHz)",
+
+    -- %1 = the private message recipient
+    UI_OmiChat_private_chat_to = "PM to %1",
+
+    -- %1 = the private message sender
+    UI_OmiChat_private_chat_from = "PM from %1",
+
+    -- %1 = the name of the player who drew the card, %2 = the name of the card that was drawn
+    UI_OmiChat_card = "%1 drew %2",
+    -- %1 = the name of the player who rolled, %2 = the number that was rolled, %3 = the number of sides on the dice
+    UI_OmiChat_roll = "%1 rolled a %2 on a %3-sided die",
+
+    -- %1 = the name of the card that was drawn
+    UI_OmiChat_card_local = "draws %1",
+    -- %1 = the number that was rolled, %2 = the number of sides on the dice
+    UI_OmiChat_roll_local = "rolls a %1 on a %2-sided die",
+
+    --[[ Help Text ]]--
+    UI_OmiChat_helptext_emotes = "Get a list of available chat emotes",
+    UI_OmiChat_helptext_name = "To set your name in chat, use: /name Name. To reset your name, use /name. Example: /name Bob"
+    UI_OmiChat_helptext_name_no_reset = "To set your name in chat, use: /name Name. Example: /name Bob"
+    UI_OmiChat_helptext_setname = "Set a player's name in chat. Example: /setname \"username\" name"
+    UI_OmiChat_helptext_resetname = "Reset a player's name in chat. Example /resetname username"
+    UI_OmiChat_helptext_clearnames = "Clears all player chat names. Use /clearnames"
+
+    --[[ Context Menus ]]--
     UI_OmiChat_context_enable_name_colors = "Enable name colors",
     UI_OmiChat_context_disable_name_colors = "Disable name colors",
     UI_OmiChat_context_enable_suggestions = "Enable suggestions",
@@ -41,9 +94,10 @@ UI_EN = {
     UI_OmiChat_context_set_custom_sneakcallouts = "Customize sneak callouts",
     UI_OmiChat_context_set_custom_callouts_desc = "Enter one 'Q' callout per line, or nothing to reset.",
 
-    -- %1 = the name that the player set with /name
+    --[[ Commands ]]--
+    -- %1 = the name that the player provided to /name
     UI_OmiChat_set_name_success = "Your name is now '%1'.",
-    UI_OmiChat_set_name_failure = "Couldn't set name.",
+    UI_OmiChat_set_name_failure = "Your name cannot be set to '%1'.",
     UI_OmiChat_set_name_empty = "No name specified. Use /name Name",
     UI_OmiChat_reset_name_success = "Your name has been reset.",
     UI_OmiChat_clear_names_success = "Cleared all nicknames.",
@@ -52,63 +106,11 @@ UI_EN = {
     UI_OmiChat_set_other_name_success = "Name has been set to '%2' for player '%1'."
     UI_OmiChat_reset_other_name_success = "Name has been reset for player '%1'."
 
-    UI_OmiChat_error_invalid_color = "Input must be a hexadecimal color value or three numbers separated by commas or spaces.",
-
-    -- %1 = the maximum color value (number)
-    UI_OmiChat_error_color_max = "Values must be less than or equal to %1.",
-
-    -- %1 = the minimum color value (number)
-    UI_OmiChat_error_color_min = "Values must be greater than or equal to %1.",
-
-    -- %1 = the maximum amount of custom shouts (number)
-    UI_OmiChat_error_too_many_shouts = "Too many lines; up to %1 custom shouts can be specified.",
-
-    -- %1 = the maximum length of custom shouts (number)
-    UI_OmiChat_error_shout_too_long = "Shout text can only be up to %1 characters long.",
-
-    UI_OmiChat_icon_cat_clothing = "Clothing",
-    UI_OmiChat_icon_cat_cooking = "Cooking",
-    UI_OmiChat_icon_cat_food = "Food",
-    UI_OmiChat_icon_cat_items = "Items",
-    UI_OmiChat_icon_cat_miscellaneous = "Miscellaneous",
-    UI_OmiChat_icon_cat_nature = "Nature",
-    UI_OmiChat_icon_cat_objects = "Objects",
-    UI_OmiChat_icon_cat_tools = "Tools",
-    UI_OmiChat_icon_cat_weapons = "Weapons",
-
-    -- %1 = a radio frequency, in the format `#.#`.
-    UI_OmiChat_radio = "Radio (%1 MHz)",
-
-    -- %1 = the private message recipient.
-    UI_OmiChat_private_chat_to = "PM to %1",
-
-    -- %1 = the private message sender.
-    UI_OmiChat_private_chat_from = "PM from %1",
-
-    --- commands ---
     UI_OmiChat_clear_message = "Console cleared",
     UI_OmiChat_available_emotes = "Trigger emote animations in local chats by including one of the following emotes in your message. Available emotes:",
     UI_OmiChat_list_of_commands = "List of commands:"
 
-    -- %1 = the name of the player who drew the card, %2 = the name of the card that was drawn
-    UI_OmiChat_card = "%1 drew %2",
-    -- %1 = the name of the player who rolled, %2 = the number that was rolled, %3 = the number of sides on the dice
-    UI_OmiChat_roll = "%1 rolled a %2 on a %3-sided die",
-
-    -- %1 = the name of the card that was drawn
-    UI_OmiChat_card_local = "draws %1",
-    -- %1 = the number that was rolled, %2 = the number of sides on the dice
-    UI_OmiChat_roll_local = "rolls a %1 on a %2-sided die",
-
-    --- help text ---
-    UI_OmiChat_helptext_emotes = "Get a list of available chat emotes",
-    UI_OmiChat_helptext_name = "To set your name in chat, use: /name Name. To reset your name, use /name. Example: /name Bob"
-    UI_OmiChat_helptext_name_no_reset = "To set your name in chat, use: /name Name. Example: /name Bob"
-    UI_OmiChat_helptext_setname = "Set a player's name in chat. Example: /setname \"username\" name"
-    UI_OmiChat_helptext_resetname = "Reset a player's name in chat. Example /resetname username"
-    UI_OmiChat_helptext_clearnames = "Clears all player chat names. Use /clearnames"
-
-    --- TAD compat ---
+    --[[ Compat: True Actions Dancing ]]--
     UI_OmiChat_helptext_dance = "Use /dance to do a random dance. Use /dance followed by the name of the dance to do a specific dance. To see a list of dances, use /dance list",
     UI_OmiChat_available_dances = "Available dances:",
 

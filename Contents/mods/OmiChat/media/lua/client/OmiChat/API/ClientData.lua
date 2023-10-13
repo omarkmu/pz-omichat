@@ -328,7 +328,7 @@ function OmiChat.setNickname(nickname)
 
     nickname = utils.interpolate(Option.FilterNickname, { name = nickname })
     if nickname == '' then
-        return false, getText('UI_OmiChat_set_name_failure')
+        return false, getText('UI_OmiChat_set_name_failure', utils.escapeRichText(nickname))
     end
 
     if Option.EnableChatNameAsCharacterName then

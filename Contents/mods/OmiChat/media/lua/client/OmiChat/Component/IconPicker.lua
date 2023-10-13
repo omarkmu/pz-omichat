@@ -252,11 +252,10 @@ function IconPicker:render()
     for row = 1, #self._rowContents do
         local value = self._rowContents[row]
         if type(value) == 'string' then
-            local catName = getText(value)
-            local textHeight = getTextManager():MeasureStringY(self.categoryFont, catName)
+            local textHeight = getTextManager():MeasureStringY(self.categoryFont, value)
             local centerDelta = (self.buttonSize - textHeight) / 2
             local catY = self.padSize + (row - 1) * self.buttonSize + centerDelta
-            self:drawTextCentre(catName, self.width / 2, catY, 1, 1, 1, 1, self.categoryFont)
+            self:drawTextCentre(value, self.width / 2, catY, 1, 1, 1, 1, self.categoryFont)
         else
             for col = 1, #value do
                 local icon = value[col]
@@ -290,7 +289,7 @@ function IconPicker:updateIcons()
         local info = iconInfo[i]
         if #info.list > 0 then
             row = row + 1
-            contents[row] = 'UI_OmiChat_icon_cat_' .. info.category
+            contents[row] = getText('UI_OmiChat_icon_cat_' .. info.category)
 
             local rowIcons = {}
             for j = 1, #info.list do
