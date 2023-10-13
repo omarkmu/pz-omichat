@@ -12,6 +12,15 @@ UI_EN = {
     UI_OmiChat_icon_cat_tools = "Tools",
     UI_OmiChat_icon_cat_weapons = "Weapons",
 
+    --[[ Help Text ]]--
+    UI_OmiChat_helptext_emotes = "Get a list of available chat emotes",
+    UI_OmiChat_helptext_name = "To set your name in chat, use: /name Name. To reset your name, use /name. Example: /name Bob"
+    UI_OmiChat_helptext_name_no_reset = "To set your name in chat, use: /name Name. Example: /name Bob"
+    UI_OmiChat_helptext_setname = "Set a player's name in chat. Example: /setname \"username\" name"
+    UI_OmiChat_helptext_resetname = "Reset a player's name in chat. Example /resetname username"
+    UI_OmiChat_helptext_clearnames = "Clears all player chat names. Use /clearnames"
+
+    --[[ Error Messages ]]--
     UI_OmiChat_error_invalid_color = "Input must be a hexadecimal color value or three numbers separated by commas or spaces.",
 
     -- %1 = the maximum color value (number)
@@ -27,17 +36,16 @@ UI_EN = {
     UI_OmiChat_error_shout_too_long = "Shout text can only be up to %1 characters long.",
 
     --[[ Chat Formats ]]--
+    -- %1 = the action the player provided to the command (e.g., to /me)
+    UI_OmiChat_rp_emote = "« %1 »",
+
     -- %1 = a radio frequency, in the format `#.#`.
     UI_OmiChat_radio = "Radio (%1 MHz)",
 
     -- %1 = the private message recipient
     UI_OmiChat_private_chat_to = "PM to %1",
-
     -- %1 = the private message sender
     UI_OmiChat_private_chat_from = "PM from %1",
-
-    -- %1 = the action the player provided to the command (e.g., to /me)
-    UI_OmiChat_rp_emote = "« %1 »",
 
     -- %1 = the name of the player who drew the card, %2 = the name of the card that was drawn
     UI_OmiChat_card = "%1 drew %2",
@@ -48,14 +56,6 @@ UI_EN = {
     UI_OmiChat_card_local = "draws %1",
     -- %1 = the number that was rolled, %2 = the number of sides on the dice
     UI_OmiChat_roll_local = "rolls a %1 on a %2-sided die",
-
-    --[[ Help Text ]]--
-    UI_OmiChat_helptext_emotes = "Get a list of available chat emotes",
-    UI_OmiChat_helptext_name = "To set your name in chat, use: /name Name. To reset your name, use /name. Example: /name Bob"
-    UI_OmiChat_helptext_name_no_reset = "To set your name in chat, use: /name Name. Example: /name Bob"
-    UI_OmiChat_helptext_setname = "Set a player's name in chat. Example: /setname \"username\" name"
-    UI_OmiChat_helptext_resetname = "Reset a player's name in chat. Example /resetname username"
-    UI_OmiChat_helptext_clearnames = "Clears all player chat names. Use /clearnames"
 
     --[[ Context Menus ]]--
     UI_OmiChat_context_enable_name_colors = "Enable name colors",
@@ -80,14 +80,6 @@ UI_EN = {
     UI_OmiChat_context_message_type_radio = "radio",
     UI_OmiChat_context_message_type_discord = "Discord",
     UI_OmiChat_context_message_type_server = "server",
-
-    -- %1 = the chat stream (e.g., /say, /yell)
-    UI_OmiChat_context_color = "Set %1 color",
-    UI_OmiChat_context_color_name = "Set name color",
-    UI_OmiChat_context_color_speech = "Set speech color",
-    UI_OmiChat_context_color_radio = "Set radio message color",
-    UI_OmiChat_context_color_discord = "Set Discord message color",
-    UI_OmiChat_context_color_server = "Set server message color",
 
     UI_OmiChat_context_color_desc = "Enter a color in RGB or hex format to set the color used for %1 messages, or nothing to reset.",
     UI_OmiChat_context_color_desc_name = "Enter a color in RGB or hex format to set the color of your name in chat, or nothing to reset.",

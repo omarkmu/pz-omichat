@@ -102,7 +102,7 @@ local function addColorOptions(context, beforeOption)
         end
     end
 
-    if #colorOpts > 1 then
+    if #colorOpts > 0 then
         local colorOptionName = getText('UI_OmiChat_context_colors_submenu_name')
         local colorOption = context:insertOptionBefore(beforeOption, colorOptionName, ISChat.instance)
 
@@ -118,15 +118,6 @@ local function addColorOptions(context, beforeOption)
 
             colorSubMenu:addOption(name, ISChat.instance, ISChat.onCustomColorMenu, category)
         end
-    elseif #colorOpts == 1 then
-        local category = colorOpts[1]
-
-        local name = getTextOrNull('UI_OmiChat_context_color_' .. category)
-        if not name then
-            name = getText('UI_OmiChat_context_color', OmiChat.getColorCategoryCommand(category))
-        end
-
-        context:insertOptionBefore(beforeOption, name, ISChat.instance, ISChat.onCustomColorMenu, category)
     end
 end
 
