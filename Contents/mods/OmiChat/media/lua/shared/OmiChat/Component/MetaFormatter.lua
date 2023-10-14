@@ -29,7 +29,7 @@ local formatters = {}
 ---@return string
 function MetaFormatter:format(text)
     text = self:wrap(text)
-    local formatted = utils.interpolate(self._formatString, { text })
+    local formatted = utils.replaceEntities(utils.interpolate(self._formatString, { text }))
 
     if not self:isMatch(formatted) then
         return text
