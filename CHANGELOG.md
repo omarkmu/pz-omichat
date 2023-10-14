@@ -1,3 +1,8 @@
+# 0.4.1
+- Added translation for RP chat format
+- Added Korean translations (thank you to 우로!)
+- Fixed admin sandbox options menu
+
 # 0.4.0
 - Added `EnableFactionColorAsDefault` as an off-by-default option
 - Added `RangeMultiplierZombies` option to change zombie attraction behavior of chat messages

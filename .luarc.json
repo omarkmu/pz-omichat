@@ -2,6 +2,7 @@
     "runtime.version": "Lua 5.1",
     "completion.requireSeparator": "/",
     "workspace.checkThirdParty": false,
+    "workspace.useGitIgnore": true,
     "diagnostics.libraryFiles": "Disable",
     "diagnostics.disable": [
         "spell-check",
@@ -11,10 +12,6 @@
     "diagnostics.groupSeverity": {
         "codestyle": "Information",
         "conventions": "Warning",
-        "redefined": "Warning",
-        "unused": "Warning"
-    },
-    "workspace.ignoreDir": [
-        ".vscode"
-    ]
+        "redefined": "Warning"
+    }
 }

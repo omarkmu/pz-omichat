@@ -5,6 +5,7 @@ description=It's a chat mod.
 description=This mod can be added or removed mid-save.
 description=[h2]Description[/h2]
 description=This mod improves the chat for players and offers a plethora of sandbox options for server operators. Among other features, it includes color customization, character naming, emote shortcuts, and new chat commands for roleplay.
+description=
 description=The list of chat streams available to players with default settings, including the vanilla streams: [list]
 description=[*]/all
 description=[*]/faction [/f]
@@ -24,7 +25,7 @@ description=
 description=[h2]Features[/h2]
 description=This mod aims to be as configurable as possible. The vast majority of the features listed below can be configured or completely disabled via [url=https://github.com/omarkmu/pz-omichat/blob/main/docs/sandbox-options.md]sandbox options.[/url]
 description=
-description=The default settings are tailored to usage for roleplay; by default, all chats other than /all will use character forenames instead of usernames. Additionally, chat will use a colon for names instead of square brackets. Both of these can be reverted using the sandbox options.
+description=The default settings are tailored to usage for roleplay; by default, chats other than /all and /pm will use character forenames instead of usernames. Additionally, chat will use a colon for names instead of square brackets. Both of these can be reverted using the sandbox options.
 description=
 description=Features for players: [list]
 description=[*]Chat color customization
