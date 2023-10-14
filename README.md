@@ -28,5 +28,9 @@ The vast majority of the features listed below can be configured or completely d
 - Info text [option](Docs/sandbox-options.md#formatinfo)
 - API for extension by other mods
 
----
+## Credits
+
+Thank you to 우로 for providing Korean translations.
+If you'd like to see the mod translated into your language, please [contribute](.github/CONTRIBUTING.md#contributing-translations)!
+
 Poster image adapted from the Messenger icon by [Freepik on Flaticon](https://www.flaticon.com/free-icons/message).
