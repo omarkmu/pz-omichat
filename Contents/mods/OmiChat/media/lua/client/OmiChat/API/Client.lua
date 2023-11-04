@@ -38,7 +38,7 @@ OmiChat._prefsFileName = 'omichat.json'
 ---@return boolean
 local function canUseAdminCommands()
     local player = getSpecificPlayer(0)
-    local access = player and player:getAccessLevel() or 0
+    local access = player and player:getAccessLevel()
     return utils.getNumericAccessLevel(access) >= Option.MinimumCommandAccessLevel
 end
 
@@ -457,7 +457,7 @@ OmiChat._suggesters = {
             for i = 1, #tab do
                 local stream = tab[i]
                 local isEnabled = stream.omichat and stream.omichat.isEnabled
-                local matchingTab = currentTabID == stream.tabID
+                local matchingTab = not stream.tabID or currentTabID == stream.tabID
                 if matchingTab and (not isEnabled or isEnabled(stream)) then
                     if utils.startsWith(stream.command, fullCommand) then
                         startsWith[#startsWith + 1] = stream.command
