@@ -3,13 +3,21 @@ local Interpolator = require 'OmiChat/Component/Interpolator'
 
 local format = string.format
 local concat = table.concat
+local getTimestampMs = getTimestampMs
 
 
 ---Utility functions.
 ---@class omichat.utils : omi.utils
+---@field private _interpolatorCache table<string, omichat.utils.InterpolatorCacheItem>
 local utils = lib.utils.copy(lib.utils)
 utils.Interpolator = Interpolator
+utils._interpolatorCache = {}
 
+---@class omichat.utils.InterpolatorCacheItem
+---@field interpolator omichat.Interpolator
+---@field lastAccess number
+
+local CACHE_EXPIRY_MS = 600000 -- ten minutes
 local shortHexPattern = '^%s*#?(%x)(%x)(%x)%s*$'
 local fullHexPattern = '^%s*#?(%x%x)%s*(%x%x)%s*(%x%x)%s*$'
 local rgbPattern = '^%s*(%d%d?%d?)[,%s]+(%d%d?%d?)[,%s]+(%d%d?%d?)%s*$'
@@ -21,6 +29,27 @@ local accessLevels = {
     observer = 2,
 }
 
+
+---Gets an interpolator from the cache.
+---@param text string
+---@return omichat.Interpolator?
+local function getCachedInterpolator(text)
+    local item = utils._interpolatorCache[text]
+    if item then
+        item.lastAccess = getTimestampMs()
+        return item.interpolator
+    end
+end
+
+---Adds an interpolator to the cache.
+---@param text string
+---@param interpolator omichat.Interpolator
+local function setCachedInterpolator(text, interpolator)
+    utils._interpolatorCache[text] = {
+        interpolator = interpolator,
+        lastAccess = getTimestampMs(),
+    }
+end
 
 ---Attempts to read an RGB or hex color from a string.
 ---@param text string
@@ -49,6 +78,27 @@ local function readColor(text)
     return tonumber(r, 16), tonumber(g, 16), tonumber(b, 16)
 end
 
+
+---Cleans up unused cache items.
+---@param clear boolean If true, the cache will be cleared entirely.
+function utils.cleanupCache(clear)
+    if clear then
+        utils._interpolatorCache = {}
+        return
+    end
+
+    local toRemove = {}
+    local currentTime = getTimestampMs()
+    for k, item in pairs(utils._interpolatorCache) do
+        if currentTime - item.lastAccess >= CACHE_EXPIRY_MS then
+            toRemove[#toRemove + 1] = k
+        end
+    end
+
+    for i = 1, #toRemove do
+        utils._interpolatorCache[toRemove[i]] = nil
+    end
+end
 
 ---Converts a color table to a hex string.
 ---@param color omichat.ColorTable
@@ -107,17 +157,26 @@ end
 ---@param options omi.interpolate.Options? Interpolation options.
 ---@return string
 function utils.interpolate(text, tokens, options)
-    options = options or {}
-    options.libraryExclude = utils.copy(options.libraryExclude or {})
+    -- only use cache for default options, since results may differ
+    local useCache = not options
 
-    -- randomness would result in messages changing due to refreshes
-    options.libraryExclude['mutators.choose'] = true
-    options.libraryExclude['mutators.random'] = true
-    options.libraryExclude['mutators.randomseed'] = true
+    local interpolator = useCache and getCachedInterpolator(text)
+    if not interpolator then
+        options = options or {}
 
-    ---@type omichat.Interpolator
-    local interpolator = Interpolator:new(options)
-    interpolator:setPattern(text)
+        -- prevent randomness; would result in messages changing due to refreshes
+        options.libraryExclude = utils.copy(options.libraryExclude or {})
+        options.libraryExclude['mutators.choose'] = true
+        options.libraryExclude['mutators.random'] = true
+        options.libraryExclude['mutators.randomseed'] = true
+
+        interpolator = Interpolator:new(options)
+        interpolator:setPattern(text)
+
+        if useCache then
+            setCachedInterpolator(text, interpolator)
+        end
+    end
 
     return interpolator:interpolate(tokens)
 end

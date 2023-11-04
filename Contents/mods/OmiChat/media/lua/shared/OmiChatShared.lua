@@ -1,6 +1,12 @@
 ---Provides API access to OmiChat.
 ---@class omichat.api.shared
-return require 'OmiChat/API/Shared'
+local OmiChat = require 'OmiChat/API/Shared'
+
+
+Events.EveryDays.Add(OmiChat.utils.cleanupCache)
+
+
+return OmiChat
 
 
 ---@alias omichat.ChatTypeString
