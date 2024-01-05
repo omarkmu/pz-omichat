@@ -179,6 +179,7 @@ OmiChat._vanillaStreamConfigs = {
     },
     yell = {
         commandType = 'chat',
+        chatType = 'shout',
         isEnabled = isBasicChatEnabled,
         onUse = useBasicChat,
         context = {

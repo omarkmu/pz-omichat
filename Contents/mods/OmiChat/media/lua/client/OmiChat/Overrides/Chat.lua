@@ -141,6 +141,66 @@ local function addCustomCalloutOptions(context, beforeOption)
     end
 end
 
+---Adds the context menu options for roleplay languages.
+---@param context ISContextMenu
+---@param beforeOption string
+local function addLanguageOptions(context, beforeOption)
+    local languages = OmiChat.getRoleplayLanguages()
+    local languageSlots = OmiChat.getRoleplayLanguageSlots()
+    if languageSlots == 0 and #languages <= 1 then
+        -- nothing to configure → don't show the menu
+        return
+    end
+
+    local languageOptionName = getText('UI_OmiChat_context_languages')
+    local languageOption = context:insertOptionBefore(beforeOption, languageOptionName, ISChat.instance)
+
+    local languageSubMenu = context:getNew(context)
+    context:addSubMenu(languageOption, languageSubMenu)
+
+    local known = {}
+    local currentLang = OmiChat.getCurrentRoleplayLanguage() or OmiChat.getDefaultRoleplayLanguage()
+    for i = 1, #languages do
+        local lang = languages[i]
+        known[lang] = true
+
+        local name = getTextOrNull('UI_OmiChat_Language_' .. lang) or lang
+        local opt = languageSubMenu:addOption(name, ISChat.instance, ISChat.onLanguageSelect, lang)
+        languageSubMenu:setOptionChecked(opt, lang == currentLang)
+    end
+
+    if languageSlots - #languages < 1 or #languages >= 32 then
+        return
+    end
+
+    local addLanguages = {}
+    local allLanguages = OmiChat.getConfiguredRoleplayLanguages()
+    for i = 1, #allLanguages do
+        local lang = allLanguages[i]
+        if not known[lang] then
+            addLanguages[#addLanguages + 1] = {
+                language = lang,
+                translated = getTextOrNull('UI_OmiChat_Language_' .. lang) or lang,
+            }
+        end
+    end
+
+    if #addLanguages == 0 then
+        return
+    end
+
+    table.sort(addLanguages, function(a, b) return a.translated < b.translated end)
+
+    local addLanguageSubMenu = languageSubMenu:getNew(languageSubMenu)
+    local addLanguageOption = languageSubMenu:addOption(getText('UI_OmiChat_context_add_language'), ISChat.instance)
+    languageSubMenu:addSubMenu(addLanguageOption, addLanguageSubMenu)
+    for i = 1, #addLanguages do
+        local lang = addLanguages[i].language
+        local name = addLanguages[i].translated
+        addLanguageSubMenu:addOption(name, ISChat.instance, ISChat.onAddLanguage, lang)
+    end
+end
+
 ---Adds the context menu options for retaining commands.
 ---@param context ISContextMenu
 ---@param beforeOption string
@@ -163,6 +223,24 @@ local function addRetainOptions(context, beforeOption)
         local opt = retainSubMenu:addOption(name, ISChat.instance, ISChat.onToggleRetainCommand, cat)
         retainSubMenu:setOptionChecked(opt, OmiChat.getRetainCommand(cat))
     end
+end
+
+---Determins whether the enable/disable signed language emotes option should display.
+---@return boolean
+local function shouldShowSignEmoteOption()
+    local languages = OmiChat.getRoleplayLanguages()
+    for i = 1, #languages do
+        if OmiChat.isRoleplayLanguageSigned(languages[i]) then
+            return true
+        end
+    end
+
+    local defaultLang = OmiChat.getDefaultRoleplayLanguage()
+    if not defaultLang then
+        return false
+    end
+
+    return OmiChat.isRoleplayLanguageSigned(defaultLang)
 end
 
 ---Attempts to set the current text with the currently selected suggester box item.
@@ -312,6 +390,7 @@ function ISChat:onCommandEntered()
     local commandType = 'other'
     local shouldHandle = false
     local allowEmotes = false
+    local allowLanguages = false
     local isDefault = false
 
     if not stream then
@@ -333,6 +412,7 @@ function ISChat:onCommandEntered()
             showWrongChatTabMessage(instance.currentTabID - 1, stream.tabID - 1, chatCommand or '')
             stream = nil
             allowEmotes = false
+            allowLanguages = false
             shouldHandle = true
         elseif stream.omichat then
             local isEnabled = stream.omichat.isEnabled
@@ -341,6 +421,7 @@ function ISChat:onCommandEntered()
             else
                 shouldHandle = true
                 allowEmotes = true
+                allowLanguages = OmiChat.canUseRoleplayLanguage(stream.omichat.chatType or stream.name, command)
 
                 useCallback = stream.omichat.onUse
                 callbackStream = stream
@@ -364,6 +445,7 @@ function ISChat:onCommandEntered()
     end
 
     -- handle emotes specified with .emote
+    local playedEmote
     if allowEmotes and Option.EnableEmotes then
         local emoteToPlay, start, finish = OmiChat.getEmoteFromCommand(command)
         if emoteToPlay then
@@ -374,6 +456,7 @@ function ISChat:onCommandEntered()
             local player = getSpecificPlayer(0)
             if player then
                 player:playEmote(emoteToPlay)
+                playedEmote = true
             end
         end
     end
@@ -407,6 +490,10 @@ function ISChat:onCommandEntered()
         if lastChatStream then
             OmiChat.cycleStream(lastChatStream)
         end
+    end
+
+    if allowLanguages then
+        command = OmiChat.getLanguageEncodedText(command, allowEmotes and not playedEmote)
     end
 
     if callbackStream and useCallback then
@@ -466,9 +553,16 @@ function ISChat:onGearButtonClick()
 
     context:insertOptionBefore(subMenuName, suggesterOptionName, ISChat.instance, ISChat.onToggleUseSuggester)
 
+    if shouldShowSignEmoteOption() then
+        local suffix = OmiChat.getSignEmotesEnabled() and 'disable' or 'enable'
+        local signEmotesOptionName = getText('UI_OmiChat_context_sign_emotes_' .. suffix)
+        context:insertOptionBefore(subMenuName, signEmotesOptionName, ISChat.instance, ISChat.onToggleUseSignEmotes)
+    end
+
     addCustomCalloutOptions(context, subMenuName)
     addColorOptions(context, subMenuName)
     addRetainOptions(context, subMenuName)
+    addLanguageOptions(context, subMenuName)
 end
 
 ---Override to handle custom info text.

@@ -28,6 +28,30 @@ local _getTextWithPrefix = _ChatMessage.getTextWithPrefix
 local _getChatTitleID = _ChatBase.getTitleID
 local _getChatType = _ChatBase.getType
 
+local signLanguageEmotes = {
+    'yes',
+    'no',
+    'signalok',
+    'wavehi',
+    'wavehi02',
+    'wavebye',
+    'saluteformal',
+    'salutecasual',
+    'comehere',
+    'comehere02',
+    'followme',
+    'thumbsup',
+    'thumbsdown',
+    'thankyou',
+    'insult',
+    'stop',
+    'stop02',
+    'shrug',
+    'undecided',
+    'freeze',
+    'comefront',
+}
+
 
 ---Creates or removes the icon button and picker from the chat box based on sandbox options.
 local function addOrRemoveIconComponents()
@@ -413,11 +437,32 @@ function OmiChat.buildMessageTextFromInfo(info)
         utils.interpolate(Option.ChatFormatFull, {
             chatType = info.chatType,
             stream = info.substitutions.stream,
+            language = info.substitutions.language,
+            languageTranslated = info.substitutions.languageTranslated,
+            isSignedLanguage = info.substitutions.isSignedLanguage,
             timestamp = info.timestamp or '',
             tag = info.tag or '',
             content = utils.interpolate(info.format, info.substitutions),
         }),
     }
+end
+
+---Checks whether a given stream and message can use roleplay languages.
+---@param stream string
+---@param message string
+---@return boolean
+function OmiChat.canUseRoleplayLanguage(stream, message)
+    local pred = Option.PredicateAllowLanguage
+    if pred == '' then
+        return false
+    end
+
+    local tokens = {
+        stream = stream,
+        message = message,
+    }
+
+    return utils.interpolate(pred, tokens) ~= ''
 end
 
 ---Determines stream information given a chat command.
@@ -553,9 +598,17 @@ function OmiChat.decodeMessageTag(tag)
     end
 
     return {
+        language = decoded.ocLanguage,
         name = decoded.ocName,
         nameColor = utils.stringToColor(decoded.ocNameColor),
     }
+end
+
+---Decodes an encoded language ID.
+---@param text string
+---@return integer
+function OmiChat.decodeRoleplayLanguageID(text)
+    return text:sub(1, 1):byte() - 127
 end
 
 ---Encodes message information including chat name and colors into a string.
@@ -570,6 +623,7 @@ function OmiChat.encodeMessageTag(message)
     local color = OmiChat.getNameColorInChat(author)
     local chatType = OmiChat.getMessageChatType(message)
     local success, encoded = utils.json.tryEncode {
+        ocLanguage = OmiChat.getMessageLanguage(message),
         ocName = OmiChat.getNameInChat(author, chatType),
         ocNameColor = color and utils.colorToHexString(color) or nil,
     }
@@ -579,6 +633,13 @@ function OmiChat.encodeMessageTag(message)
     end
 
     return encoded
+end
+
+---Encodes a roleplay language ID as a string.
+---@param id integer
+---@return string
+function OmiChat.encodeRoleplayLanguageID(id)
+    return string.char(id + 127)
 end
 
 ---Gets the command associated with a color category.
@@ -678,6 +739,57 @@ function OmiChat.getMessageChatType(message)
     return tostring(_getChatType(message:getChat()))
 end
 
+---Returns the roleplay language encoded in message content.
+---@param message omichat.Message
+---@return string?
+function OmiChat.getMessageLanguage(message)
+    local text = message:getText()
+    local formatter = OmiChat.getFormatter('language')
+
+    local languageId = 1
+    if formatter:isMatch(text) then
+        -- found a language → decode it. transformer will handle cleanup
+        text = formatter:read(text)
+        local encodedId = OmiChat.decodeRoleplayLanguageID(text)
+        if encodedId >= 1 and encodedId <= 32 then
+            languageId = encodedId
+        end
+    end
+
+    return OmiChat.getRoleplayLanguageByID(languageId)
+end
+
+---Encodes the provided text with information about the current roleplay language.
+---@param text string The text to encode.
+---@param playEmoteForSigned boolean If true, this will play a random emote for signed languages.
+---@return string
+function OmiChat.getLanguageEncodedText(text, playEmoteForSigned)
+    local currentLanguage = OmiChat.getCurrentRoleplayLanguage()
+    local langId = currentLanguage and OmiChat.getRoleplayLanguageID(currentLanguage)
+    if not currentLanguage or not langId or currentLanguage == OmiChat.getDefaultRoleplayLanguage() then
+        return text
+    end
+
+    local trimmed = utils.trimleft(text)
+    if #trimmed == 0 then
+        -- avoid creating empty messages
+        return text
+    end
+
+    local encoded = OmiChat.encodeRoleplayLanguageID(langId) .. trimmed
+    local formatted = OmiChat.getFormatter('language'):format(encoded)
+
+    playEmoteForSigned = playEmoteForSigned and OmiChat.getSignEmotesEnabled()
+    if playEmoteForSigned and OmiChat.isRoleplayLanguageSigned(currentLanguage) then
+        local player = getSpecificPlayer(0)
+        if player then
+            player:playEmote(OmiChat.getSignLanguageEmote(text))
+        end
+    end
+
+    return formatted
+end
+
 ---Suggests text based on the provided input text.
 ---@param text string
 ---@return omichat.Suggestion[]
@@ -710,6 +822,17 @@ function OmiChat.hideSuggesterBox()
     if suggesterBox then
         suggesterBox:setVisible(false)
     end
+end
+
+---Gets an emote meant to simulate sign language based on the given text.
+---@param text string
+---@return string
+function OmiChat.getSignLanguageEmote(text)
+    -- same text should map to same 'sign'
+    local rand = newrandom()
+    rand:seed(utils.trim(text:lower()))
+
+    return signLanguageEmotes[rand:random(1, #signLanguageEmotes)]
 end
 
 ---Redraws the current chat messages.

@@ -62,6 +62,10 @@ function _IsoPlayer:Callout(playEmote)
         shout = shout:upper()
     end
 
+    if OmiChat.canUseRoleplayLanguage('shout', shout) then
+        shout = OmiChat.getLanguageEncodedText(shout, not playEmote)
+    end
+
     processShoutMessage(formatter:format(shout))
 
     if playEmote then

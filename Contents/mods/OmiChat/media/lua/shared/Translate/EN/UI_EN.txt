@@ -12,6 +12,35 @@ UI_EN = {
     UI_OmiChat_icon_cat_tools = "Tools",
     UI_OmiChat_icon_cat_weapons = "Weapons",
 
+    --[[ Languages ]]--
+    UI_OmiChat_unknown_language_say = "says something in %1.",
+    UI_OmiChat_unknown_language_whisper = "whispers something in %1.",
+    UI_OmiChat_unknown_language_shout = "shouts something in %1.",
+    UI_OmiChat_unknown_language_say_signed = "signs something in %1.",
+    UI_OmiChat_unknown_language_whisper_signed = "subtly signs something in %1.",
+    UI_OmiChat_unknown_language_shout_signed = "energetically signs something in %1.",
+
+    UI_OmiChat_Language_English = "English",
+    UI_OmiChat_Language_French = "French",
+    UI_OmiChat_Language_Italian = "Italian",
+    UI_OmiChat_Language_German = "German",
+    UI_OmiChat_Language_Spanish = "Spanish",
+    UI_OmiChat_Language_Danish = "Danish",
+    UI_OmiChat_Language_Dutch = "Dutch",
+    UI_OmiChat_Language_Hungarian = "Hungarian",
+    UI_OmiChat_Language_Norwegian = "Norwegian",
+    UI_OmiChat_Language_Polish = "Polish",
+    UI_OmiChat_Language_Portuguese = "Portuguese",
+    UI_OmiChat_Language_Russian = "Russian",
+    UI_OmiChat_Language_Turkish = "Turkish",
+    UI_OmiChat_Language_Japanese = "Japanese",
+    UI_OmiChat_Language_Mandarin = "Mandarin",
+    UI_OmiChat_Language_Finnish = "Finnish",
+    UI_OmiChat_Language_Korean = "Korean",
+    UI_OmiChat_Language_Thai = "Thai",
+    UI_OmiChat_Language_Ukrainian = "Ukrainian",
+    UI_OmiChat_Language_ASL = "ASL",
+
     --[[ Help Text ]]--
     UI_OmiChat_helptext_emotes = "Get a list of available chat emotes",
     UI_OmiChat_helptext_name = "To set your name in chat, use: /name Name. To reset your name, use /name. Example: /name Bob"
@@ -63,11 +92,17 @@ UI_EN = {
     UI_OmiChat_context_enable_suggestions = "Enable suggestions",
     UI_OmiChat_context_disable_suggestions = "Disable suggestions",
     UI_OmiChat_context_colors_submenu_name = "Set chat colors",
-    UI_OmiChat_context_retain_commands = "Retain commands",
 
+    UI_OmiChat_context_retain_commands = "Retain commands",
     UI_OmiChat_context_retain_commands_chat = "Chat",
     UI_OmiChat_context_retain_commands_rp = "RP",
     UI_OmiChat_context_retain_commands_other = "Other",
+
+    UI_OmiChat_context_languages = "Language",
+    UI_OmiChat_context_add_language = "Add Language",
+    UI_OmiChat_context_confirm_add_language = "Add %1 as language #%2? This cannot be undone.",
+    UI_OmiChat_context_sign_emotes_enable = "Enable Sign Language Emotes",
+    UI_OmiChat_context_sign_emotes_disable = "Disable Sign Language Emotes",
 
     -- %1 = the chat stream (e.g., /say, /yell)
     UI_OmiChat_context_submenu_color = "%1 color",

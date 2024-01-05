@@ -14,18 +14,22 @@ local unpack = unpack
 ---@param args omichat.request.ReportDrawCard
 function OmiChat.Commands.reportDrawCard(args)
     local command = utils.interpolate(Option.FormatCard, { card = args.card })
-    local formatted = OmiChat.getFormatter('card'):format(command)
+    if OmiChat.canUseRoleplayLanguage('card', command) then
+        command = OmiChat.getLanguageEncodedText(command, false)
+    end
 
-    processSayMessage(formatted)
+    processSayMessage(OmiChat.getFormatter('card'):format(command))
 end
 
 ---Reports the results of a dice roll.
 ---@param args omichat.request.ReportRoll
 function OmiChat.Commands.reportRoll(args)
     local command = utils.interpolate(Option.FormatRoll, { roll = args.roll, sides = args.sides })
-    local formatted = OmiChat.getFormatter('roll'):format(command)
+    if OmiChat.canUseRoleplayLanguage('roll', command) then
+        command = OmiChat.getLanguageEncodedText(command, false)
+    end
 
-    processSayMessage(formatted)
+    processSayMessage(OmiChat.getFormatter('roll'):format(command))
 end
 
 ---Adds an info message for the local player.

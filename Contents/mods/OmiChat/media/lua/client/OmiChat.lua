@@ -239,6 +239,13 @@ function ISChat.onToggleShowNameColor(target)
     OmiChat.redrawMessages()
 end
 
+---Event handler for toggling sign language emotes.
+---@param target omichat.ISChat
+---@diagnostic disable-next-line: unused-local
+function ISChat.onToggleUseSignEmotes(target)
+    OmiChat.setSignEmotesEnabled(not OmiChat.getSignEmotesEnabled())
+end
+
 ---Event handler for toggling using the suggester.
 ---@param target omichat.ISChat
 ---@diagnostic disable-next-line: unused-local
@@ -305,6 +312,50 @@ function ISChat.onSuggesterSelect(target, suggestion)
     OmiChat.hideSuggesterBox()
     entry:setText(suggestion.suggestion)
     OmiChat.updateSuggesterComponent()
+end
+
+---Event handler for adding a roleplay language.
+---@param target omichat.ISChat
+---@param language string
+---@diagnostic disable-next-line: unused-local
+function ISChat.onAddLanguage(target, language)
+    if target.activeLanguageModal then
+        target.activeLanguageModal:destroy()
+    end
+
+    local languages = OmiChat.getRoleplayLanguages()
+    local languageTranslated = getTextOrNull('UI_OmiChat_Language_' .. language) or language
+    local text = getText('UI_OmiChat_context_confirm_add_language', languageTranslated, #languages + 1)
+    local width, height = ISModalDialog.CalcSize(0, 0, text)
+    local x = getPlayerScreenLeft(0) + (getPlayerScreenWidth(0) - width) / 2
+    local y = getPlayerScreenTop(0) + (getPlayerScreenHeight(0) - height) / 2
+
+    local modal = ISModalDialog:new(x, y, width, height, text, true, target, ISChat.onConfirmAddLanguage, 0, language)
+
+    modal:initialise()
+    modal:addToUIManager()
+    target.activeLanguageModal = modal
+end
+
+---Event handler for confirming adding a roleplay language.
+---@param target omichat.ISChat
+---@param button ISButton
+---@param language string
+---@diagnostic disable-next-line: unused-local
+function ISChat.onConfirmAddLanguage(target, button, language)
+    if button.internal ~= 'YES' then
+        return
+    end
+
+    OmiChat.addRoleplayLanguage(language)
+end
+
+---Event handler for selecting the current roleplay language.
+---@param target omichat.ISChat
+---@param language string
+---@diagnostic disable-next-line: unused-local
+function ISChat.onLanguageSelect(target, language)
+    OmiChat.setCurrentRoleplayLanguage(language)
 end
 
 

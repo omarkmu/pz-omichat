@@ -57,6 +57,10 @@ local floor = math.floor
 ---@field ColorServer string
 ---@field FilterNickname string
 ---@field PredicateUseNameColor string
+---@field PredicateAllowLanguage string
+---@field AvailableLanguages string
+---@field SignedLanguages string
+---@field LanguageSlots integer
 ---@field FormatCard string
 ---@field FormatRoll string
 ---@field FormatInfo string
@@ -96,6 +100,7 @@ local floor = math.floor
 ---@field ChatFormatIncomingPrivate string
 ---@field ChatFormatOutgoingPrivate string
 ---@field ChatFormatServer string
+---@field ChatFormatUnknownLanguage string
 local Option = lib.sandbox('OmiChat')
 
 

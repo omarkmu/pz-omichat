@@ -9,6 +9,37 @@ local concat = table.concat
 local getText = getText
 
 
+---Adds a roleplay language to the current player's list.
+---@param language string
+---@return boolean
+function OmiChat.addRoleplayLanguage(language)
+    local player = getSpecificPlayer(0)
+    local modData = OmiChat.getPlayerModData(player)
+    if not modData or not OmiChat.isConfiguredRoleplayLanguage(language) then
+        return false
+    end
+
+    local languages = modData.languages
+    if #languages >= 32 then
+        -- at capacity
+        return false
+    end
+
+    for i = 1, #languages do
+        if languages[i] == language then
+            -- already known
+            return false
+        end
+    end
+
+    languages[#languages + 1] = language
+    if not modData.currentLanguage then
+        modData.currentLanguage = languages[1]
+    end
+
+    return true
+end
+
 ---Sets the color associated with a given color category for the current player,
 ---if the related option is enabled.
 ---@param category omichat.ColorCategory
@@ -95,6 +126,17 @@ function OmiChat.getColorOrDefault(category)
     return OmiChat.getColor(category) or Option:getDefaultColor(category)
 end
 
+---Gets the player's current roleplay language.
+---@return string?
+function OmiChat.getCurrentRoleplayLanguage()
+    local modData = OmiChat.getPlayerModData(getSpecificPlayer(0))
+    if not modData then
+        return
+    end
+
+    return modData.currentLanguage
+end
+
 ---Retrieves the player's custom shouts.
 ---@param shoutType omichat.CalloutCategory The type of shouts to retrieve.
 ---@return string[]?
@@ -141,6 +183,7 @@ function OmiChat.getPlayerPreferences()
     OmiChat._playerPrefs = {
         showNameColors = true,
         useSuggester = true,
+        useSignEmotes = true,
         retainChatInput = true,
         retainRPInput = true,
         retainOtherInput = false,
@@ -182,6 +225,7 @@ function OmiChat.getPlayerPreferences()
 
     prefs.showNameColors = not not utils.default(decoded.showNameColors, prefs.showNameColors)
     prefs.useSuggester = not not utils.default(decoded.useSuggester, prefs.useSuggester)
+    prefs.useSignEmotes = not not utils.default(decoded.useSignEmotes, prefs.useSignEmotes)
     prefs.retainChatInput = not not utils.default(decoded.retainChatInput, prefs.retainChatInput)
     prefs.retainRPInput = not not utils.default(decoded.retainRPInput, prefs.retainRPInput)
     prefs.retainOtherInput = not not utils.default(decoded.retainOtherInput, prefs.retainOtherInput)
@@ -207,6 +251,28 @@ function OmiChat.getPlayerPreferences()
     return prefs
 end
 
+---Gets a list of the player's known roleplay languages.
+---@return string[]
+function OmiChat.getRoleplayLanguages()
+    local modData = OmiChat.getPlayerModData(getSpecificPlayer(0))
+    if not modData then
+        return {}
+    end
+
+    return modData.languages
+end
+
+---Gets the number of available roleplay language slots for the current player.
+---@return integer
+function OmiChat.getRoleplayLanguageSlots()
+    local modData = OmiChat.getPlayerModData(getSpecificPlayer(0))
+    if not modData then
+        return 0
+    end
+
+    return modData.languageSlots
+end
+
 ---Gets whether a retain command category is set to retain commands.
 ---@param category omichat.ChatCommandType
 ---@return boolean
@@ -221,6 +287,12 @@ function OmiChat.getRetainCommand(category)
     end
 
     return false
+end
+
+---Retrieves a boolean for whether the current player has sign language emotes enabled.
+---@return boolean
+function OmiChat.getSignEmotesEnabled()
+    return OmiChat.getPlayerPreferences().useSignEmotes
 end
 
 ---Returns a color table for the current player's speech color.
@@ -259,6 +331,7 @@ function OmiChat.savePlayerPreferences()
     local success, encoded = utils.json.tryEncode {
         VERSION = OmiChat._prefsVersion,
         useSuggester = prefs.useSuggester,
+        useSignEmotes = prefs.useSignEmotes,
         showNameColors = prefs.showNameColors,
         retainChatInput = prefs.retainChatInput,
         retainRPInput = prefs.retainRPInput,
@@ -276,6 +349,15 @@ function OmiChat.savePlayerPreferences()
     local outFile = getFileWriter(OmiChat._prefsFileName, true, false)
     outFile:write(encoded)
     outFile:close()
+end
+
+---Sets the player's current roleplay language.
+---@param language string
+function OmiChat.setCurrentRoleplayLanguage(language)
+    local modData = OmiChat.getPlayerModData(getSpecificPlayer(0))
+    if modData and OmiChat.isConfiguredRoleplayLanguage(language) then
+        modData.currentLanguage = language
+    end
 end
 
 ---Sets the player's custom shouts.
@@ -305,7 +387,7 @@ function OmiChat.setNameColorEnabled(enabled)
 end
 
 ---Sets the nickname of the current player.
----@param nickname string? The nickname to set. A nil or empty value will unset the nickname.
+---@param nickname string? The nickname to set. A `nil` or empty value will unset the nickname.
 ---@return boolean success
 ---@return string? status
 function OmiChat.setNickname(nickname)
@@ -365,6 +447,22 @@ function OmiChat.setRetainCommand(category, value)
         prefs.retainOtherInput = value
     end
 
+    OmiChat.savePlayerPreferences()
+end
+
+---Sets the number of available roleplay language slots for the current player.
+---@param slots integer
+function OmiChat.setRoleplayLanguageSlots(slots)
+    local modData = OmiChat.getPlayerModData(getSpecificPlayer(0))
+    if modData and slots >= 0 and slots <= 32 then
+        modData.languageSlots = slots
+    end
+end
+
+---Sets whether sign language emotes are enabled for the current player.
+---@param enable boolean
+function OmiChat.setSignEmotesEnabled(enable)
+    OmiChat.getPlayerPreferences().useSignEmotes = not not enable
     OmiChat.savePlayerPreferences()
 end
 

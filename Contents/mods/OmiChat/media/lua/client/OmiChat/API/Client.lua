@@ -695,7 +695,7 @@ OmiChat._suggesters = {
 OmiChat._transformers = {
     {
         name = 'radio-chat',
-        priority = 10,
+        priority = 12,
         transform = function(_, info)
             local text = info.content or info.rawText
             if info.chatType ~= 'radio' then
@@ -715,7 +715,7 @@ OmiChat._transformers = {
     },
     {
         name = 'decode-callout',
-        priority = 8,
+        priority = 10,
         transform = function(_, info)
             if info.chatType ~= 'shout' then
                 return
@@ -733,6 +733,7 @@ OmiChat._transformers = {
                 info.context.ocIsSneakCallout = true
 
                 if OmiChat.isCustomStreamEnabled('whisper') then
+                    -- format sneak callouts like whispers, if enabled
                     info.format = Option.ChatFormatWhisper
                     info.formatOptions.color = OmiChat.getColorOrDefault('whisper')
                     info.titleID = 'UI_OmiChat_whisper_chat_title_id'
@@ -747,18 +748,17 @@ OmiChat._transformers = {
     },
     {
         name = 'decode-stream',
-        priority = 8,
+        priority = 10,
         transform = function(_, info)
             local isRadio = info.context.ocIsRadio
+            local text = info.content or info.rawText
             for data in config:streams() do
                 local name = data.name
 
                 local formatter = OmiChat.getFormatter(name)
                 local isValidStream = data.chatTypes[info.chatType] and OmiChat.isCustomStreamEnabled(name)
 
-                local text = info.content or info.rawText
                 local isMatch = formatter:isMatch(text)
-
                 if isMatch and isRadio then
                     if data.convertToRadio then
                         info.content = formatter:read(text)
@@ -796,6 +796,80 @@ OmiChat._transformers = {
 
                     break
                 end
+            end
+        end,
+    },
+    {
+        name = 'handle-language',
+        priority = 8,
+        allowedChatTypes = {
+            say = true,
+            shout = true,
+            radio = true,
+        },
+        transform = function(self, info)
+            local formatter = OmiChat.getFormatter('language')
+            local text = info.content or info.rawText
+
+            if formatter:isMatch(text) then
+                text = formatter:read(text)
+                local encodedId = OmiChat.decodeRoleplayLanguageID(text)
+                if encodedId >= 1 or encodedId <= 32 then
+                    -- language is already handled during message metadata encoding
+                    -- but we can clean up the character here anyway
+                    info.content = text:sub(2)
+                end
+            end
+
+            if not self.allowedChatTypes[info.chatType] then
+                return
+            end
+
+            local streamData = config:getCustomStreamInfo(info.context.ocCustomStream)
+            if streamData and streamData.ignoreLanguage then
+                return
+            end
+
+            local language = info.meta.language or OmiChat.getDefaultRoleplayLanguage()
+            if not language then
+                return
+            end
+
+            -- add language information for format strings
+            local isSigned = OmiChat.isRoleplayLanguageSigned(language)
+            info.substitutions.isSignedLanguage = isSigned and 'true' or ''
+            info.substitutions.language = language
+            info.substitutions.languageTranslated = getTextOrNull('UI_OmiChat_Language_' .. language) or language
+
+            if isSigned and info.context.ocIsRadio then
+                -- hide signed messages sent over the radio
+                -- still can't actually hide the overhead text because it's hardcoded
+                info.message:setShowInChat(false)
+            end
+
+            local player = getSpecificPlayer(0)
+            if not player or info.author == player:getUsername() then
+                -- everyone understands themselves
+                return
+            elseif OmiChat.canPlayerUnderstandLanguage(player, language) then
+                -- if they understand the language, we're done here
+                return
+            end
+
+            -- they didn't understand it
+            local isWhisper = info.context.ocIsSneakCallout or info.context.ocCustomStream == 'whisper'
+            info.message:setOverHeadSpeech(false)
+            info.substitutions.unknownLanguageString = 'UI_OmiChat_unknown_language_'
+                .. (isWhisper and 'whisper' or (info.chatType == 'shout' and 'shout' or 'say'))
+                .. (isSigned and '_signed' or '')
+            info.format = Option.ChatFormatUnknownLanguage
+            info.formatOptions.useDefaultChatColor = false
+
+            if isWhisper then
+                info.titleID = 'UI_OmiChat_whisper_chat_title_id'
+                info.formatOptions.color = OmiChat.getColorOrDefault('mequiet')
+            else
+                info.formatOptions.color = OmiChat.getColorOrDefault('me')
             end
         end,
     },
@@ -916,7 +990,8 @@ OmiChat._transformers = {
             safehouse = 'ChatFormatSafehouse',
         },
         transform = function(self, info)
-            if not self.basicChatFormats[info.chatType] and not info.context.ocIsIncomingPM then
+            local chatFormat = self.basicChatFormats[info.chatType]
+            if not chatFormat and not info.context.ocIsIncomingPM then
                 return
             end
 
@@ -930,16 +1005,16 @@ OmiChat._transformers = {
                 end
             end
 
-            if info.message:isFromDiscord() then
-                info.format = Option.ChatFormatDiscord
+            if info.format then
+                return
             end
 
-            if not info.format then
-                if info.context.ocIsIncomingPM then
-                    info.format = Option.ChatFormatIncomingPrivate
-                else
-                    info.format = Option[self.basicChatFormats[info.chatType]]
-                end
+            if info.message:isFromDiscord() then
+                info.format = Option.ChatFormatDiscord
+            elseif info.context.ocIsIncomingPM then
+                info.format = Option.ChatFormatIncomingPrivate
+            else
+                info.format = Option[chatFormat]
             end
         end,
     },

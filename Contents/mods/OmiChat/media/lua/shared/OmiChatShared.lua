@@ -60,7 +60,16 @@ return OmiChat
 ---| omichat.CustomStreamName
 ---| 'callout'
 ---| 'sneakcallout'
+---| 'language'
 
+
+---@class omichat.LanguageInfoStore
+---@field languageCount integer
+---@field availableLanguages string
+---@field signedLanguages string
+---@field idToLanguage table<integer, string>
+---@field languageToID table<string, integer>
+---@field languageIsSignedMap table<string, boolean>
 
 ---@class omichat.CustomStreamInfo
 ---@field name string The name of the custom stream.
@@ -77,6 +86,7 @@ return OmiChat
 ---@field defaultRangeOpt string? The option used for the default message range. Defaults to `RangeSay`.
 ---@field titleID string? The string ID to use for chat tags associated with this stream.
 ---@field attractZombies true? Whether messages sent with this stream should attract zombies.
+---@field ignoreLanguage true? Whether messages sent with this stream should be understood by everyone.
 
 ---@class omichat.FormatterInfo
 ---@field name string The name of the formatter.
@@ -107,6 +117,12 @@ return OmiChat
 ---@field version integer The current mod data version.
 ---@field nicknames table<string, string> Association of usernames to chat nicknames.
 ---@field nameColors table<string, string> Association of usernames to chat color strings.
+
+---Player mod data.
+---@class omichat.PlayerModData
+---@field languages string[]
+---@field languageSlots integer
+---@field currentLanguage string?
 
 ---Request to update global mod data fields on the server.
 ---@class omichat.request.ModDataUpdate

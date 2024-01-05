@@ -62,6 +62,12 @@ Sandbox_EN = {
     --[[ Filters and Predicates ]]--
     Sandbox_OCFilterNickname = "Name Filter",
     Sandbox_OCPredicateUseNameColor = "Use Name Color Predicate",
+    Sandbox_OCPredicateAllowLanguage = "Allow Roleplay Language Predicate",
+
+    --[[ Languages ]]--
+    Sandbox_OCAvailableLanguages = "Available Languages",
+    Sandbox_OCLanguageSlots = "Language Slots",
+    Sandbox_OCSignedLanguages = "Signed Languages",
 
     --[[ Component Formats ]]--
     Sandbox_OCFormatCard = "/card Text Format",
@@ -100,11 +106,12 @@ Sandbox_EN = {
     Sandbox_OCChatFormatMeLoud = "/meloud Chat Format",
     Sandbox_OCChatFormatMeQuiet = "/mequiet Chat Format",
     Sandbox_OCChatFormatOutgoingPrivate = "Outgoing Private Chat Format",
+    Sandbox_OCChatFormatRadio = "Radio Chat Format",
+    Sandbox_OCChatFormatRoll = "/roll Chat Format",
     Sandbox_OCChatFormatSafehouse = "/safehouse Chat Format",
     Sandbox_OCChatFormatSay = "/say Chat Format",
     Sandbox_OCChatFormatServer = "Server Chat Format",
-    Sandbox_OCChatFormatRadio = "Radio Chat Format",
-    Sandbox_OCChatFormatRoll = "/roll Chat Format",
+    Sandbox_OCChatFormatUnknownLanguage = "Unknown Language Format",
     Sandbox_OCChatFormatWhisper = "/whisper Chat Format",
     Sandbox_OCChatFormatYell = "/yell Chat Format",
 }

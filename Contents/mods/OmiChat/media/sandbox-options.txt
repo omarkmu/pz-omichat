@@ -159,9 +159,26 @@ option OmiChat.ColorYell
 option OmiChat.FilterNickname
 { type = string, default = $sub($name 1 50), page = OmiChat, translation = OCFilterNickname, }
 
+option OmiChat.PredicateAllowLanguage
+{ type = string, default = $has(@(say;shout;whisper) $stream), page = OmiChat, translation = OCPredicateAllowLanguage, }
+
 option OmiChat.PredicateUseNameColor
 { type = string, default = $eq($stream say), page = OmiChat, translation = OCPredicateUseNameColor, }
 
+
+/* Languages */
+option OmiChat.AvailableLanguages {
+    type = string,
+    default = English;French;Italian;German;Spanish;Danish;Dutch;Hungarian;Norwegian;Polish;Portuguese;Russian;Turkish;Japanese;Mandarin;Finnish;Korean;Thai;Ukrainian;ASL,
+    page = OmiChat,
+    translation = OCAvailableLanguages,
+}
+
+option OmiChat.SignedLanguages
+{ type = string, default = ASL, page = OmiChat, translation = OCSignedLanguages, }
+
+option OmiChat.LanguageSlots
+{ type = integer, default = 1, min = 1, max = 32, page = OmiChat, translation = OCLanguageSlots, }
 
 /* Component Formats */
 option OmiChat.FormatInfo
@@ -284,3 +301,6 @@ option OmiChat.ChatFormatWhisper
 
 option OmiChat.ChatFormatYell
 { type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatYell, }
+
+option OmiChat.ChatFormatUnknownLanguage
+{ type = string, default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $gettext($unknownLanguageString $languageTranslated) <SPACE>)), page = OmiChat, translation = OCChatFormatUnknownLanguage, }

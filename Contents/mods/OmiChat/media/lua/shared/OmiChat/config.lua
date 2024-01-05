@@ -31,6 +31,7 @@ Configuration._chatStreams = {
         overheadFormatOpt = 'OverheadFormatMe',
         chatTypes = { say = true },
         stripColors = true,
+        ignoreLanguage = true,
     },
     {
         name = 'mequiet',
@@ -42,6 +43,7 @@ Configuration._chatStreams = {
         titleID = 'UI_OmiChat_whisper_chat_title_id',
         chatTypes = { say = true },
         stripColors = true,
+        ignoreLanguage = true,
     },
     {
         name = 'meloud',
@@ -54,6 +56,7 @@ Configuration._chatStreams = {
         chatTypes = { shout = true },
         stripColors = true,
         attractZombies = true,
+        ignoreLanguage = true,
     },
     {
         name = 'do',
@@ -64,6 +67,7 @@ Configuration._chatStreams = {
         overheadFormatOpt = 'OverheadFormatDo',
         chatTypes = { say = true },
         stripColors = true,
+        ignoreLanguage = true,
     },
     {
         name = 'doquiet',
@@ -75,6 +79,7 @@ Configuration._chatStreams = {
         titleID = 'UI_OmiChat_whisper_chat_title_id',
         chatTypes = { say = true },
         stripColors = true,
+        ignoreLanguage = true,
     },
     {
         name = 'doloud',
@@ -87,6 +92,7 @@ Configuration._chatStreams = {
         chatTypes = { shout = true },
         stripColors = true,
         attractZombies = true,
+        ignoreLanguage = true,
     },
     {
         name = 'looc',
@@ -96,6 +102,7 @@ Configuration._chatStreams = {
         chatFormatOpt = 'ChatFormatLooc',
         overheadFormatOpt = 'OverheadFormatLooc',
         chatTypes = { say = true },
+        ignoreLanguage = true,
     },
 }
 
@@ -111,6 +118,7 @@ Configuration._commandStreams = {
         overheadFormatOpt = 'OverheadFormatRoll',
         chatTypes = { say = true },
         autoColorOption = false,
+        ignoreLanguage = true,
     },
     {
         name = 'card',
@@ -122,6 +130,7 @@ Configuration._commandStreams = {
         overheadFormatOpt = 'OverheadFormatCard',
         chatTypes = { say = true },
         autoColorOption = false,
+        ignoreLanguage = true,
     },
 }
 
@@ -134,6 +143,10 @@ Configuration._formatters = {
     {
         name = 'sneakcallout',
         formatID = 52,
+    },
+    {
+        name = 'language',
+        formatID = 53,
     },
 }
 

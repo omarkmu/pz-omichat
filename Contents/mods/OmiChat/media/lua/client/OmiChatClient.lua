@@ -24,6 +24,7 @@ return OmiChat
 
 ---Metadata that can be attached to a message.
 ---@class omichat.MessageMetadata
+---@field language string? The roleplay language in which the message was sent.
 ---@field name string? The name of the author when this message was sent.
 ---@field nameColor omichat.ColorTable? The name color of the author when this message was sent.
 
@@ -86,6 +87,7 @@ return OmiChat
 ---@field onUse fun(self: table, command: string)? Callback triggered when the stream is used.
 ---@field allowEmotes boolean? Whether to allow emotes on this stream. Defaults to true for non-commands and false for commands.
 ---@field allowIconPicker boolean? Whether to enable the icon button for this stream. Defaults to false.
+---@field chatType string? The chat type tied to this stream. Used when determining roleplay language.
 
 ---@class omichat.ChatStreamConfig : omichat.BaseStreamConfig
 
@@ -111,6 +113,7 @@ return OmiChat
 ---@class omichat.PlayerPreferences
 ---@field showNameColors boolean Whether name colors are enabled.
 ---@field useSuggester boolean Whether suggestions are enabled.
+---@field useSignEmotes boolean Whether signed roleplay languages should play a random emote.
 ---@field callouts string[] Custom callouts.
 ---@field sneakcallouts string[] Custom sneak callouts.
 ---@field colors table<omichat.ColorCategory, omichat.ColorTable> Custom chat colors.
