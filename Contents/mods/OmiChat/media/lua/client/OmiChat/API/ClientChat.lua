@@ -494,7 +494,7 @@ end
 ---Retrieves a stream name given a chat command.
 ---@param command string A chat stream's command, with the leading slash.
 ---@param includeCommands boolean? If true, commands should be included.
----@return string? #The name of the chat stream, or nil if not found.
+---@return string? #The name of the chat stream, or `nil` if not found.
 function OmiChat.chatCommandToStreamName(command, includeCommands)
     local stream = OmiChat.chatCommandToStream(command, includeCommands)
     if stream then
@@ -616,7 +616,7 @@ function OmiChat.getColorCategoryCommand(cat)
 end
 
 ---Returns a playable emote given an emote name.
----Returns nil if there is not an emote associated with the emote name.
+---Returns `nil` if there is not an emote associated with the emote name.
 ---@param emote string
 ---@return string?
 function OmiChat.getEmote(emote)

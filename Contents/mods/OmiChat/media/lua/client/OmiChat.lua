@@ -35,7 +35,7 @@ local ISChat = ISChat
 
 
 ---Returns the non-empty lines of a string.
----If there are no non-empty lines, returns nil.
+---If there are no non-empty lines, returns `nil`.
 ---@param text string
 ---@param maxLen integer?
 ---@return string[]?

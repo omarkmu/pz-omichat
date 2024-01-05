@@ -43,7 +43,7 @@ function OmiChat.getNameColor(username)
     return utils.stringToColor(OmiChat.getModData().nameColors[username])
 end
 
----Returns the color table used for a user's name color in chat, or nil if unset.
+---Returns the color table used for a user's name color in chat, or `nil` if unset.
 ---This respects the `EnableSpeechColorAsDefaultNameColor` option.
 ---@param username string
 ---@return omichat.ColorTable?

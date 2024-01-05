@@ -346,7 +346,7 @@ function ISChat:onCommandEntered()
                 callbackStream = stream
 
                 if stream.omichat.allowEmotes ~= nil then
-                    allowEmotes = stream.omichat.allowEmotes
+                    allowEmotes = not not stream.omichat.allowEmotes
                 elseif stream.omichat.isCommand then
                     allowEmotes = false
                 end

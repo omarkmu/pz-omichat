@@ -959,7 +959,7 @@ end
 ---@param text string
 ---@return string
 function utils.trimleft(text)
-    return (text:gsub('^%s*(.+)', '%1'))
+    return (text:gsub('^%s*(.*)', '%1'))
 end
 
 ---Removes whitespace from the end of a string.
@@ -3531,7 +3531,7 @@ end)
 ---@class omi.lib
 local OmiLib = {}
 
-OmiLib.VERSION = '1.2.1'
+OmiLib.VERSION = '1.2.2'
 
 ---@type omi.class | (fun(cls: table?): omi.Class)
 OmiLib.class = require("class")

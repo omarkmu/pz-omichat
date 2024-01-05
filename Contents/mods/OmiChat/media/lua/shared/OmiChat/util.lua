@@ -162,7 +162,7 @@ function utils.interpolate(text, tokens, options)
 
     local interpolator = useCache and getCachedInterpolator(text)
     if not interpolator then
-        options = options or {}
+        options = utils.copy(options or {})
 
         -- prevent randomness; would result in messages changing due to refreshes
         options.libraryExclude = utils.copy(options.libraryExclude or {})
@@ -208,7 +208,7 @@ function utils.isValidColor(color)
     return true
 end
 
----Logs a mod error.
+---Logs a non-fatal mod error.
 ---@param err string
 ---@param ... unknown
 function utils.logError(err, ...)

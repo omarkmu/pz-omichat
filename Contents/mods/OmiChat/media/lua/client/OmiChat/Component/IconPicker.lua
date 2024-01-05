@@ -166,7 +166,7 @@ end
 
 ---Returns the row and column in the icon picker given an x and y position.
 ---This only returns grid positions of valid icon positions; an x and y
----outside of the bounds or over a category will return nil.
+---outside of the bounds or over a category will return `nil`.
 ---@param x number
 ---@param y number
 ---@return integer?
@@ -195,7 +195,7 @@ function IconPicker:getGridCoordinates(x, y)
 end
 
 ---Returns the row and column in the icon picker that's being hovered over.
----If no icon is being hovered, returns nil.
+---If no icon is being hovered, returns `nil`.
 ---@return integer?
 ---@return integer?
 ---@return table?

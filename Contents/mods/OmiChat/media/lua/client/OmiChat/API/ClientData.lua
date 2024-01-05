@@ -70,7 +70,7 @@ function OmiChat.changeSpeechColor(color)
     sendPersonalColor(player)
 end
 
----Gets a color table for the current player, or nil if unset.
+---Gets a color table for the current player, or `nil` if unset.
 ---@param category omichat.ColorCategory
 ---@return omichat.ColorTable?
 function OmiChat.getColor(category)
@@ -180,11 +180,11 @@ function OmiChat.getPlayerPreferences()
         return prefs
     end
 
-    prefs.showNameColors = not not decoded.showNameColors
-    prefs.useSuggester = not not decoded.useSuggester
-    prefs.retainChatInput = not not decoded.retainChatInput
-    prefs.retainRPInput = not not decoded.retainRPInput
-    prefs.retainOtherInput = not not decoded.retainOtherInput
+    prefs.showNameColors = not not utils.default(decoded.showNameColors, prefs.showNameColors)
+    prefs.useSuggester = not not utils.default(decoded.useSuggester, prefs.useSuggester)
+    prefs.retainChatInput = not not utils.default(decoded.retainChatInput, prefs.retainChatInput)
+    prefs.retainRPInput = not not utils.default(decoded.retainRPInput, prefs.retainRPInput)
+    prefs.retainOtherInput = not not utils.default(decoded.retainOtherInput, prefs.retainOtherInput)
 
     if type(decoded.callouts) == 'table' then
         prefs.callouts = utils.pack(utils.mapList(tostring, decoded.callouts))
@@ -195,7 +195,13 @@ function OmiChat.getPlayerPreferences()
     end
 
     if type(decoded.colors) == 'table' then
-        prefs.colors = utils.pack(utils.mapList(utils.stringToColor, decoded.colors))
+        prefs.colors = {}
+        for k, v in pairs(decoded.colors) do
+            local color = utils.stringToColor(v)
+            if color then
+                prefs.colors[k] = v
+            end
+        end
     end
 
     return prefs
@@ -263,7 +269,7 @@ function OmiChat.savePlayerPreferences()
     }
 
     if not success or type(encoded) ~= 'string' then
-        utils.logError('failed to write preferences (%s)', encoded)
+        utils.logError('failed to write preferences (%s)', tostring(encoded))
         return
     end
 

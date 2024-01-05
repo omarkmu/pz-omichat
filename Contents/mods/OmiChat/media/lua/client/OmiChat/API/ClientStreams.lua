@@ -18,10 +18,10 @@ local function isBasicChatEnabled(stream)
 end
 
 ---Helper for checking if a custom chat stream is enabled.
----@param self omichat.BaseStream
+---@param stream omichat.BaseStream
 ---@return boolean
-local function isCustomChatEnabled(self)
-    return OmiChat.isCustomStreamEnabled(self.name)
+local function isCustomChatEnabled(stream)
+    return OmiChat.isCustomStreamEnabled(stream.name)
 end
 
 ---Handler for basic chat streams.
