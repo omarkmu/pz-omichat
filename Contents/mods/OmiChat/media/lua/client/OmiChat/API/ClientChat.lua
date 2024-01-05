@@ -29,21 +29,6 @@ local _getChatTitleID = _ChatBase.getTitleID
 local _getChatType = _ChatBase.getType
 
 
----Creates a built-in formatter and assigns a constant ID.
----@param fmt string
----@param id integer
----@return omichat.MetaFormatter
-local function createFormatter(fmt, id)
-    -- not using `new` directly to avoid automatic ID assignment
-    ---@type omichat.MetaFormatter
-    local formatter = setmetatable({}, OmiChat.MetaFormatter)
-
-    formatter:init({ format = fmt })
-    formatter:setID(id)
-
-    return formatter
-end
-
 ---Creates or removes the icon button and picker from the chat box based on sandbox options.
 local function addOrRemoveIconComponents()
     local instance = ISChat.instance
@@ -136,11 +121,11 @@ local function updateFormatters()
     for info in config:formatters() do
         local name = info.name
         local optName = config:getOverheadFormatOption(name)
-        local opt = optName and Option[optName] or '$1'
+        local fmt = optName and Option[optName] or '$1'
         if OmiChat._formatters[name] then
-            OmiChat._formatters[name]:setFormatString(opt)
+            OmiChat._formatters[name]:setFormatString(fmt)
         else
-            OmiChat._formatters[name] = createFormatter(opt, info.formatID)
+            OmiChat._formatters[name] = OmiChat.MetaFormatter:new(info.formatID, { format = fmt })
         end
     end
 end

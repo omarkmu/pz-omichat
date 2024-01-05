@@ -12,9 +12,7 @@ local floor = math.floor
 ---@field protected _formatString string
 ---@field protected _idPrefix string
 ---@field protected _idSuffix string
----@field private _nextID integer
 local MetaFormatter = lib.class()
-MetaFormatter._nextID = 101
 
 
 ---@type omichat.MetaFormatter[]
@@ -80,20 +78,23 @@ function MetaFormatter:getFormatString()
 end
 
 ---Sets the ID of the formatter.
----This should not be used under normal circumstances; an ID is automatically assigned in `new`.
 ---IDs 1 to 100 are reserved by OmiChat.
 ---@param id integer An ID for the formatter, in [1, 1024].
+---@private
 function MetaFormatter:setID(id)
-    if id < 1 then
+    if type(id) ~= 'number' or id < 1 then
         error('id must be a positive integer')
     elseif id > 1024 then
         error('id is too large')
     end
 
-    local old
-    if self._id then
-        old = formatters[self._id]
-        formatters[self._id] = nil
+    id = floor(id)
+    if formatters[id] then
+        if id <= 100 then
+            error(string.format('cannot overwrite reserved formatter ID %d', id))
+        end
+
+        utils.logError('created formatter with duplicate ID %d', id)
     end
 
     self._id = id
@@ -108,15 +109,6 @@ function MetaFormatter:setID(id)
     self._idSuffix = c2 .. c1
 
     formatters[self._id] = self
-
-    if id > MetaFormatter._nextID then
-        MetaFormatter._nextID = id + 1
-    end
-
-    if old and old ~= self then
-        old:setID(MetaFormatter._nextID)
-        MetaFormatter._nextID = MetaFormatter._nextID + 1
-    end
 end
 
 ---Sets the format string to the given string.
@@ -125,22 +117,17 @@ function MetaFormatter:setFormatString(format)
     self._formatString = format
 end
 
----Initializes formatter values.
----@param options omichat.MetaFormatterOptions
-function MetaFormatter:init(options)
-    self:setFormatString(tostring(options.format or '$1'))
-end
-
 ---Creates a new meta formatter.
----@param options omichat.MetaFormatterOptions
+---@param id integer A numerical ID for the formatter, in [1, 1024]. 1–100 are reserved by OmiChat.
+---@param options omichat.MetaFormatterOptions? Optional initialization options.
 ---@return omichat.MetaFormatter
-function MetaFormatter:new(options)
+function MetaFormatter:new(id, options)
     ---@type omichat.MetaFormatter
     local this = setmetatable({}, MetaFormatter)
 
-    this:init(options or {})
-    this:setID(MetaFormatter._nextID)
-    MetaFormatter._nextID = MetaFormatter._nextID + 1
+    options = options or {}
+    this:setFormatString(tostring(options.format or '$1'))
+    this:setID(id)
 
     return this
 end
