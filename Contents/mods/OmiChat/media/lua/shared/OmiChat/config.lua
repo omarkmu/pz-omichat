@@ -148,6 +148,11 @@ Configuration._formatters = {
         name = 'language',
         formatID = 53,
     },
+    {
+        name = 'overhead',
+        formatID = 54,
+        overheadFormatOpt = 'OverheadFormatFull',
+    },
 }
 
 
@@ -188,6 +193,7 @@ function Configuration:formatters()
             return {
                 name = info.name,
                 formatID = info.formatID,
+                overheadFormatOpt = info.overheadFormatOpt,
             }
         end
     end

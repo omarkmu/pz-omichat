@@ -417,7 +417,7 @@ function ISChat:onCommandEntered()
             else
                 shouldHandle = true
                 allowEmotes = true
-                allowLanguages = OmiChat.canUseRoleplayLanguage(stream.omichat.chatType or stream.name, command)
+                allowLanguages = OmiChat.canUseRoleplayLanguage(stream.omichat.streamName or stream.name, command)
 
                 useCallback = stream.omichat.onUse
                 callbackStream = stream
@@ -488,12 +488,13 @@ function ISChat:onCommandEntered()
         end
     end
 
+    local language
     if allowLanguages then
-        command = OmiChat.getLanguageEncodedText(command, allowEmotes and not playedEmote)
+        command, language = OmiChat.getLanguageEncodedText(command, allowEmotes and not playedEmote)
     end
 
     if callbackStream and useCallback then
-        useCallback(callbackStream, command)
+        useCallback(callbackStream, command, language)
     end
 
     doKeyPress(false)

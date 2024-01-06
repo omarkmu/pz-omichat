@@ -1,6 +1,7 @@
 UI_EN = {
     --[[ General ]]--
     UI_OmiChat_whisper_chat_title_id = "Whisper",
+    UI_OmiChat_whispering = "Whispering",
 
     UI_OmiChat_icon_cat_clothing = "Clothing",
     UI_OmiChat_icon_cat_cooking = "Cooking",
@@ -19,6 +20,7 @@ UI_EN = {
     UI_OmiChat_unknown_language_say_signed = "signs something in %1.",
     UI_OmiChat_unknown_language_whisper_signed = "subtly signs something in %1.",
     UI_OmiChat_unknown_language_shout_signed = "energetically signs something in %1.",
+    UI_OmiChat_in_language = "In %1",
 
     UI_OmiChat_Language_English = "English",
     UI_OmiChat_Language_French = "French",
@@ -43,11 +45,14 @@ UI_EN = {
 
     --[[ Help Text ]]--
     UI_OmiChat_helptext_emotes = "Get a list of available chat emotes",
-    UI_OmiChat_helptext_name = "To set your name in chat, use: /name Name. To reset your name, use /name. Example: /name Bob"
-    UI_OmiChat_helptext_name_no_reset = "To set your name in chat, use: /name Name. Example: /name Bob"
-    UI_OmiChat_helptext_setname = "Set a player's name in chat. Example: /setname \"username\" name"
-    UI_OmiChat_helptext_resetname = "Reset a player's name in chat. Example /resetname username"
-    UI_OmiChat_helptext_clearnames = "Clears all player chat names. Use /clearnames"
+    UI_OmiChat_helptext_name = "To set your name in chat, use: /name Name. To reset your name, use /name. Example: /name Bob",
+    UI_OmiChat_helptext_name_no_reset = "To set your name in chat, use: /name Name. Example: /name Bob",
+    UI_OmiChat_helptext_setname = "Set a player's name in chat. Example: /setname \"username\" name",
+    UI_OmiChat_helptext_resetname = "Reset a player's name in chat. Example: /resetname username",
+    UI_OmiChat_helptext_clearnames = "Clears all player chat names. Use /clearnames",
+    UI_OmiChat_helptext_addlanguage = "Add to a player's roleplay language list. Example: /addlanguage \"username\" English",
+    UI_OmiChat_helptext_resetlanguages = "Reset a player's roleplay languages. Example: /resetlanguages username",
+    UI_OmiChat_helptext_setlanguageslots = "Set the amount of roleplay language slots for a player. Slots must be in [1, 32]. Example: /setlanguageslots \"username\" 5",
 
     --[[ Error Messages ]]--
     UI_OmiChat_error_invalid_color = "Input must be a hexadecimal color value or three numbers separated by commas or spaces.",
@@ -98,11 +103,12 @@ UI_EN = {
     UI_OmiChat_context_retain_commands_rp = "RP",
     UI_OmiChat_context_retain_commands_other = "Other",
 
-    UI_OmiChat_context_languages = "Language",
-    UI_OmiChat_context_add_language = "Add Language",
+    -- %1 = the language to add, %2 = the language slot number
+    UI_OmiChat_context_languages = "RP language",
+    UI_OmiChat_context_add_language = "Add",
     UI_OmiChat_context_confirm_add_language = "Add %1 as language #%2? This cannot be undone.",
-    UI_OmiChat_context_sign_emotes_enable = "Enable Sign Language Emotes",
-    UI_OmiChat_context_sign_emotes_disable = "Disable Sign Language Emotes",
+    UI_OmiChat_context_sign_emotes_enable = "Enable sign language emotes",
+    UI_OmiChat_context_sign_emotes_disable = "Disable sign language emotes",
 
     -- %1 = the chat stream (e.g., /say, /yell)
     UI_OmiChat_context_submenu_color = "%1 color",
@@ -133,12 +139,20 @@ UI_EN = {
     UI_OmiChat_clear_names_success = "Cleared all nicknames.",
 
     -- %1 = a player's username, %2 = the chat name that was set with /setname
-    UI_OmiChat_set_other_name_success = "Name has been set to '%2' for player '%1'."
-    UI_OmiChat_reset_other_name_success = "Name has been reset for player '%1'."
+    UI_OmiChat_set_other_name_success = "Name has been set to '%2' for player '%1'.",
+    UI_OmiChat_reset_other_name_success = "Name has been reset for player '%1'.",
+
+    -- %1 = a player's username, %2 = the language
+    UI_OmiChat_add_language_success = "Added roleplay language '%2' to player '%1'.",
+    UI_OmiChat_add_language_full = "Player '%1' already knows the maximum number of languages.",
+    UI_OmiChat_add_language_known = "Player '%1' already knows %2.",
+    UI_OmiChat_add_language_unknown_language = "'%1' is not a configured language.",
+    UI_OmiChat_reset_other_languages_success = "RP languages have been reset for player '%1'.",
+    UI_OmiChat_set_language_slots_success = "Language slots have been set to %2 for player '%1'.",
 
     UI_OmiChat_clear_message = "Console cleared",
     UI_OmiChat_available_emotes = "Trigger emote animations in local chats by including one of the following emotes in your message. Available emotes:",
-    UI_OmiChat_list_of_commands = "List of commands:"
+    UI_OmiChat_list_of_commands = "List of commands:",
 
     --[[ Compat: True Actions Dancing ]]--
     UI_OmiChat_helptext_dance = "Use /dance to do a random dance. Use /dance followed by the name of the dance to do a specific dance. To see a list of dances, use /dance list",
@@ -146,7 +160,5 @@ UI_EN = {
 
     -- %1 = the name of the dance the player tried to do with /dance
     UI_OmiChat_unknown_dance_recipe = "You don't know the %1 dance.",
-
-    -- %1 = the name of the dance the player tried to do with /dance
     UI_OmiChat_missing_dance_item = "You need a dance card to do the %1 dance.",
 }

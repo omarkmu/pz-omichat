@@ -65,6 +65,7 @@ return OmiChat
 ---| 'callout'
 ---| 'sneakcallout'
 ---| 'language'
+---| 'overhead'
 
 
 ---@class omichat.LanguageInfoStore
@@ -95,6 +96,7 @@ return OmiChat
 ---@class omichat.FormatterInfo
 ---@field name string The name of the formatter.
 ---@field formatID integer The formatter's ID.
+---@field overheadFormatOpt string? The name of the option used for the overhead format.
 
 ---Options for initializing formatters.
 ---@class omichat.MetaFormatterOptions

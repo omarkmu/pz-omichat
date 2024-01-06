@@ -84,10 +84,10 @@ return OmiChat
 ---@field context table? Table for arbitrary context data.
 ---@field isCommand boolean? Indicates that the stream is a command.
 ---@field isEnabled (fun(self: table): boolean)? Returns a boolean representing whether the stream is enabled.
----@field onUse fun(self: table, command: string)? Callback triggered when the stream is used.
+---@field onUse fun(self: table, command: string, language?: string)? Callback triggered when the stream is used.
 ---@field allowEmotes boolean? Whether to allow emotes on this stream. Defaults to true for non-commands and false for commands.
 ---@field allowIconPicker boolean? Whether to enable the icon button for this stream. Defaults to false.
----@field chatType string? The chat type tied to this stream. Used when determining roleplay language.
+---@field streamName string? The stream name tied to this stream. Used for format strings and determining roleplay language.
 
 ---@class omichat.ChatStreamConfig : omichat.BaseStreamConfig
 

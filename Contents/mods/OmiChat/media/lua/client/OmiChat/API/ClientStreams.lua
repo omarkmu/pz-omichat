@@ -27,13 +27,17 @@ end
 ---Handler for basic chat streams.
 ---@param stream omichat.ChatStream
 ---@param command string
-local function useBasicChat(stream, command)
+---@param language string?
+local function useBasicChat(stream, command, language)
     command = utils.trim(command)
     if #command == 0 then
         return
     end
 
     local ctx = stream.omichat.context
+    local streamName = stream.omichat.streamName or stream.name
+    command = OmiChat.formatOverheadText(command, streamName, language)
+
     if ctx and ctx.ocProcess then
         local result = ctx.ocProcess(command)
         local commandType = stream.omichat.commandType or 'other'
@@ -49,13 +53,14 @@ end
 ---Helper for handling formatted chat stream use.
 ---@param self omichat.ChatStream
 ---@param command string
-local function useCustomChat(self, command)
+---@param language string?
+local function useCustomChat(self, command, language)
     command = utils.trim(command)
     if #command == 0 then
         return
     end
 
-    useBasicChat(self, OmiChat.getFormatter(self.name):format(command))
+    useBasicChat(self, OmiChat.getFormatter(self.name):format(command), language)
 end
 
 
@@ -179,7 +184,7 @@ OmiChat._vanillaStreamConfigs = {
     },
     yell = {
         commandType = 'chat',
-        chatType = 'shout',
+        streamName = 'shout',
         isEnabled = isBasicChatEnabled,
         onUse = useBasicChat,
         context = {

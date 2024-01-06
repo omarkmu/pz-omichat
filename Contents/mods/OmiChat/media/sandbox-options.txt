@@ -204,6 +204,9 @@ option OmiChat.FormatRoll
 
 
 /* Overhead Message Formats */
+option OmiChat.OverheadFormatFull
+{ type = string, default = $if($language $($gettext(UI_OmiChat_in_language $language)$)&#32;)$if($eq($stream whisper) $($gettext(UI_OmiChat_whispering)$)&#32;)$1, page = OmiChat, translation = OCOverheadFormatFull, }
+
 option OmiChat.OverheadFormatDo
 { type = string, default =, page = OmiChat, translation = OCOverheadFormatDo, }
 
@@ -226,7 +229,7 @@ option OmiChat.OverheadFormatMeQuiet
 { type = string, default = $gettext(UI_OmiChat_rp_emote $1), page = OmiChat, translation = OCOverheadFormatMeQuiet, }
 
 option OmiChat.OverheadFormatWhisper
-{ type = string, default = ($1), page = OmiChat, translation = OCOverheadFormatWhisper, }
+{ type = string, default = $1, page = OmiChat, translation = OCOverheadFormatWhisper, }
 
 option OmiChat.OverheadFormatCard
 { type = string, default = $gettext(UI_OmiChat_rp_emote $1), page = OmiChat, translation = OCOverheadFormatCard, }
@@ -237,7 +240,7 @@ option OmiChat.OverheadFormatRoll
 
 /* Chat Message Formats */
 option OmiChat.ChatFormatFull
-{ type = string, default = $if($neq($stream server) $timestamp)$tag$if($languageTranslated [ $languageTranslated ] ( ) <SPACE> ( ))$content, page = OmiChat, translation = OCChatFormatFull, }
+{ type = string, default = $if($neq($stream server) $timestamp)$tag$if($language [$language]&#32;<SPACE>&#32;)$content, page = OmiChat, translation = OCChatFormatFull, }
 
 option OmiChat.ChatFormatDiscord
 { type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCChatFormatDiscord, }
@@ -303,4 +306,4 @@ option OmiChat.ChatFormatYell
 { type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatYell, }
 
 option OmiChat.ChatFormatUnknownLanguage
-{ type = string, default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $gettext($unknownLanguageString $languageTranslated) <SPACE>)), page = OmiChat, translation = OCChatFormatUnknownLanguage, }
+{ type = string, default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $gettext($unknownLanguageString $language) <SPACE>)), page = OmiChat, translation = OCChatFormatUnknownLanguage, }

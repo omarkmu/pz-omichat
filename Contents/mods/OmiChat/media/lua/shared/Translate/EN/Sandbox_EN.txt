@@ -83,6 +83,7 @@ Sandbox_EN = {
     Sandbox_OCOverheadFormatDo = "/do Overhead Format",
     Sandbox_OCOverheadFormatDoLoud = "/doloud Overhead Format",
     Sandbox_OCOverheadFormatDoQuiet = "/doquiet Overhead Format",
+    Sandbox_OCOverheadFormatFull = "Full Overhead Format",
     Sandbox_OCOverheadFormatLooc = "/looc Overhead Format",
     Sandbox_OCOverheadFormatMe = "/me Overhead Format",
     Sandbox_OCOverheadFormatMeLoud = "/meloud Overhead Format",

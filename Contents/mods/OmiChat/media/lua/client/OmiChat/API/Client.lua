@@ -730,6 +730,18 @@ OmiChat._suggesters = {
 ---@type omichat.MessageTransformer[]
 OmiChat._transformers = {
     {
+        name = 'decode-overhead',
+        priority = 14,
+        transform = function(_, info)
+            local formatter = OmiChat.getFormatter('overhead')
+            local text = info.content or info.rawText
+
+            if formatter:isMatch(text) then
+                info.content = formatter:read(text)
+            end
+        end,
+    },
+    {
         name = 'radio-chat',
         priority = 12,
         transform = function(_, info)
@@ -875,9 +887,8 @@ OmiChat._transformers = {
             -- add language information for format strings
             local isSigned = OmiChat.isRoleplayLanguageSigned(language)
             if language ~= defaultLanguage then
-                info.substitutions.isSignedLanguage = isSigned and 'true' or ''
-                info.substitutions.language = language
-                info.substitutions.languageTranslated = getTextOrNull('UI_OmiChat_Language_' .. language) or language
+                info.substitutions.language = getTextOrNull('UI_OmiChat_Language_' .. language) or language
+                info.substitutions.languageRaw = language
             end
 
             if isSigned and info.context.ocIsRadio then
