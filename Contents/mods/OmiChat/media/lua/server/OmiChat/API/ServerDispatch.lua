@@ -26,11 +26,23 @@ end
 ---Instructs the client to report the result of drawing a card.
 ---@param player IsoPlayer
 ---@param card string
-function OmiChat.reportDrawCard(player, card)
+---@param suit string
+function OmiChat.reportDrawCard(player, card, suit)
     ---@type omichat.request.ReportDrawCard
-    local req = { card = card }
+    local req = { card = card, suit = suit }
 
     dispatchCommand('reportDrawCard', player, req)
+end
+
+---Instructs all clients to report the result of drawing a card.
+---@param name string
+---@param card string
+---@param suit string
+function OmiChat.reportDrawCardGlobal(name, card, suit)
+    ---@type omichat.request.ReportDrawCard
+    local req = { name = name, card = card, suit = suit }
+
+    dispatchCommandToAll('reportDrawCard', req)
 end
 
 ---Instructs the client to report the result of a dice roll.

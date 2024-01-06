@@ -11,25 +11,25 @@ OmiChat.Commands = {}
 local Option = OmiChat.Option
 local utils = OmiChat.utils
 local suits = {
-    'Clubs',
-    'Diamonds',
-    'Hearts',
-    'Spades',
+    'clubs',
+    'diamonds',
+    'hearts',
+    'spades',
 }
 local cards = {
-    'the Ace',
-    'a Two',
-    'a Three',
-    'a Four',
-    'a Five',
-    'a Six',
-    'a Seven',
-    'an Eight',
-    'a Nine',
-    'a Ten',
-    'the Jack',
-    'the Queen',
-    'the King',
+    'ace',
+    'two',
+    'three',
+    'four',
+    'five',
+    'six',
+    'seven',
+    'eight',
+    'nine',
+    'ten',
+    'jack',
+    'queen',
+    'king',
 }
 
 
@@ -53,15 +53,6 @@ local function canAccessTarget(player, target, fromCommand)
     end
 
     return true
-end
-
----Gets a random card name.
----@return string
-local function getRandomCard()
-    local card = cards[1 + ZombRand(#cards)]
-    local suit = suits[1 + ZombRand(#suits)]
-
-    return table.concat({ card, ' of ', suit })
 end
 
 ---@param args omichat.request.ModDataUpdate
@@ -201,12 +192,13 @@ end
 ---Handles the /card command.
 ---@param player IsoPlayer
 function OmiChat.Commands.requestDrawCard(player)
-    local card = getRandomCard()
+    local card = cards[1 + ZombRand(#cards)]
+    local suit = suits[1 + ZombRand(#suits)]
     if OmiChat.isCustomStreamEnabled('card') then
-        OmiChat.reportDrawCard(player, card)
+        OmiChat.reportDrawCard(player, card, suit)
     else
         local name = OmiChat.getNameInChat(player:getUsername(), 'general') or player:getUsername()
-        OmiChat.sendTranslatedServerMessage('UI_OmiChat_card', { name, card })
+        OmiChat.reportDrawCardGlobal(name, card, suit)
     end
 end
 

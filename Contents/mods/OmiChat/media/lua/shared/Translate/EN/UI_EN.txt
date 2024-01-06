@@ -13,6 +13,29 @@ UI_EN = {
     UI_OmiChat_icon_cat_tools = "Tools",
     UI_OmiChat_icon_cat_weapons = "Weapons",
 
+    -- [[ Cards ]]--
+    -- %1 = card name, %2 = suit name
+    UI_OmiChat_card_name = "%1 of %2",
+
+    UI_OmiChat_suit_clubs = "Clubs",
+    UI_OmiChat_suit_diamonds = "Diamonds",
+    UI_OmiChat_suit_hearts = "Hearts",
+    UI_OmiChat_suit_spades = "Spades",
+
+    UI_OmiChat_card_ace = "the Ace",
+    UI_OmiChat_card_jack = "the Jack",
+    UI_OmiChat_card_queen = "the Queen",
+    UI_OmiChat_card_king = "the King",
+    UI_OmiChat_card_two = "a Two",
+    UI_OmiChat_card_three = "a Three",
+    UI_OmiChat_card_four = "a Four",
+    UI_OmiChat_card_five = "a Five",
+    UI_OmiChat_card_six = "a Six",
+    UI_OmiChat_card_seven = "a Seven",
+    UI_OmiChat_card_eight = "an Eight",
+    UI_OmiChat_card_nine = "a Nine",
+    UI_OmiChat_card_ten = "a Ten",
+
     --[[ Languages ]]--
     UI_OmiChat_unknown_language_say = "says something in %1.",
     UI_OmiChat_unknown_language_whisper = "whispers something in %1.",

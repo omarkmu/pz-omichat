@@ -140,7 +140,9 @@ return OmiChat
 
 ---Request to report the result of drawing a card on the client.
 ---@class omichat.request.ReportDrawCard
+---@field name string? The name of the player who drew the card, if called for a global message.
 ---@field card string The name of the card that was drawn.
+---@field suit string The suit of the card that was drawn.
 
 ---Request to report the result of rolling dice on the client.
 ---@class omichat.request.ReportRoll

@@ -13,8 +13,19 @@ local unpack = unpack
 ---Reports the results of drawing a card.
 ---@param args omichat.request.ReportDrawCard
 function OmiChat.Commands.reportDrawCard(args)
+    local card = getText('UI_OmiChat_card_' .. args.card)
+    local suit = getText('UI_OmiChat_suit_' .. args.suit)
+    local cardName = getText('UI_OmiChat_card_name', card, suit)
+
+    -- global message
+    if args.name then
+        OmiChat.showInfoMessage(getText('UI_OmiChat_card', args.name, cardName))
+        return
+    end
+
+    -- local message
     local language
-    local command = utils.interpolate(Option.FormatCard, { card = args.card })
+    local command = utils.interpolate(Option.FormatCard, { card = cardName })
     if OmiChat.canUseRoleplayLanguage('card', command) then
         command, language = OmiChat.getLanguageEncodedText(command, false)
     end
