@@ -96,14 +96,11 @@ end
 ---@return string[]
 function OmiChat.getRoleplayLanguages(username)
     local modData = OmiChat.getModData()
-    local languages = modData.languages[username]
-    if not languages then
-        languages = { OmiChat.getDefaultRoleplayLanguage() }
-        modData.languages[username] = languages
-        refreshLanguageInfo(username)
+    if not modData.languages[username] then
+        OmiChat.resetRoleplayLanguages(username)
     end
 
-    return languages
+    return modData.languages[username]
 end
 
 ---Gets the number of roleplay language slots for the player with the given username.

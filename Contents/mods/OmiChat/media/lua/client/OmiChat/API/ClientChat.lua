@@ -439,6 +439,7 @@ function OmiChat.buildMessageTextFromInfo(info)
             stream = info.substitutions.stream,
             language = info.substitutions.language,
             languageRaw = info.substitutions.languageRaw,
+            unknownLanguage = info.substitutions.unknownLanguage,
             timestamp = info.timestamp or '',
             tag = info.tag or '',
             content = utils.interpolate(info.format, info.substitutions),
@@ -597,6 +598,7 @@ function OmiChat.decodeMessageTag(tag)
     end
 
     return {
+        suppressed = decoded.ocSuppressed,
         language = decoded.ocLanguage,
         name = decoded.ocName,
         nameColor = utils.stringToColor(decoded.ocNameColor),
@@ -622,6 +624,7 @@ function OmiChat.encodeMessageTag(message)
     local color = OmiChat.getNameColorInChat(author)
     local chatType = OmiChat.getMessageChatType(message)
     local success, encoded = utils.json.tryEncode {
+        ocSuppressed = false,
         ocLanguage = OmiChat.getMessageLanguage(message),
         ocName = OmiChat.getNameInChat(author, chatType),
         ocNameColor = color and utils.colorToHexString(color) or nil,

@@ -102,6 +102,7 @@ local floor = math.floor
 ---@field ChatFormatOutgoingPrivate string
 ---@field ChatFormatServer string
 ---@field ChatFormatUnknownLanguage string
+---@field ChatFormatUnknownLanguageRadio string
 local Option = lib.sandbox('OmiChat')
 
 

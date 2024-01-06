@@ -205,7 +205,7 @@ option OmiChat.FormatRoll
 
 /* Overhead Message Formats */
 option OmiChat.OverheadFormatFull
-{ type = string, default = $if($language $($gettext(UI_OmiChat_in_language $language)$)&#32;)$if($eq($stream whisper) $($gettext(UI_OmiChat_whispering)$)&#32;)$1, page = OmiChat, translation = OCOverheadFormatFull, }
+{ type = string, default = $set(_whisper $eq($stream whisper))@($_whisper:[Whispering)$if($languageRaw @($_whisper:( in);[In)&#32;$languageRaw)@($any($languageRaw $_whisper):]&#32;)$1, page = OmiChat, translation = OCOverheadFormatFull, }
 
 option OmiChat.OverheadFormatDo
 { type = string, default =, page = OmiChat, translation = OCOverheadFormatDo, }
@@ -240,7 +240,7 @@ option OmiChat.OverheadFormatRoll
 
 /* Chat Message Formats */
 option OmiChat.ChatFormatFull
-{ type = string, default = $if($neq($stream server) $timestamp)$tag$if($language [$language]&#32;<SPACE>&#32;)$content, page = OmiChat, translation = OCChatFormatFull, }
+{ type = string, default = $if($neq($stream server) $timestamp)$tag$if($all($language $not($unknownLanguage)) [$language]&#32;<SPACE>&#32;)$content, page = OmiChat, translation = OCChatFormatFull, }
 
 option OmiChat.ChatFormatDiscord
 { type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCChatFormatDiscord, }
@@ -307,3 +307,6 @@ option OmiChat.ChatFormatYell
 
 option OmiChat.ChatFormatUnknownLanguage
 { type = string, default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $gettext($unknownLanguageString $language) <SPACE>)), page = OmiChat, translation = OCChatFormatUnknownLanguage, }
+
+option OmiChat.ChatFormatUnknownLanguageRadio
+{ type = string, default = $gettext(UI_OmiChat_radio $frequency): $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $gettext($unknownLanguageString $language) <SPACE>)), page = OmiChat, translation = OCChatFormatUnknownLanguageRadio, }

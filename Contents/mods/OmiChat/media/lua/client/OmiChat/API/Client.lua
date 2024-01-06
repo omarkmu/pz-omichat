@@ -108,6 +108,32 @@ local function hasAccess(flags, accessLevel)
     return flags == 1
 end
 
+---Encodes additional information in a message tag.
+---@param message omichat.Message
+---@param key string
+---@param value unknown
+local function addMessageTagValue(message, key, value)
+    local tag = message:getCustomTag()
+    local success, newTag, encodedTag
+    success, newTag = utils.json.tryDecode(tag)
+    if not success or type(newTag) ~= 'table' then
+        newTag = {}
+    end
+
+    newTag[key] = value
+    success, encodedTag = utils.json.tryEncode(newTag)
+    if not success then
+        -- other data is bad, so just throw it out
+        if type(value) == 'string' then
+            value = string.format('%q', value)
+        end
+
+        encodedTag = string.format('{"%s":%s}', key, tostring(value))
+    end
+
+    message:setCustomTag(encodedTag)
+end
+
 
 ---@type table<string, true>
 OmiChat._iconsToExclude = {
@@ -730,20 +756,8 @@ OmiChat._suggesters = {
 ---@type omichat.MessageTransformer[]
 OmiChat._transformers = {
     {
-        name = 'decode-overhead',
-        priority = 14,
-        transform = function(_, info)
-            local formatter = OmiChat.getFormatter('overhead')
-            local text = info.content or info.rawText
-
-            if formatter:isMatch(text) then
-                info.content = formatter:read(text)
-            end
-        end,
-    },
-    {
         name = 'radio-chat',
-        priority = 12,
+        priority = 35,
         transform = function(_, info)
             local text = info.content or info.rawText
             if info.chatType ~= 'radio' then
@@ -762,8 +776,20 @@ OmiChat._transformers = {
         end,
     },
     {
+        name = 'decode-overhead',
+        priority = 30,
+        transform = function(_, info)
+            local formatter = OmiChat.getFormatter('overhead')
+            local text = info.content or info.rawText
+
+            if formatter:isMatch(text) then
+                info.content = formatter:read(text)
+            end
+        end,
+    },
+    {
         name = 'decode-callout',
-        priority = 10,
+        priority = 25,
         transform = function(_, info)
             if info.chatType ~= 'shout' then
                 return
@@ -796,7 +822,7 @@ OmiChat._transformers = {
     },
     {
         name = 'decode-stream',
-        priority = 10,
+        priority = 25,
         transform = function(_, info)
             local isRadio = info.context.ocIsRadio
             local text = info.content or info.rawText
@@ -812,9 +838,6 @@ OmiChat._transformers = {
                         info.content = formatter:read(text)
                     else
                         info.message:setShowInChat(false)
-
-                        -- the message showing overhead is hardcoded for radio messages,
-                        -- so this can't actually be prevented
                         info.message:setOverHeadSpeech(false)
                     end
 
@@ -849,23 +872,26 @@ OmiChat._transformers = {
     },
     {
         name = 'handle-language',
-        priority = 8,
+        priority = 20,
         allowedChatTypes = {
             say = true,
             shout = true,
             radio = true,
         },
         transform = function(self, info)
+            local isRadio = info.context.ocIsRadio
             local formatter = OmiChat.getFormatter('language')
             local text = info.content or info.rawText
 
+            -- radio messages don't have language metadata, so we need to grab the id
+            local encodedId
             if formatter:isMatch(text) then
                 text = formatter:read(text)
-                local encodedId = OmiChat.decodeRoleplayLanguageID(text)
+                encodedId = OmiChat.decodeRoleplayLanguageID(text)
                 if encodedId >= 1 or encodedId <= 32 then
-                    -- language is already handled during message metadata encoding
-                    -- but we can clean up the character here anyway
                     info.content = text:sub(2)
+                else
+                    encodedId = nil
                 end
             end
 
@@ -880,6 +906,14 @@ OmiChat._transformers = {
 
             local defaultLanguage = OmiChat.getDefaultRoleplayLanguage()
             local language = info.meta.language or defaultLanguage
+
+            if not language and isRadio and encodedId then
+                language = OmiChat.getRoleplayLanguageFromID(encodedId)
+                if language then
+                    addMessageTagValue(info.message, 'ocLanguage', language)
+                end
+            end
+
             if not language then
                 return
             end
@@ -891,15 +925,15 @@ OmiChat._transformers = {
                 info.substitutions.languageRaw = language
             end
 
-            if isSigned and info.context.ocIsRadio then
+            if isSigned and isRadio then
                 -- hide signed messages sent over the radio
-                -- still can't actually hide the overhead text because it's hardcoded
                 info.message:setShowInChat(false)
+                info.message:setOverHeadSpeech(false)
             end
 
             local player = getSpecificPlayer(0)
             local username = player and player:getUsername()
-            if not username or info.author == username then
+            if not isRadio and username and info.author == username then
                 -- everyone understands themselves
                 return
             elseif OmiChat.checkKnowsLanguage(language) then
@@ -909,26 +943,37 @@ OmiChat._transformers = {
 
             -- they didn't understand it
             local isWhisper = info.context.ocIsSneakCallout or info.context.ocCustomStream == 'whisper'
+            local signedSuffix = isSigned and '_signed' or ''
             info.message:setOverHeadSpeech(false)
-            info.substitutions.unknownLanguageString = 'UI_OmiChat_unknown_language_'
-                .. (isWhisper and 'whisper' or (info.chatType == 'shout' and 'shout' or 'say'))
-                .. (isSigned and '_signed' or '')
             info.format = Option.ChatFormatUnknownLanguage
             info.formatOptions.useDefaultChatColor = false
+            info.substitutions.unknownLanguage = language
 
-            if isWhisper then
+            if isRadio then
+                info.substitutions.unknownLanguageString = 'UI_OmiChat_unknown_language_radio'
+                info.format = Option.ChatFormatUnknownLanguageRadio
+            elseif isWhisper then
                 info.titleID = 'UI_OmiChat_whisper_chat_title_id'
+                info.substitutions.unknownLanguageString = 'UI_OmiChat_unknown_language_whisper' .. signedSuffix
                 info.formatOptions.color = OmiChat.getColorOrDefault('mequiet')
+                info.context.ocCustomStream = 'mequiet'
+                info.substitutions.stream = 'mequiet'
             elseif info.chatType == 'shout' then
+                info.substitutions.unknownLanguageString = 'UI_OmiChat_unknown_language_shout' .. signedSuffix
                 info.formatOptions.color = OmiChat.getColorOrDefault('meloud')
+                info.context.ocCustomStream = 'meloud'
+                info.substitutions.stream = 'meloud'
             else
+                info.substitutions.unknownLanguageString = 'UI_OmiChat_unknown_language_say' .. signedSuffix
                 info.formatOptions.color = OmiChat.getColorOrDefault('me')
+                info.context.ocCustomStream = 'me'
+                info.substitutions.stream = 'me'
             end
         end,
     },
     {
         name = 'set-range',
-        priority = 6,
+        priority = 15,
         transform = function(_, info)
             local range
             local chatRange
@@ -971,16 +1016,16 @@ OmiChat._transformers = {
             local yDiff = authorPlayer:getY() - localPlayer:getY()
 
             if math.sqrt(xDiff * xDiff + yDiff * yDiff) > range then
+                -- it's okay that this runs on refresh, because the
+                -- show in chat value is only used on the initial message add
                 info.message:setOverHeadSpeech(false)
                 info.message:setShowInChat(false)
-                info.context.ocOutOfRange = true
-                return true
             end
         end,
     },
     {
         name = 'private-chat',
-        priority = 4,
+        priority = 10,
         transform = function(_, info)
             if info.chatType ~= 'whisper' then
                 return
@@ -1004,7 +1049,7 @@ OmiChat._transformers = {
     },
     {
         name = 'server-chat',
-        priority = 2,
+        priority = 5,
         transform = function(_, info)
             if info.chatType ~= 'server' then
                 return
@@ -1033,7 +1078,7 @@ OmiChat._transformers = {
     },
     {
         name = 'basic-chats',
-        priority = 2,
+        priority = 5,
         basicChatFormats = {
             say = 'ChatFormatSay',
             shout = 'ChatFormatYell',
@@ -1069,6 +1114,57 @@ OmiChat._transformers = {
             else
                 info.format = Option[chatFormat]
             end
+        end,
+    },
+    {
+        name = 'avoid-empty-chats',
+        priority = 0,
+        transform = function(_, info)
+            local text = info.content or info.rawText
+            local bytes = {}
+            for i = 1, #text do
+                local byte = text:sub(i, i):byte()
+
+                -- throw away invisible characters
+                if byte < 128 or byte > 159 then
+                    bytes[#bytes + 1] = byte
+                end
+            end
+
+            text = utils.trim(string.char(unpack(bytes)))
+            if #text == 0 then
+                info.message:setShowInChat(false)
+            end
+        end,
+    },
+    {
+        name = 'suppress-radio-overhead',
+        priority = 0,
+        transform = function(_, info)
+            -- the message showing overhead is hardcoded for radio messages,
+            -- so we have to suppress it by overwriting it with empty messages
+            if not info.context.ocIsRadio or info.message:isOverHeadSpeech() then
+                return
+            end
+
+            -- make sure we haven't done this already
+            local tag = info.message:getCustomTag()
+            local decoded = OmiChat.decodeMessageTag(tag)
+            if decoded.suppressed then
+                return
+            end
+
+            -- push the message up with blank text
+            local author = info.message:getAuthor()
+            local speaker = author and utils.getPlayerByUsername(author)
+            if speaker then
+                for _ = 1, 5 do
+                    speaker:Say(' ')
+                end
+            end
+
+            -- avoid doing this again
+            addMessageTagValue(info.message, 'ocSupressed', true)
         end,
     },
 }

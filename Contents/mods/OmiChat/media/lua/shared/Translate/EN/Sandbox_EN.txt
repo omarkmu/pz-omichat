@@ -113,6 +113,7 @@ Sandbox_EN = {
     Sandbox_OCChatFormatSay = "/say Chat Format",
     Sandbox_OCChatFormatServer = "Server Chat Format",
     Sandbox_OCChatFormatUnknownLanguage = "Unknown Language Format",
+    Sandbox_OCChatFormatUnknownLanguageRadio = "Unknown Language Format (Radio)",
     Sandbox_OCChatFormatWhisper = "/whisper Chat Format",
     Sandbox_OCChatFormatYell = "/yell Chat Format",
 }

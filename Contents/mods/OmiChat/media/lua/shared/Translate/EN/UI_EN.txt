@@ -43,6 +43,7 @@ UI_EN = {
     UI_OmiChat_unknown_language_say_signed = "signs something in %1.",
     UI_OmiChat_unknown_language_whisper_signed = "subtly signs something in %1.",
     UI_OmiChat_unknown_language_shout_signed = "energetically signs something in %1.",
+    UI_OmiChat_unknown_language_radio = "Something is said in %1.",
     UI_OmiChat_in_language = "In %1",
 
     UI_OmiChat_Language_English = "English",
