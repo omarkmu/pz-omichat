@@ -33,7 +33,7 @@ description=[*]Name color customization
 description=[*]Speech bubble color customization
 description=[*]Callout customization
 description=[*]Character naming with /name
-description=[*]Chat names in menus (Trading, Medical Check)
+description=[*]Display of chat names in menus (Trading, Medical Check)
 description=[*]Local /whisper chat
 description=[*]Local /card and /roll
 description=[*]Roleplay descriptions with /me and /do (and counterparts with larger and smaller ranges)
@@ -41,13 +41,14 @@ description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=26487
 description=[*]Icon picker for local chats (off by default)
 description=[*]Text suggestion box
 description=[*]Emote animation shortcuts (.clap, .salute, .surrender, etc.) + /emotes command to display a list of emotes
+description=[*]Roleplay languages
 description=[/list]
 description=
 description=Features for server operators: [list]
 description=[*]/setname, /resetname, and /clearnames commands
 description=[*]Additional info text option
 description=[*]Chat range options
-description=[*]Customizable, robust chat [url=https://github.com/omarkmu/pz-omichat/blob/main/docs/format-strings.md]formats[/url] for names, timestamps, all chat types, and more
+description=[*]Customization of names, timestamps, all chat types, and more via powerful [url=https://github.com/omarkmu/pz-omichat/blob/main/docs/format-strings.md]chat formats[/url]
 description=[*]Sandbox options to control the features listed above
 description=[*]Further extension of functionality using the API
 description=[/list]
@@ -59,7 +60,7 @@ description=
 description=[h2]Permissions[/h2]
 description=You may [b]not[/b] include this mod directly in modpacks.
 description=Updates will be infrequent enough that a modpack should not be necessary anyway; future features will be added in bulk.
-description=This mod uses the [url=https://theindiestone.com/forums/index.php?/topic/2530-mod-permissions/#comment-36478]Ask for permission[/url] policy.
+description=This mod uses the [url=https://theindiestone.com/forums/index.php?/topic/2530-mod-permissions/#comment-36478]Ask for permission policy.[/url]
 description=Note: this does not mean permission is required to list the mod as a requirement and extend it via the API!
 description=
 description=The code and associated documentation is licensed under the [url=https://github.com/omarkmu/pz-omichat/blob/main/LICENSE]MIT License.[/url]

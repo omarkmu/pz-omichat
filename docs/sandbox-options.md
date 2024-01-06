@@ -355,6 +355,37 @@ The default color used for `/yell` messages.
 See also: [`ChatFormatYell`](#chatformatyell).
 
 
+## Languages
+Options that are used to configure roleplay languages.
+
+With the default settings, languages must be manually added to players by admins.
+To allow players to set additional languages, the [`LanguageSlots`](#languageslots) option can be used.
+
+### AvailableLanguages
+`default → English;French;Italian;German;Spanish;Danish;Dutch;Hungarian;Norwegian;Polish;Portuguese;Russian;Turkish;Japanese;Mandarin;Finnish;Korean;Thai;Ukrainian;ASL`
+
+The roleplay languages that players can use, separated by semicolons.
+The default values are based on the game's available languages.
+
+Up to 32 languages can be specified. The first language in the list will be treated as the default language player characters speak.
+
+Translations for each language's name can be specified by defining a `UI_OmiChat_Language_[Language]` string (e.g., `UI_OmiChat_Language_English`). If the translation is absent, the language name will be used as-is regardless of the in-game language.
+
+### LanguageSlots
+`default → 1, minimum → 1, maximum → 32`
+
+The number of language slots players have by default.
+
+Every player will know the default language (the first language listed in [`AvailableLanguages`](#availablelanguages)) by default.
+With only one language slot, admins must add additional languages to players manually; the language selection option will only display if the player can add or select a language.
+
+### SignedLanguages
+`default → ASL`
+
+The languages in [`AvailableLanguages`](#availablelanguages) that should be treated as signed languages, separated by semicolons.
+If a value is included here that is not in `AvailableLanguages`, it will be ignored.
+
+
 ## Filters & Predicates
 Options that are used to define logic for mod functionality.
 
@@ -381,6 +412,13 @@ Determines whether name colors are used for a message.
 See also:
 - [`EnableSetNameColor`](#enablesetnamecolor)
 - [`EnableSpeechColorAsDefaultNameColor`](#enablespeechcolorasdefaultnamecolor)
+
+### PredicateAllowLanguage
+`default → $has(@(say;shout;whisper) $stream)`  
+`tokens → $stream, $message`
+
+Determines whether [roleplay languages](#languages) can be used for a message.
+For the purpose of this predicate, `$message` is the unaltered input.
 
 
 ## Component Formats
@@ -468,6 +506,12 @@ If blank, `/doloud` messages will not display overhead.
 Defines the format used for overhead speech bubbles of [`/doquiet`](#chatformatdoquiet) messages.
 If blank, `/doquiet` messages will not display overhead.
 
+### OverheadFormatFull
+`default → $set(_whisper $eq($stream whisper))@($_whisper:[Whispering)$if($languageRaw @($_whisper:( in);[In)&#32;$languageRaw)@($any($languageRaw $_whisper):]&#32;)$1`  
+`tokens → $1, $stream, $language, $languageRaw`
+
+The format used for the final overhead message, after all other formats have been applied.
+
 ### OverheadFormatLooc
 `default → (( $1 ))`  
 `tokens → $1`
@@ -504,7 +548,7 @@ The overhead format used for local [`/roll`](#chatformatroll) messages.
 If blank, `/roll` messages will not display overhead.
 
 ### OverheadFormatWhisper
-`default → ($1)`  
+`default → $1`  
 `tokens → $1`
 
 Defines the format used for overhead speech bubbles of [`local /whisper`](#chatformatwhisper) messages.
@@ -518,7 +562,7 @@ Options that determine the content that displays in chat.
 
 ### ChatFormatAdmin
 `default → $name: <SPACE> $message`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+`tokens → $author, $authorRaw, $name, $nameRaw, $message, $language, $languageRaw`
 
 The format used for `/admin` messages in chat.
 
@@ -526,7 +570,7 @@ See also: [`ColorAdmin`](#coloradmin).
 
 ### ChatFormatCard
 `default → &#32;<IMAGE:Item_CardDeck&#44;15&#44;14> <SPACE> $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>))`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+`tokens → $author, $authorRaw, $name, $nameRaw, $message, $language, $languageRaw`
 
 The format used for local `/card` messages in chat.
 This respects the range and color options of [`/me`](#chatformatme).
@@ -549,7 +593,7 @@ See also: [`ColorDiscord`](#colordiscord).
 
 ### ChatFormatDo
 `default → $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $punctuate($capitalize($trim($message))) <SPACE>))`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+`tokens → $author, $authorRaw, $name, $nameRaw, $message, $language, $languageRaw`
 
 The format used for `/do` messages in chat.
 If blank, `/do` messages will be disabled.
@@ -566,7 +610,7 @@ See also:
 
 ### ChatFormatDoLoud
 `default → $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $punctuate($capitalize($trim($message))) <SPACE>))`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+`tokens → $author, $authorRaw, $name, $nameRaw, $message, $language, $languageRaw`
 
 The format used for `/doloud` (`/dl`) messages in chat.
 If blank, `/doloud` messages will be disabled.
@@ -580,7 +624,7 @@ See also:
 
 ### ChatFormatDoQuiet
 `default → $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $punctuate($capitalize($trim($message))) <SPACE>))`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+`tokens → $author, $authorRaw, $name, $nameRaw, $message, $language, $languageRaw`
 
 The format used for `/doquiet` (`/dq`) messages in chat.
 If blank, `/doquiet` messages will be disabled.
@@ -594,21 +638,21 @@ See also:
 
 ### ChatFormatFaction
 `default → $name: <SPACE> $message`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+`tokens → $author, $authorRaw, $name, $nameRaw, $message, $language, $languageRaw`
 
 The format used for `/faction` messages in chat.
 
 See also: [`ColorFaction`](#colorfaction).
 
 ### ChatFormatFull
-`default → $if($neq($stream server) $timestamp)$tag$content`  
-`tokens → $tag, $timestamp, $content, $chatType, $stream`
+`default → $if($neq($stream server) $timestamp)$tag$if($all($language $not($unknownLanguage)) [$language]&#32;<SPACE>&#32;)$content`  
+`tokens → $tag, $timestamp, $content, $chatType, $stream, $language, $languageRaw`
 
 The format used for the final chat message, after all other formats have been applied.
 
 ### ChatFormatGeneral
 `default → $name: <SPACE> $message`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+`tokens → $author, $authorRaw, $name, $nameRaw, $message, $language, $languageRaw`
 
 The format used for `/all` messages in chat.
 
@@ -616,7 +660,7 @@ See also: [`ColorGeneral`](#colorgeneral).
 
 ### ChatFormatIncomingPrivate
 `default → $($gettext(UI_OmiChat_private_chat_from $name)$): <SPACE> $message`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+`tokens → $author, $authorRaw, $name, $nameRaw, $message, $language, $languageRaw`
 
 The format used for incoming private messages in chat.
 
@@ -626,7 +670,7 @@ See also
 
 ### ChatFormatLooc
 `default → $name: <SPACE> (( $message ))`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+`tokens → $author, $authorRaw, $name, $nameRaw, $message, $language, $languageRaw`
 
 The format used for `/looc` (local out-of-character) messages in chat.
 
@@ -637,7 +681,7 @@ See also:
 
 ### ChatFormatMe
 `default → $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>))`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+`tokens → $author, $authorRaw, $name, $nameRaw, $message, $language, $languageRaw`
 
 The format used for `/me` messages in chat.
 If blank, `/me` messages will be disabled.
@@ -653,7 +697,7 @@ See also:
 
 ### ChatFormatMeLoud
 `default → $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>))`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+`tokens → $author, $authorRaw, $name, $nameRaw, $message, $language, $languageRaw`
 
 The format used for `/meloud` (`/ml`) messages in chat.
 If blank, `/meloud` messages will be disabled.
@@ -667,7 +711,7 @@ See also:
 
 ### ChatFormatMeQuiet
 `default → $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>))`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+`tokens → $author, $authorRaw, $name, $nameRaw, $message, $language, $languageRaw`
 
 The format used for `/mequiet` (`/mq`) messages in chat.
 If blank, `/mequiet` messages will be disabled.
@@ -699,7 +743,7 @@ See also: [`ColorRadio`](#colorradio).
 
 ### ChatFormatRoll
 `default → &#32;<IMAGE:Item_Dice&#44;15&#44;14> <SPACE> $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>))`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+`tokens → $author, $authorRaw, $name, $nameRaw, $message, $language, $languageRaw`
 
 The format used for local `/roll` messages in chat.
 This respects the range and color options of [`/me`](#chatformatme).
@@ -713,7 +757,7 @@ See also:
 
 ### ChatFormatSafehouse
 `default → $name: <SPACE> $message`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+`tokens → $author, $authorRaw, $name, $nameRaw, $message, $language, $languageRaw`
 
 The format used for `/safehouse` messages in chat.
 
@@ -721,7 +765,7 @@ See also: [`ColorSafehouse`](#colorsafehouse).
 
 ### ChatFormatSay
 `default → $name: <SPACE> $message`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+`tokens → $author, $authorRaw, $name, $nameRaw, $message, $language, $languageRaw`
 
 The format used for `/say` messages in chat.
 
@@ -729,15 +773,31 @@ See also: [`ColorSay`](#colorsay).
 
 ### ChatFormatServer
 `default → $message`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+`tokens → $author, $authorRaw, $name, $nameRaw, $message, $language, $languageRaw`
 
 The format used for server messages in chat.
 
 See also: [`ColorServer`](#colorserver).
 
+### ChatFormatUnknownLanguage
+`default → $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $gettext($unknownLanguageString $language) <SPACE>))`  
+`tokens → $author, $authorRaw, $name, $nameRaw, $message, $language, $languageRaw, $unknownLanguageString`
+
+The format used when a player character does not speak the [language](#languages) of a chat message.
+
+With the default format, this will display as `« Name says/shouts/signs something in Language. »`.
+
+### ChatFormatUnknownLanguageRadio
+`default → $gettext(UI_OmiChat_radio $frequency): $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $gettext($unknownLanguageString $language) <SPACE>))`  
+`tokens → $frequency, $message, $unknownLanguageString`
+
+The format used when a player character does not speak the [language](#languages) of a chat message sent over the radio.
+
+With the default format, this will display as `Radio (100.0 MHz): « Something is said in Language. »`.
+
 ### ChatFormatWhisper
 `default → $name: <SPACE> $message`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+`tokens → $author, $authorRaw, $name, $nameRaw, $message, $language, $languageRaw`
 
 The format used for local `/whisper` messages in chat.
 
@@ -752,7 +812,7 @@ See also:
 
 ### ChatFormatYell
 `default → $name: <SPACE> $message`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message`
+`tokens → $author, $authorRaw, $name, $nameRaw, $message, $language, $languageRaw`
 
 The format used for `/yell` messages in chat.
 

@@ -22,7 +22,7 @@ This document serves as a complete list of tokens accepted by the various sandbo
 - `$chatType`: The type of the chat in which the message was sent.
     - One of `general`, `whisper`, `say`, `shout`, `faction`, `safehouse`, `radio`, `admin`, or `server`.
     - Note that `whisper` refers to private chats, not [local whispers](./sandbox-options.md#chatformatwhisper).
-- `$stream`: The stream in which the message was sent.
+- `$stream`: The chat stream to which the message was sent.
     - One of:
         - `general`
         - `private` (vanilla whisper)
@@ -42,6 +42,14 @@ This document serves as a complete list of tokens accepted by the various sandbo
         - `me`
         - `meloud`
         - `mequiet`
+        - `card`
+        - `roll`
+- `$language`: The translated [roleplay language](./sandbox-options.md#languages) that the message was sent in.
+This will not be defined if the message was sent in the default language.
+- `$languageRaw`: The untranslated roleplay language that the message was sent in.
+This will not be defined if the message was sent in the default language.
+- `$unknownLanguageString`: The default string ID to use when a player character doesn't understand the language of a chat message.
+    - This is only used by [`ChatFormatUnknownLanguage`](./sandbox-options.md#chatformatunknownlanguage).
 - `$frequency`: The radio frequency the message was sent on.
 - `$forename`: The relevant player's character's forename.
 - `$H`: The hour in 24-hour format.
