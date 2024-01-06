@@ -236,11 +236,7 @@ local function shouldShowSignEmoteOption()
     end
 
     local defaultLang = OmiChat.getDefaultRoleplayLanguage()
-    if not defaultLang then
-        return false
-    end
-
-    return OmiChat.isRoleplayLanguageSigned(defaultLang)
+    return not defaultLang or OmiChat.isRoleplayLanguageSigned(defaultLang)
 end
 
 ---Attempts to set the current text with the currently selected suggester box item.

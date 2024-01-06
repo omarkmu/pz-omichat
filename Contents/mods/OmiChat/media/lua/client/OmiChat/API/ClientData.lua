@@ -14,28 +14,16 @@ local getText = getText
 ---@return boolean
 function OmiChat.addRoleplayLanguage(language)
     local player = getSpecificPlayer(0)
-    local modData = OmiChat.getPlayerModData(player)
-    if not modData or not OmiChat.isConfiguredRoleplayLanguage(language) then
+    local username = player and player:getUsername()
+    if not username then
         return false
     end
 
-    local languages = modData.languages
-    if #languages >= 32 then
-        -- at capacity
-        return false
-    end
-
-    for i = 1, #languages do
-        if languages[i] == language then
-            -- already known
-            return false
-        end
-    end
-
-    languages[#languages + 1] = language
-    if not modData.currentLanguage then
-        modData.currentLanguage = languages[1]
-    end
+    OmiChat.requestDataUpdate({
+        target = username,
+        field = 'languages',
+        value = language,
+    })
 
     return true
 end
@@ -101,6 +89,19 @@ function OmiChat.changeSpeechColor(color)
     sendPersonalColor(player)
 end
 
+---Checks whether the current player knows a given roleplay language.
+---@param language string
+---@return boolean
+function OmiChat.checkKnowsLanguage(language)
+    local player = getSpecificPlayer(0)
+    local username = player and player:getUsername()
+    if not username then
+        return false
+    end
+
+    return OmiChat.checkPlayerKnowsLanguage(username, language)
+end
+
 ---Gets a color table for the current player, or `nil` if unset.
 ---@param category omichat.ColorCategory
 ---@return omichat.ColorTable?
@@ -129,12 +130,14 @@ end
 ---Gets the player's current roleplay language.
 ---@return string?
 function OmiChat.getCurrentRoleplayLanguage()
-    local modData = OmiChat.getPlayerModData(getSpecificPlayer(0))
-    if not modData then
+    local player = getSpecificPlayer(0)
+    local username = player and player:getUsername()
+    if not username then
         return
     end
 
-    return modData.currentLanguage
+    local modData = OmiChat.getModData()
+    return modData.currentLanguage[username]
 end
 
 ---Retrieves the player's custom shouts.
@@ -251,26 +254,29 @@ function OmiChat.getPlayerPreferences()
     return prefs
 end
 
----Gets a list of the player's known roleplay languages.
+---Gets a list of the current player's known roleplay languages.
 ---@return string[]
 function OmiChat.getRoleplayLanguages()
-    local modData = OmiChat.getPlayerModData(getSpecificPlayer(0))
-    if not modData then
+    local player = getSpecificPlayer(0)
+    local username = player and player:getUsername()
+    if not username then
         return {}
     end
 
-    return modData.languages
+    local modData = OmiChat.getModData()
+    if not modData.languages[username] then
+        modData.languages[username] = { OmiChat.getDefaultRoleplayLanguage() }
+    end
+
+    return modData.languages[username]
 end
 
 ---Gets the number of available roleplay language slots for the current player.
 ---@return integer
 function OmiChat.getRoleplayLanguageSlots()
-    local modData = OmiChat.getPlayerModData(getSpecificPlayer(0))
-    if not modData then
-        return 0
-    end
-
-    return modData.languageSlots
+    local player = getSpecificPlayer(0)
+    local username = player and player:getUsername()
+    return username and OmiChat.getModData().languageSlots[username] or Option.LanguageSlots
 end
 
 ---Gets whether a retain command category is set to retain commands.
@@ -353,11 +359,26 @@ end
 
 ---Sets the player's current roleplay language.
 ---@param language string
+---@return boolean
 function OmiChat.setCurrentRoleplayLanguage(language)
-    local modData = OmiChat.getPlayerModData(getSpecificPlayer(0))
-    if modData and OmiChat.isConfiguredRoleplayLanguage(language) then
-        modData.currentLanguage = language
+    local player = getSpecificPlayer(0)
+    local username = player and player:getUsername()
+    if not username then
+        return false
     end
+
+    local modData = OmiChat.getModData()
+    if OmiChat.isConfiguredRoleplayLanguage(language) then
+        modData.currentLanguage[username] = language
+    end
+
+    OmiChat.requestDataUpdate({
+        field = 'currentLanguage',
+        target = username,
+        value = language,
+    })
+
+    return true
 end
 
 ---Sets the player's custom shouts.
@@ -452,11 +473,27 @@ end
 
 ---Sets the number of available roleplay language slots for the current player.
 ---@param slots integer
+---@return boolean success
 function OmiChat.setRoleplayLanguageSlots(slots)
-    local modData = OmiChat.getPlayerModData(getSpecificPlayer(0))
-    if modData and slots >= 0 and slots <= 32 then
-        modData.languageSlots = slots
+    local player = getSpecificPlayer(0)
+    local username = player and player:getUsername()
+    if not username then
+        return false
     end
+
+    if slots < 0 or slots > 32 then
+        return false
+    end
+
+    local modData = OmiChat.getModData()
+    modData.languageSlots[username] = slots
+    OmiChat.requestDataUpdate({
+        field = 'currentLanguage',
+        target = username,
+        value = slots,
+    })
+
+    return true
 end
 
 ---Sets whether sign language emotes are enabled for the current player.

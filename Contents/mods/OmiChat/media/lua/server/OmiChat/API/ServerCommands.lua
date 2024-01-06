@@ -66,6 +66,39 @@ end
 
 ---@param args omichat.request.ModDataUpdate
 ---@return boolean
+local function updateModDataCurrentLanguage(args)
+    if not args.value then
+        return false
+    end
+
+    return OmiChat.setCurrentRoleplayLanguage(args.target, args.value)
+end
+
+---@param args omichat.request.ModDataUpdate
+---@return boolean
+---@return string?
+local function updateModDataLanguage(args)
+    if not args.value then
+        OmiChat.resetRoleplayLanguages(args.target)
+        return true
+    end
+
+    return OmiChat.addRoleplayLanguage(args.target, args.value)
+end
+
+---@param args omichat.request.ModDataUpdate
+---@return boolean
+local function updateModDataLanguageSlots(args)
+    local slots = tonumber(args.value)
+    if not slots then
+        return false
+    end
+
+    return OmiChat.setRoleplayLanguageSlots(args.target, slots)
+end
+
+---@param args omichat.request.ModDataUpdate
+---@return boolean
 local function updateModDataNameColor(args)
     if not Option.EnableSetNameColor and not args.fromCommand then
         return false
@@ -86,6 +119,52 @@ local function updateModDataNickname(args)
     return true
 end
 
+---@type table<omichat.ModDataField, function>
+local modDataUpdateFunctions = {
+    nicknames = updateModDataNickname,
+    nameColors = updateModDataNameColor,
+    languages = updateModDataLanguage,
+    languageSlots = updateModDataLanguageSlots,
+    currentLanguage = updateModDataCurrentLanguage,
+}
+
+
+---Handles the /addlanguage command.
+---@param player IsoPlayer
+---@param args omichat.request.Command
+function OmiChat.Commands.requestAddLanguage(player, args)
+    args = utils.parseCommandArgs(args.command)
+    local username = args[1]
+    local language = args[2]
+
+    local err
+    local success = false
+    if username and language then
+        success, err = OmiChat.Commands.requestDataUpdate(player, {
+            target = username,
+            field = 'languages',
+            fromCommand = true,
+            value = language,
+        })
+    end
+
+    if not success then
+        if err == 'FULL' then
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_add_language_full', { username })
+        elseif err == 'ALREADY_KNOW' then
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_add_language_known', { username })
+        elseif err == 'UNKNOWN' then
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_add_language_unknown_language', { username, language })
+        else
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_addlanguage')
+        end
+
+        return
+    end
+
+    username = utils.escapeRichText(username)
+    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_add_language_success', { username, language })
+end
 
 ---Handles the /clearnames command.
 ---@param player IsoPlayer
@@ -104,18 +183,19 @@ end
 ---@param player IsoPlayer
 ---@param args omichat.request.ModDataUpdate
 ---@return boolean
+---@return string?
 function OmiChat.Commands.requestDataUpdate(player, args)
+    local err
     local success = false
     if canAccessTarget(player, args.target, args.fromCommand) then
-        if args.field == 'nicknames' then
-            success = updateModDataNickname(args)
-        elseif args.field == 'nameColors' then
-            success = updateModDataNameColor(args)
+        local updateFunc = modDataUpdateFunctions[args.field]
+        if updateFunc then
+            success, err = updateFunc(args)
         end
     end
 
     OmiChat.transmitModData()
-    return success
+    return success, err
 end
 
 ---Handles the /card command.
@@ -128,6 +208,58 @@ function OmiChat.Commands.requestDrawCard(player)
         local name = OmiChat.getNameInChat(player:getUsername(), 'general') or player:getUsername()
         OmiChat.sendTranslatedServerMessage('UI_OmiChat_card', { name, card })
     end
+end
+
+---Handles the /resetlanguages command.
+---@param player IsoPlayer
+---@param args omichat.request.Command
+function OmiChat.Commands.requestResetLanguages(player, args)
+    args = utils.parseCommandArgs(args.command)
+    local username = args[1]
+
+    local success = false
+    if username then
+        success = OmiChat.Commands.requestDataUpdate(player, {
+            target = username,
+            field = 'languages',
+            fromCommand = true,
+        })
+    end
+
+    if not success then
+        OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_resetlanguages')
+        return
+    end
+
+    username = utils.escapeRichText(username)
+    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_reset_other_languages_success', { username })
+end
+
+---Handles the /setlanguageslots command.
+---@param player IsoPlayer
+---@param args omichat.request.Command
+function OmiChat.Commands.requestSetLanguageSlots(player, args)
+    args = utils.parseCommandArgs(args.command)
+    local username = args[1]
+    local slots = args[2]
+
+    local success = false
+    if username and slots then
+        success = OmiChat.Commands.requestDataUpdate(player, {
+            target = username,
+            field = 'languageSlots',
+            fromCommand = true,
+            value = slots,
+        })
+    end
+
+    if not success then
+        OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_setlanguageslots')
+        return
+    end
+
+    username = utils.escapeRichText(username)
+    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_set_language_slots_success', { username, slots })
 end
 
 ---Handles the /resetname command.

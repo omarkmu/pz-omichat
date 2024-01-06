@@ -248,6 +248,42 @@ OmiChat._commandStreams = {
         },
     },
     {
+        name = 'addlanguage',
+        command = '/addlanguage ',
+        omichat = {
+            isCommand = true,
+            helpText = 'UI_OmiChat_helptext_addlanguage',
+            isEnabled = canUseAdminCommands,
+            onUse = function(_, command)
+                OmiChat.requestAddLanguage(command)
+            end,
+        },
+    },
+    {
+        name = 'resetlanguages',
+        command = '/resetlanguages ',
+        omichat = {
+            isCommand = true,
+            helpText = 'UI_OmiChat_helptext_resetlanguages',
+            isEnabled = canUseAdminCommands,
+            onUse = function(_, command)
+                OmiChat.requestResetLanguages(command)
+            end,
+        },
+    },
+    {
+        name = 'setlanguageslots',
+        command = '/setlanguageslots ',
+        omichat = {
+            isCommand = true,
+            helpText = 'UI_OmiChat_helptext_setlanguageslots',
+            isEnabled = canUseAdminCommands,
+            onUse = function(_, command)
+                OmiChat.requestSetLanguageSlots(command)
+            end,
+        },
+    },
+    {
         name = 'card',
         command = '/card ',
         omichat = {
@@ -830,16 +866,19 @@ OmiChat._transformers = {
                 return
             end
 
-            local language = info.meta.language or OmiChat.getDefaultRoleplayLanguage()
+            local defaultLanguage = OmiChat.getDefaultRoleplayLanguage()
+            local language = info.meta.language or defaultLanguage
             if not language then
                 return
             end
 
             -- add language information for format strings
             local isSigned = OmiChat.isRoleplayLanguageSigned(language)
-            info.substitutions.isSignedLanguage = isSigned and 'true' or ''
-            info.substitutions.language = language
-            info.substitutions.languageTranslated = getTextOrNull('UI_OmiChat_Language_' .. language) or language
+            if language ~= defaultLanguage then
+                info.substitutions.isSignedLanguage = isSigned and 'true' or ''
+                info.substitutions.language = language
+                info.substitutions.languageTranslated = getTextOrNull('UI_OmiChat_Language_' .. language) or language
+            end
 
             if isSigned and info.context.ocIsRadio then
                 -- hide signed messages sent over the radio
@@ -848,10 +887,11 @@ OmiChat._transformers = {
             end
 
             local player = getSpecificPlayer(0)
-            if not player or info.author == player:getUsername() then
+            local username = player and player:getUsername()
+            if not username or info.author == username then
                 -- everyone understands themselves
                 return
-            elseif OmiChat.canPlayerUnderstandLanguage(player, language) then
+            elseif OmiChat.checkKnowsLanguage(language) then
                 -- if they understand the language, we're done here
                 return
             end
@@ -868,6 +908,8 @@ OmiChat._transformers = {
             if isWhisper then
                 info.titleID = 'UI_OmiChat_whisper_chat_title_id'
                 info.formatOptions.color = OmiChat.getColorOrDefault('mequiet')
+            elseif info.chatType == 'shout' then
+                info.formatOptions.color = OmiChat.getColorOrDefault('meloud')
             else
                 info.formatOptions.color = OmiChat.getColorOrDefault('me')
             end
@@ -1073,6 +1115,9 @@ function OmiChat._onReceiveGlobalModData(key, newData)
     local modData = OmiChat.getModData()
     modData.nicknames = newData.nicknames
     modData.nameColors = newData.nameColors
+    modData.languages = newData.languages
+    modData.languageSlots = newData.languageSlots
+    modData.currentLanguage = newData.currentLanguage
 end
 
 

@@ -20,121 +20,7 @@ OmiChat.utils = utils
 OmiChat._modDataKey = 'omichat'
 OmiChat._modDataVersion = 1
 OmiChat._playerModDataVersion = 1
-OmiChat._languageInfo = {
-    languageCount = 0,
-    availableLanguages = '',
-    signedLanguages = '',
-    idToLanguage = {},
-    languageToID = {},
-    languageIsSignedMap = {},
-}
 
-
----Retrieves information about configured roleplay language options.
----Performs a refresh of cached language info if necessary.
----@return omichat.LanguageInfoStore
-local function getLanguageInfo()
-    local langInfo = OmiChat._languageInfo
-    local noChanges = langInfo.availableLanguages == Option.AvailableLanguages
-        and langInfo.signedLanguages == Option.SignedLanguages
-
-    if noChanges then
-        return langInfo
-    end
-
-    langInfo.availableLanguages = Option.AvailableLanguages
-    langInfo.signedLanguages = Option.SignedLanguages
-    table.wipe(langInfo.languageToID)
-    table.wipe(langInfo.idToLanguage)
-    table.wipe(langInfo.languageIsSignedMap)
-
-    local nextId = 1
-    local languageList = Option.AvailableLanguages:split(';')
-    for i = 1, #languageList do
-        local lang = utils.trim(languageList[i])
-        if lang ~= '' and not langInfo.languageToID[lang] then
-            langInfo.languageToID[lang] = nextId
-            langInfo.idToLanguage[nextId] = lang
-            nextId = nextId + 1
-
-            if nextId == 33 then
-                -- maximum of 32 languages
-                break
-            end
-        end
-    end
-
-    local signedLanguageList = Option.SignedLanguages:split(';')
-    for i = 1, #signedLanguageList do
-        local language = utils.trim(signedLanguageList[i])
-        if language ~= '' then
-            langInfo.languageIsSignedMap[language] = true
-        end
-    end
-
-    langInfo.languageCount = nextId - 1
-    if isClient() then
-        local modData = OmiChat.getPlayerModData(getSpecificPlayer(0))
-        if not modData then
-            return langInfo
-        end
-
-        -- refresh player language data
-        local hasCurrentLang
-        local validLanguages = {}
-        for i = 1, #modData.languages do
-            local lang = modData.languages[i]
-            if langInfo.languageToID[lang] then
-                validLanguages[#validLanguages + 1] = lang
-
-                if lang == modData.currentLanguage then
-                    hasCurrentLang = true
-                end
-            end
-        end
-
-        modData.languages = validLanguages
-        if not hasCurrentLang or not modData.currentLanguage then
-            modData.currentLanguage = validLanguages[1]
-        end
-    end
-
-    return langInfo
-end
-
-
----Checks whether a player can understand a given language.
----@param player IsoPlayer
----@param language string
----@return boolean
-function OmiChat.canPlayerUnderstandLanguage(player, language)
-    local langInfo = getLanguageInfo()
-    if langInfo.languageCount == 0 then
-        -- no configured languages → understand everything
-        return true
-    end
-
-    local modData = OmiChat.getPlayerModData(player)
-    local knownLanguages = modData and modData.languages
-    if type(knownLanguages) ~= 'table' or #knownLanguages == 0 then
-        -- no languages chosen → understand only default language
-        return langInfo.languageToID[language] == 1
-    end
-
-    for i = 1, #knownLanguages do
-        if knownLanguages[i] == language then
-            return true
-        end
-    end
-
-    return false
-end
-
----Gets the default roleplay language, which is the first one listed in the configuration.
----@return string?
-function OmiChat.getDefaultRoleplayLanguage()
-    return OmiChat.getRoleplayLanguageByID(1)
-end
 
 ---Gets or creates the global mod data table.
 ---@return omichat.ModData
@@ -145,6 +31,9 @@ function OmiChat.getModData()
     modData.version = OmiChat._modDataVersion
     modData.nicknames = modData.nicknames or {}
     modData.nameColors = modData.nameColors or {}
+    modData.languages = modData.languages or {}
+    modData.languageSlots = modData.languageSlots or {}
+    modData.currentLanguage = modData.currentLanguage or {}
 
     return modData
 end
@@ -200,28 +89,6 @@ function OmiChat.getNameInChat(username, chatType)
     return utils.interpolate(Option.FormatName, tokens)
 end
 
----Gets or creates the player mod data table.
----@param player IsoPlayer
----@return omichat.PlayerModData?
-function OmiChat.getPlayerModData(player)
-    local fullModData = player and player:getModData()
-    if not fullModData then
-        return
-    end
-
-    local modData = fullModData[OmiChat._modDataKey]
-    if not modData then
-        modData = {}
-        fullModData[OmiChat._modDataKey] = modData
-    end
-
-    modData.version = OmiChat._playerModDataVersion
-    modData.languages = modData.languages or { getLanguageInfo().idToLanguage[1] }
-    modData.languageSlots = modData.languageSlots or Option.LanguageSlots
-
-    return modData
-end
-
 ---Gets substitution tokens to use in interpolation for a given player.
 ---If the player descriptor could not be obtained, returns `nil`.
 ---@param player IsoPlayer?
@@ -239,37 +106,6 @@ function OmiChat.getPlayerSubstitutions(player)
     }
 end
 
----Gets a roleplay language given a language ID.
----@param id integer
----@return string?
-function OmiChat.getRoleplayLanguageByID(id)
-    if id < 1 or id > 32 then
-        return
-    end
-
-    return getLanguageInfo().idToLanguage[id]
-end
-
----Returns the ID used for a configured roleplay language.
----@param language string
----@return integer?
-function OmiChat.getRoleplayLanguageID(language)
-    return getLanguageInfo().languageToID[language]
-end
-
----Returns a list of configured roleplay languages.
----@return string[]
-function OmiChat.getConfiguredRoleplayLanguages()
-    return utils.copy(getLanguageInfo().idToLanguage)
-end
-
----Checks whether the language is a configured roleplay language.
----@param language string
----@return boolean
-function OmiChat.isConfiguredRoleplayLanguage(language)
-    return getLanguageInfo().languageToID[language] ~= nil
-end
-
 ---Returns true if the custom chat stream specified is enabled.
 ---@param name omichat.CustomStreamName
 ---@return boolean
@@ -281,13 +117,6 @@ function OmiChat.isCustomStreamEnabled(name)
 
     local value = Option[info.chatFormatOpt]
     return value and value ~= ''
-end
-
----Returns whether a configured roleplay language is signed.
----@param language string
----@return boolean
-function OmiChat.isRoleplayLanguageSigned(language)
-    return getLanguageInfo().languageIsSignedMap[language] or false
 end
 
 ---Adds a function that should be available to all interpolator patterns.

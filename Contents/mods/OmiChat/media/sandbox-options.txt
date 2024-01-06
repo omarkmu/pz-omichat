@@ -237,7 +237,7 @@ option OmiChat.OverheadFormatRoll
 
 /* Chat Message Formats */
 option OmiChat.ChatFormatFull
-{ type = string, default = $if($neq($stream server) $timestamp)$tag$content, page = OmiChat, translation = OCChatFormatFull, }
+{ type = string, default = $if($neq($stream server) $timestamp)$tag$if($languageTranslated [ $languageTranslated ] ( ) <SPACE> ( ))$content, page = OmiChat, translation = OCChatFormatFull, }
 
 option OmiChat.ChatFormatDiscord
 { type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCChatFormatDiscord, }

@@ -19,6 +19,16 @@ local function dispatchCommand(command, args)
 end
 
 
+---Executes the /addlanguage command.
+---@param command string
+---@return boolean
+function OmiChat.requestAddLanguage(command)
+    ---@type omichat.request.Command
+    local req = { command = command }
+
+    return dispatchCommand('requestAddLanguage', req)
+end
+
 ---Executes the /clearnames command.
 function OmiChat.requestClearNames()
     return dispatchCommand('requestClearNames')
@@ -45,6 +55,16 @@ function OmiChat.requestDrawCard()
     end
 
     return dispatchCommand('requestDrawCard')
+end
+
+---Executes the /resetlanguages command.
+---@param command string
+---@return boolean
+function OmiChat.requestResetLanguages(command)
+    ---@type omichat.request.Command
+    local req = { command = command }
+
+    return dispatchCommand('requestResetLanguages', req)
 end
 
 ---Executes the /resetname command.
@@ -79,6 +99,16 @@ function OmiChat.requestRollDice(sides)
     local req = { sides = sides }
 
     return dispatchCommand('requestRollDice', req)
+end
+
+---Executes the /setlanguageslots command.
+---@param command string
+---@return boolean
+function OmiChat.requestSetLanguageSlots(command)
+    ---@type omichat.request.Command
+    local req = { command = command }
+
+    return dispatchCommand('requestSetLanguageSlots', req)
 end
 
 ---Executes the /setname command.

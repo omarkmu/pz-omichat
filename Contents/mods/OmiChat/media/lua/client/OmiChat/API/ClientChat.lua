@@ -756,7 +756,7 @@ function OmiChat.getMessageLanguage(message)
         end
     end
 
-    return OmiChat.getRoleplayLanguageByID(languageId)
+    return OmiChat.getRoleplayLanguageFromID(languageId)
 end
 
 ---Encodes the provided text with information about the current roleplay language.

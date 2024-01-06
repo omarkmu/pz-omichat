@@ -2,6 +2,7 @@
 ---@class omichat.api.shared
 local OmiChat = require 'OmiChat/API/Shared'
 
+require 'OmiChat/API/SharedLanguages'
 
 Events.EveryDays.Add(OmiChat.utils.cleanupCache)
 
@@ -42,6 +43,9 @@ return OmiChat
 ---@alias omichat.ModDataField
 ---| 'nicknames'
 ---| 'nameColors'
+---| 'languages'
+---| 'languageSlots'
+---| 'currentLanguage'
 
 ---@alias omichat.CustomStreamName
 ---| 'whisper'
@@ -117,11 +121,12 @@ return OmiChat
 ---@field version integer The current mod data version.
 ---@field nicknames table<string, string> Association of usernames to chat nicknames.
 ---@field nameColors table<string, string> Association of usernames to chat color strings.
+---@field languages table<string, string[]> Association of usernames to roleplay languages.
+---@field languageSlots table<string, integer> Association of usernames to roleplay language slots.
+---@field currentLanguage table<string, string> Association of usernames to currently selected roleplay languages.
 
 ---Player mod data.
 ---@class omichat.PlayerModData
----@field languages string[]
----@field languageSlots integer
 ---@field currentLanguage string?
 
 ---Request to update global mod data fields on the server.
