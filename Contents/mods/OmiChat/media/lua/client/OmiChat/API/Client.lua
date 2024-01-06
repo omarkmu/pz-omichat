@@ -1114,6 +1114,21 @@ function OmiChat._onGameStart()
     OmiChat.updateState(true)
 end
 
+---Event handler that runs on player death.
+---@param player IsoPlayer
+---@protected
+function OmiChat._onPlayerDeath(player)
+    if player ~= getSpecificPlayer(0) then
+        return
+    end
+
+    -- reset languages
+    OmiChat.requestDataUpdate({
+        field = 'languages',
+        target = player:getUsername(),
+    })
+end
+
 ---Event handler for retrieving global mod data.
 ---@param key string
 ---@param newData omichat.ModData

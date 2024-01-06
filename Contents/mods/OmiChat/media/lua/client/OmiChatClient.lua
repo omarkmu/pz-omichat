@@ -10,6 +10,7 @@ require 'OmiChat/API/ClientCommands'
 require 'OmiChat/API/ClientExtension'
 
 Events.OnGameStart.Add(OmiChat._onGameStart)
+Events.OnPlayerDeath.Add(OmiChat._onPlayerDeath)
 Events.OnServerCommand.Add(OmiChat._onServerCommand)
 Events.OnReceiveGlobalModData.Add(OmiChat._onReceiveGlobalModData)
 
