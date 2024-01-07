@@ -190,6 +190,7 @@ function OmiChat.getPlayerPreferences()
     end
 
     OmiChat._playerPrefs = {
+        HIGHER_VERSION = false,
         showNameColors = true,
         useSuggester = true,
         useSignEmotes = true,
@@ -229,6 +230,15 @@ function OmiChat.getPlayerPreferences()
         utils.logError('failed to read preferences (%s)', decoded)
 
         -- reset to default on failed read
+        return prefs
+    end
+
+    local version = decoded.VERSION
+    if type(version) == 'number' and version > OmiChat._prefsVersion then
+        utils.logError('preferences file has a higher version (%d > %d)', version, OmiChat._prefsVersion)
+
+        -- use default settings & add flag to avoid overwrite
+        prefs.HIGHER_VERSION = true
         return prefs
     end
 
@@ -332,9 +342,10 @@ function OmiChat.getUseSuggester()
 end
 
 ---Saves the current player preferences to a file.
+---@return boolean success
 function OmiChat.savePlayerPreferences()
-    if not OmiChat._playerPrefs then
-        return
+    if not OmiChat._playerPrefs or OmiChat._playerPrefs.HIGHER_VERSION then
+        return false
     end
 
     local prefs = OmiChat._playerPrefs
@@ -353,12 +364,14 @@ function OmiChat.savePlayerPreferences()
 
     if not success or type(encoded) ~= 'string' then
         utils.logError('failed to write preferences (%s)', tostring(encoded))
-        return
+        return false
     end
 
     local outFile = getFileWriter(OmiChat._prefsFileName, true, false)
     outFile:write(encoded)
     outFile:close()
+
+    return true
 end
 
 ---Sets the player's current roleplay language.

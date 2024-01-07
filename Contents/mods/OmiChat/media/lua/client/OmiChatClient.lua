@@ -113,6 +113,7 @@ return OmiChat
 
 ---Player preferences.
 ---@class omichat.PlayerPreferences
+---@field HIGHER_VERSION boolean Flag that's set when the preferences file had a higher verson than the current version, to avoid bad overwrites.
 ---@field showNameColors boolean Whether name colors are enabled.
 ---@field useSuggester boolean Whether suggestions are enabled.
 ---@field useSignEmotes boolean Whether signed roleplay languages should play a random emote.
