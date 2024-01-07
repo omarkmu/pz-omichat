@@ -197,10 +197,10 @@ option OmiChat.FormatMenuName
 { type = string, default = $ifelse($neq($menuType mini_scoreboard) $name $username &#32;[ $name ]), page = OmiChat, translation = OCFormatMenuName, }
 
 option OmiChat.FormatCard
-{ type = string, default = $gettext(UI_OmiChat_card_local $card), page = OmiChat, translation = OCFormatCard, }
+{ type = string, default = draws $card, page = OmiChat, translation = OCFormatCard, }
 
 option OmiChat.FormatRoll
-{ type = string, default = $gettext(UI_OmiChat_roll_local $roll $sides), page = OmiChat, translation = OCFormatRoll, }
+{ type = string, default = rolls a $roll on a $sides-sided die, page = OmiChat, translation = OCFormatRoll, }
 
 
 /* Overhead Message Formats */
@@ -261,10 +261,10 @@ option OmiChat.ChatFormatAdmin
 { type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatAdmin, }
 
 option OmiChat.ChatFormatCard
-{ type = string, default = &#32;<IMAGE:Item_CardDeck&#44;15&#44;14> <SPACE> $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>)), page = OmiChat, translation = OCChatFormatCard, }
+{ type = string, default = &#32;<IMAGE:Item_CardDeck&#44;15&#44;14> <SPACE> $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($gettext(UI_OmiChat_card_local $card)) <SPACE>)), page = OmiChat, translation = OCChatFormatCard, }
 
 option OmiChat.ChatFormatRoll
-{ type = string, default = &#32;<IMAGE:Item_Dice&#44;15&#44;14> <SPACE> $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>)), page = OmiChat, translation = OCChatFormatRoll, }
+{ type = string, default = &#32;<IMAGE:Item_Dice&#44;15&#44;14> <SPACE> $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($gettext(UI_OmiChat_roll_local $roll $sides)) <SPACE>)), page = OmiChat, translation = OCChatFormatRoll, }
 
 option OmiChat.ChatFormatDo
 { type = string, default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $punctuate($capitalize($trim($message))) <SPACE>)), page = OmiChat, translation = OCChatFormatDo, }

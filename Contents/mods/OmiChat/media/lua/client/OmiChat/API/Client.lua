@@ -757,7 +757,7 @@ OmiChat._suggesters = {
 OmiChat._transformers = {
     {
         name = 'radio-chat',
-        priority = 35,
+        priority = 40,
         transform = function(_, info)
             local text = info.content or info.rawText
             if info.chatType ~= 'radio' then
@@ -777,14 +777,109 @@ OmiChat._transformers = {
     },
     {
         name = 'decode-overhead',
-        priority = 30,
+        priority = 35,
         transform = function(_, info)
             local formatter = OmiChat.getFormatter('overhead')
             local text = info.content or info.rawText
-
-            if formatter:isMatch(text) then
-                info.content = formatter:read(text)
+            local match = formatter:read(text)
+            if match then
+                info.content = match
             end
+        end,
+    },
+    {
+        name = 'decode-card',
+        priority = 30,
+        transform = function(_, info)
+            if info.chatType ~= 'say' or not OmiChat.isCustomStreamEnabled('card') then
+                return
+            end
+
+            local text = info.content or info.rawText
+            local formatter = OmiChat.getFormatter('card')
+            local matched = formatter:read(text)
+            if not matched then
+                return
+            end
+
+            if info.context.ocIsRadio then
+                info.message:setShowInChat(false)
+                info.message:setOverHeadSpeech(false)
+                return
+            end
+
+            if Option.OverheadFormatCard == '' then
+                info.message:setOverHeadSpeech(false)
+            end
+
+            local suit = utils.decodeInvisibleCharacter(matched)
+            local card = utils.decodeInvisibleCharacter(matched:sub(2, 2))
+
+            if suit < 1 or suit > 4 or card < 1 or card > 13 then
+                info.message:setShowInChat(false)
+                return
+            end
+
+            info.content = matched:sub(3)
+            info.substitutions.card = utils.getTranslatedCardName(card, suit)
+
+            info.format = Option.ChatFormatCard
+            info.formatOptions.color = OmiChat.getColorOrDefault('me')
+            info.formatOptions.useDefaultChatColor = false
+
+            info.context.ocCustomStream = 'me'
+            info.substitutions.stream = 'card'
+
+            info.message:setShouldAttractZombies(false)
+        end,
+    },
+    {
+        name = 'decode-roll',
+        priority = 30,
+        transform = function(_, info)
+            if info.chatType ~= 'say' or not OmiChat.isCustomStreamEnabled('roll') then
+                return
+            end
+
+            local text = info.content or info.rawText
+            local formatter = OmiChat.getFormatter('roll')
+            local matched = formatter:read(text)
+            if not matched then
+                return
+            end
+
+            if info.context.ocIsRadio then
+                info.message:setShowInChat(false)
+                info.message:setOverHeadSpeech(false)
+                return
+            end
+
+            if Option.OverheadFormatRoll == '' then
+                info.message:setOverHeadSpeech(false)
+            end
+
+            local rollChar = utils.encodeInvisibleCharacter(1)
+            local sidesChar = utils.encodeInvisibleCharacter(2)
+            local roll = tonumber(matched:match(rollChar .. '(%d+)' .. rollChar))
+            local sides = tonumber(matched:match(sidesChar .. '(%d+)' .. sidesChar))
+
+            if not roll or not sides then
+                info.message:setShowInChat(false)
+                return
+            end
+
+            info.content = matched
+            info.substitutions.roll = roll
+            info.substitutions.sides = sides
+
+            info.format = Option.ChatFormatRoll
+            info.formatOptions.color = OmiChat.getColorOrDefault('me')
+            info.formatOptions.useDefaultChatColor = false
+
+            info.context.ocCustomStream = 'me'
+            info.substitutions.stream = 'roll'
+
+            info.message:setShouldAttractZombies(false)
         end,
     },
     {
@@ -826,7 +921,7 @@ OmiChat._transformers = {
         transform = function(_, info)
             local isRadio = info.context.ocIsRadio
             local text = info.content or info.rawText
-            for data in config:streams() do
+            for data in config:chatStreams() do
                 local name = data.name
 
                 local formatter = OmiChat.getFormatter(name)
@@ -887,7 +982,7 @@ OmiChat._transformers = {
             local encodedId
             if formatter:isMatch(text) then
                 text = formatter:read(text)
-                encodedId = OmiChat.decodeRoleplayLanguageID(text)
+                encodedId = utils.decodeInvisibleCharacter(text)
                 if encodedId >= 1 or encodedId <= 32 then
                     info.content = text:sub(2)
                 else

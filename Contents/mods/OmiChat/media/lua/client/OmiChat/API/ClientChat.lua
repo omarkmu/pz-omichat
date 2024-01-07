@@ -605,13 +605,6 @@ function OmiChat.decodeMessageTag(tag)
     }
 end
 
----Decodes an encoded language ID.
----@param text string
----@return integer
-function OmiChat.decodeRoleplayLanguageID(text)
-    return text:sub(1, 1):byte() - 127
-end
-
 ---Encodes message information including chat name and colors into a string.
 ---@param message omichat.Message
 ---@return string
@@ -635,13 +628,6 @@ function OmiChat.encodeMessageTag(message)
     end
 
     return encoded
-end
-
----Encodes a roleplay language ID as a string.
----@param id integer
----@return string
-function OmiChat.encodeRoleplayLanguageID(id)
-    return string.char(id + 127)
 end
 
 ---Formats overhead text in the full overhead format.
@@ -775,7 +761,7 @@ function OmiChat.getLanguageEncodedText(text, playEmoteForSigned)
         return text
     end
 
-    local encoded = OmiChat.encodeRoleplayLanguageID(langId) .. trimmed
+    local encoded = utils.encodeInvisibleCharacter(langId) .. trimmed
     local formatted = OmiChat.getFormatter('language'):format(encoded)
 
     playEmoteForSigned = playEmoteForSigned and OmiChat.getSignEmotesEnabled()
@@ -813,7 +799,7 @@ function OmiChat.getMessageLanguage(message)
     if formatter:isMatch(text) then
         -- found a language → decode it. transformer will handle cleanup
         text = formatter:read(text)
-        local encodedId = OmiChat.decodeRoleplayLanguageID(text)
+        local encodedId = utils.decodeInvisibleCharacter(text)
         if encodedId >= 1 and encodedId <= 32 then
             languageId = encodedId
         end

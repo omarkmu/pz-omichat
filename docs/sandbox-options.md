@@ -425,7 +425,7 @@ For the purpose of this predicate, `$message` is the unaltered input.
 Options that define the string formats used for purposes other than overhead speech bubbles and chat messages.
 
 ### FormatCard
-`default → $gettext(UI_OmiChat_card_local $card)`  
+`default → draws $card`  
 `tokens → $card`
 
 The format used for local [`/card`](#chatformatcard) message content.
@@ -453,7 +453,7 @@ The format used to determine the values of `$name` and `$nameRaw` in other forma
 If `$name` is specified, it is a name that was set with [`/name`](./sandbox-options.md#enablesetname).
 
 ### FormatRoll
-`default → $gettext(UI_OmiChat_roll_local $roll $sides)`  
+`default → rolls a $roll on a $sides-sided die`  
 `tokens → $roll, $sides`
 
 The format used for local [`/roll`](#chatformatroll) message content.
@@ -569,8 +569,8 @@ The format used for `/admin` messages in chat.
 See also: [`ColorAdmin`](#coloradmin).
 
 ### ChatFormatCard
-`default → &#32;<IMAGE:Item_CardDeck&#44;15&#44;14> <SPACE> $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>))`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message, $language, $languageRaw`
+`default → &#32;<IMAGE:Item_CardDeck&#44;15&#44;14> <SPACE> $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($gettext(UI_OmiChat_card_local $card)) <SPACE>))`  
+`tokens → $author, $authorRaw, $name, $nameRaw, $card, $language, $languageRaw`
 
 The format used for local `/card` messages in chat.
 This respects the range and color options of [`/me`](#chatformatme).
@@ -742,8 +742,8 @@ The format used for radio messages in chat.
 See also: [`ColorRadio`](#colorradio).
 
 ### ChatFormatRoll
-`default → &#32;<IMAGE:Item_Dice&#44;15&#44;14> <SPACE> $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>))`  
-`tokens → $author, $authorRaw, $name, $nameRaw, $message, $language, $languageRaw`
+`default → &#32;<IMAGE:Item_Dice&#44;15&#44;14> <SPACE> $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($gettext(UI_OmiChat_roll_local $roll $sides)) <SPACE>))`  
+`tokens → $author, $authorRaw, $name, $nameRaw, $roll, $sides, $language, $languageRaw`
 
 The format used for local `/roll` messages in chat.
 This respects the range and color options of [`/me`](#chatformatme).

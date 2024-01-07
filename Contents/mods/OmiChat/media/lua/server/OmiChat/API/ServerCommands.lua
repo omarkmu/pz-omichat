@@ -10,27 +10,6 @@ OmiChat.Commands = {}
 
 local Option = OmiChat.Option
 local utils = OmiChat.utils
-local suits = {
-    'clubs',
-    'diamonds',
-    'hearts',
-    'spades',
-}
-local cards = {
-    'ace',
-    'two',
-    'three',
-    'four',
-    'five',
-    'six',
-    'seven',
-    'eight',
-    'nine',
-    'ten',
-    'jack',
-    'queen',
-    'king',
-}
 
 
 ---Checks whether a player has permission to execute a command for the given target.
@@ -192,8 +171,8 @@ end
 ---Handles the /card command.
 ---@param player IsoPlayer
 function OmiChat.Commands.requestDrawCard(player)
-    local card = cards[1 + ZombRand(#cards)]
-    local suit = suits[1 + ZombRand(#suits)]
+    local suit = 1 + ZombRand(4)
+    local card = 1 + ZombRand(13)
     if OmiChat.isCustomStreamEnabled('card') then
         OmiChat.reportDrawCard(player, card, suit)
     else

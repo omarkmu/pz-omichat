@@ -25,8 +25,8 @@ end
 
 ---Instructs the client to report the result of drawing a card.
 ---@param player IsoPlayer
----@param card string
----@param suit string
+---@param card integer
+---@param suit integer
 function OmiChat.reportDrawCard(player, card, suit)
     ---@type omichat.request.ReportDrawCard
     local req = { card = card, suit = suit }
@@ -36,8 +36,8 @@ end
 
 ---Instructs all clients to report the result of drawing a card.
 ---@param name string
----@param card string
----@param suit string
+---@param card integer
+---@param suit integer
 function OmiChat.reportDrawCardGlobal(name, card, suit)
     ---@type omichat.request.ReportDrawCard
     local req = { name = name, card = card, suit = suit }

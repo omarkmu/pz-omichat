@@ -8,43 +8,86 @@ OmiChat.Commands = {}
 local utils = OmiChat.utils
 local Option = OmiChat.Option
 local unpack = unpack
+local concat = table.concat
+
+local englishSuits = {
+    'Clubs',
+    'Diamonds',
+    'Hearts',
+    'Spades',
+}
+local englishCards = {
+    'the Ace',
+    'a Two',
+    'a Three',
+    'a Four',
+    'a Five',
+    'a Six',
+    'a Seven',
+    'an Eight',
+    'a Nine',
+    'a Ten',
+    'the Jack',
+    'the Queen',
+    'the King',
+}
 
 
 ---Reports the results of drawing a card.
 ---@param args omichat.request.ReportDrawCard
 function OmiChat.Commands.reportDrawCard(args)
-    local card = getText('UI_OmiChat_card_' .. args.card)
-    local suit = getText('UI_OmiChat_suit_' .. args.suit)
-    local cardName = getText('UI_OmiChat_card_name', card, suit)
+    local card = tonumber(args.card)
+    if not card or card < 1 or card > 13 then
+        return
+    end
+
+    local suit = tonumber(args.suit)
+    if not suit or suit < 1 or suit > 4 then
+        return
+    end
 
     -- global message
     if args.name then
+        local cardName = utils.getTranslatedCardName(card, suit)
         OmiChat.showInfoMessage(getText('UI_OmiChat_card', args.name, cardName))
         return
     end
 
     -- local message
+    -- display english overhead & encode card values for future translation
     local language
-    local command = utils.interpolate(Option.FormatCard, { card = cardName })
-    if OmiChat.canUseRoleplayLanguage('card', command) then
-        command, language = OmiChat.getLanguageEncodedText(command, false)
+    local cardName = concat { englishCards[card], ' of ', englishSuits[suit] }
+    local content = utils.interpolate(Option.FormatCard, { card = cardName })
+    if OmiChat.canUseRoleplayLanguage('card', content) then
+        content, language = OmiChat.getLanguageEncodedText(content, false)
     end
 
-    local formatted = OmiChat.getFormatter('card'):format(command)
-    processSayMessage(OmiChat.formatOverheadText(formatted, 'card', language))
+    local formatter = OmiChat.getFormatter('card')
+    content = formatter:format(concat {
+        utils.encodeInvisibleCharacter(suit),
+        utils.encodeInvisibleCharacter(card),
+        content,
+    })
+
+    processSayMessage(OmiChat.formatOverheadText(content, 'card', language))
 end
 
 ---Reports the results of a dice roll.
 ---@param args omichat.request.ReportRoll
 function OmiChat.Commands.reportRoll(args)
+    local rollChar = utils.encodeInvisibleCharacter(1)
+    local sidesChar = utils.encodeInvisibleCharacter(2)
+
+    local roll = concat { rollChar, tostring(args.roll), rollChar }
+    local sides = concat { sidesChar, tostring(args.sides), sidesChar }
+    local content = utils.interpolate(Option.FormatRoll, { roll = roll, sides = sides })
+
     local language
-    local command = utils.interpolate(Option.FormatRoll, { roll = args.roll, sides = args.sides })
-    if OmiChat.canUseRoleplayLanguage('roll', command) then
-        command, language = OmiChat.getLanguageEncodedText(command, false)
+    if OmiChat.canUseRoleplayLanguage('roll', content) then
+        content, language = OmiChat.getLanguageEncodedText(content, false)
     end
 
-
-    local formatted = OmiChat.getFormatter('roll'):format(command)
+    local formatted = OmiChat.getFormatter('roll'):format(content)
     processSayMessage(OmiChat.formatOverheadText(formatted, 'roll', language))
 end
 

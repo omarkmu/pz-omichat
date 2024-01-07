@@ -28,6 +28,27 @@ local accessLevels = {
     gm = 4,
     observer = 2,
 }
+local suits = {
+    'clubs',
+    'diamonds',
+    'hearts',
+    'spades',
+}
+local cards = {
+    'ace',
+    'two',
+    'three',
+    'four',
+    'five',
+    'six',
+    'seven',
+    'eight',
+    'nine',
+    'ten',
+    'jack',
+    'queen',
+    'king',
+}
 
 
 ---Gets an interpolator from the cache.
@@ -114,12 +135,40 @@ function utils.colorToRGBString(color)
     return format('%d,%d,%d', color.r, color.g, color.b)
 end
 
+---Decodes an encoded integer value.
+---@param text string
+---@return integer
+function utils.decodeInvisibleCharacter(text)
+    return text:sub(1, 1):byte() - 127
+end
+
+---Encodes an integer value in [1, 32] into a character.
+---@param id integer
+---@return string
+function utils.encodeInvisibleCharacter(id)
+    return string.char(id + 127)
+end
+
 ---Escapes a string for use in a rich text panel.
 ---@see ISRichTextPanel
 ---@param text string
 ---@return string
 function utils.escapeRichText(text)
     return (text:gsub('<', '&lt;'):gsub('>', '&gt;'))
+end
+
+---Gets the translation for a card name.
+---@param card integer The card value, in [1, 13].
+---@param suit integer The suit value, in [1, 4].
+---@return string
+function utils.getTranslatedCardName(card, suit)
+    if not cards[card] or not suits[suit] then
+        return ''
+    end
+
+    local cardTranslated = getText('UI_OmiChat_card_' .. cards[card])
+    local suitTranslated = getText('UI_OmiChat_suit_' .. suits[suit])
+    return getText('UI_OmiChat_card_name', cardTranslated, suitTranslated)
 end
 
 ---Gets a numeric access level given an access level string.
