@@ -135,6 +135,17 @@ These functions are related to working with [at-maps](./format-string-at-maps.md
 - `$get(o key default)`: Returns the first value associated with `key`, or `default` if there are none.
 - `$has(o key)`: Returns `true` if the at-map contains the key `key`. Otherwise, returns the empty string.
 
+## Random Functions
+
+These functions are related to generating pseudo-random values.
+
+**Note:** Predicates (except `PredicateUseNameColor`), filters, `FormatCard`, `FormatRoll`, and all overhead chat formats are seeded with a constant value.
+To get pseudo-random values for these, use `$randomseed` first.
+
+- `$random(m n)`: Returns a pseudo-random number in `[m, n]`. If `n` is excluded, returns a number up to `m`.
+If both are excluded, returns a random float number.
+- `$randomseed(seed)`: Seeds the randomizer with the given value.
+- `$choose(...)`: Selects and returns one of the inputs at random. If given a single at-map, returns one of its values.
 
 ## Translation Functions
 

@@ -225,7 +225,7 @@ local function shouldUseNameColor(info)
     local tokens = utils.copy(info.substitutions)
     tokens.chatType = info.chatType
 
-    return utils.interpolate(pred, tokens) ~= ''
+    return utils.interpolate(pred, tokens, tostring(info.message:getDatetime())) ~= ''
 end
 
 
@@ -234,17 +234,19 @@ end
 ---@param info omichat.MessageInfo
 ---@return boolean success If false, the information table is invalid.
 function OmiChat.applyFormatOptions(info)
-    local meta = info.meta
-    local options = info.formatOptions
-    local message = info.message
-
     local msg = info.content
     if not msg or not info.format then
         return false
     end
 
+    local meta = info.meta
+    local options = info.formatOptions
+    local message = info.message
+    local dt = info.message:getDatetime()
+    local seed = tostring(dt)
+
     if options.showTimestamp then
-        local hour, minute, second = tostring(message:getDatetime()):match('(%d%d):(%d%d):(%d%d)')
+        local hour, minute, second = tostring(dt):match('(%d%d):(%d%d):(%d%d)')
 
         hour = tonumber(hour)
         minute = tonumber(minute)
@@ -271,7 +273,7 @@ function OmiChat.applyFormatOptions(info)
                 ampm = ampm,
                 AMPM = ampm:upper(),
                 hourFormatPref = getCore():getOptionClock24Hour() and 24 or 12,
-            })
+            }, seed)
         end
     end
 
@@ -280,7 +282,7 @@ function OmiChat.applyFormatOptions(info)
             chatType = info.chatType,
             stream = info.substitutions.stream,
             tag = getText(info.titleID),
-        })
+        }, seed)
     end
 
     if options.stripColors then
@@ -431,6 +433,7 @@ function OmiChat.buildMessageTextFromInfo(info)
         return
     end
 
+    local seed = tostring(info.message:getDatetime())
     return concat {
         utils.toChatColor(info.formatOptions.color),
         '<SIZE:', info.formatOptions.font or 'medium', '> ',
@@ -442,16 +445,16 @@ function OmiChat.buildMessageTextFromInfo(info)
             unknownLanguage = info.substitutions.unknownLanguage,
             timestamp = info.timestamp or '',
             tag = info.tag or '',
-            content = utils.interpolate(info.format, info.substitutions),
-        }),
+            content = utils.interpolate(info.format, info.substitutions, seed),
+        }, seed),
     }
 end
 
----Checks whether a given stream and message can use roleplay languages.
+---Checks whether a given stream and message text can use roleplay languages.
 ---@param stream string
----@param message string
+---@param text string
 ---@return boolean
-function OmiChat.canUseRoleplayLanguage(stream, message)
+function OmiChat.canUseRoleplayLanguage(stream, text)
     local pred = Option.PredicateAllowLanguage
     if pred == '' then
         return false
@@ -459,7 +462,7 @@ function OmiChat.canUseRoleplayLanguage(stream, message)
 
     local tokens = {
         stream = stream,
-        message = message,
+        message = text,
     }
 
     return utils.interpolate(pred, tokens) ~= ''
@@ -733,14 +736,15 @@ function OmiChat.getInfoRichText()
         return ''
     end
 
-    local name = OmiChat.getNameInChat(player:getUsername(), 'say')
+    local username = player:getUsername()
+    local name = OmiChat.getNameInChat(username, 'say')
     local tokens = name and OmiChat.getPlayerSubstitutions(player)
     if not name or not tokens then
         return ''
     end
 
     tokens.name = name
-    return utils.interpolate(Option.FormatInfo, tokens)
+    return utils.interpolate(Option.FormatInfo, tokens, username)
 end
 
 ---Encodes the provided text with information about the current roleplay language.

@@ -86,7 +86,7 @@ function OmiChat.getNameInChat(username, chatType)
 
     tokens.username = username
     tokens.chatType = chatType
-    return utils.interpolate(Option.FormatName, tokens)
+    return utils.interpolate(Option.FormatName, tokens, username)
 end
 
 ---Gets substitution tokens to use in interpolation for a given player.

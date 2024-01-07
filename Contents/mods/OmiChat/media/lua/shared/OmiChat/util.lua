@@ -203,30 +203,19 @@ end
 ---Functions are referenced using `$func(...)` syntax.
 ---@param text string The format string.
 ---@param tokens table A table of format substitution strings.
----@param options omi.interpolate.Options? Interpolation options.
+---@param seed unknown? Seed value for random functions.
 ---@return string
-function utils.interpolate(text, tokens, options)
-    -- only use cache for default options, since results may differ
-    local useCache = not options
-
-    local interpolator = useCache and getCachedInterpolator(text)
+function utils.interpolate(text, tokens, seed)
+    local interpolator = getCachedInterpolator(text)
     if not interpolator then
-        options = utils.copy(options or {})
-
-        -- prevent randomness; would result in messages changing due to refreshes
-        options.libraryExclude = utils.copy(options.libraryExclude or {})
-        options.libraryExclude['mutators.choose'] = true
-        options.libraryExclude['mutators.random'] = true
-        options.libraryExclude['mutators.randomseed'] = true
-
-        interpolator = Interpolator:new(options)
+        interpolator = Interpolator:new({})
         interpolator:setPattern(text)
 
-        if useCache then
-            setCachedInterpolator(text, interpolator)
-        end
+        setCachedInterpolator(text, interpolator)
     end
 
+    -- always seed to avoid content changing on refresh
+    interpolator:randomseed(seed)
     return interpolator:interpolate(tokens)
 end
 
