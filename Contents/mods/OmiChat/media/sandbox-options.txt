@@ -220,22 +220,22 @@ option OmiChat.OverheadFormatLooc
 { type = string, default = (( $1 )), page = OmiChat, translation = OCOverheadFormatLooc, }
 
 option OmiChat.OverheadFormatMe
-{ type = string, default = $gettext(UI_OmiChat_rp_emote $1), page = OmiChat, translation = OCOverheadFormatMe, }
+{ type = string, default = &lt; $1 &gt;, page = OmiChat, translation = OCOverheadFormatMe, }
 
 option OmiChat.OverheadFormatMeLoud
-{ type = string, default = $gettext(UI_OmiChat_rp_emote $1), page = OmiChat, translation = OCOverheadFormatMeLoud, }
+{ type = string, default = &lt; $1 &gt;, page = OmiChat, translation = OCOverheadFormatMeLoud, }
 
 option OmiChat.OverheadFormatMeQuiet
-{ type = string, default = $gettext(UI_OmiChat_rp_emote $1), page = OmiChat, translation = OCOverheadFormatMeQuiet, }
+{ type = string, default = &lt; $1 &gt;, page = OmiChat, translation = OCOverheadFormatMeQuiet, }
 
 option OmiChat.OverheadFormatWhisper
 { type = string, default = $1, page = OmiChat, translation = OCOverheadFormatWhisper, }
 
 option OmiChat.OverheadFormatCard
-{ type = string, default = $gettext(UI_OmiChat_rp_emote $1), page = OmiChat, translation = OCOverheadFormatCard, }
+{ type = string, default = &lt; $1 &gt;, page = OmiChat, translation = OCOverheadFormatCard, }
 
 option OmiChat.OverheadFormatRoll
-{ type = string, default = $gettext(UI_OmiChat_rp_emote $1), page = OmiChat, translation = OCOverheadFormatRoll, }
+{ type = string, default = &lt; $1 &gt;, page = OmiChat, translation = OCOverheadFormatRoll, }
 
 
 /* Chat Message Formats */

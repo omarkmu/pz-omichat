@@ -305,7 +305,7 @@ The default color used for [`/mequiet`](#chatformatmequiet) messages.
 The default color used for private messages.
 This applies to the vanilla `/whisper`, which is `/pm` if [local whisper](#chatformatwhisper) is enabled.
 
-See also
+See also:
 - [`ColorWhisper`](#colorwhisper)
 - [`ChatFormatIncomingPrivate`](#chatformatincomingprivate)
 - [`ChatFormatOutgoingPrivate`](#chatformatoutgoingprivate)
@@ -479,7 +479,7 @@ Options that the content that displays in speech bubbles that appear over a char
 For example, reversing the overhead text will result in the message content being reversed in chat.
 
 ### OverheadFormatCard
-`default → $gettext(UI_OmiChat_rp_emote $1)` (`« $1 »`)  
+`default → &lt; $1 &gt;` (`< $1 >`)  
 `tokens → $1`
 
 The overhead format used for local [`/card`](#chatformatcard) messages.
@@ -520,28 +520,28 @@ Defines the format used for overhead speech bubbles of [`/looc`](#chatformatlooc
 If blank, `/looc` messages will not display overhead.
 
 ### OverheadFormatMe
-`default → $gettext(UI_OmiChat_rp_emote $1)` (`« $1 »`)  
+`default → &lt; $1 &gt;` (`< $1 >`)  
 `tokens → $1`
 
 Defines the format used for overhead speech bubbles of [`/me`](#chatformatme) messages.
 If blank, `/me` messages will not display overhead.
 
 ### OverheadFormatMeLoud
-`default → $gettext(UI_OmiChat_rp_emote $1)` (`« $1 »`)  
+`default → &lt; $1 &gt;` (`< $1 >`)  
 `tokens → $1`
 
 Defines the format used for overhead speech bubbles of [`/meloud`](#chatformatmeloud) messages.
 If blank, `/meloud` messages will not display overhead.
 
 ### OverheadFormatMeQuiet
-`default → $gettext(UI_OmiChat_rp_emote $1)` (`« $1 »`)  
+`default → &lt; $1 &gt;` (`< $1 >`)  
 `tokens → $1`
 
 Defines the format used for overhead speech bubbles of [`/mequiet`](#chatformatmequiet) messages.
 If blank, `/mequiet` messages will not display overhead.
 
 ### OverheadFormatRoll
-`default → $gettext(UI_OmiChat_rp_emote $1)` (`« $1 »`)  
+`default → &lt; $1 &gt;` (`< $1 >`)  
 `tokens → $1`
 
 The overhead format used for local [`/roll`](#chatformatroll) messages.
@@ -664,7 +664,7 @@ See also: [`ColorGeneral`](#colorgeneral).
 
 The format used for incoming private messages in chat.
 
-See also
+See also:
 - [`ColorPrivate`](#colorprivate)
 - [`ChatFormatOutgoingPrivate`](#chatformatoutgoingprivate)
 
@@ -729,7 +729,7 @@ See also:
 
 The format used for outgoing private messages in chat.
 
-See also
+See also:
 - [`ColorPrivate`](#colorprivate)
 - [`ChatFormatIncomingPrivate`](#chatformatincomingprivate)
 
