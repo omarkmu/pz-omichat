@@ -1,4 +1,5 @@
 local icons = require 'OmiChat/Data/IconLists'
+local utils = require 'OmiChat/util'
 local pairs = pairs
 local getText = getText
 local getTextManager = getTextManager
@@ -22,6 +23,7 @@ local ISPanel_render = ISPanel.render
 ---@field exclude table<string, true> Icons to exclude from the picker.
 ---@field categoryOrder string[] Categories in the order in which they should display.
 ---@field protected _rowContents table
+---@field protected _preparedIcons boolean
 local IconPicker = ISPanel:derive('IconPicker')
 
 
@@ -33,13 +35,8 @@ local IconPicker = ISPanel:derive('IconPicker')
 ---@field category string? The category in which the icon should be included.
 
 
----@type table<string, string>
-local iconToTextureNameMap = {}
-local loadedIcons = false
-
-
----Collects valid icons and builds a map of icon names to texture names.
-local function loadIcons(picker)
+---Prepares icons for the icon picker.
+local function prepareIcons()
     local known = {}
     for i, t in pairs(icons) do
         -- skip the order table
@@ -50,38 +47,28 @@ local function loadIcons(picker)
         end
     end
 
-    local dest = HashMap.new()
-    Texture.collectAllIcons(HashMap.new(), dest)
-
-    iconToTextureNameMap = transformIntoKahluaTable(dest)
-    if picker.includeUnknownAsMiscellaneous then
-        local categoryOrder = icons[1]
-        for icon in pairs(iconToTextureNameMap) do
-            if not known[icon] then
-                -- include unknown icons in misc category
-                if not icons.miscellaneous then
-                    icons.miscellaneous = {}
-                    categoryOrder[#categoryOrder + 1] = 'miscellaneous'
-                end
-
-                local list = icons.miscellaneous
-                list[#list + 1] = icon
+    local categoryOrder = icons[1]
+    for icon in utils.iterateIcons() do
+        if not known[icon] then
+            -- include unknown icons in misc category
+            if not icons.miscellaneous then
+                icons.miscellaneous = {}
+                categoryOrder[#categoryOrder + 1] = 'miscellaneous'
             end
+
+            local list = icons.miscellaneous
+            list[#list + 1] = icon
         end
     end
-
-    -- special case for 'music'
-    iconToTextureNameMap.music = 'Icon_music_notes'
-
-    loadedIcons = true
 end
 
 
 ---Builds a table containing information about the current icons.
 ---@return table
 function IconPicker:buildIconList()
-    if self.includeDefaults and not loadedIcons then
-        loadIcons(self)
+    if self.includeDefaults and not self._preparedIcons then
+        prepareIcons()
+        self._preparedIcons = true
     end
 
     local categoryOrder = {}
@@ -109,8 +96,8 @@ function IconPicker:buildIconList()
             local info = iconsByCategory[cat]
             for j = 1, #icons[cat] do
                 local icon = icons[cat][j]
-                local textureName = iconToTextureNameMap[icon]
-                local texture = getTexture(textureName)
+                local textureName = utils.getTextureNameFromIcon(icon)
+                local texture = textureName and getTexture(textureName)
 
                 if not self.exclude[icon] and textureName and texture then
                     info.list[#info.list + 1] = {
@@ -152,7 +139,9 @@ function IconPicker:buildIconList()
 
     for i = 1, #categoryOrder do
         local cat = categoryOrder[i]
-        result[#result + 1] = iconsByCategory[cat]
+        if self.includeUnknownAsMiscellaneous or cat ~= 'miscellaneous' then
+            result[#result + 1] = iconsByCategory[cat]
+        end
     end
 
     return result
@@ -222,7 +211,7 @@ function IconPicker:onMouseDown(x, y)
 
     selected = selected.name
     if self.onclick then
-        self.onclick(self.target, selected, iconToTextureNameMap[selected])
+        self.onclick(self.target, selected, utils.getTextureNameFromIcon(selected))
     end
 end
 
@@ -339,6 +328,7 @@ function IconPicker:new(x, y, target, onclick)
     o.exclude = {}
     o.categoryOrder = {}
     o._rowContents = {}
+    o._preparedIcons = false
 
     o:addScrollBars()
     o:setWidth(width + o.vscroll.width)

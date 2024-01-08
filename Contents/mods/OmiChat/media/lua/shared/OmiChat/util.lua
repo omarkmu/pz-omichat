@@ -50,6 +50,10 @@ local cards = {
     'king',
 }
 
+---@type table<string, string>
+local iconToTextureNameMap = {}
+local loadedIcons = false
+
 
 ---Gets an interpolator from the cache.
 ---@param text string
@@ -60,6 +64,15 @@ local function getCachedInterpolator(text)
         item.lastAccess = getTimestampMs()
         return item.interpolator
     end
+end
+
+---Collects valid icons and builds a map of icon names to texture names.
+local function loadIcons()
+    local dest = HashMap.new()
+    Texture.collectAllIcons(HashMap.new(), dest)
+    iconToTextureNameMap = transformIntoKahluaTable(dest)
+    iconToTextureNameMap.music = 'Icon_music_notes' -- special case for 'music'
+    loadedIcons = true
 end
 
 ---Adds an interpolator to the cache.
@@ -157,18 +170,15 @@ function utils.escapeRichText(text)
     return (text:gsub('<', '&lt;'):gsub('>', '&gt;'))
 end
 
----Gets the translation for a card name.
----@param card integer The card value, in [1, 13].
----@param suit integer The suit value, in [1, 4].
----@return string
-function utils.getTranslatedCardName(card, suit)
-    if not cards[card] or not suits[suit] then
-        return ''
+---Retrieves a texture name given a chat icon name.
+---@param icon string
+---@return string?
+function utils.getTextureNameFromIcon(icon)
+    if not loadedIcons then
+        loadIcons()
     end
 
-    local cardTranslated = getText('UI_OmiChat_card_' .. cards[card])
-    local suitTranslated = getText('UI_OmiChat_suit_' .. suits[suit])
-    return getText('UI_OmiChat_card_name', cardTranslated, suitTranslated)
+    return iconToTextureNameMap[icon]
 end
 
 ---Gets a numeric access level given an access level string.
@@ -197,6 +207,20 @@ function utils.getPlayerByUsername(username)
             return player
         end
     end
+end
+
+---Gets the translation for a card name.
+---@param card integer The card value, in [1, 13].
+---@param suit integer The suit value, in [1, 4].
+---@return string
+function utils.getTranslatedCardName(card, suit)
+    if not cards[card] or not suits[suit] then
+        return ''
+    end
+
+    local cardTranslated = getText('UI_OmiChat_card_' .. cards[card])
+    local suitTranslated = getText('UI_OmiChat_suit_' .. suits[suit])
+    return getText('UI_OmiChat_card_name', cardTranslated, suitTranslated)
 end
 
 ---Interpolates substitutions into a string with format strings using `$var` format.
@@ -244,6 +268,17 @@ function utils.isValidColor(color)
     end
 
     return true
+end
+
+---Returns an iterator over an icon-to-texture name map.
+---@return function
+---@return table<string, string>
+function utils.iterateIcons()
+    if not loadedIcons then
+        loadIcons()
+    end
+
+    return pairs(iconToTextureNameMap)
 end
 
 ---Logs a non-fatal mod error.
