@@ -22,6 +22,13 @@ OmiChat._modDataVersion = 1
 OmiChat._playerModDataVersion = 1
 
 
+---Returns the chat icon for a given username.
+---@param username string
+---@return string?
+function OmiChat.getChatIcon(username)
+    return OmiChat.getModData().icons[username]
+end
+
 ---Gets or creates the global mod data table.
 ---@return omichat.ModData
 function OmiChat.getModData()
@@ -34,6 +41,7 @@ function OmiChat.getModData()
     modData.languages = modData.languages or {}
     modData.languageSlots = modData.languageSlots or {}
     modData.currentLanguage = modData.currentLanguage or {}
+    modData.icons = modData.icons or {}
 
     return modData
 end

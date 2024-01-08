@@ -121,6 +121,14 @@ function OmiChat.resetRoleplayLanguages(username)
     refreshLanguageInfo(username)
 end
 
+---Sets the chat icon for the player with the given username.
+---@param username string
+---@param icon string?
+function OmiChat.setChatIcon(username, icon)
+    local modData = OmiChat.getModData()
+    modData.icons[username] = icon
+end
+
 ---Sets the current roleplay language for the player with the given username.
 ---This does not transmit changes to clients.
 ---@see omichat.api.server.transmitModData

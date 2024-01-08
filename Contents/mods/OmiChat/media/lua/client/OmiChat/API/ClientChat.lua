@@ -3,6 +3,7 @@
 local MimicMessage = require 'OmiChat/Component/MimicMessage'
 
 local getText = getText
+local getTexture = getTexture
 local min = math.min
 local max = math.max
 local format = string.format
@@ -242,11 +243,11 @@ function OmiChat.applyFormatOptions(info)
     local meta = info.meta
     local options = info.formatOptions
     local message = info.message
-    local dt = info.message:getDatetime()
-    local seed = tostring(dt)
+    local dt = tostring(info.message:getDatetime())
+    local seed = dt
 
     if options.showTimestamp then
-        local hour, minute, second = tostring(dt):match('(%d%d):(%d%d):(%d%d)')
+        local hour, minute, second = dt:match('(%d%d):(%d%d):(%d%d)')
 
         hour = tonumber(hour)
         minute = tonumber(minute)
@@ -283,6 +284,24 @@ function OmiChat.applyFormatOptions(info)
             stream = info.substitutions.stream,
             tag = getText(info.titleID),
         }, seed)
+    end
+
+    local icon = utils.interpolate(Option.FormatIcon, {
+        chatType = info.chatType,
+        stream = info.substitutions.stream,
+        icon = meta.icon,
+    }, seed)
+
+    if icon and getTexture(icon) then
+        local size = 14
+        if options.font == 'small' then
+            size = 12
+        elseif options.font == 'large' then
+            size = 16
+        end
+
+        info.substitutions.iconRaw = icon
+        info.substitutions.icon = string.format(' <IMAGE:%s,%d,%d> ', icon, size + 1, size)
     end
 
     if options.stripColors then
@@ -443,8 +462,10 @@ function OmiChat.buildMessageTextFromInfo(info)
             language = info.substitutions.language,
             languageRaw = info.substitutions.languageRaw,
             unknownLanguage = info.substitutions.unknownLanguage,
-            timestamp = info.timestamp or '',
-            tag = info.tag or '',
+            icon = info.substitutions.icon,
+            iconRaw = info.substitutions.iconRaw,
+            timestamp = info.timestamp,
+            tag = info.tag,
             content = utils.interpolate(info.format, info.substitutions, seed),
         }, seed),
     }
@@ -605,6 +626,7 @@ function OmiChat.decodeMessageTag(tag)
         language = decoded.ocLanguage,
         name = decoded.ocName,
         nameColor = utils.stringToColor(decoded.ocNameColor),
+        icon = decoded.ocIcon,
     }
 end
 
@@ -624,6 +646,7 @@ function OmiChat.encodeMessageTag(message)
         ocLanguage = OmiChat.getMessageLanguage(message),
         ocName = OmiChat.getNameInChat(author, chatType),
         ocNameColor = color and utils.colorToHexString(color) or nil,
+        ocIcon = OmiChat.getChatIcon(author),
     }
 
     if not success then

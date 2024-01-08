@@ -27,6 +27,7 @@ return OmiChat
 ---@class omichat.MessageMetadata
 ---@field language string? The roleplay language in which the message was sent.
 ---@field name string? The name of the author when this message was sent.
+---@field icon string? The user's icon when this message was sent.
 ---@field nameColor omichat.ColorTable? The name color of the author when this message was sent.
 ---@field suppressed boolean? Whether the overhead text for this message has already been suppressed.
 

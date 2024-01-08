@@ -2,6 +2,7 @@
 
 ---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Client'
+local utils = OmiChat.utils
 
 
 ---Dispatches a client command.
@@ -57,6 +58,16 @@ function OmiChat.requestDrawCard()
     return dispatchCommand('requestDrawCard')
 end
 
+---Executes the /reseticon command.
+---@param command string
+---@return boolean
+function OmiChat.requestResetIcon(command)
+    ---@type omichat.request.Command
+    local req = { command = command }
+
+    return dispatchCommand('requestResetIcon', req)
+end
+
 ---Executes the /resetlanguages command.
 ---@param command string
 ---@return boolean
@@ -99,6 +110,34 @@ function OmiChat.requestRollDice(sides)
     local req = { sides = sides }
 
     return dispatchCommand('requestRollDice', req)
+end
+
+---Executes the /seticon command.
+---@param command string
+---@return boolean
+function OmiChat.requestSetIcon(command)
+    -- need to process client-side for texture information
+    local args = utils.parseCommandArgs(command)
+    local username = args[1]
+    local icon = args[2]
+
+    if not username or not icon then
+        return false
+    end
+
+    if not getTexture(icon) then
+        local textureName = utils.getTextureNameFromIcon(icon)
+        if textureName and getTexture(textureName) then
+            command = table.concat { string.format('%q', username), textureName }
+        else
+            return false
+        end
+    end
+
+    ---@type omichat.request.Command
+    local req = { command = command }
+
+    return dispatchCommand('requestSetIcon', req)
 end
 
 ---Executes the /setlanguageslots command.

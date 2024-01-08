@@ -71,12 +71,15 @@ UI_EN = {
     UI_OmiChat_helptext_emotes = "Get a list of available chat emotes",
     UI_OmiChat_helptext_name = "To set your name in chat, use: /name Name. To reset your name, use /name. Example: /name Bob",
     UI_OmiChat_helptext_name_no_reset = "To set your name in chat, use: /name Name. Example: /name Bob",
-    UI_OmiChat_helptext_setname = "Set a player's name in chat. Example: /setname \"username\" name",
+    UI_OmiChat_helptext_setname = "Set a player's name in chat. Example: /setname username name",
     UI_OmiChat_helptext_resetname = "Reset a player's name in chat. Example: /resetname username",
     UI_OmiChat_helptext_clearnames = "Clears all player chat names. Use /clearnames",
-    UI_OmiChat_helptext_addlanguage = "Add to a player's roleplay language list. Example: /addlanguage \"username\" English",
+    UI_OmiChat_helptext_addlanguage = "Add to a player's roleplay language list. Example: /addlanguage username English",
     UI_OmiChat_helptext_resetlanguages = "Reset a player's roleplay languages. Example: /resetlanguages username",
-    UI_OmiChat_helptext_setlanguageslots = "Set the amount of roleplay language slots for a player. Slots must be in [1, 32]. Example: /setlanguageslots \"username\" 5",
+    UI_OmiChat_helptext_setlanguageslots = "Set the amount of roleplay language slots for a player. Slots must be in [1, 32]. Example: /setlanguageslots username 5",
+    UI_OmiChat_helptext_seticon = "Set a player's chat icon. Example: /seticon username crowbar",
+    UI_OmiChat_helptext_reseticon = "Reset a player's chat icon. Example: /reseticon username",
+    UI_OmiChat_helptext_iconinfo = "Get an icon's proper name, for use in format strings. Example: /iconinfo plushspiffo",
 
     --[[ Error Messages ]]--
     UI_OmiChat_error_invalid_color = "Input must be a hexadecimal color value or three numbers separated by commas or spaces.",
@@ -165,6 +168,15 @@ UI_EN = {
     -- %1 = a player's username, %2 = the chat name that was set with /setname
     UI_OmiChat_set_other_name_success = "Name has been set to '%2' for player '%1'.",
     UI_OmiChat_reset_other_name_success = "Name has been reset for player '%1'.",
+
+    -- %1 = a player's username
+    UI_OmiChat_set_other_icon_success = "Icon has been set for player '%1'.",
+    UI_OmiChat_reset_other_icon_success = "Icon has been reset for player '%1'.",
+
+    -- %1 = icon name, %2 = image tag, %3 = icon alias
+    UI_OmiChat_icon_info = "'%1' is the icon name for: %2",
+    UI_OmiChat_icon_info_unknown = "'%1' is not a known icon name.",
+    UI_OmiChat_icon_info_alias = "'%3' is an alias for '%1', the icon name for: %2",
 
     -- %1 = a player's username, %2 = the language
     UI_OmiChat_add_language_success = "Added roleplay language '%2' to player '%1'.",

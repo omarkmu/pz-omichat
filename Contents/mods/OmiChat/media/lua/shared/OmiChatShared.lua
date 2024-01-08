@@ -46,6 +46,7 @@ return OmiChat
 ---| 'languages'
 ---| 'languageSlots'
 ---| 'currentLanguage'
+---| 'icons'
 
 ---@alias omichat.CustomStreamName
 ---| 'whisper'
@@ -121,11 +122,12 @@ return OmiChat
 ---Global mod data.
 ---@class omichat.ModData
 ---@field version integer The current mod data version.
----@field nicknames table<string, string> Association of usernames to chat nicknames.
----@field nameColors table<string, string> Association of usernames to chat color strings.
----@field languages table<string, string[]> Association of usernames to roleplay languages.
----@field languageSlots table<string, integer> Association of usernames to roleplay language slots.
----@field currentLanguage table<string, string> Association of usernames to currently selected roleplay languages.
+---@field nicknames table<string, string> Map of usernames to chat nicknames.
+---@field nameColors table<string, string> Map of usernames to chat color strings.
+---@field icons table<string, string> Map of usernames to chat icons.
+---@field languages table<string, string[]> Map of usernames to roleplay languages.
+---@field languageSlots table<string, integer> Map of usernames to roleplay language slots.
+---@field currentLanguage table<string, string> Map of usernames to currently selected roleplay languages.
 
 ---Player mod data.
 ---@class omichat.PlayerModData

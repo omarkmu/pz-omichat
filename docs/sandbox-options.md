@@ -430,6 +430,13 @@ Options that define the string formats used for purposes other than overhead spe
 
 The format used for local [`/card`](#chatformatcard) message content.
 
+### FormatIcon
+`default → @($eq($stream card):Item_CardDeck;$eq($stream roll):Item_Dice;$has(@(say;shout;whisper;faction;safehouse;looc;general) $stream):$icon)`  
+`tokens → $chatType, $stream, $icon`
+
+The format used to determine the value of `$icon` in other formats.
+The value of `$icon` in this format string is the icon set with `/seticon`.
+
 ### FormatInfo
 `(blank by default)`  
 `tokens → $forename, $surname, $username, $name`
@@ -507,7 +514,7 @@ Defines the format used for overhead speech bubbles of [`/doquiet`](#chatformatd
 If blank, `/doquiet` messages will not display overhead.
 
 ### OverheadFormatFull
-`default → $set(_whisper $eq($stream whisper))@($_whisper:[Whispering)$if($languageRaw @($_whisper:( in);[In)&#32;$languageRaw)@($any($languageRaw $_whisper):]&#32;)$1`  
+`default → $set(_whisper $eq($stream whisper))$if($_whisper [Whispering)$if($languageRaw $ifelse($_whisper ( in) [In)&#32;$languageRaw)$if($any($languageRaw $_whisper) ]&#32;)$1`  
 `tokens → $1, $stream, $language, $languageRaw`
 
 The format used for the final overhead message, after all other formats have been applied.
@@ -569,7 +576,7 @@ The format used for `/admin` messages in chat.
 See also: [`ColorAdmin`](#coloradmin).
 
 ### ChatFormatCard
-`default → &#32;<IMAGE:Item_CardDeck&#44;15&#44;14> <SPACE> $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($gettext(UI_OmiChat_card_local $card)) <SPACE>))`  
+`default → $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($gettext(UI_OmiChat_card_local $card)) <SPACE>))`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $card, $language, $languageRaw`
 
 The format used for local `/card` messages in chat.
@@ -645,7 +652,7 @@ The format used for `/faction` messages in chat.
 See also: [`ColorFaction`](#colorfaction).
 
 ### ChatFormatFull
-`default → $if($neq($stream server) $timestamp)$tag$if($all($language $not($unknownLanguage)) [$language]&#32;<SPACE>&#32;)$content`  
+`default → $if($neq($stream server) $timestamp)$tag$if($all($language $not($unknownLanguage)) [$language]&#32;<SPACE>&#32;)$if($icon $icon (<SPACE> ))$content`  
 `tokens → $tag, $timestamp, $content, $chatType, $stream, $language, $languageRaw`
 
 The format used for the final chat message, after all other formats have been applied.
@@ -742,7 +749,7 @@ The format used for radio messages in chat.
 See also: [`ColorRadio`](#colorradio).
 
 ### ChatFormatRoll
-`default → &#32;<IMAGE:Item_Dice&#44;15&#44;14> <SPACE> $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($gettext(UI_OmiChat_roll_local $roll $sides)) <SPACE>))`  
+`default → $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($gettext(UI_OmiChat_roll_local $roll $sides)) <SPACE>))`  
 `tokens → $author, $authorRaw, $name, $nameRaw, $roll, $sides, $language, $languageRaw`
 
 The format used for local `/roll` messages in chat.

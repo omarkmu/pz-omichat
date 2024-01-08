@@ -262,6 +262,52 @@ OmiChat._commandStreams = {
         },
     },
     {
+        name = 'iconinfo',
+        command = '/iconinfo ',
+        omichat = {
+            isCommand = true,
+            helpText = 'UI_OmiChat_helptext_iconinfo',
+            isEnabled = canUseAdminCommands,
+            onUse = function(_, command)
+                command = utils.trim(command)
+                if getTexture(command) then
+                    local image = table.concat { ' <SPACE> <IMAGE:', command, ',15,14> ' }
+                    OmiChat.showInfoMessage(getText('UI_OmiChat_icon_info', command, image))
+                    return
+                end
+
+                local textureName = utils.getTextureNameFromIcon(command)
+                if not textureName or not getTexture(textureName) then
+                    OmiChat.showInfoMessage(getText('UI_OmiChat_icon_info_unknown', command))
+                    return
+                end
+
+                local image = table.concat { ' <SPACE> <IMAGE:', textureName, ',15,14> ' }
+                OmiChat.showInfoMessage(getText('UI_OmiChat_icon_info_alias', textureName, image, command))
+            end,
+        },
+    },
+    {
+        name = 'seticon',
+        command = '/seticon ',
+        omichat = {
+            isCommand = true,
+            helpText = 'UI_OmiChat_helptext_seticon',
+            isEnabled = canUseAdminCommands,
+            onUse = function(self, command)
+                if not OmiChat.requestSetIcon(command) then
+                    local args = utils.parseCommandArgs(command)
+                    local icon = args[2]
+                    if not args[1] or not icon then
+                        OmiChat.showInfoMessage(getText(self.omichat.helpText))
+                    else
+                        OmiChat.showInfoMessage(getText('UI_OmiChat_icon_info_unknown', icon))
+                    end
+                end
+            end,
+        },
+    },
+    {
         name = 'resetname',
         command = '/resetname ',
         omichat = {
@@ -270,6 +316,18 @@ OmiChat._commandStreams = {
             isEnabled = canUseAdminCommands,
             onUse = function(_, command)
                 OmiChat.requestResetName(command)
+            end,
+        },
+    },
+    {
+        name = 'reseticon',
+        command = '/reseticon ',
+        omichat = {
+            isCommand = true,
+            helpText = 'UI_OmiChat_helptext_reseticon',
+            isEnabled = canUseAdminCommands,
+            onUse = function(_, command)
+                OmiChat.requestResetIcon(command)
             end,
         },
     },
@@ -1330,11 +1388,9 @@ function OmiChat._onReceiveGlobalModData(key, newData)
     end
 
     local modData = OmiChat.getModData()
-    modData.nicknames = newData.nicknames
-    modData.nameColors = newData.nameColors
-    modData.languages = newData.languages
-    modData.languageSlots = newData.languageSlots
-    modData.currentLanguage = newData.currentLanguage
+    for k in pairs(newData) do
+        modData[k] = newData[k]
+    end
 end
 
 

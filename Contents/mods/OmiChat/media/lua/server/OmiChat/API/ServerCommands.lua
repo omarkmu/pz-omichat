@@ -46,6 +46,13 @@ end
 
 ---@param args omichat.request.ModDataUpdate
 ---@return boolean
+local function updateModDataIcon(args)
+    OmiChat.setChatIcon(args.target, args.value and tostring(args.value) or nil)
+    return true
+end
+
+---@param args omichat.request.ModDataUpdate
+---@return boolean
 ---@return string?
 local function updateModDataLanguage(args)
     if not args.value then
@@ -96,6 +103,7 @@ local modDataUpdateFunctions = {
     languages = updateModDataLanguage,
     languageSlots = updateModDataLanguageSlots,
     currentLanguage = updateModDataCurrentLanguage,
+    icons = updateModDataIcon,
 }
 
 
@@ -181,6 +189,31 @@ function OmiChat.Commands.requestDrawCard(player)
     end
 end
 
+---Handles the /reseticon command.
+---@param player IsoPlayer
+---@param args omichat.request.Command
+function OmiChat.Commands.requestResetIcon(player, args)
+    args = utils.parseCommandArgs(args.command)
+    local username = args[1]
+
+    local success = false
+    if username then
+        success = OmiChat.Commands.requestDataUpdate(player, {
+            target = username,
+            field = 'icons',
+            fromCommand = true,
+        })
+    end
+
+    if not success then
+        OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_reseticon')
+        return
+    end
+
+    username = utils.escapeRichText(username)
+    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_reset_other_icon_success', { username })
+end
+
 ---Handles the /resetlanguages command.
 ---@param player IsoPlayer
 ---@param args omichat.request.Command
@@ -204,33 +237,6 @@ function OmiChat.Commands.requestResetLanguages(player, args)
 
     username = utils.escapeRichText(username)
     OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_reset_other_languages_success', { username })
-end
-
----Handles the /setlanguageslots command.
----@param player IsoPlayer
----@param args omichat.request.Command
-function OmiChat.Commands.requestSetLanguageSlots(player, args)
-    args = utils.parseCommandArgs(args.command)
-    local username = args[1]
-    local slots = args[2]
-
-    local success = false
-    if username and slots then
-        success = OmiChat.Commands.requestDataUpdate(player, {
-            target = username,
-            field = 'languageSlots',
-            fromCommand = true,
-            value = slots,
-        })
-    end
-
-    if not success then
-        OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_setlanguageslots')
-        return
-    end
-
-    username = utils.escapeRichText(username)
-    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_set_language_slots_success', { username, slots })
 end
 
 ---Handles the /resetname command.
@@ -262,7 +268,7 @@ end
 ---@param player IsoPlayer
 ---@param args omichat.request.RollDice
 function OmiChat.Commands.requestRollDice(player, args)
-    local sides = args.sides and tonumber(args.sides)
+    local sides = tonumber(args.sides)
     if type(sides) ~= 'number' or sides < 1 or sides > 100 then
         OmiChat.sendTranslatedInfoMessage(player, 'UI_ServerOptionDesc_Roll')
         return
@@ -275,6 +281,60 @@ function OmiChat.Commands.requestRollDice(player, args)
         local name = OmiChat.getNameInChat(player:getUsername(), 'general') or player:getUsername()
         OmiChat.sendTranslatedServerMessage('UI_OmiChat_roll', { name, tostring(roll), tostring(sides) })
     end
+end
+
+---Handles the /seticon command.
+---@param player IsoPlayer
+---@param args omichat.request.Command
+function OmiChat.Commands.requestSetIcon(player, args)
+    args = utils.parseCommandArgs(args.command)
+    local username = args[1]
+    local icon = args[2]
+
+    local success = false
+    if username and icon then
+        success = OmiChat.Commands.requestDataUpdate(player, {
+            target = username,
+            field = 'icons',
+            value = icon,
+            fromCommand = true,
+        })
+    end
+
+    if not success then
+        OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_seticon')
+        return
+    end
+
+    username = utils.escapeRichText(username)
+    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_set_other_icon_success', { username })
+end
+
+---Handles the /setlanguageslots command.
+---@param player IsoPlayer
+---@param args omichat.request.Command
+function OmiChat.Commands.requestSetLanguageSlots(player, args)
+    args = utils.parseCommandArgs(args.command)
+    local username = args[1]
+    local slots = args[2]
+
+    local success = false
+    if username and slots then
+        success = OmiChat.Commands.requestDataUpdate(player, {
+            target = username,
+            field = 'languageSlots',
+            fromCommand = true,
+            value = slots,
+        })
+    end
+
+    if not success then
+        OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_setlanguageslots')
+        return
+    end
+
+    username = utils.escapeRichText(username)
+    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_set_language_slots_success', { username, slots })
 end
 
 ---Handles the /setname command.
