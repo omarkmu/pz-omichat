@@ -36,7 +36,7 @@ local function useBasicChat(stream, command, language)
 
     local ctx = stream.omichat.context
     local streamName = stream.omichat.streamName or stream.name
-    command = OmiChat.formatOverheadText(command, streamName, language)
+    command = OmiChat.formatForChat(command, streamName, language)
 
     if ctx and ctx.ocProcess then
         local result = ctx.ocProcess(command)
@@ -195,6 +195,7 @@ OmiChat._vanillaStreamConfigs = {
     private = {
         allowEmotes = false,
         commandType = 'chat',
+        streamName = 'private',
         isEnabled = isBasicChatEnabled,
         onUse = useBasicChat,
         context = {

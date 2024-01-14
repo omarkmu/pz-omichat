@@ -1084,6 +1084,10 @@ OmiChat._transformers = {
                 info.message:setOverHeadSpeech(false)
             end
 
+            if isAdmin() and OmiChat.getAdminOption('know_all_languages') then
+                return
+            end
+
             local player = getSpecificPlayer(0)
             local username = player and player:getUsername()
             if not isRadio and username and info.author == username then
@@ -1154,6 +1158,10 @@ OmiChat._transformers = {
 
             -- default ranges are existing chat ranges, so this avoids unnecessary work
             if range == chatRange then
+                return
+            end
+
+            if isAdmin() and OmiChat.getAdminOption('ignore_message_range') then
                 return
             end
 

@@ -62,6 +62,15 @@ local function getLines(text, maxLen)
 end
 
 
+---Event handler for toggling admin options.
+---@param target omichat.ISChat
+---@param option omichat.AdminOption
+---@diagnostic disable-next-line: unused-local
+function ISChat.onAdminOptionToggle(target, option)
+    local value = OmiChat.getAdminOption(option)
+    OmiChat.setAdminOption(option, not value)
+end
+
 ---Event handler for color picker selection.
 ---@param target omichat.ISChat
 ---@param button table

@@ -424,14 +424,21 @@ For the purpose of this predicate, `$message` is the unaltered input.
 ## Component Formats
 Options that define the string formats used for purposes other than overhead speech bubbles and chat messages.
 
+### FormatAdminIcon
+`default → Item_Sledgehamer`  
+`tokens → $username`
+
+The format used to determine the value of `$adminIcon` in the [`FormatIcon`](#formaticon) format.
+This is only used in that format string when the player is an admin with the relevant option enabled.
+
 ### FormatCard
 `default → draws $card`  
 `tokens → $card`
 
-The format used for local [`/card`](#chatformatcard) message content.
+The format used for local [`/card`](#chatformatcard) overhead message content.
 
 ### FormatIcon
-`default → @($eq($stream card):Item_CardDeck;$eq($stream roll):Item_Dice;$has(@(say;shout;whisper;faction;safehouse;looc;general) $stream):$icon)`  
+`default → @($eq($stream card):Item_CardDeck;$eq($stream roll):Item_Dice;$has(@(say;shout;whisper;faction;safehouse;looc;general) $stream):@($adminIcon;$icon))`  
 `tokens → $chatType, $stream, $icon`
 
 The format used to determine the value of `$icon` in other formats.
@@ -463,7 +470,7 @@ If `$name` is specified, it is a name that was set with [`/name`](./sandbox-opti
 `default → rolls a $roll on a $sides-sided die`  
 `tokens → $roll, $sides`
 
-The format used for local [`/roll`](#chatformatroll) message content.
+The format used for local [`/roll`](#chatformatroll) overhead message content.
 
 ### FormatTag
 `default → [$tag]$if($eq($chatType server) :&#32;<SPACE>&#32;)`  

@@ -28,6 +28,7 @@ return OmiChat
 ---@field language string? The roleplay language in which the message was sent.
 ---@field name string? The name of the author when this message was sent.
 ---@field icon string? The user's icon when this message was sent.
+---@field adminIcon string? The admin icon when this message was sent, if it was enabled.
 ---@field nameColor omichat.ColorTable? The name color of the author when this message was sent.
 ---@field suppressed boolean? Whether the overhead text for this message has already been suppressed.
 
@@ -124,6 +125,9 @@ return OmiChat
 ---@field retainChatInput boolean Whether to retain chat input for chat streams.
 ---@field retainRPInput boolean Whether to retain chat input for roleplay streams (/me).
 ---@field retainOtherInput boolean Whether to retain other chat input.
+---@field adminShowIcon boolean Whether the admin icon should display in chat.
+---@field adminKnowLanguages boolean Whether all languages should be treated as known.
+---@field adminIgnoreRange boolean Whether message range should be ignored.
 
 ---Description of a chat tab object.
 ---@class omichat.ChatTab : ISRichTextPanel

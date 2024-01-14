@@ -78,6 +78,7 @@ Sandbox_EN = {
     Sandbox_OCFormatTag = "Chat Tag Format",
     Sandbox_OCFormatTimestamp = "Chat Timestamp Format",
     Sandbox_OCFormatIcon = "Icon Format",
+    Sandbox_OCFormatAdminIcon = "Admin Icon Format",
 
     --[[ Overhead Message Formats ]]--
     Sandbox_OCOverheadFormatCard = "/card Overhead Format",

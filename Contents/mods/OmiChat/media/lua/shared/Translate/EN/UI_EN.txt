@@ -157,6 +157,11 @@ UI_EN = {
     UI_OmiChat_context_set_custom_sneakcallouts = "Customize sneak callouts",
     UI_OmiChat_context_set_custom_callouts_desc = "Enter one 'Q' callout per line, or nothing to reset.",
 
+    UI_OmiChat_context_admin = "Admin options",
+    UI_OmiChat_context_admin_show_icon = "Display chat icon",
+    UI_OmiChat_context_admin_know_all_languages = "Understand all languages",
+    UI_OmiChat_context_admin_ignore_message_range = "Ignore message range",
+
     --[[ Commands ]]--
     -- %1 = the name that the player provided to /name
     UI_OmiChat_set_name_success = "Your name is now '%1'.",

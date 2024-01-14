@@ -69,7 +69,7 @@ function OmiChat.Commands.reportDrawCard(args)
         content,
     })
 
-    processSayMessage(OmiChat.formatOverheadText(content, 'card', language))
+    processSayMessage(OmiChat.formatForChat(content, 'card', language))
 end
 
 ---Reports the results of a dice roll.
@@ -88,7 +88,7 @@ function OmiChat.Commands.reportRoll(args)
     end
 
     local formatted = OmiChat.getFormatter('roll'):format(content)
-    processSayMessage(OmiChat.formatOverheadText(formatted, 'roll', language))
+    processSayMessage(OmiChat.formatForChat(formatted, 'roll', language))
 end
 
 ---Adds an info message for the local player.

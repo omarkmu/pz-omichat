@@ -153,6 +153,10 @@ Configuration._formatters = {
         formatID = 54,
         overheadFormatOpt = 'OverheadFormatFull',
     },
+    {
+        name = 'adminIcon',
+        formatID = 55,
+    },
 }
 
 

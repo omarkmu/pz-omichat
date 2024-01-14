@@ -31,6 +31,35 @@ local _ChatMessage = __classmetatables[ChatMessage.class].__index
 local _ServerChatMessage = __classmetatables[ServerChatMessage.class].__index
 
 
+---Adds context menu options for admin controls.
+---@param context ISContextMenu
+---@param beforeOption string
+local function addAdminOptions(context, beforeOption)
+    if not isAdmin() then
+        return
+    end
+
+    ---@type omichat.AdminOption[]
+    local options = {
+        'show_icon',
+        'know_all_languages',
+        'ignore_message_range',
+    }
+
+    local adminOptionName = getText('UI_OmiChat_context_admin')
+    local adminOption = context:insertOptionBefore(beforeOption, adminOptionName, ISChat.instance)
+
+    local subMenu = context:getNew(context)
+    context:addSubMenu(adminOption, subMenu)
+
+    for i = 1, #options do
+        local option = options[i]
+        local name = getText('UI_OmiChat_context_admin_' .. option)
+        local opt = subMenu:addOption(name, ISChat.instance, ISChat.onAdminOptionToggle, option)
+        subMenu:setOptionChecked(opt, OmiChat.getAdminOption(option))
+    end
+end
+
 ---Adds context menu options for chat colors.
 ---@param context ISContextMenu
 ---@param beforeOption string
@@ -225,7 +254,7 @@ local function addRetainOptions(context, beforeOption)
     end
 end
 
----Determins whether the enable/disable signed language emotes option should display.
+---Determines whether the enable/disable signed language emotes option should display.
 ---@return boolean
 local function shouldShowSignEmoteOption()
     local languages = OmiChat.getRoleplayLanguages()
@@ -558,6 +587,7 @@ function ISChat:onGearButtonClick()
 
     addCustomCalloutOptions(context, subMenuName)
     addColorOptions(context, subMenuName)
+    addAdminOptions(context, subMenuName)
     addRetainOptions(context, subMenuName)
     addLanguageOptions(context, subMenuName)
 end

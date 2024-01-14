@@ -203,8 +203,11 @@ option OmiChat.FormatCard
 option OmiChat.FormatRoll
 { type = string, default = rolls a $roll on a $sides-sided die, page = OmiChat, translation = OCFormatRoll, }
 
+option OmiChat.FormatAdminIcon
+{ type = string, default = Item_Sledgehamer, page = OmiChat, translation = OCFormatAdminIcon, }
+
 option OmiChat.FormatIcon
-{ type = string, default = @($eq($stream card):Item_CardDeck;$eq($stream roll):Item_Dice;$has(@(say;shout;whisper;faction;safehouse;looc;general) $stream):$icon), page = OmiChat, translation = OCFormatIcon, }
+{ type = string, default = @($eq($stream card):Item_CardDeck;$eq($stream roll):Item_Dice;$has(@(say;shout;whisper;faction;safehouse;looc;general) $stream):@($adminIcon;$icon)), page = OmiChat, translation = OCFormatIcon, }
 
 
 /* Overhead Message Formats */

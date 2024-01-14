@@ -67,6 +67,12 @@ return OmiChat
 ---| 'sneakcallout'
 ---| 'language'
 ---| 'overhead'
+---| 'adminIcon'
+
+---@alias omichat.AdminOption
+---| 'show_icon'
+---| 'know_all_languages'
+---| 'ignore_message_range'
 
 
 ---@class omichat.LanguageInfoStore

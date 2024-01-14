@@ -22,6 +22,21 @@ OmiChat._modDataVersion = 1
 OmiChat._playerModDataVersion = 1
 
 
+---Returns the admin chat icon for a given username.
+---@param username string
+---@return string?
+function OmiChat.getAdminChatIcon(username)
+    if not username then
+        return
+    end
+
+    local tokens = {
+        username = username,
+    }
+
+    return utils.interpolate(Option.FormatAdminIcon, tokens, username)
+end
+
 ---Returns the chat icon for a given username.
 ---@param username string
 ---@return string?

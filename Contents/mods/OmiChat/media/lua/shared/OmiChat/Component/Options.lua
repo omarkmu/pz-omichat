@@ -69,6 +69,7 @@ local floor = math.floor
 ---@field FormatTag string
 ---@field FormatTimestamp string
 ---@field FormatIcon string
+---@field FormatAdminIcon string
 ---@field OverheadFormatFull string
 ---@field OverheadFormatCard string
 ---@field OverheadFormatRoll string

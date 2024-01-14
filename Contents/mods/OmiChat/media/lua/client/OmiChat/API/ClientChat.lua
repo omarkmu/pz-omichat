@@ -290,6 +290,7 @@ function OmiChat.applyFormatOptions(info)
         chatType = info.chatType,
         stream = info.substitutions.stream,
         icon = meta.icon,
+        adminIcon = meta.adminIcon,
     }, seed)
 
     if icon and getTexture(icon) then
@@ -627,6 +628,7 @@ function OmiChat.decodeMessageTag(tag)
         name = decoded.ocName,
         nameColor = utils.stringToColor(decoded.ocNameColor),
         icon = decoded.ocIcon,
+        adminIcon = decoded.ocAdminIcon,
     }
 end
 
@@ -641,12 +643,14 @@ function OmiChat.encodeMessageTag(message)
 
     local color = OmiChat.getNameColorInChat(author)
     local chatType = OmiChat.getMessageChatType(message)
+    local useAdminIcon = OmiChat.getFormatter('adminIcon'):isMatch(message:getText())
     local success, encoded = utils.json.tryEncode {
         ocSuppressed = false,
         ocLanguage = OmiChat.getMessageLanguage(message),
         ocName = OmiChat.getNameInChat(author, chatType),
         ocNameColor = color and utils.colorToHexString(color) or nil,
         ocIcon = OmiChat.getChatIcon(author),
+        ocAdminIcon = useAdminIcon and OmiChat.getAdminChatIcon(author) or nil,
     }
 
     if not success then
@@ -656,19 +660,24 @@ function OmiChat.encodeMessageTag(message)
     return encoded
 end
 
----Formats overhead text in the full overhead format.
+---Formats text in the full overhead format.
 ---@param text string
 ---@param stream string
 ---@param language string?
 ---@return string
-function OmiChat.formatOverheadText(text, stream, language)
+function OmiChat.formatForChat(text, stream, language)
     if #utils.trim(text) == 0 then
         -- avoid empty messages
         return text
     end
 
-    local formatter = OmiChat.getFormatter('overhead')
-    text = formatter:wrap(text)
+    if isAdmin() and OmiChat.getAdminOption('show_icon') then
+        local adminIconFormatter = OmiChat.getFormatter('adminIcon')
+        text = adminIconFormatter:wrap(text)
+    end
+
+    local overheadFormatter = OmiChat.getFormatter('overhead')
+    text = overheadFormatter:wrap(text)
 
     local tokens = {
         text,
@@ -677,8 +686,8 @@ function OmiChat.formatOverheadText(text, stream, language)
         language = language and getTextOrNull('UI_OmiChat_Language_' .. language) or language,
     }
 
-    local formatted = utils.replaceEntities(utils.interpolate(formatter:getFormatString(), tokens))
-    if not formatter:isMatch(formatted) then
+    local formatted = utils.replaceEntities(utils.interpolate(overheadFormatter:getFormatString(), tokens))
+    if not overheadFormatter:isMatch(formatted) then
         return text
     end
 
