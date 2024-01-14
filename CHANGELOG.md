@@ -1,3 +1,24 @@
+# 0.5.0
+- Added roleplay languages and associated options
+- Added `/addlanguage`, `/resetlanguages`, and `/setlanguageslots` admin commands
+- Added final overhead chat format
+- Added caching for interpolators
+- Added support for chat icons, with `FormatIcon` format string & `/seticon`, `/reseticon`, and `/iconinfo` admin commands
+- Added admin chat menu with options for displaying an icon in chat, understanding all languages, and ignoring message ranges
+- Added support for randomization functions in format strings
+- Improved `/card` messages for non-English languages
+- Improved prevention of empty messages
+- Custom commands will now be suggested
+- Messages that shouldn't show over the radio are now hidden overhead too
+- Whisper messages now display a `[Whispering]` prefix overhead by default
+- `/card` and `/roll` messages will no longer use translations in overhead text by default
+    - This is to avoid invisible text for players using in-game languages with different fonts.
+    They will still be translated in chat.
+- RP messages (e.g., `/me`) will now use angle brackets instead of guillemets in overhead text by default
+    - This is for the same reason as the above; guillemets are invisible overhead for some languages (e.g., Korean).
+    They will still display with guillemets in chat, for supported languages.
+- MetaFormatter now requires an explicit ID
+
 # 0.4.1
 - Added translation for RP chat format
 - Added Korean translations (thank you to 우로!)
@@ -9,7 +30,7 @@
 - Added retain command options for players
 - `/meloud` and `/doloud` commands can now attract zombies
 - Client dispatch API functions no longer accept a player argument
-- Message tags and player preferences now use JSON
+- Message metadata tags and player preferences now use JSON
 - Arbitrary commands will now only suggest usernames to players with an access level
 - `/pm` command will no longer suggest the player's own username
 - Fixed command suggester suggesting commands unavailable in the current chat tab
