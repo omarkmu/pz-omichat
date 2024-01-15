@@ -3,12 +3,14 @@
 Numeric options that define limits for various functionality.
 
 ### CustomShoutMaxLength
-`default → 30, minimum → 1, maximum → 200`
+**Default:** `30`  
+**Minimum:** `1`  
+**Maximum:** `200`  
 
 The maximum length for individual custom [shouts](./feature-flags.md#enablecustomshouts) and [sneak shouts](./feature-flags.md#enablecustomsneakshouts).
 
 ### MinimumCommandAccessLevel
-`default → 16`
+**Default:** `16`  
 
 The minimum access level needed to execute admin commands such as `/setname`.
 
@@ -20,7 +22,9 @@ The minimum access level needed to execute admin commands such as `/setname`.
 - Player: 1
 
 ### MaximumCustomShouts
-`default → 10, minimum → 1, maximum → 20`
+**Default:** `10`  
+**Minimum:** `1`  
+**Maximum:** `20`  
 
 The maximum number of custom [shouts](./feature-flags.md#enablecustomshouts) and [sneak shouts](./feature-flags.md#enablecustomsneakshouts) that players are allowed to define.
 

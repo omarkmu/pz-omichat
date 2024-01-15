@@ -5,7 +5,7 @@ Compatibility feature flags allow server operators to enable or disable compatib
 As of now, there is only one such flag.
 
 ### EnableCompatTAD
-`default → true`
+**Default:** `true`  
 
 Enables the compatibility patch for [True Actions Act 3 - Dancing](https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556).
 

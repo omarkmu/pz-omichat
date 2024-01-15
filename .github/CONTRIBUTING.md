@@ -14,7 +14,7 @@ There are a few different ways to contribute to the mod:
 
 ## New contributors
 
-If you're not familiar with the project, check out the [README](../README.md). If you're totally new to contributing to GitHub repositories, here are some resources:
+If you're not familiar with the project, check out the [README](../docs/README.md). If you're totally new to contributing to GitHub repositories, here are some resources:
 
 - [Set up Git](https://docs.github.com/en/get-started/quickstart/set-up-git)
 - [GitHub flow](https://docs.github.com/en/get-started/quickstart/github-flow)
