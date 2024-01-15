@@ -14,22 +14,22 @@ The vast majority of the features listed below can be configured or completely d
 
 - Customization of names, timestamps, all chat types, and more via powerful chat [formats](./format-strings/index.md)
 - Chat color customization
-- Name color [customization](./sandbox-options/index.md#enablesetnamecolor)
-- Speech bubble color [customization](./sandbox-options/index.md#enablesetspeechcolor)
-- Callout [customization](./sandbox-options/index.md#enablecustomshouts)
-- Character naming with [`/name`](./sandbox-options/index.md#enablesetname)
-- Display of chat names in [menus](./sandbox-options/index.md#formatmenuname) (Trading, Medical Check)
-- Local [`/whisper`](./sandbox-options/index.md#chatformatwhisper) chat
-- Local [`/card`](./sandbox-options/index.md#chatformatcard) and [`/roll`](./sandbox-options/index.md#chatformatroll)
-- Roleplay descriptions with [`/me`](./sandbox-options/index.md#chatformatme) and [`/do`](./sandbox-options/index.md#chatformatdo)
+- Name color [customization](./sandbox-options/feature-flags.md#enablesetnamecolor)
+- Speech bubble color [customization](./sandbox-options/feature-flags.md#enablesetspeechcolor)
+- Callout [customization](./sandbox-options/feature-flags.md#enablecustomshouts)
+- Character naming with [`/name`](./sandbox-options/feature-flags.md#enablesetname)
+- Display of chat names in [menus](./sandbox-options/component-formats.md#formatmenuname) (Trading, Medical Check)
+- Local [`/whisper`](./sandbox-options/chat-formats.md#chatformatwhisper) chat
+- Local [`/card`](./sandbox-options/chat-formats.md#chatformatcard) and [`/roll`](./sandbox-options/chat-formats.md#chatformatroll)
+- Roleplay descriptions with [`/me`](./sandbox-options/chat-formats.md#chatformatme) and [`/do`](./sandbox-options/chat-formats.md#chatformatdo)
 - Versions of `/me` and `/do` with larger and smaller ranges (`/mequiet`, `/meloud`, `/doquiet`, `/doloud`)
-- [Icon picker](./sandbox-options/index.md#enableiconpicker) (off by default)
+- [Icon picker](./sandbox-options/feature-flags.md#enableiconpicker) (off by default)
 - Text suggestion box
 - Emote animation [shortcuts](./user-guide/emotes.md) (.clap, .salute, .surrrender, etc.)
-- Roleplay [languages](./sandbox-options/index.md#languages)
-- Compatibility with [True Actions Act 3 - Dancing](https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556) with [`/dance`](./sandbox-options/index.md#enablecompattad)
-- Chat range [options](./sandbox-options/index.md#ranges)
-- Info text [option](./sandbox-options/index.md#formatinfo)
+- Roleplay [languages](./sandbox-options/languages.md)
+- Compatibility with [True Actions Act 3 - Dancing](https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556) with [`/dance`](./sandbox-options/compatibility-feature-flags.md#enablecompattad)
+- Chat range [options](./sandbox-options/ranges.md)
+- Info text [option](./sandbox-options/component-formats.md#formatinfo)
 - API for extension by other mods
 
 ## Credits
