@@ -8,11 +8,11 @@ With the exception of the roleplay language settings, these settings will persis
 ## Basic Settings
 
 The **enable/disable name colors** option allows players to toggle the appearance of name colors in their chat.
-This will only display if either the [`EnableSpeechColorAsDefaultNameColor`](../sandbox-options/index.md#enablespeechcolorasdefaultnamecolor) option or the [`EnableSetNameColor`](../sandbox-options/index.md#enablesetnamecolor) option is enabled.
+This will only display if either the [`EnableSpeechColorAsDefaultNameColor`](../sandbox-options/feature-flags.md#enablespeechcolorasdefaultnamecolor) option or the [`EnableSetNameColor`](../sandbox-options/feature-flags.md#enablesetnamecolor) option is enabled.
 
 **Enable/disable suggestions** can be used to control whether suggestions are offered based on chat box input.
 
-The **enable/disable sign language emotes** option is only shown when the player knows a [signed language](../sandbox-options/index.md#signedlanguages). This controls whether a random [emote](./emotes.md) is played whenever they send a message.
+The **enable/disable sign language emotes** option is only shown when the player knows a [signed language](../sandbox-options/languages.md#signedlanguages). This controls whether a random [emote](./emotes.md) is played whenever they send a message.
 
 The **retain commands** submenu can be used to determine whether certain commands are “retained,” so that they are set as the initial input the next time the chat is used.
 The submenu contains three options, for “Chat,” “RP,” and “Other.”
@@ -21,7 +21,7 @@ The first option refers to streams such as `/say`, the second to [`/me`](../sand
 ## Callout Customization
 
 The **customize callouts** and **customize sneak callouts** options allow players to set custom messages for when they use callouts (bound to the `Q` key, by default).
-These rely on the [`EnableCustomShouts`](../sandbox-options/index.md#enablecustomshouts) and [`EnableCustomSneakShouts`](../sandbox-options/index.md#enablecustomsneakshouts) options, respectively.
+These rely on the [`EnableCustomShouts`](../sandbox-options/feature-flags.md#enablecustomshouts) and [`EnableCustomSneakShouts`](../sandbox-options/feature-flags.md#enablecustomsneakshouts) options, respectively.
 
 ![The custom callout input window](../images/callout-example-1.png)
 
@@ -44,6 +44,6 @@ Players will only be able to add new languages from this menu if they have more 
 
 From this menu, players can select the roleplay language that they want to use in chat.
 Languages other than the default language will display an indicator for the language.
-Players with characters that don't speak the language will see a message indicating that they don't understand it.
+Players with characters that don't speak the language will see a chat message indicating that they don't understand it.
 
 ![Language selection menu](../images/language-menu.png)

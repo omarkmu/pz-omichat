@@ -1,6 +1,6 @@
 # Emotes
 
-The `EnableEmotes` [option](../sandbox-options/index.md#enableemotes) allows players to use emote shortcuts in the form of `.emote` in local chats.
+The `EnableEmotes` [option](../sandbox-options/feature-flags.md#enableemotes) allows players to use emote shortcuts in the form of `.emote` in local chats.
 These emote shortcuts cause a player's character to play the animation associated with the emote, but they don't show up in the chat message.
 
 For example, sending the message `hello! .hi` would result in the following:

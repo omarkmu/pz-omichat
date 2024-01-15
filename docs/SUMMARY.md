@@ -6,6 +6,7 @@
 
 - [Emotes](user-guide/emotes.md)
 - [Chat Settings](user-guide/chat-settings.md)
+- [Admin Utilities](user-guide/admins.md)
 
 # Reference Guide
 
