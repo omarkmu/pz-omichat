@@ -1,27 +1,27 @@
 # Format Strings
 
-Various [sandbox options](./sandbox-options.md) use a format string style designed to be flexible enough to satisfy most needs.
-These format strings can utilize a number of features, which are outlined in this document.
+Various [sandbox options](../sandbox-options/index.md) use a format string style designed to be flexible enough to satisfy most needs.
+These format strings can utilize a number of features, which are outlined in this section of the reference guide.
 
 
 ## Tokens
 **Tokens** are placeholders for values that will be replaced when the format string is used.
 They are specified with a dollar sign followed by the name of the token (e.g., `$author`).
 
-For more information, see [Tokens](./format-string-tokens.md).
+For more information, see [Tokens](./tokens.md).
 
 
 ## Functions
 **Functions** are used to include logic in format strings.
 They are specified with a dollar sign followed by the name of the function and an argument list enclosed in parentheses (e.g., `$upper($name)`).
 
-For more information, see [Functions](./format-string-functions.md).
+For more information, see [Functions](./functions.md).
 
 
 ## At-Maps
 **At-maps** are multimaps which can be used for logic branches and lists.
 
-For more information, see [At-Maps](./format-string-at-maps.md).
+For more information, see [At-Maps](./at-maps.md).
 
 
 ## Character Escapes

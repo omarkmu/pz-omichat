@@ -1,0 +1,14 @@
+[book]
+title = "OmiChat"
+authors = ["Omar M."]
+description = "Documentation for the OmiChat Project Zomboid mod."
+language = "en"
+multilingual = false
+src = "docs"
+
+[build]
+build-dir = "guide"
+
+[output.html]
+git-repository-url = "https://github.com/omarkmu/pz-omichat"
+site-url = "/pz-omichat/"

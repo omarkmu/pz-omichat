@@ -1,14 +1,14 @@
 # Functions
 
-Advanced users have access to various [format string](./format-strings.md) functions.
+Advanced users have access to various [format string](./index.md) functions.
 These are specified using a dollar sign before the function name and a set of parentheses to enclose arguments (e.g., `$pi()`).
 If invalid inputs are given, the convention of these functions is to return the empty string.
 
 Functions can accept an arbitrary number of arguments, which are delimited by spaces.
 These arguments may be tokens, text, or the results of other functions.
-Unlike [tokens](./format-string-tokens.md), functions are case-insensitive.
+Unlike [tokens](./tokens.md), functions are case-insensitive.
 
-Note that functions that return multiple values return them as an [at-map](./format-string-at-maps.md).
+Note that functions that return multiple values return them as an [at-map](./at-maps.md).
 Individual return values can be accessed using the `$nthvalue(o n)` function.
 
 To include a literal space or multiple words in a single argument, text within functions can be enclosed within parentheses.
@@ -18,7 +18,7 @@ Escapes will still function within parentheses, but they are only necessary to e
 > `$reverse( ($)$() )` → `()`  
 > `$len(($@-sign))` → `6`
 
-Other mods can [extend](./format-string-extensions.md) the list of available functions using the API.
+Other mods can [extend](./extensions.md) the list of available functions using the API.
 
 ## Set Function
 
@@ -119,7 +119,7 @@ Functions that do not are noted as such.
 
 ## At-Map Functions
 
-These functions are related to working with [at-maps](./format-string-at-maps.md).
+These functions are related to working with [at-maps](./at-maps.md).
 
 - `$list(...)`: Creates an at-map with keys from `1` to `N`, where `N` is the number of provided arguments. If a single argument is provided and it is an at-map, its values will be used. Otherwise, the list is made up of all provided arguments.
 - `$map(funcName o ...)`: Maps elements of the at-map `o` onto the function `funcName`. Additional arguments will be passed to the map function as extra arguments.
