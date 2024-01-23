@@ -25,3 +25,10 @@ There are various commands to control player names, languages, and icons.
 | `/addlanguage <username> <language>` | Adds a known language to a player. `language` must be one of the languages specified in [`AvailableLanguages`](../sandbox-options/languages.md#availablelanguages). |
 | `/resetlanguages <username>` | Sets the known languages for a player to only the default language. |
 | `/setlanguageslots <username> <amount>` | Sets the [language slots](../sandbox-options/languages.md#languageslots) for a player. `amount` must be in `[1, 32]`. |
+
+## Mini Scoreboard
+
+The “mini scoreboard” included in the admin menu has been updated to respect the [`FormatMenuName`](../sandbox-options/component-formats.md#formatmenuname) sandbox option.
+By default, this will display players' chat names (as determined by [`FormatName`](../sandbox-options/component-formats.md#formatname)), as well as their usernames, in the format `Username [Name]`. Using the mini scoreboard, admins can determine the username associated with a chat name.
+
+![The mini scoreboard](../images/mini-scoreboard.png)
