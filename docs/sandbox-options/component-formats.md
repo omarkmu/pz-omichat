@@ -1,6 +1,6 @@
 # Component Formats
 
-Options that define the string formats used for purposes other than overhead speech bubbles and chat messages.
+These [options](./index.md) define string formats used in other format strings, or for purposes other than speech bubbles and chat messages.
 
 ### FormatAdminIcon
 **Default:** `Item_Sledgehamer` [sic]  
@@ -9,9 +9,9 @@ Options that define the string formats used for purposes other than overhead spe
 The format used to determine the value of `$adminIcon` in the [`FormatIcon`](#formaticon) format.
 
 The `/iconinfo` [command](../user-guide/admins.md#commands) can be used to determine an icon name for this format.
-
 It may also be helpful to enable the [icon picker](../sandbox-options/feature-flags.md#enableiconpicker) to look through possible icons.
-**Note:** The icon names used when clicking icons in the icon picker are **not** valid inputs for this format.
+
+**Note: The icon names used when clicking icons in the icon picker are **not** valid inputs for this format.**
 However, they can be used with `/iconinfo` to determine the icon name.
 
 ### FormatCard
@@ -25,9 +25,9 @@ The format used for local [`/card`](./chat-formats.md#chatformatcard) overhead m
 **Tokens:** `$chatType, $stream, $icon, $adminIcon`  
 
 The format used to determine the value of `$icon` in other formats.
-The value of `$icon` in this format string is the icon set with `/seticon`.
+The value of `$icon` in this format string is the icon set with [`/seticon`](../user-guide/admins.md#commands).
 
-The `$adminIcon` token is only populated when the player is an admin with the relevant option enabled (see [Admin Utilities](../user-guide/admins.md#admin-menu)).
+The `$adminIcon` token is only populated when the player is an admin with the relevant [option](../user-guide/admins.md#admin-menu) enabled.
 The icon used is determined by [`FormatAdminIcon`](#formatadminicon).
 
 ### FormatInfo

@@ -28,7 +28,8 @@ There are various commands to control player names, languages, and icons.
 
 ## Mini Scoreboard
 
-The “mini scoreboard” included in the admin menu has been updated to respect the [`FormatMenuName`](../sandbox-options/component-formats.md#formatmenuname) sandbox option.
-By default, this will display players' chat names (as determined by [`FormatName`](../sandbox-options/component-formats.md#formatname)), as well as their usernames, in the format `Username [Name]`. Using the mini scoreboard, admins can determine the username associated with a chat name.
+The “mini scoreboard” included in the admin menu will respect the [`FormatMenuName`](../sandbox-options/component-formats.md#formatmenuname) sandbox option.
+By default, this will display players' chat names (as determined by [`FormatName`](../sandbox-options/component-formats.md#formatname)) and usernames, in the format `Username [Name]`.
+Admins can use this to determine the username associated with a chat name.
 
 ![The mini scoreboard](../images/mini-scoreboard.png)

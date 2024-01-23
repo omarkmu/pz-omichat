@@ -8,7 +8,7 @@ Functions can accept an arbitrary number of arguments, which are delimited by sp
 These arguments may be tokens, text, or the results of other functions.
 Unlike [tokens](./tokens.md), functions are case-insensitive.
 
-Note that functions that return multiple values return them as an [at-map](./at-maps.md).
+If a function returns multiple values, it will return them as an [at-map](./at-maps.md).
 Individual return values can be accessed using the `$nthvalue(o n)` function.
 
 To include a literal space or multiple words in a single argument, text within functions can be enclosed within parentheses.
@@ -33,47 +33,47 @@ To avoid collisions with tokens that may be added in the future, however, custom
 
 | Function | Description |
 | -------- | ----------- |
-| `$str(s)` | Converts given arguments into a single string. |
+| `$byte(s i j)` | Returns a list of character codes in `s`, from indices `i` (default `1`) to `j` (default `i`). |
+| `$capitalize(s)` | Converts the first character in `s` to its uppercase counterpart. |
+| `$char(...)` | Returns a string made up of the characters with the integer character codes passed as arguments. |
+| `$concat(...)` | Combines provided arguments into one string. |
+| `$concats(separator ...)` | Combines provided arguments into one string, using `separator` as a separator. |
+| `$contains(this other)` | Returns `true` if `this` contains `other`. Otherwise, returns the empty string. |
+| `$endswith()` | Returns `true` if `this` ends with `other`. Otherwise, returns the empty string. |
+| `$first(s)` | Returns the first character of a given string. |
+| `$gsub(s pattern repl n)` | Replaces the first `n` copies of the pattern `pattern` in `s` with `repl`. Returns the result string, the number of matches that occurred, and any match groups that were captured. This behaves similarly to its [Lua counterpart](https://www.lua.org/manual/5.1/manual.html#pdf). |
+| `$index(s i default)` | Returns the character at index `i` in `s`, or `default` if there is no such index. |
+| `$last(s)` | Returns the last character of a given string. |
+| `$len(s)` | Returns the length of `s`. |
 | `$lower(s)` | Converts given arguments into a lowercase string. |
-| `$upper(s)` | Converts given arguments into an uppercase string. |
+| `$match(s pattern init)` |  Looks for a match of `pattern` in `s` starting from `init`. Returns any captures from the pattern, or the entire match if none are specified. This behaves similarly to its [Lua counterpart](https://www.lua.org/manual/5.1/manual.html#pdf). |
+| `$punctuate(s punctuation chars)` | Adds punctuation to the end of `s` if it isn't present.<br><br>If `punctuation` is provided, it will be used as the punctuation (default: `.`).<br><br>If `chars` is provided, the set of characters considered to be punctuation will be limited to the characters in this string. By default, the Lua [pattern](https://www.lua.org/manual/5.1/manual.html#5.4.1) `%p` is used.<br><br>`$punctuate(hi)` → `hi.`<br>`$punctuate(hello !)` → `hello!` |
+| `$rep(s n)` | Returns a string made up of `n` concatenated copies of `s`. **Use with caution; large strings can take up a lot of memory.** |
 | `$reverse(s)` | Reverses a given string. |
+| `$startswith(this other)` | Returns `true` if `this` starts with `other`. Otherwise, returns the empty string. |
+| `$str(s)` | Converts given arguments into a single string. |
+| `$sub(s i j)` | Returns a substring of `s` from `i` (default `1`) to `j` (default `#s`). |
 | `$trim(s)` | Trims the beginning and end of a given string. |
 | `$trimleft(s)` | Trims the beginning of a given string. |
 | `$trimright(s)` | Trims the end of a given string. |
-| `$first(s)` | Returns the first character of a given string. |
-| `$last(s)` | Returns the last character of a given string. |
-| `$contains(this other)` | Returns `true` if `this` contains `other`. Otherwise, returns the empty string. |
-| `$startswith(this other)` | Returns `true` if `this` starts with `other`. Otherwise, returns the empty string. |
-| `$endswith()` | Returns `true` if `this` ends with `other`. Otherwise, returns the empty string. |
-| `$concat(...)` | Combines provided arguments into one string. |
-| `$concats(separator ...)` | Combines provided arguments into one string, using `separator` as a separator. |
-| `$len(s)` | Returns the length of `s`. |
-| `$capitalize(s)` | Converts the first character in `s` to its uppercase counterpart. |
-| `$punctuate(s punctuation chars)` | Adds punctuation to the end of `s` if it isn't present.<br><br>If `punctuation` is provided, it will be used as the punctuation (default: `.`).<br><br>If `chars` is provided, the set of characters considered to be punctuation will be limited to the characters in this string. By default, the Lua [pattern](https://www.lua.org/manual/5.1/manual.html#5.4.1) `%p` is used.<br><br>`$punctuate(hi)` → `hi.`<br>`$punctuate(hello !)` → `hello!` |
-| `$gsub(s pattern repl n)` | Replaces the first `n` copies of the pattern `pattern` in `s` with `repl`. Returns the result string, the number of matches that occurred, and any match groups that were captured. This behaves similarly to its [Lua counterpart](https://www.lua.org/manual/5.1/manual.html#pdf). |
-| `$sub(s i j)` | Returns a substring of `s` from `i` (default `1`) to `j` (default `#s`). |
-| `$index(s i default)` | Returns the character at index `i` in `s`, or `default` if there is no such index. |
-| `$match(s pattern init)` |  Looks for a match of `pattern` in `s` starting from `init`. Returns any captures from the pattern, or the entire match if none are specified. This behaves similarly to its [Lua counterpart](https://www.lua.org/manual/5.1/manual.html#pdf). |
-| `$char(...)` | Returns a string made up of the characters with the integer character codes passed as arguments. |
-| `$byte(s i j)` | Returns a list of character codes in `s`, from indices `i` (default `1`) to `j` (default `i`). |
-| `$rep(s n)` | Returns a string made up of `n` concatenated copies of `s`. **Use with caution; large strings can take up a lot of memory.** |
+| `$upper(s)` | Converts given arguments into an uppercase string. |
 
 ## Boolean Functions
 
 | Function | Description |
 | -------- | ----------- |
-| `$not(value)` |  Returns `true` if `value` is the empty string. Otherwise, returns the empty string. |
+| `$all(...)` |  Returns the last argument if all provided arguments are not the empty string. Otherwise, returns the empty string. |
+| `$any(...)` |  Returns the first provided argument that's not the empty string, or the empty string if there are none. |
 | `$eq(this other)` |  Returns `true` if `this` is equivalent to `other`. Otherwise, returns the empty string. |
-| `$neq(this other)` |  Returns `true` if `this` is not equivalent to `other`. Otherwise, returns the empty string. |
 | `$gt(this other)` |  Returns `true` if `this` is greater than `other`. Otherwise, returns the empty string. If both arguments are numbers, they will be compared numerically. |
 | `$gte(this other)` |  Returns `true` if `this` is greater than or equal to `other`. Otherwise, returns the empty string. If both arguments are numbers, they will be compared numerically. |
+| `$if(condition ...)` |  Returns `$concat(...)` if `condition` is anything other than the empty string. |
+| `$ifelse(condition yes ...)` |  Returns `yes` if `condition` is anything other than the empty string. Otherwise, returns `$concat(...)`. |
 | `$lt(this other)` |  Returns `true` if `this` is less than `other`. Otherwise, returns the empty string. If both arguments are numbers, they will be compared numerically. |
 | `$lte(this other)` |  Returns `true` if `this` is less than or equal to `other`. Otherwise, returns the empty string. If both arguments are numbers, they will be compared numerically. |
-| `$any(...)` |  Returns the first provided argument that's not the empty string, or the empty string if there are none. |
-| `$all(...)` |  Returns the last argument if all provided arguments are not the empty string. Otherwise, returns the empty string. |
-| `$if(condition ...)` |  Returns `$concat(...)` if `condition` is anything other than the empty string. |
+| `$neq(this other)` |  Returns `true` if `this` is not equivalent to `other`. Otherwise, returns the empty string. |
+| `$not(value)` |  Returns `true` if `value` is the empty string. Otherwise, returns the empty string. |
 | `$unless(condition ...)` |  Returns `$concat(...)` if `condition` is the empty string. |
-| `$ifelse(condition yes ...)` |  Returns `yes` if `condition` is anything other than the empty string. Otherwise, returns `$concat(...)`. |
 
 ## Math Functions
 
@@ -123,18 +123,18 @@ These functions are related to working with [at-maps](./at-maps.md).
 
 | Function | Description |
 | -------- | ----------- |
-| `$list(...)` | Creates an at-map with keys from `1` to `N`, where `N` is the number of provided arguments. If a single argument is provided and it is an at-map, its values will be used. Otherwise, the list is made up of all provided arguments. |
-| `$map(funcName o ...)` | Maps elements of the at-map `o` onto the function `funcName`. Additional arguments will be passed to the map function as extra arguments.<br><br>`$concat($map(upper @(a;b;c)))` → `ABC` |
-| `$len(o)` | Returns the number of entries in the at-map. |
 | `$concat(o)` | Concatenates the values in the at-map. |
 | `$concats(separator o)` | Concatenates the values in the at-map, using `separator` as a separator. |
-| `$nthvalue(o n)` | Returns the value of the `n`th entry in the at-map `o`. |
 | `$first(o)` | Returns the value of the first entry in the at-map `o`. |
-| `$last(o)` | Returns the value of the last entry in the at-map `o`. |
-| `$index(s key default)` | Returns a list of entries associated with `key`, or `default` if there are none. |
-| `$unique(o)` | Returns an at-map with only the unique values in the at-map `o`. |
 | `$get(o key default)` | Returns the first value associated with `key`, or `default` if there are none. |
 | `$has(o key)` | Returns `true` if the at-map contains the key `key`. Otherwise, returns the empty string. |
+| `$index(s key default)` | Returns a list of entries associated with `key`, or `default` if there are none. |
+| `$last(o)` | Returns the value of the last entry in the at-map `o`. |
+| `$len(o)` | Returns the number of entries in the at-map. |
+| `$list(...)` | Creates an at-map with keys from `1` to `N`, where `N` is the number of provided arguments. If a single argument is provided and it is an at-map, its values will be used. Otherwise, the list is made up of all provided arguments. |
+| `$map(funcName o ...)` | Maps elements of the at-map `o` onto the function `funcName`. Additional arguments will be passed to the map function as extra arguments.<br><br>`$concat($map(upper @(a;b;c)))` → `ABC` |
+| `$nthvalue(o n)` | Returns the value of the `n`th entry in the at-map `o`. |
+| `$unique(o)` | Returns an at-map with only the unique values in the at-map `o`. |
 
 ## Random Functions
 
@@ -145,9 +145,9 @@ To get pseudo-random values for these, use `$randomseed` first.
 
 | Function | Description |
 | -------- | ----------- |
+| `$choose(...)` | Selects and returns one of the inputs at random. If given a single at-map, returns one of its values. |
 | `$random(m n)` | Returns a pseudo-random number in `[m, n]`. If `n` is excluded, returns a number up to `m`. If both are excluded, returns a random float number. |
 | `$randomseed(seed)` | Seeds the randomizer with the given value. |
-| `$choose(...)` | Selects and returns one of the inputs at random. If given a single at-map, returns one of its values. |
 
 ## Translation Functions
 

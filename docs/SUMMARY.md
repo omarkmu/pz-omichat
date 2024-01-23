@@ -4,8 +4,8 @@
 
 # User Guide
 
-- [Emotes](user-guide/emotes.md)
 - [Chat Settings](user-guide/chat-settings.md)
+- [Emotes](user-guide/emotes.md)
 - [Admin Utilities](user-guide/admins.md)
 
 # Reference Guide

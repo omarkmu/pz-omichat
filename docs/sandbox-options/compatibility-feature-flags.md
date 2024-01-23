@@ -1,11 +1,12 @@
 # Compatibility Feature Flags
 
-Compatibility feature flags allow server operators to enable or disable compatibility patches for other mods. These have no effect if the relevant mod is not active.
+Compatibility feature flags are [options](./index.md) that allow server operators to enable or disable compatibility patches for other mods.
+These have no effect if the relevant mod is not active.
 
 As of now, there is only one such flag.
 
 ### EnableCompatTAD
-**Default:** `true`  
+**Default:** `true`
 
 Enables the compatibility patch for [True Actions Act 3 - Dancing](https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556).
 
