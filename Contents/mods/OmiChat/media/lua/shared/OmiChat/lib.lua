@@ -1808,7 +1808,7 @@ end
 ---@param token unknown
 ---@param value unknown
 function Interpolator:setTokenValidated(token, value)
-    if self._requireCustomTokenUnderscore and not utils.startsWith(token, '_') and self._tokens[token] == nil then
+    if self._requireCustomTokenUnderscore and token:sub(1, 1) ~= '_' and self:token(token) == nil then
         return
     end
 
@@ -1826,7 +1826,18 @@ function Interpolator:setPattern(pattern)
         self._parser:reset(pattern)
     end
 
-    self._built = self._parser:postprocess(self._parser:parse())
+    local result = self._parser:parse()
+    if not result.success then
+        local list = {}
+        for i = 1, #result.errors do
+            list[#list + 1] = result.errors[i].message
+        end
+
+        local errors = table.concat(list, ', ')
+        error(string.format('interpolation of pattern `%s` failed: %s', pattern, errors))
+    end
+
+    self._built = result.value
 end
 
 ---Sets library functions which should be allowed and disallowed.
@@ -1900,37 +1911,20 @@ local InterpolationParser = BaseParser:derive()
 ---@field allowAtExpressions boolean?
 ---@field allowCharacterEntities boolean?
 
+---@alias omi.interpolate.Result
+---| { success: true, value: omi.interpolate.Node[], warnings: omi.fmt.ParserError[]? }
+---| { success: false, errors: omi.fmt.ParserError[], warnings: omi.fmt.ParserError[]? }
 
----@enum omi.interpolate.NodeType
-InterpolationParser.NodeType = {
-    tree = 'tree',
-    at_expression = 'at_expression',
-    at_key = 'at_key',
-    at_value = 'at_value',
-    text = 'text',
-    token = 'token',
-    string = 'string',
-    call = 'call',
-    escape = 'escape',
-    argument = 'argument',
-}
+---@alias omi.interpolate.Node
+---| omi.interpolate.ValueNode
+---| omi.interpolate.CallNode
+---| omi.interpolate.AtExpressionNode
 
-InterpolationParser.Errors = {
-    BAD_CHAR = BaseParser.Errors.BAD_CHAR,
-    WARN_UNTERM_FUNC = 'potentially unterminated function `%s`',
-    UNTERM_FUNC = 'unterminated function `%s`',
-    UNTERM_AT = 'unterminated at-expression',
-}
-
-local ERR = InterpolationParser.Errors
-local NodeType = InterpolationParser.NodeType
-
+---@alias omi.interpolate.Argument omi.interpolate.ValueNode[]
 
 ---@class omi.interpolate.ValueNode
 ---@field type omi.interpolate.NodeType
 ---@field value string
-
----@alias omi.interpolate.Argument omi.interpolate.ValueNode[]
 
 ---@class omi.interpolate.CallNode : omi.interpolate.ValueNode
 ---@field args omi.interpolate.Node[][]
@@ -1943,10 +1937,27 @@ local NodeType = InterpolationParser.NodeType
 ---@field type omi.interpolate.NodeType
 ---@field entries omi.interpolate.AtExpressionEntry[]
 
----@alias omi.interpolate.Node
----| omi.interpolate.ValueNode
----| omi.interpolate.CallNode
----| omi.interpolate.AtExpressionNode
+
+---@enum omi.interpolate.NodeType
+InterpolationParser.NodeType = {
+    at_expression = 'at_expression',
+    at_key = 'at_key',
+    at_value = 'at_value',
+    text = 'text',
+    token = 'token',
+    string = 'string',
+    call = 'call',
+    escape = 'escape',
+    argument = 'argument',
+}
+
+local NodeType = InterpolationParser.NodeType
+local ERR = {
+    BAD_CHAR = 'unexpected character: `%s`',
+    WARN_UNTERM_FUNC = 'potentially unterminated function `%s`',
+    UNTERM_FUNC = 'unterminated function `%s`',
+    UNTERM_AT = 'unterminated at-expression',
+}
 
 -- text patterns for node types
 local TEXT_PATTERNS = {
@@ -1969,10 +1980,12 @@ local SPECIAL = {
     ['&'] = true,
 }
 
+
 ---Returns a table with consecutive text nodes merged.
 ---@param tab omi.fmt.ParseTreeNode[]
 ---@return omi.fmt.ParseTreeNode[]
-local function mergeTextNodes(tab)
+---@protected
+function InterpolationParser:mergeTextNodes(tab)
     local result = {}
 
     local last
@@ -2006,8 +2019,11 @@ local function mergeTextNodes(tab)
     return result
 end
 
-local postprocessNode
-postprocessNode = function(node)
+---Performs postprocessing on a tree node.
+---@param node omi.fmt.ParseTreeNode
+---@return omi.fmt.ParseTreeNode?
+---@protected
+function InterpolationParser:postprocessNode(node)
     local nodeType = node.type
 
     if nodeType == NodeType.text or nodeType == NodeType.escape then
@@ -2025,7 +2041,7 @@ postprocessNode = function(node)
         local parts = {}
         if node.children then
             for i = 1, #node.children do
-                local built = postprocessNode(node.children[i])
+                local built = self:postprocessNode(node.children[i])
                 if built and built.value then
                     parts[#parts + 1] = built.value
                 end
@@ -2041,14 +2057,14 @@ postprocessNode = function(node)
         local parts = {}
         if node.children then
             for i = 1, #node.children do
-                local built = postprocessNode(node.children[i])
+                local built = self:postprocessNode(node.children[i])
                 if built then
                     parts[#parts + 1] = built
                 end
             end
         end
 
-        return mergeTextNodes(parts)
+        return self:mergeTextNodes(parts)
     elseif nodeType == NodeType.call then
         local args = {}
 
@@ -2057,7 +2073,7 @@ postprocessNode = function(node)
                 local child = node.children[i]
                 local type = child.type
                 if type == NodeType.argument then
-                    args[#args + 1] = postprocessNode(child)
+                    args[#args + 1] = self:postprocessNode(child)
                 end
             end
         end
@@ -2074,11 +2090,11 @@ postprocessNode = function(node)
         local i = 1
         while i <= #children do
             local key = children[i]
-            local builtKey = key and key.type == NodeType.at_key and postprocessNode(key)
+            local builtKey = key and key.type == NodeType.at_key and self:postprocessNode(key)
 
             if builtKey then
                 local value = children[i + 1]
-                local builtValue = value and value.type == NodeType.at_value and postprocessNode(value)
+                local builtValue = value and value.type == NodeType.at_value and self:postprocessNode(value)
 
                 if builtValue then
                     entries[#entries + 1] = {
@@ -2105,7 +2121,6 @@ postprocessNode = function(node)
     end
 end
 
-
 ---Gets the value of a named or numeric entity.
 ---@param entity string
 ---@return string
@@ -2129,7 +2144,7 @@ end
 ---@return string?
 ---@protected
 function InterpolationParser:readSpaces()
-    local spaces = self._text:match('^( +)', self:pos())
+    local spaces = self:match('^( +)')
     if not spaces then
         return
     end
@@ -2142,7 +2157,7 @@ end
 ---@return omi.fmt.ParseTreeNode?
 ---@protected
 function InterpolationParser:readEscape()
-    local value = self._text:match('^$([$@();:&])', self:pos())
+    local value = self:match('^$([$@();:&])')
     if not value then
         return
     end
@@ -2159,7 +2174,7 @@ end
 ---@return omi.fmt.ParseTreeNode?
 ---@protected
 function InterpolationParser:readText()
-    local value = self._text:match(self:getTextPattern(), self:pos())
+    local value = self:match(self:getTextPattern())
     if not value then
         return
     end
@@ -2234,7 +2249,7 @@ function InterpolationParser:readVariable()
         return
     end
 
-    local name, pos = self._text:match('^$([%w_]+)()', self:pos())
+    local name, pos = self:match('^$([%w_]+)()')
 
     if not name then
         return
@@ -2255,10 +2270,10 @@ function InterpolationParser:readCharacterEntity()
         return
     end
 
-    local entity, pos = self._text:match('^(&#x?%d+;)()', self:pos())
+    local entity, pos = self:match('^(&#x?%d+;)()')
 
     if not entity then
-        entity, pos = self._text:match('^(&%a+;)()', self:pos())
+        entity, pos = self:match('^(&%a+;)()')
         if not entity then
             return
         end
@@ -2284,7 +2299,7 @@ function InterpolationParser:readFunction()
         return
     end
 
-    local name, start = self._text:match('^$([%w_]+)%(()', self:pos())
+    local name, start = self:match('^$([%w_]+)%(()')
     if not name then
         return
     end
@@ -2351,7 +2366,7 @@ function InterpolationParser:readAtExpression()
         return
     end
 
-    local start = self._text:match('^@%(()', self:pos())
+    local start = self:match('^@%(()')
     if not start then
         return
     end
@@ -2462,22 +2477,41 @@ function InterpolationParser:readExpression()
 end
 
 ---Performs postprocessing on a result tree.
----@param tree omi.fmt.ParseTree
----@return omi.interpolate.Node[]
-function InterpolationParser:postprocess(tree)
+---@return omi.interpolate.Result
+---@protected
+function InterpolationParser:postprocess()
+    local tree = self._tree
     local result = {}
-    if tree.errors or not tree.children then
-        return result
+    if #self._errors > 0 then
+        return {
+            success = false,
+            warnings = #self._warnings > 0 and self._warnings or nil,
+            errors = self._errors,
+        }
+    end
+
+    if not tree.children then
+        return { success = true, value = result }
     end
 
     for i = 1, #tree.children do
-        local built = postprocessNode(tree.children[i])
+        local built = self:postprocessNode(tree.children[i])
         if built then
             result[#result + 1] = built
         end
     end
 
-    return mergeTextNodes(result)
+    return {
+        success = true,
+        warnings = #self._warnings > 0 and self._warnings or nil,
+        value = self:mergeTextNodes(result),
+    }
+end
+
+---Performs parsing and returns a list of interpolate nodes.
+---@return omi.interpolate.Result
+function InterpolationParser:parse()
+    return BaseParser.parse(self)
 end
 
 ---Creates a new interpolation parser.
@@ -2510,29 +2544,25 @@ local utils = require("utils/type")
 
 ---Base string parser.
 ---@class omi.fmt.Parser : omi.Class
----@field protected _errors omi.fmt.ParserError[]?
----@field protected _warnings omi.fmt.ParserError[]?
+---@field protected _errors omi.fmt.ParserError[]
+---@field protected _warnings omi.fmt.ParserError[]
 ---@field protected _ptr integer
 ---@field protected _text string
 ---@field protected _node omi.fmt.ParseTreeNode?
 ---@field protected _tree omi.fmt.ParseTree
----@field protected _treeNodeName string
+---@field protected _treeNodeType string?
 ---@field protected _raiseErrors boolean
 local Parser = class()
-
-Parser.Errors = {
-    BAD_CHAR = 'unexpected character: `%s`',
-}
 
 
 ---Base parser options.
 ---@class omi.fmt.ParserOptions
 ---@field raiseErrors boolean?
----@field treeNodeName string?
+---@field treeNodeType string?
 
 ---Describes error that occurred during parsing.
 ---@class omi.fmt.ParserError
----@field error string
+---@field message string
 ---@field node omi.fmt.ParseTreeNode?
 ---@field range integer[]
 
@@ -2546,8 +2576,6 @@ Parser.Errors = {
 ---Top-level parse tree node.
 ---@class omi.fmt.ParseTree : omi.fmt.ParseTreeNode
 ---@field source string
----@field errors omi.fmt.ParserError[]?
----@field warnings omi.fmt.ParserError[]?
 
 
 ---Moves the parser pointer forward.
@@ -2583,6 +2611,15 @@ function Parser:read(n)
     self:forward(n)
 
     return result
+end
+
+---Matches a string pattern against the parser's current text.
+---@param pattern string The string pattern.
+---@param pos integer? A position to start from. Defaults to the current position.
+---@return ...
+---@protected
+function Parser:match(pattern, pos)
+    return self._text:match(pattern, pos or self:pos())
 end
 
 ---Returns a substring of the current text.
@@ -2667,7 +2704,7 @@ end
 ---@param stop integer?
 ---@protected
 function Parser:setNodeRange(node, start, stop)
-    local len = #self._text
+    local len = self:len()
     local pos = self:pos()
     node.range[1] = math.max(1, math.min(start or node.range[1] or pos, len))
     node.range[2] = math.max(1, math.min(stop or node.range[2] or pos, len))
@@ -2705,7 +2742,7 @@ end
 ---@protected
 function Parser:error(err, node, start, stop)
     self._errors[#self._errors + 1] = {
-        error = err,
+        message = err,
         node = node ~= self._tree and node or nil,
         range = {
             start or node.range[1],
@@ -2737,7 +2774,7 @@ end
 ---@protected
 function Parser:warning(err, node, start, stop)
     self._warnings[#self._warnings + 1] = {
-        error = err,
+        message = err,
         node = node ~= self._tree and node or nil,
         range = {
             start or node.range[1],
@@ -2757,6 +2794,39 @@ function Parser:warningHere(err, node, len)
     self:warning(err, node, pos, pos + len - 1)
 end
 
+---Creates the parse tree.
+---@protected
+function Parser:createTree()
+    local tree = self:addNode(self:createNode(self._treeNodeType))
+
+    ---@cast tree omi.fmt.ParseTree
+    tree.source = self._text
+    self:setNodeEnd(tree, self:len())
+
+    self._tree = tree
+end
+
+---Performs the parsing operation.
+---@protected
+function Parser:perform()
+    while self:pos() <= self:len() do
+        if not self:readExpression() then
+            local pos = self:pos()
+            self:error(string.format('unexpected character: `%s`', self:peek()), self._tree, pos, pos)
+
+            -- avoid infinite loops
+            self:forward()
+        end
+    end
+end
+
+---Performs postprocessing on the tree.
+---@return omi.fmt.ParseTree
+---@protected
+function Parser:postprocess()
+    return self._tree
+end
+
 ---Resets the parser state.
 ---@param text string? If provided, sets the text to parse.
 function Parser:reset(text)
@@ -2765,44 +2835,14 @@ function Parser:reset(text)
     self._errors = {}
     self._warnings = {}
     self._node = nil
-
-    local tree = self:addNode(self:createNode(self._treeNodeName))
-
-    ---@cast tree omi.fmt.ParseTree
-    tree.source = self._text
-    self:setNodeEnd(tree, #self._text)
-
-    self._tree = tree
+    self:createTree()
 end
 
 ---Performs parsing and returns the tree.
 ---@return omi.fmt.ParseTree
 function Parser:parse()
-    while self:pos() <= self:len() do
-        if not self:readExpression() then
-            self:error(Parser.Errors.BAD_CHAR:format(self:peek()), self._tree, self:pos(), self:pos())
-
-            -- avoid infinite loops
-            self:forward()
-        end
-    end
-
-    if #self._errors > 0 then
-        self._tree.errors = self._errors
-    end
-
-    if #self._warnings > 0 then
-        self._tree.warnings = self._warnings
-    end
-
-    return self._tree
-end
-
----Performs postprocessing on the result tree, transforming it into a usable format.
----@param tree omi.fmt.ParseTree
----@return unknown
-function Parser:postprocess(tree)
-    return tree
+    self:perform()
+    return self:postprocess()
 end
 
 ---Creates a new parser.
@@ -2815,9 +2855,9 @@ function Parser:new(text, options)
 
     options = options or {}
 
-    this:reset(text)
     this._raiseErrors = utils.default(options.raiseErrors, false)
-    this._treeNodeName = utils.default(options.treeNodeName, 'tree')
+    this._treeNodeType = options.treeNodeType
+    this:reset(text)
 
     return this
 end
@@ -3456,7 +3496,7 @@ local getSandboxOptions = getSandboxOptions
 local sandbox = {}
 
 ---Helper for retrieving custom sandbox options.
----@class omi.Sandbox
+---@class omi.SandboxHelper
 ---@field protected _defaults table? Table containing default option values.
 ---@field protected _name string Name of a mod's sandbox variable table.
 local SandboxHelper = {}
@@ -3506,7 +3546,7 @@ end
 
 ---Creates a new sandbox helper.
 ---@param tableName string The name of the sandbox options table.
----@return omi.Sandbox
+---@return omi.SandboxHelper
 function sandbox.new(tableName)
     return setmetatable({ _name = tableName }, SandboxHelper)
 end
@@ -3522,7 +3562,7 @@ sandbox.Sandbox = SandboxHelper
 
 
 ---@diagnostic disable-next-line: cast-type-mismatch
----@cast sandbox omi.sandbox | (fun(tableName: string): omi.Sandbox)
+---@cast sandbox omi.sandbox | (fun(tableName: string): omi.SandboxHelper)
 return sandbox
 
 end)
@@ -3531,12 +3571,10 @@ end)
 ---@class omi.lib
 local OmiLib = {}
 
-OmiLib.VERSION = '1.2.2'
-
 ---@type omi.class | (fun(cls: table?): omi.Class)
 OmiLib.class = require("class")
 
----@type omi.sandbox | (fun(tableName: string): omi.Sandbox)
+---@type omi.sandbox | (fun(tableName: string): omi.SandboxHelper)
 OmiLib.sandbox = require("sandbox")
 
 ---@type omi.utils
