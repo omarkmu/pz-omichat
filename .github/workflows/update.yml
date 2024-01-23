@@ -17,7 +17,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
       with:
-        ref: main
+        ref: dev
         path: '.'
     - name: Checkout library
       uses: actions/checkout@v4
@@ -42,7 +42,7 @@ jobs:
         commit-message: Update lib.lua
         add-paths: ./Contents/mods/OmiChat/media/lua/shared/OmiChat/lib.lua
         body: Pulled in new [library](https://github.com/omarkmu/pz-omi-lib) changes.
-        base: main
+        base: dev
         branch: update-library
         labels: dependencies,automated
         token: ${{ github.token }}
