@@ -1,4 +1,4 @@
-# Extensions
+# Extending Format Strings
 
 [Format strings](./index.md) can be extended by other mods.
 Additional [functions](./functions.md) or overrides of existing functions can be included by calling `OmiChat.registerInterpolatorFunction`.
