@@ -4,8 +4,8 @@
 
 # User Guide
 
-- [Emotes](user-guide/emotes.md)
 - [Chat Settings](user-guide/chat-settings.md)
+- [Emotes](user-guide/emotes.md)
 - [Admin Utilities](user-guide/admins.md)
 
 # Reference Guide
@@ -25,4 +25,5 @@
     - [Tokens](format-strings/tokens.md)
     - [Functions](format-strings/functions.md)
     - [At-Maps](format-strings/at-maps.md)
+    - [Escapes & References](format-strings/escapes-references.md)
     - [Extending Format Strings](format-strings/extensions.md)
