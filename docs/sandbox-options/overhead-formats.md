@@ -7,7 +7,7 @@ In all of these formats, the [`$1`](../format-strings/tokens.md#1) token **must*
 For example, reversing the overhead text will result in the message content being reversed in chat.
 
 ### OverheadFormatCard
-**Default:** `&lt; $1 &gt;` (`< $1 >`)
+**Default:** `< $1 >`
 
 The overhead format used for local [`/card`](./chat-formats.md#chatformatcard) messages.
 If blank, `/card` messages will not display overhead.
@@ -48,25 +48,25 @@ Defines the format used for overhead speech bubbles of [`/looc`](./chat-formats.
 If blank, `/looc` messages will not display overhead.
 
 ### OverheadFormatMe
-**Default:** `&lt; $1 &gt;` (`< $1 >`)
+**Default:** `< $1 >`
 
 Defines the format used for overhead speech bubbles of [`/me`](./chat-formats.md#chatformatme) messages.
 If blank, `/me` messages will not display overhead.
 
 ### OverheadFormatMeLoud
-**Default:** `&lt; $1 &gt;` (`< $1 >`)
+**Default:** `< $1 >`
 
 Defines the format used for overhead speech bubbles of [`/meloud`](./chat-formats.md#chatformatmeloud) messages.
 If blank, `/meloud` messages will not display overhead.
 
 ### OverheadFormatMeQuiet
-**Default:** `&lt; $1 &gt;` (`< $1 >`)
+**Default:** `< $1 >`
 
 Defines the format used for overhead speech bubbles of [`/mequiet`](./chat-formats.md#chatformatmequiet) messages.
 If blank, `/mequiet` messages will not display overhead.
 
 ### OverheadFormatRoll
-**Default:** `&lt; $1 &gt;` (`< $1 >`)
+**Default:** `< $1 >`
 
 The overhead format used for local [`/roll`](./chat-formats.md#chatformatroll) messages.
 If blank, `/roll` messages will not display overhead.
