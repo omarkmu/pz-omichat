@@ -6,7 +6,7 @@ local floor = math.floor
 
 
 ---Helper for retrieving sandbox variables and their defaults.
----@class omichat.Options : omi.Sandbox
+---@class omichat.Options : omi.SandboxHelper
 ---@field EnableCustomShouts boolean
 ---@field EnableCustomSneakShouts boolean
 ---@field EnableEmotes boolean
