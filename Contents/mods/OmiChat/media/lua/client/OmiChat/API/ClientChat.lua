@@ -713,6 +713,37 @@ function OmiChat.getColorCategoryCommand(cat)
     return '/' .. cat
 end
 
+---Builds the default overhead text prefix given a chat stream name and a language.
+---If there should be no prefix, returns nil.
+---@param stream string
+---@param language string?
+---@return string?
+function OmiChat.getDefaultOverheadPrefix(stream, language)
+    local output = {}
+    if stream == 'whisper' then
+        output[#output + 1] = 'Whispering'
+    elseif stream == 'low' then
+        output[#output + 1] = 'Quietly'
+    end
+
+    if language then
+        if #output > 0 then
+            output[#output + 1] = ' in '
+        else
+            output[#output + 1] = 'In '
+        end
+
+        output[#output + 1] = language
+    end
+
+    if #output == 0 then
+        return
+    end
+
+    output[#output + 1] = '] '
+    return '[' .. concat(output)
+end
+
 ---Returns a playable emote given an emote name.
 ---Returns `nil` if there is not an emote associated with the emote name.
 ---@param emote string

@@ -72,8 +72,21 @@ OmiChat._customChatStreams = {
         tabID = 1,
         omichat = {
             allowEmotes = true,
-            commandType = 'chat',
             allowIconPicker = true,
+            commandType = 'chat',
+            isEnabled = isCustomChatEnabled,
+            onUse = useCustomChat,
+        },
+    },
+    low = {
+        name = 'low',
+        command = '/low ',
+        shortCommand = '/low ',
+        tabID = 1,
+        omichat = {
+            allowEmotes = true,
+            allowIconPicker = true,
+            commandType = 'chat',
             isEnabled = isCustomChatEnabled,
             onUse = useCustomChat,
         },

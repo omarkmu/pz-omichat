@@ -36,6 +36,7 @@ Sandbox_EN = {
     Sandbox_OCRangeMeLoud = "/meloud Range",
     Sandbox_OCRangeMeQuiet = "/mequiet Range",
     Sandbox_OCRangeSay = "/say Range",
+    Sandbox_OCRangeLow = "/low Range",
     Sandbox_OCRangeWhisper = "/whisper Range",
     Sandbox_OCRangeYell = "/yell Range",
 
@@ -56,6 +57,7 @@ Sandbox_EN = {
     Sandbox_OCColorSafehouse = "/safehouse Color",
     Sandbox_OCColorSay = "/say Color",
     Sandbox_OCColorServer = "Server Message Color",
+    Sandbox_OCColorLow = "/low Color",
     Sandbox_OCColorWhisper = "/whisper Color",
     Sandbox_OCColorYell = "/yell Color",
 
@@ -91,6 +93,7 @@ Sandbox_EN = {
     Sandbox_OCOverheadFormatMeLoud = "/meloud Overhead Format",
     Sandbox_OCOverheadFormatMeQuiet = "/mequiet Overhead Format",
     Sandbox_OCOverheadFormatRoll = "/roll Overhead Format",
+    Sandbox_OCOverheadFormatLow = "/low Overhead Format",
     Sandbox_OCOverheadFormatWhisper = "/whisper Overhead Format",
 
     --[[ Chat Message Formats ]]--
@@ -116,6 +119,7 @@ Sandbox_EN = {
     Sandbox_OCChatFormatServer = "Server Chat Format",
     Sandbox_OCChatFormatUnknownLanguage = "Unknown Language Format",
     Sandbox_OCChatFormatUnknownLanguageRadio = "Unknown Language Format (Radio)",
+    Sandbox_OCChatFormatLow = "/low Chat Format",
     Sandbox_OCChatFormatWhisper = "/whisper Chat Format",
     Sandbox_OCChatFormatYell = "/yell Chat Format",
 }

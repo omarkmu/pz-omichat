@@ -12,6 +12,17 @@ Configuration._streamTable = {}
 -- chat streams (1–25)
 Configuration._chatStreams = {
     {
+        name = 'low',
+        formatID = 9,
+        colorOpt = 'ColorLow',
+        rangeOpt = 'RangeLow',
+        chatFormatOpt = 'ChatFormatLow',
+        overheadFormatOpt = 'OverheadFormatLow',
+        titleID = 'UI_OmiChat_low_chat_title_id',
+        chatTypes = { say = true },
+        convertToRadio = true,
+    },
+    {
         name = 'whisper',
         formatID = 1,
         colorOpt = 'ColorWhisper',

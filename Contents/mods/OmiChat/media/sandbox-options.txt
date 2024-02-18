@@ -92,8 +92,11 @@ option OmiChat.RangeMeQuiet
 option OmiChat.RangeSay
 { type = integer, default = 30, min = 1, max = 30, page = OmiChat, translation = OCRangeSay, }
 
+option OmiChat.RangeLow
+{ type = integer, default = 5, min = 1, max = 30, page = OmiChat, translation = OCRangeLow, }
+
 option OmiChat.RangeWhisper
-{ type = integer, default = 3, min = 1, max = 30, page = OmiChat, translation = OCRangeWhisper, }
+{ type = integer, default = 2, min = 1, max = 30, page = OmiChat, translation = OCRangeWhisper, }
 
 option OmiChat.RangeYell
 { type = integer, default = 60, min = 1, max = 60, page = OmiChat, translation = OCRangeYell, }
@@ -148,6 +151,9 @@ option OmiChat.ColorSafehouse
 option OmiChat.ColorSay
 { type = string, default = 255 255 255, page = OmiChat, translation = OCColorSay, }
 
+option OmiChat.ColorLow
+{ type = string, default = 85 48 139, page = OmiChat, translation = OCColorLow, }
+
 option OmiChat.ColorWhisper
 { type = string, default = 85 48 139, page = OmiChat, translation = OCColorWhisper, }
 
@@ -160,7 +166,7 @@ option OmiChat.FilterNickname
 { type = string, default = $sub($name 1 50), page = OmiChat, translation = OCFilterNickname, }
 
 option OmiChat.PredicateAllowLanguage
-{ type = string, default = $has(@(say;shout;whisper) $stream), page = OmiChat, translation = OCPredicateAllowLanguage, }
+{ type = string, default = $has(@(say;shout;whisper;low) $stream), page = OmiChat, translation = OCPredicateAllowLanguage, }
 
 option OmiChat.PredicateUseNameColor
 { type = string, default = $eq($stream say), page = OmiChat, translation = OCPredicateUseNameColor, }
@@ -235,6 +241,9 @@ option OmiChat.OverheadFormatMeLoud
 option OmiChat.OverheadFormatMeQuiet
 { type = string, default = < $1 >, page = OmiChat, translation = OCOverheadFormatMeQuiet, }
 
+option OmiChat.OverheadFormatLow
+{ type = string, default = $1, page = OmiChat, translation = OCOverheadFormatLow, }
+
 option OmiChat.OverheadFormatWhisper
 { type = string, default = $1, page = OmiChat, translation = OCOverheadFormatWhisper, }
 
@@ -305,6 +314,9 @@ option OmiChat.ChatFormatSay
 
 option OmiChat.ChatFormatFaction
 { type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatFaction, }
+
+option OmiChat.ChatFormatLow
+{ type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatLow, }
 
 option OmiChat.ChatFormatWhisper
 { type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatWhisper, }
