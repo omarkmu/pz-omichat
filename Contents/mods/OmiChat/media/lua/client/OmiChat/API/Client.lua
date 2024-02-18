@@ -1129,36 +1129,31 @@ OmiChat._transformers = {
         end,
     },
     {
-        name = 'set-range',
+        name = 'check-range',
         priority = 15,
         transform = function(_, info)
             local range
-            local chatRange
+            local defaultRange
             local streamData = config:getCustomStreamInfo(info.context.ocCustomStream)
             if streamData then
                 range = Option[streamData.rangeOpt]
-                chatRange = Option:getDefault(streamData.defaultRangeOpt or 'RangeSay')
+                defaultRange = Option:getDefault(streamData.defaultRangeOpt or 'RangeSay')
             elseif info.context.ocIsCallout then
                 range = Option.RangeCallout
-                chatRange = Option:getDefault('RangeYell')
+                defaultRange = Option:getDefault('RangeYell')
             elseif info.context.ocIsSneakCallout then
                 range = Option.RangeSneakCallout
-                chatRange = Option:getDefault('RangeYell')
+                defaultRange = Option:getDefault('RangeYell')
             elseif info.chatType == 'say' then
                 range = Option.RangeSay
-                chatRange = Option:getDefault('RangeSay')
+                defaultRange = Option:getDefault('RangeSay')
             elseif info.chatType == 'shout' then
                 range = Option.RangeYell
-                chatRange = Option:getDefault('RangeYell')
-            else
-                return
+                defaultRange = Option:getDefault('RangeYell')
             end
 
-            info.attractRange = range * Option.RangeMultiplierZombies
-
-            -- default ranges are existing chat ranges, so this avoids unnecessary work
-            if range == chatRange then
-                return
+            if range then
+                info.attractRange = range * Option.RangeMultiplierZombies
             end
 
             if isAdmin() and OmiChat.getAdminOption('ignore_message_range') then
@@ -1168,15 +1163,26 @@ OmiChat._transformers = {
             local authorPlayer = getPlayerFromUsername(info.author)
             local localPlayer = getSpecificPlayer(0)
             if not authorPlayer or not localPlayer or authorPlayer == localPlayer then
+                -- players can hear themselves
                 return
             end
 
-            -- calculating distance using the distance formula like ChatUtility
-            -- assuming players are synced it works equivalently
-            local xDiff = authorPlayer:getX() - localPlayer:getX()
-            local yDiff = authorPlayer:getY() - localPlayer:getY()
+            local outOfRange = false
 
-            if math.sqrt(xDiff * xDiff + yDiff * yDiff) > range then
+            local tokens = { stream = info.substitutions.stream }
+            local zMax = tonumber(utils.interpolate(Option.RangeVertical, tokens))
+            if zMax and math.abs(authorPlayer:getZ() - localPlayer:getZ()) > zMax then
+                outOfRange = true
+            elseif range and range ~= defaultRange then
+                -- calculating distance using the distance formula like ChatUtility
+                -- assuming players are synced it works equivalently
+                local xDiff = authorPlayer:getX() - localPlayer:getX()
+                local yDiff = authorPlayer:getY() - localPlayer:getY()
+
+                outOfRange = math.sqrt(xDiff * xDiff + yDiff * yDiff) > range
+            end
+
+            if outOfRange then
                 -- it's okay that this runs on refresh, because the
                 -- show in chat value is only used on the initial message add
                 info.message:setOverHeadSpeech(false)

@@ -39,6 +39,7 @@ Sandbox_EN = {
     Sandbox_OCRangeLow = "/low Range",
     Sandbox_OCRangeWhisper = "/whisper Range",
     Sandbox_OCRangeYell = "/yell Range",
+    Sandbox_OCRangeVertical = "Vertical Range",
 
     --[[ Default Colors ]]--
     Sandbox_OCColorAdmin = "/admin Color",
