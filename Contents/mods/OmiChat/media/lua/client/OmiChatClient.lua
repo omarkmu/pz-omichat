@@ -49,6 +49,7 @@ return OmiChat
 ---@field format string? The string format to use for the message. Set by transformers.
 ---@field tag string? The result of the `FormatTag` option.
 ---@field timestamp string? The result of the `FormatTimestamp` option.
+---@field language string? The result of the `FormatLanguage` option.
 ---@field textColor Color The message's default text color.
 ---@field meta omichat.MessageMetadata Metadata attached to the message.
 ---@field rawText string The raw text of the message.
