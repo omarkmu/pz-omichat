@@ -259,10 +259,16 @@ function OmiChat.applyFormatOptions(info)
                 hour12 = 12
             end
 
+            local prefer24 = getCore():getOptionClock24Hour()
+            local prefHour = format('%d', prefer24 and hour or hour12)
+            local prefHourPadded = format('%02d', prefer24 and hour or hour12)
+
             local ampm = hour < 12 and 'am' or 'pm'
             info.timestamp = utils.interpolate(Option.FormatTimestamp, {
                 chatType = info.chatType,
                 stream = info.substitutions.stream,
+                P = prefHour,
+                PP = prefHourPadded,
                 H = format('%d', hour),
                 HH = format('%02d', hour),
                 h = format('%d', hour12),
@@ -273,7 +279,7 @@ function OmiChat.applyFormatOptions(info)
                 ss = format('%02d', second),
                 ampm = ampm,
                 AMPM = ampm:upper(),
-                hourFormatPref = getCore():getOptionClock24Hour() and 24 or 12,
+                hourFormat = prefer24 and 24 or 12,
             }, seed)
         end
     end
