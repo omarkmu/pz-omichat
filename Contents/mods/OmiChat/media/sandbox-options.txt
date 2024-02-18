@@ -215,10 +215,13 @@ option OmiChat.FormatAdminIcon
 option OmiChat.FormatIcon
 { type = string, default = @($eq($stream card):Item_CardDeck;$eq($stream roll):Item_Dice;$has(@(say;shout;whisper;faction;safehouse;looc;general) $stream):@($adminIcon;$icon)), page = OmiChat, translation = OCFormatIcon, }
 
+option OmiChat.FormatOverheadPrefix
+{ type = string, default =, page = OmiChat, translation = OCFormatOverheadPrefix, }
+
 
 /* Overhead Message Formats */
 option OmiChat.OverheadFormatFull
-{ type = string, default = $set(_whisper $eq($stream whisper))$if($_whisper [Whispering)$if($languageRaw $ifelse($_whisper ( in) [In)&#32;$languageRaw)$if($any($languageRaw $_whisper) ]&#32;)$1, page = OmiChat, translation = OCOverheadFormatFull, }
+{ type = string, default = $prefix$1, page = OmiChat, translation = OCOverheadFormatFull, }
 
 option OmiChat.OverheadFormatDo
 { type = string, default =, page = OmiChat, translation = OCOverheadFormatDo, }

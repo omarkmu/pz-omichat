@@ -676,19 +676,27 @@ function OmiChat.formatForChat(text, stream, language)
         text = adminIconFormatter:wrap(text)
     end
 
-    local overheadFormatter = OmiChat.getFormatter('overhead')
-    text = overheadFormatter:wrap(text)
-
     local tokens = {
-        text,
         stream = stream,
         languageRaw = language,
         language = language and getTextOrNull('UI_OmiChat_Language_' .. language) or language,
     }
 
+    ---@type string?
+    local prefix = utils.interpolate(Option.FormatOverheadPrefix, tokens)
+    if prefix == '' then
+        prefix = OmiChat.getDefaultOverheadPrefix(stream, language)
+    end
+
+    local overheadFormatter = OmiChat.getFormatter('overhead')
+    local wrapped = overheadFormatter:wrap(text)
+
+    tokens[1] = wrapped
+    tokens.prefix = prefix
+
     local formatted = utils.replaceEntities(utils.interpolate(overheadFormatter:getFormatString(), tokens))
     if not overheadFormatter:isMatch(formatted) then
-        return text
+        return wrapped
     end
 
     return formatted
