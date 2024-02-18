@@ -1,7 +1,7 @@
 UI_EN = {
     --[[ General ]]--
+    UI_OmiChat_low_chat_title_id = "Low",
     UI_OmiChat_whisper_chat_title_id = "Whisper",
-    UI_OmiChat_whispering = "Whispering",
 
     UI_OmiChat_icon_cat_clothing = "Clothing",
     UI_OmiChat_icon_cat_cooking = "Cooking",

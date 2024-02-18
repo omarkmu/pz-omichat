@@ -56,6 +56,7 @@ return OmiChat
 ---| 'do'
 ---| 'doquiet'
 ---| 'doloud'
+---| 'low'
 ---| 'looc'
 ---| 'card'
 ---| 'roll'

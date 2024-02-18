@@ -34,10 +34,12 @@ local floor = math.floor
 ---@field RangeMeQuiet integer
 ---@field RangeMultiplierZombies number
 ---@field RangeLooc integer
+---@field RangeLow integer
 ---@field RangeSay integer
 ---@field RangeWhisper integer
 ---@field RangeYell integer
 ---@field ColorLooc string
+---@field ColorLow string
 ---@field ColorDo string
 ---@field ColorDoQuiet string
 ---@field ColorDoLoud string
@@ -81,6 +83,7 @@ local floor = math.floor
 ---@field OverheadFormatMeQuiet string
 ---@field OverheadFormatMeLoud string
 ---@field OverheadFormatLooc string
+---@field OverheadFormatLow string
 ---@field ChatFormatFull string
 ---@field ChatFormatCard string
 ---@field ChatFormatRoll string
@@ -92,6 +95,7 @@ local floor = math.floor
 ---@field ChatFormatMeLoud string
 ---@field ChatFormatSay string
 ---@field ChatFormatLooc string
+---@field ChatFormatLow string
 ---@field ChatFormatWhisper string
 ---@field ChatFormatYell string
 ---@field ChatFormatAdmin string
