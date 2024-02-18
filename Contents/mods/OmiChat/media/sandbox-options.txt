@@ -218,6 +218,9 @@ option OmiChat.FormatAdminIcon
 option OmiChat.FormatIcon
 { type = string, default = @($eq($stream card):Item_CardDeck;$eq($stream roll):Item_Dice;$has(@(say;shout;whisper;faction;safehouse;looc;general) $stream):@($adminIcon;$icon)), page = OmiChat, translation = OCFormatIcon, }
 
+option OmiChat.FormatLanguage
+{ type = string, default = $if($all($language $not($unknownLanguage)) [$language]( <SPACE> )), page = OmiChat, translation = OCFormatLanguage, }
+
 option OmiChat.FormatOverheadPrefix
 { type = string, default =, page = OmiChat, translation = OCFormatOverheadPrefix, }
 
@@ -262,7 +265,7 @@ option OmiChat.OverheadFormatRoll
 
 /* Chat Message Formats */
 option OmiChat.ChatFormatFull
-{ type = string, default = $if($neq($stream server) $timestamp)$tag$if($all($language $not($unknownLanguage)) [$language]&#32;<SPACE>&#32;)$if($icon $icon (<SPACE> ))$content, page = OmiChat, translation = OCChatFormatFull, }
+{ type = string, default = $if($neq($stream server) $timestamp)$tag$language$if($icon $icon (<SPACE> ))$content, page = OmiChat, translation = OCChatFormatFull, }
 
 option OmiChat.ChatFormatDiscord
 { type = string, default = $author: <SPACE> $message, page = OmiChat, translation = OCChatFormatDiscord, }

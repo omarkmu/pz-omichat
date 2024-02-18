@@ -278,6 +278,14 @@ function OmiChat.applyFormatOptions(info)
         end
     end
 
+    info.language = utils.interpolate(Option.FormatLanguage, {
+        chatType = info.chatType,
+        stream = info.substitutions.stream,
+        languageRaw = info.substitutions.languageRaw,
+        language = info.substitutions.language,
+        unknownLanguage = info.substitutions.unknownLanguage,
+    })
+
     if options.showTitle then
         info.tag = utils.interpolate(Option.FormatTag, {
             chatType = info.chatType,
@@ -460,11 +468,9 @@ function OmiChat.buildMessageTextFromInfo(info)
         utils.interpolate(Option.ChatFormatFull, {
             chatType = info.chatType,
             stream = info.substitutions.stream,
-            language = info.substitutions.language,
-            languageRaw = info.substitutions.languageRaw,
-            unknownLanguage = info.substitutions.unknownLanguage,
             icon = info.substitutions.icon,
             iconRaw = info.substitutions.iconRaw,
+            language = info.language,
             timestamp = info.timestamp,
             tag = info.tag,
             content = utils.interpolate(info.format, info.substitutions, seed),
