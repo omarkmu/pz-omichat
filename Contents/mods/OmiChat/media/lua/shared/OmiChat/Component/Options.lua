@@ -37,6 +37,7 @@ local floor = math.floor
 ---@field RangeLow integer
 ---@field RangeSay integer
 ---@field RangeWhisper integer
+---@field RangeVertical string
 ---@field RangeYell integer
 ---@field ColorLooc string
 ---@field ColorLow string
