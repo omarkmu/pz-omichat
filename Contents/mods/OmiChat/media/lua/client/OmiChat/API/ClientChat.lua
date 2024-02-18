@@ -812,9 +812,10 @@ function OmiChat.getFormatter(name)
 end
 
 ---Gets the text that should display when clicking the info button.
+---@param player IsoPlayer? The player to use to populate token values. If `nil`, this will be player 1.
 ---@return string
-function OmiChat.getInfoRichText()
-    local player = getSpecificPlayer(0)
+function OmiChat.getInfoRichText(player)
+    player = player or getSpecificPlayer(0)
     if not player then
         return ''
     end

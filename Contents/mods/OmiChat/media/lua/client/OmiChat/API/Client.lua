@@ -1371,6 +1371,16 @@ OmiChat._emotes = {
 }
 
 
+---Event handler that runs when a player is created.
+---@param playerNum integer
+---@param player IsoPlayer
+---@protected
+function OmiChat._onCreatePlayer(playerNum, player)
+    if ISChat.instance and playerNum == 0 then
+        ISChat.instance:setInfo(OmiChat.getInfoRichText(player))
+    end
+end
+
 ---Event handler that runs on game start.
 ---@protected
 function OmiChat._onGameStart()
