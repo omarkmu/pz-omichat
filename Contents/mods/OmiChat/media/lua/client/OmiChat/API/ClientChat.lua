@@ -496,7 +496,7 @@ function OmiChat.canUseRoleplayLanguage(stream, text)
 
     local tokens = {
         stream = stream,
-        message = text,
+        input = text,
     }
 
     return utils.interpolate(pred, tokens) ~= ''
