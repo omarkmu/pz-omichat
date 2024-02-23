@@ -9,11 +9,41 @@ Configuration._streamList = {}
 Configuration._streamTable = {}
 
 
--- chat streams (1–25)
+-- IDs 1–32 are reserved for encoding additional data
+
+-- command streams (33–50)
+Configuration._commandStreams = {
+    {
+        name = 'roll',
+        formatID = 33,
+        streamAlias = 'me',
+        colorOpt = 'ColorMe',
+        rangeOpt = 'RangeMe',
+        chatFormatOpt = 'ChatFormatRoll',
+        overheadFormatOpt = 'OverheadFormatRoll',
+        chatTypes = { say = true },
+        autoColorOption = false,
+        ignoreLanguage = true,
+    },
+    {
+        name = 'card',
+        formatID = 34,
+        streamAlias = 'me',
+        colorOpt = 'ColorMe',
+        rangeOpt = 'RangeMe',
+        chatFormatOpt = 'ChatFormatCard',
+        overheadFormatOpt = 'OverheadFormatCard',
+        chatTypes = { say = true },
+        autoColorOption = false,
+        ignoreLanguage = true,
+    },
+}
+
+-- chat streams (51–75)
 Configuration._chatStreams = {
     {
         name = 'low',
-        formatID = 9,
+        formatID = 51,
         colorOpt = 'ColorLow',
         rangeOpt = 'RangeLow',
         chatFormatOpt = 'ChatFormatLow',
@@ -24,7 +54,7 @@ Configuration._chatStreams = {
     },
     {
         name = 'whisper',
-        formatID = 1,
+        formatID = 52,
         colorOpt = 'ColorWhisper',
         rangeOpt = 'RangeWhisper',
         chatFormatOpt = 'ChatFormatWhisper',
@@ -35,7 +65,7 @@ Configuration._chatStreams = {
     },
     {
         name = 'me',
-        formatID = 2,
+        formatID = 53,
         colorOpt = 'ColorMe',
         rangeOpt = 'RangeMe',
         chatFormatOpt = 'ChatFormatMe',
@@ -46,7 +76,7 @@ Configuration._chatStreams = {
     },
     {
         name = 'mequiet',
-        formatID = 3,
+        formatID = 54,
         colorOpt = 'ColorMeQuiet',
         rangeOpt = 'RangeMeQuiet',
         chatFormatOpt = 'ChatFormatMeQuiet',
@@ -58,7 +88,7 @@ Configuration._chatStreams = {
     },
     {
         name = 'meloud',
-        formatID = 4,
+        formatID = 55,
         colorOpt = 'ColorMeLoud',
         rangeOpt = 'RangeMeLoud',
         defaultRangeOpt = 'RangeYell',
@@ -71,7 +101,7 @@ Configuration._chatStreams = {
     },
     {
         name = 'do',
-        formatID = 5,
+        formatID = 56,
         colorOpt = 'ColorDo',
         rangeOpt = 'RangeDo',
         chatFormatOpt = 'ChatFormatDo',
@@ -82,7 +112,7 @@ Configuration._chatStreams = {
     },
     {
         name = 'doquiet',
-        formatID = 6,
+        formatID = 57,
         colorOpt = 'ColorDoQuiet',
         rangeOpt = 'RangeDoQuiet',
         chatFormatOpt = 'ChatFormatDoQuiet',
@@ -94,7 +124,7 @@ Configuration._chatStreams = {
     },
     {
         name = 'doloud',
-        formatID = 7,
+        formatID = 58,
         colorOpt = 'ColorDoLoud',
         rangeOpt = 'RangeDoLoud',
         chatFormatOpt = 'ChatFormatDoLoud',
@@ -107,7 +137,7 @@ Configuration._chatStreams = {
     },
     {
         name = 'looc',
-        formatID = 8,
+        formatID = 59,
         colorOpt = 'ColorLooc',
         rangeOpt = 'RangeLooc',
         chatFormatOpt = 'ChatFormatLooc',
@@ -117,56 +147,28 @@ Configuration._chatStreams = {
     },
 }
 
--- command streams (26–50)
-Configuration._commandStreams = {
-    {
-        name = 'roll',
-        formatID = 26,
-        streamAlias = 'me',
-        colorOpt = 'ColorMe',
-        rangeOpt = 'RangeMe',
-        chatFormatOpt = 'ChatFormatRoll',
-        overheadFormatOpt = 'OverheadFormatRoll',
-        chatTypes = { say = true },
-        autoColorOption = false,
-        ignoreLanguage = true,
-    },
-    {
-        name = 'card',
-        formatID = 27,
-        streamAlias = 'me',
-        colorOpt = 'ColorMe',
-        rangeOpt = 'RangeMe',
-        chatFormatOpt = 'ChatFormatCard',
-        overheadFormatOpt = 'OverheadFormatCard',
-        chatTypes = { say = true },
-        autoColorOption = false,
-        ignoreLanguage = true,
-    },
-}
-
--- other formatters (51–100)
+-- other formatters (76–100)
 Configuration._formatters = {
     {
         name = 'callout',
-        formatID = 51,
+        formatID = 76,
     },
     {
         name = 'sneakcallout',
-        formatID = 52,
+        formatID = 77,
     },
     {
         name = 'language',
-        formatID = 53,
+        formatID = 78,
     },
     {
         name = 'overhead',
-        formatID = 54,
+        formatID = 79,
         overheadFormatOpt = 'OverheadFormatFull',
     },
     {
         name = 'adminIcon',
-        formatID = 55,
+        formatID = 80,
     },
 }
 
