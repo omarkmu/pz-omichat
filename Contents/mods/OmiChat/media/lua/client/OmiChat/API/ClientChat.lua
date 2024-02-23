@@ -680,7 +680,7 @@ end
 function OmiChat.formatForChat(text, stream, language)
     if #utils.trim(text) == 0 then
         -- avoid empty messages
-        return text
+        return ''
     end
 
     if isAdmin() and OmiChat.getAdminOption('show_icon') then
@@ -701,17 +701,7 @@ function OmiChat.formatForChat(text, stream, language)
     end
 
     local overheadFormatter = OmiChat.getFormatter('overhead')
-    local wrapped = overheadFormatter:wrap(text)
-
-    tokens[1] = wrapped
-    tokens.prefix = prefix
-
-    local formatted = utils.replaceEntities(utils.interpolate(overheadFormatter:getFormatString(), tokens))
-    if not overheadFormatter:isMatch(formatted) then
-        return wrapped
-    end
-
-    return formatted
+    return overheadFormatter:format(text, { prefix = prefix })
 end
 
 ---Gets the command associated with a color category.

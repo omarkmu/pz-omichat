@@ -24,10 +24,19 @@ local formatters = {}
 ---If the format string doesn't return proper content, this will
 ---behave as if the format string were `$1`.
 ---@param text string
+---@param tokens table?
 ---@return string
-function MetaFormatter:format(text)
+function MetaFormatter:format(text, tokens)
     text = self:wrap(text)
-    local formatted = utils.replaceEntities(utils.interpolate(self._formatString, { text }))
+    if tokens then
+        tokens = utils.copy(tokens)
+    else
+        tokens = {}
+    end
+
+    tokens[1] = text
+
+    local formatted = utils.replaceEntities(utils.interpolate(self:getFormatString(), tokens))
 
     if not self:isMatch(formatted) then
         return text
@@ -118,7 +127,7 @@ function MetaFormatter:setFormatString(format)
 end
 
 ---Creates a new meta formatter.
----@param id integer A numerical ID for the formatter, in [1, 1024]. 1–100 are reserved by OmiChat.
+---@param id integer A numerical ID for the formatter, in [101, 1024]. 1–100 are reserved by OmiChat.
 ---@param options omichat.MetaFormatterOptions? Optional initialization options.
 ---@return omichat.MetaFormatter
 function MetaFormatter:new(id, options)
