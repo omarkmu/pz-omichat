@@ -987,6 +987,10 @@ OmiChat._transformers = {
                     info.context.ocCustomStream = data.streamAlias or name
                     info.substitutions.stream = name
 
+                    if data.useQuoteColor then
+                        info.formatOptions.colorQuotes = true
+                    end
+
                     info.formatOptions.color = OmiChat.getColorOrDefault(info.context.ocCustomStream)
                     info.formatOptions.useDefaultChatColor = false
 

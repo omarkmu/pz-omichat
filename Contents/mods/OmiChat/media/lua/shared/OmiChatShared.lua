@@ -100,6 +100,7 @@ return OmiChat
 ---@field titleID string? The string ID to use for chat tags associated with this stream.
 ---@field attractZombies true? Whether messages sent with this stream should attract zombies.
 ---@field ignoreLanguage true? Whether messages sent with this stream should be understood by everyone.
+---@field useQuoteColor true? Whether matched quotes should be colored with the /say color.
 
 ---@class omichat.FormatterInfo
 ---@field name string The name of the formatter.
