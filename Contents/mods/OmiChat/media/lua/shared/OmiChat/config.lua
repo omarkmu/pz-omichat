@@ -73,6 +73,7 @@ Configuration._chatStreams = {
         chatTypes = { say = true },
         stripColors = true,
         ignoreLanguage = true,
+        useQuoteColor = true,
     },
     {
         name = 'mequiet',
@@ -85,6 +86,7 @@ Configuration._chatStreams = {
         chatTypes = { say = true },
         stripColors = true,
         ignoreLanguage = true,
+        useQuoteColor = true,
     },
     {
         name = 'meloud',
@@ -98,6 +100,7 @@ Configuration._chatStreams = {
         stripColors = true,
         attractZombies = true,
         ignoreLanguage = true,
+        useQuoteColor = true,
     },
     {
         name = 'do',
@@ -109,6 +112,7 @@ Configuration._chatStreams = {
         chatTypes = { say = true },
         stripColors = true,
         ignoreLanguage = true,
+        useQuoteColor = true,
     },
     {
         name = 'doquiet',
@@ -121,6 +125,7 @@ Configuration._chatStreams = {
         chatTypes = { say = true },
         stripColors = true,
         ignoreLanguage = true,
+        useQuoteColor = true,
     },
     {
         name = 'doloud',
@@ -134,6 +139,7 @@ Configuration._chatStreams = {
         stripColors = true,
         attractZombies = true,
         ignoreLanguage = true,
+        useQuoteColor = true,
     },
     {
         name = 'looc',

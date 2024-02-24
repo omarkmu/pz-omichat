@@ -284,7 +284,7 @@ function OmiChat.getPlayerPreferences()
         for k, v in pairs(decoded.colors) do
             local color = utils.stringToColor(v)
             if color then
-                prefs.colors[k] = v
+                prefs.colors[k] = color
             end
         end
     end

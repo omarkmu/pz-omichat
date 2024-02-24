@@ -361,6 +361,18 @@ function OmiChat.applyFormatOptions(info)
         }
     end
 
+    if options.colorQuotes then
+        local sayColor = utils.toChatColor(OmiChat.getColorOrDefault('say'), true)
+        msg = msg:gsub('%b""', function(quote)
+            return concat {
+                sayColor,
+                '<SPACE> ',
+                quote,
+                ' <POPRGB> <SPACE> ',
+            }
+        end)
+    end
+
     info.substitutions.message = msg
     return true
 end
@@ -440,6 +452,7 @@ function OmiChat.buildMessageInfo(message, skipFormatting)
             showTimestamp = instance.showTimestamp,
             useDefaultChatColor = true,
             stripColors = false,
+            colorQuotes = false,
         },
     }
 
