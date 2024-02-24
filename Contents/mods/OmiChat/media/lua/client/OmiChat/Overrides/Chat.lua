@@ -512,7 +512,11 @@ function ISChat:onCommandEntered()
     end
 
     if callbackStream and useCallback then
-        useCallback(callbackStream, command, language)
+        useCallback {
+            stream = callbackStream,
+            command = command,
+            language = language,
+        }
     end
 
     doKeyPress(false)

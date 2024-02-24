@@ -219,15 +219,16 @@ local function shouldUseNameColor(info)
         return false
     end
 
-    local pred = Option.PredicateUseNameColor
-    if pred == '' then
-        return false
-    end
+    local tokens = {
+        author = info.substitutions.author,
+        authorRaw = info.substitutions.authorRaw,
+        chatType = info.chatType,
+        name = info.substitutions.name,
+        nameRaw = info.substitutions.nameRaw,
+        stream = info.substitutions.stream,
+    }
 
-    local tokens = utils.copy(info.substitutions)
-    tokens.chatType = info.chatType
-
-    return utils.interpolate(pred, tokens, tostring(info.message:getDatetime())) ~= ''
+    return utils.testPredicate(Option.PredicateUseNameColor, tokens, tostring(info.message:getDatetime()))
 end
 
 
@@ -503,17 +504,10 @@ end
 ---@param text string
 ---@return boolean
 function OmiChat.canUseRoleplayLanguage(stream, text)
-    local pred = Option.PredicateAllowLanguage
-    if pred == '' then
-        return false
-    end
-
-    local tokens = {
-        stream = stream,
+    return utils.testPredicate(Option.PredicateAllowLanguage, {
         input = text,
-    }
-
-    return utils.interpolate(pred, tokens) ~= ''
+        stream = stream,
+    })
 end
 
 ---Determines stream information given a chat command.

@@ -223,8 +223,8 @@ OmiChat._commandStreams = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_name_no_reset',
             isEnabled = function() return Option.EnableSetName end,
-            onUse = function(_, command)
-                local _, feedback = OmiChat.setNickname(command)
+            onUse = function(ctx)
+                local _, feedback = OmiChat.setNickname(ctx.command)
                 if feedback then
                     OmiChat.showInfoMessage(feedback)
                 end
@@ -258,8 +258,8 @@ OmiChat._commandStreams = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_setname',
             isEnabled = canUseAdminCommands,
-            onUse = function(_, command)
-                OmiChat.requestSetName(command)
+            onUse = function(ctx)
+                OmiChat.requestSetName(ctx.command)
             end,
         },
     },
@@ -270,8 +270,8 @@ OmiChat._commandStreams = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_iconinfo',
             isEnabled = canUseAdminCommands,
-            onUse = function(_, command)
-                command = utils.trim(command)
+            onUse = function(ctx)
+                local command = utils.trim(ctx.command)
                 if getTexture(command) then
                     local image = table.concat { ' <SPACE> <IMAGE:', command, ',15,14> ' }
                     OmiChat.showInfoMessage(getText('UI_OmiChat_icon_info', command, image))
@@ -296,12 +296,12 @@ OmiChat._commandStreams = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_seticon',
             isEnabled = canUseAdminCommands,
-            onUse = function(self, command)
-                if not OmiChat.requestSetIcon(command) then
-                    local args = utils.parseCommandArgs(command)
+            onUse = function(ctx)
+                if not OmiChat.requestSetIcon(ctx.command) then
+                    local args = utils.parseCommandArgs(ctx.command)
                     local icon = args[2]
                     if not args[1] or not icon then
-                        OmiChat.showInfoMessage(self:getHelpText())
+                        OmiChat.showInfoMessage(ctx.stream:getHelpText())
                     else
                         OmiChat.showInfoMessage(getText('UI_OmiChat_icon_info_unknown', icon))
                     end
@@ -316,8 +316,8 @@ OmiChat._commandStreams = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_resetname',
             isEnabled = canUseAdminCommands,
-            onUse = function(_, command)
-                OmiChat.requestResetName(command)
+            onUse = function(ctx)
+                OmiChat.requestResetName(ctx.command)
             end,
         },
     },
@@ -328,8 +328,8 @@ OmiChat._commandStreams = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_reseticon',
             isEnabled = canUseAdminCommands,
-            onUse = function(_, command)
-                OmiChat.requestResetIcon(command)
+            onUse = function(ctx)
+                OmiChat.requestResetIcon(ctx.command)
             end,
         },
     },
@@ -340,8 +340,8 @@ OmiChat._commandStreams = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_addlanguage',
             isEnabled = canUseAdminCommands,
-            onUse = function(_, command)
-                OmiChat.requestAddLanguage(command)
+            onUse = function(ctx)
+                OmiChat.requestAddLanguage(ctx.command)
             end,
         },
     },
@@ -352,8 +352,8 @@ OmiChat._commandStreams = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_resetlanguages',
             isEnabled = canUseAdminCommands,
-            onUse = function(_, command)
-                OmiChat.requestResetLanguages(command)
+            onUse = function(ctx)
+                OmiChat.requestResetLanguages(ctx.command)
             end,
         },
     },
@@ -364,8 +364,8 @@ OmiChat._commandStreams = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_setlanguageslots',
             isEnabled = canUseAdminCommands,
-            onUse = function(_, command)
-                OmiChat.requestSetLanguageSlots(command)
+            onUse = function(ctx)
+                OmiChat.requestSetLanguageSlots(ctx.command)
             end,
         },
     },
@@ -380,9 +380,9 @@ OmiChat._commandStreams = {
                 local inv = player:getInventory()
                 return inv:contains('CardDeck') or player:getAccessLevel() ~= 'None'
             end,
-            onUse = function(self)
+            onUse = function(ctx)
                 if not OmiChat.requestDrawCard() then
-                    OmiChat.showInfoMessage(self:getHelpText())
+                    OmiChat.showInfoMessage(ctx.stream:getHelpText())
                 end
             end,
         },
@@ -398,19 +398,19 @@ OmiChat._commandStreams = {
                 local inv = player:getInventory()
                 return inv:contains('Dice') or player:getAccessLevel() ~= 'None'
             end,
-            onUse = function(self, command)
-                command = utils.trim(command)
+            onUse = function(ctx)
+                local command = utils.trim(ctx.command)
                 local first = command:split(' ')[1]
                 local sides = first and tonumber(first)
                 if not sides and #command == 0 then
                     sides = 6
                 elseif not sides then
-                    OmiChat.showInfoMessage(self:getHelpText())
+                    OmiChat.showInfoMessage(ctx.stream:getHelpText())
                     return
                 end
 
                 if not OmiChat.requestRollDice(sides) then
-                    OmiChat.showInfoMessage(self:getHelpText())
+                    OmiChat.showInfoMessage(ctx.stream:getHelpText())
                 end
             end,
         },
@@ -422,7 +422,7 @@ OmiChat._commandStreams = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_emotes',
             isEnabled = function() return Option.EnableEmotes end,
-            onUse = function(self) self:onHelp() end,
+            onUse = function(ctx) ctx.stream:onHelp() end,
             onHelp = function()
                 -- collect currently available emotes
                 local emotes = {}
@@ -470,7 +470,7 @@ OmiChat._commandStreams = {
         command = '/help ',
         omichat = {
             isCommand = true,
-            onUse = function(_, command)
+            onUse = function(ctx)
                 local accessLevel
                 if isCoopHost() then
                     accessLevel = 'admin'
@@ -479,6 +479,7 @@ OmiChat._commandStreams = {
                     accessLevel = player and player:getAccessLevel()
                 end
 
+                local command = ctx.command
                 if not accessLevel then
                     -- something went wrong, defer to default help command
                     SendCommandToServer('/help ' .. command)

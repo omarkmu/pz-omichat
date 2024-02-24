@@ -3,6 +3,7 @@
 ---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Client'
 local utils = OmiChat.utils
+local Option = OmiChat.Option
 
 local concat = table.concat
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
@@ -25,21 +26,40 @@ local function isCustomChatEnabled(stream)
 end
 
 ---Handler for basic chat streams.
----@param stream omichat.StreamInfo
----@param command string
----@param language string?
-local function useBasicChat(stream, command, language)
-    command = utils.trim(command)
+---@param ctx omichat.UseCallbackContext
+---@param customFormatter omichat.MetaFormatter?
+local function useBasicChat(ctx, customFormatter)
+    local stream = ctx.stream
+    local command = utils.trim(ctx.command)
     if #command == 0 then
         return
     end
 
-    local ctx = stream:getContext()
-    command = OmiChat.formatForChat(command, stream:getIdentifier(), language)
+    local chatType = ctx.stream:getChatType()
+    local identifier = ctx.stream:getIdentifier()
+    local tokens = {
+        chatType = chatType,
+        stream = identifier,
+    }
 
-    if ctx and ctx.ocProcess then
-        local result = ctx.ocProcess(command)
-        if result and ctx.ocAppendResultToLastCommand and OmiChat.getRetainCommand(stream:getCommandType()) then
+    if customFormatter then
+        local player = getSpecificPlayer(0)
+        local username = player and player:getUsername()
+        local name = OmiChat.getNameInChat(username, chatType)
+        command = customFormatter:format(command, {
+            name = name,
+            username = username,
+            chatType = chatType,
+            stream = identifier,
+        })
+    end
+
+    local streamContext = stream:getContext()
+    command = OmiChat.formatForChat(command, identifier, ctx.language)
+
+    if streamContext and streamContext.ocProcess then
+        local result = streamContext.ocProcess(command)
+        if result and streamContext.ocAppendResultToLastCommand and OmiChat.getRetainCommand(stream:getCommandType()) then
             local chatText = ISChat.instance.chatText
             chatText.lastChatCommand = concat { chatText.lastChatCommand, result, ' ' }
         end
@@ -49,16 +69,9 @@ local function useBasicChat(stream, command, language)
 end
 
 ---Helper for handling formatted chat stream use.
----@param stream omichat.StreamInfo
----@param command string
----@param language string?
-local function useCustomChat(stream, command, language)
-    command = utils.trim(command)
-    if #command == 0 then
-        return
-    end
-
-    useBasicChat(stream, OmiChat.getFormatter(stream:getName()):format(command), language)
+---@param ctx omichat.UseCallbackContext
+local function useCustomChat(ctx)
+    useBasicChat(ctx, OmiChat.getFormatter(ctx.stream:getName()))
 end
 
 
@@ -139,6 +152,7 @@ OmiChat._customChatStreams = {
             allowEmotes = true,
             allowIconPicker = false,
             commandType = 'rp',
+            chatType = 'shout',
             isEnabled = isCustomChatEnabled,
             onUse = useCustomChat,
         },
@@ -179,6 +193,7 @@ OmiChat._customChatStreams = {
             allowEmotes = true,
             allowIconPicker = false,
             commandType = 'rp',
+            chatType = 'shout',
             isEnabled = isCustomChatEnabled,
             onUse = useCustomChat,
         },
@@ -196,6 +211,7 @@ OmiChat._vanillaStreamConfigs = {
     yell = {
         commandType = 'chat',
         streamIdentifier = 'shout',
+        chatType = 'shout',
         isEnabled = isBasicChatEnabled,
         onUse = useBasicChat,
         context = {
@@ -207,6 +223,7 @@ OmiChat._vanillaStreamConfigs = {
         allowEmotes = false,
         commandType = 'chat',
         streamIdentifier = 'private',
+        chatType = 'whisper',
         isEnabled = isBasicChatEnabled,
         onUse = useBasicChat,
         context = {
@@ -220,6 +237,7 @@ OmiChat._vanillaStreamConfigs = {
     faction = {
         allowEmotes = false,
         commandType = 'chat',
+        chatType = 'faction',
         isEnabled = isBasicChatEnabled,
         onUse = useBasicChat,
         context = {
@@ -230,6 +248,7 @@ OmiChat._vanillaStreamConfigs = {
     safehouse = {
         allowEmotes = false,
         commandType = 'chat',
+        chatType = 'safehouse',
         isEnabled = isBasicChatEnabled,
         onUse = useBasicChat,
         context = {
@@ -240,6 +259,7 @@ OmiChat._vanillaStreamConfigs = {
     general = {
         allowEmotes = false,
         commandType = 'chat',
+        chatType = 'general',
         isEnabled = isBasicChatEnabled,
         onUse = useBasicChat,
         context = {
@@ -250,6 +270,7 @@ OmiChat._vanillaStreamConfigs = {
     admin = {
         allowEmotes = false,
         commandType = 'chat',
+        chatType = 'admin',
         isEnabled = isBasicChatEnabled,
         onUse = useBasicChat,
         context = {
