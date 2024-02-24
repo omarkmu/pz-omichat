@@ -86,12 +86,18 @@ return OmiChat
 ---@field suggest fun(self: table, info: omichat.SuggestionInfo) Performs suggestion.
 ---@field priority integer? The priority of the suggester. Higher numbers will run first.
 
+---@class omichat.UseCallbackContext
+---@field command string
+---@field language string?
+---@field stream omichat.StreamInfo
+
 ---@class omichat.BaseStreamConfig
 ---@field commandType omichat.ChatCommandType? The command type used to determine whether input should be retained.
+---@field chatType string? The chat type associated with the stream.
 ---@field context table? Table for arbitrary context data.
 ---@field isCommand boolean? Indicates that the stream is a command.
 ---@field isEnabled (fun(self: omichat.StreamInfo): boolean)? Returns a boolean representing whether the stream is enabled.
----@field onUse fun(self: omichat.StreamInfo, command: string, language?: string)? Callback triggered when the stream is used.
+---@field onUse fun(ctx: omichat.UseCallbackContext)? Callback triggered when the stream is used.
 ---@field allowEmotes boolean? Whether to allow emotes on this stream. Defaults to true for non-commands and false for commands.
 ---@field allowIconPicker boolean? Whether to enable the icon button for this stream. Defaults to false.
 ---@field streamIdentifier string? The stream identifier tied to this stream. Used for format strings and determining roleplay language. Defaults to stream name.

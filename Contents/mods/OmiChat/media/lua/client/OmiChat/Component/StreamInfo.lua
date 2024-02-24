@@ -13,6 +13,11 @@ function StreamInfo:config()
     return self._stream.omichat or {}
 end
 
+---Returns the chat type associated with the stream.
+function StreamInfo:getChatType()
+    return self:config().chatType or 'say'
+end
+
 ---Returns the stream's main command.
 ---@return string
 function StreamInfo:getCommand()
@@ -90,7 +95,7 @@ function StreamInfo:getTabID()
 end
 
 ---Gets the callback to use when the stream is used.
----@return fun(self: omichat.StreamInfo, command: string, language?: string)?
+---@return fun(ctx: omichat.UseCallbackContext)?
 function StreamInfo:getUseCallback()
     return self:config().onUse
 end
@@ -148,16 +153,6 @@ function StreamInfo:onHelp()
     local helpCallback = self:getHelpCallback()
     if helpCallback then
         helpCallback(self)
-    end
-end
-
----Calls the use callback, if one exists.
----@param command string
----@param language string?
-function StreamInfo:onUse(command, language)
-    local useCallback = self:getUseCallback()
-    if useCallback then
-        useCallback(self, command, language)
     end
 end
 
