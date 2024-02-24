@@ -232,7 +232,7 @@ function ISChat.onToggleRetainCommand(target, type)
 
         if lastChatCommand then
             local stream = OmiChat.chatCommandToStream(lastChatCommand, true)
-            local commandType = (stream and stream.omichat and stream.omichat.commandType) or 'other'
+            local commandType = stream and stream:getCommandType()
             if commandType == type then
                 chatText.lastChatCommand = ''
             end

@@ -9,23 +9,23 @@ local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
 
 ---Checks whether the stream associated with a basic chat is enabled.
----@param stream omichat.ChatStream
+---@param stream omichat.StreamInfo
 ---@return boolean
 local function isBasicChatEnabled(stream)
-    local ctx = stream.omichat and stream.omichat.context
-    local cmd = ctx and ctx.ocIsEnabledCommand or stream.command
+    local ctx = stream:getContext()
+    local cmd = ctx and ctx.ocIsEnabledCommand or stream:getCommand()
     return checkPlayerCanUseChat(cmd)
 end
 
 ---Helper for checking if a custom chat stream is enabled.
----@param stream omichat.BaseStream
+---@param stream omichat.StreamInfo
 ---@return boolean
 local function isCustomChatEnabled(stream)
-    return OmiChat.isCustomStreamEnabled(stream.name)
+    return OmiChat.isCustomStreamEnabled(stream:getName())
 end
 
 ---Handler for basic chat streams.
----@param stream omichat.ChatStream
+---@param stream omichat.StreamInfo
 ---@param command string
 ---@param language string?
 local function useBasicChat(stream, command, language)
@@ -34,14 +34,12 @@ local function useBasicChat(stream, command, language)
         return
     end
 
-    local ctx = stream.omichat.context
-    local streamName = stream.omichat.streamName or stream.name
-    command = OmiChat.formatForChat(command, streamName, language)
+    local ctx = stream:getContext()
+    command = OmiChat.formatForChat(command, stream:getIdentifier(), language)
 
     if ctx and ctx.ocProcess then
         local result = ctx.ocProcess(command)
-        local commandType = stream.omichat.commandType or 'other'
-        if result and ctx.ocAppendResultToLastCommand and OmiChat.getRetainCommand(commandType) then
+        if result and ctx.ocAppendResultToLastCommand and OmiChat.getRetainCommand(stream:getCommandType()) then
             local chatText = ISChat.instance.chatText
             chatText.lastChatCommand = concat { chatText.lastChatCommand, result, ' ' }
         end
@@ -51,16 +49,16 @@ local function useBasicChat(stream, command, language)
 end
 
 ---Helper for handling formatted chat stream use.
----@param self omichat.ChatStream
+---@param stream omichat.StreamInfo
 ---@param command string
 ---@param language string?
-local function useCustomChat(self, command, language)
+local function useCustomChat(stream, command, language)
     command = utils.trim(command)
     if #command == 0 then
         return
     end
 
-    useBasicChat(self, OmiChat.getFormatter(self.name):format(command), language)
+    useBasicChat(stream, OmiChat.getFormatter(stream:getName()):format(command), language)
 end
 
 
@@ -81,7 +79,7 @@ OmiChat._customChatStreams = {
     low = {
         name = 'low',
         command = '/low ',
-        shortCommand = '/low ',
+        shortCommand = '/q ',
         tabID = 1,
         omichat = {
             allowEmotes = true,
@@ -197,7 +195,7 @@ OmiChat._vanillaStreamConfigs = {
     },
     yell = {
         commandType = 'chat',
-        streamName = 'shout',
+        streamIdentifier = 'shout',
         isEnabled = isBasicChatEnabled,
         onUse = useBasicChat,
         context = {
@@ -208,7 +206,7 @@ OmiChat._vanillaStreamConfigs = {
     private = {
         allowEmotes = false,
         commandType = 'chat',
-        streamName = 'private',
+        streamIdentifier = 'private',
         isEnabled = isBasicChatEnabled,
         onUse = useBasicChat,
         context = {
