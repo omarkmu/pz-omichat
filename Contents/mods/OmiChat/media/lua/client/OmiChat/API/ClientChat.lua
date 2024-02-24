@@ -20,6 +20,7 @@ local utils = OmiChat.utils
 local config = OmiChat.config
 local Option = OmiChat.Option
 local IconPicker = OmiChat.IconPicker
+local StreamInfo = OmiChat.StreamInfo
 
 local _ChatBase = __classmetatables[ChatBase.class].__index
 local _ChatMessage = __classmetatables[ChatMessage.class].__index
@@ -505,7 +506,7 @@ end
 ---Determines stream information given a chat command.
 ---@param command string The input text.
 ---@param includeCommands boolean? If true, commands should be included. Defaults to true.
----@return (omichat.ChatStream | omichat.CommandStream)? #The stream.
+---@return omichat.StreamInfo? #Information about the stream.
 ---@return string #The text following the command in the input.
 ---@return string? #The command or short command that was used.
 function OmiChat.chatCommandToStream(command, includeCommands)
@@ -555,7 +556,12 @@ function OmiChat.chatCommandToStream(command, includeCommands)
         i = i + 1
     end
 
-    return chatStream, command, chatCommand
+    local streamInfo
+    if chatStream then
+        streamInfo = StreamInfo:new(chatStream)
+    end
+
+    return streamInfo, command, chatCommand
 end
 
 ---Retrieves a stream name given a chat command.
@@ -565,7 +571,7 @@ end
 function OmiChat.chatCommandToStreamName(command, includeCommands)
     local stream = OmiChat.chatCommandToStream(command, includeCommands)
     if stream then
-        return stream.name
+        return stream:getName()
     end
 end
 
@@ -602,8 +608,8 @@ function OmiChat.cycleStream(target)
 
         if not target or stream.name == target then
             if stream.omichat then
-                local isEnabled = stream.omichat.isEnabled
-                if not isEnabled or isEnabled(stream) then
+                local info = StreamInfo:new(stream)
+                if info:isEnabled() then
                     targetID = streamID
                     break
                 end
@@ -723,6 +729,16 @@ function OmiChat.getColorCategoryCommand(cat)
     return '/' .. cat
 end
 
+---Returns information about the default stream for a given tab ID.
+---@param tabID integer
+---@return omichat.StreamInfo?
+function OmiChat.getDefaultTabStream(tabID)
+    local default = ISChat.defaultTabStream[tabID]
+    if default then
+        return StreamInfo:new(default)
+    end
+end
+
 ---Builds the default overhead text prefix given a chat stream name and a language.
 ---If there should be no prefix, returns nil.
 ---@param stream string
@@ -836,7 +852,7 @@ function OmiChat.getLanguageEncodedText(text, playEmoteForSigned)
     local trimmed = utils.trimleft(text)
     if #trimmed == 0 then
         -- avoid creating empty messages
-        return text
+        return ''
     end
 
     local encoded = utils.encodeInvisibleCharacter(langId) .. trimmed
@@ -928,6 +944,19 @@ function OmiChat.hideSuggesterBox()
     local suggesterBox = instance and instance.suggesterBox
     if suggesterBox then
         suggesterBox:setVisible(false)
+    end
+end
+
+---Returns an iterator over command stream info.
+---@return fun(): omichat.StreamInfo?
+function OmiChat.iterCommandStreams()
+    local i = 0
+    return function()
+        i = i + 1
+        local stream = OmiChat._commandStreams[i]
+        if stream then
+            return StreamInfo:new(stream)
+        end
     end
 end
 
@@ -1057,15 +1086,10 @@ function OmiChat.updateIconComponents(text)
     local stream = OmiChat.chatCommandToStream(text)
 
     if not stream then
-        stream = ISChat.defaultTabStream[instance.currentTabID]
+        stream = OmiChat.getDefaultTabStream(instance.currentTabID)
     end
 
-    local enable = false
-    if stream and stream.omichat and stream.omichat.allowIconPicker ~= nil then
-        -- enable icon button for custom chats where appropriate
-        enable = stream.omichat.allowIconPicker
-    end
-
+    local enable = stream and stream:isAllowIconPicker() or false
     OmiChat.setIconButtonEnabled(enable)
 end
 

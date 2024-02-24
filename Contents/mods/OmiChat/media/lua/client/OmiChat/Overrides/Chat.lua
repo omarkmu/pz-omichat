@@ -424,43 +424,32 @@ function ISChat:onCommandEntered()
         allowEmotes = not isCommand
         command = input
 
-        local default = ISChat.defaultTabStream[instance.currentTabID]
+        local default = OmiChat.getDefaultTabStream(instance.currentTabID)
         if not isCommand and default then
             stream = default
+            allowEmotes = not isCommand and default:isAllowEmotes()
             isDefault = true
         end
     end
 
     if stream then
-        if stream.tabID and instance.currentTabID ~= stream.tabID then
+        if not stream:isTabID(instance.currentTabID) then
             -- wrong chat tab
-            showWrongChatTabMessage(instance.currentTabID - 1, stream.tabID - 1, chatCommand or '')
+            showWrongChatTabMessage(instance.currentTabID - 1, stream:getTabID() - 1, chatCommand or '')
             stream = nil
             allowEmotes = false
             allowLanguages = false
             shouldHandle = true
-        elseif stream.omichat then
-            local isEnabled = stream.omichat.isEnabled
-            if isEnabled and not isEnabled(stream) then
+        else
+            if not stream:isEnabled() then
                 stream = nil
             else
                 shouldHandle = true
-                allowEmotes = true
-                allowLanguages = OmiChat.canUseRoleplayLanguage(stream.omichat.streamName or stream.name, command)
-
-                useCallback = stream.omichat.onUse
                 callbackStream = stream
-
-                if stream.omichat.allowEmotes ~= nil then
-                    allowEmotes = not not stream.omichat.allowEmotes
-                elseif stream.omichat.isCommand then
-                    allowEmotes = false
-                end
-
-                local streamCommandType = stream.omichat.commandType
-                if streamCommandType then
-                    commandType = streamCommandType
-                end
+                allowEmotes = not isDefault and stream:isAllowEmotes() or allowEmotes
+                allowLanguages = OmiChat.canUseRoleplayLanguage(stream:getIdentifier(), command)
+                useCallback = stream:getUseCallback()
+                commandType = stream:getCommandType()
             end
         end
 
@@ -489,7 +478,7 @@ function ISChat:onCommandEntered()
     local shouldRetain = OmiChat.getRetainCommand(commandType)
     if shouldRetain and stream then
         -- fix the switching functionality by updating to the used stream
-        OmiChat.cycleStream(stream.name)
+        OmiChat.cycleStream(stream:getName())
     end
 
     if not shouldHandle then

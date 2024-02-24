@@ -89,17 +89,17 @@ return OmiChat
 ---@field commandType omichat.ChatCommandType? The command type used to determine whether input should be retained.
 ---@field context table? Table for arbitrary context data.
 ---@field isCommand boolean? Indicates that the stream is a command.
----@field isEnabled (fun(self: table): boolean)? Returns a boolean representing whether the stream is enabled.
----@field onUse fun(self: table, command: string, language?: string)? Callback triggered when the stream is used.
+---@field isEnabled (fun(self: omichat.StreamInfo): boolean)? Returns a boolean representing whether the stream is enabled.
+---@field onUse fun(self: omichat.StreamInfo, command: string, language?: string)? Callback triggered when the stream is used.
 ---@field allowEmotes boolean? Whether to allow emotes on this stream. Defaults to true for non-commands and false for commands.
 ---@field allowIconPicker boolean? Whether to enable the icon button for this stream. Defaults to false.
----@field streamName string? The stream name tied to this stream. Used for format strings and determining roleplay language.
+---@field streamIdentifier string? The stream identifier tied to this stream. Used for format strings and determining roleplay language. Defaults to stream name.
 
 ---@class omichat.ChatStreamConfig : omichat.BaseStreamConfig
 
 ---@class omichat.CommandStreamConfig : omichat.BaseStreamConfig
 ---@field helpText string? String ID of a summary of the command's purpose. Displays when the /help command is used.
----@field onHelp fun(self: table)? Callback triggered when /help is used with this command.
+---@field onHelp fun(self: omichat.StreamInfo)? Callback triggered when /help is used with this command.
 
 ---@class omichat.BaseStream
 ---@field name string The name of the stream.
@@ -114,6 +114,10 @@ return OmiChat
 ---A stream used to invoke a command in chat.
 ---@class omichat.CommandStream : omichat.BaseStream
 ---@field omichat omichat.CommandStreamConfig Additional configuration options.
+
+---@alias omichat.Stream
+---| omichat.ChatStream
+---| omichat.CommandStream
 
 ---Player preferences.
 ---@class omichat.PlayerPreferences

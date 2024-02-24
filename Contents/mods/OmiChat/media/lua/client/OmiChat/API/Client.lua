@@ -25,10 +25,12 @@ local OmiChat = require 'OmiChatShared'
 local Option = OmiChat.Option
 local utils = OmiChat.utils
 local config = OmiChat.config
+local StreamInfo = require 'OmiChat/Component/StreamInfo'
 
 OmiChat.ColorModal = require 'OmiChat/Component/ColorModal'
 OmiChat.IconPicker = require 'OmiChat/Component/IconPicker'
 OmiChat.SuggesterBox = require 'OmiChat/Component/SuggesterBox'
+OmiChat.StreamInfo = StreamInfo
 
 OmiChat._prefsVersion = 1
 OmiChat._prefsFileName = 'omichat.json'
@@ -299,7 +301,7 @@ OmiChat._commandStreams = {
                     local args = utils.parseCommandArgs(command)
                     local icon = args[2]
                     if not args[1] or not icon then
-                        OmiChat.showInfoMessage(getText(self.omichat.helpText))
+                        OmiChat.showInfoMessage(self:getHelpText())
                     else
                         OmiChat.showInfoMessage(getText('UI_OmiChat_icon_info_unknown', icon))
                     end
@@ -380,7 +382,7 @@ OmiChat._commandStreams = {
             end,
             onUse = function(self)
                 if not OmiChat.requestDrawCard() then
-                    OmiChat.showInfoMessage(getText(self.omichat.helpText))
+                    OmiChat.showInfoMessage(self:getHelpText())
                 end
             end,
         },
@@ -403,12 +405,12 @@ OmiChat._commandStreams = {
                 if not sides and #command == 0 then
                     sides = 6
                 elseif not sides then
-                    OmiChat.showInfoMessage(getText(self.omichat.helpText))
+                    OmiChat.showInfoMessage(self:getHelpText())
                     return
                 end
 
                 if not OmiChat.requestRollDice(sides) then
-                    OmiChat.showInfoMessage(getText(self.omichat.helpText))
+                    OmiChat.showInfoMessage(self:getHelpText())
                 end
             end,
         },
@@ -420,7 +422,7 @@ OmiChat._commandStreams = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_emotes',
             isEnabled = function() return Option.EnableEmotes end,
-            onUse = function(self) self.omichat.onHelp() end,
+            onUse = function(self) self:onHelp() end,
             onHelp = function()
                 -- collect currently available emotes
                 local emotes = {}
@@ -487,27 +489,24 @@ OmiChat._commandStreams = {
 
                 -- specific command help
                 if #command > 0 then
-                    ---@type omichat.CommandStream?
-                    local helpStream
+                    ---@type omichat.StreamInfo?, function?, string?
+                    local helpStream, helpCallback, helpText
 
-                    for i = 1, #OmiChat._commandStreams do
-                        local stream = OmiChat._commandStreams[i]
-                        if stream.name == command then
-                            local isEnabled = stream.omichat and stream.omichat.isEnabled
-                            if stream.omichat and (not isEnabled or isEnabled(stream)) then
-                                if stream.omichat.onHelp or stream.omichat.helpText then
-                                    helpStream = stream
-                                end
+                    for stream in OmiChat.iterCommandStreams() do
+                        if stream:getName() == command and stream:isEnabled() then
+                            helpCallback = stream:getHelpCallback()
+                            helpText = stream:getHelpTextStringID() and stream:getHelpText()
+                            if helpCallback or helpText then
+                                helpStream = stream
+                                break
                             end
-
-                            break
                         end
                     end
 
-                    if helpStream and helpStream.omichat.onHelp then
-                        helpStream.omichat.onHelp(helpStream)
-                    elseif helpStream and helpStream.omichat.helpText then
-                        OmiChat.showInfoMessage(getText(helpStream.omichat.helpText))
+                    if helpCallback then
+                        helpCallback(helpStream)
+                    elseif helpText then
+                        OmiChat.showInfoMessage(helpText)
                     else
                         -- defer to default help command
                         SendCommandToServer('/help ' .. command)
@@ -516,17 +515,17 @@ OmiChat._commandStreams = {
                     return
                 end
 
+                -- overall help
                 local seen = {}
                 local commands = {} ---@type omichat.VanillaCommand[]
 
-                for i = 1, #OmiChat._commandStreams do
-                    local stream = OmiChat._commandStreams[i]
-                    if stream.omichat then
-                        local isEnabled = stream.omichat.isEnabled
-                        local helpText = stream.omichat.helpText
-                        if not seen[stream.name] and helpText and (not isEnabled or isEnabled(stream)) then
-                            seen[stream.name] = true
-                            commands[#commands + 1] = { name = stream.name, helpText = helpText, access = 0 }
+                for stream in OmiChat.iterCommandStreams() do
+                    if stream:config() then
+                        local name = stream:getName()
+                        local helpText = stream:getHelpTextStringID()
+                        if not seen[name] and helpText and stream:isEnabled() then
+                            seen[name] = true
+                            commands[#commands + 1] = { name = name, helpText = helpText, access = 0 }
                         end
                     end
                 end
@@ -573,20 +572,20 @@ OmiChat._suggesters = {
         ---@param currentTabID integer
         ---@param startsWith string[]
         ---@param contains string[]
-        collectStreamResults = function(_, tab, command, fullCommand, currentTabID, startsWith, contains)
+        collectStreamResults = function(tab, command, fullCommand, currentTabID, startsWith, contains)
             for i = 1, #tab do
-                local stream = tab[i]
-                local isEnabled = stream.omichat and stream.omichat.isEnabled
-                local matchingTab = not stream.tabID or currentTabID == stream.tabID
-                if matchingTab and (not isEnabled or isEnabled(stream)) then
-                    if utils.startsWith(stream.command, fullCommand) then
-                        startsWith[#startsWith + 1] = stream.command
-                    elseif stream.shortCommand and utils.startsWith(stream.shortCommand, fullCommand) then
-                        startsWith[#startsWith + 1] = stream.shortCommand
-                    elseif utils.contains(stream.command, command) then
-                        contains[#contains + 1] = stream.command
-                    elseif stream.shortCommand and utils.contains(stream.shortCommand, command) then
-                        contains[#contains + 1] = stream.shortCommand
+                local stream = StreamInfo:new(tab[i])
+                if stream:isTabID(currentTabID) and stream:isEnabled() then
+                    local streamCommand = stream:getCommand()
+                    local shortCommand = stream:getShortCommand()
+                    if utils.startsWith(streamCommand, fullCommand) then
+                        startsWith[#startsWith + 1] = streamCommand
+                    elseif shortCommand and utils.startsWith(shortCommand, fullCommand) then
+                        startsWith[#startsWith + 1] = shortCommand
+                    elseif utils.contains(streamCommand, command) then
+                        contains[#contains + 1] = streamCommand
+                    elseif shortCommand and utils.contains(shortCommand, command) then
+                        contains[#contains + 1] = shortCommand
                     end
                 end
             end
@@ -613,7 +612,7 @@ OmiChat._suggesters = {
                 return
             end
 
-            local command = info.input:match('^/(%S*)$')
+            local command = info.input:match('^/(%S+)$')
             if not command then
                 return
             end
@@ -625,8 +624,8 @@ OmiChat._suggesters = {
             local contains = {}
 
             -- chat & command streams
-            self:collectStreamResults(ISChat.allChatStreams, command, fullCommand, currentTabID, startsWith, contains)
-            self:collectStreamResults(OmiChat._commandStreams, command, fullCommand, currentTabID, startsWith, contains)
+            self.collectStreamResults(ISChat.allChatStreams, command, fullCommand, currentTabID, startsWith, contains)
+            self.collectStreamResults(OmiChat._commandStreams, command, fullCommand, currentTabID, startsWith, contains)
 
             -- vanilla command streams
             for i = 1, #vanillaCommands do
@@ -666,7 +665,7 @@ OmiChat._suggesters = {
             end
 
             local stream = OmiChat.chatCommandToStream(info.input)
-            local context = stream and stream.omichat and stream.omichat.context
+            local context = stream and stream:getContext()
             local wantsSuggestions = context and context.ocSuggestUsernames
 
             local player = getSpecificPlayer(0)
@@ -735,38 +734,25 @@ OmiChat._suggesters = {
 
             local currentTabID = instance.currentTabID
             local stream = OmiChat.chatCommandToStream(info.input)
-            local allowEmotes = false
             if not stream then
-                local isCommand = utils.startsWith(info.input, '/')
-                local default = ISChat.defaultTabStream[currentTabID]
-                allowEmotes = not isCommand
-
-                if not isCommand and default then
-                    stream = default
-                else
+                if utils.startsWith(info.input, '/') then
+                    -- disallow for unknown commands
                     return
                 end
+
+                local default = OmiChat.getDefaultTabStream(currentTabID)
+                if not default then
+                    return
+                end
+
+                stream = default
             end
 
-            if stream.tabID and currentTabID ~= stream.tabID then
+            if not stream:isTabID(currentTabID) then
                 return
             end
 
-            local def = stream.omichat
-            if def then
-                if def.isEnabled and not def.isEnabled(stream) then
-                    return
-                end
-
-                allowEmotes = true
-                if def.allowEmotes ~= nil then
-                    allowEmotes = def.allowEmotes
-                elseif def.isCommand then
-                    allowEmotes = false
-                end
-            end
-
-            if not allowEmotes then
+            if not stream:isEnabled() or not stream:isAllowEmotes() then
                 return
             end
 
