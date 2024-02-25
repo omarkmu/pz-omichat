@@ -128,7 +128,6 @@ Configuration._chatStreams = {
         overheadFormatOpt = 'OverheadFormatMeLoud',
         chatTypes = { shout = true },
         stripColors = true,
-        attractZombies = true,
         ignoreLanguage = true,
     },
     {
@@ -164,7 +163,6 @@ Configuration._chatStreams = {
         defaultRangeOpt = 'RangeYell',
         chatTypes = { shout = true },
         stripColors = true,
-        attractZombies = true,
         ignoreLanguage = true,
     },
     {

@@ -891,8 +891,6 @@ OmiChat._transformers = {
 
             info.context.ocCustomStream = 'me'
             info.substitutions.stream = 'card'
-
-            info.message:setShouldAttractZombies(false)
         end,
     },
     {
@@ -938,8 +936,6 @@ OmiChat._transformers = {
 
             info.context.ocCustomStream = 'me'
             info.substitutions.stream = 'roll'
-
-            info.message:setShouldAttractZombies(false)
         end,
     },
     {
@@ -1013,8 +1009,6 @@ OmiChat._transformers = {
                     if data.titleID then
                         info.titleID = data.titleID
                     end
-
-                    info.message:setShouldAttractZombies(not not data.attractZombies)
 
                     if Option[data.overheadFormatOpt] == '' then
                         info.message:setOverHeadSpeech(false)
@@ -1181,16 +1175,13 @@ OmiChat._transformers = {
             local range
             local defaultRange
             local streamData = config:getCustomStreamInfo(info.context.ocCustomStream)
-            local shouldAttract = true
             if streamData then
                 range = Option[streamData.rangeOpt]
                 defaultRange = Option:getDefault(streamData.defaultRangeOpt or 'RangeSay')
             elseif info.context.ocIsCallout then
-                shouldAttract = false -- callouts already make a sound
                 range = Option.RangeCallout
                 defaultRange = Option:getDefault('RangeYell')
             elseif info.context.ocIsSneakCallout then
-                shouldAttract = false -- callouts already make a sound
                 range = Option.RangeSneakCallout
                 defaultRange = Option:getDefault('RangeYell')
             elseif info.chatType == 'say' then
@@ -1201,8 +1192,12 @@ OmiChat._transformers = {
                 defaultRange = Option:getDefault('RangeYell')
             end
 
-            if range and shouldAttract then
+            if range then
                 info.attractRange = range * Option.RangeMultiplierZombies
+                if not info.context.ocIsCallout and not info.context.ocIsSneakCallout then
+                    local tokens = { stream = info.substitutions.stream }
+                    info.message:setShouldAttractZombies(utils.testPredicate(Option.PredicateCanZombiesHear, tokens))
+                end
             end
 
             if isAdmin() and OmiChat.getAdminOption('ignore_message_range') then

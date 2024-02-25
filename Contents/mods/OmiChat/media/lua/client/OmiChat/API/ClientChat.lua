@@ -733,7 +733,7 @@ end
 ---@param args omichat.FormatForChatArgs
 ---@return string
 function OmiChat.formatForChat(args)
-    local text = args.text
+    local text = utils.interpolate(Option.FilterChatInput, { input = args.text })
     if #utils.trim(text) == 0 then
         -- avoid empty messages
         return ''

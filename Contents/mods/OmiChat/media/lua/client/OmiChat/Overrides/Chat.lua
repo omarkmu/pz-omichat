@@ -303,6 +303,8 @@ function ISChat.addLineInChat(message, tabID)
 
     local soundRange
     local player = getSpecificPlayer(0)
+    local username = player and player:getUsername()
+
     local mtIndex = (getmetatable(message) or {}).__index
     if mtIndex == _ChatMessage or mtIndex == _ServerChatMessage or utils.isinstance(message, OmiChat.MimicMessage) then
         local chatType = OmiChat.getMessageChatType(message)
@@ -311,7 +313,6 @@ function ISChat.addLineInChat(message, tabID)
             local value = formatter:read(message:getText())
             local onlineID = value and utils.decodeInvisibleInt(value)
             local authorPlayer = onlineID and getPlayerByOnlineID(onlineID)
-            local username = player and player:getUsername()
 
             if authorPlayer then
                 message:setAuthor(authorPlayer:getUsername())
@@ -330,13 +331,8 @@ function ISChat.addLineInChat(message, tabID)
                 return
             end
 
-            if message:isShouldAttractZombies() then
-                local username = player and player:getUsername()
-                local author = message:getAuthor()
-
-                if username == author then
-                    soundRange = info.attractRange
-                end
+            if message:isShouldAttractZombies() and username == message:getAuthor() then
+                soundRange = info.attractRange
             end
         end
     end
