@@ -59,7 +59,9 @@ local floor = math.floor
 ---@field ColorPrivate string
 ---@field ColorServer string
 ---@field FilterNickname string
+---@field FilterNarrativeStyle string
 ---@field PredicateUseNameColor string
+---@field PredicateUseNarrativeStyle string
 ---@field PredicateAllowLanguage string
 ---@field AvailableLanguages string
 ---@field SignedLanguages string
@@ -75,6 +77,8 @@ local floor = math.floor
 ---@field FormatIcon string
 ---@field FormatLanguage string
 ---@field FormatAdminIcon string
+---@field FormatNarrativeDialogueTag string
+---@field FormatNarrativePunctuation string
 ---@field OverheadFormatFull string
 ---@field OverheadFormatCard string
 ---@field OverheadFormatRoll string
@@ -87,6 +91,7 @@ local floor = math.floor
 ---@field OverheadFormatMeLoud string
 ---@field OverheadFormatLooc string
 ---@field OverheadFormatLow string
+---@field OverheadFormatOther string
 ---@field ChatFormatFull string
 ---@field ChatFormatCard string
 ---@field ChatFormatRoll string

@@ -802,7 +802,7 @@ OmiChat._suggesters = {
 OmiChat._transformers = {
     {
         name = 'radio-chat',
-        priority = 40,
+        priority = 45,
         transform = function(_, info)
             local text = info.content or info.rawText
             if info.chatType ~= 'radio' then
@@ -821,10 +821,27 @@ OmiChat._transformers = {
         end,
     },
     {
-        name = 'decode-overhead',
-        priority = 35,
+        name = 'cleanup-author-metadata',
+        priority = 44,
         transform = function(_, info)
-            local formatter = OmiChat.getFormatter('overhead')
+            local text = info.content or info.rawText
+            local formatter = OmiChat.getFormatter('onlineID')
+            local id = formatter:read(text)
+
+            -- cleanup
+            if id then
+                local start, finish = text:find(formatter:getPattern())
+                if start then
+                    info.content = concat { text:sub(1, start - 1), text:sub(start, finish), text:sub(finish + 1) }
+                end
+            end
+        end,
+    },
+    {
+        name = 'decode-full-overhead',
+        priority = 40,
+        transform = function(_, info)
+            local formatter = OmiChat.getFormatter('overheadFull')
             local text = info.content or info.rawText
             local match = formatter:read(text)
             if match then
@@ -834,7 +851,7 @@ OmiChat._transformers = {
     },
     {
         name = 'decode-card',
-        priority = 30,
+        priority = 35,
         transform = function(_, info)
             if info.chatType ~= 'say' or not OmiChat.isCustomStreamEnabled('card') then
                 return
@@ -880,7 +897,7 @@ OmiChat._transformers = {
     },
     {
         name = 'decode-roll',
-        priority = 30,
+        priority = 35,
         transform = function(_, info)
             if info.chatType ~= 'say' or not OmiChat.isCustomStreamEnabled('roll') then
                 return
@@ -903,10 +920,8 @@ OmiChat._transformers = {
                 info.message:setOverHeadSpeech(false)
             end
 
-            local rollChar = utils.encodeInvisibleCharacter(1)
-            local sidesChar = utils.encodeInvisibleCharacter(2)
-            local roll = tonumber(matched:match(rollChar .. '(%d+)' .. rollChar))
-            local sides = tonumber(matched:match(sidesChar .. '(%d+)' .. sidesChar))
+            local roll = tonumber(utils.unwrapStringArgument(matched, 1, '(%d+)'))
+            local sides = tonumber(utils.unwrapStringArgument(matched, 2, '(%d+)'))
 
             if not roll or not sides then
                 info.message:setShowInChat(false)
@@ -929,7 +944,7 @@ OmiChat._transformers = {
     },
     {
         name = 'decode-callout',
-        priority = 25,
+        priority = 30,
         transform = function(_, info)
             if info.chatType ~= 'shout' then
                 return
@@ -937,7 +952,7 @@ OmiChat._transformers = {
 
             local text = info.content or info.rawText
             local calloutFormatter = OmiChat.getFormatter('callout')
-            local sneakCalloutFormatter = OmiChat.getFormatter('sneakcallout')
+            local sneakCalloutFormatter = OmiChat.getFormatter('sneakCallout')
 
             if calloutFormatter:isMatch(text) then
                 info.content = calloutFormatter:read(text)
@@ -962,7 +977,7 @@ OmiChat._transformers = {
     },
     {
         name = 'decode-stream',
-        priority = 25,
+        priority = 30,
         transform = function(_, info)
             local isRadio = info.context.ocIsRadio
             local text = info.content or info.rawText
@@ -988,10 +1003,6 @@ OmiChat._transformers = {
                     info.context.ocCustomStream = data.streamAlias or name
                     info.substitutions.stream = name
 
-                    if data.useQuoteColor then
-                        info.formatOptions.colorQuotes = true
-                    end
-
                     info.formatOptions.color = OmiChat.getColorOrDefault(info.context.ocCustomStream)
                     info.formatOptions.useDefaultChatColor = false
 
@@ -1015,8 +1026,21 @@ OmiChat._transformers = {
         end,
     },
     {
+        name = 'decode-other',
+        priority = 30,
+        transform = function(_, info)
+            local text = info.content or info.rawText
+            local formatter = OmiChat.getFormatter('overheadOther')
+
+            local matched = formatter:read(text)
+            if matched then
+                info.content = matched
+            end
+        end,
+    },
+    {
         name = 'handle-language',
-        priority = 20,
+        priority = 25,
         allowedChatTypes = {
             say = true,
             shout = true,
@@ -1032,7 +1056,7 @@ OmiChat._transformers = {
             if formatter:isMatch(text) then
                 text = formatter:read(text)
                 encodedId = utils.decodeInvisibleCharacter(text)
-                if encodedId >= 1 or encodedId <= 32 then
+                if encodedId >= 1 and encodedId <= 32 then
                     info.content = text:sub(2)
                 else
                     encodedId = nil
@@ -1065,7 +1089,7 @@ OmiChat._transformers = {
             -- add language information for format strings
             local isSigned = OmiChat.isRoleplayLanguageSigned(language)
             if language ~= defaultLanguage then
-                info.substitutions.language = getTextOrNull('UI_OmiChat_Language_' .. language) or language
+                info.substitutions.language = utils.getTranslatedLanguageName(language)
                 info.substitutions.languageRaw = language
             end
 
@@ -1120,19 +1144,53 @@ OmiChat._transformers = {
         end,
     },
     {
+        name = 'decode-narrative',
+        priority = 20,
+        transform = function(_, info)
+            local text = info.content or info.rawText
+            local formatter = OmiChat.getFormatter('narrative')
+
+            local matched = formatter:read(text)
+            if not matched then
+                return
+            end
+
+            local dialogueTag = utils.unwrapStringArgument(matched, 21)
+            local content = utils.unwrapStringArgument(matched, 22)
+
+            if not dialogueTag or not content then
+                return
+            end
+
+            content = string.format('"%s"', content)
+
+            local dialogueTagIdent = dialogueTag:gsub('%s', '_')
+
+            local translated = getTextOrNull('UI_OmiChat_NarrativeTag_' .. dialogueTagIdent, content)
+            if not translated then
+                translated = getText('UI_OmiChat_NarrativeTag', dialogueTag, content)
+            end
+
+            info.content = translated
+        end,
+    },
+    {
         name = 'check-range',
         priority = 15,
         transform = function(_, info)
             local range
             local defaultRange
             local streamData = config:getCustomStreamInfo(info.context.ocCustomStream)
+            local shouldAttract = true
             if streamData then
                 range = Option[streamData.rangeOpt]
                 defaultRange = Option:getDefault(streamData.defaultRangeOpt or 'RangeSay')
             elseif info.context.ocIsCallout then
+                shouldAttract = false -- callouts already make a sound
                 range = Option.RangeCallout
                 defaultRange = Option:getDefault('RangeYell')
             elseif info.context.ocIsSneakCallout then
+                shouldAttract = false -- callouts already make a sound
                 range = Option.RangeSneakCallout
                 defaultRange = Option:getDefault('RangeYell')
             elseif info.chatType == 'say' then
@@ -1143,7 +1201,7 @@ OmiChat._transformers = {
                 defaultRange = Option:getDefault('RangeYell')
             end
 
-            if range then
+            if range and shouldAttract then
                 info.attractRange = range * Option.RangeMultiplierZombies
             end
 

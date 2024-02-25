@@ -49,28 +49,6 @@ return OmiChat
 ---| 'currentLanguage'
 ---| 'icons'
 
----@alias omichat.CustomStreamName
----| 'whisper'
----| 'me'
----| 'mequiet'
----| 'meloud'
----| 'do'
----| 'doquiet'
----| 'doloud'
----| 'low'
----| 'looc'
----| 'card'
----| 'roll'
-
----@see omichat.api.client.getFormatter
----@alias omichat.FormatterName
----| omichat.CustomStreamName
----| 'callout'
----| 'sneakcallout'
----| 'language'
----| 'overhead'
----| 'adminIcon'
-
 ---@alias omichat.AdminOption
 ---| 'show_icon'
 ---| 'know_all_languages'
@@ -101,7 +79,6 @@ return OmiChat
 ---@field titleID string? The string ID to use for chat tags associated with this stream.
 ---@field attractZombies true? Whether messages sent with this stream should attract zombies.
 ---@field ignoreLanguage true? Whether messages sent with this stream should be understood by everyone.
----@field useQuoteColor true? Whether matched quotes should be colored with the /say color.
 
 ---@class omichat.FormatterInfo
 ---@field name string The name of the formatter.

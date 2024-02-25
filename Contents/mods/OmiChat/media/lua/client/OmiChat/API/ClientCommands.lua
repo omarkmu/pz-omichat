@@ -55,40 +55,35 @@ function OmiChat.Commands.reportDrawCard(args)
 
     -- local message
     -- display english overhead & encode card values for future translation
-    local language
     local cardName = concat { englishCards[card], ' of ', englishSuits[suit] }
     local content = utils.interpolate(Option.FormatCard, { card = cardName })
-    if OmiChat.canUseRoleplayLanguage('card', content) then
-        content, language = OmiChat.getLanguageEncodedText(content, false)
-    end
 
-    local formatter = OmiChat.getFormatter('card')
-    content = formatter:format(concat {
+    content = concat {
         utils.encodeInvisibleCharacter(suit),
         utils.encodeInvisibleCharacter(card),
         content,
-    })
+    }
 
-    processSayMessage(OmiChat.formatForChat(content, 'card', language))
+    processSayMessage(OmiChat.formatForChat {
+        text = content,
+        formatterName = 'card',
+        chatType = 'say',
+        playSignedEmote = false,
+    })
 end
 
 ---Reports the results of a dice roll.
 ---@param args omichat.request.ReportRoll
 function OmiChat.Commands.reportRoll(args)
-    local rollChar = utils.encodeInvisibleCharacter(1)
-    local sidesChar = utils.encodeInvisibleCharacter(2)
-
-    local roll = concat { rollChar, tostring(args.roll), rollChar }
-    local sides = concat { sidesChar, tostring(args.sides), sidesChar }
+    local roll = utils.wrapStringArgument(tostring(args.roll), 1)
+    local sides = utils.wrapStringArgument(tostring(args.sides), 2)
     local content = utils.interpolate(Option.FormatRoll, { roll = roll, sides = sides })
 
-    local language
-    if OmiChat.canUseRoleplayLanguage('roll', content) then
-        content, language = OmiChat.getLanguageEncodedText(content, false)
-    end
-
-    local formatted = OmiChat.getFormatter('roll'):format(content)
-    processSayMessage(OmiChat.formatForChat(formatted, 'roll', language))
+    processSayMessage(OmiChat.formatForChat {
+        text = content,
+        formatterName = 'roll',
+        chatType = 'say',
+    })
 end
 
 ---Adds an info message for the local player.

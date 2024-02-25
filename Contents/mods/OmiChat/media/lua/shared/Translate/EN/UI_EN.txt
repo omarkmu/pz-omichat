@@ -67,6 +67,19 @@ UI_EN = {
     UI_OmiChat_Language_Ukrainian = "Ukrainian",
     UI_OmiChat_Language_ASL = "ASL",
 
+    -- [[ Narrative Style ]]--
+    -- %1 = dialogue tag, %2 = content
+    UI_OmiChat_NarrativeTag = "%1, %2",
+    -- %1 = content
+    UI_OmiChat_NarrativeTag_asks = "asks, %1",
+    UI_OmiChat_NarrativeTag_says = "says, %1",
+    UI_OmiChat_NarrativeTag_states = "states, %1",
+    UI_OmiChat_NarrativeTag_shouts = "shouts, %1",
+    UI_OmiChat_NarrativeTag_hisses = "hisses, %1",
+    UI_OmiChat_NarrativeTag_exclaims = "exclaims, %1",
+    UI_OmiChat_NarrativeTag_whispers = "whispers, %1",
+    UI_OmiChat_NarrativeTag_whisper_shouts = "whisper shouts, %1",
+
     --[[ Help Text ]]--
     UI_OmiChat_helptext_emotes = "Get a list of available chat emotes",
     UI_OmiChat_helptext_name = "To set your name in chat, use: /name Name. To reset your name, use /name. Example: /name Bob",
