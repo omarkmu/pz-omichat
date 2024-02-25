@@ -165,11 +165,17 @@ option OmiChat.ColorYell
 
 
 /* Filters & Predicates */
+option OmiChat.FilterChatInput
+{ type = string, default = $trim($input), page = OmiChat, translation = OCFilterChatInput, }
+
 option OmiChat.FilterNickname
 { type = string, default = $sub($name 1 50), page = OmiChat, translation = OCFilterNickname, }
 
 option OmiChat.FilterNarrativeStyle
 { type = string, default = $capitalize($input), page = OmiChat, translation = OCFilterNarrativeStyle, }
+
+option OmiChat.PredicateCanZombiesHear
+{ type = string, default = $has(@(say;shout;meloud;doloud;radio) $stream), page = OmiChat, translation = OCPredicateCanZombiesHear, }
 
 option OmiChat.PredicateAllowLanguage
 { type = string, default = $has(@(say;shout;whisper;low) $stream), page = OmiChat, translation = OCPredicateAllowLanguage, }

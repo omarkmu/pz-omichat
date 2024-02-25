@@ -58,8 +58,10 @@ local floor = math.floor
 ---@field ColorSafehouse string
 ---@field ColorPrivate string
 ---@field ColorServer string
+---@field FilterChatInput string
 ---@field FilterNickname string
 ---@field FilterNarrativeStyle string
+---@field PredicateCanZombiesHear string
 ---@field PredicateUseNameColor string
 ---@field PredicateUseNarrativeStyle string
 ---@field PredicateAllowLanguage string

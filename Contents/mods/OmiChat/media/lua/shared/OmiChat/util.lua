@@ -329,6 +329,10 @@ end
 ---@param seed unknown? Seed value for random functions.
 ---@return string
 function utils.interpolate(text, tokens, seed)
+    if text == '' then
+        return ''
+    end
+
     local interpolator = getCachedInterpolator(text)
     if not interpolator then
         interpolator = Interpolator:new({})

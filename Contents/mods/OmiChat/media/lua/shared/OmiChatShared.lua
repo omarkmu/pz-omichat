@@ -77,7 +77,6 @@ return OmiChat
 ---@field autoColorOption false? Whether to automatically add a color option for this stream.
 ---@field defaultRangeOpt string? The option used for the default message range. Defaults to `RangeSay`.
 ---@field titleID string? The string ID to use for chat tags associated with this stream.
----@field attractZombies true? Whether messages sent with this stream should attract zombies.
 ---@field ignoreLanguage true? Whether messages sent with this stream should be understood by everyone.
 
 ---@class omichat.FormatterInfo
