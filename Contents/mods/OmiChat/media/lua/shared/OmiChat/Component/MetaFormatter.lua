@@ -5,6 +5,8 @@ local char = string.char
 local concat = table.concat
 local floor = math.floor
 
+local metaChar = char(65535)
+
 
 ---Handles formatting for special chat messages with invisible characters.
 ---@class omichat.MetaFormatter : omi.Class
@@ -114,8 +116,8 @@ function MetaFormatter:setID(id)
     local c1 = char(128 + floor(n / 32))
     local c2 = char(128 + (n % 32))
 
-    self._idPrefix = c1 .. c2
-    self._idSuffix = c2 .. c1
+    self._idPrefix = metaChar .. c1 .. c2
+    self._idSuffix = c2 .. c1 .. metaChar
 
     formatters[self._id] = self
 end

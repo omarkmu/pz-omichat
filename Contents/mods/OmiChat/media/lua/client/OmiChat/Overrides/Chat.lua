@@ -301,9 +301,26 @@ function ISChat.addLineInChat(message, tabID)
         return
     end
 
-    local player, soundRange
+    local soundRange
+    local player = getSpecificPlayer(0)
     local mtIndex = (getmetatable(message) or {}).__index
     if mtIndex == _ChatMessage or mtIndex == _ServerChatMessage or utils.isinstance(message, OmiChat.MimicMessage) then
+        local chatType = OmiChat.getMessageChatType(message)
+        if chatType == 'radio' then
+            local formatter = OmiChat.getFormatter('onlineID')
+            local value = formatter:read(message:getText())
+            local onlineID = value and utils.decodeInvisibleInt(value)
+            local authorPlayer = onlineID and getPlayerByOnlineID(onlineID)
+            local username = player and player:getUsername()
+
+            if authorPlayer then
+                message:setAuthor(authorPlayer:getUsername())
+            elseif username and message:getAuthor() == username then
+                -- if we can't find the author, clear instead of attributing to this player
+                message:setAuthor('')
+            end
+        end
+
         message:setCustomTag(OmiChat.encodeMessageTag(message))
 
         -- necessary to process transforms so we know whether this message should be added to chat
@@ -314,7 +331,6 @@ function ISChat.addLineInChat(message, tabID)
             end
 
             if message:isShouldAttractZombies() then
-                player = getSpecificPlayer(0)
                 local username = player and player:getUsername()
                 local author = message:getAuthor()
 
