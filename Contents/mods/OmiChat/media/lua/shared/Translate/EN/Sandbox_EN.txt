@@ -64,8 +64,10 @@ Sandbox_EN = {
 
     --[[ Filters and Predicates ]]--
     Sandbox_OCFilterNickname = "Name Filter",
+    Sandbox_OCFilterNarrativeStyle = "Narrative Style Filter",
     Sandbox_OCPredicateUseNameColor = "Use Name Color Predicate",
     Sandbox_OCPredicateAllowLanguage = "Allow Roleplay Language Predicate",
+    Sandbox_OCPredicateUseNarrativeStyle = "Use Narrative Style Predicate",
 
     --[[ Languages ]]--
     Sandbox_OCAvailableLanguages = "Available Languages",
@@ -84,6 +86,8 @@ Sandbox_EN = {
     Sandbox_OCFormatLanguage = "Language Format",
     Sandbox_OCFormatOverheadPrefix = "Overhead Prefix Format",
     Sandbox_OCFormatAdminIcon = "Admin Icon Format",
+    Sandbox_OCFormatNarrativeDialogueTag = "Narrative Style Dialogue Tag Format",
+    Sandbox_OCFormatNarrativePunctuation = "Narrative Style Punctuation Format",
 
     --[[ Overhead Message Formats ]]--
     Sandbox_OCOverheadFormatCard = "/card Overhead Format",
@@ -98,6 +102,7 @@ Sandbox_EN = {
     Sandbox_OCOverheadFormatRoll = "/roll Overhead Format",
     Sandbox_OCOverheadFormatLow = "/low Overhead Format",
     Sandbox_OCOverheadFormatWhisper = "/whisper Overhead Format",
+    Sandbox_OCOverheadFormatOther = "Other Overhead Format",
 
     --[[ Chat Message Formats ]]--
     Sandbox_OCChatFormatAdmin = "/admin Chat Format",

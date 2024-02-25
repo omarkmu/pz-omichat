@@ -333,7 +333,7 @@ function ISChat.onAddLanguage(target, language)
     end
 
     local languages = OmiChat.getRoleplayLanguages()
-    local languageTranslated = getTextOrNull('UI_OmiChat_Language_' .. language) or language
+    local languageTranslated = utils.getTranslatedLanguageName(language)
     local text = getText('UI_OmiChat_context_confirm_add_language', languageTranslated, #languages + 1)
     local width, height = ISModalDialog.CalcSize(0, 0, text)
     local x = getPlayerScreenLeft(0) + (getPlayerScreenWidth(0) - width) / 2

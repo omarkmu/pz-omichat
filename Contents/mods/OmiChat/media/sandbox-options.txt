@@ -168,8 +168,14 @@ option OmiChat.ColorYell
 option OmiChat.FilterNickname
 { type = string, default = $sub($name 1 50), page = OmiChat, translation = OCFilterNickname, }
 
+option OmiChat.FilterNarrativeStyle
+{ type = string, default = $capitalize($input), page = OmiChat, translation = OCFilterNarrativeStyle, }
+
 option OmiChat.PredicateAllowLanguage
 { type = string, default = $has(@(say;shout;whisper;low) $stream), page = OmiChat, translation = OCPredicateAllowLanguage, }
+
+option OmiChat.PredicateUseNarrativeStyle
+{ type = string, default =, page = OmiChat, translation = OCPredicateUseNarrativeStyle, }
 
 option OmiChat.PredicateUseNameColor
 { type = string, default = $eq($stream say), page = OmiChat, translation = OCPredicateUseNameColor, }
@@ -224,6 +230,12 @@ option OmiChat.FormatLanguage
 option OmiChat.FormatOverheadPrefix
 { type = string, default =, page = OmiChat, translation = OCFormatOverheadPrefix, }
 
+option OmiChat.FormatNarrativeDialogueTag
+{ type = string, default = @($eq($stream shout):shouts;$eq($stream whisper):whispers;$endswith($input ?):asks;$endswith($input !):exclaims;$lt($len($input) 10):states;says), page = OmiChat, translation = OCFormatNarrativeDialogueTag, }
+
+option OmiChat.FormatNarrativePunctuation
+{ type = string, default = @($eq($stream shout):!;.), page = OmiChat, translation = OCFormatNarrativePunctuation, }
+
 
 /* Overhead Message Formats */
 option OmiChat.OverheadFormatFull
@@ -261,6 +273,9 @@ option OmiChat.OverheadFormatCard
 
 option OmiChat.OverheadFormatRoll
 { type = string, default = < $1 >, page = OmiChat, translation = OCOverheadFormatRoll, }
+
+option OmiChat.OverheadFormatOther
+{ type = string, default = $1, page = OmiChat, translation = OCOverheadFormatOther, }
 
 
 /* Chat Message Formats */

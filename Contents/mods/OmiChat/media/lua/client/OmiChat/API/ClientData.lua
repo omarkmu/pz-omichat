@@ -16,22 +16,11 @@ local adminOptionMap = {
 }
 
 
----Gets the username of player 1.
----@return string?
-local function getPlayerUsername()
-    local player = getSpecificPlayer(0)
-    local username = player and player:getUsername()
-    if username then
-        return username
-    end
-end
-
-
 ---Adds a roleplay language to the current player's list.
 ---@param language string
 ---@return boolean
 function OmiChat.addRoleplayLanguage(language)
-    local username = getPlayerUsername()
+    local username = utils.getPlayerUsername()
     if not username then
         return false
     end
@@ -64,7 +53,7 @@ function OmiChat.changeColor(category, color)
         return
     end
 
-    local username = getPlayerUsername()
+    local username = utils.getPlayerUsername()
     if not username then
         return
     end
@@ -109,7 +98,7 @@ end
 ---@param language string
 ---@return boolean
 function OmiChat.checkKnowsLanguage(language)
-    local username = getPlayerUsername()
+    local username = utils.getPlayerUsername()
     if not username then
         return false
     end
@@ -154,7 +143,7 @@ end
 ---Gets the player's current roleplay language.
 ---@return string?
 function OmiChat.getCurrentRoleplayLanguage()
-    local username = getPlayerUsername()
+    local username = utils.getPlayerUsername()
     if not username then
         return
     end
@@ -189,7 +178,7 @@ end
 ---Gets the nickname for the current player, if one is set.
 ---@return string?
 function OmiChat.getNickname()
-    local username = getPlayerUsername()
+    local username = utils.getPlayerUsername()
     if not username then
         return
     end
@@ -295,7 +284,7 @@ end
 ---Gets a list of the current player's known roleplay languages.
 ---@return string[]
 function OmiChat.getRoleplayLanguages()
-    local username = getPlayerUsername()
+    local username = utils.getPlayerUsername()
     if not username then
         return {}
     end
@@ -311,7 +300,7 @@ end
 ---Gets the number of available roleplay language slots for the current player.
 ---@return integer
 function OmiChat.getRoleplayLanguageSlots()
-    local username = getPlayerUsername()
+    local username = utils.getPlayerUsername()
     return username and OmiChat.getModData().languageSlots[username] or Option.LanguageSlots
 end
 
@@ -421,7 +410,7 @@ end
 ---@param language string
 ---@return boolean
 function OmiChat.setCurrentRoleplayLanguage(language)
-    local username = getPlayerUsername()
+    local username = utils.getPlayerUsername()
     if not username then
         return false
     end
@@ -473,7 +462,7 @@ end
 function OmiChat.setNickname(nickname)
     nickname = utils.trim(nickname or '')
 
-    local username = getPlayerUsername()
+    local username = utils.getPlayerUsername()
     if not username then
         return false
     end
@@ -493,9 +482,10 @@ function OmiChat.setNickname(nickname)
         return true, getText('UI_OmiChat_reset_name_success')
     end
 
+    local original = nickname
     nickname = utils.interpolate(Option.FilterNickname, { input = nickname })
     if nickname == '' then
-        return false, getText('UI_OmiChat_set_name_failure', utils.escapeRichText(nickname))
+        return false, getText('UI_OmiChat_set_name_failure', utils.escapeRichText(original))
     end
 
     if Option.EnableChatNameAsCharacterName then
@@ -533,7 +523,7 @@ end
 ---@param slots integer
 ---@return boolean success
 function OmiChat.setRoleplayLanguageSlots(slots)
-    local username = getPlayerUsername()
+    local username = utils.getPlayerUsername()
     if not username then
         return false
     end

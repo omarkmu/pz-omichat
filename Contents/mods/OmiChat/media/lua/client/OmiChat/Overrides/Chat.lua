@@ -415,7 +415,6 @@ function ISChat:onCommandEntered()
     local commandType = 'other'
     local shouldHandle = false
     local allowEmotes = false
-    local allowLanguages = false
     local isDefault = false
 
     if not stream then
@@ -438,7 +437,6 @@ function ISChat:onCommandEntered()
             showWrongChatTabMessage(instance.currentTabID - 1, stream:getTabID() - 1, chatCommand or '')
             stream = nil
             allowEmotes = false
-            allowLanguages = false
             shouldHandle = true
         else
             if not stream:isEnabled() then
@@ -447,7 +445,6 @@ function ISChat:onCommandEntered()
                 shouldHandle = true
                 callbackStream = stream
                 allowEmotes = not isDefault and stream:isAllowEmotes() or allowEmotes
-                allowLanguages = OmiChat.canUseRoleplayLanguage(stream:getIdentifier(), command)
                 useCallback = stream:getUseCallback()
                 commandType = stream:getCommandType()
             end
@@ -506,16 +503,11 @@ function ISChat:onCommandEntered()
         end
     end
 
-    local language
-    if allowLanguages then
-        command, language = OmiChat.getLanguageEncodedText(command, allowEmotes and not playedEmote)
-    end
-
     if callbackStream and useCallback then
         useCallback {
             stream = callbackStream,
             command = command,
-            language = language,
+            playSignedEmote = allowEmotes and not playedEmote,
         }
     end
 

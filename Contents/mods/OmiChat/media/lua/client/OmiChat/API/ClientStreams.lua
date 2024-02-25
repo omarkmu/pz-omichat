@@ -3,7 +3,6 @@
 ---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Client'
 local utils = OmiChat.utils
-local Option = OmiChat.Option
 
 local concat = table.concat
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
@@ -27,36 +26,23 @@ end
 
 ---Handler for basic chat streams.
 ---@param ctx omichat.UseCallbackContext
----@param customFormatter omichat.MetaFormatter?
-local function useBasicChat(ctx, customFormatter)
-    local stream = ctx.stream
+---@param formatterName string?
+local function useBasicChat(ctx, formatterName)
     local command = utils.trim(ctx.command)
     if #command == 0 then
         return
     end
 
-    local chatType = ctx.stream:getChatType()
-    local identifier = ctx.stream:getIdentifier()
-    local tokens = {
-        chatType = chatType,
-        stream = identifier,
+    local stream = ctx.stream
+    command = OmiChat.formatForChat {
+        text = command,
+        chatType = stream:getChatType(),
+        formatterName = formatterName,
+        stream = stream:getIdentifier(),
+        playSignedEmote = ctx.playSignedEmote,
     }
 
-    if customFormatter then
-        local player = getSpecificPlayer(0)
-        local username = player and player:getUsername()
-        local name = OmiChat.getNameInChat(username, chatType)
-        command = customFormatter:format(command, {
-            name = name,
-            username = username,
-            chatType = chatType,
-            stream = identifier,
-        })
-    end
-
     local streamContext = stream:getContext()
-    command = OmiChat.formatForChat(command, identifier, ctx.language)
-
     if streamContext and streamContext.ocProcess then
         local result = streamContext.ocProcess(command)
         if result and streamContext.ocAppendResultToLastCommand and OmiChat.getRetainCommand(stream:getCommandType()) then
@@ -71,7 +57,7 @@ end
 ---Helper for handling formatted chat stream use.
 ---@param ctx omichat.UseCallbackContext
 local function useCustomChat(ctx)
-    useBasicChat(ctx, OmiChat.getFormatter(ctx.stream:getName()))
+    useBasicChat(ctx, ctx.stream:getName())
 end
 
 

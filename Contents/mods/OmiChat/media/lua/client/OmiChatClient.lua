@@ -37,7 +37,6 @@ return OmiChat
 ---@class omichat.MessageFormatOptions
 ---@field showTitle boolean Whether the message will include the chat type tag.
 ---@field showTimestamp boolean Whether the message will include a timestamp.
----@field colorQuotes boolean Whether quotes should be colored with the /say color.
 ---@field useDefaultChatColor boolean Whether the default color associated with the chat type will be used if no color is specified.
 ---@field stripColors boolean Whether to remove rich text colors.
 ---@field font omichat.ChatFont The font size of the message.
@@ -86,10 +85,23 @@ return OmiChat
 ---@field suggest fun(self: table, info: omichat.SuggestionInfo) Performs suggestion.
 ---@field priority integer? The priority of the suggester. Higher numbers will run first.
 
+---Context passed to `onUse` callbacks.
 ---@class omichat.UseCallbackContext
 ---@field command string
----@field language string?
 ---@field stream omichat.StreamInfo
+---@field playSignedEmote boolean?
+
+---Argument table passed to `formatForChat`.
+---@see omichat.api.client.formatForChat
+---@class omichat.FormatForChatArgs
+---@field text string
+---@field playSignedEmote boolean?
+---@field formatterName omichat.FormatterName?
+---@field stream string?
+---@field chatType omichat.ChatTypeString
+---@field name string?
+---@field username string?
+---@field tokens table?
 
 ---@class omichat.BaseStreamConfig
 ---@field commandType omichat.ChatCommandType? The command type used to determine whether input should be retained.

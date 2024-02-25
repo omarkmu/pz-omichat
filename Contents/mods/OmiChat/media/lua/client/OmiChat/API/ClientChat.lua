@@ -53,6 +53,11 @@ local signLanguageEmotes = {
     'freeze',
     'comefront',
 }
+local overheadChatTypes = {
+    say = true,
+    shout = true,
+    radio = true,
+}
 
 
 ---Creates or removes the icon button and picker from the chat box based on sandbox options.
@@ -231,6 +236,50 @@ local function shouldUseNameColor(info)
     return utils.testPredicate(Option.PredicateUseNameColor, tokens, tostring(info.message:getDatetime()))
 end
 
+---Applies the narrative style given an input and stream.
+---@param input string
+---@param stream omichat.StreamInfo
+---@param tokens table?
+---@return string
+local function applyNarrativeStyle(input, stream, tokens)
+    tokens = tokens and utils.copy(tokens) or {}
+    tokens.input = input
+    tokens.chatType = stream:getChatType()
+    tokens.stream = stream:getIdentifier()
+
+    if not utils.testPredicate(Option.PredicateUseNarrativeStyle, tokens) then
+        return input
+    end
+
+    local original = input
+    input = utils.interpolate(Option.FilterNarrativeStyle, tokens)
+    if input == '' then
+        return original
+    end
+
+    local seed = getTimestampMs()
+    local dialogueTag = utils.interpolate(Option.FormatNarrativeDialogueTag, tokens, seed)
+    if dialogueTag == '' then
+        return original
+    end
+
+    local prefix, suffix
+    input, prefix, suffix = utils.getInternalText(input) -- get the actual end, not an invisible character
+    if not input:match('%p$') then
+        local punctuation = utils.interpolate(Option.FormatNarrativePunctuation, tokens, seed)
+        if punctuation then
+            input = input .. punctuation
+        end
+    end
+
+    dialogueTag = utils.wrapStringArgument(dialogueTag, 21)
+    input = utils.wrapStringArgument(concat { prefix, input, suffix }, 22)
+    local combined = format('%s, "%s"', dialogueTag, input)
+
+    local formatter = OmiChat.getFormatter('narrative')
+    return formatter:format(combined)
+end
+
 
 ---Applies format options from a message information table.
 ---This mutates `info`.
@@ -362,20 +411,17 @@ function OmiChat.applyFormatOptions(info)
         }
     end
 
-    if options.colorQuotes then
-        local sayColor = utils.toChatColor(OmiChat.getColorOrDefault('say'), true)
-        msg = msg:gsub('%b""', function(quote)
-            return concat {
-                sayColor,
-                '<SPACE> ',
-                quote,
-                ' <POPRGB> <SPACE> ',
-            }
-        end)
-    end
-
     info.substitutions.message = msg
     return true
+end
+
+---Applies overhead chat styles to a stream's input.
+---@param input string
+---@param stream omichat.StreamInfo
+---@param tokens table?
+---@return string
+function OmiChat.applyOverheadStyles(input, stream, tokens)
+    return applyNarrativeStyle(input, stream, tokens)
 end
 
 ---Applies message transforms.
@@ -453,7 +499,6 @@ function OmiChat.buildMessageInfo(message, skipFormatting)
             showTimestamp = instance.showTimestamp,
             useDefaultChatColor = true,
             stripColors = false,
-            colorQuotes = false,
         },
     }
 
@@ -638,7 +683,7 @@ end
 ---@param tag string
 ---@return omichat.MessageMetadata
 function OmiChat.decodeMessageTag(tag)
-    if not tag then
+    if not tag or tag == '' then
         return {}
     end
 
@@ -661,13 +706,23 @@ end
 ---@param message omichat.Message
 ---@return string
 function OmiChat.encodeMessageTag(message)
+    local chatType = OmiChat.getMessageChatType(message)
+    if chatType == 'radio' then
+        local formatter = OmiChat.getFormatter('onlineID')
+        local value = formatter:read(message:getText())
+        local onlineID = value and utils.decodeInvisibleInt(value)
+        local playerAuthor = onlineID and getPlayerByOnlineID(onlineID)
+        if playerAuthor then
+            message:setAuthor(playerAuthor:getUsername())
+        end
+    end
+
     local author = message:getAuthor()
-    if not author then
+    if not author or author == '' then
         return ''
     end
 
     local color = OmiChat.getNameColorInChat(author)
-    local chatType = OmiChat.getMessageChatType(message)
     local useAdminIcon = OmiChat.getFormatter('adminIcon'):isMatch(message:getText())
     local success, encoded = utils.json.tryEncode {
         ocSuppressed = false,
@@ -685,36 +740,81 @@ function OmiChat.encodeMessageTag(message)
     return encoded
 end
 
----Formats text in the full overhead format.
----@param text string
----@param stream string
----@param language string?
+---Prepares text for sending to chat.
+---@param args omichat.FormatForChatArgs
 ---@return string
-function OmiChat.formatForChat(text, stream, language)
+function OmiChat.formatForChat(args)
+    local text = args.text
     if #utils.trim(text) == 0 then
         -- avoid empty messages
         return ''
     end
 
+    local tokens = args.tokens and utils.copy(args.tokens) or {}
+    local username = args.username or utils.getPlayerUsername()
+    local stream = args.stream or args.formatterName or args.chatType
+    local name = args.name or OmiChat.getNameInChat(username, args.chatType)
+
+    -- apply overhead styles
+    local streamInfo = OmiChat.getChatStreamByIdentifier(stream)
+    text = streamInfo and OmiChat.applyOverheadStyles(text, streamInfo, tokens) or text
+
+    -- encode rp language
+    local language
+    if OmiChat.canUseRoleplayLanguage(stream, text) then
+        text, language = OmiChat.getLanguageEncodedText(text, args.playSignedEmote)
+    end
+
+    tokens.name = name
+    tokens.username = username
+    tokens.stream = stream
+    tokens.languageRaw = language
+    tokens.language = language and utils.getTranslatedLanguageName(language)
+
+    -- apply format
+    local formatterName = args.formatterName
+    if not formatterName and overheadChatTypes[args.chatType] then
+        formatterName = 'overheadOther'
+    end
+
+    local formatter = formatterName and OmiChat.getFormatter(formatterName)
+    text = formatter and formatter:format(text, tokens) or text
+
+    -- add indicator for admin icon
     if isAdmin() and OmiChat.getAdminOption('show_icon') then
         local adminIconFormatter = OmiChat.getFormatter('adminIcon')
         text = adminIconFormatter:wrap(text)
     end
 
-    local tokens = {
-        stream = stream,
-        languageRaw = language,
-        language = language and getTextOrNull('UI_OmiChat_Language_' .. language) or language,
-    }
-
     ---@type string?
     local prefix = utils.interpolate(Option.FormatOverheadPrefix, tokens)
     if prefix == '' then
-        prefix = OmiChat.getDefaultOverheadPrefix(stream, language)
+        tokens.prefix = OmiChat.getDefaultOverheadPrefix(stream, language)
     end
 
-    local overheadFormatter = OmiChat.getFormatter('overhead')
-    return overheadFormatter:format(text, { prefix = prefix })
+    local overheadFormatter = OmiChat.getFormatter('overheadFull')
+    text = overheadFormatter:format(text, tokens)
+
+    -- encode online ID for radio
+    local player = getSpecificPlayer(0)
+    if player then
+        local id = utils.encodeInvisibleInt(player:getOnlineID())
+        text = OmiChat.getFormatter('onlineID'):format(id) .. text
+    end
+
+    return text
+end
+
+---Retrieves a stream given its identifier.
+---@param identifier string
+---@return omichat.StreamInfo?
+function OmiChat.getChatStreamByIdentifier(identifier)
+    for i = 1, #ISChat.allChatStreams do
+        local info = StreamInfo:new(ISChat.allChatStreams[i])
+        if info:getIdentifier() == identifier then
+            return info
+        end
+    end
 end
 
 ---Gets the command associated with a color category.

@@ -52,22 +52,27 @@ function _IsoPlayer:Callout(playEmote)
         shoutMax = Option.MaximumCustomShouts > 0 and min(#shouts, Option.MaximumCustomShouts) or #shouts
     end
 
-    local formatter
+    local formatterName
     local shout = shouts[ZombRand(1, shoutMax + 1)]
     if isSneaking then
-        formatter = OmiChat.getFormatter('sneakcallout')
+        formatterName = 'sneakCallout'
         shout = shout:lower()
     else
-        formatter = OmiChat.getFormatter('callout')
+        formatterName = 'callout'
         shout = shout:upper()
     end
 
-    local language
-    if OmiChat.canUseRoleplayLanguage('shout', shout) then
-        shout, language = OmiChat.getLanguageEncodedText(shout, not playEmote)
-    end
-
-    processShoutMessage(OmiChat.formatForChat(formatter:format(shout), 'shout', language))
+    processShoutMessage(OmiChat.formatForChat {
+        text = shout,
+        formatterName = formatterName,
+        stream = 'shout',
+        chatType = 'shout',
+        playSignedEmote = not playEmote,
+        tokens = {
+            callout = '1',
+            sneakCallout = isSneaking and '1' or nil,
+        },
+    })
 
     if playEmote then
         self:playEmote('shout')

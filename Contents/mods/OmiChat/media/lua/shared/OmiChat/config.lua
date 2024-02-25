@@ -8,8 +8,40 @@ local Configuration = {}
 Configuration._streamList = {}
 Configuration._streamTable = {}
 
+---@alias omichat.CustomStreamName
+---| 'whisper'
+---| 'me'
+---| 'mequiet'
+---| 'meloud'
+---| 'do'
+---| 'doquiet'
+---| 'doloud'
+---| 'low'
+---| 'looc'
+---| 'card'
+---| 'roll'
+
+---@see omichat.api.client.getFormatter
+---@alias omichat.FormatterName
+---| omichat.CustomStreamName
+---| 'callout'
+---| 'sneakCallout'
+---| 'language'
+---| 'overheadFull'
+---| 'overheadOther'
+---| 'adminIcon'
+---| 'narrative'
+---| 'onlineID'
+
 
 -- IDs 1–32 are reserved for encoding additional data
+--[[
+    1–2: /roll args
+    1–4: /card suit
+    1–13: /card name
+    21: narrative style dialogue tag
+    22: narrative style text
+]]
 
 -- command streams (33–50)
 Configuration._commandStreams = {
@@ -73,7 +105,6 @@ Configuration._chatStreams = {
         chatTypes = { say = true },
         stripColors = true,
         ignoreLanguage = true,
-        useQuoteColor = true,
     },
     {
         name = 'mequiet',
@@ -86,7 +117,6 @@ Configuration._chatStreams = {
         chatTypes = { say = true },
         stripColors = true,
         ignoreLanguage = true,
-        useQuoteColor = true,
     },
     {
         name = 'meloud',
@@ -100,7 +130,6 @@ Configuration._chatStreams = {
         stripColors = true,
         attractZombies = true,
         ignoreLanguage = true,
-        useQuoteColor = true,
     },
     {
         name = 'do',
@@ -112,7 +141,6 @@ Configuration._chatStreams = {
         chatTypes = { say = true },
         stripColors = true,
         ignoreLanguage = true,
-        useQuoteColor = true,
     },
     {
         name = 'doquiet',
@@ -125,7 +153,6 @@ Configuration._chatStreams = {
         chatTypes = { say = true },
         stripColors = true,
         ignoreLanguage = true,
-        useQuoteColor = true,
     },
     {
         name = 'doloud',
@@ -139,7 +166,6 @@ Configuration._chatStreams = {
         stripColors = true,
         attractZombies = true,
         ignoreLanguage = true,
-        useQuoteColor = true,
     },
     {
         name = 'looc',
@@ -158,23 +184,38 @@ Configuration._formatters = {
     {
         name = 'callout',
         formatID = 76,
+        overheadFormatOpt = 'OverheadFormatOther',
     },
     {
-        name = 'sneakcallout',
+        name = 'sneakCallout',
         formatID = 77,
+        overheadFormatOpt = 'OverheadFormatOther',
     },
     {
         name = 'language',
         formatID = 78,
     },
     {
-        name = 'overhead',
+        name = 'overheadFull',
         formatID = 79,
         overheadFormatOpt = 'OverheadFormatFull',
     },
     {
-        name = 'adminIcon',
+        name = 'overheadOther',
         formatID = 80,
+        overheadFormatOpt = 'OverheadFormatOther',
+    },
+    {
+        name = 'adminIcon',
+        formatID = 81,
+    },
+    {
+        name = 'narrative',
+        formatID = 82,
+    },
+    {
+        name = 'onlineID',
+        formatID = 83,
     },
 }
 

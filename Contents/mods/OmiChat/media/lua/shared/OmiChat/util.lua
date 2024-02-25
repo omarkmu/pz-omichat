@@ -148,18 +148,51 @@ function utils.colorToRGBString(color)
     return format('%d,%d,%d', color.r, color.g, color.b)
 end
 
----Decodes an encoded integer value.
+---Decodes an encoded character.
 ---@param text string
 ---@return integer
 function utils.decodeInvisibleCharacter(text)
     return text:sub(1, 1):byte() - 127
 end
 
+---Decodes an encoded integer value.
+---@param text string
+---@return integer?
+function utils.decodeInvisibleInt(text)
+    local digits = {}
+
+    for i = 1, #text do
+        local c = string.byte(text:sub(i, i)) - 127
+        if c >= 0 and c <= 9 then
+            digits[#digits + 1] = string.char(c + 48)
+        end
+    end
+
+    return tonumber(concat(digits))
+end
+
 ---Encodes an integer value in [1, 32] into a character.
----@param id integer
+---@param n integer
 ---@return string
-function utils.encodeInvisibleCharacter(id)
-    return string.char(id + 127)
+function utils.encodeInvisibleCharacter(n)
+    return string.char(n + 127)
+end
+
+---Encodes a positive, nonzero integer value as an invisible representation of its digits.
+---@param value integer
+---@return string
+function utils.encodeInvisibleInt(value)
+    if value < 1 then
+        return ''
+    end
+
+    local str = tostring(value)
+    local result = {}
+    for i = 1, #str do
+        result[#result + 1] = utils.encodeInvisibleCharacter(string.byte(str:sub(i, i)) - 48)
+    end
+
+    return concat(result)
 end
 
 ---Escapes a string for use in a rich text panel.
@@ -246,6 +279,16 @@ function utils.getPlayerByUsername(username)
     end
 end
 
+---Gets the username of player 1.
+---@return string?
+function utils.getPlayerUsername()
+    local player = getSpecificPlayer(0)
+    local username = player and player:getUsername()
+    if username then
+        return username
+    end
+end
+
 ---Retrieves a texture name given a chat icon name.
 ---@param icon string
 ---@return string?
@@ -269,6 +312,18 @@ function utils.getTranslatedCardName(card, suit)
     local cardTranslated = getText('UI_OmiChat_card_' .. cards[card])
     local suitTranslated = getText('UI_OmiChat_suit_' .. suits[suit])
     return getText('UI_OmiChat_card_name', cardTranslated, suitTranslated)
+end
+
+---Returns the translation of the given language.
+---If no translation exists, returns the same string.
+---@param language string
+---@return string
+function utils.getTranslatedLanguageName(language)
+    if not language then
+        return language
+    end
+
+    return getTextOrNull('UI_OmiChat_Language_' .. language) or language
 end
 
 ---Interpolates substitutions into a string with format strings using `$var` format.
@@ -401,6 +456,20 @@ function utils.stringToColor(text)
     return utils.tryStringToColor(text).value
 end
 
+---Tests a predicate.
+---@param pred string
+---@param tokens table?
+---@param seed unknown?
+---@param default boolean?
+---@return boolean
+function utils.testPredicate(pred, tokens, seed, default)
+    if pred == '' then
+        return default or false
+    end
+
+    return utils.interpolate(pred, tokens or {}, seed) ~= ''
+end
+
 ---Converts a color table to a color string for chat messages.
 ---@param color omichat.ColorTable
 ---@param pushFormat boolean? If true, PUSHRGB format will be used.
@@ -478,6 +547,26 @@ end
 ---@return string
 function utils.unescapeRichText(text)
     return (text:gsub('&lt;', '<'):gsub('&gt;', '>'))
+end
+
+---Matches on text wrapped in invisible characters.
+---@param text string The string to read.
+---@param n integer A number in [1, 32].
+---@param pattern string? The string pattern to use. Defaults to `(.-)`.
+---@return ...
+function utils.unwrapStringArgument(text, n, pattern)
+    pattern = pattern or '(.-)'
+    local c = utils.encodeInvisibleCharacter(n)
+    return text:match(concat { c, pattern, c })
+end
+
+---Encodes `n` as an invisible character and wraps text with it.
+---@param text string The string to wrap.
+---@param n integer A number in [1, 32].
+---@return string
+function utils.wrapStringArgument(text, n)
+    local c = utils.encodeInvisibleCharacter(n)
+    return concat { c, text, c }
 end
 
 
