@@ -170,15 +170,52 @@ function utils.escapeRichText(text)
     return (text:gsub('<', '&lt;'):gsub('>', '&gt;'))
 end
 
----Retrieves a texture name given a chat icon name.
----@param icon string
----@return string?
-function utils.getTextureNameFromIcon(icon)
-    if not loadedIcons then
-        loadIcons()
+---Gets the text within invisible character wrapping.
+---Returns the text and the invisible character prefix & suffix.
+---@param text string
+---@return string internal
+---@return string prefix
+---@return string suffix
+function utils.getInternalText(text)
+    -- first non-invisible pos
+    local start = 1
+    local i = 1
+    while i <= #text do
+        local c = text:sub(i, i)
+        local byte = c:byte()
+        if byte < 128 or byte > 159 then
+            start = i
+            break
+        end
+
+        i = i + 1
     end
 
-    return iconToTextureNameMap[icon]
+    -- last non-invisible pos
+    local finish = #text
+    i = #text
+    while i > 0 do
+        local c = text:sub(i, i)
+        local byte = c:byte()
+        if byte < 128 or byte > 159 then
+            finish = i
+            break
+        end
+
+        i = i - 1
+    end
+
+    local prefix = ''
+    local suffix = ''
+    if start > 1 then
+        prefix = text:sub(1, start - 1)
+    end
+
+    if finish < #text then
+        suffix = text:sub(finish + 1, #text)
+    end
+
+    return text:sub(start, finish), prefix, suffix
 end
 
 ---Gets a numeric access level given an access level string.
@@ -207,6 +244,17 @@ function utils.getPlayerByUsername(username)
             return player
         end
     end
+end
+
+---Retrieves a texture name given a chat icon name.
+---@param icon string
+---@return string?
+function utils.getTextureNameFromIcon(icon)
+    if not loadedIcons then
+        loadIcons()
+    end
+
+    return iconToTextureNameMap[icon]
 end
 
 ---Gets the translation for a card name.
