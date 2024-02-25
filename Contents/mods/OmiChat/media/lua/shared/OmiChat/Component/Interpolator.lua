@@ -41,6 +41,8 @@ end
 function Interpolator:new(options)
     local this = BaseInterpolator.new(self, options)
 
+    Interpolator.CustomLibrary:load(this._library)
+
     ---@cast this omichat.Interpolator
     return this
 end
