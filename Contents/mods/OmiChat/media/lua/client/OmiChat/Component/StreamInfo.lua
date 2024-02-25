@@ -7,6 +7,16 @@ local lib = require 'OmiChat/lib'
 local StreamInfo = lib.class()
 
 
+---Returns an iterator over the stream's aliases.
+function StreamInfo:aliases()
+    local aliases = self:config().aliases or {}
+    local i = 0
+    return function()
+        i = i + 1
+        return aliases[i]
+    end
+end
+
 ---Returns the stream's OmiChat configuration, or an empty table.
 ---@return omichat.ChatStreamConfig | omichat.CommandStreamConfig
 function StreamInfo:config()

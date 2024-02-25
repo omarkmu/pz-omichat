@@ -104,6 +104,7 @@ return OmiChat
 ---@field tokens table?
 
 ---@class omichat.BaseStreamConfig
+---@field aliases string[]? Additional aliases for the command.
 ---@field commandType omichat.ChatCommandType? The command type used to determine whether input should be retained.
 ---@field chatType string? The chat type associated with the stream.
 ---@field context table? Table for arbitrary context data.

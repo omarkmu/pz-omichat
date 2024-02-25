@@ -600,6 +600,18 @@ function OmiChat.chatCommandToStream(command, includeCommands)
             command = ' '
         end
 
+        local aliases = stream.omichat and stream.omichat.aliases
+        if not chatCommand and aliases then
+            for j = 1, #aliases do
+                local aliasCommand = aliases[j]
+                if utils.startsWith(command, aliasCommand) then
+                    chatCommand = aliasCommand
+                    command = command:sub(#chatCommand)
+                    break
+                end
+            end
+        end
+
         if chatCommand then
             chatStream = stream
             break
