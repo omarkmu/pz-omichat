@@ -706,31 +706,20 @@ end
 ---@param message omichat.Message
 ---@return string
 function OmiChat.encodeMessageTag(message)
-    local chatType = OmiChat.getMessageChatType(message)
-    if chatType == 'radio' then
-        local formatter = OmiChat.getFormatter('onlineID')
-        local value = formatter:read(message:getText())
-        local onlineID = value and utils.decodeInvisibleInt(value)
-        local playerAuthor = onlineID and getPlayerByOnlineID(onlineID)
-        if playerAuthor then
-            message:setAuthor(playerAuthor:getUsername())
-        end
+    local author = message:getAuthor() ---@type string?
+    if author == '' then
+        author = nil
     end
 
-    local author = message:getAuthor()
-    if not author or author == '' then
-        return ''
-    end
-
-    local color = OmiChat.getNameColorInChat(author)
+    local color = author and OmiChat.getNameColorInChat(author)
     local useAdminIcon = OmiChat.getFormatter('adminIcon'):isMatch(message:getText())
     local success, encoded = utils.json.tryEncode {
         ocSuppressed = false,
         ocLanguage = OmiChat.getMessageLanguage(message),
-        ocName = OmiChat.getNameInChat(author, chatType),
+        ocName = OmiChat.getNameInChat(author, OmiChat.getMessageChatType(message)),
         ocNameColor = color and utils.colorToHexString(color) or nil,
-        ocIcon = OmiChat.getChatIcon(author),
-        ocAdminIcon = useAdminIcon and OmiChat.getAdminChatIcon(author) or nil,
+        ocIcon = author and OmiChat.getChatIcon(author) or nil,
+        ocAdminIcon = (author and useAdminIcon) and OmiChat.getAdminChatIcon(author) or nil,
     }
 
     if not success then

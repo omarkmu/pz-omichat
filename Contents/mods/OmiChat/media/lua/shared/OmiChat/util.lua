@@ -162,9 +162,9 @@ function utils.decodeInvisibleInt(text)
     local digits = {}
 
     for i = 1, #text do
-        local c = string.byte(text:sub(i, i)) - 127
-        if c >= 0 and c <= 9 then
-            digits[#digits + 1] = string.char(c + 48)
+        local c = text:sub(i, i):byte() - 127
+        if c >= 1 and c <= 10 then
+            digits[#digits + 1] = string.char(c + 47)
         end
     end
 
@@ -178,18 +178,14 @@ function utils.encodeInvisibleCharacter(n)
     return string.char(n + 127)
 end
 
----Encodes a positive, nonzero integer value as an invisible representation of its digits.
+---Encodes a positive integer value as an invisible representation of its digits.
 ---@param value integer
 ---@return string
 function utils.encodeInvisibleInt(value)
-    if value < 1 then
-        return ''
-    end
-
     local str = tostring(value)
     local result = {}
     for i = 1, #str do
-        result[#result + 1] = utils.encodeInvisibleCharacter(string.byte(str:sub(i, i)) - 48)
+        result[#result + 1] = utils.encodeInvisibleCharacter(str:sub(i, i):byte() - 47)
     end
 
     return concat(result)
