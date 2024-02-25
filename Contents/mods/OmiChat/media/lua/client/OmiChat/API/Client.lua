@@ -1319,6 +1319,11 @@ OmiChat._transformers = {
                 end
             end
 
+            if info.chatType == 'faction' then
+                local faction = Faction.getPlayerFaction(getPlayer())
+                info.substitutions.faction = faction and faction:getName() or nil
+            end
+
             if info.format then
                 return
             end
