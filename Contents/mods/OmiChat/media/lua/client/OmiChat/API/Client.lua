@@ -588,6 +588,14 @@ OmiChat._suggesters = {
                     elseif shortCommand and utils.contains(shortCommand, command) then
                         contains[#contains + 1] = shortCommand
                     end
+
+                    for alias in stream:aliases() do
+                        if utils.startsWith(alias, fullCommand) then
+                            startsWith[#startsWith + 1] = alias
+                        elseif utils.contains(alias, command) then
+                            contains[#contains + 1] = alias
+                        end
+                    end
                 end
             end
         end,

@@ -200,6 +200,7 @@ OmiChat._vanillaStreamConfigs = {
         chatType = 'shout',
         isEnabled = isBasicChatEnabled,
         onUse = useBasicChat,
+        aliases = { '/shout ' },
         context = {
             ocIsEnabledCommand = '/y',
             ocProcess = processShoutMessage,
