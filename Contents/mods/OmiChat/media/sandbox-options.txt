@@ -35,6 +35,9 @@ option OmiChat.EnableIconPicker
 option OmiChat.EnableMiscellaneousIcons
 { type = boolean, default = false, page = OmiChat, translation = OCEnableMiscellaneousIcons, }
 
+option OmiChat.ShowDiscordColorOption
+{ type = enum, numValues = 3, default = 3, page = OmiChat, translation = OCShowDiscordColorOption, valueTranslation = OCShowDiscordColorOption, }
+
 
 /* Compatibility Feature Flags */
 option OmiChat.EnableCompatTAD
