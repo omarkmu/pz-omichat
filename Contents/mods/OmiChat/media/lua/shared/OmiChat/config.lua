@@ -32,6 +32,7 @@ Configuration._streamTable = {}
 ---| 'adminIcon'
 ---| 'narrative'
 ---| 'onlineID'
+---| 'echo'
 
 
 -- IDs 1–32 are reserved for encoding additional data
@@ -214,6 +215,11 @@ Configuration._formatters = {
     {
         name = 'onlineID',
         formatID = 83,
+    },
+    {
+        name = 'echo',
+        formatID = 84,
+        overheadFormatOpt = 'OverheadFormatEcho',
     },
 }
 

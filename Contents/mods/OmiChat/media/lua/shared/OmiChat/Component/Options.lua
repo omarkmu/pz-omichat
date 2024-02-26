@@ -87,6 +87,7 @@ local floor = math.floor
 ---@field OverheadFormatDo string
 ---@field OverheadFormatDoLoud string
 ---@field OverheadFormatDoQuiet string
+---@field OverheadFormatEcho string
 ---@field OverheadFormatMe string
 ---@field OverheadFormatWhisper string
 ---@field OverheadFormatMeQuiet string
@@ -98,8 +99,9 @@ local floor = math.floor
 ---@field ChatFormatCard string
 ---@field ChatFormatRoll string
 ---@field ChatFormatDo string
----@field ChatFormatDoQuiet string
 ---@field ChatFormatDoLoud string
+---@field ChatFormatDoQuiet string
+---@field ChatFormatEcho string
 ---@field ChatFormatMe string
 ---@field ChatFormatMeQuiet string
 ---@field ChatFormatMeLoud string

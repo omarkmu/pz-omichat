@@ -256,6 +256,9 @@ option OmiChat.OverheadFormatDoLoud
 option OmiChat.OverheadFormatDoQuiet
 { type = string, default =, page = OmiChat, translation = OCOverheadFormatDoQuiet, }
 
+option OmiChat.OverheadFormatEcho
+{ type = string, default = (Over Radio) $1, page = OmiChat, translation = OCOverheadFormatEcho, }
+
 option OmiChat.OverheadFormatLooc
 { type = string, default = (( $1 )), page = OmiChat, translation = OCOverheadFormatLooc, }
 
@@ -353,6 +356,9 @@ option OmiChat.ChatFormatWhisper
 
 option OmiChat.ChatFormatYell
 { type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatYell, }
+
+option OmiChat.ChatFormatEcho
+{ type = string, default =, page = OmiChat, translation = OCChatFormatEcho, }
 
 option OmiChat.ChatFormatUnknownLanguage
 { type = string, default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $gettext($unknownLanguageString $language) <SPACE>)), page = OmiChat, translation = OCChatFormatUnknownLanguage, }
