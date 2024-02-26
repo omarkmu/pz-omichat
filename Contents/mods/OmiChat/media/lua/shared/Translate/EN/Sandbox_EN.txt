@@ -13,6 +13,10 @@ Sandbox_EN = {
     Sandbox_OCEnableSetSpeechColor = "Custom Speech Colors",
     Sandbox_OCEnableSpeechColorAsDefaultNameColor = "Use Speech Color as Default Name Color",
     Sandbox_OCEnableFactionColorAsDefault = "Use Faction Tag Color as Default Chat Color",
+    Sandbox_OCShowDiscordColorOption = "Show Discord Color Option",
+    Sandbox_OCShowDiscordColorOption_option1 = "Yes",
+    Sandbox_OCShowDiscordColorOption_option2 = "No",
+    Sandbox_OCShowDiscordColorOption_option3 = "Respect server setting",
 
     --[[ Compatibility Feature Flags ]]--
     Sandbox_OCEnableCompatTAD = "True Actions Act 3 - Dancing Compatibility",

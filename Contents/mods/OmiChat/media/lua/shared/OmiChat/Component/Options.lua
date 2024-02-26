@@ -19,6 +19,7 @@ local floor = math.floor
 ---@field EnableCompatTAD boolean
 ---@field EnableChatNameAsCharacterName boolean
 ---@field EnableFactionColorAsDefault boolean
+---@field ShowDiscordColorOption integer
 ---@field CustomShoutMaxLength integer
 ---@field MinimumCommandAccessLevel integer
 ---@field MaximumCustomShouts integer
