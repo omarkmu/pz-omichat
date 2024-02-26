@@ -80,8 +80,8 @@ option OmiChat.RangeDoLoud
 option OmiChat.RangeDoQuiet
 { type = integer, default = 3, min = 1, max = 30, page = OmiChat, translation = OCRangeDoQuiet, }
 
-option OmiChat.RangeLooc
-{ type = integer, default = 30, min = 1, max = 30, page = OmiChat, translation = OCRangeLooc, }
+option OmiChat.RangeOoc
+{ type = integer, default = 30, min = 1, max = 30, page = OmiChat, translation = OCRangeOoc, }
 
 option OmiChat.RangeMe
 { type = integer, default = 30, min = 1, max = 30, page = OmiChat, translation = OCRangeMe, }
@@ -136,8 +136,8 @@ option OmiChat.ColorDoQuiet
 option OmiChat.ColorFaction
 { type = string, default = 22 113 20, page = OmiChat, translation = OCColorFaction, }
 
-option OmiChat.ColorLooc
-{ type = string, default = 48 128 128, page = OmiChat, translation = OCColorLooc, }
+option OmiChat.ColorOoc
+{ type = string, default = 48 128 128, page = OmiChat, translation = OCColorOoc, }
 
 option OmiChat.ColorMe
 { type = string, default = 130 130 130, page = OmiChat, translation = OCColorMe, }
@@ -172,10 +172,10 @@ option OmiChat.FilterChatInput
 { type = string, default = $trim($input), page = OmiChat, translation = OCFilterChatInput, }
 
 option OmiChat.FilterNickname
-{ type = string, default = $sub($name 1 50), page = OmiChat, translation = OCFilterNickname, }
+{ type = string, default = $sub($input 1 50), page = OmiChat, translation = OCFilterNickname, }
 
 option OmiChat.FilterNarrativeStyle
-{ type = string, default = $capitalize($input), page = OmiChat, translation = OCFilterNarrativeStyle, }
+{ type = string, default = $ifelse($sneakCallout $input $capitalize($input)), page = OmiChat, translation = OCFilterNarrativeStyle, }
 
 option OmiChat.PredicateCanZombiesHear
 { type = string, default = $has(@(say;shout;meloud;doloud;radio) $stream), page = OmiChat, translation = OCPredicateCanZombiesHear, }
@@ -213,7 +213,7 @@ option OmiChat.FormatName
 { type = string, default = $ifelse($has(@(general;admin;whisper) $chatType) $username @($name;$forename)), page = OmiChat, translation = OCFormatName, }
 
 option OmiChat.FormatTag
-{ type = string, default = [$tag]$if($eq($chatType server) :&#32;<SPACE>&#32;), page = OmiChat, translation = OCFormatTag, }
+{ type = string, default = [$tag]$if($eq($chatType server) (: <SPACE> )), page = OmiChat, translation = OCFormatTag, }
 
 option OmiChat.FormatTimestamp
 { type = string, default = [$ifelse($eq($hourFormat 12) $h $HH):$mm], page = OmiChat, translation = OCFormatTimestamp, }
@@ -231,16 +231,16 @@ option OmiChat.FormatAdminIcon
 { type = string, default = Item_Sledgehamer, page = OmiChat, translation = OCFormatAdminIcon, }
 
 option OmiChat.FormatIcon
-{ type = string, default = @($eq($stream card):Item_CardDeck;$eq($stream roll):Item_Dice;$has(@(say;shout;whisper;faction;safehouse;looc;general) $stream):@($adminIcon;$icon)), page = OmiChat, translation = OCFormatIcon, }
+{ type = string, default = @($eq($stream card):Item_CardDeck;$eq($stream roll):Item_Dice;$has(@(say;shout;whisper;faction;safehouse;ooc;general) $stream):@($adminIcon;$icon)), page = OmiChat, translation = OCFormatIcon, }
 
 option OmiChat.FormatLanguage
 { type = string, default = $if($all($language $not($unknownLanguage)) [$language]( <SPACE> )), page = OmiChat, translation = OCFormatLanguage, }
 
 option OmiChat.FormatOverheadPrefix
-{ type = string, default =, page = OmiChat, translation = OCFormatOverheadPrefix, }
+{ type = string, default = $concats(( ) $if($eq($stream low) [Low]) $if($languageRaw [$languageRaw]))&#32;, page = OmiChat, translation = OCFormatOverheadPrefix, }
 
 option OmiChat.FormatNarrativeDialogueTag
-{ type = string, default = @($eq($stream shout):shouts;$eq($stream whisper):whispers;$endswith($input ?):asks;$endswith($input !):exclaims;$lt($len($input) 10):states;says), page = OmiChat, translation = OCFormatNarrativeDialogueTag, }
+{ type = string, default = @($sneakCallout:hisses;$eq($stream shout):shouts;$eq($stream whisper):whispers;$endswith($input ?):asks;$endswith($input !):exclaims;$endswith($input ..):says;$lt($len($input) 10):states;says), page = OmiChat, translation = OCFormatNarrativeDialogueTag, }
 
 option OmiChat.FormatNarrativePunctuation
 { type = string, default = @($eq($stream shout):!;.), page = OmiChat, translation = OCFormatNarrativePunctuation, }
@@ -262,8 +262,8 @@ option OmiChat.OverheadFormatDoQuiet
 option OmiChat.OverheadFormatEcho
 { type = string, default = (Over Radio) $1, page = OmiChat, translation = OCOverheadFormatEcho, }
 
-option OmiChat.OverheadFormatLooc
-{ type = string, default = (( $1 )), page = OmiChat, translation = OCOverheadFormatLooc, }
+option OmiChat.OverheadFormatOoc
+{ type = string, default = (( $1 )), page = OmiChat, translation = OCOverheadFormatOoc, }
 
 option OmiChat.OverheadFormatMe
 { type = string, default = < $1 >, page = OmiChat, translation = OCOverheadFormatMe, }
@@ -330,8 +330,8 @@ option OmiChat.ChatFormatDoQuiet
 option OmiChat.ChatFormatGeneral
 { type = string, default = $name: <SPACE> $message, page = OmiChat, translation = OCChatFormatGeneral, }
 
-option OmiChat.ChatFormatLooc
-{ type = string, default = $name: <SPACE> (( $message )), page = OmiChat, translation = OCChatFormatLooc, }
+option OmiChat.ChatFormatOoc
+{ type = string, default = $name: <SPACE> (( $message )), page = OmiChat, translation = OCChatFormatOoc, }
 
 option OmiChat.ChatFormatMe
 { type = string, default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>)), page = OmiChat, translation = OCChatFormatMe, }

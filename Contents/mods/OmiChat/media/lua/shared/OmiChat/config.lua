@@ -17,7 +17,7 @@ Configuration._streamTable = {}
 ---| 'doquiet'
 ---| 'doloud'
 ---| 'low'
----| 'looc'
+---| 'ooc'
 ---| 'card'
 ---| 'roll'
 
@@ -167,12 +167,12 @@ Configuration._chatStreams = {
         ignoreLanguage = true,
     },
     {
-        name = 'looc',
+        name = 'ooc',
         formatID = 59,
-        colorOpt = 'ColorLooc',
-        rangeOpt = 'RangeLooc',
-        chatFormatOpt = 'ChatFormatLooc',
-        overheadFormatOpt = 'OverheadFormatLooc',
+        colorOpt = 'ColorOoc',
+        rangeOpt = 'RangeOoc',
+        chatFormatOpt = 'ChatFormatOoc',
+        overheadFormatOpt = 'OverheadFormatOoc',
         chatTypes = { say = true },
         ignoreLanguage = true,
     },

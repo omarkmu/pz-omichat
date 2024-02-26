@@ -212,7 +212,7 @@ function utils.getInternalText(text)
     while i <= #text do
         local c = text:sub(i, i)
         local byte = c:byte()
-        if byte < 128 or byte > 159 then
+        if (byte < 128 or byte > 159) and byte ~= 65535 then
             start = i
             break
         end
@@ -226,7 +226,7 @@ function utils.getInternalText(text)
     while i > 0 do
         local c = text:sub(i, i)
         local byte = c:byte()
-        if byte < 128 or byte > 159 then
+        if (byte < 128 or byte > 159) and byte ~= 65535 then
             finish = i
             break
         end
