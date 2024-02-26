@@ -87,10 +87,10 @@ end
 
 
 OmiChat._customChatStreams = {
-    looc = {
-        name = 'looc',
-        command = '/looc ',
-        shortCommand = '/l ',
+    ooc = {
+        name = 'ooc',
+        command = '/ooc ',
+        shortCommand = '/o ',
         tabID = 1,
         omichat = {
             allowEmotes = true,
@@ -103,7 +103,7 @@ OmiChat._customChatStreams = {
     low = {
         name = 'low',
         command = '/low ',
-        shortCommand = '/q ',
+        shortCommand = '/l ',
         tabID = 1,
         omichat = {
             allowEmotes = true,
