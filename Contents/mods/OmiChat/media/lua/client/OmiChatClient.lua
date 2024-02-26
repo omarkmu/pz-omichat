@@ -53,7 +53,7 @@ return OmiChat
 ---@field language string? The result of the `FormatLanguage` option.
 ---@field textColor Color The message's default text color.
 ---@field meta omichat.MessageMetadata Metadata attached to the message.
----@field rawText string The raw text of the message.
+---@field rawText string The raw text of the message. This should not be modified.
 ---@field author string The username of the message author.
 ---@field titleID string The string ID of the chat type's tag.
 ---@field chatType omichat.ChatTypeString The chat type of the message's chat.
@@ -90,12 +90,14 @@ return OmiChat
 ---@field command string
 ---@field stream omichat.StreamInfo
 ---@field playSignedEmote boolean?
+---@field isEcho boolean?
 
 ---Argument table passed to `formatForChat`.
 ---@see omichat.api.client.formatForChat
 ---@class omichat.FormatForChatArgs
 ---@field text string
 ---@field playSignedEmote boolean?
+---@field isEcho boolean?
 ---@field formatterName omichat.FormatterName?
 ---@field stream string?
 ---@field chatType omichat.ChatTypeString

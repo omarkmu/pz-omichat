@@ -793,6 +793,12 @@ function OmiChat.formatForChat(args)
         tokens.prefix = OmiChat.getDefaultOverheadPrefix(stream, language)
     end
 
+    -- mark as echo message
+    if args.isEcho then
+        local echoFormatter = OmiChat.getFormatter('echo')
+        text = echoFormatter:format(text, tokens)
+    end
+
     local overheadFormatter = OmiChat.getFormatter('overheadFull')
     text = overheadFormatter:format(text, tokens)
 

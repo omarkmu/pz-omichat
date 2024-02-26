@@ -810,7 +810,7 @@ OmiChat._suggesters = {
 OmiChat._transformers = {
     {
         name = 'radio-chat',
-        priority = 45,
+        priority = 55,
         transform = function(_, info)
             local text = info.content or info.rawText
             if info.chatType ~= 'radio' then
@@ -830,7 +830,7 @@ OmiChat._transformers = {
     },
     {
         name = 'cleanup-author-metadata',
-        priority = 44,
+        priority = 50,
         transform = function(_, info)
             local text = info.content or info.rawText
             local formatter = OmiChat.getFormatter('onlineID')
@@ -847,13 +847,37 @@ OmiChat._transformers = {
     },
     {
         name = 'decode-full-overhead',
-        priority = 40,
+        priority = 45,
         transform = function(_, info)
             local formatter = OmiChat.getFormatter('overheadFull')
             local text = info.content or info.rawText
             local match = formatter:read(text)
             if match then
                 info.content = match
+            end
+        end,
+    },
+    {
+        name = 'handle-echo',
+        priority = 40,
+        transform = function(_, info)
+            local text = info.content or info.rawText
+            local formatter = OmiChat.getFormatter('echo')
+
+            local matched = formatter:read(text)
+            if not matched then
+                return
+            end
+
+            if Option.ChatFormatEcho ~= '' then
+                info.format = Option.ChatFormatEcho
+            end
+
+            local player = getSpecificPlayer(0)
+            local username = player and player:getUsername()
+            if info.message:getAuthor() == username then
+                info.message:setShowInChat(false)
+                info.message:setOverHeadSpeech(false)
             end
         end,
     },
@@ -967,7 +991,7 @@ OmiChat._transformers = {
 
                 if OmiChat.isCustomStreamEnabled('whisper') then
                     -- format sneak callouts like whispers, if enabled
-                    info.format = Option.ChatFormatWhisper
+                    info.format = info.format or Option.ChatFormatWhisper
                     info.formatOptions.color = OmiChat.getColorOrDefault('whisper')
                     info.titleID = 'UI_OmiChat_whisper_chat_title_id'
                 end
@@ -1003,7 +1027,7 @@ OmiChat._transformers = {
                     break
                 elseif isValidStream and isMatch then
                     info.content = formatter:read(text)
-                    info.format = Option[data.chatFormatOpt]
+                    info.format = info.format or Option[data.chatFormatOpt]
                     info.context.ocCustomStream = data.streamAlias or name
                     info.substitutions.stream = name
 

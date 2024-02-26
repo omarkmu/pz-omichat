@@ -3,6 +3,7 @@
 ---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Client'
 local utils = OmiChat.utils
+local Option = OmiChat.Option
 
 local concat = table.concat
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
@@ -34,11 +35,15 @@ local function useBasicChat(ctx, formatterName)
     end
 
     local stream = ctx.stream
+    local chatType = stream:getChatType()
+    local originalCommand = command
+
     command = OmiChat.formatForChat {
         text = command,
-        chatType = stream:getChatType(),
+        chatType = chatType,
         formatterName = formatterName,
         stream = stream:getIdentifier(),
+        isEcho = ctx.isEcho,
         playSignedEmote = ctx.playSignedEmote,
     }
 
@@ -47,10 +52,30 @@ local function useBasicChat(ctx, formatterName)
         local result = streamContext.ocProcess(command)
         if result and streamContext.ocAppendResultToLastCommand and OmiChat.getRetainCommand(stream:getCommandType()) then
             local chatText = ISChat.instance.chatText
-            chatText.lastChatCommand = concat { chatText.lastChatCommand, result, ' ' }
+            chatText.lastChatCommand = concat { chatText.lastChatCommand, tostring(result), ' ' }
         end
     else
         processSayMessage(command)
+    end
+
+    if Option.ChatFormatEcho ~= '' and (chatType == 'safehouse' or chatType == 'faction') then
+        local echoStream = OmiChat.getChatStreamByIdentifier('low')
+        if not echoStream or not echoStream:isEnabled() then
+            echoStream = OmiChat.getChatStreamByIdentifier('say')
+        end
+
+        if not echoStream or not echoStream:isEnabled() then
+            return
+        end
+
+        local useCallback = echoStream:getUseCallback()
+        if useCallback then
+            useCallback {
+                isEcho = true,
+                stream = echoStream,
+                command = originalCommand,
+            }
+        end
     end
 end
 
