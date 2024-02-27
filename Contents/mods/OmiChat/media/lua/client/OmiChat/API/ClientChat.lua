@@ -728,7 +728,7 @@ function OmiChat.encodeMessageTag(message)
     local success, encoded = utils.json.tryEncode {
         ocSuppressed = false,
         ocLanguage = OmiChat.getMessageLanguage(message),
-        ocName = OmiChat.getNameInChat(author, OmiChat.getMessageChatType(message)),
+        ocName = OmiChat.getNameInChatRichText(author, OmiChat.getMessageChatType(message)),
         ocNameColor = color and utils.colorToHexString(color) or nil,
         ocIcon = author and OmiChat.getChatIcon(author) or nil,
         ocAdminIcon = (author and useAdminIcon) and OmiChat.getAdminChatIcon(author) or nil,
@@ -906,7 +906,7 @@ function OmiChat.getInfoRichText(player)
     end
 
     local username = player:getUsername()
-    local name = OmiChat.getNameInChat(username, 'say')
+    local name = OmiChat.getNameInChatRichText(username, 'say')
     local tokens = name and OmiChat.getPlayerSubstitutions(player)
     if not name or not tokens then
         return ''

@@ -1318,7 +1318,7 @@ OmiChat._transformers = {
                 info.content = text:sub(msgStart + 1)
                 info.format = Option.ChatFormatOutgoingPrivate
                 info.substitutions.recipient = other
-                info.substitutions.recipientName = OmiChat.getNameInChat(other, 'whisper') or other
+                info.substitutions.recipientName = utils.escapeRichText(OmiChat.getNameInChat(other, 'whisper') or other)
             else
                 -- defer to basic chat format handler
                 info.context.ocIsIncomingPM = true
