@@ -130,9 +130,9 @@ function OmiChat.Commands.requestAddLanguage(player, args)
         if err == 'FULL' then
             OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_add_language_full', { username })
         elseif err == 'ALREADY_KNOW' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_add_language_known', { username })
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_add_language_known', { username, language })
         elseif err == 'UNKNOWN' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_add_language_unknown_language', { username, language })
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_add_language_unknown_language', { language })
         else
             OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_addlanguage')
         end
