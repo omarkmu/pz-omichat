@@ -14,6 +14,9 @@ option OmiChat.EnableEmotes
 option OmiChat.EnableSetName
 { type = boolean, default = true, page = OmiChat, translation = OCEnableSetName, }
 
+option OmiChat.EnableSetCharacterName
+{ type = boolean, default = false, page = OmiChat, translation = OCEnableSetCharacterName, }
+
 option OmiChat.EnableChatNameAsCharacterName
 { type = boolean, default = false, page = OmiChat, translation = OCEnableChatNameAsCharacterName, }
 

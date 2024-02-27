@@ -475,10 +475,6 @@ function OmiChat.setNickname(nickname)
             field = 'nicknames',
         })
 
-        if Option.EnableChatNameAsCharacterName then
-            return false, getText('UI_OmiChat_set_name_empty')
-        end
-
         return true, getText('UI_OmiChat_reset_name_success')
     end
 
@@ -486,11 +482,6 @@ function OmiChat.setNickname(nickname)
     nickname = utils.interpolate(Option.FilterNickname, { input = nickname })
     if nickname == '' then
         return false, getText('UI_OmiChat_set_name_failure', utils.escapeRichText(original))
-    end
-
-    if Option.EnableChatNameAsCharacterName then
-        OmiChat.updateCharacterName(nickname)
-        return true, getText('UI_OmiChat_set_name_success', utils.escapeRichText(nickname))
     end
 
     modData.nicknames[username] = nickname
@@ -558,10 +549,10 @@ function OmiChat.setUseSuggester(useSuggester)
 end
 
 ---Updates the current player's character name.
----@param name string The new full name of the character. This will be split into forename and surname.
----@param surname string? The character surname. If provided, `name` will be interpreted as the forename.
+---@param name string The new name of the character.
+---@param updateSurname boolean? Whether the name should be split into forename and surname. Defaults to false.
 ---@return boolean success
-function OmiChat.updateCharacterName(name, surname)
+function OmiChat.updateCharacterName(name, updateSurname)
     if #name == 0 then
         return false
     end
@@ -572,8 +563,14 @@ function OmiChat.updateCharacterName(name, surname)
         return false
     end
 
+    name = utils.interpolate(Option.FilterNickname, { input = name })
+    if name == '' then
+        return false
+    end
+
+    local surname
     local forename = name
-    if not surname then
+    if updateSurname then
         surname = ''
 
         local parts = name:split(' ')
@@ -584,13 +581,18 @@ function OmiChat.updateCharacterName(name, surname)
     end
 
     desc:setForename(forename)
-    desc:setSurname(surname)
-
-    -- update name in inventory
-    player:getInventory():setDrawDirty(true)
-    getPlayerData(player:getPlayerNum()).playerInventory:refreshBackpacks()
+    if surname then
+        desc:setSurname(surname)
+    end
 
     sendPlayerStatsChange(player)
+
+    -- update name in inventory
+    local data = getPlayerData(player:getPlayerNum())
+    if data then
+        player:getInventory():setDrawDirty(true)
+        data.playerInventory:refreshBackpacks()
+    end
 
     return true
 end

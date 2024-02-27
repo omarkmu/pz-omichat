@@ -224,6 +224,22 @@ OmiChat._commandStreams = {
             helpText = 'UI_OmiChat_helptext_name_no_reset',
             isEnabled = function() return Option.EnableSetName end,
             onUse = function(ctx)
+                if Option.EnableChatNameAsCharacterName then
+                    local input = utils.trim(ctx.command or '')
+                    if #input == 0 then
+                        OmiChat.showInfoMessage(getText('UI_OmiChat_set_name_empty'))
+                        return
+                    end
+
+                    if OmiChat.updateCharacterName(input) then
+                        OmiChat.showInfoMessage(getText('UI_OmiChat_set_name_success', utils.escapeRichText(input)))
+                    else
+                        OmiChat.showInfoMessage(getText('UI_OmiChat_set_name_failure', utils.escapeRichText(input)))
+                    end
+
+                    return
+                end
+
                 local _, feedback = OmiChat.setNickname(ctx.command)
                 if feedback then
                     OmiChat.showInfoMessage(feedback)
@@ -236,6 +252,28 @@ OmiChat._commandStreams = {
                 end
 
                 OmiChat.showInfoMessage(getText(msg))
+            end,
+        },
+    },
+    {
+        name = 'charactername',
+        command = '/charactername ',
+        omichat = {
+            isCommand = true,
+            helpText = 'UI_OmiChat_helptext_charactername',
+            isEnabled = function() return Option.EnableSetCharacterName end,
+            onUse = function(ctx)
+                local input = utils.trim(ctx.command or '')
+                if #input == 0 then
+                    OmiChat.showInfoMessage(getText('UI_OmiChat_helptext_charactername'))
+                    return
+                end
+
+                if OmiChat.updateCharacterName(input, true) then
+                    OmiChat.showInfoMessage(getText('UI_OmiChat_set_name_success', utils.escapeRichText(input)))
+                else
+                    OmiChat.showInfoMessage(getText('UI_OmiChat_set_name_failure', utils.escapeRichText(input)))
+                end
             end,
         },
     },

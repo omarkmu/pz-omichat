@@ -8,6 +8,7 @@ Sandbox_EN = {
     Sandbox_OCEnableEmotes = "Enable Emotes",
     Sandbox_OCEnableIconPicker = "Enable Icon Picker",
     Sandbox_OCEnableMiscellaneousIcons = "Include Miscellaneous Icons",
+    Sandbox_OCEnableSetCharacterName = "Enable /charactername",
     Sandbox_OCEnableSetName = "Enable /name",
     Sandbox_OCEnableSetNameColor = "Custom Name Colors",
     Sandbox_OCEnableSetSpeechColor = "Custom Speech Colors",
