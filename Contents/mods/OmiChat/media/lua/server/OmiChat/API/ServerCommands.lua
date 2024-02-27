@@ -184,7 +184,7 @@ function OmiChat.Commands.requestDrawCard(player)
     if OmiChat.isCustomStreamEnabled('card') then
         OmiChat.reportDrawCard(player, card, suit)
     else
-        local name = OmiChat.getNameInChat(player:getUsername(), 'general') or player:getUsername()
+        local name = OmiChat.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
         OmiChat.reportDrawCardGlobal(name, card, suit)
     end
 end
@@ -278,7 +278,7 @@ function OmiChat.Commands.requestRollDice(player, args)
     if OmiChat.isCustomStreamEnabled('roll') then
         OmiChat.reportRoll(player, roll, sides)
     else
-        local name = OmiChat.getNameInChat(player:getUsername(), 'general') or player:getUsername()
+        local name = OmiChat.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
         OmiChat.sendTranslatedServerMessage('UI_OmiChat_roll', { name, tostring(roll), tostring(sides) })
     end
 end

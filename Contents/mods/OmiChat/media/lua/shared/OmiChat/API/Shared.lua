@@ -104,12 +104,23 @@ function OmiChat.getNameInChat(username, chatType)
 
     local modData = OmiChat.getModData()
     if modData.nicknames[username] then
-        tokens.name = utils.escapeRichText(modData.nicknames[username])
+        tokens.name = modData.nicknames[username]
     end
 
     tokens.username = username
     tokens.chatType = chatType
     return utils.interpolate(Option.FormatName, tokens, username)
+end
+
+---Retrieves the name that should be used in chat for a given username, escaped for rich text.
+---@param username string?
+---@param chatType omichat.ChatTypeString The chat type to use in format string interpolation.
+---@return string? name The name to use in chat, or `nil` if unable to retrieve information about the user.
+function OmiChat.getNameInChatRichText(username, chatType)
+    local name = OmiChat.getNameInChat(username, chatType)
+    if name then
+        return utils.escapeRichText(name)
+    end
 end
 
 ---Gets substitution tokens to use in interpolation for a given player.
