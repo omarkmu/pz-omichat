@@ -11,6 +11,7 @@ local floor = math.floor
 ---@field EnableCustomSneakShouts boolean
 ---@field EnableEmotes boolean
 ---@field EnableSetName boolean
+---@field EnableSetCharacterName boolean
 ---@field EnableSetNameColor boolean
 ---@field EnableSpeechColorAsDefaultNameColor boolean
 ---@field EnableSetSpeechColor boolean
