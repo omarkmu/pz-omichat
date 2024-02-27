@@ -1247,7 +1247,7 @@ OmiChat._transformers = {
 
             local tokens = { stream = info.substitutions.stream }
             local zMax = tonumber(utils.interpolate(Option.RangeVertical, tokens))
-            if zMax and math.abs(authorPlayer:getZ() - localPlayer:getZ()) > zMax then
+            if zMax and math.abs(authorPlayer:getZ() - localPlayer:getZ()) >= zMax then
                 outOfRange = true
             elseif range and range ~= defaultRange then
                 -- calculating distance using the distance formula like ChatUtility
