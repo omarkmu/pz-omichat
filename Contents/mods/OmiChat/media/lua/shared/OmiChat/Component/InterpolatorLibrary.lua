@@ -66,6 +66,13 @@ local library = {
 
         return s
     end,
+    ---@param _ omichat.Interpolator
+    ---@param s string
+    ---@return string
+    stripcolors = function(_, s)
+        s = tostring(s or ''):gsub('<RGB:[%d,.]*>', '')
+        return s
+    end,
 }
 
 

@@ -104,7 +104,6 @@ Configuration._chatStreams = {
         chatFormatOpt = 'ChatFormatMe',
         overheadFormatOpt = 'OverheadFormatMe',
         chatTypes = { say = true },
-        stripColors = true,
         ignoreLanguage = true,
     },
     {
@@ -116,7 +115,6 @@ Configuration._chatStreams = {
         overheadFormatOpt = 'OverheadFormatMeQuiet',
         titleID = 'UI_OmiChat_whisper_chat_title_id',
         chatTypes = { say = true },
-        stripColors = true,
         ignoreLanguage = true,
     },
     {
@@ -128,7 +126,6 @@ Configuration._chatStreams = {
         chatFormatOpt = 'ChatFormatMeLoud',
         overheadFormatOpt = 'OverheadFormatMeLoud',
         chatTypes = { shout = true },
-        stripColors = true,
         ignoreLanguage = true,
     },
     {
@@ -139,7 +136,6 @@ Configuration._chatStreams = {
         chatFormatOpt = 'ChatFormatDo',
         overheadFormatOpt = 'OverheadFormatDo',
         chatTypes = { say = true },
-        stripColors = true,
         ignoreLanguage = true,
     },
     {
@@ -151,7 +147,6 @@ Configuration._chatStreams = {
         overheadFormatOpt = 'OverheadFormatDoQuiet',
         titleID = 'UI_OmiChat_whisper_chat_title_id',
         chatTypes = { say = true },
-        stripColors = true,
         ignoreLanguage = true,
     },
     {
@@ -163,7 +158,6 @@ Configuration._chatStreams = {
         overheadFormatOpt = 'OverheadFormatDoLoud',
         defaultRangeOpt = 'RangeYell',
         chatTypes = { shout = true },
-        stripColors = true,
         ignoreLanguage = true,
     },
     {

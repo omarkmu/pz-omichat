@@ -370,10 +370,6 @@ function OmiChat.applyFormatOptions(info)
         info.substitutions.icon = string.format(' <IMAGE:%s,%d,%d> ', icon, size + 1, size)
     end
 
-    if options.stripColors then
-        msg = msg:gsub('<RGB:%d%.%d+,%d%.%d+,%d%.%d+>', '')
-    end
-
     local hasNameColor = meta.nameColor or Option.EnableSpeechColorAsDefaultNameColor
     if hasNameColor and shouldUseNameColor(info) then
         local colorToUse = meta.nameColor or Option:getDefaultColor('name', message:getAuthor())
@@ -498,7 +494,6 @@ function OmiChat.buildMessageInfo(message, skipFormatting)
             showTitle = instance.showTitle,
             showTimestamp = instance.showTimestamp,
             useDefaultChatColor = true,
-            stripColors = false,
         },
     }
 
@@ -745,16 +740,23 @@ end
 ---@param args omichat.FormatForChatArgs
 ---@return string
 function OmiChat.formatForChat(args)
-    local text = utils.interpolate(Option.FilterChatInput, { input = args.text })
+    local stream = args.stream or args.formatterName or args.chatType
+    local username = args.username or utils.getPlayerUsername()
+    local name = args.name or OmiChat.getNameInChat(username, args.chatType)
+
+    local text = utils.interpolate(Option.FilterChatInput, {
+        input = args.text,
+        username = username,
+        name = name,
+        stream = stream,
+    })
+
     if #utils.trim(text) == 0 then
         -- avoid empty messages
         return ''
     end
 
     local tokens = args.tokens and utils.copy(args.tokens) or {}
-    local username = args.username or utils.getPlayerUsername()
-    local stream = args.stream or args.formatterName or args.chatType
-    local name = args.name or OmiChat.getNameInChat(username, args.chatType)
 
     -- apply overhead styles
     local streamInfo = OmiChat.getChatStreamByIdentifier(stream)

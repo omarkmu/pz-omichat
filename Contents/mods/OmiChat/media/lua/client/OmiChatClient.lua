@@ -38,7 +38,6 @@ return OmiChat
 ---@field showTitle boolean Whether the message will include the chat type tag.
 ---@field showTimestamp boolean Whether the message will include a timestamp.
 ---@field useDefaultChatColor boolean Whether the default color associated with the chat type will be used if no color is specified.
----@field stripColors boolean Whether to remove rich text colors.
 ---@field font omichat.ChatFont The font size of the message.
 ---@field color omichat.ColorTable? The message color.
 

@@ -73,7 +73,6 @@ return OmiChat
 ---@field convertToRadio true? Whether messages sent on this stream should show up in chat over the radio.
 ---@field chatTypes table<omichat.ChatTypeString, true?> Chat types for which this stream is enabled.
 ---@field streamAlias string? An alias to use for determining color and range.
----@field stripColors boolean? Whether to strip colors from messages sent via this stream.
 ---@field autoColorOption false? Whether to automatically add a color option for this stream.
 ---@field defaultRangeOpt string? The option used for the default message range. Defaults to `RangeSay`.
 ---@field titleID string? The string ID to use for chat tags associated with this stream.
