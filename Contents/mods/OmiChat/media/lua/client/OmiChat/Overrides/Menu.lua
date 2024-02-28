@@ -348,11 +348,17 @@ function ISMiniScoreboardUI:populateList()
             local desc = player:getDescriptor()
             local forename = desc and desc:getForename() or ''
             local surname = desc and desc:getSurname() or ''
+            local chatName = OmiChat.getNameInChat(username, 'say') or ''
 
             local details = {
                 'Username: ',
                 username,
             }
+
+            if chatName ~= '' then
+                details[#details + 1] = '\nChat Name: '
+                details[#details + 1] = chatName
+            end
 
             if forename ~= '' then
                 details[#details + 1] = '\nForename: '
