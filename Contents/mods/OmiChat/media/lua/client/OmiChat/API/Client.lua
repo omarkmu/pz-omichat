@@ -1064,10 +1064,6 @@ OmiChat._transformers = {
                     info.formatOptions.color = OmiChat.getColorOrDefault(info.context.ocCustomStream)
                     info.formatOptions.useDefaultChatColor = false
 
-                    if data.stripColors then
-                        info.formatOptions.stripColors = true
-                    end
-
                     if data.titleID then
                         info.titleID = data.titleID
                     end
