@@ -345,9 +345,26 @@ function ISMiniScoreboardUI:populateList()
         local name = player and getMenuName(player, 'mini_scoreboard')
         if name then
             item.text = name
-            if name ~= username then
-                item.tooltip = username
+            local desc = player:getDescriptor()
+            local forename = desc and desc:getForename() or ''
+            local surname = desc and desc:getSurname() or ''
+
+            local details = {
+                'Username: ',
+                username,
+            }
+
+            if forename ~= '' then
+                details[#details + 1] = '\nForename: '
+                details[#details + 1] = forename
             end
+
+            if surname ~= '' then
+                details[#details + 1] = '\nSurname: '
+                details[#details + 1] = surname
+            end
+
+            item.tooltip = table.concat(details)
         end
     end
 end
