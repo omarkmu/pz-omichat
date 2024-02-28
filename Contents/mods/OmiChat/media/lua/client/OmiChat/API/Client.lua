@@ -221,34 +221,33 @@ OmiChat._commandStreams = {
         command = '/name ',
         omichat = {
             isCommand = true,
-            helpText = 'UI_OmiChat_helptext_name_no_reset',
-            isEnabled = function() return Option.EnableSetName end,
+            helpText = 'UI_OmiChat_helptext_name',
+            isEnabled = function() return Option:isNameCommandEnabled() end,
             onUse = function(ctx)
-                if Option.EnableChatNameAsCharacterName then
-                    local input = utils.trim(ctx.command or '')
-                    if #input == 0 then
-                        OmiChat.showInfoMessage(getText('UI_OmiChat_set_name_empty'))
-                        return
-                    end
-
-                    if OmiChat.updateCharacterName(input) then
-                        OmiChat.showInfoMessage(getText('UI_OmiChat_set_name_success', utils.escapeRichText(input)))
-                    else
-                        OmiChat.showInfoMessage(getText('UI_OmiChat_set_name_failure', utils.escapeRichText(input)))
+                if Option:isNameCommandSetNickname() then
+                    local _, feedback = OmiChat.setNickname(ctx.command)
+                    if feedback then
+                        OmiChat.showInfoMessage(feedback)
                     end
 
                     return
                 end
 
-                local _, feedback = OmiChat.setNickname(ctx.command)
+                local input = utils.trim(ctx.command or '')
+                if #input == 0 then
+                    OmiChat.showInfoMessage(getText('UI_OmiChat_set_name_empty'))
+                    return
+                end
+
+                local _, feedback = OmiChat.updateCharacterName(input, Option:isNameCommandSetFullName())
                 if feedback then
                     OmiChat.showInfoMessage(feedback)
                 end
             end,
             onHelp = function()
                 local msg = 'UI_OmiChat_helptext_name'
-                if Option.EnableChatNameAsCharacterName then
-                    msg = 'UI_OmiChat_helptext_name_no_reset'
+                if Option:isNameCommandSetFullName() then
+                    msg = 'UI_OmiChat_helptext_name_full'
                 end
 
                 OmiChat.showInfoMessage(getText(msg))
@@ -256,23 +255,16 @@ OmiChat._commandStreams = {
         },
     },
     {
-        name = 'charactername',
-        command = '/charactername ',
+        name = 'nickname',
+        command = '/nickname ',
         omichat = {
             isCommand = true,
-            helpText = 'UI_OmiChat_helptext_charactername',
-            isEnabled = function() return Option.EnableSetCharacterName end,
+            helpText = 'UI_OmiChat_helptext_nickname',
+            isEnabled = function() return Option:isNicknameCommandEnabled() end,
             onUse = function(ctx)
-                local input = utils.trim(ctx.command or '')
-                if #input == 0 then
-                    OmiChat.showInfoMessage(getText('UI_OmiChat_helptext_charactername'))
-                    return
-                end
-
-                if OmiChat.updateCharacterName(input, true) then
-                    OmiChat.showInfoMessage(getText('UI_OmiChat_set_name_success', utils.escapeRichText(input)))
-                else
-                    OmiChat.showInfoMessage(getText('UI_OmiChat_set_name_failure', utils.escapeRichText(input)))
+                local _, feedback = OmiChat.setNickname(ctx.command)
+                if feedback then
+                    OmiChat.showInfoMessage(feedback)
                 end
             end,
         },
