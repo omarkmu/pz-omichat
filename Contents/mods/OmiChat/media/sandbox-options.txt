@@ -646,7 +646,7 @@ option OmiChat.FormatNarrativeDialogueTag
 option OmiChat.FormatNarrativePunctuation
 {
     type = string,
-    default = @($eq($stream shout):!;.),
+    default = $unless($sneakCallout @($eq($stream shout):!;.)),
     page = OmiChat,
     translation = OCFormatNarrativePunctuation,
 }
