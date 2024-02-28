@@ -1,7 +1,7 @@
 VERSION = 1,
 
 
-/* Feature Flags */
+/* Basic Features */
 option OmiChat.EnableCustomShouts
 {
     type = boolean,
@@ -24,30 +24,6 @@ option OmiChat.EnableEmotes
     default = true,
     page = OmiChat,
     translation = OCEnableEmotes,
-}
-
-option OmiChat.EnableSetName
-{
-    type = boolean,
-    default = true,
-    page = OmiChat,
-    translation = OCEnableSetName,
-}
-
-option OmiChat.EnableSetCharacterName
-{
-    type = boolean,
-    default = false,
-    page = OmiChat,
-    translation = OCEnableSetCharacterName,
-}
-
-option OmiChat.EnableChatNameAsCharacterName
-{
-    type = boolean,
-    default = false,
-    page = OmiChat,
-    translation = OCEnableChatNameAsCharacterName,
 }
 
 option OmiChat.EnableSetNameColor
@@ -106,6 +82,16 @@ option OmiChat.ShowDiscordColorOption
     page = OmiChat,
     translation = OCShowDiscordColorOption,
     valueTranslation = OCShowDiscordColorOption,
+}
+
+option OmiChat.SetNameMode
+{
+    type = enum,
+    numValues = 6,
+    default = 2,
+    page = OmiChat,
+    translation = OCSetNameMode,
+    valueTranslation = OCSetNameMode,
 }
 
 

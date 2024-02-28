@@ -82,10 +82,10 @@ UI_EN = {
 
     --[[ Help Text ]]--
     UI_OmiChat_helptext_emotes = "Get a list of available chat emotes",
-    UI_OmiChat_helptext_name = "To set your name in chat, use: /name Name. To reset your name, use /name. Example: /name Bob",
-    UI_OmiChat_helptext_name_no_reset = "To set your name in chat, use: /name Name. Example: /name Bob",
-    UI_OmiChat_helptext_charactername = "To set your character's name, use: /charactername Forename Surname. Example: /name Bob Smith",
-    UI_OmiChat_helptext_setname = "Set a player's name in chat. Example: /setname username name",
+    UI_OmiChat_helptext_name = "To set your name, use: /name Name. Example: /name Bob",
+    UI_OmiChat_helptext_name_full = "To set your name, use: /name FirstName LastName. Example: /name Bob Smith",
+    UI_OmiChat_helptext_nickname = "To set your name in chat, use: /nickname Name. Example: /name Bob",
+    UI_OmiChat_helptext_setname = "Set a player's name in chat. Example: /setname username Name",
     UI_OmiChat_helptext_resetname = "Reset a player's name in chat. Example: /resetname username",
     UI_OmiChat_helptext_clearnames = "Clears all player chat names. Use /clearnames",
     UI_OmiChat_helptext_addlanguage = "Add to a player's roleplay language list. Example: /addlanguage username English",

@@ -552,7 +552,9 @@ end
 ---@param name string The new name of the character.
 ---@param updateSurname boolean? Whether the name should be split into forename and surname. Defaults to false.
 ---@return boolean success
+---@return string? status
 function OmiChat.updateCharacterName(name, updateSurname)
+    name = utils.trim(name)
     if #name == 0 then
         return false
     end
@@ -565,7 +567,7 @@ function OmiChat.updateCharacterName(name, updateSurname)
 
     name = utils.interpolate(Option.FilterNickname, { input = name })
     if name == '' then
-        return false
+        return false, getText('UI_OmiChat_set_name_failure', utils.escapeRichText(name))
     end
 
     local surname
@@ -594,5 +596,5 @@ function OmiChat.updateCharacterName(name, updateSurname)
         data.playerInventory:refreshBackpacks()
     end
 
-    return true
+    return true, getText('UI_OmiChat_set_name_success', utils.escapeRichText(name))
 end

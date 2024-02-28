@@ -10,17 +10,15 @@ local floor = math.floor
 ---@field EnableCustomShouts boolean
 ---@field EnableCustomSneakShouts boolean
 ---@field EnableEmotes boolean
----@field EnableSetName boolean
----@field EnableSetCharacterName boolean
 ---@field EnableSetNameColor boolean
 ---@field EnableSpeechColorAsDefaultNameColor boolean
 ---@field EnableSetSpeechColor boolean
 ---@field EnableIconPicker boolean
 ---@field EnableMiscellaneousIcons boolean
 ---@field EnableCompatTAD boolean
----@field EnableChatNameAsCharacterName boolean
 ---@field EnableFactionColorAsDefault boolean
 ---@field ShowDiscordColorOption integer
+---@field SetNameMode integer
 ---@field CustomShoutMaxLength integer
 ---@field MinimumCommandAccessLevel integer
 ---@field MaximumCustomShouts integer
@@ -170,6 +168,12 @@ local function getColorOrDefault(options, colorOpt)
 end
 
 
+---Returns whether players have a way to set their chat nickname.
+---@return boolean
+function Option:canPlayersSetNickname()
+    return self:isNicknameCommandEnabled() or self.SetNameMode == 2
+end
+
 ---Returns the default color associated with a category.
 ---@param category omichat.ColorCategory
 ---@param username string? The username of the user to use for getting defaults, if applicable.
@@ -220,6 +224,49 @@ end
 ---@return boolean
 function Option:isCustomCalloutTypeEnabled(category)
     return self[calloutOpts[category]]
+end
+
+---Returns whether the /name command should be enabled.
+---@return boolean
+function Option:isNameCommandEnabled()
+    return self.SetNameMode ~= 1
+end
+
+---Returns whether /name should set characters' forenames.
+---@return boolean
+function Option:isNameCommandSetForename()
+    local mode = self.SetNameMode
+    return mode == 3 or mode == 5
+end
+
+---Returns whether /name should set characters' full names.
+---@return boolean
+function Option:isNameCommandSetFullName()
+    local mode = self.SetNameMode
+    return mode == 4 or mode == 6
+end
+
+---Returns whether /name should set characters' nicknames.
+---@return boolean
+function Option:isNameCommandSetNickname()
+    return self.SetNameMode == 2
+end
+
+---Returns whether the /nickname command should be enabled.
+---@return boolean
+function Option:isNicknameCommandEnabled()
+    return self.SetNameMode > 4
+end
+
+---Returns whether the Discord color option should be shown.
+---@return boolean
+function Option:showDiscordColorOption()
+    local opt = self.ShowDiscordColorOption
+    if opt then
+        return getServerOptions():getBoolean('DiscordEnable')
+    end
+
+    return opt == 1
 end
 
 

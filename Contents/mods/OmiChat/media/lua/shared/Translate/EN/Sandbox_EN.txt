@@ -1,7 +1,7 @@
 Sandbox_EN = {
     Sandbox_OmiChat = "OmiChat",
 
-    --[[ Feature Flags ]]--
+    --[[ Basic Features ]]--
     Sandbox_OCEnableChatNameAsCharacterName = "Use Chat Name as Character Name",
     Sandbox_OCEnableCustomShouts = "Enable Custom Shouts",
     Sandbox_OCEnableCustomSneakShouts = "Enable Custom Sneak Shouts",
@@ -15,11 +15,20 @@ Sandbox_EN = {
     Sandbox_OCEnableSpeechColorAsDefaultNameColor = "Use Speech Color as Default Name Color",
     Sandbox_OCEnableFactionColorAsDefault = "Use Faction Tag Color as Default Chat Color",
     Sandbox_OCShowDiscordColorOption = "Show Discord Color Option",
+    Sandbox_OCSetNameMode = "/name Mode",
+
     Sandbox_OCShowDiscordColorOption_option1 = "Yes",
     Sandbox_OCShowDiscordColorOption_option2 = "No",
     Sandbox_OCShowDiscordColorOption_option3 = "Respect server setting",
 
-    --[[ Compatibility Feature Flags ]]--
+    Sandbox_OCSetNameMode_option1 = "Disallow setting name",
+    Sandbox_OCSetNameMode_option2 = "/name sets chat nickname",
+    Sandbox_OCSetNameMode_option3 = "/name sets character forename",
+    Sandbox_OCSetNameMode_option4 = "/name sets character's full name",
+    Sandbox_OCSetNameMode_option5 = "/name sets character's forename, /nickname sets character's chat nickname",
+    Sandbox_OCSetNameMode_option6 = "/name sets character's full name, /nickname sets character's chat nickname",
+
+    --[[ Compatibility Features ]]--
     Sandbox_OCEnableCompatTAD = "True Actions Act 3 - Dancing Compatibility",
 
     --[[ Limits ]]--

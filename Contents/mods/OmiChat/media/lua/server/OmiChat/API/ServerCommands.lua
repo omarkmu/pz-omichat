@@ -88,7 +88,7 @@ end
 ---@param args omichat.request.ModDataUpdate
 ---@return boolean
 local function updateModDataNickname(args)
-    if not Option.EnableSetName and not args.fromCommand then
+    if not Option:canPlayersSetNickname() and not args.fromCommand then
         return false
     end
 

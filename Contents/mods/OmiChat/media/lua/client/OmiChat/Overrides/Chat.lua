@@ -78,18 +78,12 @@ local function addColorOptions(context, beforeOption)
 
     colorOpts[#colorOpts + 1] = 'server'
 
-    local serverOptions = getServerOptions()
-    local showDiscordOption = Option.ShowDiscordColorOption == 1
-    if Option.ShowDiscordColorOption == 3 then
-        showDiscordOption = serverOptions:getBoolean('DiscordEnable')
-    end
-
-    if showDiscordOption then
+    if Option:showDiscordColorOption() then
         colorOpts[#colorOpts + 1] = 'discord'
     end
 
     -- need to check the option because checkPlayerCanUseChat checks for a radio item
-    local allowedStreams = serverOptions:getOption('ChatStreams'):split(',')
+    local allowedStreams = getServerOptions():getOption('ChatStreams'):split(',')
     for i = 1, #allowedStreams do
         if allowedStreams[i] == 'r' then
             colorOpts[#colorOpts + 1] = 'radio'
