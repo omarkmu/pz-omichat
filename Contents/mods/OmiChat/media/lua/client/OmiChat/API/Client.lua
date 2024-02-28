@@ -1399,17 +1399,18 @@ OmiChat._transformers = {
         priority = 0,
         transform = function(_, info)
             local text = info.content or info.rawText
-            local bytes = {}
+            local chars = {}
             for i = 1, #text do
-                local byte = text:sub(i, i):byte()
+                local c = text:sub(i, i)
+                local byte = c:byte()
 
                 -- throw away invisible characters
                 if byte < 128 or byte > 159 then
-                    bytes[#bytes + 1] = byte
+                    chars[#chars + 1] = byte
                 end
             end
 
-            text = utils.trim(string.char(unpack(bytes)))
+            text = utils.trim(concat(chars))
             if #text == 0 then
                 info.message:setShowInChat(false)
             end
