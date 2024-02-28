@@ -14,7 +14,6 @@ local getTextOrNull = getTextOrNull
 
 local _addLineInChat = ISChat.addLineInChat
 local _onCommandEntered = ISChat.onCommandEntered
-local _onGearButtonClick = ISChat.onGearButtonClick
 local _logChatCommand = ISChat.logChatCommand
 local _createChildren = ISChat.createChildren
 local _focus = ISChat.focus
@@ -33,8 +32,7 @@ local _ServerChatMessage = __classmetatables[ServerChatMessage.class].__index
 
 ---Adds context menu options for admin controls.
 ---@param context ISContextMenu
----@param beforeOption string
-local function addAdminOptions(context, beforeOption)
+local function addAdminOptions(context)
     if not isAdmin() then
         return
     end
@@ -47,7 +45,7 @@ local function addAdminOptions(context, beforeOption)
     }
 
     local adminOptionName = getText('UI_OmiChat_context_admin')
-    local adminOption = context:insertOptionBefore(beforeOption, adminOptionName, ISChat.instance)
+    local adminOption = context:addOption(adminOptionName, ISChat.instance)
 
     local subMenu = context:getNew(context)
     context:addSubMenu(adminOption, subMenu)
@@ -60,10 +58,89 @@ local function addAdminOptions(context, beforeOption)
     end
 end
 
+---Adds the chat setting submenus from vanilla.
+---From ISChat.
+---@param context ISContextMenu
+local function addVanillaSubmenuOptions(context)
+    local instance = ISChat.instance
+    if not instance then
+        return
+    end
+
+    local fontSizeOption = context:addOption(getText('UI_chat_context_font_submenu_name'), instance)
+    local fontSubMenu = context:getNew(context)
+    context:addSubMenu(fontSizeOption, fontSubMenu)
+    fontSubMenu:addOption(getText('UI_chat_context_font_small'), instance, ISChat.onFontSizeChange, 'small')
+    fontSubMenu:addOption(getText('UI_chat_context_font_medium'), instance, ISChat.onFontSizeChange, 'medium')
+    fontSubMenu:addOption(getText('UI_chat_context_font_large'), instance, ISChat.onFontSizeChange, 'large')
+    if instance.chatFont == 'small' then
+        fontSubMenu:setOptionChecked(fontSubMenu.options[1], true)
+    elseif instance.chatFont == 'medium' then
+        fontSubMenu:setOptionChecked(fontSubMenu.options[2], true)
+    elseif instance.chatFont == 'large' then
+        fontSubMenu:setOptionChecked(fontSubMenu.options[3], true)
+    end
+
+    local minOpaqueOption = context:addOption(getText('UI_chat_context_opaque_min'), instance)
+    local minOpaqueSubMenu = context:getNew(context)
+    context:addSubMenu(minOpaqueOption, minOpaqueSubMenu)
+    local opaques = { 0, 0.25, 0.5, 0.75, 1 }
+    for i = 1, #opaques do
+        if logTo01(opaques[i]) <= instance.maxOpaque then
+            local optName = (opaques[i] * 100) .. '%'
+            local option = minOpaqueSubMenu:addOption(optName, instance, ISChat.onMinOpaqueChange, opaques[i])
+            local current = math.floor(instance.minOpaque * 1000)
+            local value = math.floor(logTo01(opaques[i]) * 1000)
+            if current == value then
+                minOpaqueSubMenu:setOptionChecked(option, true)
+            end
+        end
+    end
+
+    local maxOpaqueOption = context:addOption(getText('UI_chat_context_opaque_max'), instance)
+    local maxOpaqueSubMenu = context:getNew(context)
+    context:addSubMenu(maxOpaqueOption, maxOpaqueSubMenu)
+    for i = 1, #opaques do
+        if logTo01(opaques[i]) >= instance.minOpaque then
+            local optName = (opaques[i] * 100) .. '%'
+            local option = maxOpaqueSubMenu:addOption(optName, instance, ISChat.onMaxOpaqueChange, opaques[i])
+            local current = math.floor(instance.maxOpaque * 1000)
+            local value = math.floor(logTo01(opaques[i]) * 1000)
+            if current == value then
+                maxOpaqueSubMenu:setOptionChecked(option, true)
+            end
+        end
+    end
+
+    local fadeTimeOption = context:addOption(getText('UI_chat_context_opaque_fade_time_submenu_name'), instance)
+    local fadeTimeSubMenu = context:getNew(context)
+    context:addSubMenu(fadeTimeOption, fadeTimeSubMenu)
+    local availFadeTime = { 0, 1, 2, 3, 5, 10 }
+    local optionName = getText('UI_chat_context_disable')
+    local option = fadeTimeSubMenu:addOption(optionName, instance, ISChat.onFadeTimeChange, 0)
+    if instance.fadeTime == 0 then
+        fadeTimeSubMenu:setOptionChecked(option, true)
+    end
+
+    for i = 2, #availFadeTime do
+        local time = availFadeTime[i]
+        option = fadeTimeSubMenu:addOption(time .. ' s', instance, ISChat.onFadeTimeChange, time)
+        if instance.fadeTime == time then
+            fadeTimeSubMenu:setOptionChecked(option, true)
+        end
+    end
+
+    local opaqueOnFocusOption = context:addOption(getText('UI_chat_context_opaque_on_focus'), instance)
+    local opaqueOnFocusSubMenu = context:getNew(context)
+    context:addSubMenu(opaqueOnFocusOption, opaqueOnFocusSubMenu)
+    opaqueOnFocusSubMenu:addOption(getText('UI_chat_context_disable'), instance, ISChat.onFocusOpaqueChange, false)
+    opaqueOnFocusSubMenu:addOption(getText('UI_chat_context_enable'), instance, ISChat.onFocusOpaqueChange, true)
+    opaqueOnFocusSubMenu:setOptionChecked(opaqueOnFocusSubMenu.options[instance.opaqueOnFocus and 2 or 1], true)
+end
+
 ---Adds context menu options for chat colors.
 ---@param context ISContextMenu
----@param beforeOption string
-local function addColorOptions(context, beforeOption)
+local function addColorOptions(context)
     local colorOpts = {}
     local canUsePM = checkPlayerCanUseChat('/w')
     local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
@@ -132,7 +209,7 @@ local function addColorOptions(context, beforeOption)
 
     if #colorOpts > 0 then
         local colorOptionName = getText('UI_OmiChat_context_colors_submenu_name')
-        local colorOption = context:insertOptionBefore(beforeOption, colorOptionName, ISChat.instance)
+        local colorOption = context:addOption(colorOptionName, ISChat.instance)
 
         local colorSubMenu = context:getNew(context)
         context:addSubMenu(colorOption, colorSubMenu)
@@ -151,8 +228,7 @@ end
 
 ---Adds the context menu options for custom callouts.
 ---@param context ISContextMenu
----@param beforeOption string
-local function addCustomCalloutOptions(context, beforeOption)
+local function addCustomCalloutOptions(context)
     local shoutOpts = {}
     if Option.EnableCustomShouts then
         shoutOpts[#shoutOpts + 1] = 'callouts'
@@ -165,14 +241,13 @@ local function addCustomCalloutOptions(context, beforeOption)
     for i = 1, #shoutOpts do
         local shoutType = shoutOpts[i]
         local shoutOptionName = getText('UI_OmiChat_context_set_custom_' .. shoutType)
-        context:insertOptionBefore(beforeOption, shoutOptionName, ISChat.instance, ISChat.onCustomCalloutMenu, shoutType)
+        context:addOption(shoutOptionName, ISChat.instance, ISChat.onCustomCalloutMenu, shoutType)
     end
 end
 
 ---Adds the context menu options for roleplay languages.
 ---@param context ISContextMenu
----@param beforeOption string
-local function addLanguageOptions(context, beforeOption)
+local function addLanguageOptions(context)
     local languages = OmiChat.getRoleplayLanguages()
     local languageSlots = OmiChat.getRoleplayLanguageSlots()
     if languageSlots == 0 and #languages <= 1 then
@@ -181,7 +256,7 @@ local function addLanguageOptions(context, beforeOption)
     end
 
     local languageOptionName = getText('UI_OmiChat_context_languages')
-    local languageOption = context:insertOptionBefore(beforeOption, languageOptionName, ISChat.instance)
+    local languageOption = context:addOption(languageOptionName, ISChat.instance)
 
     local languageSubMenu = context:getNew(context)
     context:addSubMenu(languageOption, languageSubMenu)
@@ -231,10 +306,8 @@ end
 
 ---Adds the context menu options for retaining commands.
 ---@param context ISContextMenu
----@param beforeOption string
-local function addRetainOptions(context, beforeOption)
-    local retainOptionName = getText('UI_OmiChat_context_retain_commands')
-    local retainOption = context:insertOptionBefore(beforeOption, retainOptionName, ISChat.instance)
+local function addRetainOptions(context)
+    local retainOption = context:addOption(getText('UI_OmiChat_context_retain_commands'), ISChat.instance)
 
     local retainSubMenu = context:getNew(context)
     context:addSubMenu(retainOption, retainSubMenu)
@@ -526,66 +599,63 @@ function ISChat:onCommandEntered()
     instance.timerTextEntry = 20
 end
 
----Override to add additional settings.
+---Override to add additional settings and reorganize existing ones.
 function ISChat:onGearButtonClick()
-    _onGearButtonClick(self)
     OmiChat.hideSuggesterBox()
 
-    -- grab and modify the context menu that the default onGearButtonClick creates
-    local context = getPlayerContextMenu(0)
-    if not context then
-        return
-    end
+    local x = self:getAbsoluteX() + self:getWidth()
+    local y = self:getAbsoluteY() + self.gearButton:getY()
+    local context = ISContextMenu.get(0, x, y)
 
-    -- sanity check that this is the chat context menu
-    local checkOpt = context.options and context.options[1]
-    if not checkOpt or checkOpt.target ~= ISChat.instance then
-        return
-    end
+    addAdminOptions(context)
 
-    -- insert new options before the first submenu
-    local firstSubMenu
-    for i = 1, #context.options do
-        local opt = context.options[i]
-        if opt.subOption and opt.subOption > 0 then
-            firstSubMenu = opt
-            break
-        end
-    end
+    -- Chat settings
+    local chatSettingsOpt = context:addOption(getText('UI_OmiChat_context_chat_settings'), ISChat.instance)
+    local chatSettingsSubmenu = context:getNew(context)
+    context:addSubMenu(chatSettingsOpt, chatSettingsSubmenu)
 
-    local subMenuName = firstSubMenu and firstSubMenu.name or ''
+    local timestampOptName = self.showTimestamp
+        and getText('UI_chat_context_disable_timestamp')
+        or getText('UI_chat_context_enable_timestamp')
+    local tagOptName = self.showTitle
+        and getText('UI_chat_context_disable_tags')
+        or getText('UI_chat_context_enable_tags')
+
+    chatSettingsSubmenu:addOption(timestampOptName, ISChat.instance, ISChat.onToggleTimestampPrefix)
+    chatSettingsSubmenu:addOption(tagOptName, ISChat.instance, ISChat.onToggleTagPrefix)
+
+    local suggesterOptName = OmiChat.getUseSuggester()
+        and getText('UI_OmiChat_context_disable_suggestions')
+        or getText('UI_OmiChat_context_enable_suggestions')
+    chatSettingsSubmenu:addOption(suggesterOptName, ISChat.instance, ISChat.onToggleUseSuggester)
+
+    addRetainOptions(chatSettingsSubmenu)
+    addVanillaSubmenuOptions(chatSettingsSubmenu)
+
+    -- Chat customization
+    local chatCustomzationOpt = context:addOption(getText('UI_OmiChat_context_customization'), ISChat.instance)
+    local chatCustomizationSubmenu = context:getNew(context)
+    context:addSubMenu(chatCustomzationOpt, chatCustomizationSubmenu)
+
+    addCustomCalloutOptions(chatCustomizationSubmenu)
 
     if Option.EnableSetNameColor or Option.EnableSpeechColorAsDefaultNameColor then
-        local nameColorOptionName
-        if OmiChat.getNameColorsEnabled() then
-            nameColorOptionName = getText('UI_OmiChat_context_disable_name_colors')
-        else
-            nameColorOptionName = getText('UI_OmiChat_context_enable_name_colors')
-        end
+        local nameColorOptName = OmiChat.getNameColorsEnabled()
+            and getText('UI_OmiChat_context_disable_name_colors')
+            or getText('UI_OmiChat_context_enable_name_colors')
 
-        context:insertOptionBefore(subMenuName, nameColorOptionName, ISChat.instance, ISChat.onToggleShowNameColor)
+        chatCustomizationSubmenu:addOption(nameColorOptName, ISChat.instance, ISChat.onToggleShowNameColor)
     end
-
-    local suggesterOptionName
-    if OmiChat.getUseSuggester() then
-        suggesterOptionName = getText('UI_OmiChat_context_disable_suggestions')
-    else
-        suggesterOptionName = getText('UI_OmiChat_context_enable_suggestions')
-    end
-
-    context:insertOptionBefore(subMenuName, suggesterOptionName, ISChat.instance, ISChat.onToggleUseSuggester)
 
     if shouldShowSignEmoteOption() then
         local suffix = OmiChat.getSignEmotesEnabled() and 'disable' or 'enable'
         local signEmotesOptionName = getText('UI_OmiChat_context_sign_emotes_' .. suffix)
-        context:insertOptionBefore(subMenuName, signEmotesOptionName, ISChat.instance, ISChat.onToggleUseSignEmotes)
+        chatCustomizationSubmenu:addOption(signEmotesOptionName, ISChat.instance, ISChat.onToggleUseSignEmotes)
     end
 
-    addCustomCalloutOptions(context, subMenuName)
-    addColorOptions(context, subMenuName)
-    addAdminOptions(context, subMenuName)
-    addRetainOptions(context, subMenuName)
-    addLanguageOptions(context, subMenuName)
+    addColorOptions(chatCustomizationSubmenu)
+
+    addLanguageOptions(context)
 end
 
 ---Override to handle custom info text.
