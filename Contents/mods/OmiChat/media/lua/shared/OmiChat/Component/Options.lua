@@ -62,7 +62,7 @@ local floor = math.floor
 ---@field FilterChatInput string
 ---@field FilterNickname string
 ---@field FilterNarrativeStyle string
----@field PredicateCanZombiesHear string
+---@field PredicateAttractZombies string
 ---@field PredicateUseNameColor string
 ---@field PredicateUseNarrativeStyle string
 ---@field PredicateAllowLanguage string

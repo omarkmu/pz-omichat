@@ -453,7 +453,7 @@ return {
                 info.attractRange = range * Option.RangeMultiplierZombies
                 if not info.context.ocIsCallout and not info.context.ocIsSneakCallout then
                     local tokens = { stream = info.tokens.stream }
-                    info.message:setShouldAttractZombies(utils.testPredicate(Option.PredicateCanZombiesHear, tokens))
+                    info.message:setShouldAttractZombies(utils.testPredicate(Option.PredicateAttractZombies, tokens))
                 end
             end
 
