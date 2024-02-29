@@ -2,7 +2,9 @@
 local OmiChat = require 'OmiChat/API/Client'
 
 local concat = table.concat
+local char = string.char
 local getText = getText
+local instanceof = instanceof
 
 local utils = OmiChat.utils
 local Option = OmiChat.Option
@@ -601,7 +603,7 @@ return {
 
                 -- throw away invisible characters
                 if byte < 128 or byte > 159 then
-                    chars[#chars + 1] = byte
+                    chars[#chars + 1] = char(byte)
                 end
             end
 
@@ -628,17 +630,37 @@ return {
                 return
             end
 
+            -- avoid doing this again
+            addMessageTagValue(info.message, 'ocSupressed', true)
+
             -- push the message up with blank text
-            local author = info.message:getAuthor()
-            local speaker = author and utils.getPlayerByUsername(author)
-            if speaker then
+            local player = getSpecificPlayer(0)
+            if player then
                 for _ = 1, 5 do
-                    speaker:Say(' ')
+                    player:Say(' ')
                 end
             end
 
-            -- avoid doing this again
-            addMessageTagValue(info.message, 'ocSupressed', true)
+            local zomboidRadio = getZomboidRadio()
+            if not zomboidRadio then
+                return
+            end
+
+            -- do the same thing for radios
+            local devices = zomboidRadio:getDevices()
+            for i = 0, devices:size() - 1 do
+                local device = devices:get(i) ---@cast device IsoWaveSignal
+                local deviceData = device and device:getDeviceData()
+                if deviceData and instanceof(device, 'IsoRadio') then
+                    local canTransmit = not deviceData:isPlayingMedia() and not deviceData:isNoTransmit()
+                    local hasSayLine = canTransmit and device.getSayLine and device:getSayLine()
+                    if hasSayLine and deviceData:getChannel() == info.message:getRadioChannel() then
+                        for _ = 1, 5 do
+                            device:Say(' ')
+                        end
+                    end
+                end
+            end
         end,
     },
 }
