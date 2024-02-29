@@ -496,7 +496,7 @@ local function onUseDanceCommand(_, command)
     end
 
     if feedback then
-        OmiChat.showInfoMessage(feedback)
+        OmiChat.addInfoMessage(feedback)
     end
 end
 

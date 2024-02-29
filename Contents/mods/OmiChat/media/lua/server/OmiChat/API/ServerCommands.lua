@@ -1,4 +1,4 @@
----Server command handling.
+---Server API functionality related to dispatching and handling commands.
 
 if not isServer() then return end
 
@@ -7,9 +7,11 @@ if not isServer() then return end
 local OmiChat = require 'OmiChat/API/Server'
 OmiChat.Commands = {}
 
-
 local Option = OmiChat.Option
 local utils = OmiChat.utils
+
+---@type table<omichat.ModDataField, function>
+local updateModData = {}
 
 
 ---Checks whether a player has permission to execute a command for the given target.
@@ -36,7 +38,7 @@ end
 
 ---@param args omichat.request.ModDataUpdate
 ---@return boolean
-local function updateModDataCurrentLanguage(args)
+function updateModData.currentLanguage(args)
     if not args.value then
         return false
     end
@@ -46,7 +48,7 @@ end
 
 ---@param args omichat.request.ModDataUpdate
 ---@return boolean
-local function updateModDataIcon(args)
+function updateModData.icons(args)
     OmiChat.setChatIcon(args.target, args.value and tostring(args.value) or nil)
     return true
 end
@@ -54,7 +56,7 @@ end
 ---@param args omichat.request.ModDataUpdate
 ---@return boolean
 ---@return string?
-local function updateModDataLanguage(args)
+function updateModData.languages(args)
     if not args.value then
         OmiChat.resetRoleplayLanguages(args.target)
         return true
@@ -65,7 +67,7 @@ end
 
 ---@param args omichat.request.ModDataUpdate
 ---@return boolean
-local function updateModDataLanguageSlots(args)
+function updateModData.languageSlots(args)
     local slots = tonumber(args.value)
     if not slots then
         return false
@@ -76,7 +78,7 @@ end
 
 ---@param args omichat.request.ModDataUpdate
 ---@return boolean
-local function updateModDataNameColor(args)
+function updateModData.nameColors(args)
     if not Option.EnableSetNameColor and not args.fromCommand then
         return false
     end
@@ -87,7 +89,7 @@ end
 
 ---@param args omichat.request.ModDataUpdate
 ---@return boolean
-local function updateModDataNickname(args)
+function updateModData.nicknames(args)
     if not Option:canPlayersSetNickname() and not args.fromCommand then
         return false
     end
@@ -96,16 +98,105 @@ local function updateModDataNickname(args)
     return true
 end
 
----@type table<omichat.ModDataField, function>
-local modDataUpdateFunctions = {
-    nicknames = updateModDataNickname,
-    nameColors = updateModDataNameColor,
-    languages = updateModDataLanguage,
-    languageSlots = updateModDataLanguageSlots,
-    currentLanguage = updateModDataCurrentLanguage,
-    icons = updateModDataIcon,
-}
 
+--#region dispatch
+
+---Dispatches a server command.
+---@param player IsoPlayer
+---@param command string
+---@param args table?
+function OmiChat.dispatch(command, player, args)
+    sendServerCommand(player, OmiChat._modDataKey, command, args or {})
+end
+
+---Dispatches a server command to all players.
+---@param command string
+---@param args table?
+function OmiChat.dispatchAll(command, args)
+    sendServerCommand(OmiChat._modDataKey, command, args or {})
+end
+
+---Instructs the client to report the result of drawing a card.
+---@param player IsoPlayer
+---@param card integer
+---@param suit integer
+function OmiChat.reportDrawCard(player, card, suit)
+    ---@type omichat.request.ReportDrawCard
+    local req = { card = card, suit = suit }
+
+    OmiChat.dispatch('reportDrawCard', player, req)
+end
+
+---Instructs all clients to report the result of drawing a card.
+---@param name string
+---@param card integer
+---@param suit integer
+function OmiChat.reportDrawCardGlobal(name, card, suit)
+    ---@type omichat.request.ReportDrawCard
+    local req = { name = name, card = card, suit = suit }
+
+    OmiChat.dispatchAll('reportDrawCard', req)
+end
+
+---Instructs the client to report the result of a dice roll.
+---@param player IsoPlayer
+---@param roll integer
+---@param sides integer
+function OmiChat.reportRoll(player, roll, sides)
+    ---@type omichat.request.ReportRoll
+    local req = { roll = roll, sides = sides }
+
+    OmiChat.dispatch('reportRoll', player, req)
+end
+
+---Sends an info message that will show only for the specified player.
+---@param player IsoPlayer
+---@param text string
+---@param serverAlert boolean?
+function OmiChat.sendInfoMessage(player, text, serverAlert)
+    ---@type omichat.request.ShowMessage
+    local req = { text = text, serverAlert = serverAlert }
+
+    OmiChat.dispatch('showInfoMessage', player, req)
+end
+
+---Sends an info message that will show for all players.
+---@param text string
+---@param serverAlert boolean?
+function OmiChat.sendServerMessage(text, serverAlert)
+    ---@type omichat.request.ShowMessage
+    local req = { text = text, serverAlert = serverAlert }
+
+    OmiChat.dispatchAll('showInfoMessage', req)
+end
+
+---Sends an info message that will show only for the specified player.
+---@param player IsoPlayer
+---@param stringID string
+---@param args string[]?
+---@param serverAlert boolean?
+function OmiChat.sendTranslatedInfoMessage(player, stringID, args, serverAlert)
+    ---@type omichat.request.ShowMessage
+    local req = { stringID = stringID, args = args, serverAlert = serverAlert }
+
+    OmiChat.dispatch('showInfoMessage', player, req)
+end
+
+---Sends an info message that will show for all players.
+---@param stringID string
+---@param args string[]?
+---@param serverAlert boolean?
+function OmiChat.sendTranslatedServerMessage(stringID, args, serverAlert)
+    ---@type omichat.request.ShowMessage
+    local req = { stringID = stringID, args = args, serverAlert = serverAlert }
+
+    OmiChat.dispatchAll('showInfoMessage', req)
+end
+
+
+--#endregion
+
+--#region handlers
 
 ---Handles the /addlanguage command.
 ---@param player IsoPlayer
@@ -166,7 +257,7 @@ function OmiChat.Commands.requestDataUpdate(player, args)
     local err
     local success = false
     if canAccessTarget(player, args.target, args.fromCommand) then
-        local updateFunc = modDataUpdateFunctions[args.field]
+        local updateFunc = updateModData[args.field]
         if updateFunc then
             success, err = updateFunc(args)
         end
@@ -364,6 +455,8 @@ function OmiChat.Commands.requestSetName(player, args)
     name = utils.escapeRichText(name)
     OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_set_other_name_success', { username, name })
 end
+
+--#endregion
 
 
 ---Event handler for processing commands from the client.
