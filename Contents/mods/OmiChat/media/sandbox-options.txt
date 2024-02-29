@@ -494,12 +494,12 @@ option OmiChat.FilterNarrativeStyle
     translation = OCFilterNarrativeStyle,
 }
 
-option OmiChat.PredicateCanZombiesHear
+option OmiChat.PredicateAttractZombies
 {
     type = string,
     default = $has(@(say;shout;meloud;doloud;radio) $stream),
     page = OmiChat,
-    translation = OCPredicateCanZombiesHear,
+    translation = OCPredicateAttractZombies,
 }
 
 option OmiChat.PredicateAllowLanguage
