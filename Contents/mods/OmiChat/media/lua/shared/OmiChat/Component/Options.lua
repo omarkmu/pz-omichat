@@ -20,6 +20,7 @@ local floor = math.floor
 ---@field EnableCharacterCustomization boolean
 ---@field ShowDiscordColorOption integer
 ---@field SetNameMode integer
+---@field BuffCooldown integer
 ---@field CustomShoutMaxLength integer
 ---@field MinimumCommandAccessLevel integer
 ---@field MaximumCustomShouts integer
@@ -63,6 +64,7 @@ local floor = math.floor
 ---@field FilterNickname string
 ---@field FilterNarrativeStyle string
 ---@field PredicateAttractZombies string
+---@field PredicateApplyBuff string
 ---@field PredicateUseNameColor string
 ---@field PredicateUseNarrativeStyle string
 ---@field PredicateAllowLanguage string

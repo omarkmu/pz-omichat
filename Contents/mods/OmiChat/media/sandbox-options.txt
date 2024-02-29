@@ -114,6 +114,16 @@ option OmiChat.EnableCompatTAD
 
 
 /* Limits */
+option OmiChat.BuffCooldown
+{
+    type = integer,
+    default = 15,
+    min = 0,
+    max = 1440,
+    page = OmiChat,
+    translation = OCBuffCooldown,
+}
+
 option OmiChat.CustomShoutMaxLength
 {
     type = integer,
@@ -494,20 +504,28 @@ option OmiChat.FilterNarrativeStyle
     translation = OCFilterNarrativeStyle,
 }
 
-option OmiChat.PredicateAttractZombies
-{
-    type = string,
-    default = $has(@(say;shout;meloud;doloud;radio) $stream),
-    page = OmiChat,
-    translation = OCPredicateAttractZombies,
-}
-
 option OmiChat.PredicateAllowLanguage
 {
     type = string,
     default = $has(@(say;shout;whisper;low) $stream),
     page = OmiChat,
     translation = OCPredicateAllowLanguage,
+}
+
+option OmiChat.PredicateApplyBuff
+{
+    type = string,
+    default =,
+    page = OmiChat,
+    translation = OCPredicateApplyBuff,
+}
+
+option OmiChat.PredicateAttractZombies
+{
+    type = string,
+    default = $has(@(say;shout;meloud;doloud;radio) $stream),
+    page = OmiChat,
+    translation = OCPredicateAttractZombies,
 }
 
 option OmiChat.PredicateUseNarrativeStyle
