@@ -74,6 +74,14 @@ option OmiChat.EnableMiscellaneousIcons
     translation = OCEnableMiscellaneousIcons,
 }
 
+option OmiChat.EnableCharacterCustomization
+{
+    type = boolean,
+    default = false,
+    page = OmiChat,
+    translation = OCEnableCharacterCustomization,
+}
+
 option OmiChat.ShowDiscordColorOption
 {
     type = enum,
