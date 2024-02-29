@@ -546,7 +546,8 @@ option OmiChat.PredicateUseNameColor
 
 
 /* Languages */
-option OmiChat.AvailableLanguages {
+option OmiChat.AvailableLanguages
+{
     type = string,
     default = English;French;Italian;German;Spanish;Danish;Dutch;Hungarian;Norwegian;Polish;Portuguese;Russian;Turkish;Japanese;Mandarin;Finnish;Korean;Thai;Ukrainian;ASL,
     page = OmiChat,

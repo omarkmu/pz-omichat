@@ -22,7 +22,6 @@ return OmiChat
 
 ---@alias omichat.ChatCommandType 'chat' | 'rp' | 'other'
 ---@alias omichat.ChatFont 'small' | 'medium' | 'large'
----@alias omichat.EmoteGetter fun(emoteName: string): string?
 ---@alias omichat.Message ChatMessage | omichat.MimicMessage
 
 

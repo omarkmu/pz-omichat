@@ -591,7 +591,7 @@ function OmiChat.updateCharacterName(name, updateSurname)
 
     -- update name in inventory
     local data = getPlayerData(player:getPlayerNum())
-    if data then
+    if data and data.playerInventory then
         player:getInventory():setDrawDirty(true)
         data.playerInventory:refreshBackpacks()
     end
