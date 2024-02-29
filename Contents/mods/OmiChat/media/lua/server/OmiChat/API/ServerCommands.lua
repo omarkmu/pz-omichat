@@ -390,6 +390,11 @@ function OmiChat.Commands.requestRollDice(player, args)
     end
 end
 
+---Handles sandbox options being updated by an admin.
+function OmiChat.Commands.requestSandboxUpdate()
+    OmiChat.dispatchAll('updateState')
+end
+
 ---Handles the /seticon command.
 ---@param player IsoPlayer
 ---@param args omichat.request.Command
