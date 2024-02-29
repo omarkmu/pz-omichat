@@ -5,7 +5,6 @@ OmiChat._commandStreams = require 'OmiChat/Definition/CommandStreams'
 OmiChat._suggesters = require 'OmiChat/Definition/Suggesters'
 OmiChat._transformers = require 'OmiChat/Definition/Transformers'
 
-require 'OmiChat/API/ClientDefines'
 require 'OmiChat/API/ClientChat'
 require 'OmiChat/API/ClientData'
 require 'OmiChat/API/ClientCommands'

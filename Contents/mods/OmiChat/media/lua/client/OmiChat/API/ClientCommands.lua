@@ -45,8 +45,19 @@ function OmiChat.dispatch(command, args)
         return false
     end
 
+    if player:isDead() and command ~= 'reportPlayerDeath' then
+        -- prevent processing commands while dead
+        return false
+    end
+
     sendClientCommand(player, OmiChat._modDataKey, command, args or {})
     return true
+end
+
+---Reports to the server that the player died, for clearing relevant data.
+---@return boolean
+function OmiChat.reportPlayerDeath()
+    return OmiChat.dispatch('reportPlayerDeath')
 end
 
 ---Executes the /addlanguage command.

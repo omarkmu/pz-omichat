@@ -487,6 +487,13 @@ local function getLines(text, maxLen)
     return lines
 end
 
+---Checks whether the player is dead or unavailable.
+---@return boolean
+local function isPlayerDead()
+    local player = getSpecificPlayer(0)
+    return not player or player:isDead()
+end
+
 ---Attempts to set the current text with the currently selected suggester box item.
 ---@return boolean didSet
 local function tryInputSuggestedItem()
@@ -820,6 +827,10 @@ end
 ---@param target omichat.ISChat
 ---@return boolean
 function ISChat.onIconButtonClick(target)
+    if isPlayerDead() then
+        return false
+    end
+
     local iconPicker = target.iconPicker
     if not ISChat.focused or not iconPicker then
         return false
@@ -851,6 +862,10 @@ end
 ---@param target omichat.ISChat
 ---@param icon string The icon that was selected.
 function ISChat.onIconClick(target, icon)
+    if isPlayerDead() then
+        return
+    end
+
     if not ISChat.focused then
         target:focus()
     elseif not ISChat.instance.textEntry:isFocused() then
@@ -1065,6 +1080,10 @@ end
 
 ---Override to correct the chat stream and enable the icon button on focus.
 function ISChat:focus()
+    if isPlayerDead() then
+        return
+    end
+
     _focus(self)
 
     local text = ISChat.instance.textEntry:getInternalText()
@@ -1090,6 +1109,10 @@ end
 
 ---Override to support custom commands and emote shortcuts.
 function ISChat:onCommandEntered()
+    if isPlayerDead() then
+        return
+    end
+
     if tryInputSuggestedItem() then
         OmiChat.updateCustomComponents()
         return
@@ -1207,6 +1230,11 @@ end
 
 ---Override to add additional settings and reorganize existing ones.
 function ISChat:onGearButtonClick()
+    if isPlayerDead() then
+        -- avoid errors from clicking the button after dying
+        return
+    end
+
     OmiChat.hideSuggesterBox()
 
     local x = self:getAbsoluteX() + self:getWidth()
