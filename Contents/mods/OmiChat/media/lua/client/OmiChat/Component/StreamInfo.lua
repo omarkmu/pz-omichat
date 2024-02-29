@@ -1,4 +1,6 @@
 local lib = require 'OmiChat/lib'
+local config = require 'OmiChat/config'
+local Option = require 'OmiChat/Component/Options'
 
 
 ---Stream wrapper for easier retrieval of stream info and mod configuration data.
@@ -40,10 +42,10 @@ function StreamInfo:getCommandType()
     return self:config().commandType or 'other'
 end
 
----Returns the context table of the stream.
----@return table?
-function StreamInfo:getContext()
-    return self:config().context
+---Returns the name of the formatter the stream uses.
+---@return string?
+function StreamInfo:getFormatterName()
+    return self:config().formatter
 end
 
 ---Returns the callback to use when the /help command is used with the stream.
@@ -105,7 +107,7 @@ function StreamInfo:getTabID()
 end
 
 ---Gets the callback to use when the stream is used.
----@return fun(ctx: omichat.UseCallbackContext)?
+---@return fun(ctx: omichat.SendArgs)?
 function StreamInfo:getUseCallback()
     return self:config().onUse
 end
@@ -137,12 +139,24 @@ end
 ---Returns whether the stream is enabled.
 ---@return boolean
 function StreamInfo:isEnabled()
-    local config = self:config()
-    if not config.isEnabled then
+    local cfg = self:config()
+    local isEnabled = cfg.isEnabled
+    if isEnabled then
+        return isEnabled(self)
+    end
+
+    local cmd = cfg.isEnabledCommand
+    if cmd then
+        return checkPlayerCanUseChat(cmd)
+    end
+
+    local info = config:getCustomStreamInfo(self:getName())
+    if not info then
         return true
     end
 
-    return config.isEnabled(self)
+    local value = Option[info.chatFormatOpt]
+    return value and value ~= ''
 end
 
 ---Checks the stream's tab ID against a given tab ID.
@@ -164,6 +178,18 @@ function StreamInfo:onHelp()
     if helpCallback then
         helpCallback(self)
     end
+end
+
+---Returns whether usernames should be suggested for commands.
+---@return boolean
+function StreamInfo:suggestUsernames()
+    return self:config().suggestUsernames or false
+end
+
+---Returns whether the player's own username should be suggested for commands.
+---@return boolean
+function StreamInfo:suggestOwnUsername()
+    return self:config().suggestOwnUsername or false
 end
 
 

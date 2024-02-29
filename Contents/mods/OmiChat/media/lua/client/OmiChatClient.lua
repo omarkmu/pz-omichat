@@ -7,6 +7,7 @@ require 'OmiChat/API/ClientChat'
 require 'OmiChat/API/ClientData'
 require 'OmiChat/API/ClientCommands'
 require 'OmiChat/API/ClientExtension'
+require 'OmiChat/Component/MimicMessage'
 
 Events.OnGameStart.Add(OmiChat._onGameStart)
 Events.OnCreatePlayer.Add(OmiChat._onCreatePlayer)
@@ -83,16 +84,17 @@ return OmiChat
 ---@field suggest fun(self: table, info: omichat.SuggestionInfo) Performs suggestion.
 ---@field priority integer? The priority of the suggester. Higher numbers will run first.
 
----Context passed to `onUse` callbacks.
----@class omichat.UseCallbackContext
+---Context for sending chat messages.
+---@class omichat.SendArgs
 ---@field command string
 ---@field stream omichat.StreamInfo
 ---@field playSignedEmote boolean?
 ---@field isEcho boolean?
+---@field formatterName omichat.FormatterName?
 
 ---Argument table passed to `formatForChat`.
 ---@see omichat.api.client.formatForChat
----@class omichat.FormatForChatArgs
+---@class FormatArgs
 ---@field text string
 ---@field playSignedEmote boolean?
 ---@field isEcho boolean?
@@ -107,15 +109,19 @@ return OmiChat
 ---@field aliases string[]? Additional aliases for the command.
 ---@field commandType omichat.ChatCommandType? The command type used to determine whether input should be retained.
 ---@field chatType string? The chat type associated with the stream.
----@field context table? Table for arbitrary context data.
 ---@field isCommand boolean? Indicates that the stream is a command.
+---@field suggestUsernames boolean? Whether online usernames should be suggested for the command.
+---@field suggestOwnUsername boolean? Whether the player's username should also be included. Relies on `suggestUsernames`.
 ---@field isEnabled (fun(self: omichat.StreamInfo): boolean)? Returns a boolean representing whether the stream is enabled.
----@field onUse fun(ctx: omichat.UseCallbackContext)? Callback triggered when the stream is used.
+---@field onUse fun(ctx: omichat.SendArgs)? Callback triggered when the stream is used.
 ---@field allowEmotes boolean? Whether to allow emotes on this stream. Defaults to true for non-commands and false for commands.
 ---@field allowIconPicker boolean? Whether to enable the icon button for this stream. Defaults to false.
 ---@field streamIdentifier string? The stream identifier tied to this stream. Used for format strings and determining roleplay language. Defaults to stream name.
 
 ---@class omichat.ChatStreamConfig : omichat.BaseStreamConfig
+---@field isLocalWhisper boolean?
+---@field isEnabledCommand string? The command to pass to checkPlayerCanUseChat to determine whether the stream is enabled.
+---@field formatter string?
 
 ---@class omichat.CommandStreamConfig : omichat.BaseStreamConfig
 ---@field helpText string? String ID of a summary of the command's purpose. Displays when the /help command is used.

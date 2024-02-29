@@ -2,7 +2,7 @@
 
 require 'Chat/ISChat'
 
-local vanillaCommands = require 'OmiChat/Define/VanillaCommandList'
+local vanillaCommands = require 'OmiChat/Definition/VanillaCommandList'
 
 local concat = table.concat
 local pairs = pairs
@@ -117,84 +117,7 @@ local function hasAccess(flags, accessLevel)
     return flags == 1
 end
 
----Checks whether the stream associated with a basic chat is enabled.
----@param stream omichat.StreamInfo
----@return boolean
-local function isBasicChatEnabled(stream)
-    local ctx = stream:getContext()
-    local cmd = ctx and ctx.ocIsEnabledCommand or stream:getCommand()
-    return checkPlayerCanUseChat(cmd)
-end
 
----Helper for checking if a custom chat stream is enabled.
----@param stream omichat.StreamInfo
----@return boolean
-local function isCustomChatEnabled(stream)
-    return OmiChat.isCustomStreamEnabled(stream:getName())
-end
-
----Handler for basic chat streams.
----@param ctx omichat.UseCallbackContext
----@param formatterName string?
-local function useBasicChat(ctx, formatterName)
-    local command = utils.trim(ctx.command)
-    if #command == 0 then
-        return
-    end
-
-    local stream = ctx.stream
-    local chatType = stream:getChatType()
-    local originalCommand = command
-
-    command = OmiChat.formatForChat {
-        text = command,
-        chatType = chatType,
-        formatterName = formatterName,
-        stream = stream:getIdentifier(),
-        isEcho = ctx.isEcho,
-        playSignedEmote = ctx.playSignedEmote,
-    }
-
-    local streamContext = stream:getContext()
-    if streamContext and streamContext.ocProcess then
-        local result = streamContext.ocProcess(command)
-        if result and streamContext.ocAppendResultToLastCommand and OmiChat.getRetainCommand(stream:getCommandType()) then
-            local chatText = ISChat.instance.chatText
-            chatText.lastChatCommand = concat { chatText.lastChatCommand, tostring(result), ' ' }
-        end
-    else
-        processSayMessage(command)
-    end
-
-    if Option.ChatFormatEcho ~= '' and (chatType == 'safehouse' or chatType == 'faction') then
-        local echoStream = OmiChat.getChatStreamByIdentifier('low')
-        if not echoStream or not echoStream:isEnabled() then
-            echoStream = OmiChat.getChatStreamByIdentifier('say')
-
-            if not echoStream or not echoStream:isEnabled() then
-                return
-            end
-        end
-
-        local useCallback = echoStream:getUseCallback()
-        if useCallback then
-            useCallback {
-                isEcho = true,
-                stream = echoStream,
-                command = originalCommand,
-            }
-        end
-    end
-end
-
----Helper for handling formatted chat stream use.
----@param ctx omichat.UseCallbackContext
-local function useCustomChat(ctx)
-    useBasicChat(ctx, ctx.stream:getName())
-end
-
-
----@type omichat.CommandStream[]
 OmiChat._commandStreams = {
     {
         name = 'name',
@@ -685,8 +608,7 @@ OmiChat._suggesters = {
             end
 
             local stream = OmiChat.chatCommandToStream(info.input)
-            local context = stream and stream:getContext()
-            local wantsSuggestions = context and context.ocSuggestUsernames
+            local wantsSuggestions = stream and stream:suggestUsernames()
 
             local player = getSpecificPlayer(0)
             local isCommand = not stream and info.input:sub(1, 1) == '/' and player and player:getAccessLevel() ~= 'None'
@@ -705,7 +627,7 @@ OmiChat._suggesters = {
             local contains = {}
 
             local ownUsername = player and player:getUsername()
-            local includeSelf = utils.default(context and context.ocSuggestOwnUsername, true)
+            local includeSelf = utils.default(stream and stream:suggestOwnUsername(), true)
             local last = parts[#parts]:lower()
             for i = 0, onlinePlayers:size() - 1 do
                 local onlinePlayer = onlinePlayers:get(i)
@@ -1434,8 +1356,7 @@ OmiChat._customChatStreams = {
             allowEmotes = true,
             allowIconPicker = true,
             commandType = 'chat',
-            isEnabled = isCustomChatEnabled,
-            onUse = useCustomChat,
+            formatter = 'ooc',
         },
     },
     low = {
@@ -1447,8 +1368,7 @@ OmiChat._customChatStreams = {
             allowEmotes = true,
             allowIconPicker = true,
             commandType = 'chat',
-            isEnabled = isCustomChatEnabled,
-            onUse = useCustomChat,
+            formatter = 'low',
         },
     },
     whisper = {
@@ -1459,10 +1379,9 @@ OmiChat._customChatStreams = {
         omichat = {
             allowEmotes = true,
             allowIconPicker = true,
+            isLocalWhisper = true,
             commandType = 'chat',
-            context = { ocIsLocalWhisper = true },
-            isEnabled = isCustomChatEnabled,
-            onUse = useCustomChat,
+            formatter = 'whisper',
         },
     },
     ['do'] = {
@@ -1474,8 +1393,7 @@ OmiChat._customChatStreams = {
             allowEmotes = true,
             allowIconPicker = true,
             commandType = 'rp',
-            isEnabled = isCustomChatEnabled,
-            onUse = useCustomChat,
+            formatter = 'do',
         },
     },
     doquiet = {
@@ -1487,8 +1405,7 @@ OmiChat._customChatStreams = {
             allowEmotes = true,
             allowIconPicker = true,
             commandType = 'rp',
-            isEnabled = isCustomChatEnabled,
-            onUse = useCustomChat,
+            formatter = 'doquiet',
         },
     },
     doloud = {
@@ -1497,13 +1414,11 @@ OmiChat._customChatStreams = {
         shortCommand = '/dl ',
         tabID = 1,
         omichat = {
-            context = { ocProcess = processShoutMessage },
             allowEmotes = true,
             allowIconPicker = false,
             commandType = 'rp',
             chatType = 'shout',
-            isEnabled = isCustomChatEnabled,
-            onUse = useCustomChat,
+            formatter = 'doloud',
         },
     },
     me = {
@@ -1515,8 +1430,7 @@ OmiChat._customChatStreams = {
             allowEmotes = true,
             allowIconPicker = true,
             commandType = 'rp',
-            isEnabled = isCustomChatEnabled,
-            onUse = useCustomChat,
+            formatter = 'me',
         },
     },
     mequiet = {
@@ -1528,8 +1442,7 @@ OmiChat._customChatStreams = {
             allowEmotes = true,
             allowIconPicker = true,
             commandType = 'rp',
-            isEnabled = isCustomChatEnabled,
-            onUse = useCustomChat,
+            formatter = 'mequiet',
         },
     },
     meloud = {
@@ -1538,13 +1451,11 @@ OmiChat._customChatStreams = {
         shortCommand = '/ml ',
         tabID = 1,
         omichat = {
-            context = { ocProcess = processShoutMessage },
             allowEmotes = true,
             allowIconPicker = false,
             commandType = 'rp',
             chatType = 'shout',
-            isEnabled = isCustomChatEnabled,
-            onUse = useCustomChat,
+            formatter = 'meloud',
         },
     },
 }
@@ -1553,79 +1464,46 @@ OmiChat._vanillaStreamConfigs = {
     say = {
         allowIconPicker = true,
         commandType = 'chat',
-        isEnabled = isBasicChatEnabled,
-        onUse = useBasicChat,
-        context = { ocIsEnabledCommand = '/s' },
+        isEnabledCommand = '/s',
     },
     yell = {
         commandType = 'chat',
         streamIdentifier = 'shout',
         chatType = 'shout',
-        isEnabled = isBasicChatEnabled,
-        onUse = useBasicChat,
+        isEnabledCommand = '/y',
         aliases = { '/shout ' },
-        context = {
-            ocIsEnabledCommand = '/y',
-            ocProcess = processShoutMessage,
-        },
     },
     private = {
         allowEmotes = false,
+        suggestUsernames = true,
+        appendResultToLast = true,
         commandType = 'chat',
         streamIdentifier = 'private',
         chatType = 'whisper',
-        isEnabled = isBasicChatEnabled,
-        onUse = useBasicChat,
-        context = {
-            ocSuggestUsernames = true,
-            ocSuggestOwnUsername = false,
-            ocAppendResultToLastCommand = true,
-            ocIsEnabledCommand = '/w',
-            ocProcess = proceedPM,
-        },
+        isEnabledCommand = '/w',
     },
     faction = {
         allowEmotes = false,
         commandType = 'chat',
         chatType = 'faction',
-        isEnabled = isBasicChatEnabled,
-        onUse = useBasicChat,
-        context = {
-            ocIsEnabledCommand = '/f',
-            ocProcess = proceedFactionMessage,
-        },
+        isEnabledCommand = '/f',
     },
     safehouse = {
         allowEmotes = false,
         commandType = 'chat',
         chatType = 'safehouse',
-        isEnabled = isBasicChatEnabled,
-        onUse = useBasicChat,
-        context = {
-            ocIsEnabledCommand = '/sh',
-            ocProcess = processSafehouseMessage,
-        },
+        isEnabledCommand = '/sh',
     },
     general = {
         allowEmotes = false,
         commandType = 'chat',
         chatType = 'general',
-        isEnabled = isBasicChatEnabled,
-        onUse = useBasicChat,
-        context = {
-            ocIsEnabledCommand = '/all',
-            ocProcess = processGeneralMessage,
-        },
+        isEnabledCommand = '/all',
     },
     admin = {
         allowEmotes = false,
         commandType = 'chat',
         chatType = 'admin',
-        isEnabled = isBasicChatEnabled,
-        onUse = useBasicChat,
-        context = {
-            ocIsEnabledCommand = '/a',
-            ocProcess = processAdminChatMessage,
-        },
+        isEnabledCommand = '/a',
     },
 }
