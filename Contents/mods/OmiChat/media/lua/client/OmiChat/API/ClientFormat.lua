@@ -453,7 +453,7 @@ function OmiChat.encodeMessageTag(message)
 end
 
 ---Prepares text for sending to chat.
----@param args omichat.FormatForChatArgs
+---@param args FormatArgs
 ---@return string
 function OmiChat.formatForChat(args)
     local stream = args.stream or args.formatterName or args.chatType

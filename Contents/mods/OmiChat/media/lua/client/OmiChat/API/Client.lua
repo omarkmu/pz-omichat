@@ -21,7 +21,6 @@ OmiChat.ColorModal = require 'OmiChat/Component/ColorModal'
 OmiChat.IconPicker = require 'OmiChat/Component/IconPicker'
 OmiChat.SuggesterBox = require 'OmiChat/Component/SuggesterBox'
 OmiChat.StreamInfo = require 'OmiChat/Component/StreamInfo'
-OmiChat.MimicMessage = require 'OmiChat/Component/MimicMessage'
 
 OmiChat._prefsVersion = 1
 OmiChat._prefsFileName = 'omichat.json'

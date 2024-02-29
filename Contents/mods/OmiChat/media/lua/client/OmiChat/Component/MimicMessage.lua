@@ -1,4 +1,6 @@
 local lib = require 'OmiChat/lib'
+
+---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Client'
 
 local utils = OmiChat.utils
@@ -413,4 +415,5 @@ function MimicMessage.__tostring(self)
 end
 
 
+OmiChat.MimicMessage = MimicMessage
 return MimicMessage

@@ -2,6 +2,9 @@
 
 local OmiChat = require 'OmiChat/API/Client'
 
+-- requires buildMessageText
+require 'OmiChat/API/ClientFormat'
+
 
 ---Extended fields for ISChat.
 ---@class omichat.ISChat : ISChat
@@ -891,7 +894,7 @@ function ISChat:onCommandEntered()
                 shouldHandle = true
                 callbackStream = stream
                 allowEmotes = not isDefault and stream:isAllowEmotes() or allowEmotes
-                useCallback = stream:getUseCallback()
+                useCallback = stream:getUseCallback() or OmiChat.send
                 commandType = stream:getCommandType()
             end
         end

@@ -264,7 +264,6 @@ function OmiChat.Commands.showInfoMessage(args)
     OmiChat.addInfoMessage(text, args.serverAlert)
 end
 
-
 --#endregion
 
 

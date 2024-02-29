@@ -10,6 +10,17 @@ local ISChat = ISChat ---@cast ISChat omichat.ISChat
 ---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Client'
 
+---Contains raw chat functions, to send without formatting.
+OmiChat.raw = {
+    say = processSayMessage,
+    shout = processShoutMessage,
+    whisper = proceedPM,
+    general = processGeneralMessage,
+    safehouse = processSafehouseMessage,
+    faction = proceedFactionMessage,
+    admin = processAdminChatMessage,
+}
+
 local utils = OmiChat.utils
 local config = OmiChat.config
 local Option = OmiChat.Option
@@ -40,6 +51,10 @@ local signLanguageEmotes = {
     'undecided',
     'freeze',
     'comefront',
+}
+local echoChatTypes = {
+    faction = true,
+    safehouse = true,
 }
 
 
@@ -157,7 +172,7 @@ local function updateStreams()
             if stream.name == 'private' then
                 vanillaWhisper = stream
             elseif stream.name == 'whisper' then
-                if stream.omichat.context and stream.omichat.context.ocIsLocalWhisper then
+                if stream.omichat.isLocalWhisper then
                     ---@cast data omichat.CustomStreamInfo
                     exists[data.name] = stream
                 else
@@ -562,6 +577,55 @@ function OmiChat.scrollToTop()
     for i = 1, #ISChat.instance.tabs do
         local tab = ISChat.instance.tabs[i]
         tab:setYScroll(0)
+    end
+end
+
+---Sends a message on the given stream.
+---@param args omichat.SendArgs
+function OmiChat.send(args)
+    local command = utils.trim(args.command)
+    if #command == 0 then
+        return
+    end
+
+    local stream = args.stream
+    local chatType = stream:getChatType()
+    local originalCommand = command
+
+    command = OmiChat.formatForChat {
+        text = command,
+        chatType = chatType,
+        isEcho = args.isEcho,
+        stream = stream:getIdentifier(),
+        formatterName = stream:getFormatterName(),
+        playSignedEmote = args.playSignedEmote,
+    }
+
+    local process = OmiChat.raw[chatType] or OmiChat.raw.say
+    if process then
+        local result = process(command)
+        if result and chatType == 'whisper' and OmiChat.getRetainCommand(stream:getCommandType()) then
+            local chatText = ISChat.instance.chatText
+            chatText.lastChatCommand = concat { chatText.lastChatCommand, tostring(result), ' ' }
+        end
+    end
+
+    if Option.ChatFormatEcho ~= '' and echoChatTypes[chatType] then
+        local echoStream = OmiChat.getChatStreamByIdentifier('low')
+        if not echoStream or not echoStream:isEnabled() then
+            echoStream = OmiChat.getChatStreamByIdentifier('say')
+
+            if not echoStream or not echoStream:isEnabled() then
+                return
+            end
+        end
+
+        local useCallback = echoStream:getUseCallback() or OmiChat.send
+        useCallback {
+            isEcho = true,
+            stream = echoStream,
+            command = originalCommand,
+        }
     end
 end
 
