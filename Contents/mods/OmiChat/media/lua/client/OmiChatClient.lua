@@ -2,10 +2,9 @@
 ---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Client'
 
-require 'OmiChat/API/ClientStreams'
+require 'OmiChat/API/ClientDefines'
 require 'OmiChat/API/ClientChat'
 require 'OmiChat/API/ClientData'
-require 'OmiChat/API/ClientDispatch'
 require 'OmiChat/API/ClientCommands'
 require 'OmiChat/API/ClientExtension'
 
@@ -57,7 +56,7 @@ return OmiChat
 ---@field titleID string The string ID of the chat type's tag.
 ---@field chatType omichat.ChatTypeString The chat type of the message's chat.
 ---@field context table Table for arbitrary context data.
----@field substitutions table<string, unknown> Token substitution values.
+---@field tokens table<string, unknown> Token substitution values.
 ---@field formatOptions omichat.MessageFormatOptions Formatting options to apply to the message.
 
 ---A suggestion that can display to the player.

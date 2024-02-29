@@ -1,6 +1,7 @@
 ---@class omichat.Interpolator
 local Interpolator = require 'OmiChat/Component/Interpolator'
 
+---Format string function library.
 local InterpolatorLibrary = {}
 
 local OmiChat = require 'OmiChat/API/Shared'

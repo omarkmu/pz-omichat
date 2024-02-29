@@ -1,4 +1,4 @@
----Client command handling.
+---Client API functionality related to dispatching and handling commands.
 
 ---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Client'
@@ -33,6 +33,166 @@ local englishCards = {
 }
 
 
+--#region dispatch
+
+---Dispatches a client command.
+---@param command string
+---@param args table?
+---@return boolean success Whether the command was successfully sent.
+function OmiChat.dispatch(command, args)
+    local player = getSpecificPlayer(0)
+    if not player then
+        return false
+    end
+
+    sendClientCommand(player, OmiChat._modDataKey, command, args or {})
+    return true
+end
+
+---Executes the /addlanguage command.
+---@param command string
+---@return boolean
+function OmiChat.requestAddLanguage(command)
+    ---@type omichat.request.Command
+    local req = { command = command }
+
+    return OmiChat.dispatch('requestAddLanguage', req)
+end
+
+---Executes the /clearnames command.
+function OmiChat.requestClearNames()
+    return OmiChat.dispatch('requestClearNames')
+end
+
+---Requests an update to global mod data.
+---@param updates omichat.request.ModDataUpdate
+---@return boolean
+function OmiChat.requestDataUpdate(updates)
+    return OmiChat.dispatch('requestDataUpdate', updates)
+end
+
+---Requests drawing a card from a card deck in the player's inventory.
+---@return boolean
+function OmiChat.requestDrawCard()
+    local player = getSpecificPlayer(0)
+    if not player then
+        return false
+    end
+
+    local inv = player:getInventory()
+    if not inv:contains('CardDeck') and player:getAccessLevel() == 'None' then
+        return false
+    end
+
+    return OmiChat.dispatch('requestDrawCard')
+end
+
+---Executes the /reseticon command.
+---@param command string
+---@return boolean
+function OmiChat.requestResetIcon(command)
+    ---@type omichat.request.Command
+    local req = { command = command }
+
+    return OmiChat.dispatch('requestResetIcon', req)
+end
+
+---Executes the /resetlanguages command.
+---@param command string
+---@return boolean
+function OmiChat.requestResetLanguages(command)
+    ---@type omichat.request.Command
+    local req = { command = command }
+
+    return OmiChat.dispatch('requestResetLanguages', req)
+end
+
+---Executes the /resetname command.
+---@param command string
+---@return boolean
+function OmiChat.requestResetName(command)
+    ---@type omichat.request.Command
+    local req = { command = command }
+
+    return OmiChat.dispatch('requestResetName', req)
+end
+
+---Requests rolling dice.
+---@param sides integer
+---@return boolean
+function OmiChat.requestRollDice(sides)
+    local player = getSpecificPlayer(0)
+    if not player then
+        return false
+    end
+
+    local inv = player:getInventory()
+    if not inv:contains('Dice') and player:getAccessLevel() == 'None' then
+        return false
+    end
+
+    if not sides or sides < 1 or sides > 100 then
+        return false
+    end
+
+    ---@type omichat.request.RollDice
+    local req = { sides = sides }
+
+    return OmiChat.dispatch('requestRollDice', req)
+end
+
+---Executes the /seticon command.
+---@param command string
+---@return boolean
+function OmiChat.requestSetIcon(command)
+    -- need to process client-side for texture information
+    local args = utils.parseCommandArgs(command)
+    local username = args[1]
+    local icon = args[2]
+
+    if not username or not icon then
+        return false
+    end
+
+    if not getTexture(icon) then
+        local textureName = utils.getTextureNameFromIcon(icon)
+        if textureName and getTexture(textureName) then
+            command = table.concat { string.format('%q', username), textureName }
+        else
+            return false
+        end
+    end
+
+    ---@type omichat.request.Command
+    local req = { command = command }
+
+    return OmiChat.dispatch('requestSetIcon', req)
+end
+
+---Executes the /setlanguageslots command.
+---@param command string
+---@return boolean
+function OmiChat.requestSetLanguageSlots(command)
+    ---@type omichat.request.Command
+    local req = { command = command }
+
+    return OmiChat.dispatch('requestSetLanguageSlots', req)
+end
+
+---Executes the /setname command.
+---@param command string
+---@return boolean
+function OmiChat.requestSetName(command)
+    ---@type omichat.request.Command
+    local req = { command = command }
+
+    return OmiChat.dispatch('requestSetName', req)
+end
+
+--#endregion
+
+--#region handlers
+
 ---Reports the results of drawing a card.
 ---@param args omichat.request.ReportDrawCard
 function OmiChat.Commands.reportDrawCard(args)
@@ -49,7 +209,7 @@ function OmiChat.Commands.reportDrawCard(args)
     -- global message
     if args.name then
         local cardName = utils.getTranslatedCardName(card, suit)
-        OmiChat.showInfoMessage(getText('UI_OmiChat_card', args.name, cardName))
+        OmiChat.addInfoMessage(getText('UI_OmiChat_card', args.name, cardName))
         return
     end
 
@@ -101,8 +261,11 @@ function OmiChat.Commands.showInfoMessage(args)
         return
     end
 
-    OmiChat.showInfoMessage(text, args.serverAlert)
+    OmiChat.addInfoMessage(text, args.serverAlert)
 end
+
+
+--#endregion
 
 
 ---Event handler for processing commands from the server.

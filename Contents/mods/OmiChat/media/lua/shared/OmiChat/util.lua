@@ -322,7 +322,7 @@ function utils.getTranslatedLanguageName(language)
     return getTextOrNull('UI_OmiChat_Language_' .. language) or language
 end
 
----Interpolates substitutions into a string with format strings using `$var` format.
+---Interpolates substitution tokens into a string with format strings using `$var` format.
 ---Functions are referenced using `$func(...)` syntax.
 ---@param text string The format string.
 ---@param tokens table A table of format substitution strings.
