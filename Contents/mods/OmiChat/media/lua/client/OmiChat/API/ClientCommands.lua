@@ -270,6 +270,11 @@ function OmiChat.Commands.showInfoMessage(args)
     OmiChat.addInfoMessage(text, args.serverAlert)
 end
 
+---Updates chat state.
+function OmiChat.Commands.updateState()
+    OmiChat.updateState(true)
+end
+
 --#endregion
 
 
