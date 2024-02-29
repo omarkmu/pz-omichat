@@ -87,6 +87,27 @@ function OmiChat.getNameColorInChat(username)
     end
 end
 
+---Retrieves the name that should be used in chat for a given player.
+---@param player IsoPlayer
+---@param chatType omichat.ChatTypeString The chat type to use in format string interpolation.
+---@return string? name The name to use in chat, or `nil` if unable to retrieve information about the user.
+function OmiChat.getPlayerNameInChat(player, chatType)
+    local tokens = player and OmiChat.getPlayerSubstitutions(player)
+    if not tokens then
+        return
+    end
+
+    local username = player:getUsername()
+    local modData = OmiChat.getModData()
+    if modData.nicknames[username] then
+        tokens.name = modData.nicknames[username]
+    end
+
+    tokens.username = username
+    tokens.chatType = chatType
+    return utils.interpolate(Option.FormatName, tokens, username)
+end
+
 ---Retrieves the name that should be used in chat for a given username.
 ---@param username string?
 ---@param chatType omichat.ChatTypeString The chat type to use in format string interpolation.
@@ -97,19 +118,11 @@ function OmiChat.getNameInChat(username, chatType)
     end
 
     local player = utils.getPlayerByUsername(username)
-    local tokens = player and OmiChat.getPlayerSubstitutions(player)
-    if not tokens then
+    if not player then
         return
     end
 
-    local modData = OmiChat.getModData()
-    if modData.nicknames[username] then
-        tokens.name = modData.nicknames[username]
-    end
-
-    tokens.username = username
-    tokens.chatType = chatType
-    return utils.interpolate(Option.FormatName, tokens, username)
+    return OmiChat.getPlayerNameInChat(player, chatType)
 end
 
 ---Retrieves the name that should be used in chat for a given username, escaped for rich text.

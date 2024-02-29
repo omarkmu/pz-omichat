@@ -8,6 +8,7 @@ local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
 ---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Client'
+require 'OmiChat/Component/MimicMessage'
 
 local utils = OmiChat.utils
 local Option = OmiChat.Option

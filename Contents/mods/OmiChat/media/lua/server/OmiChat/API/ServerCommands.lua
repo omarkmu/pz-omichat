@@ -198,6 +198,22 @@ end
 
 --#region handlers
 
+---Handles player death.
+---@param player IsoPlayer
+function OmiChat.Commands.reportPlayerDeath(player)
+    local username = player:getUsername()
+    if not canAccessTarget(player, username) then
+        return
+    end
+
+    -- clear nickname, icon, and languages
+    updateModData.nicknames({ target = username })
+    updateModData.icons({ target = username })
+    updateModData.languages({ target = username })
+
+    OmiChat.transmitModData()
+end
+
 ---Handles the /addlanguage command.
 ---@param player IsoPlayer
 ---@param args omichat.request.Command

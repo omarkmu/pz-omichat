@@ -9,6 +9,7 @@ local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
 ---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Client'
+require 'OmiChat/Component/MimicMessage'
 
 ---Contains raw chat functions, to send without formatting.
 OmiChat.raw = {
@@ -524,15 +525,14 @@ function OmiChat.getInfoRichText(player)
         return ''
     end
 
-    local username = player:getUsername()
-    local name = OmiChat.getNameInChatRichText(username, 'say')
+    local name = OmiChat.getPlayerNameInChat(player, 'say')
     local tokens = name and OmiChat.getPlayerSubstitutions(player)
     if not name or not tokens then
         return ''
     end
 
-    tokens.name = name
-    return utils.interpolate(Option.FormatInfo, tokens, username)
+    tokens.name = utils.escapeRichText(name)
+    return utils.interpolate(Option.FormatInfo, tokens, player:getUsername())
 end
 
 ---Gets an emote meant to simulate sign language based on the given text.

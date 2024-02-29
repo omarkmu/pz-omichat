@@ -155,11 +155,14 @@ function OmiChat._onPlayerDeath(player)
         return
     end
 
-    -- reset languages
-    OmiChat.requestDataUpdate({
-        field = 'languages',
-        target = player:getUsername(),
-    })
+    -- reset nickname, icon, and languages
+    OmiChat.reportPlayerDeath()
+
+    local instance = ISChat.instance
+    if instance then
+        instance:unfocus()
+        instance:close()
+    end
 end
 
 ---Event handler for retrieving global mod data.
