@@ -175,6 +175,31 @@ local function transformSendArgs(args, streamIdentifier)
     return args
 end
 
+---Applies a buff if the cooldown period has ended.
+local function tryApplyBuff()
+    local player = getSpecificPlayer(0)
+    local modData = player and player:getModData()
+    if not modData then
+        return
+    end
+
+    local now = getTimestampMs()
+    local lastBuff = modData and tonumber(modData.ocLastBuff)
+    if lastBuff and (now - lastBuff) / 60000 < Option.BuffCooldown then
+        return
+    end
+
+    local stats = player:getStats()
+    local bodyDamage = player:getBodyDamage()
+
+    stats:setHunger(stats:getHunger() - 0.02)
+    stats:setThirst(stats:getThirst() - 0.02)
+    stats:setStressFromCigarettes(stats:getStressFromCigarettes() - 0.25)
+    bodyDamage:setBoredomLevel(bodyDamage:getBoredomLevel() - 50)
+    bodyDamage:setUnhappynessLevel(bodyDamage:getUnhappynessLevel() - 50)
+    modData.ocLastBuff = now
+end
+
 ---Creates or updates built-in formatters.
 local function updateFormatters()
     for info in config:formatters() do
@@ -656,6 +681,10 @@ function OmiChat.send(args)
             local chatText = ISChat.instance.chatText
             chatText.lastChatCommand = concat { chatText.lastChatCommand, tostring(result), ' ' }
         end
+    end
+
+    if utils.testPredicate(Option.PredicateApplyBuff, { stream = stream:getIdentifier() }) then
+        tryApplyBuff()
     end
 
     if Option.ChatFormatEcho ~= '' and echoChatTypes[chatType] then

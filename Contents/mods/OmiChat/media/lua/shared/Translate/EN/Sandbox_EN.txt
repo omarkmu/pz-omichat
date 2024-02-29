@@ -36,6 +36,7 @@ Sandbox_EN = {
     Sandbox_OCCustomShoutMaxLength = "Custom Shout Maximum Length",
     Sandbox_OCMinimumCommandAccessLevel = "Minimum Access Level for Commands",
     Sandbox_OCMaximumCustomShouts = "Maximum Custom Shouts",
+    Sandbox_OCBuffCooldown = "Buff Cooldown",
 
     --[[ Ranges ]]--
     Sandbox_OCRangeCallout = "Callout Range",
@@ -82,6 +83,7 @@ Sandbox_EN = {
     Sandbox_OCFilterNickname = "Name Filter",
     Sandbox_OCFilterNarrativeStyle = "Narrative Style Filter",
     Sandbox_OCPredicateAttractZombies = "Attract Zombies Predicate",
+    Sandbox_OCPredicateApplyBuff = "Apply Buff Predicate",
     Sandbox_OCPredicateUseNameColor = "Use Name Color Predicate",
     Sandbox_OCPredicateAllowLanguage = "Allow Roleplay Language Predicate",
     Sandbox_OCPredicateUseNarrativeStyle = "Use Narrative Style Predicate",
