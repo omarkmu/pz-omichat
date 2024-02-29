@@ -36,23 +36,11 @@ local getTextOrNull = getTextOrNull
 local max = math.max
 local concat = table.concat
 
-local _addLineInChat = ISChat.addLineInChat
-local _onCommandEntered = ISChat.onCommandEntered
-local _logChatCommand = ISChat.logChatCommand
-local _createChildren = ISChat.createChildren
-local _focus = ISChat.focus
-local _unfocus = ISChat.unfocus
-local _close = ISChat.close
-local _onMouseDown = ISChat.onMouseDown
-local _onPressDown = ISChat.onPressDown
-local _onPressUp = ISChat.onPressUp
-local _onOtherKey = ISChat.onOtherKey
-local _onTextChange = ISChat.onTextChange
-local _onInfo = ISChat.onInfo
+local BloodBodyPartType = BloodBodyPartType
+local getCoveredParts = BloodClothingType.getCoveredParts
 
-local _ChatMessage = __classmetatables[ChatMessage.class].__index
-local _ServerChatMessage = __classmetatables[ServerChatMessage.class].__index
 
+--#region helpers
 
 ---Adds context menu options for admin controls.
 ---@param context ISContextMenu
@@ -350,6 +338,128 @@ local function addRetainOptions(context)
     end
 end
 
+---Adds the context menu option for enabling/disabling sign language emote animations.
+---@param context ISContextMenu
+local function addSignEmoteOption(context)
+    local foundSigned = false
+    local languages = OmiChat.getRoleplayLanguages()
+    for i = 1, #languages do
+        if OmiChat.isRoleplayLanguageSigned(languages[i]) then
+            foundSigned = true
+            break
+        end
+    end
+
+    local defaultLang = not foundSigned and OmiChat.getDefaultRoleplayLanguage()
+    if defaultLang then
+        foundSigned = OmiChat.isRoleplayLanguageSigned(defaultLang)
+    end
+
+    if not foundSigned then
+        return
+    end
+
+    local suffix = OmiChat.getSignEmotesEnabled() and 'disable' or 'enable'
+    local optName = getText('UI_OmiChat_context_sign_emotes_' .. suffix)
+    local option = context:addOption(optName, ISChat.instance, ISChat.onToggleUseSignEmotes)
+    option.toolTip = ISToolTip:new()
+    option.toolTip.description = getText('UI_OmiChat_context_sign_emotes_tooltip')
+end
+
+---Adds the chat settings submenu to the context menu.
+---@param context ISContextMenu
+local function addChatSettings(context)
+    local instance = ISChat.instance
+    if not instance then
+        return
+    end
+
+    local option = context:addOption(getText('UI_OmiChat_context_chat_settings'), instance)
+    local submenu = context:getNew(context)
+    context:addSubMenu(option, submenu)
+
+    local timestampOptName = instance.showTimestamp
+        and getText('UI_chat_context_disable_timestamp')
+        or getText('UI_chat_context_enable_timestamp')
+    local tagOptName = instance.showTitle
+        and getText('UI_chat_context_disable_tags')
+        or getText('UI_chat_context_enable_tags')
+
+    submenu:addOption(timestampOptName, instance, ISChat.onToggleTimestampPrefix)
+    submenu:addOption(tagOptName, instance, ISChat.onToggleTagPrefix)
+
+    local suggesterOptName = OmiChat.getUseSuggester()
+        and getText('UI_OmiChat_context_disable_suggestions')
+        or getText('UI_OmiChat_context_enable_suggestions')
+    submenu:addOption(suggesterOptName, instance, ISChat.onToggleUseSuggester)
+
+    addRetainOptions(submenu)
+    addVanillaSubmenuOptions(submenu)
+end
+
+---Adds the chat customization submenu to the context menu.
+---@param context ISContextMenu
+local function addChatCustomizationSettings(context)
+    local instance = ISChat.instance
+    if not instance then
+        return
+    end
+
+    local option = context:addOption(getText('UI_OmiChat_context_chat_customization'), instance)
+    local submenu = context:getNew(context)
+    context:addSubMenu(option, submenu)
+
+    addCustomCalloutOptions(submenu)
+
+    if Option.EnableSetNameColor or Option.EnableSpeechColorAsDefaultNameColor then
+        local nameColorOptName = OmiChat.getNameColorsEnabled()
+            and getText('UI_OmiChat_context_disable_name_colors')
+            or getText('UI_OmiChat_context_enable_name_colors')
+
+        submenu:addOption(nameColorOptName, instance, ISChat.onToggleShowNameColor)
+    end
+
+    if not Option.EnableCharacterCustomization then
+        addSignEmoteOption(submenu)
+    end
+
+    addColorOptions(submenu)
+end
+
+---Adds the character customization submenu to the context menu.
+---@param context ISContextMenu
+local function addCharacterCustomizationSettings(context)
+    local instance = ISChat.instance
+    if not instance or not Option.EnableCharacterCustomization then
+        return
+    end
+
+    local player = getSpecificPlayer(0)
+    if not player then
+        return
+    end
+
+    local option = context:addOption(getText('UI_OmiChat_context_character_customization'), instance)
+    local submenu = context:getNew(context)
+    context:addSubMenu(option, submenu)
+
+    addSignEmoteOption(submenu)
+
+    local cleanOptName = getText('UI_OmiChat_context_clean')
+    submenu:addOption(cleanOptName, instance, ISChat.onCleanCharacter)
+
+    local hairColorOptName = getText('UI_OmiChat_context_hair_color')
+    submenu:addOption(hairColorOptName, instance, ISChat.onHairColorMenu)
+
+    local growHairOptName = getText('UI_OmiChat_context_grow_hair')
+    submenu:addOption(growHairOptName, instance, ISChat.onGrowHair)
+
+    if not player:isFemale() then
+        local growBeardOptName = getText('UI_OmiChat_context_grow_beard')
+        submenu:addOption(growBeardOptName, instance, ISChat.onGrowBeard)
+    end
+end
+
 ---Returns the non-empty lines of a string.
 ---If there are no non-empty lines, returns `nil`.
 ---@param text string
@@ -377,24 +487,6 @@ local function getLines(text, maxLen)
     return lines
 end
 
----Determines whether the enable/disable signed language emotes option should display.
----@return boolean
-local function shouldShowSignEmoteOption()
-    local languages = OmiChat.getRoleplayLanguages()
-    for i = 1, #languages do
-        if OmiChat.isRoleplayLanguageSigned(languages[i]) then
-            return true
-        end
-    end
-
-    local defaultLang = OmiChat.getDefaultRoleplayLanguage()
-    if defaultLang then
-        return OmiChat.isRoleplayLanguageSigned(defaultLang)
-    end
-
-    return false
-end
-
 ---Attempts to set the current text with the currently selected suggester box item.
 ---@return boolean didSet
 local function tryInputSuggestedItem()
@@ -414,6 +506,7 @@ local function tryInputSuggestedItem()
     return false
 end
 
+--#endregion
 
 --#region callbacks
 
@@ -424,6 +517,137 @@ end
 function ISChat.onAdminOptionToggle(target, option)
     local value = OmiChat.getAdminOption(option)
     OmiChat.setAdminOption(option, not value)
+end
+
+---Event handler for the clean character customization option.
+---@param target omichat.ISChat
+---@diagnostic disable-next-line: unused-local
+function ISChat.onCleanCharacter(target)
+    local player = getSpecificPlayer(0)
+    local visual = player and player:getHumanVisual()
+    if not visual then
+        return
+    end
+
+    -- update body
+    for i = 0, BloodBodyPartType.MAX:index() - 1 do
+        local bodyPart = BloodBodyPartType.FromIndex(i)
+        visual:setDirt(bodyPart, 0)
+        visual:setBlood(bodyPart, 0)
+    end
+
+    -- update clothing
+    local items = player:getWornItems()
+    for i = 0, items:size() - 1 do
+        local item = items:getItemByIndex(i)
+        local itemVisual = item and instanceof(item, 'Clothing') and item:getVisual()
+        if itemVisual then
+            local parts = getCoveredParts(item:getBloodClothingType())
+
+            for j = 0, parts:size() - 1 do
+                local part = parts:get(j)
+                itemVisual:setDirt(part, 0)
+                itemVisual:setBlood(part, 0)
+            end
+        end
+    end
+
+    player:resetModel()
+    sendVisual(player)
+    sendClothing(player)
+end
+
+---Event handler for the grow hair customization option.
+---@param target omichat.ISChat
+---@diagnostic disable-next-line: unused-local
+function ISChat.onGrowHair(target)
+    local player = getSpecificPlayer(0)
+    if not player then
+        return
+    end
+
+    local hairStyle = player:isFemale() and 'Long2' or 'Fabian'
+    ISTimedActionQueue.add(ISCutHair:new(player, hairStyle, nil, 1))
+end
+
+---Event handler for the grow beard customization option.
+---@param target omichat.ISChat
+---@diagnostic disable-next-line: unused-local
+function ISChat.onGrowBeard(target)
+    local player = getSpecificPlayer(0)
+    if not player then
+        return
+    end
+
+    ISTimedActionQueue.add(ISTrimBeard:new(player, 'Long', nil, 1))
+end
+
+---Event handler for the hair color customization menu initialization.
+---@param target omichat.ISChat
+---@diagnostic disable-next-line: unused-local
+function ISChat.onHairColorMenu(target)
+    local player = getSpecificPlayer(0)
+    local visual = player and player:getHumanVisual()
+    if not visual then
+        return
+    end
+
+    if target.activeColorModal then
+        target.activeColorModal:destroy()
+    end
+
+    local currentHairColor = visual:getHairColor()
+    local naturalHairColor = visual:getNaturalHairColor()
+    local color = {
+        r = currentHairColor:getRedInt(),
+        g = currentHairColor:getGreenInt(),
+        b = currentHairColor:getBlueInt(),
+    }
+    local emptyColor = {
+        r = naturalHairColor:getRedInt(),
+        g = naturalHairColor:getGreenInt(),
+        b = naturalHairColor:getBlueInt(),
+    }
+
+    local text = getText('UI_OmiChat_context_hair_color_desc')
+    local width = max(450, getTextManager():MeasureStringX(UIFont.Small, text) + 60)
+    local modal = ColorModal:new(0, 0, width, 250, text, color, target, ISChat.onCustomHairColorMenuClick, 0)
+
+    modal:setEmptyColor(emptyColor)
+    modal:initialise()
+    modal:addToUIManager()
+
+    target.activeColorModal = modal
+end
+
+---Event handler for hair color picker selection.
+---@param target omichat.ISChat
+---@param button table
+---@diagnostic disable-next-line: unused-local
+function ISChat.onCustomHairColorMenuClick(target, button)
+    if button.internal ~= 'OK' then
+        return
+    end
+
+    local player = getSpecificPlayer(0)
+    local visual = player and player:getHumanVisual()
+    if not visual then
+        return
+    end
+
+    local hairColor
+    local color = button.parent:getColorTable()
+    if color then
+        hairColor = ImmutableColor.new(color.r / 255, color.g / 255, color.b / 255, 1)
+    else
+        hairColor = visual:getNaturalHairColor()
+    end
+
+    visual:setHairColor(hairColor)
+    visual:setBeardColor(hairColor)
+
+    player:resetModel()
+    sendVisual(player)
 end
 
 ---Event handler for color menu initialization.
@@ -726,6 +950,23 @@ end
 
 --#region overrides
 
+local _addLineInChat = ISChat.addLineInChat
+local _onCommandEntered = ISChat.onCommandEntered
+local _logChatCommand = ISChat.logChatCommand
+local _createChildren = ISChat.createChildren
+local _focus = ISChat.focus
+local _unfocus = ISChat.unfocus
+local _close = ISChat.close
+local _onMouseDown = ISChat.onMouseDown
+local _onPressDown = ISChat.onPressDown
+local _onPressUp = ISChat.onPressUp
+local _onOtherKey = ISChat.onOtherKey
+local _onTextChange = ISChat.onTextChange
+local _onInfo = ISChat.onInfo
+
+local _ChatMessage = __classmetatables[ChatMessage.class].__index
+local _ServerChatMessage = __classmetatables[ServerChatMessage.class].__index
+
 ---Override to enable custom formatting.
 _ChatMessage.getTextWithPrefix = OmiChat.buildMessageText
 _ServerChatMessage.getTextWithPrefix = OmiChat.buildMessageText
@@ -973,53 +1214,9 @@ function ISChat:onGearButtonClick()
     local context = ISContextMenu.get(0, x, y)
 
     addAdminOptions(context)
-
-    -- Chat settings
-    local chatSettingsOpt = context:addOption(getText('UI_OmiChat_context_chat_settings'), ISChat.instance)
-    local chatSettingsSubmenu = context:getNew(context)
-    context:addSubMenu(chatSettingsOpt, chatSettingsSubmenu)
-
-    local timestampOptName = self.showTimestamp
-        and getText('UI_chat_context_disable_timestamp')
-        or getText('UI_chat_context_enable_timestamp')
-    local tagOptName = self.showTitle
-        and getText('UI_chat_context_disable_tags')
-        or getText('UI_chat_context_enable_tags')
-
-    chatSettingsSubmenu:addOption(timestampOptName, ISChat.instance, ISChat.onToggleTimestampPrefix)
-    chatSettingsSubmenu:addOption(tagOptName, ISChat.instance, ISChat.onToggleTagPrefix)
-
-    local suggesterOptName = OmiChat.getUseSuggester()
-        and getText('UI_OmiChat_context_disable_suggestions')
-        or getText('UI_OmiChat_context_enable_suggestions')
-    chatSettingsSubmenu:addOption(suggesterOptName, ISChat.instance, ISChat.onToggleUseSuggester)
-
-    addRetainOptions(chatSettingsSubmenu)
-    addVanillaSubmenuOptions(chatSettingsSubmenu)
-
-    -- Chat customization
-    local chatCustomzationOpt = context:addOption(getText('UI_OmiChat_context_customization'), ISChat.instance)
-    local chatCustomizationSubmenu = context:getNew(context)
-    context:addSubMenu(chatCustomzationOpt, chatCustomizationSubmenu)
-
-    addCustomCalloutOptions(chatCustomizationSubmenu)
-
-    if Option.EnableSetNameColor or Option.EnableSpeechColorAsDefaultNameColor then
-        local nameColorOptName = OmiChat.getNameColorsEnabled()
-            and getText('UI_OmiChat_context_disable_name_colors')
-            or getText('UI_OmiChat_context_enable_name_colors')
-
-        chatCustomizationSubmenu:addOption(nameColorOptName, ISChat.instance, ISChat.onToggleShowNameColor)
-    end
-
-    if shouldShowSignEmoteOption() then
-        local suffix = OmiChat.getSignEmotesEnabled() and 'disable' or 'enable'
-        local signEmotesOptionName = getText('UI_OmiChat_context_sign_emotes_' .. suffix)
-        chatCustomizationSubmenu:addOption(signEmotesOptionName, ISChat.instance, ISChat.onToggleUseSignEmotes)
-    end
-
-    addColorOptions(chatCustomizationSubmenu)
-
+    addChatSettings(context)
+    addChatCustomizationSettings(context)
+    addCharacterCustomizationSettings(context)
     addLanguageOptions(context)
 end
 

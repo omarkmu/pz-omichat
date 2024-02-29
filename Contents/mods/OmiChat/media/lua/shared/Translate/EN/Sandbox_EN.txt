@@ -10,6 +10,7 @@ Sandbox_EN = {
     Sandbox_OCEnableMiscellaneousIcons = "Include Miscellaneous Icons",
     Sandbox_OCEnableSetCharacterName = "Enable /charactername",
     Sandbox_OCEnableSetName = "Enable /name",
+    Sandbox_OCEnableCharacterCustomization = "Enable Character Customization",
     Sandbox_OCEnableSetNameColor = "Custom Name Colors",
     Sandbox_OCEnableSetSpeechColor = "Custom Speech Colors",
     Sandbox_OCEnableSpeechColorAsDefaultNameColor = "Use Speech Color as Default Name Color",
