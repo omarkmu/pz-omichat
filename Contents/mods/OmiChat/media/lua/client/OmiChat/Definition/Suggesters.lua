@@ -9,6 +9,7 @@ local OmiChat = require 'OmiChat/API/Client'
 local utils = OmiChat.utils
 local StreamInfo = OmiChat.StreamInfo
 
+---Collects results from a list of streams into `startsWith` and `contains`.
 ---@param tab (omichat.ChatStream | omichat.CommandStream)[]
 ---@param command string
 ---@param fullCommand string

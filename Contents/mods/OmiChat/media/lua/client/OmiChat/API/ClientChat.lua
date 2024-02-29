@@ -481,12 +481,7 @@ end
 ---@param emote string
 ---@return string?
 function OmiChat.getEmote(emote)
-    local value = OmiChat._emotes[emote]
-    if type(value) == 'function' then
-        return value(emote)
-    end
-
-    return value
+    return OmiChat._emotes[emote]
 end
 
 ---Returns the first emote found from an emote shortcut in the provided text.
@@ -526,12 +521,12 @@ function OmiChat.getInfoRichText(player)
     end
 
     local name = OmiChat.getPlayerNameInChat(player, 'say')
-    local tokens = name and OmiChat.getPlayerSubstitutions(player)
-    if not name or not tokens then
+    local tokens = OmiChat.getPlayerSubstitutions(player)
+    if not tokens then
         return ''
     end
 
-    tokens.name = utils.escapeRichText(name)
+    tokens.name = name and utils.escapeRichText(name) or ''
     return utils.interpolate(Option.FormatInfo, tokens, player:getUsername())
 end
 

@@ -259,10 +259,8 @@ return {
             onHelp = function()
                 -- collect currently available emotes
                 local emotes = {}
-                for k, v in pairs(OmiChat._emotes) do
-                    if type(v) ~= 'function' or v(k) then
-                        emotes[#emotes + 1] = k
-                    end
+                for k in pairs(OmiChat._emotes) do
+                    emotes[#emotes + 1] = k
                 end
 
                 if #emotes == 0 then
