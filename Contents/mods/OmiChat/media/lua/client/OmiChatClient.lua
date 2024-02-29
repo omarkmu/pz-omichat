@@ -1,6 +1,9 @@
 ---Provides client API access to OmiChat.
 ---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Client'
+OmiChat._commandStreams = require 'OmiChat/Definition/CommandStreams'
+OmiChat._suggesters = require 'OmiChat/Definition/Suggesters'
+OmiChat._transformers = require 'OmiChat/Definition/Transformers'
 
 require 'OmiChat/API/ClientDefines'
 require 'OmiChat/API/ClientChat'
@@ -87,10 +90,11 @@ return OmiChat
 ---Context for sending chat messages.
 ---@class omichat.SendArgs
 ---@field command string
----@field stream omichat.StreamInfo
+---@field stream omichat.StreamInfo?
 ---@field playSignedEmote boolean?
 ---@field isEcho boolean?
 ---@field formatterName omichat.FormatterName?
+---@field tokens table?
 
 ---Argument table passed to `formatForChat`.
 ---@see omichat.api.client.formatForChat

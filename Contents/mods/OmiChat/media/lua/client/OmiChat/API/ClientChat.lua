@@ -21,6 +21,9 @@ OmiChat.raw = {
     admin = processAdminChatMessage,
 }
 
+local vanillaStreamConfigs = require 'OmiChat/Definition/VanillaStreams'
+local customChatStreams = require 'OmiChat/Definition/CustomStreams'
+
 local utils = OmiChat.utils
 local config = OmiChat.config
 local Option = OmiChat.Option
@@ -145,6 +148,33 @@ local function addOrRemoveIconComponents()
     end
 end
 
+---Builds send arguments for the given stream.
+---@param args string | omichat.SendArgs
+---@param streamIdentifier string
+---@return omichat.SendArgs?
+local function transformSendArgs(args, streamIdentifier)
+    local stream = OmiChat.getChatStreamByIdentifier(streamIdentifier)
+    if not stream then
+        return
+    end
+
+    if type(args) == 'string' then
+        return {
+            command = args,
+            stream = stream,
+        }
+    end
+
+    if type(args) ~= 'table' then
+        return
+    end
+
+    args = utils.copy(args)
+    args.stream = stream
+
+    return args
+end
+
 ---Creates or updates built-in formatters.
 local function updateFormatters()
     for info in config:formatters() do
@@ -163,7 +193,6 @@ end
 local function updateStreams()
     local vanillaWhisper
     local exists = {}
-    local streamConfigs = OmiChat._vanillaStreamConfigs
 
     for i = 1, #ISChat.allChatStreams do
         local stream = ISChat.allChatStreams[i]
@@ -183,14 +212,14 @@ local function updateStreams()
             end
         elseif stream.name == 'whisper' then
             vanillaWhisper = stream
-            vanillaWhisper.omichat = streamConfigs.private
-        elseif streamConfigs[stream.name] then
-            stream.omichat = streamConfigs[stream.name]
+            vanillaWhisper.omichat = vanillaStreamConfigs.private
+        elseif vanillaStreamConfigs[stream.name] then
+            stream.omichat = vanillaStreamConfigs[stream.name]
         end
     end
 
     for data in config:chatStreams() do
-        local stream = OmiChat._customChatStreams[data.name]
+        local stream = customChatStreams[data.name]
         if not exists[data.name] and stream then
             OmiChat.addStreamBefore(stream, vanillaWhisper)
         end
@@ -380,9 +409,14 @@ end
 ---@return omichat.StreamInfo?
 function OmiChat.getChatStreamByIdentifier(identifier)
     for i = 1, #ISChat.allChatStreams do
-        local info = StreamInfo:new(ISChat.allChatStreams[i])
-        if info:getIdentifier() == identifier then
-            return info
+        local stream = ISChat.allChatStreams[i]
+        local id = stream.omichat and stream.omichat.streamIdentifier
+        if not id then
+            id = stream.name
+        end
+
+        if id == identifier then
+            return StreamInfo:new(stream)
         end
     end
 end
@@ -581,14 +615,26 @@ function OmiChat.scrollToTop()
 end
 
 ---Sends a message on the given stream.
----@param args omichat.SendArgs
+---@param args omichat.SendArgs?
+---@return string?
 function OmiChat.send(args)
+    if not args then
+        return
+    end
+
     local command = utils.trim(args.command)
     if #command == 0 then
         return
     end
 
     local stream = args.stream
+    if not stream then
+        stream = OmiChat.getChatStreamByIdentifier('say')
+        if not stream then
+            return
+        end
+    end
+
     local chatType = stream:getChatType()
     local originalCommand = command
 
@@ -597,13 +643,15 @@ function OmiChat.send(args)
         chatType = chatType,
         isEcho = args.isEcho,
         stream = stream:getIdentifier(),
-        formatterName = stream:getFormatterName(),
+        formatterName = args.formatterName or stream:getFormatterName(),
         playSignedEmote = args.playSignedEmote,
+        tokens = args.tokens,
     }
 
+    local result
     local process = OmiChat.raw[chatType] or OmiChat.raw.say
     if process then
-        local result = process(command)
+        result = process(command)
         if result and chatType == 'whisper' and OmiChat.getRetainCommand(stream:getCommandType()) then
             local chatText = ISChat.instance.chatText
             chatText.lastChatCommand = concat { chatText.lastChatCommand, tostring(result), ' ' }
@@ -616,7 +664,7 @@ function OmiChat.send(args)
             echoStream = OmiChat.getChatStreamByIdentifier('say')
 
             if not echoStream or not echoStream:isEnabled() then
-                return
+                return result
             end
         end
 
@@ -627,6 +675,50 @@ function OmiChat.send(args)
             command = originalCommand,
         }
     end
+
+    return result
+end
+
+---Sends an /admin message, formatted according to configuration.
+---@param args string | omichat.SendArgs
+function OmiChat.sendAdmin(args)
+    OmiChat.send(transformSendArgs(args, 'admin'))
+end
+
+---Sends a /faction message, formatted according to configuration.
+---@param args string | omichat.SendArgs
+function OmiChat.sendFaction(args)
+    OmiChat.send(transformSendArgs(args, 'faction'))
+end
+
+---Sends an /all message, formatted according to configuration.
+---@param args string | omichat.SendArgs
+function OmiChat.sendGeneral(args)
+    OmiChat.send(transformSendArgs(args, 'general'))
+end
+
+---Sends an /all message, formatted according to configuration.
+---@param args string | omichat.SendArgs
+function OmiChat.sendPM(args)
+    OmiChat.send(transformSendArgs(args, 'private'))
+end
+
+---Sends a /safehouse message, formatted according to configuration.
+---@param args string | omichat.SendArgs
+function OmiChat.sendSafehouse(args)
+    OmiChat.send(transformSendArgs(args, 'safehouse'))
+end
+
+---Sends a /say message, formatted according to configuration.
+---@param args string | omichat.SendArgs
+function OmiChat.sendSay(args)
+    OmiChat.send(transformSendArgs(args, 'say'))
+end
+
+---Sends a /yell message, formatted according to configuration.
+---@param args string | omichat.SendArgs
+function OmiChat.sendShout(args)
+    OmiChat.send(transformSendArgs(args, 'shout'))
 end
 
 ---Sets whether the icon picker button is enabled.
@@ -753,3 +845,12 @@ function OmiChat.updateSuggesterComponent(text)
         suggesterBox.vscroll:setHeight(suggesterBox.height)
     end
 end
+
+
+proceedPM = OmiChat.sendPM
+processSayMessage = OmiChat.sendSay
+processShoutMessage = OmiChat.sendShout
+processGeneralMessage = OmiChat.sendGeneral
+proceedFactionMessage = OmiChat.sendFaction
+processAdminChatMessage = OmiChat.sendAdmin
+processSafehouseMessage = OmiChat.sendSafehouse

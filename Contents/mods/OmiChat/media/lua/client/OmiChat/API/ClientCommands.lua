@@ -218,18 +218,14 @@ function OmiChat.Commands.reportDrawCard(args)
     local cardName = concat { englishCards[card], ' of ', englishSuits[suit] }
     local content = utils.interpolate(Option.FormatCard, { card = cardName })
 
-    content = concat {
-        utils.encodeInvisibleCharacter(suit),
-        utils.encodeInvisibleCharacter(card),
-        content,
-    }
-
-    processSayMessage(OmiChat.formatForChat {
-        text = content,
+    OmiChat.send {
         formatterName = 'card',
-        chatType = 'say',
-        playSignedEmote = false,
-    })
+        command = concat {
+            utils.encodeInvisibleCharacter(suit),
+            utils.encodeInvisibleCharacter(card),
+            content,
+        },
+    }
 end
 
 ---Reports the results of a dice roll.
@@ -239,11 +235,10 @@ function OmiChat.Commands.reportRoll(args)
     local sides = utils.wrapStringArgument(tostring(args.sides), 2)
     local content = utils.interpolate(Option.FormatRoll, { roll = roll, sides = sides })
 
-    processSayMessage(OmiChat.formatForChat {
-        text = content,
+    OmiChat.send {
         formatterName = 'roll',
-        chatType = 'say',
-    })
+        command = content,
+    }
 end
 
 ---Adds an info message for the local player.
