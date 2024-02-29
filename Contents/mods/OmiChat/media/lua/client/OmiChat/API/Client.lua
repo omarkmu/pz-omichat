@@ -14,7 +14,6 @@ require 'Chat/ISChat'
 ---@field private _prefsFileName string
 ---@field private _playerPrefs omichat.PlayerPreferences
 ---@field private _customChatStreams table<string, omichat.ChatStream>
----@field private _vanillaStreamConfigs table<string, omichat.ChatStreamConfig>
 local OmiChat = require 'OmiChatShared'
 
 OmiChat.ColorModal = require 'OmiChat/Component/ColorModal'

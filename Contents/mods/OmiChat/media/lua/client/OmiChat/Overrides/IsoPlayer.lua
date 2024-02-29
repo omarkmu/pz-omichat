@@ -62,17 +62,15 @@ function _IsoPlayer:Callout(playEmote)
         shout = shout:upper()
     end
 
-    processShoutMessage(OmiChat.formatForChat {
-        text = shout,
+    OmiChat.sendShout {
+        command = shout,
         formatterName = formatterName,
-        stream = 'shout',
-        chatType = 'shout',
         playSignedEmote = not playEmote,
         tokens = {
             callout = '1',
             sneakCallout = isSneaking and '1' or nil,
         },
-    })
+    }
 
     if playEmote then
         self:playEmote('shout')

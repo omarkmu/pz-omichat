@@ -120,7 +120,13 @@ function StreamInfo:isAllowEmotes()
         return allowEmotes
     end
 
-    -- default to false for commands
+    -- emotes only work via /say or /yell
+    local chatType = self:getChatType()
+    if chatType ~= 'say' and chatType ~= 'shout' then
+        return false
+    end
+
+    -- default to false for commands, true for chat streams
     return not self:isCommand()
 end
 

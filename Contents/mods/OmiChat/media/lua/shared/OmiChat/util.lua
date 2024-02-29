@@ -322,6 +322,60 @@ function utils.getTranslatedLanguageName(language)
     return getTextOrNull('UI_OmiChat_Language_' .. language) or language
 end
 
+---Checks whether a given access level should have access based on provided flags.
+---@param flags integer?
+---@param accessLevel string
+---@return boolean
+function utils.hasAccess(flags, accessLevel)
+    if not flags then
+        return true
+    end
+
+    accessLevel = accessLevel:lower()
+
+    if flags >= 32 then
+        if accessLevel == 'admin' then
+            return true
+        end
+
+        flags = flags - 32
+    end
+
+    if flags >= 16 then
+        if accessLevel == 'moderator' then
+            return true
+        end
+
+        flags = flags - 16
+    end
+
+    if flags >= 8 then
+        if accessLevel == 'overseer' then
+            return true
+        end
+
+        flags = flags - 8
+    end
+
+    if flags >= 4 then
+        if accessLevel == 'gm' then
+            return true
+        end
+
+        flags = flags - 4
+    end
+
+    if flags >= 2 then
+        if accessLevel == 'observer' then
+            return true
+        end
+
+        flags = flags - 2
+    end
+
+    return flags == 1
+end
+
 ---Interpolates substitution tokens into a string with format strings using `$var` format.
 ---Functions are referenced using `$func(...)` syntax.
 ---@param text string The format string.
