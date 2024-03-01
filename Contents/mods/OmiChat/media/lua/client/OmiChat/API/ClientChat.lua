@@ -69,11 +69,11 @@ local function addOrRemoveIconComponents()
         return
     end
 
-    local add = Option.EnableIconPicker
+    local add = false
     local iconPicker = instance.iconPicker
     local iconButton = instance.iconButton
     local epIncludeMisc = iconPicker and iconPicker.includeUnknownAsMiscellaneous
-    local includeMisc = Option.EnableMiscellaneousIcons
+    local includeMisc = false
     if iconPicker and epIncludeMisc ~= includeMisc then
         iconPicker.includeUnknownAsMiscellaneous = includeMisc
         iconPicker:updateIcons()
@@ -120,7 +120,7 @@ local function addOrRemoveIconComponents()
 
         iconPicker = IconPicker:new(0, 0, instance, ISChat.onIconClick)
         iconPicker.exclude = OmiChat._iconsToExclude
-        iconPicker.includeUnknownAsMiscellaneous = OmiChat.Option.EnableMiscellaneousIcons
+        iconPicker.includeUnknownAsMiscellaneous = false
 
         iconPicker:initialise()
         iconPicker:addToUIManager()

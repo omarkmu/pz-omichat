@@ -10,14 +10,6 @@ option OmiChat.EnableCustomShouts
     translation = OCEnableCustomShouts,
 }
 
-option OmiChat.EnableCustomSneakShouts
-{
-    type = boolean,
-    default = true,
-    page = OmiChat,
-    translation = OCEnableCustomSneakShouts,
-}
-
 option OmiChat.EnableEmotes
 {
     type = boolean,
@@ -58,22 +50,6 @@ option OmiChat.EnableFactionColorAsDefault
     translation = OCEnableFactionColorAsDefault,
 }
 
-option OmiChat.EnableIconPicker
-{
-    type = boolean,
-    default = false,
-    page = OmiChat,
-    translation = OCEnableIconPicker,
-}
-
-option OmiChat.EnableMiscellaneousIcons
-{
-    type = boolean,
-    default = false,
-    page = OmiChat,
-    translation = OCEnableMiscellaneousIcons,
-}
-
 option OmiChat.EnableCharacterCustomization
 {
     type = boolean,
@@ -82,24 +58,24 @@ option OmiChat.EnableCharacterCustomization
     translation = OCEnableCharacterCustomization,
 }
 
-option OmiChat.ShowDiscordColorOption
-{
-    type = enum,
-    numValues = 3,
-    default = 3,
-    page = OmiChat,
-    translation = OCShowDiscordColorOption,
-    valueTranslation = OCShowDiscordColorOption,
-}
-
-option OmiChat.SetNameMode
+option OmiChat.EnableSetName
 {
     type = enum,
     numValues = 6,
     default = 2,
     page = OmiChat,
-    translation = OCSetNameMode,
-    valueTranslation = OCSetNameMode,
+    translation = OCEnableSetName,
+    valueTranslation = OCEnableSetName,
+}
+
+option OmiChat.EnableDiscordColorOption
+{
+    type = enum,
+    numValues = 3,
+    default = 3,
+    page = OmiChat,
+    translation = OCEnableDiscordColorOption,
+    valueTranslation = OCEnableDiscordColorOption,
 }
 
 
