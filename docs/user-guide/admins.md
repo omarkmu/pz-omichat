@@ -21,7 +21,7 @@ There are various commands to control player names, languages, and icons.
 | `/clearnames` | Resets **all** players' chat names. |
 | `/seticon <username> <icon>` | Sets the chat icon for a player. |
 | `/reseticon <username>` | Clears the chat icon for a player. |
-| `/iconinfo <name>` | Gets information about an icon. If provided a valid icon name or alias, it will display the icon. Icons available in the [icon picker](../sandbox-options/feature-flags.md#enableiconpicker) are all valid aliases. |
+| `/iconinfo <name>` | Gets information about an icon. If provided a valid icon name or alias, it will display the icon. See the partial [list of icons](https://projectzomboid.com/chat_colours.txt) for possible aliases. |
 | `/addlanguage <username> <language>` | Adds a known language to a player. `language` must be one of the languages specified in [`AvailableLanguages`](../sandbox-options/languages.md#availablelanguages). |
 | `/resetlanguages <username>` | Sets the known languages for a player to only the default language. |
 | `/setlanguageslots <username> <amount>` | Sets the [language slots](../sandbox-options/languages.md#languageslots) for a player. `amount` must be in `[1, 32]`. |

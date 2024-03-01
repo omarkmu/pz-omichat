@@ -8,7 +8,10 @@ src = "docs"
 
 [build]
 build-dir = "guide"
+use-default-preprocessors = false
 
 [output.html]
 git-repository-url = "https://github.com/omarkmu/pz-omichat"
 site-url = "/pz-omichat/"
+
+[preprocessor.links]

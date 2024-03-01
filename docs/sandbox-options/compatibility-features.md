@@ -1,9 +1,8 @@
-# Compatibility Feature Flags
+# Compatibility Features
 
-Compatibility feature flags are [options](./index.md) that allow server operators to enable or disable compatibility patches for other mods.
-These have no effect if the relevant mod is not active.
-
-As of now, there is only one such flag.
+These [options](./index.md) options control compatibility patches for other mods.
+They have no effect if the relevant mod is not active.
+As of now, there is only one such feature.
 
 ### EnableCompatTAD
 **Default:** `true`

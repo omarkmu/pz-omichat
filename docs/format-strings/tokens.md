@@ -5,7 +5,6 @@ which are replaced with a relevant value when they're used.
 These are specified with a dollar sign followed by the name of the token.
 Unlike [functions](./functions.md), tokens are case-sensitive; `$author` is not the same as `$Author`.
 
-Many tokens are available in multiple sandbox options.
 Tokens that are used by multiple sandbox options are documented below.
 **Some tokens may take on different meanings in certain options; the documentation of an option will indicate if that is the case.**
 
@@ -26,6 +25,11 @@ This may include the name color, if one is included.
 ## `$authorRaw`
 
 The same as `$author`, but does not include name colors.
+
+## `$callout`
+
+Defined if the relevant message was a 'Q' callout.
+Unlike [`$sneakCallout`](#sneakcallout), this is defined for both sneak callouts and regular callouts.
 
 ## `$chatType`
 
@@ -58,6 +62,13 @@ The `<IMAGE>` tag for the chat icon of a message, with a leading and trailing sp
 
 The name of the icon used for [`$icon`](#icon).
 
+## `$input`
+
+The input that was sent to a chat or command stream.
+
+This is available for overhead formats, but should **not** be used in place of [`$1`](#1) in the final result.
+The invisible characters included in `$1` are necessary for correctly interpreting messages.
+
 ## `$language`
 
 The translated [roleplay language](../sandbox-options/languages.md) that a message was sent in.
@@ -81,6 +92,10 @@ Determined by the format specified by [`FormatName`](../sandbox-options/componen
 
 The same as [`$name`](#name), but does not include name colors.
 
+## `$sneakCallout`
+
+Like [`$callout`](#callout), but defined only when the message was sent from a sneak callout.
+
 ## `$stream`
 
 The chat stream to which a message was or will be sent.
@@ -97,7 +112,7 @@ This can be extended by other mods. In the base mod, however, this will be one o
 - `admin`
 - `server`
 - `discord`
-- `looc`
+- `ooc`
 - `whisper` (local whisper)
 - `do`
 - `doloud`

@@ -136,6 +136,25 @@ If blank, `/doquiet` messages will be disabled.
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
 
+### ChatFormatEcho
+**Default:** `(blank by default)`
+
+The format used for `/safehouse` and `/faction` messages echoed onto the `/say` stream.
+If blank, echoing will not occur.
+
+**See also:** [`OverheadFormatEcho`](./overhead-formats.md#overheadformatecho)
+
+**Tokens:**
+- [`$author`](../format-strings/tokens.md#author)
+- [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$language`](../format-strings/tokens.md#language)
+- [`$languageRaw`](../format-strings/tokens.md#languageraw)
+- [`$icon`](../format-strings/tokens.md#icon)
+- [`$iconRaw`](../format-strings/tokens.md#iconraw)
+- [`$message`](../format-strings/tokens.md#message)
+- [`$name`](../format-strings/tokens.md#name)
+- [`$nameRaw`](../format-strings/tokens.md#nameraw)
+
 ### ChatFormatFaction
 **Default:** `$name: <SPACE> $message`
 
@@ -155,7 +174,7 @@ The format used for `/faction` messages in chat.
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
 
 ### ChatFormatFull
-**Default:** `$if($neq($stream server) $timestamp)$tag$if($all($language $not($unknownLanguage)) [$language]&#32;<SPACE>&#32;)$if($icon $icon (<SPACE> ))$content`
+**Default:** `$if($neq($stream server) $timestamp)$tag$language$if($icon $icon (<SPACE> ))$content`
 
 The format used for the final chat message, after all other formats have been applied.
 
@@ -163,10 +182,9 @@ The format used for the final chat message, after all other formats have been ap
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - `$content`: The full chat message content, after other formatting has occurred.
-- [`$language`](../format-strings/tokens.md#language)
-- [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
 - [`$iconRaw`](../format-strings/tokens.md#iconraw)
+- `$language`: The result of the [`FormatLanguage`](../sandbox-options/component-formats.md#formatlanguage) option.
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
@@ -211,15 +229,15 @@ The format used for incoming private messages in chat.
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
 
-### ChatFormatLooc
-**Default:** `$name: <SPACE> (( $message ))`
+### ChatFormatLow
+**Default:** `$name: <SPACE> $message`
 
-The format used for `/looc` (local out-of-character) messages in chat.
+The format used for `/low` messages in chat.
 
 **See also:**
-- [`ColorLooc`](./colors.md#colorlooc)
-- [`RangeLooc`](./ranges.md#rangelooc)
-- [`OverheadFormatLooc`](./overhead-formats.md#overheadformatlooc)
+- [`ColorLow`](./colors.md#colorlow)
+- [`RangeLow`](./ranges.md#rangelow)
+- [`OverheadFormatLow`](./overhead-formats.md#overheadformatlow)
 
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
@@ -305,6 +323,16 @@ If blank, `/mequiet` messages will be disabled.
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+
+### ChatFormatOoc
+**Default:** `$name: <SPACE> (( $message ))`
+
+The format used for `/ooc` (local out-of-character) messages in chat.
+
+**See also:**
+- [`ColorOoc`](./colors.md#colorooc)
+- [`RangeOoc`](./ranges.md#rangeooc)
+- [`OverheadFormatOoc`](./overhead-formats.md#overheadformatooc)
 
 ### ChatFormatOutgoingPrivate
 **Default:** `$($gettext(UI_OmiChat_private_chat_to $recipientName)$): <SPACE> $message`
@@ -463,8 +491,8 @@ With the default format, this will display as `Radio (100.0 MHz): « Something i
 
 The format used for local `/whisper` messages in chat.
 
-If populated, the existing `/whisper` is changed to `/pm`, and `/whisper` is modified to act as local chat which doesn't attract zombies and has a very short range.
-If blank, local whisper will be disabled and the default `/whisper` will not be renamed.
+If populated, the vanilla `/whisper` is changed to `/pm`, and `/whisper` is modified to act as local chat which doesn't attract zombies and has a very short range.
+If blank, local whisper will be disabled and the vanilla `/whisper` will not be renamed.
 
 **See also:**
 - [`ColorWhisper`](./colors.md#colorwhisper)
@@ -487,7 +515,7 @@ If blank, local whisper will be disabled and the default `/whisper` will not be 
 
 The format used for `/yell` messages in chat.
 
-See also: [`ColorYell`](./colors.md#coloryell).
+**See also:** [`ColorYell`](./colors.md#coloryell).
 
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)

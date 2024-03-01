@@ -1,6 +1,6 @@
 # Summary
 
-[Introduction](README.md)
+[Introduction](index.md)
 
 # User Guide
 
@@ -11,9 +11,8 @@
 # Reference Guide
 
 - [Sandbox Options](sandbox-options/index.md)
-    - [Feature Flags](sandbox-options/feature-flags.md)
-    - [Compatibility Feature Flags](sandbox-options/compatibility-feature-flags.md)
-    - [Limits](sandbox-options/limits.md)
+    - [Basic Features](sandbox-options/basic-features.md)
+    - [Compatibility Features](sandbox-options/compatibility-features.md)
     - [Chat Ranges](sandbox-options/ranges.md)
     - [Filters & Predicates](sandbox-options/filters-predicates.md)
     - [Default Colors](sandbox-options/colors.md)
