@@ -8,7 +8,7 @@ With the exception of the [roleplay language](#language-options) settings, these
 ## Basic Settings
 
 The **enable/disable name colors** option allows players to toggle the appearance of name colors in their chat.
-This will only display if either the [`EnableSpeechColorAsDefaultNameColor`](../sandbox-options/feature-flags.md#enablespeechcolorasdefaultnamecolor) option or the [`EnableSetNameColor`](../sandbox-options/feature-flags.md#enablesetnamecolor) option is enabled.
+This will only display if either the [`EnableSpeechColorAsDefaultNameColor`](../sandbox-options/basic-features.md#enablespeechcolorasdefaultnamecolor) option or the [`EnableSetNameColor`](../sandbox-options/basic-features.md#enablesetnamecolor) option is enabled.
 
 **Enable/disable suggestions** can be used to control whether suggestions are offered based on chat box input.
 
@@ -22,7 +22,7 @@ The first option refers to streams such as `/say`, the second to [`/me`](../sand
 ## Callout Customization
 
 The **customize callouts** and **customize sneak callouts** options allow players to set custom messages for when they use callouts (bound to the `Q` key, by default).
-These rely on the [`EnableCustomShouts`](../sandbox-options/feature-flags.md#enablecustomshouts) and [`EnableCustomSneakShouts`](../sandbox-options/feature-flags.md#enablecustomsneakshouts) options, respectively.
+These rely on the [`EnableCustomShouts`](../sandbox-options/basic-features.md#enablecustomshouts) option.
 
 ![The custom callout input window](../images/callout-example-1.png)  
 ![A player using a custom callout](../images/callout-example-2.png)

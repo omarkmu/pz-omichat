@@ -5,18 +5,93 @@ These [options](./index.md) are used to define logic for mod functionality.
 Filters are used to transform input values, whereas predicates are used to determine a yes/no value.
 For predicates, any value other than the empty string is considered a “yes”.
 
-### FilterNickname
-**Default:** `$sub($name 1 50)`
+### FilterChatInput
+**Default:** `$trim($input)`
 
-Filters names set by players with `/name`.
+Filters messages before they're sent on a chat stream.
+If this returns the empty string, the command won't be passed to the chat stream.
+
+**Tokens:**
+- [`$callout`](../format-strings/tokens.md#callout)
+- [`$chatType`](../format-strings/tokens.md#chattype)
+- [`$input`](../format-strings/tokens#input)
+- [`$name`](../format-strings/tokens.md#name)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+- [`$stream`](../format-strings/tokens.md#stream)
+- [`$username`](../format-strings/tokens.md#username)
+
+### FilterNarrativeStyle
+**Default:** `@($sneakCallout:$input;$capitalize($input))`
+
+Filters messages sent on a stream with [narrative style](#predicateusenarrativestyle) enabled.
+
+**Tokens:**
+- [`$callout`](../format-strings/tokens.md#callout)
+- [`$chatType`](../format-strings/tokens.md#chattype)
+- [`$input`](../format-strings/tokens#input)
+- [`$name`](../format-strings/tokens.md#name)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+- [`$stream`](../format-strings/tokens.md#stream)
+- [`$username`](../format-strings/tokens.md#username)
+
+**See also:**
+- [`FormatNarrativeDialogueTag`](./component-formats.md#formatnarrativedialoguetag)
+- [`FormatNarrativePunctuation`](./component-formats.md#formatnarrativepunctuation)
+
+### FilterNickname
+**Default:** `$sub($input 1 50)`
+
+Filters names set by players with `/name` or `/nickname`.
 
 The default option will limit names to 50 characters.
 If the empty string is returned, the `/name` command will fail.
 
 **Tokens:**
-- `$name`: The input that was passed to `/name`.
+- [`$input`](../format-strings/tokens#input)
+- `$target`: If the name being set is the character name, `name`. Otherwise, `nickname`.
 
-**See also:** [`EnableSetName`](./feature-flags.md#enablesetname).
+**See also:** [`EnableSetName`](./basic-features.md#enablesetname).
+
+### PredicateAllowLanguage
+**Default:** `$has(@(say;shout;whisper;low) $stream)`
+
+Determines whether [roleplay languages](./languages.md) can be used for a message.
+
+**Tokens:**
+- [`$callout`](../format-strings/tokens.md#callout)
+- [`$chatType`](../format-strings/tokens.md#chattype)
+- [`$input`](../format-strings/tokens#input)
+- [`$name`](../format-strings/tokens.md#name)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+- [`$stream`](../format-strings/tokens.md#stream)
+- [`$username`](../format-strings/tokens.md#username)
+
+### PredicateApplyBuff
+`(blank by default)`
+
+Determines whether messages sent on a stream will apply a buff to a player.
+This is a QoL feature intended for roleplay servers.
+
+**Tokens:**
+- [`$callout`](../format-strings/tokens.md#callout)
+- [`$chatType`](../format-strings/tokens.md#chattype)
+- [`$input`](../format-strings/tokens#input)
+- [`$name`](../format-strings/tokens.md#name)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+- [`$stream`](../format-strings/tokens.md#stream)
+- [`$username`](../format-strings/tokens.md#username)
+
+**See also:** [`BuffCooldown`](./basic-features.md#buffcooldown)
+
+### PredicateAttractZombies
+**Default:** `$has(@(say;shout;meloud;doloud) $stream)`
+
+Determines whether a message on a stream will attract zombies.
+
+**Tokens:**
+- [`$stream`](../format-strings/tokens.md#stream)
+
+**See also:** [`RangeMultiplierZombies`](./ranges.md#rangemultiplierzombies).
 
 ### PredicateUseNameColor
 **Default:** `$eq($stream say)`
@@ -32,14 +107,28 @@ Determines whether name colors are used for a message.
 - [`$stream`](../format-strings/tokens.md#stream)
 
 **See also:**
-- [`EnableSetNameColor`](./feature-flags.md#enablesetnamecolor)
-- [`EnableSpeechColorAsDefaultNameColor`](./feature-flags.md#enablespeechcolorasdefaultnamecolor)
+- [`EnableSetNameColor`](./basic-features.md#enablesetnamecolor)
+- [`EnableSpeechColorAsDefaultNameColor`](./basic-features.md#enablespeechcolorasdefaultnamecolor)
 
-### PredicateAllowLanguage
-**Default:** `$has(@(say;shout;whisper) $stream)`
+### PredicateUseNarrativeStyle
+`(blank by default)`
 
-Determines whether [roleplay languages](./languages.md) can be used for a message.
+Determines whether the narrative style is used for a message.
+If narrative style is used, messages will be enclosed in quotes and prefixed with a dialogue tag depending on the stream.
+
+For example, with the default settings and a modified predicate, a message sent with `/yell Hey` will be transformed to `shouts, "Hey!"`.
+Note that the player name is not included; overhead and chat formats should include it as needed.
 
 **Tokens:**
-- `$message`: The input that was passed to the stream.
+- [`$callout`](../format-strings/tokens.md#callout)
+- [`$chatType`](../format-strings/tokens.md#chattype)
+- [`$input`](../format-strings/tokens#input)
+- [`$name`](../format-strings/tokens.md#name)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 - [`$stream`](../format-strings/tokens.md#stream)
+- [`$username`](../format-strings/tokens.md#username)
+
+**See also:**
+- [`FilterNarrativeStyle`](#filternarrativestyle)
+- [`FormatNarrativeDialogueTag`](./component-formats.md#formatnarrativedialoguetag)
+- [`FormatNarrativePunctuation`](./component-formats.md#formatnarrativepunctuation)

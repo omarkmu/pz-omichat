@@ -2,7 +2,7 @@
 
 These [options](./index.md) are used to configure roleplay languages.
 
-With the default settings, languages must be manually added to players by admins.
+With the default settings, languages must be manually added to players by admins with [`/addlanguage`](../user-guide/admins.md#commands).
 To allow players to set additional languages, the [`LanguageSlots`](#languageslots) option can be used.
 
 ### AvailableLanguages
@@ -10,6 +10,9 @@ To allow players to set additional languages, the [`LanguageSlots`](#languageslo
 
 The roleplay languages that players can use, separated by semicolons.
 The default values are based on the game's available languages (with the exception of ASL).
+
+**The order of languages is important**, since their position in this list is used as an ID.
+New languages should always be added to the end, unless replacement is intended.
 
 Up to 32 languages can be specified.
 The first language in the list will be treated as the default language player characters speak.
@@ -19,15 +22,16 @@ If the translation is absent, the language name will be used as-is regardless of
 The default languages have translations provided by the mod, in all languages for which the mod has translations.
 
 ### LanguageSlots
-**Default:** `1`
+**Default:** `1`  
 **Minimum:** `1`  
-**Maximum:** `32`  
+**Maximum:** `32`
 
 The number of language slots players have by default.
 
 Every player character will know the default language (the first language listed in [`AvailableLanguages`](#availablelanguages)) by default.
 The language selection option will only display if the player can add or select a language.
-With only one language slot (the default), admins must add additional languages to players manually with [`/addlanguage`](../user-guide/admins.md#commands).
+
+With only one language slot (the default), players will not have the option to add a language. In this case, admins can add languages with [`/addlanguage`](../user-guide/admins.md#commands).
 
 ### SignedLanguages
 **Default:** `ASL`

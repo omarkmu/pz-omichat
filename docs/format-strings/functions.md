@@ -34,24 +34,27 @@ To avoid collisions with tokens that may be added in the future, however, custom
 | Function | Description |
 | -------- | ----------- |
 | `$byte(s i j)` | Returns a list of character codes in `s`, from indices `i` (default `1`) to `j` (default `i`). |
-| `$capitalize(s)` | Converts the first character in `s` to its uppercase counterpart. |
+| `$capitalize(s)` | Converts the first character in `s` to its uppercase counterpart. If `s` is wrapped in invisible encoding characters (128–159 or 65535), this will capitalize the first visible character. |
 | `$char(...)` | Returns a string made up of the characters with the integer character codes passed as arguments. |
+| `$colorquotes(s category)` | Wraps quoted text within `s` in the color category specified, or the `say` color if none is given. |
 | `$concat(...)` | Combines provided arguments into one string. |
 | `$concats(separator ...)` | Combines provided arguments into one string, using `separator` as a separator. |
 | `$contains(this other)` | Returns `true` if `this` contains `other`. Otherwise, returns the empty string. |
-| `$endswith()` | Returns `true` if `this` ends with `other`. Otherwise, returns the empty string. |
+| `$endswith(this other)` | Returns `true` if `this` ends with `other`. Otherwise, returns the empty string. |
 | `$first(s)` | Returns the first character of a given string. |
 | `$gsub(s pattern repl n)` | Replaces the first `n` copies of the pattern `pattern` in `s` with `repl`. Returns the result string, the number of matches that occurred, and any match groups that were captured. This behaves similarly to its [Lua counterpart](https://www.lua.org/manual/5.1/manual.html#pdf). |
 | `$index(s i default)` | Returns the character at index `i` in `s`, or `default` if there is no such index. |
+| `$internal(s)` | Returns the visible part of text wrapped in invisible encoding characters (128–159 or 65535), the invisible prefix, and the invisible suffix. |
 | `$last(s)` | Returns the last character of a given string. |
 | `$len(s)` | Returns the length of `s`. |
 | `$lower(s)` | Converts given arguments into a lowercase string. |
 | `$match(s pattern init)` |  Looks for a match of `pattern` in `s` starting from `init`. Returns any captures from the pattern, or the entire match if none are specified. This behaves similarly to its [Lua counterpart](https://www.lua.org/manual/5.1/manual.html#pdf). |
-| `$punctuate(s punctuation chars)` | Adds punctuation to the end of `s` if it isn't present.<br><br>If `punctuation` is provided, it will be used as the punctuation (default: `.`).<br><br>If `chars` is provided, the set of characters considered to be punctuation will be limited to the characters in this string. By default, the Lua [pattern](https://www.lua.org/manual/5.1/manual.html#5.4.1) `%p` is used.<br><br>`$punctuate(hi)` → `hi.`<br>`$punctuate(hello !)` → `hello!` |
+| `$punctuate(s punctuation chars)` | Adds punctuation to the end of `s` if it isn't present. If `s` is wrapped in invisible encoding characters (128–159 or 65535), the last visible character will be considered the end.<br><br>If `punctuation` is provided, it will be used as the punctuation (default: `.`).<br><br>If `chars` is provided, the set of characters considered to be punctuation will be limited to the characters in this string. By default, the Lua [pattern](https://www.lua.org/manual/5.1/manual.html#5.4.1) `%p` is used.<br><br>`$punctuate(hi)` → `hi.`<br>`$punctuate(hello !)` → `hello!` |
 | `$rep(s n)` | Returns a string made up of `n` concatenated copies of `s`. **Use with caution; large strings can take up a lot of memory.** |
 | `$reverse(s)` | Reverses a given string. |
 | `$startswith(this other)` | Returns `true` if `this` starts with `other`. Otherwise, returns the empty string. |
 | `$str(s)` | Converts given arguments into a single string. |
+| `$stripcolors(s)` | Removes chat colors defined with `<RGB>` from the given string. |
 | `$sub(s i j)` | Returns a substring of `s` from `i` (default `1`) to `j` (default `#s`). |
 | `$trim(s)` | Trims the beginning and end of a given string. |
 | `$trimleft(s)` | Trims the beginning of a given string. |
