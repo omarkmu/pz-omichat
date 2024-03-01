@@ -69,7 +69,7 @@ local function applyNarrativeStyle(input, stream, tokens)
         return original
     end
 
-    local seed = getTimestampMs()
+    local seed = input
     local dialogueTag = utils.interpolate(Option.FormatNarrativeDialogueTag, tokens, seed)
     if dialogueTag == '' then
         return original
@@ -461,19 +461,18 @@ function OmiChat.formatForChat(args)
     local username = args.username or utils.getPlayerUsername()
     local name = args.name or OmiChat.getNameInChat(username, args.chatType)
 
-    local text = utils.interpolate(Option.FilterChatInput, {
-        input = args.text,
-        username = username,
-        name = name,
-        stream = stream,
-    })
+    local tokens = args.tokens and utils.copy(args.tokens) or {}
+    tokens.chatType = args.chatType
+    tokens.input = args.text
+    tokens.username = username
+    tokens.name = name
+    tokens.stream = stream
 
+    local text = utils.interpolate(Option.FilterChatInput, tokens)
     if #utils.trim(text) == 0 then
         -- avoid empty messages
         return ''
     end
-
-    local tokens = args.tokens and utils.copy(args.tokens) or {}
 
     -- apply styles
     local streamInfo = OmiChat.getChatStreamByIdentifier(stream)
@@ -481,13 +480,10 @@ function OmiChat.formatForChat(args)
 
     -- encode rp language
     local language
-    if OmiChat.canUseRoleplayLanguage(stream, text) then
+    if utils.testPredicate(Option.PredicateAllowLanguage, tokens) then
         text, language = OmiChat.encodeLanguage(text, args.playSignedEmote)
     end
 
-    tokens.name = name
-    tokens.username = username
-    tokens.stream = stream
     tokens.languageRaw = language
     tokens.language = language and utils.getTranslatedLanguageName(language)
 
@@ -506,8 +502,6 @@ function OmiChat.formatForChat(args)
         text = adminIconFormatter:wrap(text)
     end
 
-    tokens.prefix = utils.trimleft(utils.interpolate(Option.FormatOverheadPrefix, tokens))
-
     -- mark as echo message
     if args.isEcho then
         local echoFormatter = OmiChat.getFormatter('echo')
@@ -515,6 +509,7 @@ function OmiChat.formatForChat(args)
     end
 
     local overheadFormatter = OmiChat.getFormatter('overheadFull')
+    tokens.prefix = utils.trimleft(utils.interpolate(Option.FormatOverheadPrefix, tokens))
     text = overheadFormatter:format(text, tokens)
 
     -- encode online ID for radio

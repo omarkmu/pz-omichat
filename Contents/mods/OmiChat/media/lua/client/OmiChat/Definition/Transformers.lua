@@ -451,10 +451,10 @@ return {
                 defaultRange = Option:getDefault('RangeYell')
             end
 
+            local tokens = { stream = info.tokens.stream }
             if range then
                 info.attractRange = range * Option.RangeMultiplierZombies
                 if not info.context.ocIsCallout and not info.context.ocIsSneakCallout then
-                    local tokens = { stream = info.tokens.stream }
                     info.message:setShouldAttractZombies(utils.testPredicate(Option.PredicateAttractZombies, tokens))
                 end
             end
@@ -471,10 +471,11 @@ return {
             end
 
             local outOfRange = false
+            tokens.callout = (info.context.ocIsCallout or info.context.ocIsSneakCallout) and '1' or nil
+            tokens.sneakCallout = info.context.ocIsSneakCallout and '1' or nil
 
-            local tokens = { stream = info.tokens.stream }
             local zMax = tonumber(utils.interpolate(Option.RangeVertical, tokens))
-            if zMax and math.abs(authorPlayer:getZ() - localPlayer:getZ()) >= zMax then
+            if range and zMax and math.abs(authorPlayer:getZ() - localPlayer:getZ()) >= zMax then
                 outOfRange = true
             elseif range and range ~= defaultRange then
                 -- calculating distance using the distance formula like ChatUtility
@@ -486,8 +487,8 @@ return {
             end
 
             if outOfRange then
-                -- it's okay that this runs on refresh, because the
-                -- show in chat value is only used on the initial message add
+                -- show in chat value is only used on the initial message add,
+                -- so it's okay that this runs on refresh
                 info.message:setOverHeadSpeech(false)
                 info.message:setShowInChat(false)
             end

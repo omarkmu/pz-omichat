@@ -295,7 +295,7 @@ option OmiChat.RangeYell
 option OmiChat.RangeVertical
 {
     type = string,
-    default = $index(@(@(shout;meloud;doloud):3;@(whisper;low;mequiet;doquiet):1) $stream 2),
+    default = @($sneakCallout:1;$index(@(@(shout;meloud;doloud):3;@(whisper;low;mequiet;doquiet):1) $stream 2)),
     page = OmiChat,
     translation = OCRangeVertical,
 }
@@ -475,7 +475,7 @@ option OmiChat.FilterNickname
 option OmiChat.FilterNarrativeStyle
 {
     type = string,
-    default = $ifelse($sneakCallout $input $capitalize($input)),
+    default = @($sneakCallout:$input;$capitalize($input)),
     page = OmiChat,
     translation = OCFilterNarrativeStyle,
 }
@@ -499,7 +499,7 @@ option OmiChat.PredicateApplyBuff
 option OmiChat.PredicateAttractZombies
 {
     type = string,
-    default = $has(@(say;shout;meloud;doloud;radio) $stream),
+    default = $has(@(say;shout;meloud;doloud) $stream),
     page = OmiChat,
     translation = OCPredicateAttractZombies,
 }

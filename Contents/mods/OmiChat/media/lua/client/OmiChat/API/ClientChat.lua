@@ -283,17 +283,6 @@ function OmiChat.addInfoMessage(text, serverAlert)
     ISChat.addLineInChat(message, ISChat.instance.currentTabID - 1)
 end
 
----Checks whether a given stream and message text can use roleplay languages.
----@param stream string
----@param text string
----@return boolean
-function OmiChat.canUseRoleplayLanguage(stream, text)
-    return utils.testPredicate(Option.PredicateAllowLanguage, {
-        input = text,
-        stream = stream,
-    })
-end
-
 ---Determines stream information given a chat command.
 ---@param command string The input text.
 ---@param includeCommands boolean? If true, commands should be included. Defaults to true.
@@ -496,12 +485,12 @@ function OmiChat.getInfoRichText(player)
         return ''
     end
 
-    local name = OmiChat.getPlayerNameInChat(player, 'say')
     local tokens = OmiChat.getPlayerSubstitutions(player)
     if not tokens then
         return ''
     end
 
+    local name = OmiChat.getPlayerNameInChat(player, 'say')
     tokens.name = name and utils.escapeRichText(name) or ''
     return utils.interpolate(Option.FormatInfo, tokens, player:getUsername())
 end
@@ -674,7 +663,15 @@ function OmiChat.send(args)
         end
     end
 
-    if utils.testPredicate(Option.PredicateApplyBuff, { stream = stream:getIdentifier() }) then
+    local username = utils.getPlayerUsername()
+    local tokens = args.tokens and utils.copy(args.tokens) or {}
+    tokens.chatType = chatType
+    tokens.input = echoCommand
+    tokens.username = username
+    tokens.name = OmiChat.getNameInChat(username, chatType)
+    tokens.stream = stream:getIdentifier()
+
+    if utils.testPredicate(Option.PredicateApplyBuff, tokens) then
         tryApplyBuff()
     end
 

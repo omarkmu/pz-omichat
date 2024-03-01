@@ -479,7 +479,11 @@ function OmiChat.setNickname(nickname)
     end
 
     local original = nickname
-    nickname = utils.interpolate(Option.FilterNickname, { input = nickname })
+    nickname = utils.interpolate(Option.FilterNickname, {
+        target = 'nickname',
+        input = nickname,
+    })
+
     if nickname == '' then
         return false, getText('UI_OmiChat_set_name_failure', utils.escapeRichText(original))
     end
@@ -565,7 +569,11 @@ function OmiChat.updateCharacterName(name, updateSurname)
         return false
     end
 
-    name = utils.interpolate(Option.FilterNickname, { input = name })
+    name = utils.interpolate(Option.FilterNickname, {
+        target = 'name',
+        input = name,
+    })
+
     if name == '' then
         return false, getText('UI_OmiChat_set_name_failure', utils.escapeRichText(name))
     end

@@ -227,7 +227,11 @@ function OmiChat.Commands.reportDrawCard(args)
     -- local message
     -- display english overhead & encode card values for future translation
     local cardName = concat { englishCards[card], ' of ', englishSuits[suit] }
-    local content = utils.interpolate(Option.FormatCard, { card = cardName })
+    local content = utils.interpolate(Option.FormatCard, {
+        suit = suit,
+        number = card,
+        card = cardName,
+    })
 
     OmiChat.send {
         formatterName = 'card',
