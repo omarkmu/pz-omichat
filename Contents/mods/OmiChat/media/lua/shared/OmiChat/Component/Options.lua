@@ -8,18 +8,15 @@ local floor = math.floor
 ---Helper for retrieving sandbox variables and their defaults.
 ---@class omichat.Options : omi.SandboxHelper
 ---@field EnableCustomShouts boolean
----@field EnableCustomSneakShouts boolean
 ---@field EnableEmotes boolean
 ---@field EnableSetNameColor boolean
 ---@field EnableSpeechColorAsDefaultNameColor boolean
 ---@field EnableSetSpeechColor boolean
----@field EnableIconPicker boolean
----@field EnableMiscellaneousIcons boolean
 ---@field EnableCompatTAD boolean
 ---@field EnableFactionColorAsDefault boolean
 ---@field EnableCharacterCustomization boolean
----@field ShowDiscordColorOption integer
----@field SetNameMode integer
+---@field EnableDiscordColorOption integer
+---@field EnableSetName integer
 ---@field BuffCooldown integer
 ---@field CustomShoutMaxLength integer
 ---@field MinimumCommandAccessLevel integer
@@ -141,12 +138,6 @@ local colorOpts = {
     server = 'ColorServer',
 }
 
----@type table<omichat.CalloutCategory, string>
-local calloutOpts = {
-    callouts = 'EnableCustomShouts',
-    sneakcallouts = 'EnableCustomSneakShouts',
-}
-
 
 ---@param options omichat.Options
 ---@param colorOpt string?
@@ -174,7 +165,7 @@ end
 ---Returns whether players have a way to set their chat nickname.
 ---@return boolean
 function Option:canPlayersSetNickname()
-    return self:isNicknameCommandEnabled() or self.SetNameMode == 2
+    return self:isNicknameCommandEnabled() or self.EnableSetName == 2
 end
 
 ---Returns the default color associated with a category.
@@ -222,49 +213,42 @@ function Option:getDefaultColor(category, username)
         or { r = 255, g = 255, b = 255 }
 end
 
----Returns whether the provided callout category type is enabled.
----@param category omichat.CalloutCategory
----@return boolean
-function Option:isCustomCalloutTypeEnabled(category)
-    return self[calloutOpts[category]]
-end
-
 ---Returns whether the /name command should be enabled.
 ---@return boolean
 function Option:isNameCommandEnabled()
-    return self.SetNameMode ~= 1
+    return self.EnableSetName ~= 1
 end
 
 ---Returns whether /name should set characters' forenames.
 ---@return boolean
 function Option:isNameCommandSetForename()
-    local mode = self.SetNameMode
+    local mode = self.EnableSetName
     return mode == 3 or mode == 5
 end
 
 ---Returns whether /name should set characters' full names.
 ---@return boolean
 function Option:isNameCommandSetFullName()
-    local mode = self.SetNameMode
+    local mode = self.EnableSetName
     return mode == 4 or mode == 6
 end
 
 ---Returns whether /name should set characters' nicknames.
 ---@return boolean
 function Option:isNameCommandSetNickname()
-    return self.SetNameMode == 2
+    return self.EnableSetName == 2
 end
 
 ---Returns whether the /nickname command should be enabled.
 ---@return boolean
 function Option:isNicknameCommandEnabled()
-    return self.SetNameMode > 4
+    return self.EnableSetName > 4
 end
 
 ---Returns whether the Discord color option should be shown.
 ---@return boolean
 function Option:showDiscordColorOption()
-    local opt = self.ShowDiscordColorOption
+    local opt = self.EnableDiscordColorOption
     if opt then
         return getServerOptions():getBoolean('DiscordEnable')
     end

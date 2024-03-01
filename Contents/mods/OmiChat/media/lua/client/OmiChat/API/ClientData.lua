@@ -156,7 +156,7 @@ end
 ---@param shoutType omichat.CalloutCategory The type of shouts to retrieve.
 ---@return string[]?
 function OmiChat.getCustomShouts(shoutType)
-    if not Option:isCustomCalloutTypeEnabled(shoutType) then
+    if not Option.EnableCustomShouts then
         return
     end
 
@@ -433,7 +433,7 @@ end
 ---@param shouts string[]?
 ---@param shoutType omichat.CalloutCategory The type of shouts to set.
 function OmiChat.setCustomShouts(shouts, shoutType)
-    if not Option:isCustomCalloutTypeEnabled(shoutType) then
+    if not Option.EnableCustomShouts then
         return
     end
 

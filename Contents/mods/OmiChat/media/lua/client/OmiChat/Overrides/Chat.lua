@@ -241,15 +241,11 @@ end
 ---Adds the context menu options for custom callouts.
 ---@param context ISContextMenu
 local function addCustomCalloutOptions(context)
-    local shoutOpts = {}
-    if Option.EnableCustomShouts then
-        shoutOpts[#shoutOpts + 1] = 'callouts'
+    if not Option.EnableCustomShouts then
+        return
     end
 
-    if Option.EnableCustomSneakShouts then
-        shoutOpts[#shoutOpts + 1] = 'sneakcallouts'
-    end
-
+    local shoutOpts = { 'callouts', 'sneakcallouts' }
     for i = 1, #shoutOpts do
         local shoutType = shoutOpts[i]
         local shoutOptionName = getText('UI_OmiChat_context_set_custom_' .. shoutType)

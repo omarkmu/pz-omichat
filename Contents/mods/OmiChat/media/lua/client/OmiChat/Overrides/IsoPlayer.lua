@@ -34,10 +34,8 @@ function _IsoPlayer:Callout(playEmote)
     local range = isSneaking and Option.RangeSneakCalloutZombies or Option.RangeCalloutZombies
 
     local shouts
-    if isSneaking and Option.EnableCustomSneakShouts then
-        shouts = OmiChat.getCustomShouts('sneakcallouts')
-    elseif not isSneaking and Option.EnableCustomShouts then
-        shouts = OmiChat.getCustomShouts('callouts')
+    if Option.EnableCustomShouts then
+        shouts = OmiChat.getCustomShouts(isSneaking and 'sneakcallouts' or 'callouts')
     end
 
     -- this can't set .callOut, so minor boredom reduction will occur from shouting
