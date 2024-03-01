@@ -124,6 +124,7 @@ return OmiChat
 ---@field isLocalWhisper boolean?
 ---@field isEnabledCommand string? The command to pass to checkPlayerCanUseChat to determine whether the stream is enabled.
 ---@field formatter string?
+---@field validator (fun(self: omichat.StreamInfo, input: string): boolean)?
 
 ---@class omichat.CommandStreamConfig : omichat.BaseStreamConfig
 ---@field helpText string? String ID of a summary of the command's purpose. Displays when the /help command is used.

@@ -1,4 +1,5 @@
 local lib = require 'OmiChat/lib'
+local utils = require 'OmiChat/util'
 local config = require 'OmiChat/config'
 local Option = require 'OmiChat/Component/Options'
 
@@ -17,6 +18,32 @@ function StreamInfo:aliases()
         i = i + 1
         return aliases[i]
     end
+end
+
+---Returns the chat command and command remainder if the stream is a match.
+---@param command string
+---@return string?
+---@return string
+function StreamInfo:checkMatch(command)
+    local longCommand = self:getCommand()
+    local shortCommand = self:getShortCommand()
+
+    if utils.startsWith(command, longCommand) then
+        return longCommand, command:sub(#longCommand)
+    elseif shortCommand and utils.startsWith(command, shortCommand) then
+        return shortCommand, command:sub(#shortCommand)
+    elseif self:isCommand() and command == utils.trim(longCommand) then
+        -- commands can be entered with no trailing space
+        return command, ' '
+    end
+
+    for alias in self:aliases() do
+        if utils.startsWith(command, alias) then
+            return alias, command:sub(#alias)
+        end
+    end
+
+    return nil, command
 end
 
 ---Returns the stream's OmiChat configuration, or an empty table.
@@ -196,6 +223,18 @@ end
 ---@return boolean
 function StreamInfo:suggestOwnUsername()
     return self:config().suggestOwnUsername or false
+end
+
+---Returns the result of the validator, if one is configured. Otherwise, returns true.
+---@param input string
+---@return boolean
+function StreamInfo:validate(input)
+    local validator = self:config().validator
+    if validator then
+        return validator(self, input)
+    end
+
+    return true
 end
 
 
