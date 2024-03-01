@@ -223,12 +223,12 @@ function OmiChat.applyFormatOptions(info)
     return true
 end
 
----Applies overhead chat styles to a stream's input.
+---Applies chat styles to a stream's input.
 ---@param input string
 ---@param stream omichat.StreamInfo
 ---@param tokens table?
 ---@return string
-function OmiChat.applyOverheadStyles(input, stream, tokens)
+function OmiChat.applyStyles(input, stream, tokens)
     return applyNarrativeStyle(input, stream, tokens)
 end
 
@@ -475,9 +475,9 @@ function OmiChat.formatForChat(args)
 
     local tokens = args.tokens and utils.copy(args.tokens) or {}
 
-    -- apply overhead styles
+    -- apply styles
     local streamInfo = OmiChat.getChatStreamByIdentifier(stream)
-    text = streamInfo and OmiChat.applyOverheadStyles(text, streamInfo, tokens) or text
+    text = streamInfo and OmiChat.applyStyles(text, streamInfo, tokens) or text
 
     -- encode rp language
     local language

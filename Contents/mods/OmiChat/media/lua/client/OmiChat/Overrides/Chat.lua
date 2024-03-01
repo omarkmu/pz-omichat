@@ -1120,7 +1120,7 @@ function ISChat:onCommandEntered()
 
     local instance = ISChat.instance ---@cast instance omichat.ISChat
     local input = instance.textEntry:getText()
-    local stream, command, chatCommand = OmiChat.chatCommandToStream(input)
+    local stream, command, chatCommand = OmiChat.chatCommandToStream(input, true, true)
 
     local useCallback
     local callbackStream
@@ -1152,15 +1152,11 @@ function ISChat:onCommandEntered()
             allowEmotes = false
             shouldHandle = true
         else
-            if not stream:isEnabled() then
-                stream = nil
-            else
-                shouldHandle = true
-                callbackStream = stream
-                allowEmotes = not isDefault and stream:isAllowEmotes() or allowEmotes
-                useCallback = stream:getUseCallback() or OmiChat.send
-                commandType = stream:getCommandType()
-            end
+            shouldHandle = true
+            callbackStream = stream
+            allowEmotes = not isDefault and stream:isAllowEmotes() or allowEmotes
+            useCallback = stream:getUseCallback() or OmiChat.send
+            commandType = stream:getCommandType()
         end
 
         if isDefault then
@@ -1189,6 +1185,11 @@ function ISChat:onCommandEntered()
     if shouldRetain and stream then
         -- fix the switching functionality by updating to the used stream
         OmiChat.cycleStream(stream:getName())
+    end
+
+    if callbackStream and not callbackStream:validate(command) then
+        shouldHandle = true
+        callbackStream = nil
     end
 
     if not shouldHandle then

@@ -501,10 +501,13 @@ return {
                 return
             end
 
-            local text = info.content or info.rawText
+            local text = info.rawText
             local _, msgStart, other = text:find('%[to ([^%]]+)%]:')
             if other then
-                info.content = text:sub(msgStart + 1)
+                if not info.content then
+                    info.content = text:sub(msgStart + 1)
+                end
+
                 info.format = Option.ChatFormatOutgoingPrivate
                 info.tokens.recipient = other
                 info.tokens.recipientName = utils.escapeRichText(OmiChat.getNameInChat(other, 'whisper') or other)

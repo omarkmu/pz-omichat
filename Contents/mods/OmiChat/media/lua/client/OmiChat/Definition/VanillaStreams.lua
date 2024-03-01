@@ -1,3 +1,5 @@
+local OmiChat = require 'OmiChat/API/Client'
+
 ---@type table<string, omichat.ChatStreamConfig>
 return {
     say = {
@@ -19,6 +21,15 @@ return {
         isEnabledCommand = '/w',
         suggestUsernames = true,
         appendResultToLast = true,
+        validator = function(_, input)
+            -- vanilla regex is /("[^"]*\s+[^"]*"|[^"]\S*)\s(.+)/
+            if input:match('^"[^"]*%s+[^"]*"%s.+$') or input:match('^[^"]%S*%s.+$') then
+                return true
+            end
+
+            OmiChat.addInfoMessage(getText('IGUI_Commands_Whisper'))
+            return false
+        end,
     },
     faction = {
         commandType = 'chat',

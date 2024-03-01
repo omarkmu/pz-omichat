@@ -297,10 +297,11 @@ end
 ---Determines stream information given a chat command.
 ---@param command string The input text.
 ---@param includeCommands boolean? If true, commands should be included. Defaults to true.
+---@param enabledOnly boolean? If true, only enabled streams will be returned. Defaults to false.
 ---@return omichat.StreamInfo? #Information about the stream.
 ---@return string #The text following the command in the input.
 ---@return string? #The command or short command that was used.
-function OmiChat.chatCommandToStream(command, includeCommands)
+function OmiChat.chatCommandToStream(command, includeCommands, enabledOnly)
     if not command or command == '' then
         return nil, ''
     end
@@ -309,14 +310,14 @@ function OmiChat.chatCommandToStream(command, includeCommands)
         includeCommands = true
     end
 
-    local chatStream
+    local streamInfo
     local chatCommand
 
     local i = 1
     local numStreams = #ISChat.allChatStreams
     local numCommands = #OmiChat._commandStreams
     while i <= numStreams + numCommands do
-        local stream
+        local stream, checkCommand
         if i <= numStreams then
             stream = ISChat.allChatStreams[i]
         else
@@ -327,41 +328,15 @@ function OmiChat.chatCommandToStream(command, includeCommands)
             stream = OmiChat._commandStreams[i - numStreams]
         end
 
-        chatCommand = nil
-        if utils.startsWith(command, stream.command) then
-            chatCommand = stream.command
-            command = command:sub(#chatCommand)
-        elseif utils.startsWith(command, stream.shortCommand) then
-            chatCommand = stream.shortCommand
-            command = command:sub(#chatCommand)
-        elseif stream.omichat and stream.omichat.isCommand and command == utils.trim(stream.command) then
-            chatCommand = command
-            command = ' '
-        end
-
-        local aliases = stream.omichat and stream.omichat.aliases
-        if not chatCommand and aliases then
-            for j = 1, #aliases do
-                local aliasCommand = aliases[j]
-                if utils.startsWith(command, aliasCommand) then
-                    chatCommand = aliasCommand
-                    command = command:sub(#chatCommand)
-                    break
-                end
-            end
-        end
-
-        if chatCommand then
-            chatStream = stream
+        local info = StreamInfo:new(stream)
+        chatCommand, checkCommand = info:checkMatch(command)
+        if chatCommand and (not enabledOnly or info:isEnabled()) then
+            streamInfo = info
+            command = checkCommand
             break
         end
 
         i = i + 1
-    end
-
-    local streamInfo
-    if chatStream then
-        streamInfo = StreamInfo:new(chatStream)
     end
 
     return streamInfo, command, chatCommand
@@ -370,9 +345,10 @@ end
 ---Retrieves a stream name given a chat command.
 ---@param command string A chat stream's command, with the leading slash.
 ---@param includeCommands boolean? If true, commands should be included.
+---@param enabledOnly boolean? If true, only enabled streams will be returned. Defaults to false.
 ---@return string? #The name of the chat stream, or `nil` if not found.
-function OmiChat.chatCommandToStreamName(command, includeCommands)
-    local stream = OmiChat.chatCommandToStream(command, includeCommands)
+function OmiChat.chatCommandToStreamName(command, includeCommands, enabledOnly)
+    local stream = OmiChat.chatCommandToStream(command, includeCommands, enabledOnly)
     if stream then
         return stream:getName()
     end
@@ -655,9 +631,25 @@ function OmiChat.send(args)
         end
     end
 
+    local prefix = ''
     local chatType = stream:getChatType()
-    local originalCommand = command
+    if chatType == 'whisper' then
+        -- don't apply formatting to the username
+        local m1, m2 = command:match('^("[^"]*%s+[^"]*"%s)(.+)$')
+        if not m1 then
+            m1, m2 = command:match('^([^"]%S*%s)(.+)$')
+        end
 
+        if not m1 then
+            -- not a valid whisper chat
+            return
+        end
+
+        prefix = m1
+        command = m2
+    end
+
+    local echoCommand = command
     command = OmiChat.formatForChat {
         text = command,
         chatType = chatType,
@@ -668,10 +660,14 @@ function OmiChat.send(args)
         tokens = args.tokens,
     }
 
+    if command == '' then
+        return
+    end
+
     local result
     local process = OmiChat.raw[chatType] or OmiChat.raw.say
     if process then
-        result = process(command)
+        result = process(prefix .. command)
         if result and chatType == 'whisper' and OmiChat.getRetainCommand(stream:getCommandType()) then
             local chatText = ISChat.instance.chatText
             chatText.lastChatCommand = concat { chatText.lastChatCommand, tostring(result), ' ' }
@@ -696,7 +692,7 @@ function OmiChat.send(args)
         useCallback {
             isEcho = true,
             stream = echoStream,
-            command = originalCommand,
+            command = echoCommand,
         }
     end
 
@@ -721,10 +717,11 @@ function OmiChat.sendGeneral(args)
     OmiChat.send(transformSendArgs(args, 'general'))
 end
 
----Sends an /all message, formatted according to configuration.
+---Sends a /pm message, formatted according to configuration.
 ---@param args string | omichat.SendArgs
+---@return string
 function OmiChat.sendPM(args)
-    OmiChat.send(transformSendArgs(args, 'private'))
+    return OmiChat.send(transformSendArgs(args, 'private')) or ''
 end
 
 ---Sends a /safehouse message, formatted according to configuration.
