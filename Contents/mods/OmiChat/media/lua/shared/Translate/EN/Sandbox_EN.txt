@@ -4,11 +4,11 @@ Sandbox_EN = {
     --[[ Basic Features ]]--
     Sandbox_OCEnableChatNameAsCharacterName = "Use Chat Name as Character Name",
     Sandbox_OCEnableCustomShouts = "Enable Custom Shouts",
-    Sandbox_OCEnableEmotes = "Enable Emotes",
+    Sandbox_OCEnableEmotes = "Enable Emote Shortcuts",
     Sandbox_OCEnableSetName = "Enable /name",
     Sandbox_OCEnableCharacterCustomization = "Enable Character Customization",
-    Sandbox_OCEnableSetNameColor = "Custom Name Colors",
-    Sandbox_OCEnableSetSpeechColor = "Custom Speech Colors",
+    Sandbox_OCEnableSetNameColor = "Enable Custom Name Colors",
+    Sandbox_OCEnableSetSpeechColor = "Enable Custom Speech Colors",
     Sandbox_OCEnableSpeechColorAsDefaultNameColor = "Use Speech Color as Default Name Color",
     Sandbox_OCEnableFactionColorAsDefault = "Use Faction Tag Color as Default Chat Color",
     Sandbox_OCEnableDiscordColorOption = "Enable Discord Color Option",
@@ -17,7 +17,7 @@ Sandbox_EN = {
     Sandbox_OCEnableDiscordColorOption_option2 = "No",
     Sandbox_OCEnableDiscordColorOption_option3 = "Respect server setting",
 
-    Sandbox_OCEnableSetName_option1 = "Disallow setting name",
+    Sandbox_OCEnableSetName_option1 = "Disable",
     Sandbox_OCEnableSetName_option2 = "/name sets chat nickname",
     Sandbox_OCEnableSetName_option3 = "/name sets character forename",
     Sandbox_OCEnableSetName_option4 = "/name sets character's full name",

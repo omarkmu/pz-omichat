@@ -1,8 +1,5 @@
 UI_EN = {
     --[[ General ]]--
-    UI_OmiChat_low_chat_title_id = "Low",
-    UI_OmiChat_whisper_chat_title_id = "Whisper",
-
     UI_OmiChat_icon_cat_clothing = "Clothing",
     UI_OmiChat_icon_cat_cooking = "Cooking",
     UI_OmiChat_icon_cat_food = "Food",
@@ -164,11 +161,11 @@ UI_EN = {
 
     -- %1 = the chat stream (e.g., /say, /yell)
     UI_OmiChat_context_submenu_color = "%1 color",
-    UI_OmiChat_context_submenu_color_radio = "Radio Message Color",
-    UI_OmiChat_context_submenu_color_discord = "Discord Message Color",
-    UI_OmiChat_context_submenu_color_server = "Server Message Color",
-    UI_OmiChat_context_submenu_color_name = "Name Color",
-    UI_OmiChat_context_submenu_color_speech = "Speech Color",
+    UI_OmiChat_context_submenu_color_radio = "Radio message color",
+    UI_OmiChat_context_submenu_color_discord = "Discord message color",
+    UI_OmiChat_context_submenu_color_server = "Server message color",
+    UI_OmiChat_context_submenu_color_name = "Name color",
+    UI_OmiChat_context_submenu_color_speech = "Speech color",
 
     UI_OmiChat_context_message_type_radio = "radio",
     UI_OmiChat_context_message_type_discord = "Discord",
@@ -180,7 +177,7 @@ UI_EN = {
 
     UI_OmiChat_context_set_custom_callouts = "Customize callouts",
     UI_OmiChat_context_set_custom_sneakcallouts = "Customize sneak callouts",
-    UI_OmiChat_context_set_custom_callouts_desc = "Enter one 'Q' callout per line, or nothing to reset.",
+    UI_OmiChat_context_set_custom_callouts_desc = "Enter one callout per line, or nothing to reset.",
 
     UI_OmiChat_context_admin = "Admin options",
     UI_OmiChat_context_admin_show_icon = "Display chat icon",

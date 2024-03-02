@@ -225,7 +225,6 @@ return {
                     -- format sneak callouts like whispers, if enabled
                     info.format = info.format or Option.ChatFormatWhisper
                     info.formatOptions.color = OmiChat.getColorOrDefault('whisper')
-                    info.titleID = 'UI_OmiChat_whisper_chat_title_id'
                 end
             else
                 return
@@ -373,7 +372,6 @@ return {
                 info.tokens.unknownLanguageString = 'UI_OmiChat_unknown_language_radio'
                 info.format = Option.ChatFormatUnknownLanguageRadio
             elseif isWhisper then
-                info.titleID = 'UI_OmiChat_whisper_chat_title_id'
                 info.tokens.unknownLanguageString = 'UI_OmiChat_unknown_language_whisper' .. signedSuffix
                 info.formatOptions.color = OmiChat.getColorOrDefault('mequiet')
                 info.context.ocCustomStream = 'mequiet'
