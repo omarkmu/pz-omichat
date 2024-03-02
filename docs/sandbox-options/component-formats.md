@@ -21,6 +21,24 @@ The format used for local [`/card`](./chat-formats.md#chatformatcard) overhead m
 - `$number`: The number of the card, from 1 to 13. 1 is ace, 11 is jack, 12 is queen, and 13 is king.
 - `$suit`: The suit  of the card, from 1 to 4. 1 is clubs, 2 is diamonds, 3 is hearts, and 4 is spades.
 
+### FormatChatPrefix
+**Default:** `$if($icon $icon <SPACE>)$if($neq($stream server) $timestamp)$tag$language`
+
+The format used to determine the value of the `$prefix` token in [`ChatFormatFull`](./chat-formats.md#chatformatfull).
+
+**Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
+- [`$author`](../format-strings/tokens.md#author)
+- [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$icon`](../format-strings/tokens.md#icon)
+- [`$iconRaw`](../format-strings/tokens.md#iconraw)
+- `$language`: The result of the [`FormatLanguage`](../sandbox-options/component-formats.md#formatlanguage) option.
+- [`$message`](../format-strings/tokens.md#message)
+- [`$name`](../format-strings/tokens.md#name)
+- [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- `$tag`: The result of the [`FormatTag`](../sandbox-options/component-formats.md#formattag) option.
+- `$timestamp`: The result of the [`FormatTimestamp`](../sandbox-options/component-formats.md#formattimestamp) option.
+
 ### FormatIcon
 **Default:** `@($eq($stream card):Item_CardDeck;$eq($stream roll):Item_Dice;$has(@(say;shout;whisper;faction;safehouse;ooc;general) $stream):@($adminIcon;$icon))`
 

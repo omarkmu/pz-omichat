@@ -99,6 +99,7 @@ Sandbox_EN = {
     Sandbox_OCFormatTimestamp = "Chat Timestamp Format",
     Sandbox_OCFormatIcon = "Icon Format",
     Sandbox_OCFormatLanguage = "Language Format",
+    Sandbox_OCFormatChatPrefix = "Chat Prefix Format",
     Sandbox_OCFormatOverheadPrefix = "Overhead Prefix Format",
     Sandbox_OCFormatAdminIcon = "Admin Icon Format",
     Sandbox_OCFormatNarrativeDialogueTag = "Narrative Style Dialogue Tag Format",
