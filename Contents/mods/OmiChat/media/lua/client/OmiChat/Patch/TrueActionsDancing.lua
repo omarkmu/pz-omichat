@@ -400,7 +400,7 @@ end
 ---@param player IsoPlayer
 ---@return table
 local function processDanceCommand(name, player)
-    name = trim(name)
+    name = trim(name or '')
 
     if name == 'list' then
         return { list = true }
@@ -462,8 +462,8 @@ local function processDanceCommand(name, player)
 end
 
 ---Event handler for the /dance command.
----@param command string
-local function onUseDanceCommand(_, command)
+---@param args omichat.SendArgs
+local function onUseDanceCommand(args)
     if not isPatchEnabled() then
         return
     end
@@ -474,7 +474,7 @@ local function onUseDanceCommand(_, command)
     end
 
     local feedback
-    local info = processDanceCommand(command, player)
+    local info = processDanceCommand(args.command, player)
     if info.emote then
         player:setPrimaryHandItem(nil)
         player:setSecondaryHandItem(nil)
