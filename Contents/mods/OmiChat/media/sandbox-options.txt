@@ -108,10 +108,20 @@ option OmiChat.BuffCooldown
     translation = OCBuffCooldown,
 }
 
+option OmiChat.MaximumCustomShouts
+{
+    type = integer,
+    default = 10,
+    min = 1,
+    max = 20,
+    page = OmiChat,
+    translation = OCMaximumCustomShouts,
+}
+
 option OmiChat.CustomShoutMaxLength
 {
     type = integer,
-    default = 30,
+    default = 50,
     min = 1,
     max = 200,
     page = OmiChat,
@@ -126,16 +136,6 @@ option OmiChat.MinimumCommandAccessLevel
     max = 32,
     page = OmiChat,
     translation = OCMinimumCommandAccessLevel,
-}
-
-option OmiChat.MaximumCustomShouts
-{
-    type = integer,
-    default = 10,
-    min = 1,
-    max = 20,
-    page = OmiChat,
-    translation = OCMaximumCustomShouts,
 }
 
 
@@ -491,7 +491,7 @@ option OmiChat.FilterNarrativeStyle
 option OmiChat.PredicateAllowLanguage
 {
     type = string,
-    default = $has(@(say;shout;whisper;low) $stream),
+    default = $has(@(say;shout;whisper;low;faction;safehouse) $stream),
     page = OmiChat,
     translation = OCPredicateAllowLanguage,
 }
@@ -781,7 +781,7 @@ option OmiChat.OverheadFormatOther
 option OmiChat.ChatFormatFull
 {
     type = string,
-    default = $if($neq($stream server) $timestamp)$tag$language$if($icon $icon (<SPACE> ))$content,
+    default = if($icon $icon (<SPACE> ))$if($neq($stream server) $timestamp)$tag$language$content,
     page = OmiChat,
     translation = OCChatFormatFull,
 }

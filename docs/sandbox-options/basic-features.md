@@ -11,7 +11,7 @@ These [options](./index.md) are used to control basic features of the mod.
 The cooldown for applying [buffs](./filters-predicates.md#predicateapplybuff), in real-time minutes.
 
 ### CustomShoutMaxLength
-**Default:** `30`  
+**Default:** `50`  
 **Minimum:** `1`  
 **Maximum:** `200`
 
