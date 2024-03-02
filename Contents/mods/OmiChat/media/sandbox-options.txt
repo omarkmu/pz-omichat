@@ -80,6 +80,14 @@ option OmiChat.EnableDiscordColorOption
 
 
 /* Compatibility Feature Flags */
+option OmiChat.EnableCompatChatBubble
+{
+    type = boolean,
+    default = true,
+    page = OmiChat,
+    translation = OCEnableCompatChatBubble,
+}
+
 option OmiChat.EnableCompatTAD
 {
     type = boolean,

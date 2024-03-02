@@ -1012,6 +1012,10 @@ function ISChat.addLineInChat(message, tabID)
             end
         end
 
+        if Option:compatChatBubbleEnabled() and message:getText():match('^%[img=media/textures/bubble%d%.png%]$') then
+            return
+        end
+
         message:setCustomTag(OmiChat.encodeMessageTag(message))
 
         -- necessary to process transforms so we know whether this message should be added to chat

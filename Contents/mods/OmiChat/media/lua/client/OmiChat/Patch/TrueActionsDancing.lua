@@ -391,7 +391,7 @@ end
 ---Checks whether the patch is in effect.
 ---@return boolean
 local function isPatchEnabled()
-    return OmiChat.Option.EnableCompatTAD and getActivatedMods():contains('TrueActionsDancing')
+    return OmiChat.Option:compatTADEnabled()
 end
 
 ---Returns a dance emote given command input, or information

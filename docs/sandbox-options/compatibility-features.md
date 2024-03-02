@@ -2,7 +2,14 @@
 
 These [options](./index.md) options control compatibility patches for other mods.
 They have no effect if the relevant mod is not active.
-As of now, there is only one such feature.
+
+### EnableCompatChatBubble
+**Default:** `true`
+
+Enables the compatibility patch for [Chat Bubble v0.6](https://steamcommunity.com/sharedfiles/filedetails/?id=2688676019).
+
+This prevents chat bubble messages from showing up in chat when enabling timestamps or tags, by preventing adding them to chat at all.
+Chat bubbles still function as expected with this option enabled; they just won't affect the chat window.
 
 ### EnableCompatTAD
 **Default:** `true`

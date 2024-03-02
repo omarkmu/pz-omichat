@@ -25,6 +25,7 @@ Sandbox_EN = {
     Sandbox_OCEnableSetName_option6 = "/name sets character's full name, /nickname sets chat nickname",
 
     --[[ Compatibility Features ]]--
+    Sandbox_OCEnableCompatChatBubble = "Chat Bubble Compatibility",
     Sandbox_OCEnableCompatTAD = "True Actions Act 3 - Dancing Compatibility",
 
     --[[ Limits ]]--
