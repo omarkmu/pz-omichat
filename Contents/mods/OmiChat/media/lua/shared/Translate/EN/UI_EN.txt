@@ -225,6 +225,7 @@ UI_EN = {
     UI_OmiChat_available_dances = "Available dances:",
 
     -- %1 = the name of the dance the player tried to do with /dance
-    UI_OmiChat_unknown_dance_recipe = "You don't know the %1 dance.",
-    UI_OmiChat_missing_dance_item = "You need a dance card to do the %1 dance.",
+    UI_OmiChat_unknown_dance = "Unknown dance. Use '/dance list' to see available dances.",
+    UI_OmiChat_unknown_dance_recipe = "You don't know the %1 dance. Use '/dance list' to see available dances.",
+    UI_OmiChat_missing_dance_item = "You need a dance card to do the %1 dance. Use '/dance list' to see available dances.",
 }

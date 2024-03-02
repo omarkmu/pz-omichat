@@ -1,11 +1,13 @@
 ---Compatibility patch for True Actions Act 3 - Dancing.
 
 local OmiChat = require 'OmiChatClient'
+local utils = OmiChat.utils
+local Option = OmiChat.Option
 
 local getText = getText
 local pairs = pairs
 local concat = table.concat
-local trim = OmiChat.utils.trim
+local trim = utils.trim
 
 
 -- dances from TAD
@@ -350,7 +352,7 @@ end
 ---@return table[] #List of dances.
 ---@return integer? #Index of `search` in the list, if `search` was provided and found.
 local function getAvailableDances(player, search)
-    local danceList, _, searchIdx = getAvailableItemDances(player)
+    local danceList, _, searchIdx = getAvailableItemDances(player, search)
 
     for _, dance in pairs(recipeDances) do
         if player:isRecipeKnown(dance.recipe) then
@@ -386,12 +388,6 @@ local function getAvailableDanceHelpText(player)
     end
 
     return concat(parts)
-end
-
----Checks whether the patch is in effect.
----@return boolean
-local function isPatchEnabled()
-    return OmiChat.Option:compatTADEnabled()
 end
 
 ---Returns a dance emote given command input, or information
@@ -461,66 +457,91 @@ local function processDanceCommand(name, player)
     return { unknown = true }
 end
 
----Event handler for the /dance command.
----@param args omichat.SendArgs
-local function onUseDanceCommand(args)
-    if not isPatchEnabled() then
-        return
-    end
 
-    local player = getSpecificPlayer(0)
-    if not player then
-        return
-    end
+---@type omichat.CommandStream
+local danceStream = {
+    name = 'dance',
+    command = '/dance ',
+    omichat = {
+        helpText = 'UI_OmiChat_helptext_dance',
+        isEnabled = function() return Option:compatTADEnabled() end,
+        onUse = function(args)
+            local player = getSpecificPlayer(0)
+            if not player then
+                return
+            end
 
-    local feedback
-    local info = processDanceCommand(args.command, player)
-    if info.emote then
-        player:setPrimaryHandItem(nil)
-        player:setSecondaryHandItem(nil)
-        player:playEmote(info.emote)
-    elseif info.unknownRecipe then
-        feedback = concat {
-            getText('UI_OmiChat_unknown_dance_recipe', info.name),
-            ' ',
-            getAvailableDanceHelpText(player),
-        }
-    elseif info.missingItem then
-        feedback = concat {
-            getText('UI_OmiChat_missing_dance_item', info.name),
-            ' ',
-            getAvailableDanceHelpText(player),
-        }
-    else
-        feedback = getAvailableDanceHelpText(player)
-    end
+            local feedback
+            local info = processDanceCommand(args.command, player)
+            if info.emote then
+                player:setPrimaryHandItem(nil)
+                player:setSecondaryHandItem(nil)
+                player:playEmote(info.emote)
+            elseif info.unknownRecipe then
+                feedback = getText('UI_OmiChat_unknown_dance_recipe', info.name)
+            elseif info.missingItem then
+                feedback = getText('UI_OmiChat_missing_dance_item', info.name)
+            elseif info.list then
+                feedback = getAvailableDanceHelpText(player)
+            else
+                feedback = getText('UI_OmiChat_unknown_dance')
+            end
 
-    if feedback then
-        OmiChat.addInfoMessage(feedback)
-    end
-end
+            if feedback then
+                OmiChat.addInfoMessage(feedback)
+            end
+        end,
+    },
+}
 
+---@type omichat.Suggester
+local danceSuggester = {
+    suggest = function(_, info)
+        if not Option:compatTADEnabled() then
+            return
+        end
+
+        local player = getSpecificPlayer(0)
+        if not player then
+            return
+        end
+
+        local matched = info.input:match('^/dance%s+(.*)')
+        local input = matched and trim(matched:gsub(' ', '_'))
+        if not input then
+            return
+        end
+
+        local dances = getAvailableDances(player)
+        for i = 1, #dances do
+            local dance = dances[i]
+            local displayUnderscore = dance.display:gsub(' ', '_')
+            if utils.contains(displayUnderscore, input) or utils.contains(dance.name, input) then
+                info.suggestions[#info.suggestions + 1] = {
+                    type = 'dance',
+                    display = dance.display,
+                    suggestion = concat({ '/dance ', dance.name:gsub('_', ' '), ' ' }),
+                }
+            end
+        end
+    end,
+}
 
 ---Applies the TAD patch.
 local function applyPatch()
     for k, v in pairs(itemDances) do
         v.name = k
+        v.display = v.emote:gsub('^BobTA_', ''):gsub('_', ' ')
         itemDanceByItemType[v.item] = v
     end
 
     for k, v in pairs(recipeDances) do
         v.name = k
+        v.display = v.recipe:gsub('^BobTA%s*', '')
     end
 
-    OmiChat.addCommand({
-        name = 'dance',
-        command = '/dance ',
-        omichat = {
-            helpText = 'UI_OmiChat_helptext_dance',
-            isEnabled = isPatchEnabled,
-            onUse = onUseDanceCommand,
-        },
-    })
+    OmiChat.addCommand(danceStream)
+    OmiChat.addSuggester(danceSuggester)
 end
 
 Events.OnGameStart.Add(applyPatch)
