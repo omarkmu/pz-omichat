@@ -55,6 +55,7 @@ local function extend(t1, t2)
     return t1
 end
 
+---@type omichat.Suggester[]
 return {
     {
         name = 'commands',
