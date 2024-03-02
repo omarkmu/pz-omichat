@@ -1217,7 +1217,7 @@ function ISChat:onCommandEntered()
         useCallback {
             stream = callbackStream,
             command = command,
-            playSignedEmote = allowEmotes and not playedEmote,
+            playSignedEmote = not playedEmote,
         }
     end
 

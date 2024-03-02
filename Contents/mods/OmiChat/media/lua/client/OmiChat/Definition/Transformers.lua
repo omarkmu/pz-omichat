@@ -41,7 +41,7 @@ end
 return {
     {
         name = 'radio-chat',
-        priority = 55,
+        priority = 75,
         transform = function(_, info)
             local text = info.content or info.rawText
             if info.chatType ~= 'radio' then
@@ -61,7 +61,7 @@ return {
     },
     {
         name = 'cleanup-author-metadata',
-        priority = 50,
+        priority = 70,
         transform = function(_, info)
             local text = info.content or info.rawText
             local formatter = OmiChat.getFormatter('onlineID')
@@ -78,7 +78,7 @@ return {
     },
     {
         name = 'decode-full-overhead',
-        priority = 45,
+        priority = 65,
         transform = function(_, info)
             local formatter = OmiChat.getFormatter('overheadFull')
             local text = info.content or info.rawText
@@ -90,7 +90,7 @@ return {
     },
     {
         name = 'handle-echo',
-        priority = 40,
+        priority = 60,
         transform = function(_, info)
             local text = info.content or info.rawText
             local formatter = OmiChat.getFormatter('echo')
@@ -101,6 +101,7 @@ return {
             end
 
             if Option.ChatFormatEcho ~= '' then
+                info.tokens.echo = '1'
                 info.format = Option.ChatFormatEcho
             end
 
@@ -114,7 +115,7 @@ return {
     },
     {
         name = 'decode-card',
-        priority = 35,
+        priority = 55,
         transform = function(_, info)
             if info.chatType ~= 'say' or not OmiChat.isCustomStreamEnabled('card') then
                 return
@@ -158,7 +159,7 @@ return {
     },
     {
         name = 'decode-roll',
-        priority = 35,
+        priority = 50,
         transform = function(_, info)
             if info.chatType ~= 'say' or not OmiChat.isCustomStreamEnabled('roll') then
                 return
@@ -203,7 +204,7 @@ return {
     },
     {
         name = 'decode-callout',
-        priority = 30,
+        priority = 45,
         transform = function(_, info)
             if info.chatType ~= 'shout' then
                 return
@@ -239,7 +240,7 @@ return {
     },
     {
         name = 'decode-stream',
-        priority = 30,
+        priority = 40,
         transform = function(_, info)
             local isRadio = info.context.ocIsRadio
             local text = info.content or info.rawText
@@ -283,7 +284,7 @@ return {
     },
     {
         name = 'decode-other',
-        priority = 30,
+        priority = 35,
         transform = function(_, info)
             local text = info.content or info.rawText
             local formatter = OmiChat.getFormatter('overheadOther')
@@ -296,7 +297,7 @@ return {
     },
     {
         name = 'handle-language',
-        priority = 25,
+        priority = 30,
         transform = function(self, info)
             local isRadio = info.context.ocIsRadio
             local formatter = OmiChat.getFormatter('language')
@@ -312,10 +313,6 @@ return {
                 else
                     encodedId = nil
                 end
-            end
-
-            if not self.allowedChatTypes[info.chatType] then
-                return
             end
 
             local streamData = config:getCustomStreamInfo(info.context.ocCustomStream)
@@ -396,7 +393,7 @@ return {
     },
     {
         name = 'decode-narrative',
-        priority = 20,
+        priority = 25,
         transform = function(_, info)
             local text = info.content or info.rawText
             local formatter = OmiChat.getFormatter('narrative')
@@ -408,13 +405,25 @@ return {
 
             local dialogueTag = utils.unwrapStringArgument(matched, 21)
             local content = utils.unwrapStringArgument(matched, 22)
+            if not dialogueTag or not content then
+                return
+            end
 
+            info.context.ocNarrativeTag = dialogueTag
+            info.context.ocNarrativeContent = content
+        end,
+    },
+    {
+        name = 'apply-narrative',
+        priority = 20,
+        transform = function(_, info)
+            local dialogueTag = info.context.ocNarrativeTag
+            local content = info.context.ocNarrativeContent
             if not dialogueTag or not content then
                 return
             end
 
             content = string.format('"%s"', content)
-
             local dialogueTagIdent = dialogueTag:gsub('%s', '_')
 
             local translated = getTextOrNull('UI_OmiChat_NarrativeTag_' .. dialogueTagIdent, content)
@@ -600,12 +609,10 @@ return {
             local text = info.content or info.rawText
             local chars = {}
             for i = 1, #text do
-                local c = text:sub(i, i)
-                local byte = c:byte()
-
                 -- throw away invisible characters
-                if byte < 128 or byte > 159 then
-                    chars[#chars + 1] = char(byte)
+                local c = text:sub(i, i)
+                if not utils.isInvisibleByte(c:byte()) then
+                    chars[#chars + 1] = c
                 end
             end
 
