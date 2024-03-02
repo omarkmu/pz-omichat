@@ -198,7 +198,7 @@ The format used for `/faction` messages in chat.
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 
 ### ChatFormatFull
-**Default:** `$if($icon $icon (<SPACE> ))$if($neq($stream server) $timestamp)$tag$language$content`
+**Default:** `$prefix$content`
 
 The format used for the final chat message, after all other formats have been applied.
 
@@ -213,6 +213,7 @@ The format used for the final chat message, after all other formats have been ap
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- `$prefix`: The prefix determined by the [`FormatChatPrefix`](../sandbox-options/component-formats.md#formatchatprefix) option.
 - `$tag`: The result of the [`FormatTag`](../sandbox-options/component-formats.md#formattag) option.
 - `$timestamp`: The result of the [`FormatTimestamp`](../sandbox-options/component-formats.md#formattimestamp) option.
 

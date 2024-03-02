@@ -337,10 +337,7 @@ function OmiChat.buildMessageTextFromInfo(info)
     end
 
     local seed = tostring(info.message:getDatetime())
-    return concat {
-        utils.toChatColor(info.formatOptions.color),
-        '<SIZE:', info.formatOptions.font or 'medium', '> ',
-        utils.interpolate(Option.ChatFormatFull, {
+    local tokens = {
             admin = info.tokens.admin,
             chatType = info.chatType,
             stream = info.tokens.stream,
@@ -350,7 +347,14 @@ function OmiChat.buildMessageTextFromInfo(info)
             timestamp = info.timestamp,
             tag = info.tag,
             content = utils.interpolate(info.format, info.tokens, seed),
-        }, seed),
+    }
+
+    tokens.prefix = utils.trim(utils.interpolate(Option.FormatChatPrefix, tokens, seed))
+
+    return concat {
+        utils.toChatColor(info.formatOptions.color),
+        '<SIZE:', info.formatOptions.font or 'medium', '> ',
+        utils.interpolate(Option.ChatFormatFull, tokens, seed),
     }
 end
 

@@ -646,6 +646,14 @@ option OmiChat.FormatOverheadPrefix
     translation = OCFormatOverheadPrefix,
 }
 
+option OmiChat.FormatChatPrefix
+{
+    type = string,
+    default = $if($icon $icon <SPACE>)$if($neq($stream server) $timestamp)$tag$language,
+    page = OmiChat,
+    translation = OCFormatChatPrefix,
+}
+
 option OmiChat.FormatNarrativeDialogueTag
 {
     type = string,
@@ -781,7 +789,7 @@ option OmiChat.OverheadFormatOther
 option OmiChat.ChatFormatFull
 {
     type = string,
-    default = if($icon $icon (<SPACE> ))$if($neq($stream server) $timestamp)$tag$language$content,
+    default = $prefix$content,
     page = OmiChat,
     translation = OCChatFormatFull,
 }
