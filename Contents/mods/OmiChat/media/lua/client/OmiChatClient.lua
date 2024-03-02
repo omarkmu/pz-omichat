@@ -97,9 +97,9 @@ return OmiChat
 
 ---Argument table passed to `formatForChat`.
 ---@see omichat.api.client.formatForChat
----@class FormatArgs
+---@class omichat.FormatArgs
 ---@field text string
----@field playSignedEmote boolean?
+---@field language string?
 ---@field isEcho boolean?
 ---@field formatterName omichat.FormatterName?
 ---@field stream string?
@@ -107,6 +107,12 @@ return OmiChat
 ---@field name string?
 ---@field username string?
 ---@field tokens table?
+
+---Result of `formatForChat`.
+---@see omichat.api.client.formatForChat
+---@class omichat.FormatResult
+---@field text string
+---@field allowLanguage boolean
 
 ---@class omichat.BaseStreamConfig
 ---@field aliases string[]? Additional aliases for the command.

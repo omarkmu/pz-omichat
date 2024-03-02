@@ -72,6 +72,7 @@ To avoid collisions with tokens that may be added in the future, however, custom
 | `$gte(this other)` |  Returns `true` if `this` is greater than or equal to `other`. Otherwise, returns the empty string. If both arguments are numbers, they will be compared numerically. |
 | `$if(condition ...)` |  Returns `$concat(...)` if `condition` is anything other than the empty string. |
 | `$ifelse(condition yes ...)` |  Returns `yes` if `condition` is anything other than the empty string. Otherwise, returns `$concat(...)`. |
+| `$issigned(language)` | Returns `true` if `language` is configured as a [signed language](../sandbox-options/languages.md#signedlanguages). |
 | `$lt(this other)` |  Returns `true` if `this` is less than `other`. Otherwise, returns the empty string. If both arguments are numbers, they will be compared numerically. |
 | `$lte(this other)` |  Returns `true` if `this` is less than or equal to `other`. Otherwise, returns the empty string. If both arguments are numbers, they will be compared numerically. |
 | `$neq(this other)` |  Returns `true` if `this` is not equivalent to `other`. Otherwise, returns the empty string. |
