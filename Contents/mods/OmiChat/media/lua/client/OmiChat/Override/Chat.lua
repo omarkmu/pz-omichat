@@ -965,6 +965,7 @@ local _addLineInChat = ISChat.addLineInChat
 local _onCommandEntered = ISChat.onCommandEntered
 local _logChatCommand = ISChat.logChatCommand
 local _createChildren = ISChat.createChildren
+local _createTab = ISChat.createTab
 local _focus = ISChat.focus
 local _unfocus = ISChat.unfocus
 local _close = ISChat.close
@@ -1076,6 +1077,14 @@ function ISChat:createChildren()
     self.suggesterBox:setVisible(false)
 
     OmiChat.updateState()
+end
+
+---Override to mark chat tabs for rich text processing changes.
+---@return omichat.ChatTab
+function ISChat:createTab()
+    local tab = _createTab(self)
+    tab.ocIsChatTab = true
+    return tab
 end
 
 ---Override to correct the chat stream and enable the icon button on focus.
