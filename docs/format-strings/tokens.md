@@ -17,6 +17,11 @@ If it isn't, the format string will behave as if only `$1` had been specified.
 
 The invisible characters included in this token are used to encode information for mod functionality.
 
+## `$admin`
+
+Only available in [chat formats](../sandbox-options/chat-formats.md).
+Populated if the author of a message is an admin with the chat icon [option](../user-guide/admins.md#admin-menu) enabled.
+
 ## `$author`
 
 The author of a message (usually a username).

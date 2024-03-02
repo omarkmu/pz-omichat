@@ -8,6 +8,7 @@ These [options](./index.md) determine the content that displays for chat message
 The format used for `/admin` messages in chat.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -31,6 +32,7 @@ This respects the range and color options of [`/me`](./chat-formats.md#chatforma
 If blank, `/card` messages will be global instead of local and related options will be ignored.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -56,6 +58,7 @@ The format used for messages from Discord in chat.
 Messages from Discord will not apply name colors.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -78,6 +81,7 @@ Allows players to use `/do` to narrate events.
 With the default setting, `/do the lights flicker` will appear in chat as `« The lights flicker. »`.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -105,6 +109,7 @@ If blank, `/doloud` messages will be disabled.
 `/doloud` behaves similarly to [`/do`](#chatformatdo), but has a larger range.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -131,6 +136,7 @@ If blank, `/doquiet` messages will be disabled.
 `/doquiet` behaves similarly to [`/do`](#chatformatdo), but has a smaller range.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -157,6 +163,7 @@ If blank, echoing will not occur.
 **See also:** [`OverheadFormatEcho`](./overhead-formats.md#overheadformatecho)
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -177,6 +184,7 @@ The format used for `/faction` messages in chat.
 **See also:** [`ColorFaction`](./colors.md#colorfaction).
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -195,6 +203,7 @@ The format used for `/faction` messages in chat.
 The format used for the final chat message, after all other formats have been applied.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - `$content`: The full chat message content, after other formatting has occurred.
@@ -213,6 +222,7 @@ The format used for the final chat message, after all other formats have been ap
 The format used for `/all` messages in chat.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -233,6 +243,7 @@ The format used for `/all` messages in chat.
 The format used for incoming private messages in chat.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -255,6 +266,7 @@ The format used for incoming private messages in chat.
 The format used for `/low` messages in chat.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -282,6 +294,7 @@ If blank, `/me` messages will be disabled.
 With the default settings, if a player with a character named “Jane” uses `/me smiles` it will appear in chat as `« Jane smiles. »`.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -309,6 +322,7 @@ If blank, `/meloud` messages will be disabled.
 `/meloud` behaves similarly to [`/me`](#chatformatme), but has a larger range.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -335,6 +349,7 @@ If blank, `/mequiet` messages will be disabled.
 `/mequiet` behaves similarly to [`/me`](#chatformatme), but has a smaller range.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -358,6 +373,7 @@ If blank, `/mequiet` messages will be disabled.
 The format used for `/ooc` (local out-of-character) messages in chat.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -381,6 +397,7 @@ The format used for `/ooc` (local out-of-character) messages in chat.
 The format used for outgoing private messages in chat.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -405,6 +422,7 @@ The format used for outgoing private messages in chat.
 The format used for radio messages in chat.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -429,6 +447,7 @@ This respects the range and color options of [`/me`](./chat-formats.md#chatforma
 If blank, `/roll` messages will be global instead of local and related options will be ignored.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -454,6 +473,7 @@ If blank, `/roll` messages will be global instead of local and related options w
 The format used for `/safehouse` messages in chat.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -474,6 +494,7 @@ The format used for `/safehouse` messages in chat.
 The format used for `/say` messages in chat.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -494,6 +515,7 @@ The format used for `/say` messages in chat.
 The format used for server messages in chat.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -516,6 +538,7 @@ The format used when a player character does not speak the [language](./language
 With the default format, this will display as `« Name says/shouts/signs something in Language. »`.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -537,6 +560,7 @@ The format used when a player character does not speak the [language](./language
 With the default format, this will display as `Radio (100.0 MHz): « Something is said in Language. »`.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -560,6 +584,7 @@ If populated, the vanilla `/whisper` is changed to `/pm`, and `/whisper` is modi
 If blank, local whisper will be disabled and the vanilla `/whisper` will not be renamed.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -583,6 +608,7 @@ If blank, local whisper will be disabled and the vanilla `/whisper` will not be 
 The format used for `/yell` messages in chat.
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
