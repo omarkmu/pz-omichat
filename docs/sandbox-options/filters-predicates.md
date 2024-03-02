@@ -53,7 +53,7 @@ If the empty string is returned, the `/name` command will fail.
 **See also:** [`EnableSetName`](./basic-features.md#enablesetname).
 
 ### PredicateAllowLanguage
-**Default:** `$has(@(say;shout;whisper;low) $stream)`
+**Default:** `$has(@(say;shout;whisper;low;faction;safehouse) $stream)`
 
 Determines whether [roleplay languages](./languages.md) can be used for a message.
 

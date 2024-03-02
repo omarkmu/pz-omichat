@@ -190,7 +190,7 @@ The format used for `/faction` messages in chat.
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 
 ### ChatFormatFull
-**Default:** `$if($neq($stream server) $timestamp)$tag$language$if($icon $icon (<SPACE> ))$content`
+**Default:** `$if($icon $icon (<SPACE> ))$if($neq($stream server) $timestamp)$tag$language$content`
 
 The format used for the final chat message, after all other formats have been applied.
 
