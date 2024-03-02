@@ -297,11 +297,6 @@ return {
     {
         name = 'handle-language',
         priority = 25,
-        allowedChatTypes = {
-            say = true,
-            shout = true,
-            radio = true,
-        },
         transform = function(self, info)
             local isRadio = info.context.ocIsRadio
             local formatter = OmiChat.getFormatter('language')
