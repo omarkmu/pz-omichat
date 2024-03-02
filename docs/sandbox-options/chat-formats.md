@@ -7,11 +7,10 @@ These [options](./index.md) determine the content that displays for chat message
 
 The format used for `/admin` messages in chat.
 
-**See also:** [`ColorAdmin`](./colors.md#coloradmin).
-
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -19,6 +18,9 @@ The format used for `/admin` messages in chat.
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+
+**See also:** [`ColorAdmin`](./colors.md#coloradmin).
 
 ### ChatFormatCard
 **Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($gettext(UI_OmiChat_card_local $card)) <SPACE>))`
@@ -28,14 +30,10 @@ This respects the range and color options of [`/me`](./chat-formats.md#chatforma
 
 If blank, `/card` messages will be global instead of local and related options will be ignored.
 
-**See also:**
-- [`OverheadFormatCard`](./overhead-formats.md#overheadformatcard)
-- [`ColorMe`](./colors.md#colorme)
-- [`RangeMe`](./ranges.md#rangeme)
-
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - `$card`: The translated name of the card that was drawn.
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
@@ -44,6 +42,12 @@ If blank, `/card` messages will be global instead of local and related options w
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+
+**See also:**
+- [`OverheadFormatCard`](./overhead-formats.md#overheadformatcard)
+- [`ColorMe`](./colors.md#colorme)
+- [`RangeMe`](./ranges.md#rangeme)
 
 ### ChatFormatDiscord
 **Default:** `$author: <SPACE> $message`
@@ -51,16 +55,18 @@ If blank, `/card` messages will be global instead of local and related options w
 The format used for messages from Discord in chat.
 Messages from Discord will not apply name colors.
 
-**See also:** [`ColorDiscord`](./colors.md#colordiscord).
-
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
 - [`$iconRaw`](../format-strings/tokens.md#iconraw)
 - [`$message`](../format-strings/tokens.md#message)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+
+**See also:** [`ColorDiscord`](./colors.md#colordiscord).
 
 ### ChatFormatDo
 **Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $punctuate($capitalize($trim($message))) <SPACE>))`
@@ -71,15 +77,10 @@ If blank, `/do` messages will be disabled.
 Allows players to use `/do` to narrate events.
 With the default setting, `/do the lights flicker` will appear in chat as `« The lights flicker. »`.
 
-**See also:**
-- [`ColorDo`](./colors.md#colordo)
-- [`RangeDo`](./ranges.md#rangedo)
-- [`OverheadFormatDo`](./overhead-formats.md#overheadformatdo)
-- [`ChatFormatMe`](#chatformatme)
-
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -87,6 +88,13 @@ With the default setting, `/do the lights flicker` will appear in chat as `« Th
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+
+**See also:**
+- [`ColorDo`](./colors.md#colordo)
+- [`RangeDo`](./ranges.md#rangedo)
+- [`OverheadFormatDo`](./overhead-formats.md#overheadformatdo)
+- [`ChatFormatMe`](#chatformatme)
 
 ### ChatFormatDoLoud
 **Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $punctuate($capitalize($trim($message))) <SPACE>))`
@@ -96,14 +104,10 @@ If blank, `/doloud` messages will be disabled.
 
 `/doloud` behaves similarly to [`/do`](#chatformatdo), but has a larger range.
 
-**See also:**
-- [`ColorDoLoud`](./colors.md#colordoloud)
-- [`RangeDoLoud`](./ranges.md#rangedoloud)
-- [`OverheadFormatDoLoud`](./overhead-formats.md#overheadformatdoloud)
-
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -111,6 +115,12 @@ If blank, `/doloud` messages will be disabled.
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+
+**See also:**
+- [`ColorDoLoud`](./colors.md#colordoloud)
+- [`RangeDoLoud`](./ranges.md#rangedoloud)
+- [`OverheadFormatDoLoud`](./overhead-formats.md#overheadformatdoloud)
 
 ### ChatFormatDoQuiet
 **Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $punctuate($capitalize($trim($message))) <SPACE>))`
@@ -120,14 +130,10 @@ If blank, `/doquiet` messages will be disabled.
 
 `/doquiet` behaves similarly to [`/do`](#chatformatdo), but has a smaller range.
 
-**See also:**
-- [`ColorDoQuiet`](./colors.md#colordoquiet)
-- [`RangeDoQuiet`](./ranges.md#rangedoquiet)
-- [`OverheadFormatDoQuiet`](./overhead-formats.md#overheadformatdoquiet)
-
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -135,6 +141,12 @@ If blank, `/doquiet` messages will be disabled.
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+
+**See also:**
+- [`ColorDoQuiet`](./colors.md#colordoquiet)
+- [`RangeDoQuiet`](./ranges.md#rangedoquiet)
+- [`OverheadFormatDoQuiet`](./overhead-formats.md#overheadformatdoquiet)
 
 ### ChatFormatEcho
 **Default:** `(blank by default)`
@@ -147,6 +159,7 @@ If blank, echoing will not occur.
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -154,6 +167,7 @@ If blank, echoing will not occur.
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 
 ### ChatFormatFaction
 **Default:** `$name: <SPACE> $message`
@@ -165,6 +179,7 @@ The format used for `/faction` messages in chat.
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -172,6 +187,7 @@ The format used for `/faction` messages in chat.
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 
 ### ChatFormatFull
 **Default:** `$if($neq($stream server) $timestamp)$tag$language$if($icon $icon (<SPACE> ))$content`
@@ -196,11 +212,10 @@ The format used for the final chat message, after all other formats have been ap
 
 The format used for `/all` messages in chat.
 
-**See also:** [`ColorGeneral`](./colors.md#colorgeneral).
-
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -208,19 +223,19 @@ The format used for `/all` messages in chat.
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+
+**See also:** [`ColorGeneral`](./colors.md#colorgeneral).
 
 ### ChatFormatIncomingPrivate
 **Default:** `$($gettext(UI_OmiChat_private_chat_from $name)$): <SPACE> $message`
 
 The format used for incoming private messages in chat.
 
-**See also:**
-- [`ColorPrivate`](./colors.md#colorprivate)
-- [`ChatFormatOutgoingPrivate`](#chatformatoutgoingprivate)
-
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -228,20 +243,21 @@ The format used for incoming private messages in chat.
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+
+**See also:**
+- [`ColorPrivate`](./colors.md#colorprivate)
+- [`ChatFormatOutgoingPrivate`](#chatformatoutgoingprivate)
 
 ### ChatFormatLow
 **Default:** `$name: <SPACE> $message`
 
 The format used for `/low` messages in chat.
 
-**See also:**
-- [`ColorLow`](./colors.md#colorlow)
-- [`RangeLow`](./ranges.md#rangelow)
-- [`OverheadFormatLow`](./overhead-formats.md#overheadformatlow)
-
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -249,6 +265,12 @@ The format used for `/low` messages in chat.
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+
+**See also:**
+- [`ColorLow`](./colors.md#colorlow)
+- [`RangeLow`](./ranges.md#rangelow)
+- [`OverheadFormatLow`](./overhead-formats.md#overheadformatlow)
 
 ### ChatFormatMe
 **Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>))`
@@ -259,15 +281,10 @@ If blank, `/me` messages will be disabled.
 `/me` messages allow players to describe their actions.
 With the default settings, if a player with a character named “Jane” uses `/me smiles` it will appear in chat as `« Jane smiles. »`.
 
-**See also:**
-- [`ColorMe`](./colors.md#colorme)
-- [`RangeMe`](./ranges.md#rangeme)
-- [`OverheadFormatMe`](./overhead-formats.md#overheadformatme)
-- [`ChatFormatDo`](#chatformatdo)
-
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -275,6 +292,13 @@ With the default settings, if a player with a character named “Jane” uses `/
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+
+**See also:**
+- [`ColorMe`](./colors.md#colorme)
+- [`RangeMe`](./ranges.md#rangeme)
+- [`OverheadFormatMe`](./overhead-formats.md#overheadformatme)
+- [`ChatFormatDo`](#chatformatdo)
 
 ### ChatFormatMeLoud
 **Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>))`
@@ -284,14 +308,10 @@ If blank, `/meloud` messages will be disabled.
 
 `/meloud` behaves similarly to [`/me`](#chatformatme), but has a larger range.
 
-**See also:**
-- [`ColorMeLoud`](./colors.md#colormeloud)
-- [`RangeMeLoud`](./ranges.md#rangemeloud)
-- [`OverheadFormatMeLoud`](./overhead-formats.md#overheadformatmeloud)
-
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -299,6 +319,12 @@ If blank, `/meloud` messages will be disabled.
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+
+**See also:**
+- [`ColorMeLoud`](./colors.md#colormeloud)
+- [`RangeMeLoud`](./ranges.md#rangemeloud)
+- [`OverheadFormatMeLoud`](./overhead-formats.md#overheadformatmeloud)
 
 ### ChatFormatMeQuiet
 **Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>))`
@@ -308,14 +334,10 @@ If blank, `/mequiet` messages will be disabled.
 
 `/mequiet` behaves similarly to [`/me`](#chatformatme), but has a smaller range.
 
-**See also:**
-- [`ColorMeQuiet`](./colors.md#colormequiet)
-- [`RangeMeQuiet`](./ranges.md#rangemequiet)
-- [`OverheadFormatMeQuiet`](./overhead-formats.md#overheadformatmequiet)
-
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -323,11 +345,30 @@ If blank, `/mequiet` messages will be disabled.
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+
+**See also:**
+- [`ColorMeQuiet`](./colors.md#colormequiet)
+- [`RangeMeQuiet`](./ranges.md#rangemequiet)
+- [`OverheadFormatMeQuiet`](./overhead-formats.md#overheadformatmequiet)
 
 ### ChatFormatOoc
 **Default:** `$name: <SPACE> (( $message ))`
 
 The format used for `/ooc` (local out-of-character) messages in chat.
+
+**Tokens:**
+- [`$author`](../format-strings/tokens.md#author)
+- [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
+- [`$language`](../format-strings/tokens.md#language)
+- [`$languageRaw`](../format-strings/tokens.md#languageraw)
+- [`$icon`](../format-strings/tokens.md#icon)
+- [`$iconRaw`](../format-strings/tokens.md#iconraw)
+- [`$message`](../format-strings/tokens.md#message)
+- [`$name`](../format-strings/tokens.md#name)
+- [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 
 **See also:**
 - [`ColorOoc`](./colors.md#colorooc)
@@ -339,13 +380,10 @@ The format used for `/ooc` (local out-of-character) messages in chat.
 
 The format used for outgoing private messages in chat.
 
-**See also:**
-- [`ColorPrivate`](./colors.md#colorprivate)
-- [`ChatFormatIncomingPrivate`](./chat-formats.md#chatformatincomingprivate)
-
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -355,21 +393,32 @@ The format used for outgoing private messages in chat.
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
 - `$recipient`: The username of the recipient of the message.
 - `$recipientName`: The chat name of the recipient of the message, as determined by [`FormatName`](./component-formats.md#formatname).
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+
+**See also:**
+- [`ColorPrivate`](./colors.md#colorprivate)
+- [`ChatFormatIncomingPrivate`](./chat-formats.md#chatformatincomingprivate)
 
 ### ChatFormatRadio
 **Default:** `$gettext(UI_OmiChat_radio $frequency): <SPACE> $message`
 
 The format used for radio messages in chat.
 
-**See also:** [`ColorRadio`](./colors.md#colorradio).
-
 **Tokens:**
-- [`$language`](../format-strings/tokens.md#language)
+- [`$author`](../format-strings/tokens.md#author)
+- [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$frequency`](../format-strings/tokens.md#frequency)
+- [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
 - [`$iconRaw`](../format-strings/tokens.md#iconraw)
 - [`$message`](../format-strings/tokens.md#message)
+- [`$name`](../format-strings/tokens.md#name)
+- [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+
+**See also:** [`ColorRadio`](./colors.md#colorradio).
 
 ### ChatFormatRoll
 **Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($gettext(UI_OmiChat_roll_local $roll $sides)) <SPACE>))`
@@ -379,14 +428,10 @@ This respects the range and color options of [`/me`](./chat-formats.md#chatforma
 
 If blank, `/roll` messages will be global instead of local and related options will be ignored.
 
-**See also:**
-- [`OverheadFormatRoll`](./overhead-formats.md#overheadformatroll)
-- [`ColorMe`](./colors.md#colorme)
-- [`RangeMe`](./ranges.md#rangeme)
-
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -396,17 +441,22 @@ If blank, `/roll` messages will be global instead of local and related options w
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
 - `$roll`: The number that was rolled.
 - `$sides`: The number of sides on the die that was rolled.
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+
+**See also:**
+- [`OverheadFormatRoll`](./overhead-formats.md#overheadformatroll)
+- [`ColorMe`](./colors.md#colorme)
+- [`RangeMe`](./ranges.md#rangeme)
 
 ### ChatFormatSafehouse
 **Default:** `$name: <SPACE> $message`
 
 The format used for `/safehouse` messages in chat.
 
-**See also:** [`ColorSafehouse`](./colors.md#colorsafehouse).
-
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -414,17 +464,19 @@ The format used for `/safehouse` messages in chat.
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+
+**See also:** [`ColorSafehouse`](./colors.md#colorsafehouse).
 
 ### ChatFormatSay
 **Default:** `$name: <SPACE> $message`
 
 The format used for `/say` messages in chat.
 
-**See also:** [`ColorSay`](./colors.md#colorsay).
-
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -432,17 +484,19 @@ The format used for `/say` messages in chat.
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+
+**See also:** [`ColorSay`](./colors.md#colorsay).
 
 ### ChatFormatServer
 **Default:** `$message`
 
 The format used for server messages in chat.
 
-**See also:** [`ColorServer`](./colors.md#colorserver).
-
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -450,6 +504,9 @@ The format used for server messages in chat.
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+
+**See also:** [`ColorServer`](./colors.md#colorserver).
 
 ### ChatFormatUnknownLanguage
 **Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $gettext($unknownLanguageString $language) <SPACE>))`
@@ -461,6 +518,7 @@ With the default format, this will display as `« Name says/shouts/signs somethi
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -468,6 +526,7 @@ With the default format, this will display as `« Name says/shouts/signs somethi
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 - [`$unknownLanguageString`](../format-strings/tokens.md#unknownlanguagestring)
 
 ### ChatFormatUnknownLanguageRadio
@@ -478,12 +537,18 @@ The format used when a player character does not speak the [language](./language
 With the default format, this will display as `Radio (100.0 MHz): « Something is said in Language. »`.
 
 **Tokens:**
-- [`$language`](../format-strings/tokens.md#language)
+- [`$author`](../format-strings/tokens.md#author)
+- [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$frequency`](../format-strings/tokens.md#frequency)
+- [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
 - [`$iconRaw`](../format-strings/tokens.md#iconraw)
 - [`$message`](../format-strings/tokens.md#message)
+- [`$name`](../format-strings/tokens.md#name)
+- [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 - [`$unknownLanguageString`](../format-strings/tokens.md#unknownlanguagestring)
 
 ### ChatFormatWhisper
@@ -494,14 +559,10 @@ The format used for local `/whisper` messages in chat.
 If populated, the vanilla `/whisper` is changed to `/pm`, and `/whisper` is modified to act as local chat which doesn't attract zombies and has a very short range.
 If blank, local whisper will be disabled and the vanilla `/whisper` will not be renamed.
 
-**See also:**
-- [`ColorWhisper`](./colors.md#colorwhisper)
-- [`RangeWhisper`](./ranges.md#rangewhisper)
-- [`OverheadFormatWhisper`](./overhead-formats.md#overheadformatwhisper)
-
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -509,17 +570,22 @@ If blank, local whisper will be disabled and the vanilla `/whisper` will not be 
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+
+**See also:**
+- [`ColorWhisper`](./colors.md#colorwhisper)
+- [`RangeWhisper`](./ranges.md#rangewhisper)
+- [`OverheadFormatWhisper`](./overhead-formats.md#overheadformatwhisper)
 
 ### ChatFormatYell
 **Default:** `$name: <SPACE> $message`
 
 The format used for `/yell` messages in chat.
 
-**See also:** [`ColorYell`](./colors.md#coloryell).
-
 **Tokens:**
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -527,3 +593,6 @@ The format used for `/yell` messages in chat.
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+
+**See also:** [`ColorYell`](./colors.md#coloryell).
