@@ -9,13 +9,17 @@ local OmiChat = require 'OmiChat/API/Client'
 local utils = OmiChat.utils
 local StreamInfo = OmiChat.StreamInfo
 
+---@class omichat.suggester.StreamResult
+---@field command string
+---@field full string?
+
 ---Collects results from a list of streams into `startsWith` and `contains`.
 ---@param tab (omichat.ChatStream | omichat.CommandStream)[]
 ---@param command string
 ---@param fullCommand string
 ---@param currentTabID integer
----@param startsWith string[]
----@param contains string[]
+---@param startsWith omichat.suggester.StreamResult[]
+---@param contains omichat.suggester.StreamResult[]
 local function collectStreamResults(tab, command, fullCommand, currentTabID, startsWith, contains)
     for i = 1, #tab do
         local stream = StreamInfo:new(tab[i])
@@ -23,20 +27,20 @@ local function collectStreamResults(tab, command, fullCommand, currentTabID, sta
             local streamCommand = stream:getCommand()
             local shortCommand = stream:getShortCommand()
             if utils.startsWith(streamCommand, fullCommand) then
-                startsWith[#startsWith + 1] = streamCommand
+                startsWith[#startsWith + 1] = { command = streamCommand }
             elseif shortCommand and utils.startsWith(shortCommand, fullCommand) then
-                startsWith[#startsWith + 1] = shortCommand
+                startsWith[#startsWith + 1] = { command = shortCommand, full = streamCommand }
             elseif utils.contains(streamCommand, command) then
-                contains[#contains + 1] = streamCommand
+                contains[#contains + 1] = { command = streamCommand }
             elseif shortCommand and utils.contains(shortCommand, command) then
-                contains[#contains + 1] = shortCommand
+                contains[#contains + 1] = { command = shortCommand, full = streamCommand }
             end
 
             for alias in stream:aliases() do
                 if utils.startsWith(alias, fullCommand) then
-                    startsWith[#startsWith + 1] = alias
+                    startsWith[#startsWith + 1] = { command = alias, full = streamCommand }
                 elseif utils.contains(alias, command) then
-                    contains[#contains + 1] = alias
+                    contains[#contains + 1] = { command = alias, full = streamCommand }
                 end
             end
         end
@@ -44,9 +48,9 @@ local function collectStreamResults(tab, command, fullCommand, currentTabID, sta
 end
 
 ---Appends members of `t1` to `t2`.
----@param t1 string[]
----@param t2 string[]
----@return string[]
+---@param t1 unknown[]
+---@param t2 unknown[]
+---@return unknown[]
 local function extend(t1, t2)
     for i = 1, #t2 do
         t1[#t1 + 1] = t2[i]
@@ -103,25 +107,32 @@ return {
                 if utils.hasAccess(commandInfo.access, accessLevel) then
                     local vanillaCommand = concat { '/', commandInfo.name, ' ' }
                     if utils.startsWith(vanillaCommand, fullCommand) then
-                        startsWith[#startsWith + 1] = vanillaCommand
+                        startsWith[#startsWith + 1] = { command = vanillaCommand }
                     elseif utils.contains(vanillaCommand, command) then
-                        contains[#contains + 1] = vanillaCommand
+                        contains[#contains + 1] = { command = vanillaCommand }
                     end
                 end
             end
 
             local seen = {}
+
+            ---@type omichat.suggester.StreamResult[]
             local results = extend(startsWith, contains)
             for i = 1, #results do
-                local cmd = results[i]
-                if not seen[cmd] then
+                local result = results[i]
+                local display = result.command
+                if result.full then
+                    display = concat { result.command, ' [', utils.trimright(result.full), ']' }
+                end
+
+                if not seen[result.command] then
                     info.suggestions[#info.suggestions + 1] = {
                         type = 'command',
-                        display = cmd,
-                        suggestion = cmd,
+                        display = display,
+                        suggestion = result.command,
                     }
 
-                    seen[cmd] = true
+                    seen[result] = true
                 end
             end
         end,
