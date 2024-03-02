@@ -1,6 +1,6 @@
 ---External client API.
 
 local OmiChat = require 'OmiChatClient'
-require 'OmiChat/Overrides/Chat'
+require 'OmiChat/Override/Chat'
 
 return OmiChat
