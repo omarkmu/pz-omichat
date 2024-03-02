@@ -18,6 +18,7 @@ local function canUseAdminCommands()
     return utils.getNumericAccessLevel(access) >= Option.MinimumCommandAccessLevel
 end
 
+---@type omichat.CommandStream[]
 return {
     {
         name = 'name',
@@ -105,6 +106,11 @@ return {
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
                 local command = utils.trim(ctx.command)
+                if #command == '' then
+                    OmiChat.addInfoMessage(ctx.stream:getHelpText())
+                    return
+                end
+
                 if getTexture(command) then
                     local image = table.concat { ' <SPACE> <IMAGE:', command, ',15,14> ' }
                     OmiChat.addInfoMessage(getText('UI_OmiChat_icon_info', command, image))

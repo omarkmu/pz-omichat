@@ -275,6 +275,7 @@ function OmiChat.buildMessageInfo(message, skipFormatting)
     local author = message:getAuthor() or ''
     local textColor = message:getTextColor()
     local meta = OmiChat.decodeMessageTag(message:getCustomTag())
+    local displayAsAdmin = OmiChat.getFormatter('adminIcon'):isMatch(message:getText())
 
     local streamName = chatType
     if chatType == 'whisper' then
@@ -295,6 +296,7 @@ function OmiChat.buildMessageInfo(message, skipFormatting)
 
         context = {},
         tokens = {
+            admin = displayAsAdmin and '1' or nil,
             stream = streamName,
             author = utils.escapeRichText(author),
             authorRaw = author,
@@ -339,6 +341,7 @@ function OmiChat.buildMessageTextFromInfo(info)
         utils.toChatColor(info.formatOptions.color),
         '<SIZE:', info.formatOptions.font or 'medium', '> ',
         utils.interpolate(Option.ChatFormatFull, {
+            admin = info.tokens.admin,
             chatType = info.chatType,
             stream = info.tokens.stream,
             icon = info.tokens.icon,
