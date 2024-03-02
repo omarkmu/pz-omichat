@@ -643,7 +643,7 @@ function OmiChat.send(args)
         text = command,
         chatType = chatType,
         isEcho = args.isEcho,
-        stream = stream:getIdentifier(),
+        stream = args.streamName or stream:getIdentifier(),
         formatterName = args.formatterName or stream:getFormatterName(),
         playSignedEmote = args.playSignedEmote,
         tokens = args.tokens,
