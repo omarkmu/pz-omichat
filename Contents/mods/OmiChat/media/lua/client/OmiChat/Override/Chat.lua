@@ -490,6 +490,21 @@ local function isPlayerDead()
     return not player or player:isDead()
 end
 
+---Checks whether the chat input should be reset to a slash based on the current input.
+---@param prefix string?
+---@param text string
+---@param internalText string
+---@return string?
+local function shouldResetText(prefix, text, internalText)
+    if not prefix or not utils.startsWith(internalText, prefix) then
+        return
+    end
+
+    if #text:sub(#prefix + 1, #text) <= 5 and utils.endsWith(internalText, '/') then
+        return prefix
+    end
+end
+
 ---Attempts to set the current text with the currently selected suggester box item.
 ---@return boolean didSet
 local function tryInputSuggestedItem()
@@ -973,7 +988,6 @@ local _onMouseDown = ISChat.onMouseDown
 local _onPressDown = ISChat.onPressDown
 local _onPressUp = ISChat.onPressUp
 local _onOtherKey = ISChat.onOtherKey
-local _onTextChange = ISChat.onTextChange
 local _onInfo = ISChat.onInfo
 
 local _ChatMessage = __classmetatables[ChatMessage.class].__index
@@ -1353,9 +1367,57 @@ function ISChat.onSwitchStream()
     OmiChat.updateCustomComponents(text)
 end
 
----Override to update custom components.
+---Override to update custom components and include aliases.
 function ISChat.onTextChange()
-    _onTextChange()
+    local instance = ISChat.instance
+    local chatText = instance and instance.chatText
+    if not instance or not chatText or not chatText.lastChatCommand then
+        OmiChat.updateCustomComponents()
+        return
+    end
+
+    local entry = ISChat.instance.textEntry
+    local internalText = entry:getInternalText()
+    if not utils.endsWith(internalText, '/') then
+        OmiChat.updateCustomComponents()
+        return
+    end
+
+    local text = entry:getText()
+    if #text <= 6 then
+        entry:setText('/')
+        OmiChat.updateCustomComponents()
+        return
+    end
+
+    for i = 1, #chatText.chatStreams do
+        local prefix
+        local stream = chatText.chatStreams[i]
+
+        if stream.command then
+            prefix = shouldResetText(stream.command, text, internalText)
+        end
+
+        if not prefix and stream.shortCommand then
+            prefix = shouldResetText(stream.shortCommand, text, internalText)
+        end
+
+        if not prefix and stream.omichat and stream.omichat.aliases then
+            for j = 1, #stream.omichat.aliases do
+                prefix = shouldResetText(stream.omichat.aliases[j], text, internalText)
+                if prefix then
+                    break
+                end
+            end
+        end
+
+        if prefix and #text:sub(#prefix + 1, #text) <= 5 then
+            entry:setText('/')
+            OmiChat.updateCustomComponents()
+            return
+        end
+    end
+
     OmiChat.updateCustomComponents()
 end
 
