@@ -863,12 +863,3 @@ function OmiChat.updateSuggesterComponent(text)
         suggesterBox.vscroll:setHeight(suggesterBox.height)
     end
 end
-
-
-proceedPM = OmiChat.sendPM
-processSayMessage = OmiChat.sendSay
-processShoutMessage = OmiChat.sendShout
-processGeneralMessage = OmiChat.sendGeneral
-proceedFactionMessage = OmiChat.sendFaction
-processAdminChatMessage = OmiChat.sendAdmin
-processSafehouseMessage = OmiChat.sendSafehouse

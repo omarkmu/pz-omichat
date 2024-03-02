@@ -211,8 +211,7 @@ function utils.getInternalText(text)
     local i = 1
     while i <= #text do
         local c = text:sub(i, i)
-        local byte = c:byte()
-        if (byte < 128 or byte > 159) and byte ~= 65535 then
+        if not utils.isInvisibleByte(c:byte()) then
             start = i
             break
         end
@@ -225,8 +224,7 @@ function utils.getInternalText(text)
     i = #text
     while i > 0 do
         local c = text:sub(i, i)
-        local byte = c:byte()
-        if (byte < 128 or byte > 159) and byte ~= 65535 then
+        if not utils.isInvisibleByte(c:byte()) then
             finish = i
             break
         end
@@ -398,6 +396,13 @@ function utils.interpolate(text, tokens, seed)
     -- always seed to avoid content changing on refresh
     interpolator:randomseed(seed)
     return interpolator:interpolate(tokens)
+end
+
+---Checks whether a byte value is an invisible character used for encoding mod information.
+---@param byte integer
+---@return boolean
+function utils.isInvisibleByte(byte)
+    return (byte >= 128 and byte <= 159) or byte == 65535
 end
 
 ---Checks a color table for validity.
