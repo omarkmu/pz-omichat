@@ -9,7 +9,7 @@ For predicates, any value other than the empty string is considered a “yes”.
 **Default:** `$trim($input)`
 
 Filters messages before they're sent on a chat stream.
-If this returns the empty string, the command won't be passed to the chat stream.
+If this returns the empty string, the command won't be sent to the chat stream.
 
 **Tokens:**
 - [`$callout`](../format-strings/tokens.md#callout)

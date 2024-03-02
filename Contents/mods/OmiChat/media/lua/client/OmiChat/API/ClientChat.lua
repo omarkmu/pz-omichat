@@ -638,9 +638,16 @@ function OmiChat.send(args)
         command = m2
     end
 
-    local echoCommand = command
-    command = OmiChat.formatForChat {
+    local language
+    local currentLanguage = OmiChat.getCurrentRoleplayLanguage()
+    if currentLanguage and currentLanguage ~= OmiChat.getDefaultRoleplayLanguage() then
+        language = currentLanguage
+    end
+
+    local initialCommand = command
+    local formatResult = OmiChat.formatForChat {
         text = command,
+        language = language,
         chatType = chatType,
         isEcho = args.isEcho,
         stream = args.streamName or stream:getIdentifier(),
@@ -649,24 +656,33 @@ function OmiChat.send(args)
         tokens = args.tokens,
     }
 
+    command = formatResult.text
     if command == '' then
         return
     end
 
-    local result
+    local processResult
     local process = OmiChat.raw[chatType] or OmiChat.raw.say
     if process then
-        result = process(prefix .. command)
-        if result and chatType == 'whisper' and OmiChat.getRetainCommand(stream:getCommandType()) then
+        processResult = process(prefix .. command)
+        if processResult and chatType == 'whisper' and OmiChat.getRetainCommand(stream:getCommandType()) then
             local chatText = ISChat.instance.chatText
-            chatText.lastChatCommand = concat { chatText.lastChatCommand, tostring(result), ' ' }
+            chatText.lastChatCommand = concat { chatText.lastChatCommand, tostring(processResult), ' ' }
+        end
+    end
+
+    local isSigned = formatResult.allowLanguage and language and OmiChat.isRoleplayLanguageSigned(language)
+    if isSigned and args.playSignedEmote and OmiChat.getSignEmotesEnabled() then
+        local player = getSpecificPlayer(0)
+        if player then
+            player:playEmote(OmiChat.getSignLanguageEmote(initialCommand))
         end
     end
 
     local username = utils.getPlayerUsername()
     local tokens = args.tokens and utils.copy(args.tokens) or {}
     tokens.chatType = chatType
-    tokens.input = echoCommand
+    tokens.input = initialCommand
     tokens.username = username
     tokens.name = OmiChat.getNameInChat(username, chatType)
     tokens.stream = stream:getIdentifier()
@@ -681,7 +697,7 @@ function OmiChat.send(args)
             echoStream = OmiChat.getChatStreamByIdentifier('say')
 
             if not echoStream or not echoStream:isEnabled() then
-                return result
+                return processResult
             end
         end
 
@@ -689,11 +705,11 @@ function OmiChat.send(args)
         useCallback {
             isEcho = true,
             stream = echoStream,
-            command = echoCommand,
+            command = initialCommand,
         }
     end
 
-    return result
+    return processResult
 end
 
 ---Sends an /admin message, formatted according to configuration.

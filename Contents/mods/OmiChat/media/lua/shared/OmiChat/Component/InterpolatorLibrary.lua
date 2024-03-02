@@ -74,6 +74,13 @@ local library = {
         s = tostring(s or ''):gsub('<RGB:[%d,.]*>', '')
         return s
     end,
+    ---@param _ omichat.Interpolator
+    ---@param language string
+    ---@return boolean
+    issigned = function(_, language)
+        language = tostring(language or '')
+        return OmiChat.isRoleplayLanguageSigned(tostring(language or ''))
+    end,
 }
 
 

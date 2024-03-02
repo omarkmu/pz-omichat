@@ -110,7 +110,7 @@ The format used for the final overhead message, after all other formats have bee
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$name`](../format-strings/tokens.md#name)
-- `$prefix`: Prefix format determined by [`FormatOverheadPrefix`](component-formats.md#formatoverheadprefix).
+- `$prefix`: The prefix determined by the [`FormatOverheadPrefix`](component-formats.md#formatoverheadprefix) option.
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 - [`$stream`](../format-strings/tokens.md#stream)
 - [`$username`](../format-strings/tokens.md#username)

@@ -338,15 +338,15 @@ function OmiChat.buildMessageTextFromInfo(info)
 
     local seed = tostring(info.message:getDatetime())
     local tokens = {
-            admin = info.tokens.admin,
-            chatType = info.chatType,
-            stream = info.tokens.stream,
-            icon = info.tokens.icon,
-            iconRaw = info.tokens.iconRaw,
-            language = info.language,
-            timestamp = info.timestamp,
-            tag = info.tag,
-            content = utils.interpolate(info.format, info.tokens, seed),
+        admin = info.tokens.admin,
+        chatType = info.chatType,
+        stream = info.tokens.stream,
+        icon = info.tokens.icon,
+        iconRaw = info.tokens.iconRaw,
+        language = info.language,
+        timestamp = info.timestamp,
+        tag = info.tag,
+        content = utils.interpolate(info.format, info.tokens, seed),
     }
 
     tokens.prefix = utils.trim(utils.interpolate(Option.FormatChatPrefix, tokens, seed))
@@ -401,36 +401,19 @@ function OmiChat.decodeMessageTag(tag)
     }
 end
 
----Encodes the provided text with information about the current roleplay language.
+---Encodes the provided text with information about the given roleplay language.
 ---@param text string The text to encode.
----@param playEmoteForSigned boolean If true, this will play a random emote for signed languages.
+---@param language string The language to encode.
 ---@return string text
 ---@return string? language
-function OmiChat.encodeLanguage(text, playEmoteForSigned)
-    local currentLanguage = OmiChat.getCurrentRoleplayLanguage()
-    local langId = currentLanguage and OmiChat.getRoleplayLanguageID(currentLanguage)
-    if not currentLanguage or not langId or currentLanguage == OmiChat.getDefaultRoleplayLanguage() then
+function OmiChat.encodeLanguage(text, language)
+    local langId = OmiChat.getRoleplayLanguageID(language)
+    if not langId or #utils.trim(text) == 0 then
         return text
     end
 
-    local trimmed = utils.trimleft(text)
-    if #trimmed == 0 then
-        -- avoid creating empty messages
-        return ''
-    end
-
-    local encoded = utils.encodeInvisibleCharacter(langId) .. trimmed
-    local formatted = OmiChat.getFormatter('language'):format(encoded)
-
-    playEmoteForSigned = playEmoteForSigned and OmiChat.getSignEmotesEnabled()
-    if playEmoteForSigned and OmiChat.isRoleplayLanguageSigned(currentLanguage) then
-        local player = getSpecificPlayer(0)
-        if player then
-            player:playEmote(OmiChat.getSignLanguageEmote(text))
-        end
-    end
-
-    return formatted, currentLanguage
+    local encoded = utils.encodeInvisibleCharacter(langId) .. text
+    return OmiChat.getFormatter('language'):format(encoded)
 end
 
 ---Encodes message information including chat name and colors into a string.
@@ -461,8 +444,8 @@ function OmiChat.encodeMessageTag(message)
 end
 
 ---Prepares text for sending to chat.
----@param args FormatArgs
----@return string
+---@param args omichat.FormatArgs
+---@return omichat.FormatResult
 function OmiChat.formatForChat(args)
     local stream = args.stream or args.formatterName or args.chatType
     local username = args.username or utils.getPlayerUsername()
@@ -475,24 +458,28 @@ function OmiChat.formatForChat(args)
     tokens.name = name
     tokens.stream = stream
 
+    local language
+    local allowLanguage = args.language and utils.testPredicate(Option.PredicateAllowLanguage, tokens)
+    if allowLanguage then
+        language = args.language
+        tokens.languageRaw = language
+        tokens.language = language and utils.getTranslatedLanguageName(language)
+    end
+
     local text = utils.interpolate(Option.FilterChatInput, tokens)
-    if #utils.trim(text) == 0 then
+    if #text == 0 then
         -- avoid empty messages
-        return ''
+        return { text = '' }
     end
 
     -- apply styles
     local streamInfo = OmiChat.getChatStreamByIdentifier(stream)
     text = streamInfo and OmiChat.applyStyles(text, streamInfo, tokens) or text
 
-    -- encode rp language
-    local language
-    if utils.testPredicate(Option.PredicateAllowLanguage, tokens) then
-        text, language = OmiChat.encodeLanguage(text, args.playSignedEmote)
+    -- encode language
+    if language then
+        text = OmiChat.encodeLanguage(text, language)
     end
-
-    tokens.languageRaw = language
-    tokens.language = language and utils.getTranslatedLanguageName(language)
 
     -- apply format
     local formatterName = args.formatterName
@@ -515,6 +502,7 @@ function OmiChat.formatForChat(args)
         text = echoFormatter:format(text, tokens)
     end
 
+    -- apply full overhead format
     local overheadFormatter = OmiChat.getFormatter('overheadFull')
     tokens.prefix = utils.trimleft(utils.interpolate(Option.FormatOverheadPrefix, tokens))
     text = overheadFormatter:format(text, tokens)
@@ -526,7 +514,10 @@ function OmiChat.formatForChat(args)
         text = OmiChat.getFormatter('onlineID'):format(id) .. text
     end
 
-    return text
+    return {
+        text = text,
+        allowLanguage = allowLanguage or false,
+    }
 end
 
 ---Gets a named formatter.
