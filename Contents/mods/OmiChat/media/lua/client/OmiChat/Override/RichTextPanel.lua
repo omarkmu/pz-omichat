@@ -4,11 +4,13 @@ require 'ISUI/ISRichTextPanel'
 local max = math.max
 local concat = table.concat
 local trim = string.trim
+local getTextManager = getTextManager
 local getTexture = getTexture
 local utils = require 'OmiChat/util'
 
 
 ---@class omichat.ISRichTextPanel : ISRichTextPanel
+---@field ocIsChatTab boolean?
 local ISRichTextPanel = ISRichTextPanel
 
 local _processCommand = ISRichTextPanel.processCommand
@@ -47,6 +49,7 @@ local function addText(self, text, x, y, lineImageHeight, curLine, maxLineWidth)
 
         x = 0
         y = y + max(lineImageHeight, font:getLineHeight())
+        self.ocLastChar = ''
         lineImageHeight = 0
         self.lines[curLine] = text
         if self.lines[curLine] ~= '' then
@@ -68,6 +71,11 @@ local function addText(self, text, x, y, lineImageHeight, curLine, maxLineWidth)
         end
 
         x = self.lineX[curLine] + pixLen
+    end
+
+    local line = self.lines[curLine]
+    if line ~= '' then
+        self.ocLastChar = line:sub(#line)
     end
 
     return x, y, lineImageHeight, curLine
@@ -175,6 +183,7 @@ function ISRichTextPanel:paginate()
     self.lineX = {}
     self.lines = {}
     self.keybinds = {}
+    self.ocLastChar = ''
 
     local text = (self:replaceKeyNames(self.text) .. ' '):gsub('\n', ' <LINE> ')
     if self.maxLines > 0 then
@@ -234,7 +243,12 @@ function ISRichTextPanel:paginate()
             local command = text:sub(specialPos + 1, commandEndPos - 1)
 
             self.currentLine = curLine
+            local oldY = y
             x, y, lineImageHeight = self:processCommand(command, x, y, lineImageHeight, lineHeight)
+
+            if y ~= oldY then
+                self.ocLastChar = ''
+            end
 
             ptr = commandEndPos + 1
         else
@@ -330,6 +344,28 @@ function ISRichTextPanel:processCommand(command, x, y, lineImageHeight, lineHeig
 
     if command:find('SETX:') then
         x = tonumber(command:sub(6)) or 0
+        return x, y, lineImageHeight
+    end
+
+    if self.ocIsChatTab and command:find('SPACE') then
+        if x > 0 then
+            local lastChar = self.ocLastChar or ''
+            local font = getTextManager():getFontFromEnum(self.font)
+            local fontDelta = self.font == UIFont.NewSmall and 0 or 1
+
+            local delta
+            if lastChar ~= '' then
+                -- context-based spacing
+                local lastWidth = font:getWidth(lastChar)
+                local combinedWidth = font:getWidth(lastChar .. ' ')
+                delta = max(0, combinedWidth - lastWidth)
+            else
+                delta = font:getWidth(' ')
+            end
+
+            x = x + delta + fontDelta
+        end
+
         return x, y, lineImageHeight
     end
 
