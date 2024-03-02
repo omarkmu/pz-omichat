@@ -115,7 +115,7 @@ The format used to determine the punctuation used in [narrative style](./filters
 - [`$username`](../format-strings/tokens.md#username)
 
 ### FormatOverheadPrefix
-`$concats(( ) $if($eq($stream low) [Low]) $if($languageRaw [$languageRaw]))&#32;`
+**Default:** `$concats(( ) $index(@(low:[Low];whisper:[Whisper]) $stream) $if($languageRaw [$languageRaw]))&#32;`
 
 The format used to determine the value of the `$prefix` token in [`OverheadFormatFull`](./overhead-formats.md#overheadformatfull).
 

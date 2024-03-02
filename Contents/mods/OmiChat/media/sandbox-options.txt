@@ -633,7 +633,7 @@ option OmiChat.FormatLanguage
 option OmiChat.FormatOverheadPrefix
 {
     type = string,
-    default = $concats(( ) $if($eq($stream low) [Low]) $if($languageRaw [$languageRaw]))&#32;,
+    default = $concats(( ) $index(@(low:[Low];whisper:[Whisper]) $stream) $if($languageRaw [$languageRaw]))&#32;,
     page = OmiChat,
     translation = OCFormatOverheadPrefix,
 }
