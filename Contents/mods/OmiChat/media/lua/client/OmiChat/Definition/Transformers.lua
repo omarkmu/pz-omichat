@@ -230,6 +230,9 @@ return {
                 return
             end
 
+            info.tokens.callout = '1'
+            info.tokens.sneakCallout = info.context.ocIsSneakCallout and '1' or nil
+
             -- already created a sound for the callout
             info.message:setShouldAttractZombies(false)
         end,
