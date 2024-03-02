@@ -2,6 +2,7 @@ local lib = require 'OmiChat/lib'
 local utils = require 'OmiChat/util'
 local config = require 'OmiChat/config'
 
+local getActivatedMods = getActivatedMods
 local floor = math.floor
 
 
@@ -12,6 +13,7 @@ local floor = math.floor
 ---@field EnableSetNameColor boolean
 ---@field EnableSpeechColorAsDefaultNameColor boolean
 ---@field EnableSetSpeechColor boolean
+---@field EnableCompatChatBubble boolean
 ---@field EnableCompatTAD boolean
 ---@field EnableFactionColorAsDefault boolean
 ---@field EnableCharacterCustomization boolean
@@ -166,6 +168,18 @@ end
 ---@return boolean
 function Option:canPlayersSetNickname()
     return self:isNicknameCommandEnabled() or self.EnableSetName == 2
+end
+
+---Returns whether the Chat Bubble compatibility patch is enabled.
+---@return boolean
+function Option:compatChatBubbleEnabled()
+    return Option.EnableCompatChatBubble and getActivatedMods():contains('ChatBubble')
+end
+
+---Returns whether the True Actions Dancing compatibility patch is enabled.
+---@return boolean
+function Option:compatTADEnabled()
+    return Option.EnableCompatTAD and getActivatedMods():contains('TrueActionsDancing')
 end
 
 ---Returns the default color associated with a category.
