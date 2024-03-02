@@ -11,11 +11,11 @@ Sandbox_EN = {
     Sandbox_OCEnableSetSpeechColor = "Custom Speech Colors",
     Sandbox_OCEnableSpeechColorAsDefaultNameColor = "Use Speech Color as Default Name Color",
     Sandbox_OCEnableFactionColorAsDefault = "Use Faction Tag Color as Default Chat Color",
-    Sandbox_EnableDiscordColorOption = "Enable Discord Color Option",
+    Sandbox_OCEnableDiscordColorOption = "Enable Discord Color Option",
 
-    Sandbox_EnableDiscordColorOption_option1 = "Yes",
-    Sandbox_EnableDiscordColorOption_option2 = "No",
-    Sandbox_EnableDiscordColorOption_option3 = "Respect server setting",
+    Sandbox_OCEnableDiscordColorOption_option1 = "Yes",
+    Sandbox_OCEnableDiscordColorOption_option2 = "No",
+    Sandbox_OCEnableDiscordColorOption_option3 = "Respect server setting",
 
     Sandbox_OCEnableSetName_option1 = "Disallow setting name",
     Sandbox_OCEnableSetName_option2 = "/name sets chat nickname",
