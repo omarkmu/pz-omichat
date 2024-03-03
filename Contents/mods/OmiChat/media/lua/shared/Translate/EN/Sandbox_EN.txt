@@ -81,6 +81,7 @@ Sandbox_EN = {
     Sandbox_OCPredicateAttractZombies = "Attract Zombies Predicate",
     Sandbox_OCPredicateApplyBuff = "Apply Buff Predicate",
     Sandbox_OCPredicateUseNameColor = "Use Name Color Predicate",
+    Sandbox_OCPredicateAllowChatInput = "Allow Chat Input Predicate",
     Sandbox_OCPredicateAllowLanguage = "Allow Roleplay Language Predicate",
     Sandbox_OCPredicateUseNarrativeStyle = "Use Narrative Style Predicate",
 

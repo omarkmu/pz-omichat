@@ -44,13 +44,37 @@ Filters messages sent on a stream with [narrative style](#predicateusenarratives
 Filters names set by players with `/name` or `/nickname`.
 
 The default option will limit names to 50 characters.
-If the empty string is returned, the `/name` command will fail.
+
+This format can [set](../format-strings/functions.md#set-function) `error` or `errorID` to provide feedback to the player.
+If `errorID` is used, it will be interpreted as a string ID, whereas `error` will be displayed as given.
+
+If the empty string is returned, or either error token is set, the command will fail.
 
 **Tokens:**
 - [`$input`](../format-strings/tokens#input)
 - `$target`: If the name being set is the character name, `name`. Otherwise, `nickname`.
 
 **See also:** [`EnableSetName`](./basic-features.md#enablesetname).
+
+### PredicateAllowChatInput
+**Default:** `true`
+
+Determines whether chat input is allowed.
+
+This format can [set](../format-strings/functions.md#set-function) `error` or `errorID` to provide feedback to the player.
+If `errorID` is used, it will be interpreted as a string ID, whereas `error` will be displayed as given.
+If either token is set, the predicate will be considered a failure.
+
+**Tokens:**
+- [`$callout`](../format-strings/tokens.md#callout)
+- [`$chatType`](../format-strings/tokens.md#chattype)
+- [`$input`](../format-strings/tokens#input)
+- [`$language`](../format-strings/tokens.md#language)
+- [`$languageRaw`](../format-strings/tokens.md#languageraw)
+- [`$name`](../format-strings/tokens.md#name)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+- [`$stream`](../format-strings/tokens.md#stream)
+- [`$username`](../format-strings/tokens.md#username)
 
 ### PredicateAllowLanguage
 **Default:** `$has(@(say;shout;whisper;low;faction;safehouse) $stream)`
@@ -123,6 +147,8 @@ Note that the player name is not included; overhead and chat formats should incl
 - [`$callout`](../format-strings/tokens.md#callout)
 - [`$chatType`](../format-strings/tokens.md#chattype)
 - [`$input`](../format-strings/tokens#input)
+- [`$language`](../format-strings/tokens.md#language)
+- [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 - [`$stream`](../format-strings/tokens.md#stream)

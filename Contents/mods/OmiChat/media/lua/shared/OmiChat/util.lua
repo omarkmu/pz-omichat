@@ -199,6 +199,26 @@ function utils.escapeRichText(text)
     return (text:gsub('<', '&lt;'):gsub('>', '&gt;'))
 end
 
+---Gets an error from the error tokens, if one is set, and unsets the tokens.
+---@param tokens table
+---@return string?
+function utils.extractError(tokens)
+    local err
+    local error = tostring(tokens.error or '')
+    local errorID = tostring(tokens.errorID or '')
+
+    if error ~= '' then
+        err = tostring(error or '')
+    elseif errorID ~= '' then
+        err = getText(errorID)
+    end
+
+    tokens.error = nil
+    tokens.errorID = nil
+
+    return err
+end
+
 ---Gets the text within invisible character wrapping.
 ---Returns the text and the invisible character prefix & suffix.
 ---@param text string
