@@ -263,37 +263,45 @@ local function addLanguageOptions(context)
         return
     end
 
-    local languageOptionName = getText('UI_OmiChat_context_languages')
-    local languageOption = context:addOption(languageOptionName, ISChat.instance)
-
-    local languageSubMenu = context:getNew(context)
-    context:addSubMenu(languageOption, languageSubMenu)
-
-    local known = {}
+    local isKnown = {}
+    local knownLanguages = {}
+    local allLanguages = OmiChat.getConfiguredRoleplayLanguages()
     local currentLang = OmiChat.getCurrentRoleplayLanguage() or OmiChat.getDefaultRoleplayLanguage()
     for i = 1, #languages do
         local lang = languages[i]
-        known[lang] = true
-
-        local name = getTextOrNull('UI_OmiChat_Language_' .. lang) or lang
-        local opt = languageSubMenu:addOption(name, ISChat.instance, ISChat.onLanguageSelect, lang)
-        languageSubMenu:setOptionChecked(opt, lang == currentLang)
-    end
-
-    if languageSlots - #languages < 1 or #languages >= 32 then
-        return
+        if allLanguages[lang] then
+            knownLanguages[#knownLanguages + 1] = lang
+            isKnown[lang] = true
+        end
     end
 
     local addLanguages = {}
-    local allLanguages = OmiChat.getConfiguredRoleplayLanguages()
-    for i = 1, #allLanguages do
-        local lang = allLanguages[i]
-        if not known[lang] then
-            addLanguages[#addLanguages + 1] = {
-                language = lang,
-                translated = getTextOrNull('UI_OmiChat_Language_' .. lang) or lang,
-            }
+    if languageSlots - #languages >= 1 and #languages < 32 then
+        for i = 1, #allLanguages do
+            local lang = allLanguages[i]
+            if not isKnown[lang] then
+                addLanguages[#addLanguages + 1] = {
+                    language = lang,
+                    translated = getTextOrNull('UI_OmiChat_Language_' .. lang) or lang,
+                }
+            end
         end
+    end
+
+    local languageSubMenu
+    if #knownLanguages > 0 or #addLanguages > 0 then
+        local languageOptionName = getText('UI_OmiChat_context_languages')
+        local languageOption = context:addOption(languageOptionName, ISChat.instance)
+
+        languageSubMenu = context:getNew(context)
+        context:addSubMenu(languageOption, languageSubMenu)
+    end
+
+    for i = 1, #knownLanguages do
+        local lang = knownLanguages[i]
+        local name = getTextOrNull('UI_OmiChat_Language_' .. lang) or lang
+        local opt = languageSubMenu:addOption(name, ISChat.instance, ISChat.onLanguageSelect, lang)
+        languageSubMenu:setOptionChecked(opt, lang == currentLang)
     end
 
     if #addLanguages == 0 then
