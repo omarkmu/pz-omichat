@@ -1,10 +1,12 @@
 ---Client API functionality related to manipulating the chat.
 
+local lib = require 'OmiChat/lib'
 local getTexture = getTexture
 local min = math.min
 local max = math.max
 local concat = table.concat
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
+local MultiMap = lib.interpolate.MultiMap
 
 
 ---@class omichat.api.client
@@ -199,6 +201,67 @@ local function tryApplyBuff()
     bodyDamage:setBoredomLevel(bodyDamage:getBoredomLevel() - 50)
     bodyDamage:setUnhappynessLevel(bodyDamage:getUnhappynessLevel() - 50)
     modData.ocLastBuff = now
+end
+
+---Updates stream aliases.
+local function updateAliases()
+    -- clear all aliases
+    local i = 1
+    local numStreams = #ISChat.allChatStreams
+    local numCommands = #OmiChat._commandStreams
+    while i <= numStreams + numCommands do
+        local stream
+        if i <= numStreams then
+            stream = ISChat.allChatStreams[i]
+        else
+            stream = OmiChat._commandStreams[i - numStreams]
+        end
+
+        if stream and stream.omichat and stream.omichat.aliases then
+            table.wipe(stream.omichat.aliases)
+        end
+
+        i = i + 1
+    end
+
+    -- update aliases
+    local configuredAliases = utils.interpolateRaw(Option.FormatAliases, {})
+
+    ---@cast configuredAliases omi.interpolate.MultiMap
+    if not utils.isinstance(configuredAliases, MultiMap) then
+        return
+    end
+
+    local allAliases = {}
+    for alias, identifier in configuredAliases:pairs() do
+        alias = tostring(alias)
+        identifier = tostring(identifier)
+        if not allAliases[identifier] then
+            allAliases[identifier] = {}
+        end
+
+        local list = allAliases[identifier]
+        list[tostring(alias)] = true
+    end
+
+    for ident, tab in pairs(allAliases) do
+        local info = OmiChat.getChatStreamByIdentifier(ident)
+        local stream = info and info:getStream()
+        if stream then
+            if not stream.omichat then
+                stream.omichat = {}
+            end
+
+            if not stream.omichat.aliases then
+                stream.omichat.aliases = {}
+            end
+
+            local aliases = stream.omichat.aliases
+            for k in pairs(tab) do
+                aliases[#aliases + 1] = concat { '/', k, ' ' }
+            end
+        end
+    end
 end
 
 ---Creates or updates built-in formatters.
@@ -841,6 +904,7 @@ function OmiChat.updateState(redraw)
     OmiChat.getPlayerPreferences()
     updateStreams()
     updateFormatters()
+    updateAliases()
     addOrRemoveIconComponents()
     OmiChat.updateInfoText()
 

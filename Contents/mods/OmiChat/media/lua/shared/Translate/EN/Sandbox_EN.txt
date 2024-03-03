@@ -93,6 +93,7 @@ Sandbox_EN = {
     --[[ Component Formats ]]--
     Sandbox_OCFormatCard = "/card Text Format",
     Sandbox_OCFormatRoll = "/roll Text Format",
+    Sandbox_OCFormatAliases = "Stream Aliases",
     Sandbox_OCFormatInfo = "Info Button Text",
     Sandbox_OCFormatMenuName = "Menu Name Format",
     Sandbox_OCFormatName = "Chat Name Format",

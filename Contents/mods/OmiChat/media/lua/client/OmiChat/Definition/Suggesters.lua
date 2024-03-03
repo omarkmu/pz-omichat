@@ -26,6 +26,8 @@ local function collectStreamResults(tab, command, fullCommand, currentTabID, sta
         if stream:isTabID(currentTabID) and stream:isEnabled() then
             local streamCommand = stream:getCommand()
             local shortCommand = stream:getShortCommand()
+
+            local checkAliases = false
             if utils.startsWith(streamCommand, fullCommand) then
                 startsWith[#startsWith + 1] = { command = streamCommand }
             elseif shortCommand and utils.startsWith(shortCommand, fullCommand) then
@@ -34,13 +36,19 @@ local function collectStreamResults(tab, command, fullCommand, currentTabID, sta
                 contains[#contains + 1] = { command = streamCommand }
             elseif shortCommand and utils.contains(shortCommand, command) then
                 contains[#contains + 1] = { command = shortCommand, full = streamCommand }
+            else
+                checkAliases = true
             end
 
-            for alias in stream:aliases() do
-                if utils.startsWith(alias, fullCommand) then
-                    startsWith[#startsWith + 1] = { command = alias, full = streamCommand }
-                elseif utils.contains(alias, command) then
-                    contains[#contains + 1] = { command = alias, full = streamCommand }
+            if checkAliases then
+                for alias in stream:aliases() do
+                    if utils.startsWith(alias, fullCommand) then
+                        startsWith[#startsWith + 1] = { command = alias, full = streamCommand }
+                        break
+                    elseif utils.contains(alias, command) then
+                        contains[#contains + 1] = { command = alias, full = streamCommand }
+                        break
+                    end
                 end
             end
         end

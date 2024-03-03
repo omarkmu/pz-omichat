@@ -2,6 +2,15 @@
 
 These [options](./index.md) define string formats used in other format strings, or for purposes other than speech bubbles and chat messages.
 
+### FormatAliases
+**Default:** `@(shout:shout;quiet:low)`
+
+Specifies aliases for streams, in the form `alias:stream`.
+These will be usable in chat as `/alias` and will behave equivalently to the regular command.
+The normal command will also still be available.
+
+This must return an [at-map](../format-strings/at-maps.md), or it will be ignored.
+
 ### FormatAdminIcon
 **Default:** `Item_Sledgehamer` [sic]
 
