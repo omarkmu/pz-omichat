@@ -30,6 +30,7 @@ The format used to determine the value of the `$prefix` token in [`ChatFormatFul
 - [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$echo`](../format-strings/tokens.md#echo)
 - [`$icon`](../format-strings/tokens.md#icon)
 - [`$iconRaw`](../format-strings/tokens.md#iconraw)
 - `$language`: The result of the [`FormatLanguage`](../sandbox-options/component-formats.md#formatlanguage) option.
