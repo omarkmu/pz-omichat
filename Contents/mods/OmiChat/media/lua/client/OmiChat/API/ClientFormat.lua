@@ -55,9 +55,9 @@ end
 ---@return string
 local function applyNarrativeStyle(input, stream, tokens)
     tokens = tokens and utils.copy(tokens) or {}
-    tokens.input = input
-    tokens.chatType = stream:getChatType()
-    tokens.stream = stream:getIdentifier()
+    tokens.input = tokens.input or input
+    tokens.chatType = tokens.chatType or stream:getChatType()
+    tokens.stream = tokens.stream or stream:getIdentifier()
 
     if not utils.testPredicate(Option.PredicateUseNarrativeStyle, tokens) then
         return input
@@ -340,6 +340,7 @@ function OmiChat.buildMessageTextFromInfo(info)
     local tokens = {
         admin = info.tokens.admin,
         chatType = info.chatType,
+        echo = info.tokens.echo,
         stream = info.tokens.stream,
         icon = info.tokens.icon,
         iconRaw = info.tokens.iconRaw,
@@ -457,6 +458,7 @@ function OmiChat.formatForChat(args)
     tokens.username = username
     tokens.name = name
     tokens.stream = stream
+    tokens.echo = args.isEcho and '1' or nil
 
     -- check language
     local language

@@ -14,6 +14,7 @@ If this returns the empty string, the command won't be sent to the chat stream.
 **Tokens:**
 - [`$callout`](../format-strings/tokens.md#callout)
 - [`$chatType`](../format-strings/tokens.md#chattype)
+- [`$echo`](../format-strings/tokens.md#echo)
 - [`$input`](../format-strings/tokens#input)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
@@ -28,6 +29,7 @@ Filters messages sent on a stream with [narrative style](#predicateusenarratives
 **Tokens:**
 - [`$callout`](../format-strings/tokens.md#callout)
 - [`$chatType`](../format-strings/tokens.md#chattype)
+- [`$echo`](../format-strings/tokens.md#echo)
 - [`$input`](../format-strings/tokens#input)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
@@ -68,6 +70,7 @@ If either token is set, the predicate will be considered a failure.
 **Tokens:**
 - [`$callout`](../format-strings/tokens.md#callout)
 - [`$chatType`](../format-strings/tokens.md#chattype)
+- [`$echo`](../format-strings/tokens.md#echo)
 - [`$input`](../format-strings/tokens#input)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
@@ -84,6 +87,7 @@ Determines whether [roleplay languages](./languages.md) can be used for a messag
 **Tokens:**
 - [`$callout`](../format-strings/tokens.md#callout)
 - [`$chatType`](../format-strings/tokens.md#chattype)
+- [`$echo`](../format-strings/tokens.md#echo)
 - [`$input`](../format-strings/tokens#input)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
@@ -146,6 +150,7 @@ Note that the player name is not included; overhead and chat formats should incl
 **Tokens:**
 - [`$callout`](../format-strings/tokens.md#callout)
 - [`$chatType`](../format-strings/tokens.md#chattype)
+- [`$echo`](../format-strings/tokens.md#echo)
 - [`$input`](../format-strings/tokens#input)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)

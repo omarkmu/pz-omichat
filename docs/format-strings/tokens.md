@@ -51,6 +51,10 @@ The value of this token will be one of:
 - `admin`
 - `server`
 
+## `$echo`
+
+Populated if this is an [echo message](../sandbox-options/chat-formats.md#chatformatecho).
+
 ## `$forename`
 
 The relevant player character's forename.

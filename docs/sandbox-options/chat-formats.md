@@ -207,6 +207,7 @@ The format used for the final chat message, after all other formats have been ap
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - `$content`: The full chat message content, after other formatting has occurred.
+- [`$echo`](../format-strings/tokens.md#echo)
 - [`$icon`](../format-strings/tokens.md#icon)
 - [`$iconRaw`](../format-strings/tokens.md#iconraw)
 - `$language`: The result of the [`FormatLanguage`](../sandbox-options/component-formats.md#formatlanguage) option.
@@ -271,6 +272,7 @@ The format used for `/low` messages in chat.
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$echo`](../format-strings/tokens.md#echo)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -499,6 +501,7 @@ The format used for `/say` messages in chat.
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$echo`](../format-strings/tokens.md#echo)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
