@@ -12,7 +12,6 @@ return {
         chatType = 'shout',
         streamIdentifier = 'shout',
         isEnabledCommand = '/y',
-        aliases = { '/shout ' },
     },
     private = {
         commandType = 'chat',

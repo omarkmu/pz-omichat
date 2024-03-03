@@ -59,7 +59,6 @@ return {
             allowIconPicker = true,
             commandType = 'rp',
             formatter = 'doquiet',
-            aliases = { '/dolow ' },
         },
     },
     doloud = {
@@ -73,7 +72,6 @@ return {
             commandType = 'rp',
             chatType = 'shout',
             formatter = 'doloud',
-            aliases = { '/dolong ' },
         },
     },
     me = {
@@ -98,7 +96,6 @@ return {
             allowIconPicker = true,
             commandType = 'rp',
             formatter = 'mequiet',
-            aliases = { '/melow ' },
         },
     },
     meloud = {
@@ -112,7 +109,6 @@ return {
             commandType = 'rp',
             chatType = 'shout',
             formatter = 'meloud',
-            aliases = { '/melong ' },
         },
     },
 }

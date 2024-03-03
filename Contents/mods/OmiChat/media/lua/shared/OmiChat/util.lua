@@ -401,6 +401,17 @@ end
 ---@param seed unknown? Seed value for random functions.
 ---@return string
 function utils.interpolate(text, tokens, seed)
+    return tostring(utils.interpolateRaw(text, tokens, seed))
+end
+
+---Interpolates substitution tokens into a string with format strings using `$var` format.
+---Functions are referenced using `$func(...)` syntax.
+---This returns the raw result, which may or may not be a string.
+---@param text string The format string.
+---@param tokens table A table of format substitution strings.
+---@param seed unknown? Seed value for random functions.
+---@return unknown
+function utils.interpolateRaw(text, tokens, seed)
     if text == '' then
         return ''
     end
@@ -415,7 +426,7 @@ function utils.interpolate(text, tokens, seed)
 
     -- always seed to avoid content changing on refresh
     interpolator:randomseed(seed)
-    return interpolator:interpolate(tokens)
+    return interpolator:interpolateRaw(tokens)
 end
 
 ---Checks whether a byte value is an invisible character used for encoding mod information.

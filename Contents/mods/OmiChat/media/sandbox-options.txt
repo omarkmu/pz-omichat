@@ -566,6 +566,14 @@ option OmiChat.LanguageSlots
 
 
 /* Component Formats */
+option OmiChat.FormatAliases
+{
+    type = string,
+    default = @(shout:shout;quiet:low),
+    page = OmiChat,
+    translation = OCFormatAliases,
+}
+
 option OmiChat.FormatInfo
 {
     type = string,

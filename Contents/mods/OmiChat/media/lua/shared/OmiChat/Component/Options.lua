@@ -73,6 +73,7 @@ local floor = math.floor
 ---@field LanguageSlots integer
 ---@field FormatCard string
 ---@field FormatRoll string
+---@field FormatAliases string
 ---@field FormatInfo string
 ---@field FormatMenuName string
 ---@field FormatName string
