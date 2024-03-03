@@ -94,6 +94,9 @@ UI_EN = {
 
     --[[ Error Messages ]]--
     UI_OmiChat_error_invalid_color = "Input must be a hexadecimal color value or three numbers separated by commas or spaces.",
+    UI_OmiChat_error_signed_radio = "You can't use sign language over the radio.",
+    UI_OmiChat_error_signed_faction_radio = "You can't use sign language over faction radio.",
+    UI_OmiChat_error_signed_safehouse_radio = "You can't use sign language over safehouse radio.",
 
     -- %1 = the maximum color value (number)
     UI_OmiChat_error_color_max = "Values must be less than or equal to %1.",

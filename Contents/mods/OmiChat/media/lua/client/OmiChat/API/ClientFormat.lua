@@ -458,6 +458,7 @@ function OmiChat.formatForChat(args)
     tokens.name = name
     tokens.stream = stream
 
+    -- check language
     local language
     local allowLanguage = args.language and utils.testPredicate(Option.PredicateAllowLanguage, tokens)
     if allowLanguage then
@@ -466,10 +467,19 @@ function OmiChat.formatForChat(args)
         tokens.language = language and utils.getTranslatedLanguageName(language)
     end
 
+    -- filter and check input
     local text = utils.interpolate(Option.FilterChatInput, tokens)
-    if #text == 0 then
-        -- avoid empty messages
-        return { text = '' }
+
+    tokens.error = ''
+    tokens.errorID = ''
+    local allowInput = #text > 0 and utils.testPredicate(Option.PredicateAllowChatInput, tokens)
+    local err = utils.extractError(tokens)
+
+    if not allowInput or err then
+        return {
+            text = '',
+            error = err,
+        }
     end
 
     -- apply styles
@@ -516,7 +526,7 @@ function OmiChat.formatForChat(args)
 
     return {
         text = text,
-        allowLanguage = allowLanguage or false,
+        allowLanguage = allowLanguage,
     }
 end
 

@@ -112,7 +112,8 @@ return OmiChat
 ---@see omichat.api.client.formatForChat
 ---@class omichat.FormatResult
 ---@field text string
----@field allowLanguage boolean
+---@field error string?
+---@field allowLanguage boolean?
 
 ---@class omichat.BaseStreamConfig
 ---@field aliases string[]? Additional aliases for the command.

@@ -479,13 +479,17 @@ function OmiChat.setNickname(nickname)
     end
 
     local original = nickname
-    nickname = utils.interpolate(Option.FilterNickname, {
+    local tokens = {
         target = 'nickname',
         input = nickname,
-    })
+        error = '',
+        errorID = '',
+    }
 
-    if nickname == '' then
-        return false, getText('UI_OmiChat_set_name_failure', utils.escapeRichText(original))
+    nickname = utils.interpolate(Option.FilterNickname, tokens)
+    local err = utils.extractError(tokens)
+    if nickname == '' or err then
+        return false, err or getText('UI_OmiChat_set_name_failure', utils.escapeRichText(original))
     end
 
     modData.nicknames[username] = nickname
@@ -569,13 +573,18 @@ function OmiChat.updateCharacterName(name, updateSurname)
         return false
     end
 
-    name = utils.interpolate(Option.FilterNickname, {
+    local tokens = {
         target = 'name',
         input = name,
-    })
+        error = '',
+        errorID = '',
+    }
 
+    name = utils.interpolate(Option.FilterNickname, tokens)
+
+    local err = utils.extractError(tokens)
     if name == '' then
-        return false, getText('UI_OmiChat_set_name_failure', utils.escapeRichText(name))
+        return false, err or getText('UI_OmiChat_set_name_failure', utils.escapeRichText(name))
     end
 
     local surname

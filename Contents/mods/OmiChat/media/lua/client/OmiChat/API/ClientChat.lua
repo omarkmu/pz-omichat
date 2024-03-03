@@ -658,6 +658,10 @@ function OmiChat.send(args)
 
     command = formatResult.text
     if command == '' then
+        if formatResult.error then
+            OmiChat.addInfoMessage(formatResult.error)
+        end
+
         return
     end
 
