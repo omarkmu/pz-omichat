@@ -97,6 +97,7 @@ UI_EN = {
     UI_OmiChat_error_signed_radio = "You can't use sign language over the radio.",
     UI_OmiChat_error_signed_faction_radio = "You can't use sign language over faction radio.",
     UI_OmiChat_error_signed_safehouse_radio = "You can't use sign language over safehouse radio.",
+    UI_OmiChat_error_unknown_player = "Could not find player '%1'."
 
     -- %1 = the maximum color value (number)
     UI_OmiChat_error_color_max = "Values must be less than or equal to %1.",

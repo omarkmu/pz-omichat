@@ -36,6 +36,18 @@ local function canAccessTarget(player, target, fromCommand)
     return true
 end
 
+---Checks whether the given username belongs to a currently online player.
+---@param username string
+---@return boolean
+local function isOnlinePlayer(username)
+    if not username then
+        return false
+    end
+
+    local player = utils.getPlayerByUsername(username)
+    return player ~= nil
+end
+
 ---@param args omichat.request.ModDataUpdate
 ---@return boolean
 function updateModData.currentLanguage(args)
@@ -240,6 +252,8 @@ function OmiChat.Commands.requestAddLanguage(player, args)
             OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_add_language_known', { username, language })
         elseif err == 'UNKNOWN' then
             OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_add_language_unknown_language', { language })
+        elseif err == 'UNKNOWN_PLAYER' then
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_error_unknown_player', { username })
         else
             OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_addlanguage')
         end
@@ -272,6 +286,10 @@ end
 function OmiChat.Commands.requestDataUpdate(player, args)
     local err
     local success = false
+    if not isOnlinePlayer(args.target) then
+        return false, 'UNKNOWN_PLAYER'
+    end
+
     if canAccessTarget(player, args.target, args.fromCommand) then
         local updateFunc = updateModData[args.field]
         if updateFunc then
@@ -303,9 +321,10 @@ function OmiChat.Commands.requestResetIcon(player, args)
     args = utils.parseCommandArgs(args.command)
     local username = args[1]
 
+    local err
     local success = false
     if username then
-        success = OmiChat.Commands.requestDataUpdate(player, {
+        success, err = OmiChat.Commands.requestDataUpdate(player, {
             target = username,
             field = 'icons',
             fromCommand = true,
@@ -313,7 +332,12 @@ function OmiChat.Commands.requestResetIcon(player, args)
     end
 
     if not success then
-        OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_reseticon')
+        if err == 'UNKNOWN_PLAYER' then
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_error_unknown_player', { username })
+        else
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_reseticon')
+        end
+
         return
     end
 
@@ -328,9 +352,10 @@ function OmiChat.Commands.requestResetLanguages(player, args)
     args = utils.parseCommandArgs(args.command)
     local username = args[1]
 
+    local err
     local success = false
     if username then
-        success = OmiChat.Commands.requestDataUpdate(player, {
+        success, err = OmiChat.Commands.requestDataUpdate(player, {
             target = username,
             field = 'languages',
             fromCommand = true,
@@ -338,7 +363,12 @@ function OmiChat.Commands.requestResetLanguages(player, args)
     end
 
     if not success then
-        OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_resetlanguages')
+        if err == 'UNKNOWN_PLAYER' then
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_error_unknown_player', { username })
+        else
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_resetlanguages')
+        end
+
         return
     end
 
@@ -353,9 +383,10 @@ function OmiChat.Commands.requestResetName(player, args)
     args = utils.parseCommandArgs(args.command)
     local username = args[1]
 
+    local err
     local success = false
     if username then
-        success = OmiChat.Commands.requestDataUpdate(player, {
+        success, err = OmiChat.Commands.requestDataUpdate(player, {
             target = username,
             field = 'nicknames',
             fromCommand = true,
@@ -363,7 +394,12 @@ function OmiChat.Commands.requestResetName(player, args)
     end
 
     if not success then
-        OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_resetname')
+        if err == 'UNKNOWN_PLAYER' then
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_error_unknown_player', { username })
+        else
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_resetname')
+        end
+
         return
     end
 
@@ -403,9 +439,10 @@ function OmiChat.Commands.requestSetIcon(player, args)
     local username = args[1]
     local icon = args[2]
 
+    local err
     local success = false
     if username and icon then
-        success = OmiChat.Commands.requestDataUpdate(player, {
+        success, err = OmiChat.Commands.requestDataUpdate(player, {
             target = username,
             field = 'icons',
             value = icon,
@@ -414,7 +451,12 @@ function OmiChat.Commands.requestSetIcon(player, args)
     end
 
     if not success then
-        OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_seticon')
+        if err == 'UNKNOWN_PLAYER' then
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_error_unknown_player', { username })
+        else
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_seticon')
+        end
+
         return
     end
 
@@ -430,9 +472,10 @@ function OmiChat.Commands.requestSetLanguageSlots(player, args)
     local username = args[1]
     local slots = args[2]
 
+    local err
     local success = false
     if username and slots then
-        success = OmiChat.Commands.requestDataUpdate(player, {
+        success, err = OmiChat.Commands.requestDataUpdate(player, {
             target = username,
             field = 'languageSlots',
             fromCommand = true,
@@ -441,7 +484,12 @@ function OmiChat.Commands.requestSetLanguageSlots(player, args)
     end
 
     if not success then
-        OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_setlanguageslots')
+        if err == 'UNKNOWN_PLAYER' then
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_error_unknown_player', { username })
+        else
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_setlanguageslots')
+        end
+
         return
     end
 
@@ -457,9 +505,10 @@ function OmiChat.Commands.requestSetName(player, args)
     local username = args[1]
     local name = args[2]
 
+    local err
     local success = false
     if username and name then
-        success = OmiChat.Commands.requestDataUpdate(player, {
+        success, err = OmiChat.Commands.requestDataUpdate(player, {
             target = username,
             field = 'nicknames',
             value = name,
@@ -468,7 +517,12 @@ function OmiChat.Commands.requestSetName(player, args)
     end
 
     if not success then
-        OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_setname')
+        if err == 'UNKNOWN_PLAYER' then
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_error_unknown_player', { username })
+        else
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_setname')
+        end
+
         return
     end
 

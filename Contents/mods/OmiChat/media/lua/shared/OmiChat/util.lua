@@ -285,7 +285,7 @@ function utils.getPlayerByUsername(username)
     end
 
     local onlinePlayers = getOnlinePlayers()
-    for i = 0, onlinePlayers:size() do
+    for i = 0, onlinePlayers:size() - 1 do
         local player = onlinePlayers:get(i)
         if player:getUsername() == username then
             return player
