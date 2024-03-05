@@ -26,6 +26,7 @@ Sandbox_EN = {
 
     --[[ Compatibility Features ]]--
     Sandbox_OCEnableCompatChatBubble = "Chat Bubble Compatibility",
+    Sandbox_OCEnableCompatSearchPlayers = "Search Players For Weapons Compatibility",
     Sandbox_OCEnableCompatTAD = "True Actions Act 3 - Dancing Compatibility",
 
     --[[ Limits ]]--

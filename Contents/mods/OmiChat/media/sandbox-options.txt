@@ -88,6 +88,14 @@ option OmiChat.EnableCompatChatBubble
     translation = OCEnableCompatChatBubble,
 }
 
+option OmiChat.EnableCompatSearchPlayers
+{
+    type = boolean,
+    default = true,
+    page = OmiChat,
+    translation = OCEnableCompatSearchPlayers,
+}
+
 option OmiChat.EnableCompatTAD
 {
     type = boolean,

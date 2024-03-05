@@ -14,6 +14,7 @@ local floor = math.floor
 ---@field EnableSpeechColorAsDefaultNameColor boolean
 ---@field EnableSetSpeechColor boolean
 ---@field EnableCompatChatBubble boolean
+---@field EnableCompatSearchPlayers boolean
 ---@field EnableCompatTAD boolean
 ---@field EnableFactionColorAsDefault boolean
 ---@field EnableCharacterCustomization boolean
@@ -177,6 +178,12 @@ end
 ---@return boolean
 function Option:compatChatBubbleEnabled()
     return Option.EnableCompatChatBubble and getActivatedMods():contains('ChatBubble')
+end
+
+---Returns whether the Search Players For Weapons compatibility patch is enabled.
+---@return boolean
+function Option:compatSearchPlayersEnabled()
+    return Option.EnableCompatSearchPlayers and getActivatedMods():contains('SearchPlayersForWeapons')
 end
 
 ---Returns whether the True Actions Dancing compatibility patch is enabled.

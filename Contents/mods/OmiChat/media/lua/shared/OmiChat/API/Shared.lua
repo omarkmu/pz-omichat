@@ -136,6 +136,35 @@ function OmiChat.getNameInChatRichText(username, chatType)
     end
 end
 
+---Retrieves the name that should be used in chat for the given menu type.
+---If the menu name should not be affected or retrieving the name fails, this returns `nil`.
+---@param player IsoPlayer
+---@param menuType omichat.MenuTypeString
+---@return string?
+function OmiChat.getPlayerMenuName(player, menuType)
+    local nameFormat = Option.FormatMenuName
+    if not player or not nameFormat or nameFormat == '' then
+        return
+    end
+
+    local username = player:getUsername()
+    local chatName = OmiChat.getNameInChat(username, 'say')
+    local tokens = chatName and OmiChat.getPlayerSubstitutions(player)
+    if not chatName or not tokens then
+        return
+    end
+
+    tokens.name = OmiChat.utils.unescapeRichText(chatName)
+    tokens.menuType = menuType
+    local result = OmiChat.utils.interpolate(nameFormat, tokens, username)
+
+    if result == '' then
+        return
+    end
+
+    return result
+end
+
 ---Gets substitution tokens to use in interpolation for a given player.
 ---If the player descriptor could not be obtained, returns `nil`.
 ---@param player IsoPlayer?
