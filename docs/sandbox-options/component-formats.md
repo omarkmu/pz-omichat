@@ -12,7 +12,7 @@ The normal command will also still be available.
 This must return an [at-map](../format-strings/at-maps.md), or it will be ignored.
 
 ### FormatAdminIcon
-**Default:** `Item_Sledgehamer` [sic]
+**Default:** `Item_Sledgehamer` \[sic]
 
 The format used to determine the value of `$adminIcon` in the [`FormatIcon`](#formaticon) format.
 This format expects a valid texture name. `/iconinfo` [command](../user-guide/admins.md#commands) can be used to determine an icon name for this format.
@@ -99,8 +99,11 @@ If blank, menus will not be affected.
 - [`$name`](../format-strings/tokens.md#name): The character name without name colors applied.
 - [`$surname`](../format-strings/tokens.md#surname)
 - [`$username`](../format-strings/tokens.md#username)
-- `$menuType`: The type of menu in which the name will appear.
-One of `trade`, `medical`, or `mini_scoreboard`.
+- `$menuType`: The type of menu in which the name will appear. One of:
+    - `medical`
+    - `mini_scoreboard`
+    - `search_player` (see [`EnableCompatSearchPlayers`](../sandbox-options/compatibility-features.md#enablecompatsearchplayers))
+    - `trade`
 
 ### FormatName
 **Default:** `$ifelse($has(@(general;admin;whisper) $chatType) $username @($name;$forename))`
@@ -122,7 +125,7 @@ The format used to determine the dialogue tag used in [narrative style](./filter
 **Tokens:**
 - [`$callout`](../format-strings/tokens.md#callout)
 - [`$chatType`](../format-strings/tokens.md#chattype)
-- [`$input`](../format-strings/tokens#input)
+- [`$input`](../format-strings/tokens.md#input)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 - [`$stream`](../format-strings/tokens.md#stream)
@@ -136,7 +139,7 @@ The format used to determine the punctuation used in [narrative style](./filters
 **Tokens:**
 - [`$callout`](../format-strings/tokens.md#callout)
 - [`$chatType`](../format-strings/tokens.md#chattype)
-- [`$input`](../format-strings/tokens#input)
+- [`$input`](../format-strings/tokens.md#input)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 - [`$stream`](../format-strings/tokens.md#stream)
@@ -150,7 +153,7 @@ The format used to determine the value of the `$prefix` token in [`OverheadForma
 **Tokens:**:
 - [`$callout`](../format-strings/tokens.md#callout)
 - [`$chatType`](../format-strings/tokens.md#chattype)
-- [`$input`](../format-strings/tokens#input)
+- [`$input`](../format-strings/tokens.md#input)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$name`](../format-strings/tokens.md#name)

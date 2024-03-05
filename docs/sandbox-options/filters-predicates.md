@@ -15,7 +15,7 @@ If this returns the empty string, the command won't be sent to the chat stream.
 - [`$callout`](../format-strings/tokens.md#callout)
 - [`$chatType`](../format-strings/tokens.md#chattype)
 - [`$echo`](../format-strings/tokens.md#echo)
-- [`$input`](../format-strings/tokens#input)
+- [`$input`](../format-strings/tokens.md#input)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 - [`$stream`](../format-strings/tokens.md#stream)
@@ -30,7 +30,7 @@ Filters messages sent on a stream with [narrative style](#predicateusenarratives
 - [`$callout`](../format-strings/tokens.md#callout)
 - [`$chatType`](../format-strings/tokens.md#chattype)
 - [`$echo`](../format-strings/tokens.md#echo)
-- [`$input`](../format-strings/tokens#input)
+- [`$input`](../format-strings/tokens.md#input)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 - [`$stream`](../format-strings/tokens.md#stream)
@@ -53,7 +53,7 @@ If `errorID` is used, it will be interpreted as a string ID, whereas `error` wil
 If the empty string is returned, or either error token is set, the command will fail.
 
 **Tokens:**
-- [`$input`](../format-strings/tokens#input)
+- [`$input`](../format-strings/tokens.md#input)
 - `$target`: If the name being set is the character name, `name`. Otherwise, `nickname`.
 
 **See also:** [`EnableSetName`](./basic-features.md#enablesetname).
@@ -71,7 +71,7 @@ If either token is set, the predicate will be considered a failure.
 - [`$callout`](../format-strings/tokens.md#callout)
 - [`$chatType`](../format-strings/tokens.md#chattype)
 - [`$echo`](../format-strings/tokens.md#echo)
-- [`$input`](../format-strings/tokens#input)
+- [`$input`](../format-strings/tokens.md#input)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$name`](../format-strings/tokens.md#name)
@@ -88,7 +88,7 @@ Determines whether [roleplay languages](./languages.md) can be used for a messag
 - [`$callout`](../format-strings/tokens.md#callout)
 - [`$chatType`](../format-strings/tokens.md#chattype)
 - [`$echo`](../format-strings/tokens.md#echo)
-- [`$input`](../format-strings/tokens#input)
+- [`$input`](../format-strings/tokens.md#input)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 - [`$stream`](../format-strings/tokens.md#stream)
@@ -103,7 +103,7 @@ This is a QoL feature intended for roleplay servers.
 **Tokens:**
 - [`$callout`](../format-strings/tokens.md#callout)
 - [`$chatType`](../format-strings/tokens.md#chattype)
-- [`$input`](../format-strings/tokens#input)
+- [`$input`](../format-strings/tokens.md#input)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 - [`$stream`](../format-strings/tokens.md#stream)
@@ -151,7 +151,7 @@ Note that the player name is not included; overhead and chat formats should incl
 - [`$callout`](../format-strings/tokens.md#callout)
 - [`$chatType`](../format-strings/tokens.md#chattype)
 - [`$echo`](../format-strings/tokens.md#echo)
-- [`$input`](../format-strings/tokens#input)
+- [`$input`](../format-strings/tokens.md#input)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$name`](../format-strings/tokens.md#name)

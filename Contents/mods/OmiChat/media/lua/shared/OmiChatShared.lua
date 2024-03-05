@@ -22,6 +22,12 @@ return OmiChat
 ---| 'admin'
 ---| 'server'
 
+---@alias omichat.MenuTypeString
+---| 'trade'
+---| 'medical'
+---| 'mini_scoreboard'
+---| 'search_player'
+
 ---@alias omichat.CalloutCategory
 ---| 'callouts'
 ---| 'sneakcallouts'

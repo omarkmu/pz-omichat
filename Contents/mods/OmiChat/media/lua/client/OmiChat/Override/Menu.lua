@@ -2,34 +2,7 @@
 ---@diagnostic disable: duplicate-set-field
 
 local OmiChat = require 'OmiChatClient'
-
-
----@param player IsoPlayer
----@param menuType 'trade' | 'medical' | 'mini_scoreboard'
----@return string?
-local function getMenuName(player, menuType)
-    local nameFormat = OmiChat.Option.FormatMenuName
-    if not nameFormat or nameFormat == '' then
-        return
-    end
-
-    local username = player:getUsername()
-    local chatName = OmiChat.getNameInChat(username, 'say')
-    local tokens = chatName and OmiChat.getPlayerSubstitutions(player)
-    if not chatName or not tokens then
-        return
-    end
-
-    tokens.name = OmiChat.utils.unescapeRichText(chatName)
-    tokens.menuType = menuType
-    local result = OmiChat.utils.interpolate(nameFormat, tokens, username)
-
-    if result == '' then
-        return
-    end
-
-    return result
-end
+local Option = OmiChat.Option
 
 
 --#region Medical
@@ -46,7 +19,7 @@ function ISMedicalCheckAction:perform()
         return
     end
 
-    local name = getMenuName(self.otherPlayer, 'medical')
+    local name = OmiChat.getPlayerMenuName(self.otherPlayer, 'medical')
     if not name then
         return
     end
@@ -61,7 +34,7 @@ function ISHealthPanel:update()
         return
     end
 
-    local name = getMenuName(self.character, 'medical')
+    local name = OmiChat.getPlayerMenuName(self.character, 'medical')
     if not name then
         return
     end
@@ -109,7 +82,7 @@ function ISTradingUI.ReceiveTradeRequest(requester)
         return
     end
 
-    local name = getMenuName(requester, 'trade')
+    local name = OmiChat.getPlayerMenuName(requester, 'trade')
     if not name then
         return
     end
@@ -130,7 +103,7 @@ function ISTradingUI.AcceptedTrade(accepted)
         return
     end
 
-    local name = getMenuName(instance.otherPlayer, 'trade')
+    local name = OmiChat.getPlayerMenuName(instance.otherPlayer, 'trade')
     if not name then
         return
     end
@@ -148,7 +121,7 @@ function ISTradingUI.OtherAddNewItem(player, item)
         return
     end
 
-    local name = getMenuName(player, 'trade')
+    local name = OmiChat.getPlayerMenuName(player, 'trade')
     if not name then
         return
     end
@@ -172,7 +145,7 @@ function ISTradingUI.RemoveItem(player, index)
         return
     end
 
-    local name = getMenuName(player, 'trade')
+    local name = OmiChat.getPlayerMenuName(player, 'trade')
     if not name then
         return
     end
@@ -196,7 +169,7 @@ function ISTradingUI.UpdateState(player, state)
         return
     end
 
-    local name = getMenuName(instance.otherPlayer, 'trade')
+    local name = OmiChat.getPlayerMenuName(instance.otherPlayer, 'trade')
     if not name then
         return
     end
@@ -228,7 +201,7 @@ end
 function ISTradingUI:update()
     ISTradingUI_update(self)
 
-    local name = getMenuName(self.otherPlayer, 'trade')
+    local name = OmiChat.getPlayerMenuName(self.otherPlayer, 'trade')
     if not name then
         return
     end
@@ -248,7 +221,7 @@ function ISTradingUI:update()
 end
 
 function ISTradingUI:prerender()
-    local name = getMenuName(self.otherPlayer, 'trade')
+    local name = OmiChat.getPlayerMenuName(self.otherPlayer, 'trade')
     if not name then
         return ISTradingUI_prerender(self)
     end
@@ -275,7 +248,7 @@ function ISTradingUI:prerender()
 end
 
 function ISTradingUIHistorical:prerender()
-    local name = getMenuName(self.otherPlayer, 'trade')
+    local name = OmiChat.getPlayerMenuName(self.otherPlayer, 'trade')
     if not name then
         return ISTradingUIHistorical_prerender(self)
     end
@@ -300,7 +273,7 @@ function ISWorldObjectContextMenu.onTrade(worldobjects, player, otherPlayer)
         return
     end
 
-    local name = getMenuName(otherPlayer, 'trade')
+    local name = OmiChat.getPlayerMenuName(otherPlayer, 'trade')
     if not name then
         return
     end
@@ -342,7 +315,7 @@ function ISMiniScoreboardUI:populateList()
         end
 
         local player = getPlayerFromUsername(username)
-        local name = player and getMenuName(player, 'mini_scoreboard')
+        local name = player and OmiChat.getPlayerMenuName(player, 'mini_scoreboard')
         if name then
             item.text = name
             local desc = player:getDescriptor()
@@ -379,32 +352,56 @@ end
 
 --#region Context Menu
 
----@param context ISContextMenu
-local function onContextMenu(_, context)
-    for i = 1, #context.options do
-        local opt = context.options[i]
+local ISWorldObjectContextMenu_createMenu = ISWorldObjectContextMenu.createMenu
 
-        local player = opt.param2
-        local isParamPlayer = player and instanceof(player, 'IsoPlayer')
-        if isParamPlayer and opt.onSelect == ISWorldObjectContextMenu.onTrade then
-            local name = getMenuName(player, 'trade')
-            if name then
-                opt.name = getText('ContextMenu_Trade', name)
+---Modifies a context menu option if it matches one of the known options that uses the player name.
+---@param opt table
+---@param spfwEnabled boolean
+local function handleContextMenuOption(opt, spfwEnabled)
+    local otherPlayer = opt.param2
+    if not otherPlayer or not instanceof(otherPlayer, 'IsoPlayer') then
+        return
+    end
 
-                if opt.toolTip and opt.notAvailable then
-                    opt.toolTip.description = getText('ContextMenu_GetCloserToTrade', name)
-                end
-            end
-        elseif isParamPlayer and opt.onSelect == ISWorldObjectContextMenu.onMedicalCheck then
-            local name = opt.toolTip and opt.notAvailable and getMenuName(player, 'medical')
-            if name then
-                opt.toolTip.description = getText('ContextMenu_GetCloser', name)
-            end
+    local onSelect = opt.onSelect
+    if onSelect == ISWorldObjectContextMenu.onTrade then
+        local name = OmiChat.getPlayerMenuName(otherPlayer, 'trade')
+        if not name then
+            return
+        end
+
+        opt.name = getText('ContextMenu_Trade', name)
+        if opt.toolTip and opt.notAvailable then
+            opt.toolTip.description = getText('ContextMenu_GetCloserToTrade', name)
+        end
+    elseif onSelect == ISWorldObjectContextMenu.onMedicalCheck then
+        local name = opt.toolTip and opt.notAvailable and OmiChat.getPlayerMenuName(otherPlayer, 'medical')
+        if name then
+            opt.toolTip.description = getText('ContextMenu_GetCloser', name)
+        end
+    elseif spfwEnabled and onSelect == onSearchPlayerContextSelected then ---@diagnostic disable-line: undefined-global
+        local name = OmiChat.getPlayerMenuName(otherPlayer, 'search_player')
+        if name then
+            opt.name = getText('UI_SearchStub', name)
         end
     end
 end
 
+---Override to createMenu to ensure our handling occurs after all event handlers have run.
+---@param ... unknown
+---@return unknown
+function ISWorldObjectContextMenu.createMenu(...)
+    local context = ISWorldObjectContextMenu_createMenu(...)
+    if type(context) ~= 'table' or not context.options then
+        return context
+    end
 
-Events.OnFillWorldObjectContextMenu.Add(onContextMenu)
+    local spfwEnabled = Option:compatSearchPlayersEnabled()
+    for i = 1, #context.options do
+        handleContextMenuOption(context.options[i], spfwEnabled)
+    end
+
+    return context
+end
 
 --#endregion
