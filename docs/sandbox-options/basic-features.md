@@ -35,7 +35,7 @@ This allows players to specify a list of custom shouts that are used when pressi
 Players can configure custom shouts using an option in the [chat settings](../user-guide/chat-settings.md).
 
 ### EnableDiscordColorOption
-**Default:** `3`
+**Default:** `3 - Respect server setting`
 
 Determines whether the option to change the color of Discord messages will be included in the [chat settings](../user-guide/chat-settings.md).
 If this is set to `3`, the `DiscordEnable` server option will be respected.
@@ -57,7 +57,7 @@ If enabled, players' faction tag colors will be used as the default color for `/
 This takes precedence over the [`ColorFaction`](./colors.md#colorfaction) setting.
 
 ### EnableSetName
-**Default:** `2`
+**Default:** `2 - /name sets chat nickname`
 
 Determines the behavior of the `/name` and `/nickname` chat commands.
 **If `/name` is configured to set the character's name, the empty command cannot be used to reset it.**

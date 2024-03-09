@@ -13,9 +13,9 @@ local floor = math.floor
 ---@field EnableSetNameColor boolean
 ---@field EnableSpeechColorAsDefaultNameColor boolean
 ---@field EnableSetSpeechColor boolean
----@field EnableCompatChatBubble boolean
----@field EnableCompatSearchPlayers boolean
----@field EnableCompatTAD boolean
+---@field EnableCompatChatBubble integer
+---@field EnableCompatSearchPlayers integer
+---@field EnableCompatTAD integer
 ---@field EnableFactionColorAsDefault boolean
 ---@field EnableCharacterCustomization boolean
 ---@field EnableDiscordColorOption integer
@@ -167,6 +167,18 @@ local function getColorOrDefault(options, colorOpt)
     end
 end
 
+---Checks whether a mod compatibility option is enabled.
+---@param value integer The value of the option.
+---@param modId string The mod ID of the relevant mod.
+---@return boolean
+local function isCompatEnabled(value, modId)
+    if value ~= 3 then
+        return value == 1
+    end
+
+    return getActivatedMods():contains(modId)
+end
+
 
 ---Returns whether players have a way to set their chat nickname.
 ---@return boolean
@@ -177,19 +189,19 @@ end
 ---Returns whether the Chat Bubble compatibility patch is enabled.
 ---@return boolean
 function Option:compatChatBubbleEnabled()
-    return Option.EnableCompatChatBubble and getActivatedMods():contains('ChatBubble')
+    return isCompatEnabled(Option.EnableCompatChatBubble, 'ChatBubble')
 end
 
 ---Returns whether the Search Players For Weapons compatibility patch is enabled.
 ---@return boolean
 function Option:compatSearchPlayersEnabled()
-    return Option.EnableCompatSearchPlayers and getActivatedMods():contains('SearchPlayersForWeapons')
+    return isCompatEnabled(Option.EnableCompatSearchPlayers, 'SearchPlayersForWeapons')
 end
 
 ---Returns whether the True Actions Dancing compatibility patch is enabled.
 ---@return boolean
 function Option:compatTADEnabled()
-    return Option.EnableCompatTAD and getActivatedMods():contains('TrueActionsDancing')
+    return isCompatEnabled(Option.EnableCompatTAD, 'TrueActionsDancing')
 end
 
 ---Returns the default color associated with a category.
@@ -273,7 +285,7 @@ end
 ---@return boolean
 function Option:showDiscordColorOption()
     local opt = self.EnableDiscordColorOption
-    if opt then
+    if opt == 3 then
         return getServerOptions():getBoolean('DiscordEnable')
     end
 

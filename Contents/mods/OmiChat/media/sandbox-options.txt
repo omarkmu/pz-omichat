@@ -82,26 +82,32 @@ option OmiChat.EnableDiscordColorOption
 /* Compatibility Feature Flags */
 option OmiChat.EnableCompatChatBubble
 {
-    type = boolean,
-    default = true,
+    type = enum,
+    numValues = 3,
+    default = 3,
     page = OmiChat,
     translation = OCEnableCompatChatBubble,
+    valueTranslation = OCCompatOptionValue,
 }
 
 option OmiChat.EnableCompatSearchPlayers
 {
-    type = boolean,
-    default = true,
+    type = enum,
+    numValues = 3,
+    default = 3,
     page = OmiChat,
     translation = OCEnableCompatSearchPlayers,
+    valueTranslation = OCCompatOptionValue,
 }
 
 option OmiChat.EnableCompatTAD
 {
-    type = boolean,
-    default = true,
+    type = enum,
+    numValues = 3,
+    default = 3,
     page = OmiChat,
     translation = OCEnableCompatTAD,
+    valueTranslation = OCCompatOptionValue,
 }
 
 
