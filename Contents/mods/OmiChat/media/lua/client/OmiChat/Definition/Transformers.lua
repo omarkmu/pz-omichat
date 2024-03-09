@@ -395,6 +395,10 @@ return {
         name = 'check-range',
         priority = 15,
         transform = function(_, info)
+            if info.chatType ~= 'say' and info.chatType ~= 'shout' then
+                return
+            end
+
             local range
             local defaultRange
             local streamData = config:getCustomStreamInfo(info.context.ocCustomStream)
