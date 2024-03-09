@@ -32,6 +32,7 @@ return OmiChat
 ---@field icon string? The user's icon when this message was sent.
 ---@field adminIcon string? The admin icon when this message was sent, if it was enabled.
 ---@field nameColor omichat.ColorTable? The name color of the author when this message was sent.
+---@field recipientNameColor omichat.ColorTable? The name color of the recipient when this message was sent.
 ---@field suppressed boolean? Whether the overhead text for this message has already been suppressed.
 
 ---Options for how to format a message in chat.

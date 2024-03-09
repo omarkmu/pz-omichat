@@ -11,32 +11,6 @@ local Option = OmiChat.Option
 local config = OmiChat.config
 
 
----Encodes additional information in a message tag.
----@param message omichat.Message
----@param key string
----@param value unknown
-local function addMessageTagValue(message, key, value)
-    local tag = message:getCustomTag()
-    local success, newTag, encodedTag
-    success, newTag = utils.json.tryDecode(tag)
-    if not success or type(newTag) ~= 'table' then
-        newTag = {}
-    end
-
-    newTag[key] = value
-    success, encodedTag = utils.json.tryEncode(newTag)
-    if not success then
-        -- other data is bad, so just throw it out
-        if type(value) == 'string' then
-            value = string.format('%q', value)
-        end
-
-        encodedTag = string.format('{"%s":%s}', key, tostring(value))
-    end
-
-    message:setCustomTag(encodedTag)
-end
-
 ---@type omichat.MessageTransformer[]
 return {
     {
@@ -55,7 +29,7 @@ return {
 
             info.context.ocIsRadio = true
             info.content = text:sub(msgStart + 1)
-            info.format = Option.ChatFormatRadio
+            info.format = info.format or Option.ChatFormatRadio
             info.tokens.frequency = freq
         end,
     },
@@ -102,7 +76,7 @@ return {
 
             if Option.ChatFormatEcho ~= '' then
                 info.tokens.echo = '1'
-                info.format = Option.ChatFormatEcho
+                info.format = info.format or Option.ChatFormatEcho
             end
 
             local player = getSpecificPlayer(0)
@@ -117,7 +91,7 @@ return {
         name = 'decode-card',
         priority = 55,
         transform = function(_, info)
-            if info.chatType ~= 'say' or not OmiChat.isCustomStreamEnabled('card') then
+            if not OmiChat.isCustomStreamEnabled('card') then
                 return
             end
 
@@ -161,7 +135,7 @@ return {
         name = 'decode-roll',
         priority = 50,
         transform = function(_, info)
-            if info.chatType ~= 'say' or not OmiChat.isCustomStreamEnabled('roll') then
+            if not OmiChat.isCustomStreamEnabled('roll') then
                 return
             end
 
@@ -297,7 +271,7 @@ return {
     {
         name = 'handle-language',
         priority = 30,
-        transform = function(self, info)
+        transform = function(_, info)
             local isRadio = info.context.ocIsRadio
             local formatter = OmiChat.getFormatter('language')
             local text = info.content or info.rawText
@@ -325,7 +299,7 @@ return {
             if not language and isRadio and encodedId then
                 language = OmiChat.getRoleplayLanguageFromID(encodedId)
                 if language then
-                    addMessageTagValue(info.message, 'ocLanguage', language)
+                    utils.addMessageTagValue(info.message, 'ocLanguage', language)
                 end
             end
 
@@ -516,7 +490,13 @@ return {
 
                 info.format = Option.ChatFormatOutgoingPrivate
                 info.tokens.recipient = other
+                info.tokens.recipientRaw = other
                 info.tokens.recipientName = utils.escapeRichText(OmiChat.getNameInChat(other, 'whisper') or other)
+                info.tokens.recipientNameRaw = info.tokens.recipientName
+
+                if not info.meta.recipientNameColor then
+                    info.meta.recipientNameColor = OmiChat.getNameColorInChat(other)
+                end
             else
                 -- defer to basic chat format handler
                 info.context.ocIsIncomingPM = true
@@ -583,7 +563,8 @@ return {
             end
 
             if info.chatType == 'faction' then
-                local faction = Faction.getPlayerFaction(getPlayer())
+                local player = getSpecificPlayer(0)
+                local faction = player and Faction.getPlayerFaction(player)
                 info.tokens.faction = faction and faction:getName() or nil
             end
 
@@ -638,7 +619,7 @@ return {
             end
 
             -- avoid doing this again
-            addMessageTagValue(info.message, 'ocSupressed', true)
+            utils.addMessageTagValue(info.message, 'ocSuppressed', true)
 
             -- push the message up with blank text
             local player = getSpecificPlayer(0)

@@ -113,6 +113,32 @@ local function readColor(text)
 end
 
 
+---Encodes additional information in a message tag.
+---@param message omichat.Message
+---@param key string
+---@param value unknown
+function utils.addMessageTagValue(message, key, value)
+    local tag = message:getCustomTag()
+    local success, newTag, encodedTag
+    success, newTag = utils.json.tryDecode(tag)
+    if not success or type(newTag) ~= 'table' then
+        newTag = {}
+    end
+
+    newTag[key] = value
+    success, encodedTag = utils.json.tryEncode(newTag)
+    if not success then
+        -- other data is bad, so just throw it out
+        if type(value) == 'string' then
+            value = string.format('%q', value)
+        end
+
+        encodedTag = string.format('{"%s":%s}', key, tostring(value))
+    end
+
+    message:setCustomTag(encodedTag)
+end
+
 ---Cleans up unused cache items.
 ---@param clear boolean If true, the cache will be cleared entirely.
 function utils.cleanupCache(clear)
