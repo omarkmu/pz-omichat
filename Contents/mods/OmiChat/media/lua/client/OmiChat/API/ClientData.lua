@@ -149,7 +149,12 @@ function OmiChat.getCurrentRoleplayLanguage()
     end
 
     local modData = OmiChat.getModData()
-    return modData.currentLanguage[username]
+    local language = modData.currentLanguage[username]
+    if not OmiChat.isConfiguredRoleplayLanguage(language) then
+        return
+    end
+
+    return language
 end
 
 ---Retrieves the player's custom shouts.

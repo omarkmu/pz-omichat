@@ -8,35 +8,6 @@ local OmiChat = require 'OmiChat/API/Server'
 local Option = OmiChat.Option
 
 
----Updates language information for the player with the given username.
----@param username string
-local function refreshLanguageInfo(username)
-    local modData = OmiChat.getModData()
-    local currentLang = modData.currentLanguage[username]
-    local languages = modData.languages[username]
-    if not languages then
-        modData.currentLanguage[username] = nil
-        return
-    end
-
-    local hasCurrentLang = false
-    local validLanguages = {}
-    for i = 1, #languages do
-        local lang = languages[i]
-        if OmiChat.isConfiguredRoleplayLanguage(lang) then
-            validLanguages[#validLanguages + 1] = lang
-            if lang == currentLang then
-                hasCurrentLang = true
-            end
-        end
-    end
-
-    modData.languages[username] = validLanguages
-    if not hasCurrentLang or not currentLang then
-        modData.currentLanguage[username] = validLanguages[1]
-    end
-end
-
 ---Adds a roleplay language for a given player.
 ---This does not transmit changes to clients.
 ---@see omichat.api.server.transmitModData
@@ -61,7 +32,7 @@ function OmiChat.addRoleplayLanguage(username, language)
     end
 
     languages[#languages + 1] = language
-    refreshLanguageInfo(username)
+    OmiChat.refreshLanguageInfo(username)
     return true
 end
 
@@ -78,7 +49,7 @@ end
 ---@return string?
 function OmiChat.getCurrentRoleplayLanguage(username)
     local modData = OmiChat.getModData()
-    refreshLanguageInfo(username)
+    OmiChat.refreshLanguageInfo(username)
     return modData.currentLanguage[username]
 end
 
@@ -118,7 +89,7 @@ end
 function OmiChat.resetRoleplayLanguages(username)
     local modData = OmiChat.getModData()
     modData.languages[username] = { OmiChat.getDefaultRoleplayLanguage() }
-    refreshLanguageInfo(username)
+    OmiChat.refreshLanguageInfo(username)
 end
 
 ---Sets the chat icon for the player with the given username.
@@ -143,7 +114,7 @@ function OmiChat.setCurrentRoleplayLanguage(username, language)
     local modData = OmiChat.getModData()
     modData.currentLanguage[username] = language
 
-    refreshLanguageInfo(username)
+    OmiChat.refreshLanguageInfo(username)
     return true
 end
 

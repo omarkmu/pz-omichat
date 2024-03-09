@@ -11,9 +11,6 @@ To allow players to set additional languages, the [`LanguageSlots`](#languageslo
 The roleplay languages that players can use, separated by semicolons.
 The default values are based on the game's available languages (with the exception of ASL).
 
-**The order of languages is important**, since their position in this list is used as an ID.
-New languages should always be added to the end, unless replacement is intended.
-
 Up to 32 languages can be specified.
 The first language in the list will be treated as the default language player characters speak.
 
