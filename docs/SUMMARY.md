@@ -5,7 +5,7 @@
 # User Guide
 
 - [Chat Settings](user-guide/chat-settings.md)
-- [Emote Shortcuts](user-guide/emotes.md)
+- [Emote Shortcuts](user-guide/emote-shortcuts.md)
 - [Admin Utilities](user-guide/admins.md)
 
 # Reference Guide

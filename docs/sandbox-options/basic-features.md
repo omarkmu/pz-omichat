@@ -47,7 +47,7 @@ If this is set to `3`, the `DiscordEnable` server option will be respected.
 ### EnableEmotes
 **Default:** `true`
 
-Allows players to use [emote](../user-guide/emotes.md) shortcuts in the form of `.emote`.
+Allows players to use [emote](../user-guide/emote-shortcuts.md) shortcuts in the form of `.emote`.
 These are enabled only in local chats.
 
 ### EnableFactionColorAsDefault
