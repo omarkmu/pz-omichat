@@ -5,11 +5,12 @@
 # User Guide
 
 - [Chat Settings](user-guide/chat-settings.md)
-- [Emotes](user-guide/emotes.md)
+- [Emote Shortcuts](user-guide/emotes.md)
 - [Admin Utilities](user-guide/admins.md)
 
 # Reference Guide
 
+- [Presets](sandbox-presets/index.md)
 - [Sandbox Options](sandbox-options/index.md)
     - [Basic Features](sandbox-options/basic-features.md)
     - [Compatibility Features](sandbox-options/compatibility-features.md)
