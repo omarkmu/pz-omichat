@@ -265,7 +265,7 @@ local function addLanguageOptions(context)
     local currentLang = OmiChat.getCurrentRoleplayLanguage() or OmiChat.getDefaultRoleplayLanguage()
     for i = 1, #languages do
         local lang = languages[i]
-        if allLanguages[lang] then
+        if OmiChat.isConfiguredRoleplayLanguage(lang) then
             knownLanguages[#knownLanguages + 1] = lang
             isKnown[lang] = true
         end
@@ -278,7 +278,7 @@ local function addLanguageOptions(context)
             if not isKnown[lang] then
                 addLanguages[#addLanguages + 1] = {
                     language = lang,
-                    translated = getTextOrNull('UI_OmiChat_Language_' .. lang) or lang,
+                    translated = utils.getTranslatedLanguageName(lang),
                 }
             end
         end
@@ -295,7 +295,7 @@ local function addLanguageOptions(context)
 
     for i = 1, #knownLanguages do
         local lang = knownLanguages[i]
-        local name = getTextOrNull('UI_OmiChat_Language_' .. lang) or lang
+        local name = utils.getTranslatedLanguageName(lang)
         local opt = languageSubMenu:addOption(name, ISChat.instance, ISChat.onLanguageSelect, lang)
         languageSubMenu:setOptionChecked(opt, lang == currentLang)
     end

@@ -182,22 +182,46 @@ function OmiChat.applyFormatOptions(info)
         info.tokens.icon = string.format(' <IMAGE:%s,%d,%d> ', icon, size + 1, size)
     end
 
-    local hasNameColor = meta.nameColor or Option.EnableSpeechColorAsDefaultNameColor
-    if hasNameColor and shouldUseNameColor(info) then
-        local colorToUse = meta.nameColor or Option:getDefaultColor('name', message:getAuthor())
-        local nameColor = utils.toChatColor(colorToUse, true)
+    if shouldUseNameColor(info) then
+        local hasNameColor = meta.nameColor or Option.EnableSpeechColorAsDefaultNameColor
+        local hasRecipientNameColor = meta.recipientNameColor or Option.EnableSpeechColorAsDefaultNameColor
+        if hasNameColor then
+            local colorToUse = meta.nameColor or Option:getDefaultColor('name', message:getAuthor())
+            local nameColor = utils.toChatColor(colorToUse, true)
 
-        if nameColor ~= '' then
-            info.tokens.name = concat {
-                nameColor,
-                info.tokens.name,
-                ' <POPRGB> ',
-            }
-            info.tokens.author = concat {
-                nameColor,
-                info.tokens.author,
-                ' <POPRGB> ',
-            }
+            if nameColor ~= '' then
+                utils.addMessageTagValue(message, 'ocNameColor', utils.colorToHexString(colorToUse))
+                info.tokens.name = concat {
+                    nameColor,
+                    info.tokens.name,
+                    ' <POPRGB> ',
+                }
+                info.tokens.author = concat {
+                    nameColor,
+                    info.tokens.author,
+                    ' <POPRGB> ',
+                }
+            end
+        end
+
+        if hasRecipientNameColor and info.tokens.recipient then
+            local colorToUse = meta.recipientNameColor or Option:getDefaultColor('name', info.tokens.recipient)
+            meta.recipientNameColor = colorToUse
+            local nameColor = utils.toChatColor(colorToUse, true)
+
+            if nameColor ~= '' then
+                utils.addMessageTagValue(message, 'ocRecipientNameColor', utils.colorToHexString(colorToUse))
+                info.tokens.recipientName = concat {
+                    nameColor,
+                    info.tokens.recipientName,
+                    ' <POPRGB> ',
+                }
+                info.tokens.recipient = concat {
+                    nameColor,
+                    info.tokens.recipient,
+                    ' <POPRGB> ',
+                }
+            end
         end
     end
 
@@ -397,6 +421,7 @@ function OmiChat.decodeMessageTag(tag)
         language = decoded.ocLanguage,
         name = decoded.ocName,
         nameColor = utils.stringToColor(decoded.ocNameColor),
+        recipientNameColor = utils.stringToColor(decoded.ocRecipientNameColor),
         icon = decoded.ocIcon,
         adminIcon = decoded.ocAdminIcon,
     }
