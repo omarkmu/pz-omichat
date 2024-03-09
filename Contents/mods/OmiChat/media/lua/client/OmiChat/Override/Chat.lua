@@ -241,10 +241,6 @@ end
 ---Adds the context menu options for custom callouts.
 ---@param context ISContextMenu
 local function addCustomCalloutOptions(context)
-    if not Option.EnableCustomShouts then
-        return
-    end
-
     local shoutOpts = { 'callouts', 'sneakcallouts' }
     for i = 1, #shoutOpts do
         local shoutType = shoutOpts[i]
@@ -413,7 +409,9 @@ local function addChatCustomizationSettings(context)
     local submenu = context:getNew(context)
     context:addSubMenu(option, submenu)
 
-    addCustomCalloutOptions(submenu)
+    if Option.EnableCustomShouts then
+        addCustomCalloutOptions(submenu)
+    end
 
     if Option.EnableSetNameColor or Option.EnableSpeechColorAsDefaultNameColor then
         local nameColorOptName = OmiChat.getNameColorsEnabled()
@@ -425,6 +423,12 @@ local function addChatCustomizationSettings(context)
 
     if not Option.EnableCharacterCustomization then
         addSignEmoteOption(submenu)
+    end
+
+    if #submenu.options == 0 then
+        -- no submenu options → just add the color option to the top-level menu
+        context:removeLastOption()
+        submenu = context
     end
 
     addColorOptions(submenu)
@@ -1151,7 +1155,7 @@ function ISChat:onCommandEntered()
 
     local instance = ISChat.instance ---@cast instance omichat.ISChat
     local input = instance.textEntry:getText()
-    local stream, command, chatCommand = OmiChat.chatCommandToStream(input, true, true)
+    local stream, command, chatCommand, hasDisabled = OmiChat.chatCommandToStream(input, true, true)
 
     local useCallback
     local callbackStream
@@ -1223,7 +1227,9 @@ function ISChat:onCommandEntered()
         callbackStream = nil
     end
 
-    if not shouldHandle then
+    if hasDisabled then
+        OmiChat.addInfoMessage('Unknown command ' .. command:sub(2))
+    elseif not shouldHandle then
         -- no special handling, pass to original function
         _onCommandEntered(self)
 
@@ -1269,8 +1275,8 @@ function ISChat:onGearButtonClick()
 
     OmiChat.hideSuggesterBox()
 
-    local x = self:getAbsoluteX() + self:getWidth()
-    local y = self:getAbsoluteY() + self.gearButton:getY()
+    local x = getMouseX()
+    local y = getMouseY()
     local context = ISContextMenu.get(0, x, y)
 
     addAdminOptions(context)
