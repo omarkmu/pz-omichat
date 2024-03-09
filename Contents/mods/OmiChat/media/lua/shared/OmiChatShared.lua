@@ -76,13 +76,11 @@ return OmiChat
 ---@field rangeOpt string The name of the option used to determine message range.
 ---@field chatFormatOpt string The name of the option used for the chat format.
 ---@field overheadFormatOpt string The name of the option used for the overhead format.
----@field convertToRadio true? Whether messages sent on this stream should show up in chat over the radio.
 ---@field chatTypes table<omichat.ChatTypeString, true?> Chat types for which this stream is enabled.
 ---@field streamAlias string? An alias to use for determining color and range.
 ---@field autoColorOption false? Whether to automatically add a color option for this stream.
 ---@field defaultRangeOpt string? The option used for the default message range. Defaults to `RangeSay`.
 ---@field titleID string? The string ID to use for chat tags associated with this stream.
----@field ignoreLanguage true? Whether messages sent with this stream should be understood by everyone.
 
 ---@class omichat.FormatterInfo
 ---@field name string The name of the formatter.

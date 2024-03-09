@@ -94,6 +94,31 @@ Determines whether [roleplay languages](./languages.md) can be used for a messag
 - [`$stream`](../format-strings/tokens.md#stream)
 - [`$username`](../format-strings/tokens.md#username)
 
+### PredicateTransmitOverRadio
+**Default:** `$has(@(say;shout;low;whisper) $stream)`
+
+Determines whether a message should be transmitted over the radio.
+
+This only controls whether messages that have already been transmitted will be visible.
+For faction/safehouse echo messages, use [`ChatFormatEcho`](./chat-formats.md#chatformatecho).
+
+**Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
+- [`$author`](../format-strings/tokens.md#author)
+- [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
+- [`$echo`](../format-strings/tokens.md#echo)
+- [`$language`](../format-strings/tokens.md#language)
+- [`$languageRaw`](../format-strings/tokens.md#languageraw)
+- [`$icon`](../format-strings/tokens.md#icon)
+- [`$iconRaw`](../format-strings/tokens.md#iconraw)
+- [`$message`](../format-strings/tokens.md#message)
+- [`$name`](../format-strings/tokens.md#name)
+- [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+- [`$stream`](../format-strings/tokens.md#stream)
+
 ### PredicateApplyBuff
 `(blank by default)`
 

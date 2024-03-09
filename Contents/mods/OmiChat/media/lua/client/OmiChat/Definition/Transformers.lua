@@ -66,7 +66,7 @@ return {
         name = 'handle-echo',
         priority = 60,
         transform = function(_, info)
-            local text = info.content or info.rawText
+            local text = info.rawText
             local formatter = OmiChat.getFormatter('echo')
 
             local matched = formatter:read(text)
@@ -225,14 +225,8 @@ return {
 
                 local isMatch = formatter:isMatch(text)
                 if isMatch and isRadio then
-                    if data.convertToRadio then
-                        info.content = formatter:read(text)
-                    else
-                        info.message:setShowInChat(false)
-                        info.message:setOverHeadSpeech(false)
-                    end
-
-                    break
+                    info.tokens.customStream = data.streamAlias or name
+                    info.content = formatter:read(text)
                 elseif isValidStream and isMatch then
                     info.content = formatter:read(text)
                     info.format = info.format or Option[data.chatFormatOpt]
@@ -288,11 +282,6 @@ return {
                 end
             end
 
-            local streamData = config:getCustomStreamInfo(info.context.ocCustomStream)
-            if streamData and streamData.ignoreLanguage then
-                return
-            end
-
             local defaultLanguage = OmiChat.getDefaultRoleplayLanguage()
             local language = info.meta.language or defaultLanguage
 
@@ -345,8 +334,15 @@ return {
                 info.format = Option.ChatFormatUnknownLanguage
                 if OmiChat.isCustomStreamEnabled('me') then
                     info.formatOptions.color = OmiChat.getColorOrDefault('me')
-                    info.context.ocCustomStream = 'me'
                     info.tokens.stream = 'me'
+                elseif (info.context.ocIsSneakCallout or info.context.ocCustomStream == 'whisper') and OmiChat.isCustomStreamEnabled('mequiet') then
+                    info.context.ocStreamForRange = 'whisper'
+                    info.formatOptions.color = OmiChat.getColorOrDefault('mequiet')
+                    info.tokens.stream = 'mequiet'
+                elseif info.chatType == 'shout' and OmiChat.isCustomStreamEnabled('meloud') then
+                    info.context.ocStreamForRange = 'shout'
+                    info.formatOptions.color = OmiChat.getColorOrDefault('meloud')
+                    info.tokens.stream = 'meloud'
                 end
             end
         end,
@@ -419,7 +415,7 @@ return {
                 defaultRange = Option:getDefault('RangeYell')
             end
 
-            local tokens = { stream = info.tokens.stream }
+            local tokens = { stream = info.context.ocStreamForRange or info.tokens.stream }
             if range then
                 info.attractRange = range * Option.RangeMultiplierZombies
                 if not info.context.ocIsCallout and not info.context.ocIsSneakCallout then
@@ -493,6 +489,18 @@ return {
 
             info.formatOptions.color = OmiChat.getColorOrDefault('private')
             info.formatOptions.useDefaultChatColor = false
+        end,
+    },
+    {
+        name = 'check-hide-radio',
+        priority = 5,
+        transform = function(_, info)
+            if info.chatType ~= 'radio' or utils.testPredicate(Option.PredicateTransmitOverRadio, info.tokens) then
+                return
+            end
+
+            info.message:setShowInChat(false)
+            info.message:setOverHeadSpeech(false)
         end,
     },
     {

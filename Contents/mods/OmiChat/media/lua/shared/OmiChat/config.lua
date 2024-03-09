@@ -56,7 +56,6 @@ Configuration._commandStreams = {
         overheadFormatOpt = 'OverheadFormatRoll',
         chatTypes = { say = true },
         autoColorOption = false,
-        ignoreLanguage = true,
     },
     {
         name = 'card',
@@ -68,7 +67,6 @@ Configuration._commandStreams = {
         overheadFormatOpt = 'OverheadFormatCard',
         chatTypes = { say = true },
         autoColorOption = false,
-        ignoreLanguage = true,
     },
 }
 
@@ -82,7 +80,6 @@ Configuration._chatStreams = {
         chatFormatOpt = 'ChatFormatLow',
         overheadFormatOpt = 'OverheadFormatLow',
         chatTypes = { say = true },
-        convertToRadio = true,
     },
     {
         name = 'whisper',
@@ -92,7 +89,6 @@ Configuration._chatStreams = {
         chatFormatOpt = 'ChatFormatWhisper',
         overheadFormatOpt = 'OverheadFormatWhisper',
         chatTypes = { say = true },
-        convertToRadio = true,
     },
     {
         name = 'me',
@@ -102,7 +98,6 @@ Configuration._chatStreams = {
         chatFormatOpt = 'ChatFormatMe',
         overheadFormatOpt = 'OverheadFormatMe',
         chatTypes = { say = true },
-        ignoreLanguage = true,
     },
     {
         name = 'mequiet',
@@ -112,7 +107,6 @@ Configuration._chatStreams = {
         chatFormatOpt = 'ChatFormatMeQuiet',
         overheadFormatOpt = 'OverheadFormatMeQuiet',
         chatTypes = { say = true },
-        ignoreLanguage = true,
     },
     {
         name = 'meloud',
@@ -123,7 +117,6 @@ Configuration._chatStreams = {
         chatFormatOpt = 'ChatFormatMeLoud',
         overheadFormatOpt = 'OverheadFormatMeLoud',
         chatTypes = { shout = true },
-        ignoreLanguage = true,
     },
     {
         name = 'do',
@@ -133,7 +126,6 @@ Configuration._chatStreams = {
         chatFormatOpt = 'ChatFormatDo',
         overheadFormatOpt = 'OverheadFormatDo',
         chatTypes = { say = true },
-        ignoreLanguage = true,
     },
     {
         name = 'doquiet',
@@ -143,7 +135,6 @@ Configuration._chatStreams = {
         chatFormatOpt = 'ChatFormatDoQuiet',
         overheadFormatOpt = 'OverheadFormatDoQuiet',
         chatTypes = { say = true },
-        ignoreLanguage = true,
     },
     {
         name = 'doloud',
@@ -154,7 +145,6 @@ Configuration._chatStreams = {
         overheadFormatOpt = 'OverheadFormatDoLoud',
         defaultRangeOpt = 'RangeYell',
         chatTypes = { shout = true },
-        ignoreLanguage = true,
     },
     {
         name = 'ooc',
@@ -164,7 +154,6 @@ Configuration._chatStreams = {
         chatFormatOpt = 'ChatFormatOoc',
         overheadFormatOpt = 'OverheadFormatOoc',
         chatTypes = { say = true },
-        ignoreLanguage = true,
     },
 }
 
