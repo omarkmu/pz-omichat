@@ -12,6 +12,7 @@ The format used for `/admin` messages in chat.
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -37,6 +38,7 @@ If blank, `/card` messages will be global instead of local and related options w
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
 - `$card`: The translated name of the card that was drawn.
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -62,6 +64,7 @@ Messages from Discord will not apply name colors.
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -85,6 +88,7 @@ With the default setting, `/do the lights flicker` will appear in chat as `« Th
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -113,6 +117,7 @@ If blank, `/doloud` messages will be disabled.
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -140,6 +145,7 @@ If blank, `/doquiet` messages will be disabled.
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -167,6 +173,7 @@ If blank, echoing will not occur.
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -188,6 +195,7 @@ The format used for `/faction` messages in chat.
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -207,6 +215,7 @@ The format used for the final chat message, after all other formats have been ap
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - `$content`: The full chat message content, after other formatting has occurred.
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$echo`](../format-strings/tokens.md#echo)
 - [`$icon`](../format-strings/tokens.md#icon)
 - [`$iconRaw`](../format-strings/tokens.md#iconraw)
@@ -228,6 +237,7 @@ The format used for `/all` messages in chat.
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -249,6 +259,7 @@ The format used for incoming private messages in chat.
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -272,6 +283,7 @@ The format used for `/low` messages in chat.
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$echo`](../format-strings/tokens.md#echo)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
@@ -301,6 +313,7 @@ With the default settings, if a player with a character named “Jane” uses `/
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -329,6 +342,7 @@ If blank, `/meloud` messages will be disabled.
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -356,6 +370,7 @@ If blank, `/mequiet` messages will be disabled.
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -380,6 +395,7 @@ The format used for `/ooc` (local out-of-character) messages in chat.
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -404,6 +420,7 @@ The format used for outgoing private messages in chat.
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -412,7 +429,9 @@ The format used for outgoing private messages in chat.
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
 - `$recipient`: The username of the recipient of the message.
+- `$recipientRaw`: The username of the recipient, without name colors.
 - `$recipientName`: The chat name of the recipient of the message, as determined by [`FormatName`](./component-formats.md#formatname).
+- `$recipientNameRaw`: The chat name of the recipient, without name colors.
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 
 **See also:**
@@ -429,6 +448,7 @@ The format used for radio messages in chat.
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$frequency`](../format-strings/tokens.md#frequency)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
@@ -454,6 +474,7 @@ If blank, `/roll` messages will be global instead of local and related options w
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -480,6 +501,7 @@ The format used for `/safehouse` messages in chat.
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -501,6 +523,7 @@ The format used for `/say` messages in chat.
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$echo`](../format-strings/tokens.md#echo)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
@@ -523,6 +546,7 @@ The format used for server messages in chat.
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -535,17 +559,18 @@ The format used for server messages in chat.
 **See also:** [`ColorServer`](./colors.md#colorserver).
 
 ### ChatFormatUnknownLanguage
-**Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $gettext($unknownLanguageString $language) <SPACE>))`
+**Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $getunknownlanguagestring($languageRaw $stream) <SPACE>))`
 
 The format used when a player character does not speak the [language](./languages.md) of a chat message.
 
-With the default format, this will display as `« Name says/shouts/signs something in Language. »`.
+With the default format, this will display as `« Name says/shouts/whispers/signs something in Language. »`.
 
 **Tokens:**
 - [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -554,10 +579,9 @@ With the default format, this will display as `« Name says/shouts/signs somethi
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
-- [`$unknownLanguageString`](../format-strings/tokens.md#unknownlanguagestring)
 
 ### ChatFormatUnknownLanguageRadio
-**Default:** `$gettext(UI_OmiChat_radio $frequency): $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $gettext($unknownLanguageString $language) <SPACE>))`
+**Default:** `$gettext(UI_OmiChat_radio $frequency): $gettext(UI_OmiChat_rp_emote $getunknownlanguagestring($languageRaw $stream))`
 
 The format used when a player character does not speak the [language](./languages.md) of a chat message sent over the radio.
 
@@ -568,6 +592,7 @@ With the default format, this will display as `Radio (100.0 MHz): « Something i
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$frequency`](../format-strings/tokens.md#frequency)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
@@ -577,7 +602,6 @@ With the default format, this will display as `Radio (100.0 MHz): « Something i
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
-- [`$unknownLanguageString`](../format-strings/tokens.md#unknownlanguagestring)
 
 ### ChatFormatWhisper
 **Default:** `$name: <SPACE> $message`
@@ -592,6 +616,7 @@ If blank, local whisper will be disabled and the vanilla `/whisper` will not be 
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
@@ -616,6 +641,7 @@ The format used for `/yell` messages in chat.
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$language`](../format-strings/tokens.md#language)
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)

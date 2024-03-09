@@ -81,6 +81,64 @@ local library = {
         language = tostring(language or '')
         return OmiChat.isRoleplayLanguageSigned(tostring(language or ''))
     end,
+    escaperichtext = function(_, ...)
+        local t = {}
+        for i = 1, select('#', ...) do
+            t[#t + 1] = tostring(select(i, ...) or '')
+        end
+
+        return utils.escapeRichText(concat({ ... }))
+    end,
+    ---@param _ omichat.Interpolator
+    ---@param language string
+    ---@param stream string?
+    ---@param author string?
+    ---@param dialogueTag string?
+    ---@return string?
+    getunknownlanguagestring = function(_, language, stream, author, dialogueTag)
+        if not language then
+            return
+        end
+
+        language = tostring(language)
+        stream = stream and tostring(stream) or 'say'
+        author = author and tostring(author) or nil
+
+        local isSigned = OmiChat.isRoleplayLanguageSigned(language)
+        language = utils.getTranslatedLanguageName(language)
+
+        if stream == 'radio' and not author then
+            return getText('UI_OmiChat_unknown_language_radio_no_author', language)
+        end
+
+        dialogueTag = dialogueTag and tostring(dialogueTag) or nil
+        if author and dialogueTag then
+            local stringID = 'UI_OmiChat_unknown_language_narrative_' .. dialogueTag:gsub('%s', '_')
+            local translated = getTextOrNull(stringID, author, language)
+
+            if translated then
+                return translated
+            elseif isSigned then
+                return getText('UI_OmiChat_unknown_language_narrative_signs', author, language)
+            end
+
+            return getText('UI_OmiChat_unknown_language_narrative_says', author, language)
+        end
+
+        local stringID = { 'UI_OmiChat_unknown_language_' }
+        if stream == 'whisper' or stream == 'shout' then
+            stringID[#stringID + 1] = stream
+        else
+            stringID[#stringID + 1] = 'say'
+        end
+
+        stringID[#stringID + 1] = 's'
+        if isSigned then
+            stringID[#stringID + 1] = '_signed'
+        end
+
+        return getText(concat(stringID), language)
+    end,
 }
 
 

@@ -51,6 +51,10 @@ The value of this token will be one of:
 - `admin`
 - `server`
 
+## `$dialogueTag`
+
+The [dialogue tag](../sandbox-options/component-formats.md#formatnarrativedialoguetag) used for a message with [narrative style](../sandbox-options/filters-predicates.md#predicateusenarrativestyle) applied.
+
 ## `$echo`
 
 Populated if this is an [echo message](../sandbox-options/chat-formats.md#chatformatecho).
@@ -139,11 +143,6 @@ The relevant player character's forename.
 ## `$unknownLanguage`
 
 Equivalent to [`$language`](#language), but only populated if the language is not known by the player.
-
-## `$unknownLanguageString`
-
-The default string ID to use when a player character doesn't understand the language of a chat message.
-The value of this is dependent on whether a message was a shout, whisper, or say message, and whether it was sent in a [signed language](../sandbox-options/languages.md#signedlanguages).
 
 ## `$username`
 

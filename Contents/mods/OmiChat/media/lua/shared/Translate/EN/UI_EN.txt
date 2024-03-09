@@ -34,15 +34,6 @@ UI_EN = {
     UI_OmiChat_card_ten = "a Ten",
 
     --[[ Languages ]]--
-    UI_OmiChat_unknown_language_say = "says something in %1.",
-    UI_OmiChat_unknown_language_whisper = "whispers something in %1.",
-    UI_OmiChat_unknown_language_shout = "shouts something in %1.",
-    UI_OmiChat_unknown_language_say_signed = "signs something in %1.",
-    UI_OmiChat_unknown_language_whisper_signed = "subtly signs something in %1.",
-    UI_OmiChat_unknown_language_shout_signed = "energetically signs something in %1.",
-    UI_OmiChat_unknown_language_radio = "Something is said in %1.",
-    UI_OmiChat_in_language = "In %1",
-
     UI_OmiChat_Language_English = "English",
     UI_OmiChat_Language_French = "French",
     UI_OmiChat_Language_Italian = "Italian",
@@ -63,6 +54,24 @@ UI_EN = {
     UI_OmiChat_Language_Thai = "Thai",
     UI_OmiChat_Language_Ukrainian = "Ukrainian",
     UI_OmiChat_Language_ASL = "ASL",
+
+    UI_OmiChat_unknown_language_says = "says something in %1.",
+    UI_OmiChat_unknown_language_whispers = "whispers something in %1.",
+    UI_OmiChat_unknown_language_shouts = "shouts something in %1.",
+    UI_OmiChat_unknown_language_says_signed = "signs something in %1.",
+    UI_OmiChat_unknown_language_whispers_signed = "subtly signs something in %1.",
+    UI_OmiChat_unknown_language_shouts_signed = "energetically signs something in %1.",
+    UI_OmiChat_unknown_language_radio_no_author = "Something is said in %1.",
+
+    UI_OmiChat_unknown_language_narrative_asks = "%1 asks something in %2.",
+    UI_OmiChat_unknown_language_narrative_says = "%1 says something in %2.",
+    UI_OmiChat_unknown_language_narrative_signs = "%1 signs something in %2.",
+    UI_OmiChat_unknown_language_narrative_states = "%1 states something in %2.",
+    UI_OmiChat_unknown_language_narrative_shouts = "%1 shouts something in %2.",
+    UI_OmiChat_unknown_language_narrative_hisses = "%1 hisses something in %2.",
+    UI_OmiChat_unknown_language_narrative_exclaims = "%1 exclaims something in %2.",
+    UI_OmiChat_unknown_language_narrative_whispers = "%1 whispers something in %2.",
+    UI_OmiChat_unknown_language_narrative_whisper_shouts = "%1 whisper shouts something in %2.",
 
     -- [[ Narrative Style ]]--
     -- %1 = dialogue tag, %2 = content
