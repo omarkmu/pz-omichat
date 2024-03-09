@@ -1,7 +1,6 @@
 # Compatibility Features
 
-These [options](./index.md) options control compatibility patches for other mods.
-They have no effect if the relevant mod is not active.
+These [options](./index.md) control compatibility patches for other mods.
 
 All of these features have three possible values:
 - `1`: Enable the compatibility patch

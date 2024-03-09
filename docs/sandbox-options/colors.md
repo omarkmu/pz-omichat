@@ -3,7 +3,7 @@
 These [options](./index.md) define the default colors for various chat types.
 Colors should be in RGB format, space- or comma-delimited.
 
-These colors will be used unless overriden by a player's client-side chat color settings.
+These colors will be used unless overriden by a player's client-side chat color [settings](../user-guide/chat-settings.md#color-customization).
 
 ### ColorAdmin
 **Default:** `255 255 255`
@@ -77,7 +77,8 @@ The default color used for [`/ooc`](./chat-formats.md#chatformatooc) messages.
 **Default:** `85 26 139`
 
 The default color used for private messages.
-This applies to the vanilla `/whisper`, which is `/pm` if [local whisper](./chat-formats.md#chatformatwhisper) is enabled.
+
+This applies to the vanilla `/whisper`, which is changed to `/pm` if [local whisper](./chat-formats.md#chatformatwhisper) is enabled.
 
 See also:
 - [`ColorWhisper`](./colors.md#colorwhisper)
@@ -118,7 +119,7 @@ The default color used for server messages.
 The default color used for local [`/whisper`](./chat-formats.md#chatformatwhisper) messages.
 This does **not** apply to the vanilla whisper chat.
 
-**See also:** [`ColorPrivate`](./colors.md#colorprivate).
+**See also:** [`ColorPrivate`](#colorprivate).
 
 ### ColorYell
 **Default:** `255 51 51`
