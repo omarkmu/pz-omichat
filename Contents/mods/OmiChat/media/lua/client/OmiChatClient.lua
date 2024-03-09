@@ -128,12 +128,12 @@ return OmiChat
 ---@field allowEmotes boolean? Whether to allow emotes on this stream. Defaults to true for non-commands and false for commands.
 ---@field allowIconPicker boolean? Whether to enable the icon button for this stream. Defaults to false.
 ---@field streamIdentifier string? The stream identifier tied to this stream. Used for format strings and determining roleplay language. Defaults to stream name.
+---@field validator (fun(self: omichat.StreamInfo, input: string): boolean)?
 
 ---@class omichat.ChatStreamConfig : omichat.BaseStreamConfig
 ---@field isLocalWhisper boolean?
 ---@field isEnabledCommand string? The command to pass to checkPlayerCanUseChat to determine whether the stream is enabled.
 ---@field formatter string?
----@field validator (fun(self: omichat.StreamInfo, input: string): boolean)?
 
 ---@class omichat.CommandStreamConfig : omichat.BaseStreamConfig
 ---@field helpText string? String ID of a summary of the command's purpose. Displays when the /help command is used.
