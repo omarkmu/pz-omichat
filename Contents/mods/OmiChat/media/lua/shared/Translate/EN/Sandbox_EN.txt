@@ -88,6 +88,7 @@ Sandbox_EN = {
     Sandbox_OCPredicateUseNameColor = "Use Name Color Predicate",
     Sandbox_OCPredicateAllowChatInput = "Allow Chat Input Predicate",
     Sandbox_OCPredicateAllowLanguage = "Allow Roleplay Language Predicate",
+    Sandbox_OCPredicateTransmitOverRadio = "Transmit Over Radio Predicate",
     Sandbox_OCPredicateUseNarrativeStyle = "Use Narrative Style Predicate",
 
     --[[ Languages ]]--

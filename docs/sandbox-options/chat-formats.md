@@ -448,6 +448,8 @@ The format used for radio messages in chat.
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- `$customStream`: The name of the custom stream the original message was sent over, if any.
+This has the same values as `$stream`, but will only be populated with custom streams.
 - [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$frequency`](../format-strings/tokens.md#frequency)
 - [`$language`](../format-strings/tokens.md#language)
@@ -579,6 +581,7 @@ With the default format, this will display as `« Name says/shouts/whispers/sign
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+- [`$stream`](../format-strings/tokens.md#stream)
 
 ### ChatFormatUnknownLanguageRadio
 **Default:** `$gettext(UI_OmiChat_radio $frequency): $gettext(UI_OmiChat_rp_emote $getunknownlanguagestring($languageRaw $stream))`
@@ -592,6 +595,8 @@ With the default format, this will display as `Radio (100.0 MHz): « Something i
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- `$customStream`: The name of the custom stream the original message was sent over, if any.
+This has the same values as `$stream`, but will only be populated with custom streams.
 - [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$frequency`](../format-strings/tokens.md#frequency)
 - [`$language`](../format-strings/tokens.md#language)
@@ -602,6 +607,7 @@ With the default format, this will display as `Radio (100.0 MHz): « Something i
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+- [`$stream`](../format-strings/tokens.md#stream)
 
 ### ChatFormatWhisper
 **Default:** `$name: <SPACE> $message`

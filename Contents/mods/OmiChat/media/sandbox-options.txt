@@ -534,6 +534,14 @@ option OmiChat.PredicateAttractZombies
     translation = OCPredicateAttractZombies,
 }
 
+option OmiChat.PredicateTransmitOverRadio
+{
+    type = string,
+    default = $has(@(say;shout;low;whisper) $stream),
+    page = OmiChat,
+    translation = OCPredicateTransmitOverRadio,
+}
+
 option OmiChat.PredicateUseNarrativeStyle
 {
     type = string,
