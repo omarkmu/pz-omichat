@@ -29,6 +29,10 @@ Sandbox_EN = {
     Sandbox_OCEnableCompatSearchPlayers = "Search Players For Weapons Compatibility",
     Sandbox_OCEnableCompatTAD = "True Actions Act 3 - Dancing Compatibility",
 
+    Sandbox_OCCompatOptionValue_option1 = "Enable",
+    Sandbox_OCCompatOptionValue_option2 = "Disable",
+    Sandbox_OCCompatOptionValue_option3 = "Enable if mod is enabled",
+
     --[[ Limits ]]--
     Sandbox_OCCustomShoutMaxLength = "Custom Shout Maximum Length",
     Sandbox_OCMinimumCommandAccessLevel = "Minimum Access Level for Commands",
