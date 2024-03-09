@@ -579,6 +579,33 @@ return {
         end,
     },
     {
+        name = 'radio-storm-fix',
+        priority = 0,
+        transform = function(_, info)
+            if info.chatType ~= 'radio' or Option.PredicateUseNarrativeStyle == '' then
+                return
+            end
+
+            local text = info.content
+            -- avoid duplicate name when radios scramble narrative style messages
+            if not text or not text:match('&lt;[bfws]zzt&gt;') then
+                return
+            end
+
+            -- this is not ideal, but for now it will have to do
+            local author = info.message:getAuthor()
+            if author and author ~= '' then
+                text = text:gsub(utils.escape(author), '')
+            end
+
+            if info.tokens.nameRaw then
+                text = text:gsub(utils.escape(info.tokens.nameRaw), '')
+            end
+
+            info.content = text
+        end,
+    },
+    {
         name = 'avoid-empty-chats',
         priority = 0,
         transform = function(_, info)
