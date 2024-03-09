@@ -95,7 +95,7 @@ Determines whether [roleplay languages](./languages.md) can be used for a messag
 - [`$username`](../format-strings/tokens.md#username)
 
 ### PredicateTransmitOverRadio
-**Default:** `$has(@(say;shout;low;whisper) $stream)`
+**Default:** `$any($has(@(whisper;low) $customStream) $not($customStream))`
 
 Determines whether a message should be transmitted over the radio.
 
@@ -107,6 +107,8 @@ For faction/safehouse echo messages, use [`ChatFormatEcho`](./chat-formats.md#ch
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
 - [`$callout`](../format-strings/tokens.md#callout)
+- `$customStream`: The name of the custom stream the original message was sent over, if any.
+This has the same values as `$stream`, but will only be populated with custom streams.
 - [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$echo`](../format-strings/tokens.md#echo)
 - [`$language`](../format-strings/tokens.md#language)

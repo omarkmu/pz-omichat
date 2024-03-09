@@ -8,7 +8,7 @@ The original text will try to be extracted where possible, but modification of c
 For example, reversing the overhead text will result in the message content being reversed in chat.
 
 ### OverheadFormatCard
-**Default:** `< $1 >`
+**Default:** `<< $1 >>`
 
 The overhead format used for local [`/card`](./chat-formats.md#chatformatcard) messages.
 If blank, `/card` messages will not display overhead.
@@ -136,7 +136,7 @@ If blank, `/low` messages will not display overhead.
 - [`$username`](../format-strings/tokens.md#username)
 
 ### OverheadFormatMe
-**Default:** `< $1 >`
+**Default:** `<< $1 >>`
 
 Defines the format used for overhead speech bubbles of [`/me`](./chat-formats.md#chatformatme) messages.
 If blank, `/me` messages will not display overhead.
@@ -154,7 +154,7 @@ If blank, `/me` messages will not display overhead.
 - [`$username`](../format-strings/tokens.md#username)
 
 ### OverheadFormatMeLoud
-**Default:** `< $1 >`
+**Default:** `<< $1 >>`
 
 Defines the format used for overhead speech bubbles of [`/meloud`](./chat-formats.md#chatformatmeloud) messages.
 If blank, `/meloud` messages will not display overhead.
@@ -172,7 +172,7 @@ If blank, `/meloud` messages will not display overhead.
 - [`$username`](../format-strings/tokens.md#username)
 
 ### OverheadFormatMeQuiet
-**Default:** `< $1 >`
+**Default:** `<< $1 >>`
 
 Defines the format used for overhead speech bubbles of [`/mequiet`](./chat-formats.md#chatformatmequiet) messages.
 If blank, `/mequiet` messages will not display overhead.
@@ -226,7 +226,7 @@ Defines the format used for overhead speech bubbles of messages not covered by o
 - [`$username`](../format-strings/tokens.md#username)
 
 ### OverheadFormatRoll
-**Default:** `< $1 >`
+**Default:** `<< $1 >>`
 
 The overhead format used for local [`/roll`](./chat-formats.md#chatformatroll) messages.
 If blank, `/roll` messages will not display overhead.

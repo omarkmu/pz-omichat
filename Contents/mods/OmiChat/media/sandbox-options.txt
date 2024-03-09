@@ -537,7 +537,7 @@ option OmiChat.PredicateAttractZombies
 option OmiChat.PredicateTransmitOverRadio
 {
     type = string,
-    default = $has(@(say;shout;low;whisper) $stream),
+    default = $any($has(@(whisper;low) $customStream) $not($customStream)),
     page = OmiChat,
     translation = OCPredicateTransmitOverRadio,
 }
@@ -761,7 +761,7 @@ option OmiChat.OverheadFormatOoc
 option OmiChat.OverheadFormatMe
 {
     type = string,
-    default = < $1 >,
+    default = << $1 >>,
     page = OmiChat,
     translation = OCOverheadFormatMe,
 }
@@ -769,7 +769,7 @@ option OmiChat.OverheadFormatMe
 option OmiChat.OverheadFormatMeLoud
 {
     type = string,
-    default = < $1 >,
+    default = << $1 >>,
     page = OmiChat,
     translation = OCOverheadFormatMeLoud,
 }
@@ -777,7 +777,7 @@ option OmiChat.OverheadFormatMeLoud
 option OmiChat.OverheadFormatMeQuiet
 {
     type = string,
-    default = < $1 >,
+    default = << $1 >>,
     page = OmiChat,
     translation = OCOverheadFormatMeQuiet,
 }
@@ -801,7 +801,7 @@ option OmiChat.OverheadFormatWhisper
 option OmiChat.OverheadFormatCard
 {
     type = string,
-    default = < $1 >,
+    default = << $1 >>,
     page = OmiChat,
     translation = OCOverheadFormatCard,
 }
@@ -809,7 +809,7 @@ option OmiChat.OverheadFormatCard
 option OmiChat.OverheadFormatRoll
 {
     type = string,
-    default = < $1 >,
+    default = << $1 >>,
     page = OmiChat,
     translation = OCOverheadFormatRoll,
 }
