@@ -214,10 +214,19 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_ServerOptionDesc_Card',
-            isEnabled = function()
+            validator = function()
                 local player = getSpecificPlayer(0)
-                local inv = player:getInventory()
-                return inv:contains('CardDeck') or player:getAccessLevel() ~= 'None'
+                local inv = player and player:getInventory()
+                if not inv then
+                    return false
+                end
+
+                if inv:contains('CardDeck') or player:getAccessLevel() ~= 'None' then
+                    return true
+                end
+
+                OmiChat.addInfoMessage(getText('UI_ServerOptionDesc_Card'))
+                return false
             end,
             onUse = function(ctx)
                 if not OmiChat.requestDrawCard() then
@@ -232,10 +241,19 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_ServerOptionDesc_Roll',
-            isEnabled = function()
+            validator = function()
                 local player = getSpecificPlayer(0)
-                local inv = player:getInventory()
-                return inv:contains('Dice') or player:getAccessLevel() ~= 'None'
+                local inv = player and player:getInventory()
+                if not inv then
+                    return false
+                end
+
+                if inv:contains('Dice') or player:getAccessLevel() ~= 'None' then
+                    return true
+                end
+
+                OmiChat.addInfoMessage(getText('UI_ServerOptionDesc_Roll'))
+                return false
             end,
             onUse = function(ctx)
                 local command = utils.trim(ctx.command)
