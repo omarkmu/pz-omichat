@@ -1039,7 +1039,7 @@ function ISChat.addLineInChat(message, tabID)
             end
         end
 
-        if Option:compatChatBubbleEnabled() and message:getText():match('^%[img=media/textures/bubble%d%.png%]$') then
+        if Option:compatChatBubbleEnabled() and message:getText():match('%[img=media/textures/bubble%d%.png%]') then
             return
         end
 
