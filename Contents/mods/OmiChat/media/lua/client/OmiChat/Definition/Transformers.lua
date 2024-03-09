@@ -335,31 +335,19 @@ return {
             end
 
             -- they didn't understand it
-            local isWhisper = info.context.ocIsSneakCallout or info.context.ocCustomStream == 'whisper'
-            local signedSuffix = isSigned and '_signed' or ''
             info.message:setOverHeadSpeech(false)
-            info.format = Option.ChatFormatUnknownLanguage
             info.formatOptions.useDefaultChatColor = false
             info.tokens.unknownLanguage = language
 
             if isRadio then
-                info.tokens.unknownLanguageString = 'UI_OmiChat_unknown_language_radio'
                 info.format = Option.ChatFormatUnknownLanguageRadio
-            elseif isWhisper then
-                info.tokens.unknownLanguageString = 'UI_OmiChat_unknown_language_whisper' .. signedSuffix
-                info.formatOptions.color = OmiChat.getColorOrDefault('mequiet')
-                info.context.ocCustomStream = 'mequiet'
-                info.tokens.stream = 'mequiet'
-            elseif info.chatType == 'shout' then
-                info.tokens.unknownLanguageString = 'UI_OmiChat_unknown_language_shout' .. signedSuffix
-                info.formatOptions.color = OmiChat.getColorOrDefault('meloud')
-                info.context.ocCustomStream = 'meloud'
-                info.tokens.stream = 'meloud'
             else
-                info.tokens.unknownLanguageString = 'UI_OmiChat_unknown_language_say' .. signedSuffix
-                info.formatOptions.color = OmiChat.getColorOrDefault('me')
-                info.context.ocCustomStream = 'me'
-                info.tokens.stream = 'me'
+                info.format = Option.ChatFormatUnknownLanguage
+                if OmiChat.isCustomStreamEnabled('me') then
+                    info.formatOptions.color = OmiChat.getColorOrDefault('me')
+                    info.context.ocCustomStream = 'me'
+                    info.tokens.stream = 'me'
+                end
             end
         end,
     },
@@ -403,6 +391,7 @@ return {
                 translated = getText('UI_OmiChat_NarrativeTag', dialogueTag, content)
             end
 
+            info.tokens.dialogueTag = dialogueTag
             info.content = translated
         end,
     },

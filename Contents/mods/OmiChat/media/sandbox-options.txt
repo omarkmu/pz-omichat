@@ -1011,7 +1011,7 @@ option OmiChat.ChatFormatEcho
 option OmiChat.ChatFormatUnknownLanguage
 {
     type = string,
-    default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $gettext($unknownLanguageString $language) <SPACE>)),
+    default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $getunknownlanguagestring($languageRaw $stream) <SPACE>)),
     page = OmiChat,
     translation = OCChatFormatUnknownLanguage,
 }
@@ -1019,7 +1019,7 @@ option OmiChat.ChatFormatUnknownLanguage
 option OmiChat.ChatFormatUnknownLanguageRadio
 {
     type = string,
-    default = $gettext(UI_OmiChat_radio $frequency): $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $gettext($unknownLanguageString $language) <SPACE>)),
+    default = $gettext(UI_OmiChat_radio $frequency): $gettext(UI_OmiChat_rp_emote $getunknownlanguagestring($languageRaw $stream)),
     page = OmiChat,
     translation = OCChatFormatUnknownLanguageRadio,
 }
