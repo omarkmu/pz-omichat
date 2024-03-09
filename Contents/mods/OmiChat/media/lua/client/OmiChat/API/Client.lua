@@ -138,6 +138,7 @@ OmiChat._emotes = {
 function OmiChat._onCreatePlayer(playerNum, player)
     if playerNum == 0 then
         OmiChat.updateInfoText(player)
+        OmiChat.refreshLanguageInfo(player:getUsername())
     end
 end
 

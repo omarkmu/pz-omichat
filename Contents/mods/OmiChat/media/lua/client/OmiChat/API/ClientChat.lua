@@ -913,6 +913,12 @@ function OmiChat.updateState(redraw)
     addOrRemoveIconComponents()
     OmiChat.updateInfoText()
 
+    local player = getSpecificPlayer(0)
+    local username = player and player:getUsername()
+    if username then
+        OmiChat.refreshLanguageInfo(username)
+    end
+
     if redraw then
         -- some sandbox vars affect how messages are drawn
         OmiChat.redrawMessages(false)
