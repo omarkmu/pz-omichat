@@ -309,10 +309,7 @@ function ISMiniScoreboardUI:populateList()
 
     for i = 1, #self.playerList.items do
         local item = self.playerList.items[i]
-        local username = item.text
-        if item.tooltip then
-            username = item.tooltip
-        end
+        local username = item.item and item.item.username
 
         local player = getPlayerFromUsername(username)
         local name = player and OmiChat.getPlayerMenuName(player, 'mini_scoreboard')
@@ -356,8 +353,7 @@ local ISWorldObjectContextMenu_createMenu = ISWorldObjectContextMenu.createMenu
 
 ---Modifies a context menu option if it matches one of the known options that uses the player name.
 ---@param opt table
----@param spfwEnabled boolean
-local function handleContextMenuOption(opt, spfwEnabled)
+local function handleContextMenuOption(opt)
     local otherPlayer = opt.param2
     if not otherPlayer or not instanceof(otherPlayer, 'IsoPlayer') then
         return
@@ -379,11 +375,6 @@ local function handleContextMenuOption(opt, spfwEnabled)
         if name then
             opt.toolTip.description = getText('ContextMenu_GetCloser', name)
         end
-    elseif spfwEnabled and onSelect == onSearchPlayerContextSelected then ---@diagnostic disable-line: undefined-global
-        local name = OmiChat.getPlayerMenuName(otherPlayer, 'search_player')
-        if name then
-            opt.name = getText('UI_SearchStub', name)
-        end
     end
 end
 
@@ -396,9 +387,8 @@ function ISWorldObjectContextMenu.createMenu(...)
         return context
     end
 
-    local spfwEnabled = Option:compatSearchPlayersEnabled()
     for i = 1, #context.options do
-        handleContextMenuOption(context.options[i], spfwEnabled)
+        handleContextMenuOption(context.options[i])
     end
 
     return context
