@@ -615,7 +615,7 @@ option OmiChat.FormatName
 option OmiChat.FormatTag
 {
     type = string,
-    default = [$tag]$if($eq($chatType server) (: <SPACE> )),
+    default = [$tag],
     page = OmiChat,
     translation = OCFormatTag,
 }
