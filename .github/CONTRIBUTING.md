@@ -40,19 +40,19 @@ There is no linting process, but contributions should be readable.
 The repository includes `.editorconfig` and `.luarc.json` files, which formatters such as the one included in [Lua Language Server](https://github.com/luals/lua-language-server) can use to maintain code style.
 2. One of the primary aims of this mod is to be configurable.
 If you're adding a new feature, consider whether you need to add sandbox options to control it.
-3. Make sure the correct functionality is in the right place
- The `OmiChatShared` API should contain functionality that should work on both client and server, whereas the `OmiChatClient` and `OmiChatServer` APIs are specific to client and server, respectively.
+3. Make sure the correct functionality is in the right place.
+The `OmiChatShared` API should contain functionality that should work on both client and server, whereas the `OmiChatClient` and `OmiChatServer` APIs are specific to client and server, respectively.
 4. Use type [annotations](https://luals.github.io/wiki/annotations).
 Variables and functions should be strongly typed wherever possible, to help catch easily-avoidable problems.
 You should document your functions and classes, as well.
 5. Test your changes.
-Ideally, you can test them on a dedicated server before creating a PR.
+Ideally, you can test them on a dedicated server before creating a pull request.
 If that isn't possible, consider testing using a hosted server and two or more instances of the game running with the `-nosteam` flag.
-Please indicate how you tested your changes in the PR.
+Please indicate how you tested your changes in the pull request.
 6. Write clear commit messages. Your commit messages should:
     - Clearly, succintly describe what you did in that commit.
+    If you need to provide further information, do so *after* the first line. The first line should provide a quick summary; subsequent lines may have more details.
     - Be written in present tense, imperative mood (e.g., “Add x function”, *not* “Added x function”).
-    - If you need to provide further information, do so *after* the first line. The first line should provide a quick summary; subsequent lines may have more details.
 
 ## Contributing translations
 *Based on the instructions provided [here](https://steamcommunity.com/sharedfiles/filedetails/?id=3006690572).*
@@ -70,7 +70,7 @@ Leave the quotes intact, make sure the final comma remains, and don't change any
     The files have comments that explain the context.
     `%1` should always be present in the translations of strings that use it.
 6. Save the files with the encoding specified in the table below. For example, for a translation into Estonian, save with UTF-8 encoding.
-7. Upload a `.zip` of the folder in a [discussion](https://github.com/omarkmu/pz-omichat/discussions/new?category=translation) post.
+7. Upload a `.zip` of the folder or a pastebin link in a [discussion](https://github.com/omarkmu/pz-omichat/discussions/new?category=translation) post.
 If you're familiar with Git, you can instead create a pull request with your translation changes; see the section on [contributing code](#contributing-code).
 
 | Language             | Translation Folder | Encoding  |
