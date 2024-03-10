@@ -495,11 +495,11 @@ function OmiChat.formatForChat(args)
     end
 
     -- filter and check input
-    local text = utils.interpolate(Option.FilterChatInput, tokens)
+    tokens.input = utils.interpolate(Option.FilterChatInput, tokens)
 
     tokens.error = ''
     tokens.errorID = ''
-    local allowInput = #text > 0 and utils.testPredicate(Option.PredicateAllowChatInput, tokens)
+    local allowInput = #tokens.input > 0 and utils.testPredicate(Option.PredicateAllowChatInput, tokens)
     local err = utils.extractError(tokens)
 
     if not allowInput or err then
@@ -511,11 +511,11 @@ function OmiChat.formatForChat(args)
 
     -- apply styles
     local streamInfo = OmiChat.getChatStreamByIdentifier(stream)
-    text = streamInfo and OmiChat.applyStyles(text, streamInfo, tokens) or text
+    tokens.input = streamInfo and OmiChat.applyStyles(tokens.input, streamInfo, tokens) or tokens.input
 
     -- encode language
     if language then
-        text = OmiChat.encodeLanguage(text, language)
+        tokens.input = OmiChat.encodeLanguage(tokens.input, language)
     end
 
     -- apply format
@@ -525,34 +525,34 @@ function OmiChat.formatForChat(args)
     end
 
     local formatter = formatterName and OmiChat.getFormatter(formatterName)
-    text = formatter and formatter:format(text, tokens) or text
+    tokens.input = formatter and formatter:format(tokens.input, tokens) or tokens.input
 
     -- add indicator for admin icon
     if isAdmin() and OmiChat.getAdminOption('show_icon') then
         local adminIconFormatter = OmiChat.getFormatter('adminIcon')
-        text = adminIconFormatter:wrap(text)
+        tokens.input = adminIconFormatter:wrap(tokens.input)
     end
 
     -- mark as echo message
     if args.isEcho then
         local echoFormatter = OmiChat.getFormatter('echo')
-        text = echoFormatter:format(text, tokens)
+        tokens.input = echoFormatter:format(tokens.input, tokens)
     end
 
     -- apply full overhead format
     local overheadFormatter = OmiChat.getFormatter('overheadFull')
     tokens.prefix = utils.trimleft(utils.interpolate(Option.FormatOverheadPrefix, tokens))
-    text = overheadFormatter:format(text, tokens)
+    tokens.input = overheadFormatter:format(tokens.input, tokens)
 
     -- encode online ID for radio
     local player = getSpecificPlayer(0)
     if player then
         local id = utils.encodeInvisibleInt(player:getOnlineID())
-        text = OmiChat.getFormatter('onlineID'):format(id) .. text
+        tokens.input = OmiChat.getFormatter('onlineID'):format(id) .. tokens.input
     end
 
     return {
-        text = text,
+        text = tokens.input,
         allowLanguage = allowLanguage,
     }
 end

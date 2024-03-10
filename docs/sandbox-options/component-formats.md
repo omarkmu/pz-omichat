@@ -171,7 +171,7 @@ The format used for local [`/roll`](./chat-formats.md#chatformatroll) overhead m
 - `$sides`: The number of sides on the die that was rolled. This will be wrapped in invisible characters.
 
 ### FormatTag
-**Default:** `[$tag]$if($eq($chatType server) (: <SPACE> ))`
+**Default:** `[$tag]`
 
 The format used when `Enable tags` is selected in the chat settings menu.
 This describes the chat title that displays to the left of messages (e.g., `[Local]`).
