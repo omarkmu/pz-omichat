@@ -9,6 +9,7 @@ For example, sending the message `Don't shoot! .surrender` would result in the f
 
 This can be useful for text roleplay servers, since players can play an animation in sync with their message.
 The shortcuts can also be used without a message; sending `.hi` will play the animation without sending a message in chat.
+
 **Note:** Unless the emote is the only thing sent, it must come after a space. This is to prevent suggesting emotes after ending a sentence.
 
 ## Shortcut list
