@@ -6,7 +6,7 @@ description=This mod can be added or removed mid-save.
 description=[h2]Description[/h2]
 description=This mod improves the chat for players and offers a plethora of sandbox options for server operators. Among other features, it includes color customization, character naming, emote shortcuts, and new chat commands for roleplay.
 description=
-description=The list of chat streams available to players with default settings, including the vanilla streams: [list]
+description=The list of chat streams available with the default settings, including the vanilla streams: [list]
 description=[*]/all
 description=[*]/faction [/f]
 description=[*]/safehouse [/sh]
@@ -28,7 +28,7 @@ description=
 description=For more details, please see the [url=https://omarkmu.github.io/pz-omichat]documentation![/url]
 description=
 description=[h2]Features[/h2]
-description=This mod aims to be as configurable as possible. The vast majority of the features listed below can be configured or completely disabled via [url=https://github.com/omarkmu/pz-omichat/blob/main/docs/sandbox-options.md]sandbox options.[/url]
+description=This mod aims to be as configurable as possible. The vast majority of the features listed below can be configured or completely disabled via [url=https://omarkmu.github.io/pz-omichat/sandbox-options]sandbox options.[/url]
 description=
 description=The default settings are tailored to usage for roleplay; by default, chats other than /all and /pm will use character forenames instead of usernames. Additionally, chat will use a colon for names instead of square brackets. Both of these can be reverted using the sandbox options.
 description=
@@ -55,11 +55,17 @@ description=[*]Configurable info text
 description=[*]Chat range options
 description=[*]Customization of names, timestamps, all chat types, and more via powerful [url=https://omarkmu.github.io/pz-omichat/format-strings]chat formats[/url]
 description=[*]Sandbox options to control the features listed above
+description=[*]Easy configuration with [url=https://omarkmu.github.io/pz-omichat/sandbox-presets]sandbox option presets[/url]
 description=[*]Further extension of functionality using the API
 description=[/list]
 description=
 description=[h2]Compatibility[/h2]
 description=I don't expect this to be compatible with other mods that heavily modify chat, but it shouldn't cause compatibility issues otherwise. If there seems to be a conflict, [url=https://github.com/omarkmu/pz-omichat/issues/new?template=bug_report.yaml]let me know![/url]
+description=The mod is confirmed to be compatible with the following mods, for which there are options to control compatibility: [list]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2688676019]Chat Bubble v0.6[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2873010748]Search Players For Weapons[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556]True Actions. Act 3 - Dancing[/url]
+description=[/list]
 description=
 description=[h2]Permissions[/h2]
 description=This mod uses the [url=https://theindiestone.com/forums/index.php?/topic/2530-mod-permissions/#comment-36478]Ask for permission policy.[/url]
