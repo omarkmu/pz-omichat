@@ -20,24 +20,24 @@ The vast majority of the features listed below can be configured or completely d
 This is not a comprehensive list; please see the documentation.
 
 - Customization of names, timestamps, all chat types, and more via powerful chat [formats](https://omarkmu.github.io/pz-omichat/format-strings)
-- Chat color [customization](https://omarkmu.github.io/pz-omichat/user-guide/chat-settings.md#color-customization)
-- Name color [customization](https://omarkmu.github.io/pz-omichat/sandbox-options/basic-features.md#enablesetnamecolor)
-- Speech bubble color [customization](https://omarkmu.github.io/pz-omichat/sandbox-options/basic-features.md#enablesetspeechcolor)
-- Callout [customization](https://omarkmu.github.io/pz-omichat/sandbox-options/basic-features.md#enablecustomshouts)
-- Character naming with [`/name`](https://omarkmu.github.io/pz-omichat/sandbox-options/basic-features.md#enablesetname)
-- Character [customization](https://omarkmu.github.io/pz-omichat/sandbox-options/basic-features.md#enablecharactercustomization) (off-by-default)
-- Chat [buffs](https://omarkmu.github.io/pz-omichat/sandbox-options/filters-predicates.md#predicateapplybuff) (off-by-default)
-- Display of chat names in [menus](https://omarkmu.github.io/pz-omichat/sandbox-options/component-formats.md#formatmenuname) (Trading, Medical Check)
-- Local [`/whisper`](https://omarkmu.github.io/pz-omichat/sandbox-options/chat-formats.md#chatformatwhisper) chat
-- Local [`/card`](https://omarkmu.github.io/pz-omichat/sandbox-options/chat-formats.md#chatformatcard) and [`/roll`](https://omarkmu.github.io/pz-omichat/sandbox-options/chat-formats.md#chatformatroll)
-- Roleplay descriptions with [`/me`](https://omarkmu.github.io/pz-omichat/sandbox-options/chat-formats.md#chatformatme) and [`/do`](https://omarkmu.github.io/pz-omichat/sandbox-options/chat-formats.md#chatformatdo)
+- Chat color [customization](https://omarkmu.github.io/pz-omichat/user-guide/chat-settings.html#color-customization)
+- Name color [customization](https://omarkmu.github.io/pz-omichat/sandbox-options/basic-features.html#enablesetnamecolor)
+- Speech bubble color [customization](https://omarkmu.github.io/pz-omichat/sandbox-options/basic-features.html#enablesetspeechcolor)
+- Callout [customization](https://omarkmu.github.io/pz-omichat/user-guide/chat-settings.html#callout-customization)
+- Character naming with [`/name`](https://omarkmu.github.io/pz-omichat/sandbox-options/basic-features.html#enablesetname)
+- Character [customization](https://omarkmu.github.io/pz-omichat/sandbox-options/basic-features.html#enablecharactercustomization) (off-by-default)
+- Chat [buffs](https://omarkmu.github.io/pz-omichat/sandbox-options/filters-predicates.html#predicateapplybuff) (off-by-default)
+- Display of chat names in [menus](https://omarkmu.github.io/pz-omichat/sandbox-options/component-formats.html#formatmenuname) (Trading, Medical Check)
+- Local [`/whisper`](https://omarkmu.github.io/pz-omichat/sandbox-options/chat-formats.html#chatformatwhisper) chat
+- Local [`/card`](https://omarkmu.github.io/pz-omichat/sandbox-options/chat-formats.html#chatformatcard) and [`/roll`](https://omarkmu.github.io/pz-omichat/sandbox-options/chat-formats.html#chatformatroll)
+- Roleplay descriptions with [`/me`](https://omarkmu.github.io/pz-omichat/sandbox-options/chat-formats.html#chatformatme) and [`/do`](https://omarkmu.github.io/pz-omichat/sandbox-options/chat-formats.html#chatformatdo)
 - Range-based chat streams (`/mequiet`, `/meloud`, `/doquiet`, `/doloud`)
 - Input suggestion box
-- Emote animation [shortcuts](https://omarkmu.github.io/pz-omichat/user-guide/emote-shortcuts.md) (.clap, .salute, .surrrender, etc.)
-- Roleplay [languages](https://omarkmu.github.io/pz-omichat/sandbox-options/languages.md)
-- Compatibility with [True Actions Act 3 - Dancing](https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556) with [`/dance`](https://omarkmu.github.io/pz-omichat/sandbox-options/compatibility-features.md#enablecompattad)
-- Chat range [options](https://omarkmu.github.io/pz-omichat/sandbox-options/ranges.md)
-- Info text [option](https://omarkmu.github.io/pz-omichat/sandbox-options/component-formats.md#formatinfo)
+- Emote animation [shortcuts](https://omarkmu.github.io/pz-omichat/user-guide/emote-shortcuts.html) (.clap, .salute, .surrrender, etc.)
+- Roleplay [languages](https://omarkmu.github.io/pz-omichat/sandbox-options/languages.html)
+- Compatibility with [True Actions Act 3 - Dancing](https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556) with [`/dance`](https://omarkmu.github.io/pz-omichat/sandbox-options/compatibility-features.html#enablecompattad)
+- Chat range [options](https://omarkmu.github.io/pz-omichat/sandbox-options/ranges.html)
+- Info text [option](https://omarkmu.github.io/pz-omichat/sandbox-options/component-formats.html#formatinfo)
 - API for extension by other mods
 
 ## Credits

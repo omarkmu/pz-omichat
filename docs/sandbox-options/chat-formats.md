@@ -614,7 +614,7 @@ This has the same values as `$stream`, but will only be populated with custom st
 
 The format used for local `/whisper` messages in chat.
 
-If populated, the vanilla `/whisper` is changed to `/pm`, and `/whisper` is modified to act as local chat which doesn't attract zombies and has a very short range.
+If populated, the vanilla `/whisper` is changed to `/pm`, and `/whisper` is modified to act as local chat with a very short range.
 If blank, local whisper will be disabled and the vanilla `/whisper` will not be renamed.
 
 **Tokens:**
