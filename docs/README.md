@@ -1,7 +1,7 @@
 <!-- ANCHOR: intro -->
 
 <a href="https://github.com/omarkmu/pz-omichat">
-<img src="./images/icon.png" width=256 height=256 />
+<img src="./images/workshop/preview.png" width=256 height=256 />
 </a>
 
 OmiChat is a mod for [Project Zomboid](https://projectzomboid.com) that extends chat functionality.
