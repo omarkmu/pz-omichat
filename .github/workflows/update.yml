@@ -31,16 +31,21 @@ jobs:
         repository: omarkmu/luabun
     - name: Install luabun
       run: cd luabun && npm i && cd ..
+    - name: Read library version
+      id: read_version
+      run: |
+        version=`cat OmiLib/library.json | jq -r '.version'`
+        echo "version=$version" >> $GITHUB_OUTPUT
     - name: Build library
-      run: node luabun create OmiLib -m class sandbox utils interpolate -o ./Contents/mods/OmiChat/media/lua/shared/OmiChat/lib.lua
+      run: node luabun create OmiLib -m ${{ vars.LIB_MODULES }} -o ${{ vars.LIB_PATH }}
     - name: Cleanup files
       run: rm -rf OmiLib luabun
     - name: Create pull request
       uses: peter-evans/create-pull-request@v5
       with:
-        title: Update library
-        commit-message: Update lib.lua
-        add-paths: ./Contents/mods/OmiChat/media/lua/shared/OmiChat/lib.lua
+        title: Update library to version ${{ steps.read_version.outputs.version }}
+        commit-message: Update library to version ${{ steps.read_version.outputs.version }}
+        add-paths: ${{ vars.LIB_PATH }}
         body: Pulled in new [library](https://github.com/omarkmu/pz-omi-lib) changes.
         base: dev
         branch: update-library

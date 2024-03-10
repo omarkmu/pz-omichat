@@ -1,81 +1,88 @@
 local lib = require 'OmiChat/lib'
-local OmiChatInterpolator = require 'OmiChat/Interpolator'
+local Interpolator = require 'OmiChat/Component/Interpolator'
+
+local format = string.format
+local concat = table.concat
+local getTimestampMs = getTimestampMs
 
 
 ---Utility functions.
 ---@class omichat.utils : omi.utils
+---@field private _interpolatorCache table<string, omichat.utils.InterpolatorCacheItem>
 local utils = lib.utils.copy(lib.utils)
-utils.kvp = {}
-utils.Interpolator = OmiChatInterpolator
+utils.Interpolator = Interpolator
+utils._interpolatorCache = {}
 
-local string = string
-local format = string.format
-local concat = table.concat
+---@class omichat.utils.InterpolatorCacheItem
+---@field interpolator omichat.Interpolator
+---@field lastAccess number
 
+local CACHE_EXPIRY_MS = 600000 -- ten minutes
 local shortHexPattern = '^%s*#?(%x)(%x)(%x)%s*$'
 local fullHexPattern = '^%s*#?(%x%x)%s*(%x%x)%s*(%x%x)%s*$'
 local rgbPattern = '^%s*(%d%d?%d?)[,%s]+(%d%d?%d?)[,%s]+(%d%d?%d?)%s*$'
+local accessLevels = {
+    admin = 32,
+    moderator = 16,
+    overseer = 8,
+    gm = 4,
+    observer = 2,
+}
+local suits = {
+    'clubs',
+    'diamonds',
+    'hearts',
+    'spades',
+}
+local cards = {
+    'ace',
+    'two',
+    'three',
+    'four',
+    'five',
+    'six',
+    'seven',
+    'eight',
+    'nine',
+    'ten',
+    'jack',
+    'queen',
+    'king',
+}
+
+---@type table<string, string>
+local iconToTextureNameMap = {}
+local loadedIcons = false
 
 
----Encodes a string for use as a key or value in kvp format.
+---Gets an interpolator from the cache.
 ---@param text string
----@param forceQuotes boolean?
----@return string
-local function kvpEncodeString(text, forceQuotes)
-    text = tostring(text)
-    if forceQuotes or #text == 0 or text:find('"') then
-        return concat { '"', text:gsub('([\\"])', '\\%1'), '"' }
+---@return omichat.Interpolator?
+local function getCachedInterpolator(text)
+    local item = utils._interpolatorCache[text]
+    if item then
+        item.lastAccess = getTimestampMs()
+        return item.interpolator
     end
-
-    return text
 end
 
----Reads a key or value from a kvp-encoded string.
+---Collects valid icons and builds a map of icon names to texture names.
+local function loadIcons()
+    local dest = HashMap.new()
+    Texture.collectAllIcons(HashMap.new(), dest)
+    iconToTextureNameMap = transformIntoKahluaTable(dest)
+    iconToTextureNameMap.music = 'Icon_music_notes' -- special case for 'music'
+    loadedIcons = true
+end
+
+---Adds an interpolator to the cache.
 ---@param text string
----@param i integer Current character index.
----@return string decodedValue
----@return integer index
-local function kvpReadString(text, i)
-    local escape = false
-    local value = {}
-
-    local current = text:sub(i, i)
-    if current == '"' then
-        i = i + 1
-    else
-        -- not quote-wrapped → skip to next quote if possible
-        local nextQuote = text:find('"', i)
-        if nextQuote then
-            return text:sub(i, nextQuote - 1), nextQuote
-        end
-    end
-
-    while i <= #text do
-        local c = text:sub(i, i)
-        if escape then
-            if c ~= '"' and c ~= '\\' then
-                value[#value+1] = '\\'
-            end
-
-            value[#value+1] = c
-            escape = false
-        elseif c == '"' then
-            break
-        elseif c == '\\' then
-            escape = true
-        else
-            value[#value+1] = c
-        end
-
-        i = i + 1
-    end
-
-    if escape then
-        -- should not happen
-        value[#value+1] = '\\'
-    end
-
-    return concat(value), i + 1
+---@param interpolator omichat.Interpolator
+local function setCachedInterpolator(text, interpolator)
+    utils._interpolatorCache[text] = {
+        interpolator = interpolator,
+        lastAccess = getTimestampMs(),
+    }
 end
 
 ---Attempts to read an RGB or hex color from a string.
@@ -105,10 +112,360 @@ local function readColor(text)
     return tonumber(r, 16), tonumber(g, 16), tonumber(b, 16)
 end
 
----Checks a color table for validity.
----@param color table
+
+---Encodes additional information in a message tag.
+---@param message omichat.Message
+---@param key string
+---@param value unknown
+function utils.addMessageTagValue(message, key, value)
+    local tag = message:getCustomTag()
+    local success, newTag, encodedTag
+    success, newTag = utils.json.tryDecode(tag)
+    if not success or type(newTag) ~= 'table' then
+        newTag = {}
+    end
+
+    newTag[key] = value
+    success, encodedTag = utils.json.tryEncode(newTag)
+    if not success then
+        -- other data is bad, so just throw it out
+        if type(value) == 'string' then
+            value = string.format('%q', value)
+        end
+
+        encodedTag = string.format('{"%s":%s}', key, tostring(value))
+    end
+
+    message:setCustomTag(encodedTag)
+end
+
+---Cleans up unused cache items.
+---@param clear boolean If true, the cache will be cleared entirely.
+function utils.cleanupCache(clear)
+    if clear then
+        utils._interpolatorCache = {}
+        return
+    end
+
+    local toRemove = {}
+    local currentTime = getTimestampMs()
+    for k, item in pairs(utils._interpolatorCache) do
+        if currentTime - item.lastAccess >= CACHE_EXPIRY_MS then
+            toRemove[#toRemove + 1] = k
+        end
+    end
+
+    for i = 1, #toRemove do
+        utils._interpolatorCache[toRemove[i]] = nil
+    end
+end
+
+---Converts a color table to a hex string.
+---@param color omichat.ColorTable
+---@return string
+function utils.colorToHexString(color)
+    return format('%02x%02x%02x', color.r, color.g, color.b)
+end
+
+---Converts a color table to an RGB string.
+---@param color omichat.ColorTable
+---@return string
+function utils.colorToRGBString(color)
+    return format('%d,%d,%d', color.r, color.g, color.b)
+end
+
+---Decodes an encoded character.
+---@param text string
+---@return integer
+function utils.decodeInvisibleCharacter(text)
+    return text:sub(1, 1):byte() - 127
+end
+
+---Decodes an encoded integer value.
+---@param text string
+---@return integer?
+function utils.decodeInvisibleInt(text)
+    local digits = {}
+
+    for i = 1, #text do
+        local c = text:sub(i, i):byte() - 127
+        if c >= 1 and c <= 10 then
+            digits[#digits + 1] = string.char(c + 47)
+        end
+    end
+
+    return tonumber(concat(digits))
+end
+
+---Encodes an integer value in [1, 32] into a character.
+---@param n integer
+---@return string
+function utils.encodeInvisibleCharacter(n)
+    return string.char(n + 127)
+end
+
+---Encodes a positive integer value as an invisible representation of its digits.
+---@param value integer
+---@return string
+function utils.encodeInvisibleInt(value)
+    local str = tostring(value)
+    local result = {}
+    for i = 1, #str do
+        result[#result + 1] = utils.encodeInvisibleCharacter(str:sub(i, i):byte() - 47)
+    end
+
+    return concat(result)
+end
+
+---Escapes a string for use in a rich text panel.
+---@see ISRichTextPanel
+---@param text string
+---@return string
+function utils.escapeRichText(text)
+    return (text:gsub('<', '&lt;'):gsub('>', '&gt;'))
+end
+
+---Gets an error from the error tokens, if one is set, and unsets the tokens.
+---@param tokens table
+---@return string?
+function utils.extractError(tokens)
+    local err
+    local error = tostring(tokens.error or '')
+    local errorID = tostring(tokens.errorID or '')
+
+    if error ~= '' then
+        err = tostring(error or '')
+    elseif errorID ~= '' then
+        err = getText(errorID)
+    end
+
+    tokens.error = nil
+    tokens.errorID = nil
+
+    return err
+end
+
+---Gets the text within invisible character wrapping.
+---Returns the text and the invisible character prefix & suffix.
+---@param text string
+---@return string internal
+---@return string prefix
+---@return string suffix
+function utils.getInternalText(text)
+    -- first non-invisible pos
+    local start = 1
+    local i = 1
+    while i <= #text do
+        local c = text:sub(i, i)
+        if not utils.isInvisibleByte(c:byte()) then
+            start = i
+            break
+        end
+
+        i = i + 1
+    end
+
+    -- last non-invisible pos
+    local finish = #text
+    i = #text
+    while i > 0 do
+        local c = text:sub(i, i)
+        if not utils.isInvisibleByte(c:byte()) then
+            finish = i
+            break
+        end
+
+        i = i - 1
+    end
+
+    local prefix = ''
+    local suffix = ''
+    if start > 1 then
+        prefix = text:sub(1, start - 1)
+    end
+
+    if finish < #text then
+        suffix = text:sub(finish + 1, #text)
+    end
+
+    return text:sub(start, finish), prefix, suffix
+end
+
+---Gets a numeric access level given an access level string.
+---@param access string
+---@return integer
+function utils.getNumericAccessLevel(access)
+    if not access then
+        return 1
+    end
+
+    return accessLevels[access:lower()] or 1
+end
+
+---Gets a player given their username.
+---@param username string
+---@return IsoPlayer?
+function utils.getPlayerByUsername(username)
+    if isClient() then
+        return getPlayerFromUsername(username)
+    end
+
+    local onlinePlayers = getOnlinePlayers()
+    for i = 0, onlinePlayers:size() - 1 do
+        local player = onlinePlayers:get(i)
+        if player:getUsername() == username then
+            return player
+        end
+    end
+end
+
+---Gets the username of player 1.
+---@return string?
+function utils.getPlayerUsername()
+    local player = getSpecificPlayer(0)
+    local username = player and player:getUsername()
+    if username then
+        return username
+    end
+end
+
+---Retrieves a texture name given a chat icon name.
+---@param icon string
+---@return string?
+function utils.getTextureNameFromIcon(icon)
+    if not loadedIcons then
+        loadIcons()
+    end
+
+    return iconToTextureNameMap[icon]
+end
+
+---Gets the translation for a card name.
+---@param card integer The card value, in [1, 13].
+---@param suit integer The suit value, in [1, 4].
+---@return string
+function utils.getTranslatedCardName(card, suit)
+    if not cards[card] or not suits[suit] then
+        return ''
+    end
+
+    local cardTranslated = getText('UI_OmiChat_card_' .. cards[card])
+    local suitTranslated = getText('UI_OmiChat_suit_' .. suits[suit])
+    return getText('UI_OmiChat_card_name', cardTranslated, suitTranslated)
+end
+
+---Returns the translation of the given language.
+---If no translation exists, returns the same string.
+---@param language string
+---@return string
+function utils.getTranslatedLanguageName(language)
+    if not language then
+        return language
+    end
+
+    return getTextOrNull('UI_OmiChat_Language_' .. language) or language
+end
+
+---Checks whether a given access level should have access based on provided flags.
+---@param flags integer?
+---@param accessLevel string
 ---@return boolean
-local function checkColorTable(color)
+function utils.hasAccess(flags, accessLevel)
+    if not flags then
+        return true
+    end
+
+    accessLevel = accessLevel:lower()
+
+    if flags >= 32 then
+        if accessLevel == 'admin' then
+            return true
+        end
+
+        flags = flags - 32
+    end
+
+    if flags >= 16 then
+        if accessLevel == 'moderator' then
+            return true
+        end
+
+        flags = flags - 16
+    end
+
+    if flags >= 8 then
+        if accessLevel == 'overseer' then
+            return true
+        end
+
+        flags = flags - 8
+    end
+
+    if flags >= 4 then
+        if accessLevel == 'gm' then
+            return true
+        end
+
+        flags = flags - 4
+    end
+
+    if flags >= 2 then
+        if accessLevel == 'observer' then
+            return true
+        end
+
+        flags = flags - 2
+    end
+
+    return flags == 1
+end
+
+---Interpolates substitution tokens into a string with format strings using `$var` format.
+---Functions are referenced using `$func(...)` syntax.
+---@param text string The format string.
+---@param tokens table A table of format substitution strings.
+---@param seed unknown? Seed value for random functions.
+---@return string
+function utils.interpolate(text, tokens, seed)
+    return tostring(utils.interpolateRaw(text, tokens, seed))
+end
+
+---Interpolates substitution tokens into a string with format strings using `$var` format.
+---Functions are referenced using `$func(...)` syntax.
+---This returns the raw result, which may or may not be a string.
+---@param text string The format string.
+---@param tokens table A table of format substitution strings.
+---@param seed unknown? Seed value for random functions.
+---@return unknown
+function utils.interpolateRaw(text, tokens, seed)
+    if text == '' then
+        return ''
+    end
+
+    local interpolator = getCachedInterpolator(text)
+    if not interpolator then
+        interpolator = Interpolator:new({})
+        interpolator:setPattern(text)
+
+        setCachedInterpolator(text, interpolator)
+    end
+
+    -- always seed to avoid content changing on refresh
+    interpolator:randomseed(seed)
+    return interpolator:interpolateRaw(tokens)
+end
+
+---Checks whether a byte value is an invisible character used for encoding mod information.
+---@param byte integer
+---@return boolean
+function utils.isInvisibleByte(byte)
+    return (byte >= 128 and byte <= 159) or byte == 65535
+end
+
+---Checks a color table for validity.
+---@param color omichat.ColorTable?
+---@return boolean
+function utils.isValidColor(color)
     if type(color) ~= 'table' then
         return false
     end
@@ -120,9 +477,11 @@ local function checkColorTable(color)
     if type(r) ~= 'number' or r < 0 or r > 255 then
         return false
     end
+
     if type(g) ~= 'number' or g < 0 or g > 255 then
         return false
     end
+
     if type(b) ~= 'number' or b < 0 or b > 255 then
         return false
     end
@@ -130,41 +489,143 @@ local function checkColorTable(color)
     return true
 end
 
+---Returns an iterator over an icon-to-texture name map.
+---@return function
+---@return table<string, string>
+function utils.iterateIcons()
+    if not loadedIcons then
+        loadIcons()
+    end
 
----Interpolates substitutions into a string with format strings using $var format.
----Functions are referenced using $func(...) syntax.
----@param text string The format string.
----@param tokens table A table of format substitution strings.
----@param options omi.interpolate.Options? Interpolation options.
----@return string
-function utils.interpolate(text, tokens, options)
-    options = options or {}
-    options.libraryExclude = utils.copy(options.libraryExclude or {})
-
-    -- randomness would result in messages changing due to refreshes
-    options.libraryExclude['mutators.choose'] = true
-    options.libraryExclude['mutators.random'] = true
-    options.libraryExclude['mutators.randomseed'] = true
-
-    ---@type omichat.Interpolator
-    local interpolator = OmiChatInterpolator:new(options)
-    interpolator:setPattern(text)
-
-    return interpolator:interpolate(tokens)
+    return pairs(iconToTextureNameMap)
 end
 
----Converts a color table to an RGB string.
----@param color omichat.ColorTable
----@return string
-function utils.colorToRGBString(color)
-    return string.format('%d,%d,%d', color.r, color.g, color.b)
+---Logs a non-fatal mod error.
+---@param err string
+---@param ... unknown
+function utils.logError(err, ...)
+    print('[OmiChat] ' .. string.format(err, ...))
 end
 
----Converts a color table to a hex string.
----@param color omichat.ColorTable
+---Parses arguments for a chat command.
+---@param text string?
+---@return string[]
+function utils.parseCommandArgs(text)
+    if not text then
+        return {}
+    end
+
+    local i = 1
+    local inQuote = false
+    local current = {}
+    local args = {}
+
+    while i <= #text do
+        local c = text:sub(i, i)
+        local next = text:sub(i + 1, i + 1)
+
+        if c == '\\' and next == '"' then
+            current[#current + 1] = '"'
+            i = i + 1
+        elseif c == '"' then
+            if #current > 0 then
+                args[#args + 1] = concat(current)
+                current = {}
+            end
+
+            inQuote = not inQuote
+        elseif not inQuote and c == ' ' then
+            if #current > 0 then
+                args[#args + 1] = concat(current)
+                current = {}
+            end
+        else
+            current[#current + 1] = c
+        end
+
+        i = i + 1
+    end
+
+    if #current > 0 then
+        args[#args + 1] = concat(current)
+    end
+
+    return args
+end
+
+---Replaces character entities with the characters that they represent.
+---Numeric entities and named entities in ISO-8859-1 are supported.
+---@param text string
 ---@return string
-function utils.colorToHexString(color)
-    return string.format('%02x%02x%02x', color.r, color.g, color.b)
+function utils.replaceEntities(text)
+    text = text:gsub('(&#?x?[%a%d]+;)', function(entity)
+        return utils.getEntityValue(entity) or entity
+    end)
+
+    return text
+end
+
+---Converts a color string to a color. Returns `nil` on failure.
+---@param text string A color string, in RGB or hex.
+---@return omichat.ColorTable?
+function utils.stringToColor(text)
+    return utils.tryStringToColor(text).value
+end
+
+---Tests a predicate.
+---@param pred string
+---@param tokens table?
+---@param seed unknown?
+---@param default boolean?
+---@return boolean
+function utils.testPredicate(pred, tokens, seed, default)
+    if pred == '' then
+        return default or false
+    end
+
+    return utils.interpolate(pred, tokens or {}, seed) ~= ''
+end
+
+---Converts a color table to a color string for chat messages.
+---@param color omichat.ColorTable
+---@param pushFormat boolean? If true, PUSHRGB format will be used.
+---@return string
+function utils.toChatColor(color, pushFormat)
+    if not utils.isValidColor(color) then
+        return ''
+    end
+
+    return concat {
+        ' <',
+        pushFormat and 'PUSH' or '',
+        'RGB:',
+        format('%.7f', color.r / 255):gsub('00+$', '0'),
+        ',',
+        format('%.7f', color.g / 255):gsub('00+$', '0'),
+        ',',
+        format('%.7f', color.b / 255):gsub('00+$', '0'),
+        '> ',
+    }
+end
+
+---Converts a color table to a color string for overhead messages.
+---@param color omichat.ColorTable
+---@param bbCodeFormat boolean? If true, BBCode format will be used.
+---@return string
+function utils.toOverheadColor(color, bbCodeFormat)
+    if not utils.isValidColor(color) then
+        return ''
+    end
+
+    return concat {
+        bbCodeFormat and '[col=' or '*',
+        color.r,
+        ',',
+        color.g,
+        ',',
+        color.b,
+        bbCodeFormat and ']' or '*',
+    }
 end
 
 ---Attempts to convert a color string to a color. Returns false and an error message on failure.
@@ -195,86 +656,33 @@ function utils.tryStringToColor(text, minColor, maxColor)
     return { success = true, value = { r = r, g = g, b = b } }
 end
 
----Converts a color string to a color. Returns nil on failure.
----@param text string A color string, in RGB or hex.
----@return omichat.ColorTable?
-function utils.stringToColor(text)
-    return utils.tryStringToColor(text).value
-end
-
----Converts a color table to a color string for chat messages.
----@param color omichat.ColorTable
----@param pushFormat boolean? If true, PUSHRGB format will be used.
----@return string
-function utils.toChatColor(color, pushFormat)
-    if not checkColorTable(color) then
-        return ''
-    end
-
-    return concat {
-        ' <',
-        pushFormat and 'PUSH' or '',
-        'RGB:',
-        format('%.7f', color.r / 255):gsub('00+$', '0'),
-        ',',
-        format('%.7f', color.g / 255):gsub('00+$', '0'),
-        ',',
-        format('%.7f', color.b / 255):gsub('00+$', '0'),
-        '> '
-    }
-end
-
----Converts a color table to a color string for overhead messages.
----@param color omichat.ColorTable
----@param bbCodeFormat boolean? If true, BBCode format will be used.
----@return string
-function utils.toOverheadColor(color, bbCodeFormat)
-    if not checkColorTable(color) then
-        return ''
-    end
-
-    return concat {
-        bbCodeFormat and '[col=' or '*',
-        color.r,
-        ',',
-        color.g,
-        ',',
-        color.b,
-        bbCodeFormat and ']' or '*'
-    }
-end
-
----Encodes a table as a string of key-value pairs.
----Keys and values are converted to strings.
----@param table table
----@return string
-function utils.kvp.encode(table)
-    local result = {}
-
-    for k, v in pairs(table) do
-        result[#result+1] = kvpEncodeString(k)
-        result[#result+1] = kvpEncodeString(v, true)
-    end
-
-    return concat(result)
-end
-
----Decodes a string of key-value pairs.
+---Reverses the operation of escaping text for use in a rich text panel.
+---@see ISRichTextPanel
+---@see omichat.utils.escapeRichText
 ---@param text string
----@return table
-function utils.kvp.decode(text)
-    local result = {}
+---@return string
+function utils.unescapeRichText(text)
+    return (text:gsub('&lt;', '<'):gsub('&gt;', '>'))
+end
 
-    local i = 1
-    local key, value
-    while i <= #text do
-        key, i = kvpReadString(text, i)
-        value, i = kvpReadString(text, i)
+---Matches on text wrapped in invisible characters.
+---@param text string The string to read.
+---@param n integer A number in [1, 32].
+---@param pattern string? The string pattern to use. Defaults to `(.-)`.
+---@return ...
+function utils.unwrapStringArgument(text, n, pattern)
+    pattern = pattern or '(.-)'
+    local c = utils.encodeInvisibleCharacter(n)
+    return text:match(concat { c, pattern, c })
+end
 
-        result[key] = value
-    end
-
-    return result
+---Encodes `n` as an invisible character and wraps text with it.
+---@param text string The string to wrap.
+---@param n integer A number in [1, 32].
+---@return string
+function utils.wrapStringArgument(text, n)
+    local c = utils.encodeInvisibleCharacter(n)
+    return concat { c, text, c }
 end
 
 

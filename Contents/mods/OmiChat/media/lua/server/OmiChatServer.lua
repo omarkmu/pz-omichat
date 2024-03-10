@@ -1,19 +1,15 @@
 if not isServer() then return end
 
-local OmiChatShared = require 'OmiChatShared'
-
 
 ---Provides server API access to OmiChat.
----@class omichat.api.server : omichat.api.shared
-local OmiChat = OmiChatShared:derive()
+---@class omichat.api.server
+local OmiChat = require 'OmiChat/API/Server'
 
+require 'OmiChat/API/ServerData'
+require 'OmiChat/API/ServerDispatch'
+require 'OmiChat/API/ServerCommands'
 
----Transmits mod data to clients.
-function OmiChat.transmitModData()
-    OmiChat.getModData()
-    ModData.transmit(OmiChat.modDataKey)
-end
-
-
+Events.OnClientCommand.Add(OmiChat._onClientCommand)
 Events.SendCustomModData.Add(OmiChat.transmitModData)
+
 return OmiChat

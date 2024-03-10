@@ -1,4 +1,5 @@
-name=OmiChat
-id=omichat
-description=Extends chat functionality.
+name=OmiChat (Beta)
+id=omichat_beta
+description=It's a chat mod.
+description=Extends the functionality of the chat with new commands and components.
 poster=poster.png

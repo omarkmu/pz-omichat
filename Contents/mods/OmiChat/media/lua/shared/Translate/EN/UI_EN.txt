@@ -1,45 +1,124 @@
 UI_EN = {
-    --- general ---
-    UI_OmiChat_whisper_chat_title_id = "Whisper",
+    --[[ General ]]--
+    UI_OmiChat_icon_cat_clothing = "Clothing",
+    UI_OmiChat_icon_cat_cooking = "Cooking",
+    UI_OmiChat_icon_cat_food = "Food",
+    UI_OmiChat_icon_cat_items = "Items",
+    UI_OmiChat_icon_cat_miscellaneous = "Miscellaneous",
+    UI_OmiChat_icon_cat_nature = "Nature",
+    UI_OmiChat_icon_cat_objects = "Objects",
+    UI_OmiChat_icon_cat_tools = "Tools",
+    UI_OmiChat_icon_cat_weapons = "Weapons",
 
-    UI_OmiChat_context_enable_name_colors = "Enable name colors",
-    UI_OmiChat_context_disable_name_colors = "Disable name colors",
-    UI_OmiChat_context_colors_submenu_name = "Set chat colors",
+    -- [[ Cards ]]--
+    -- %1 = card name, %2 = suit name
+    UI_OmiChat_card_name = "%1 of %2",
 
-    -- %1 = the chat stream (e.g., /say, /yell)
-    UI_OmiChat_context_submenu_color = "%1 color",
-    UI_OmiChat_context_submenu_color_radio = "Radio Message Color",
-    UI_OmiChat_context_submenu_color_discord = "Discord Message Color",
-    UI_OmiChat_context_submenu_color_server = "Server Message Color",
-    UI_OmiChat_context_submenu_color_name = "Name Color",
-    UI_OmiChat_context_submenu_color_speech = "Speech Color",
+    UI_OmiChat_suit_clubs = "Clubs",
+    UI_OmiChat_suit_diamonds = "Diamonds",
+    UI_OmiChat_suit_hearts = "Hearts",
+    UI_OmiChat_suit_spades = "Spades",
 
-    UI_OmiChat_context_message_type_radio = "radio",
-    UI_OmiChat_context_message_type_discord = "Discord",
-    UI_OmiChat_context_message_type_server = "server",
+    UI_OmiChat_card_ace = "the Ace",
+    UI_OmiChat_card_jack = "the Jack",
+    UI_OmiChat_card_queen = "the Queen",
+    UI_OmiChat_card_king = "the King",
+    UI_OmiChat_card_two = "a Two",
+    UI_OmiChat_card_three = "a Three",
+    UI_OmiChat_card_four = "a Four",
+    UI_OmiChat_card_five = "a Five",
+    UI_OmiChat_card_six = "a Six",
+    UI_OmiChat_card_seven = "a Seven",
+    UI_OmiChat_card_eight = "an Eight",
+    UI_OmiChat_card_nine = "a Nine",
+    UI_OmiChat_card_ten = "a Ten",
 
-    -- %1 = the chat stream (e.g., /say, /yell), or one of the `context_message_type` strings
-    UI_OmiChat_context_color = "Set %1 color",
-    UI_OmiChat_context_color_name = "Set name color",
-    UI_OmiChat_context_color_speech = "Set speech color",
-    UI_OmiChat_context_color_radio = "Set radio message color",
-    UI_OmiChat_context_color_discord = "Set Discord message color",
-    UI_OmiChat_context_color_server = "Set server message color",
+    --[[ Languages ]]--
+    UI_OmiChat_Language_Arabic = "Arabic",
+    UI_OmiChat_Language_ASL = "ASL",
+    UI_OmiChat_Language_Bengali = "Bengali",
+    UI_OmiChat_Language_Cantonese = "Cantonese",
+    UI_OmiChat_Language_Danish = "Danish",
+    UI_OmiChat_Language_Dutch = "Dutch",
+    UI_OmiChat_Language_English = "English",
+    UI_OmiChat_Language_Finnish = "Finnish",
+    UI_OmiChat_Language_French = "French",
+    UI_OmiChat_Language_German = "German",
+    UI_OmiChat_Language_Hindi = "Hindi",
+    UI_OmiChat_Language_Hungarian = "Hungarian",
+    UI_OmiChat_Language_Italian = "Italian",
+    UI_OmiChat_Language_Japanese = "Japanese",
+    UI_OmiChat_Language_Javanese = "Javanese",
+    UI_OmiChat_Language_Korean = "Korean",
+    UI_OmiChat_Language_Mandarin = "Mandarin",
+    UI_OmiChat_Language_Marathi = "Marathi",
+    UI_OmiChat_Language_Norwegian = "Norwegian",
+    UI_OmiChat_Language_Polish = "Polish",
+    UI_OmiChat_Language_Portuguese = "Portuguese",
+    UI_OmiChat_Language_Punjabi = "Punjabi",
+    UI_OmiChat_Language_Russian = "Russian",
+    UI_OmiChat_Language_Shanghainese = "Shanghainese",
+    UI_OmiChat_Language_Spanish = "Spanish",
+    UI_OmiChat_Language_Tamil = "Tamil",
+    UI_OmiChat_Language_Telugu = "Telugu",
+    UI_OmiChat_Language_Thai = "Thai",
+    UI_OmiChat_Language_Turkish = "Turkish",
+    UI_OmiChat_Language_Ukrainian = "Ukrainian",
+    UI_OmiChat_Language_Urdu = "Urdu",
+    UI_OmiChat_Language_Vietnamese = "Vietnamese",
 
-    UI_OmiChat_context_color_desc = "Enter a color in RGB or hex format to set the color used for %1 messages, or nothing to reset.",
-    UI_OmiChat_context_color_desc_name = "Enter a color in RGB or hex format to set the color of your name in chat, or nothing to reset.",
-    UI_OmiChat_context_color_desc_speech = "Enter a color in RGB or hex format to set the color of your overhead speech bubbles.",
+    UI_OmiChat_unknown_language_says = "says something in %1.",
+    UI_OmiChat_unknown_language_whispers = "whispers something in %1.",
+    UI_OmiChat_unknown_language_shouts = "shouts something in %1.",
+    UI_OmiChat_unknown_language_says_signed = "signs something in %1.",
+    UI_OmiChat_unknown_language_whispers_signed = "subtly signs something in %1.",
+    UI_OmiChat_unknown_language_shouts_signed = "energetically signs something in %1.",
+    UI_OmiChat_unknown_language_radio_no_author = "Something is said in %1.",
 
-    UI_OmiChat_context_set_custom_callouts = "Customize callouts",
-    UI_OmiChat_context_set_custom_sneakcallouts = "Customize sneak callouts",
-    UI_OmiChat_context_set_custom_callouts_desc = "Enter one 'Q' callout per line, or nothing to reset.",
+    UI_OmiChat_unknown_language_narrative_asks = "%1 asks something in %2.",
+    UI_OmiChat_unknown_language_narrative_says = "%1 says something in %2.",
+    UI_OmiChat_unknown_language_narrative_signs = "%1 signs something in %2.",
+    UI_OmiChat_unknown_language_narrative_states = "%1 states something in %2.",
+    UI_OmiChat_unknown_language_narrative_shouts = "%1 shouts something in %2.",
+    UI_OmiChat_unknown_language_narrative_hisses = "%1 hisses something in %2.",
+    UI_OmiChat_unknown_language_narrative_exclaims = "%1 exclaims something in %2.",
+    UI_OmiChat_unknown_language_narrative_whispers = "%1 whispers something in %2.",
+    UI_OmiChat_unknown_language_narrative_whisper_shouts = "%1 whisper shouts something in %2.",
 
-    -- %1 = the name that the player set with /name
-    UI_OmiChat_set_name_success = "Name has been set to '%1'.",
-    UI_OmiChat_set_name_failure = "Failed to set name.",
-    UI_OmiChat_reset_name_success = "Name has been reset.",
+    -- [[ Narrative Style ]]--
+    -- %1 = dialogue tag, %2 = content
+    UI_OmiChat_NarrativeTag = "%1, %2",
+    -- %1 = content
+    UI_OmiChat_NarrativeTag_asks = "asks, %1",
+    UI_OmiChat_NarrativeTag_says = "says, %1",
+    UI_OmiChat_NarrativeTag_states = "states, %1",
+    UI_OmiChat_NarrativeTag_shouts = "shouts, %1",
+    UI_OmiChat_NarrativeTag_hisses = "hisses, %1",
+    UI_OmiChat_NarrativeTag_exclaims = "exclaims, %1",
+    UI_OmiChat_NarrativeTag_whispers = "whispers, %1",
+    UI_OmiChat_NarrativeTag_whisper_shouts = "whisper shouts, %1",
 
+    --[[ Help Text ]]--
+    UI_OmiChat_helptext_emotes = "Get a list of available chat emotes",
+    UI_OmiChat_helptext_name = "To set your name, use: /name Name. Example: /name Bob",
+    UI_OmiChat_helptext_name_full = "To set your name, use: /name FirstName LastName. Example: /name Bob Smith",
+    UI_OmiChat_helptext_nickname = "To set your name in chat, use: /nickname Name. Example: /name Bob",
+    UI_OmiChat_helptext_setname = "Set a player's name in chat. Example: /setname username Name",
+    UI_OmiChat_helptext_resetname = "Reset a player's name in chat. Example: /resetname username",
+    UI_OmiChat_helptext_clearnames = "Clears all player chat names. Use /clearnames",
+    UI_OmiChat_helptext_addlanguage = "Add to a player's roleplay language list. Example: /addlanguage username English",
+    UI_OmiChat_helptext_resetlanguages = "Reset a player's roleplay languages. Example: /resetlanguages username",
+    UI_OmiChat_helptext_setlanguageslots = "Set the amount of roleplay language slots for a player. Slots must be in [1, 32]. Example: /setlanguageslots username 5",
+    UI_OmiChat_helptext_seticon = "Set a player's chat icon. Example: /seticon username crowbar",
+    UI_OmiChat_helptext_reseticon = "Reset a player's chat icon. Example: /reseticon username",
+    UI_OmiChat_helptext_iconinfo = "Get an icon's proper name, for use in format strings. Example: /iconinfo plushspiffo",
+
+    --[[ Error Messages ]]--
     UI_OmiChat_error_invalid_color = "Input must be a hexadecimal color value or three numbers separated by commas or spaces.",
+    UI_OmiChat_error_signed_radio = "You can't use sign language over the radio.",
+    UI_OmiChat_error_signed_faction_radio = "You can't use sign language over faction radio.",
+    UI_OmiChat_error_signed_safehouse_radio = "You can't use sign language over safehouse radio.",
+    UI_OmiChat_error_unknown_player = "Could not find player '%1'."
 
     -- %1 = the maximum color value (number)
     UI_OmiChat_error_color_max = "Values must be less than or equal to %1.",
@@ -53,39 +132,122 @@ UI_EN = {
     -- %1 = the maximum length of custom shouts (number)
     UI_OmiChat_error_shout_too_long = "Shout text can only be up to %1 characters long.",
 
-    UI_OmiChat_icon_cat_clothing = "Clothing",
-    UI_OmiChat_icon_cat_cooking = "Cooking",
-    UI_OmiChat_icon_cat_food = "Food",
-    UI_OmiChat_icon_cat_items = "Items",
-    UI_OmiChat_icon_cat_miscellaneous = "Miscellaneous",
-    UI_OmiChat_icon_cat_nature = "Nature",
-    UI_OmiChat_icon_cat_objects = "Objects",
-    UI_OmiChat_icon_cat_tools = "Tools",
-    UI_OmiChat_icon_cat_weapons = "Weapons",
+    --[[ Chat Formats ]]--
+    -- %1 = the action the player provided to the command (e.g., to /me)
+    UI_OmiChat_rp_emote = "« %1 »",
 
     -- %1 = a radio frequency, in the format `#.#`.
     UI_OmiChat_radio = "Radio (%1 MHz)",
 
-    -- %1 = the private message recipient.
-    UI_OmiChat_private_chat_to = "to %1",
+    -- %1 = the private message recipient
+    UI_OmiChat_private_chat_to = "PM to %1",
+    -- %1 = the private message sender
+    UI_OmiChat_private_chat_from = "PM from %1",
 
-    --- commands  ---
+    -- %1 = the name of the player who drew the card, %2 = the name of the card that was drawn
+    UI_OmiChat_card = "%1 drew %2",
+    -- %1 = the name of the player who rolled, %2 = the number that was rolled, %3 = the number of sides on the dice
+    UI_OmiChat_roll = "%1 rolled a %2 on a %3-sided die",
+
+    -- %1 = the name of the card that was drawn
+    UI_OmiChat_card_local = "draws %1",
+    -- %1 = the number that was rolled, %2 = the number of sides on the dice
+    UI_OmiChat_roll_local = "rolls a %1 on a %2-sided die",
+
+    --[[ Context Menus ]]--
+    UI_OmiChat_context_chat_settings = "Chat settings",
+    UI_OmiChat_context_chat_customization = "Chat customization",
+    UI_OmiChat_context_character_customization = "Character customization",
+    UI_OmiChat_context_languages = "Language",
+
+    UI_OmiChat_context_clean = "Clean blood & dirt",
+    UI_OmiChat_context_hair_color = "Change hair color",
+    UI_OmiChat_context_grow_hair = "Grow hair",
+    UI_OmiChat_context_grow_beard = "Grow beard",
+    UI_OmiChat_context_hair_color_desc = "Enter a color in RGB or hex format to set your hair color, or nothing to reset.",
+
+    UI_OmiChat_context_enable_name_colors = "Enable name colors",
+    UI_OmiChat_context_disable_name_colors = "Disable name colors",
+    UI_OmiChat_context_enable_suggestions = "Enable suggestions",
+    UI_OmiChat_context_disable_suggestions = "Disable suggestions",
+    UI_OmiChat_context_colors_submenu_name = "Set chat colors",
+
+    UI_OmiChat_context_retain_commands = "Retain commands",
+    UI_OmiChat_context_retain_commands_chat = "Chat",
+    UI_OmiChat_context_retain_commands_rp = "RP",
+    UI_OmiChat_context_retain_commands_other = "Other",
+
+    -- %1 = the language to add, %2 = the language slot number
+    UI_OmiChat_context_add_language = "Add",
+    UI_OmiChat_context_confirm_add_language = "Add %1 as language #%2? This cannot be undone.",
+    UI_OmiChat_context_sign_emotes_enable = "Enable sign language animations",
+    UI_OmiChat_context_sign_emotes_disable = "Disable sign language animations",
+    UI_OmiChat_context_sign_emotes_tooltip = "This controls whether a random animation is played when sending a message in a signed language.",
+
+    -- %1 = the chat stream (e.g., /say, /yell)
+    UI_OmiChat_context_submenu_color = "%1 color",
+    UI_OmiChat_context_submenu_color_radio = "Radio message color",
+    UI_OmiChat_context_submenu_color_discord = "Discord message color",
+    UI_OmiChat_context_submenu_color_server = "Server message color",
+    UI_OmiChat_context_submenu_color_name = "Name color",
+    UI_OmiChat_context_submenu_color_speech = "Speech color",
+
+    UI_OmiChat_context_message_type_radio = "radio",
+    UI_OmiChat_context_message_type_discord = "Discord",
+    UI_OmiChat_context_message_type_server = "server",
+
+    UI_OmiChat_context_color_desc = "Enter a color in RGB or hex format to set the color used for %1 messages, or nothing to reset.",
+    UI_OmiChat_context_color_desc_name = "Enter a color in RGB or hex format to set the color of your name in chat, or nothing to reset.",
+    UI_OmiChat_context_color_desc_speech = "Enter a color in RGB or hex format to set the color of your overhead speech bubbles.",
+
+    UI_OmiChat_context_set_custom_callouts = "Customize callouts",
+    UI_OmiChat_context_set_custom_sneakcallouts = "Customize sneak callouts",
+    UI_OmiChat_context_set_custom_callouts_desc = "Enter one callout per line, or nothing to reset.",
+
+    UI_OmiChat_context_admin = "Admin options",
+    UI_OmiChat_context_admin_show_icon = "Display chat icon",
+    UI_OmiChat_context_admin_know_all_languages = "Understand all languages",
+    UI_OmiChat_context_admin_ignore_message_range = "Ignore message range",
+
+    --[[ Commands ]]--
+    -- %1 = the name that the player provided to /name
+    UI_OmiChat_set_name_success = "Your name is now '%1'.",
+    UI_OmiChat_set_name_failure = "Your name cannot be set to '%1'.",
+    UI_OmiChat_set_name_empty = "No name specified. Use /name Name",
+    UI_OmiChat_reset_name_success = "Your name has been reset.",
+    UI_OmiChat_clear_names_success = "Cleared all nicknames.",
+
+    -- %1 = a player's username, %2 = the chat name that was set with /setname
+    UI_OmiChat_set_other_name_success = "Name has been set to '%2' for player '%1'.",
+    UI_OmiChat_reset_other_name_success = "Name has been reset for player '%1'.",
+
+    -- %1 = a player's username
+    UI_OmiChat_set_other_icon_success = "Icon has been set for player '%1'.",
+    UI_OmiChat_reset_other_icon_success = "Icon has been reset for player '%1'.",
+
+    -- %1 = icon name, %2 = image tag, %3 = icon alias
+    UI_OmiChat_icon_info = "'%1' is the icon name for: %2",
+    UI_OmiChat_icon_info_unknown = "'%1' is not a known icon name.",
+    UI_OmiChat_icon_info_alias = "'%3' is an alias for '%1', the icon name for: %2",
+
+    -- %1 = a player's username, %2 = the language
+    UI_OmiChat_add_language_success = "Added roleplay language '%2' to player '%1'.",
+    UI_OmiChat_add_language_full = "Player '%1' already knows the maximum number of languages.",
+    UI_OmiChat_add_language_known = "Player '%1' already knows %2.",
+    UI_OmiChat_add_language_unknown_language = "'%1' is not a configured language.",
+    UI_OmiChat_reset_other_languages_success = "RP languages have been reset for player '%1'.",
+    UI_OmiChat_set_language_slots_success = "Language slots have been set to %2 for player '%1'.",
+
     UI_OmiChat_clear_message = "Console cleared",
     UI_OmiChat_available_emotes = "Trigger emote animations in local chats by including one of the following emotes in your message. Available emotes:",
-    UI_OmiChat_list_of_commands = "List of commands:"
+    UI_OmiChat_list_of_commands = "List of commands:",
 
-    --- help text  ---
-    UI_OmiChat_helptext_emotes = "Get a list of available chat emotes",
-    UI_OmiChat_helptext_name = "To set your name in chat, use: /name Name. Example: /name Bob. To reset your name, use /name"
-    UI_OmiChat_helptext_name_no_reset = "To set your name in chat, use: /name Name. Example: /name Bob"
-
-    --- TAD compat  ---
+    --[[ Compat: True Actions Dancing ]]--
     UI_OmiChat_helptext_dance = "Use /dance to do a random dance. Use /dance followed by the name of the dance to do a specific dance. To see a list of dances, use /dance list",
     UI_OmiChat_available_dances = "Available dances:",
 
     -- %1 = the name of the dance the player tried to do with /dance
-    UI_OmiChat_unknown_dance_recipe = "You don't know the %1 dance.",
-
-    -- %1 = the name of the dance the player tried to do with /dance
-    UI_OmiChat_missing_dance_item = "You need a dance card to do the %1 dance.",
+    UI_OmiChat_unknown_dance = "Unknown dance. Use '/dance list' to see available dances.",
+    UI_OmiChat_unknown_dance_recipe = "You don't know the %1 dance. Use '/dance list' to see available dances.",
+    UI_OmiChat_missing_dance_item = "You need a dance card to do the %1 dance. Use '/dance list' to see available dances.",
 }

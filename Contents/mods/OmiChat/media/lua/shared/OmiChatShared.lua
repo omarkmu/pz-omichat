@@ -1,153 +1,16 @@
-local lib = require 'OmiChat/lib'
-local utils = require 'OmiChat/util'
-local Option = require 'OmiChat/Options'
-local MetaFormatter = require 'OmiChat/MetaFormatter'
+---Provides API access to OmiChat.
+---@class omichat.api.shared
+local OmiChat = require 'OmiChat/API/Shared'
+
+require 'OmiChat/API/SharedLanguages'
+require 'OmiChat/Component/InterpolatorLibrary'
+
+Events.EveryDays.Add(OmiChat.utils.cleanupCache)
 
 
----Provides client and server API access to OmiChat.
----@class omichat.api.shared : omi.Class
----@field protected modDataKey string
----@field protected modDataVersion integer
-local OmiChat = lib.class()
-
-OmiChat.modDataVersion = 1
-OmiChat.modDataKey = 'omichat'
-OmiChat.utils = utils
-OmiChat.Option = Option
-OmiChat.MetaFormatter = MetaFormatter
+return OmiChat
 
 
----Event handler for retrieving global mod data.
----@param key string
----@param newData omichat.ModData
----@protected
-function OmiChat._onReceiveGlobalModData(key, newData)
-    if key ~= OmiChat.modDataKey or type(newData) ~= 'table' then
-        return
-    end
-
-    local modData = OmiChat.getModData()
-
-    if isClient() then
-        modData.nicknames = newData.nicknames
-        modData.nameColors = newData.nameColors
-    elseif newData._updates then
-        local user = newData._updates.nicknameToUpdate
-        if user and Option.AllowSetName then
-            modData.nicknames[user] = newData.nicknames[user]
-        end
-
-        user = newData._updates.nicknameToClear
-        if user then
-            modData.nicknames[user] = nil
-        end
-
-        user = newData._updates.nameColorToUpdate
-        if user and Option.AllowSetNameColor then
-            modData.nameColors[user] = newData.nameColors[user]
-        end
-    end
-
-    modData._updates = nil
-
-    if isServer() then
-        ModData.transmit(OmiChat.modDataKey)
-    end
-end
-
-
----Gets substitution tokens to use in interpolation for a given player.
----If the player descriptor could not be obtained, returns `nil`.
----@param player IsoPlayer
----@return table?
-function OmiChat.getPlayerSubstitutions(player)
-    local desc = player and player:getDescriptor()
-    if not desc then
-        return
-    end
-
-    return {
-        forename = desc:getForename(),
-        surname = desc:getSurname(),
-        username = player:getUsername(),
-    }
-end
-
----Gets or creates the global mod data table.
----@return omichat.ModData
-function OmiChat.getModData()
-    ---@type omichat.ModData
-    local modData = ModData.getOrCreate(OmiChat.modDataKey)
-
-    modData.version = OmiChat.modDataVersion
-    modData.nicknames = modData.nicknames or {}
-    modData.nameColors = modData.nameColors or {}
-
-    return modData
-end
-
----Returns the color table for a user's name color, or nil if unset.
----@param username string
----@return omichat.ColorTable?
-function OmiChat.getNameColor(username)
-    if not Option.AllowSetNameColor then
-        return
-    end
-
-    return utils.stringToColor(OmiChat.getModData().nameColors[username])
-end
-
----Returns the color table used for a user's name color in chat, or nil if unset.
----This respects the UseSpeechColorAsDefaultNameColor option.
----@param username string
----@return omichat.ColorTable?
-function OmiChat.getNameColorInChat(username)
-    local nameColor = OmiChat.getNameColor(username)
-    if nameColor then
-        return nameColor
-    end
-
-    if Option.UseSpeechColorAsDefaultNameColor then
-        return Option:getDefaultColor('name', username)
-    end
-end
-
----Retrieves the name that should be used in chat for a given username.
----@param username string
----@param chatType omichat.ChatTypeString? The chat type to use in format string interpolation.
----@return string? #The name to use in chat, or nil if unable to retrieve information about the user.
-function OmiChat.getNameInChat(username, chatType)
-    if not username then
-        return
-    end
-
-    local modData = OmiChat.getModData()
-    if Option.AllowSetName and modData.nicknames[username] then
-        return modData.nicknames[username]
-    end
-
-    local tokens = OmiChat.getPlayerSubstitutions(getPlayerFromUsername(username))
-    if not tokens then
-        return
-    end
-
-    tokens.username = username
-    tokens.chatType = chatType
-    return utils.interpolate(Option.NameFormat, tokens)
-end
-
----Adds a function that should be available to all interpolator patterns.
----@param name string
----@param func function
-function OmiChat.registerInterpolatorFunction(name, func)
-    ---@diagnostic disable-next-line: invisible
-    utils.Interpolator._registeredFunctions[name:lower()] = func
-end
-
-
---#region Types
-
----Chat types.
 ---@alias omichat.ChatTypeString
 ---| 'general'
 ---| 'whisper'
@@ -159,28 +22,134 @@ end
 ---| 'admin'
 ---| 'server'
 
+---@alias omichat.MenuTypeString
+---| 'trade'
+---| 'medical'
+---| 'mini_scoreboard'
+---| 'search_player'
+
+---@alias omichat.CalloutCategory
+---| 'callouts'
+---| 'sneakcallouts'
+
+---@alias omichat.ColorCategory
+---| omichat.CustomStreamName
+---| 'general'
+---| 'say'
+---| 'shout'
+---| 'faction'
+---| 'safehouse'
+---| 'radio'
+---| 'admin'
+---| 'server'
+---| 'private'
+---| 'discord'
+---| 'name'
+---| 'speech'
+
+---@alias omichat.ModDataField
+---| 'nicknames'
+---| 'nameColors'
+---| 'languages'
+---| 'languageSlots'
+---| 'currentLanguage'
+---| 'icons'
+
+---@alias omichat.AdminOption
+---| 'show_icon'
+---| 'know_all_languages'
+---| 'ignore_message_range'
+
+
+---@class omichat.LanguageInfoStore
+---@field languageCount integer
+---@field availableLanguages string
+---@field signedLanguages string
+---@field idToLanguage table<integer, string>
+---@field languageToID table<string, integer>
+---@field languageIsSignedMap table<string, boolean>
+
+---@class omichat.CustomStreamInfo
+---@field name string The name of the custom stream.
+---@field formatID integer The constant ID to use for message formatting.
+---@field colorOpt string The name of the option used to determine message color.
+---@field rangeOpt string The name of the option used to determine message range.
+---@field chatFormatOpt string The name of the option used for the chat format.
+---@field overheadFormatOpt string The name of the option used for the overhead format.
+---@field chatTypes table<omichat.ChatTypeString, true?> Chat types for which this stream is enabled.
+---@field streamAlias string? An alias to use for determining color and range.
+---@field autoColorOption false? Whether to automatically add a color option for this stream.
+---@field defaultRangeOpt string? The option used for the default message range. Defaults to `RangeSay`.
+---@field titleID string? The string ID to use for chat tags associated with this stream.
+
+---@class omichat.FormatterInfo
+---@field name string The name of the formatter.
+---@field formatID integer The formatter's ID.
+---@field overheadFormatOpt string? The name of the option used for the overhead format.
+
+---Options for initializing formatters.
+---@class omichat.MetaFormatterOptions
+---@field format string The format string to use.
+
 ---A table containing color values in [0, 255].
 ---@class omichat.ColorTable
----@field r integer
----@field g integer
----@field b integer
+---@field r integer The red value.
+---@field g integer The green value.
+---@field b integer The blue value.
 
----Updates to mod data.
----@class omichat.ModDataUpdates
----@field nicknameToClear unknown?
----@field nicknameToUpdate unknown?
----@field nameColorToUpdate unknown?
+---A table containing color values in [0.0, 1.0].
+---@class omichat.DecimalRGBColorTable
+---@field r number The red value.
+---@field g number The green value.
+---@field b number The blue value.
 
----Mod data fields.
+---A table containing color values in [0.0, 1.0].
+---@class omichat.DecimalRGBAColorTable : omichat.DecimalRGBColorTable
+---@field a number The alpha value.
+
+---Global mod data.
 ---@class omichat.ModData
----@field version integer
----@field nicknames table<string, string>
----@field nameColors table<string, string>
----@field _updates omichat.ModDataUpdates?
+---@field version integer The current mod data version.
+---@field nicknames table<string, string> Map of usernames to chat nicknames.
+---@field nameColors table<string, string> Map of usernames to chat color strings.
+---@field icons table<string, string> Map of usernames to chat icons.
+---@field languages table<string, string[]> Map of usernames to roleplay languages.
+---@field languageSlots table<string, integer> Map of usernames to roleplay language slots.
+---@field currentLanguage table<string, string> Map of usernames to currently selected roleplay languages.
 
---#endregion
+---Player mod data.
+---@class omichat.PlayerModData
+---@field currentLanguage string?
 
+---Request to update global mod data fields on the server.
+---@class omichat.request.ModDataUpdate
+---@field target string The target username.
+---@field field omichat.ModDataField The field to update.
+---@field fromCommand boolean? Whether this request was created from a command.
+---@field value unknown? The value to set on the field.
 
-Events.OnReceiveGlobalModData.Add(OmiChat._onReceiveGlobalModData)
+---Request to report the result of drawing a card on the client.
+---@class omichat.request.ReportDrawCard
+---@field name string? The name of the player who drew the card, if called for a global message.
+---@field card integer The card number, in [1, 13].
+---@field suit integer The suit number, in [1, 4].
 
-return OmiChat
+---Request to report the result of rolling dice on the client.
+---@class omichat.request.ReportRoll
+---@field roll integer The value of the dice roll.
+---@field sides integer The number of sides on the dice that was rolled.
+
+---Request to display a message on the client.
+---@class omichat.request.ShowMessage
+---@field text string? The message text.
+---@field stringID string? The string ID of a message to translate.
+---@field args string[]? Arguments for message translation.
+---@field serverAlert boolean? Whether this should be treated as a server alert.
+
+---Request to roll dice on the server.
+---@class omichat.request.RollDice
+---@field sides integer The number of sides on the dice to roll.
+
+---Request to handle a command on the server.
+---@class omichat.request.Command
+---@field command string The command text, excluding the command itself.

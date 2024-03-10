@@ -1,44 +1,82 @@
 version=1
-title=OmiChat
+id=3040299907
+title=OmiChat (Beta)
 description=It's a chat mod.
+description=This mod can be added or removed mid-save.
+description=[h2]Description[/h2]
+description=This mod improves the chat for players and offers a plethora of sandbox options for server operators. Among other features, it includes color customization, character naming, emote shortcuts, and new chat commands for roleplay.
 description=
-description=[h2]Features[/h2]
-description=This mod aims to be as configurable as possible. All of the features listed below can be configured or completely disabled via sandbox options.
-description=
-description=The default settings are tailored to usage for roleplay chat; by default, local chats will use character forenames instead of usernames. Additionally, chat will use a colon for names instead of square brackets. Both of these can be reverted using the sandbox options.
-description=
-description=Features for players: [list]
-description=[*]Chat color customization
-description=[*]Name color customization
-description=[*]Callout customization
-description=[*]Character naming with /name
-description=[*]Chat names in menus (Trading, Medical Check)
-description=[*]Roleplay emotes with /me
-description=[*]Local /whisper chat
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556]True Actions Act 3 - Dancing[/url] compatibility with /dance
-description=[*]Icon picker for local chats
-description=[*]Emote animation shortcuts (.clap, .salute, .surrender, etc.) + /emotes command to display a list of emotes
+description=The list of chat streams available with the default settings, including the vanilla streams: [list]
+description=[*]/all
+description=[*]/faction [/f]
+description=[*]/safehouse [/sh]
+description=[*]/pm (private chat; replaces vanilla /whisper)
+description=[*]/say [/s]
+description=[*]/yell [/y, /shout]
+description=[*]/low (short range chat)
+description=[*]/whisper [/w] (shorter range chat)
+description=[*]/me [/m] (describes a character's actions)
+description=[*]/mequiet [/mq]
+description=[*]/meloud [/ml]
+description=[*]/do [/d] (describes an action or event)
+description=[*]/doquiet [/dq]
+description=[*]/doloud [/dl]
+description=[*]/ooc [/o] (local out-of-character chat)
+description=[*]/admin [/a] (admin-only chat)
 description=[/list]
 description=
-description=Features for server operators: [list]
+description=For more details, please see the [url=https://omarkmu.github.io/pz-omichat]documentation![/url]
+description=
+description=[h2]Features[/h2]
+description=This mod aims to be as configurable as possible. The vast majority of the features listed below can be configured or completely disabled via [url=https://omarkmu.github.io/pz-omichat/sandbox-options]sandbox options.[/url]
+description=
+description=The default settings are tailored to usage for roleplay; by default, chats other than /all and /pm will use character forenames instead of usernames. Additionally, chat will use a colon for names instead of square brackets. Both of these can be reverted using the sandbox options.
+description=
+description=[b]Features for players:[/b] [list]
+description=[*]Chat color customization
+description=[*]Name color customization
+description=[*]Speech bubble color customization
+description=[*]Callout customization
+description=[*]Character naming with /name
+description=[*]Local /whisper chat
+description=[*]Local /card and /roll
+description=[*]Roleplay descriptions with /me and /do (and counterparts with larger and smaller ranges)
+description=[*]Display of chat names in menus (Trading, Medical Check)
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556]True Actions Act 3 - Dancing[/url] compatibility with /dance
+description=[*]Input suggestion box
+description=[*]Emote animation shortcuts (.clap, .salute, .surrender, etc.) + /emotes command to display a list of emotes
+description=[*]Roleplay languages
+description=[*]...and more!
+description=[/list]
+description=
+description=[b]Features for server operators:[/b] [list]
+description=[*]Various [url=https://omarkmu.github.io/pz-omichat/user-guide/admins.html]admin commands[/url]
+description=[*]Configurable info text
 description=[*]Chat range options
-description=[*]Customizable chat [url=https://github.com/omarkmu/pz-omichat/blob/main/docs/format-strings.md]formats[/url] for names, timestamps, and all chat types
-description=[*][url=https://github.com/omarkmu/pz-omichat/blob/main/docs/sandbox-options.md]Sandbox options[/url] to control all of the features listed above
+description=[*]Customization of names, timestamps, all chat types, and more via powerful [url=https://omarkmu.github.io/pz-omichat/format-strings]chat formats[/url]
+description=[*]Sandbox options to control the features listed above
+description=[*]Easy configuration with [url=https://omarkmu.github.io/pz-omichat/sandbox-presets]sandbox option presets[/url]
+description=[*]Further extension of functionality using the API
 description=[/list]
 description=
 description=[h2]Compatibility[/h2]
-description=Although I don't expect this to be compatible with other mods that heavily modify chat, it shouldn't cause compatibility issues otherwise.
-description=If there seems to be a conflict, let me know!
+description=I don't expect this to be compatible with other mods that heavily modify chat, but it shouldn't cause compatibility issues otherwise. If there seems to be a conflict, [url=https://github.com/omarkmu/pz-omichat/issues/new?template=bug_report.yaml]let me know![/url]
+description=The mod is confirmed to be compatible with the following mods, for which there are options to control compatibility: [list]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2688676019]Chat Bubble v0.6[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2873010748]Search Players For Weapons[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556]True Actions. Act 3 - Dancing[/url]
+description=[/list]
 description=
 description=[h2]Permissions[/h2]
-description=You may [b]not[/b] include this mod directly in modpacks.
-description=Updates will be infrequent enough that a modpack should not be necessary anyway; future features will be added in bulk.
+description=This mod uses the [url=https://theindiestone.com/forums/index.php?/topic/2530-mod-permissions/#comment-36478]Ask for permission policy.[/url]
+description=You may [b]not[/b] reupload this mod or include it directly in modpacks. If there's something missing from the mod, [url=https://github.com/omarkmu/pz-omichat/blob/main/.github/CONTRIBUTING.md]contribute![/url]
+description=Permission is not required to list the mod as a requirement or extend it via the API! If you'd like to request permission to use it in another way (modpack requests will likely be denied), please create a [url=https://github.com/omarkmu/pz-omichat/discussions/new?category=general]discussion.[/url]
 description=
 description=The code and associated documentation is licensed under the [url=https://github.com/omarkmu/pz-omichat/blob/main/LICENSE]MIT License.[/url]
 description=[hr][/hr]Questions? Use the [url=https://github.com/omarkmu/pz-omichat/discussions]GitHub discussions.[/url]
 description=Suggestions? Create a [url=https://github.com/omarkmu/pz-omichat/issues/new?template=feature_request.yaml]feature request.[/url]
 description=Problems? Create an [url=https://github.com/omarkmu/pz-omichat/issues/new?template=bug_report.yaml]issue.[/url]
-description=Want to contribute? [url=https://github.com/omarkmu/pz-omichat]You can![/url]
-description=Poster image adapted from the Messenger icon by [url=https://www.flaticon.com/free-icons/message]Freepik on Flaticon.[/url]
-tags=Build 41;Multiplayer;Silly/Fun
+description=Want to contribute? [url=https://github.com/omarkmu/pz-omichat/blob/main/.github/CONTRIBUTING.md]You can![/url]
+description=Some features were inspired by [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2688851521]buffy's roleplay chat.[/url]
+tags=Build 41;Interface;Multiplayer;Silly/Fun
 visibility=unlisted

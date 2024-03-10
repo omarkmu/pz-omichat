@@ -1,3 +1,5 @@
+---@format disable
+---@diagnostic disable: codestyle-check, name-style-check, no-unknown, redefined-local, spell-check, unused-local
 local require, __bundle_register = (function(_require)
 	local require
 	local loadingPlaceholder = {}
@@ -174,9 +176,22 @@ function MultiMap:has(key)
     return self._map[key] ~= nil
 end
 
+---Gets the first value associated with a key.
+---@param key unknown The key to query.
+---@param default unknown? A default value to return if there are no entries associated with the key.
+---@return unknown?
+function MultiMap:get(key, default)
+    local list = self._map[key]
+    if not list then
+        return default
+    end
+
+    return list[1].value
+end
+
 ---Gets a MultiMap of entries associated with a key.
 ---@param key unknown The key to query.
----@param default unknown? A default value to return if there is no nth value.
+---@param default unknown? A default value to return if there are no entries associated with the key.
 ---@return unknown?
 function MultiMap:index(key, default)
     if not self:has(key) then
@@ -301,7 +316,6 @@ function class.new(cls)
 end
 
 
----@diagnostic disable-next-line: param-type-mismatch
 setmetatable(class, {
     __call = function(self, ...) return self.new(...) end,
 })
@@ -318,14 +332,18 @@ __bundle_register("utils", function(require)
 local utils = {}
 
 
+---@type omi.utils.json
+utils.json = require("utils/json")
+
+
 local submodules = {
     require("utils/string"),
     require("utils/table"),
     require("utils/type"),
 }
 
-for _, mod in ipairs(submodules) do
-    for k, v in pairs(mod) do
+for i = 1, #submodules do
+    for k, v in pairs(submodules[i]) do
         utils[k] = v
     end
 end
@@ -338,7 +356,7 @@ __bundle_register("utils/type", function(require)
 local deepEquals
 local rawget = rawget
 local getmetatable = getmetatable
-local unpack = unpack or table.unpack
+local unpack = unpack or table.unpack ---@diagnostic disable-line: deprecated
 
 
 ---Utilities related to types.
@@ -350,12 +368,11 @@ local utils = {}
 ---@param t1 unknown
 ---@param t2 unknown
 ---@param seen table<table, boolean>
+---@return boolean
 deepEquals = function(t1, t2, seen)
-    if t1 == t2 then
-        return true
-    end
-
-    if type(t1) ~= 'table' or type(t1) ~= type(t2) then
+    if type(t1) ~= 'table' then
+        return t1 == t2
+    elseif type(t1) ~= type(t2) then
         return false
     end
 
@@ -396,7 +413,7 @@ end
 ---@param ... unknown
 ---@return function
 function utils.bind(func, ...)
-    local nArgs = select('#', ... )
+    local nArgs = select('#', ...)
     local boundArgs = { ... }
 
     return function(...)
@@ -690,8 +707,113 @@ __bundle_register("utils/string", function(require)
 local utils = {}
 
 
----Tests if a table is empty or has only keys from 1 to #t.
+local iso8859Entities = {
+    quot = 34,
+    amp = 38,
+    lt = 60,
+    gt = 62,
+    nbsp = 160,
+    iexcl = 161,
+    cent = 162,
+    pound = 163,
+    curren = 164,
+    yen = 165,
+    brvbar = 166,
+    sect = 167,
+    uml = 168,
+    copy = 169,
+    ordf = 170,
+    laquo = 171,
+    ['not'] = 172,
+    shy = 173,
+    reg = 174,
+    macr = 175,
+    deg = 176,
+    plusmn = 177,
+    sup2 = 178,
+    sup3 = 179,
+    acute = 180,
+    micro = 181,
+    para = 182,
+    middot = 183,
+    cedil = 184,
+    sup1 = 185,
+    ordm = 186,
+    raquo = 187,
+    frac14 = 188,
+    frac12 = 189,
+    frac34 = 190,
+    iquest = 191,
+    Agrave = 192,
+    Aacute = 193,
+    Acirc = 194,
+    Atilde = 195,
+    Auml = 196,
+    Aring = 197,
+    AElig = 198,
+    Ccedil = 199,
+    Egrave = 200,
+    Eacute = 201,
+    Ecirc = 202,
+    Euml = 203,
+    Igrave = 204,
+    Iacute = 205,
+    Icirc = 206,
+    Iuml = 207,
+    ETH = 208,
+    Ntilde = 209,
+    Ograve = 210,
+    Oacute = 211,
+    Ocirc = 212,
+    Otilde = 213,
+    Ouml = 214,
+    times = 215,
+    Oslash = 216,
+    Ugrave = 217,
+    Uacute = 218,
+    Ucirc = 219,
+    Uuml = 220,
+    Yacute = 221,
+    THORN = 222,
+    szlig = 223,
+    agrave = 224,
+    aacute = 225,
+    acirc = 226,
+    atilde = 227,
+    auml = 228,
+    aring = 229,
+    aelig = 230,
+    ccedil = 231,
+    egrave = 232,
+    eacute = 233,
+    ecirc = 234,
+    euml = 235,
+    igrave = 236,
+    iacute = 237,
+    icirc = 238,
+    iuml = 239,
+    eth = 240,
+    ntilde = 241,
+    ograve = 242,
+    oacute = 243,
+    ocirc = 244,
+    otilde = 245,
+    ouml = 246,
+    divide = 247,
+    oslash = 248,
+    ugrave = 249,
+    uacute = 250,
+    ucirc = 251,
+    uuml = 252,
+    yacute = 253,
+    thorn = 254,
+    yuml = 255,
+}
+
+
+---Tests if a table is empty or has only keys from `1` to `#t`.
 ---@param t table
+---@return boolean
 local function isArray(t)
     local i = 0
     for _ in pairs(t) do
@@ -752,44 +874,78 @@ local function stringifyTable(t, seen, pretty, depth, maxDepth)
 
     for k, v in iter(t) do
         if not isFirst then
-            result[#result+1] = ','
-            result[#result+1] = space
+            result[#result + 1] = ','
+            result[#result + 1] = space
         end
 
         isFirst = false
 
-        result[#result+1] = tab
+        result[#result + 1] = tab
 
         if not isNumeric then
-            result[#result+1] = '['
+            result[#result + 1] = '['
             if type(k) == 'table' then
                 -- don't show table keys
-                result[#result+1] = '{...}'
+                result[#result + 1] = '{...}'
             else
-                result[#result+1] = stringifyPrimitive(k)
+                result[#result + 1] = stringifyPrimitive(k)
             end
 
-            result[#result+1] = keyEnd
+            result[#result + 1] = keyEnd
         end
 
         if type(v) == 'table' then
-            result[#result+1] = stringifyTable(v, seen, pretty, depth + 1, maxDepth)
+            result[#result + 1] = stringifyTable(v, seen, pretty, depth + 1, maxDepth)
         else
-            result[#result+1] = stringifyPrimitive(v)
+            result[#result + 1] = stringifyPrimitive(v)
         end
     end
 
-    result[#result+1] = pretty and (space .. string.rep('    ', depth - 1)) or space
-    result[#result+1] = '}'
+    result[#result + 1] = pretty and (space .. string.rep('    ', depth - 1)) or space
+    result[#result + 1] = '}'
 
     return table.concat(result)
 end
+
 
 ---Returns text that's safe for use in a pattern.
 ---@param text string
 ---@return string
 function utils.escape(text)
     return (text:gsub('([[%]%+-*?().^$])', '%%%1'))
+end
+
+---Returns the value of a numeric character reference or character entity reference.
+---If the value cannot be resolved, returns `nil`.
+---@param entity string
+---@return string?
+function utils.getEntityValue(entity)
+    if entity:sub(1, 1) ~= '&' or entity:sub(#entity) ~= ';' then
+        return
+    end
+
+    entity = entity:sub(2, #entity - 1)
+    if entity:sub(1, 1) ~= '#' then
+        local value = iso8859Entities[entity]
+        if value then
+            return string.char(value)
+        end
+    end
+
+    local hex = entity:sub(2, 2) == 'x'
+    local num = entity:sub(hex and 3 or 2)
+
+    local value = tonumber(num, hex and 16 or 10)
+    if not value then
+        return
+    end
+
+    local success, char = pcall(string.char, value)
+    if not success then
+        return
+    end
+
+    return char
 end
 
 ---Removes whitespace from either side of a string.
@@ -803,7 +959,7 @@ end
 ---@param text string
 ---@return string
 function utils.trimleft(text)
-    return (text:gsub('^%s*(.+)', '%1'))
+    return (text:gsub('^%s*(.*)', '%1'))
 end
 
 ---Removes whitespace from the end of a string.
@@ -850,7 +1006,8 @@ function utils.endsWith(text, other)
         return true
     end
 
-    return text:sub(-#other) == other
+    local len = #other
+    return text:sub(-len) == other
 end
 
 ---Stringifies a value for display.
@@ -859,6 +1016,7 @@ end
 ---@param value unknown
 ---@param pretty boolean? If true, tables will include newlines and tabs.
 ---@param maxDepth number? Maximum table depth. Defaults to 5.
+---@return string
 function utils.stringify(value, pretty, maxDepth)
     if type(value) ~= 'table' then
         return tostring(value)
@@ -871,9 +1029,459 @@ end
 return utils
 
 end)
+__bundle_register("utils/json", function(require)
+--
+-- json.lua
+--
+-- Copyright (c) 2020 rxi
+--
+-- Permission is hereby granted, free of charge, to any person obtaining a copy of
+-- this software and associated documentation files (the "Software"), to deal in
+-- the Software without restriction, including without limitation the rights to
+-- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+-- of the Software, and to permit persons to whom the Software is furnished to do
+-- so, subject to the following conditions:
+--
+-- The above copyright notice and this permission notice shall be included in all
+-- copies or substantial portions of the Software.
+--
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+-- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-- SOFTWARE.
+--
+
+---Utilities related to handling JSON.
+---@class omi.utils.json
+local json = {}
+
+---@alias omi.JSONType table | string | number | boolean | nil
+
+
+--#region encode
+
+local encode
+
+local escape_char_map = {
+    ['\\'] = '\\',
+    ['\"'] = '\"',
+    ['\b'] = 'b',
+    ['\f'] = 'f',
+    ['\n'] = 'n',
+    ['\r'] = 'r',
+    ['\t'] = 't',
+}
+
+local escape_char_map_inv = { ['/'] = '/' }
+for k, v in pairs(escape_char_map) do
+    escape_char_map_inv[v] = k
+end
+
+
+local function escape_char(c)
+    return '\\' .. (escape_char_map[c] or string.format('u%04x', c:byte()))
+end
+
+
+---@diagnostic disable-next-line: unused-local
+local function encode_nil(val)
+    return 'null'
+end
+
+
+local function is_empty(tab)
+    if next then
+        return next(tab) == nil
+    end
+
+    for _ in pairs(tab) do
+        return false
+    end
+
+    return true
+end
+
+
+local function encode_table(val, stack)
+    local res = {}
+    stack = stack or {}
+
+    -- Circular reference?
+    if stack[val] then error('circular reference') end
+
+    stack[val] = true
+
+    if rawget(val, 1) ~= nil or is_empty(val) then
+        -- Treat as array -- check keys are valid and it is not sparse
+        local n = 0
+        for k in pairs(val) do
+            if type(k) ~= 'number' then
+                error('invalid table: mixed or invalid key types')
+            end
+
+            n = n + 1
+        end
+
+        if n ~= #val then
+            error('invalid table: sparse array')
+        end
+
+        -- Encode
+        for i = 1, #val do
+            table.insert(res, encode(val[i], stack))
+        end
+
+        stack[val] = nil
+        return '[' .. table.concat(res, ',') .. ']'
+    else
+        -- Treat as an object
+        for k, v in pairs(val) do
+            if type(k) ~= 'string' then
+                error('invalid table: mixed or invalid key types')
+            end
+
+            table.insert(res, encode(k, stack) .. ':' .. encode(v, stack))
+        end
+
+        stack[val] = nil
+        return '{' .. table.concat(res, ',') .. '}'
+    end
+end
+
+
+local function encode_string(val)
+    return '"' .. val:gsub('[%z\1-\31\\"]', escape_char) .. '"'
+end
+
+
+local function encode_number(val)
+    -- Check for NaN, -inf and inf
+    if val ~= val or val <= -math.huge or val >= math.huge then
+        error("unexpected number value '" .. tostring(val) .. "'")
+    end
+
+    return string.format('%.14g', val)
+end
+
+
+local type_func_map = {
+    ['nil'] = encode_nil,
+    ['table'] = encode_table,
+    ['string'] = encode_string,
+    ['number'] = encode_number,
+    ['boolean'] = tostring,
+}
+
+
+encode = function(val, stack)
+    local t = type(val)
+    local f = type_func_map[t]
+    if f then
+        return f(val, stack)
+    end
+
+    error("unexpected type '" .. t .. "'")
+end
+
+
+---Encodes a value as JSON.
+---@param val omi.JSONType
+---@return string
+function json.encode(val)
+    return (encode(val))
+end
+
+---Tries to encode a value as JSON.
+---@param val omi.JSONType
+---@return boolean success
+---@return string resultOrError
+function json.tryEncode(val)
+    local s, e = pcall(json.encode, val)
+    return s, e
+end
+
+--#endregion
+
+
+--#region decode
+
+local parse
+
+local function create_set(...)
+    local res = {}
+    for i = 1, select('#', ...) do
+        res[select(i, ...)] = true
+    end
+
+    return res
+end
+
+local space_chars = create_set(' ', '\t', '\r', '\n')
+local delim_chars = create_set(' ', '\t', '\r', '\n', ']', '}', ',')
+local escape_chars = create_set('\\', '/', '"', 'b', 'f', 'n', 'r', 't', 'u')
+local literals = create_set('true', 'false', 'null')
+
+local literal_map = {
+    ['true'] = true,
+    ['false'] = false,
+    ['null'] = nil,
+}
+
+
+local function next_char(str, idx, set, negate)
+    for i = idx, #str do
+        if set[str:sub(i, i)] ~= negate then
+            return i
+        end
+    end
+
+    return #str + 1
+end
+
+local function decode_error(str, idx, msg)
+    local line_count = 1
+    local col_count = 1
+    for i = 1, idx - 1 do
+        col_count = col_count + 1
+        if str:sub(i, i) == '\n' then
+            line_count = line_count + 1
+            col_count = 1
+        end
+    end
+
+    error(string.format('%s at line %d col %d', msg, line_count, col_count))
+end
+
+local function codepoint_to_utf8(n)
+    -- http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=iws-appendixa
+    local f = math.floor
+    if n <= 0x7f then
+        return string.char(n)
+    elseif n <= 0x7ff then
+        return string.char(f(n / 64) + 192, n % 64 + 128)
+    elseif n <= 0xffff then
+        return string.char(f(n / 4096) + 224, f(n % 4096 / 64) + 128, n % 64 + 128)
+    elseif n <= 0x10ffff then
+        return string.char(f(n / 262144) + 240, f(n % 262144 / 4096) + 128, f(n % 4096 / 64) + 128, n % 64 + 128)
+    end
+
+    error(string.format("invalid unicode codepoint '%x'", n))
+end
+
+local function parse_unicode_escape(s)
+    local n1 = tonumber(s:sub(1, 4), 16)
+    local n2 = tonumber(s:sub(7, 10), 16)
+
+    -- Surrogate pair?
+    if n2 then
+        return codepoint_to_utf8((n1 - 0xd800) * 0x400 + (n2 - 0xdc00) + 0x10000)
+    else
+        return codepoint_to_utf8(n1)
+    end
+end
+
+local function parse_string(str, i)
+    local res = ''
+    local j = i + 1
+    local k = j
+
+    while j <= #str do
+        local x = str:byte(j)
+
+        if x < 32 then
+            decode_error(str, j, 'control character in string')
+        elseif x == 92 then -- `\`: Escape
+            res = res .. str:sub(k, j - 1)
+            j = j + 1
+            local c = str:sub(j, j)
+            if c == 'u' then
+                local hex = str:match('^[dD][89aAbB]%x%x\\u%x%x%x%x', j + 1)
+                    or str:match('^%x%x%x%x', j + 1)
+                    or decode_error(str, j - 1, 'invalid unicode escape in string')
+                res = res .. parse_unicode_escape(hex)
+                j = j + #hex
+            else
+                if not escape_chars[c] then
+                    decode_error(str, j - 1, "invalid escape char '" .. c .. "' in string")
+                end
+
+                res = res .. escape_char_map_inv[c]
+            end
+
+            k = j + 1
+        elseif x == 34 then -- `"`: End of string
+            res = res .. str:sub(k, j - 1)
+            return res, j + 1
+        end
+
+        j = j + 1
+    end
+
+    decode_error(str, i, 'expected closing quote for string')
+end
+
+local function parse_number(str, i)
+    local x = next_char(str, i, delim_chars)
+    local s = str:sub(i, x - 1)
+    local n = tonumber(s)
+    if not n then
+        decode_error(str, i, "invalid number '" .. s .. "'")
+    end
+
+    return n, x
+end
+
+local function parse_literal(str, i)
+    local x = next_char(str, i, delim_chars)
+    local word = str:sub(i, x - 1)
+    if not literals[word] then
+        decode_error(str, i, "invalid literal '" .. word .. "'")
+    end
+
+    return literal_map[word], x
+end
+
+local function parse_array(str, i)
+    local res = {}
+    local n = 1
+    i = i + 1
+    while 1 do
+        local x
+        i = next_char(str, i, space_chars, true)
+        -- Empty / end of array?
+        if str:sub(i, i) == ']' then
+            i = i + 1
+            break
+        end
+
+        -- Read token
+        x, i = parse(str, i)
+        res[n] = x
+        n = n + 1
+        -- Next token
+        i = next_char(str, i, space_chars, true)
+        local chr = str:sub(i, i)
+        i = i + 1
+        if chr == ']' then break end
+
+        if chr ~= ',' then decode_error(str, i, "expected ']' or ','") end
+    end
+
+    return res, i
+end
+
+local function parse_object(str, i)
+    local res = {}
+    i = i + 1
+    while 1 do
+        local key, val
+        i = next_char(str, i, space_chars, true)
+        -- Empty / end of object?
+        if str:sub(i, i) == '}' then
+            i = i + 1
+            break
+        end
+
+        -- Read key
+        if str:sub(i, i) ~= '"' then
+            decode_error(str, i, 'expected string for key')
+        end
+
+        key, i = parse(str, i)
+        -- Read ':' delimiter
+        i = next_char(str, i, space_chars, true)
+        if str:sub(i, i) ~= ':' then
+            decode_error(str, i, "expected ':' after key")
+        end
+
+        i = next_char(str, i + 1, space_chars, true)
+        -- Read value
+        val, i = parse(str, i)
+        -- Set
+        res[key] = val
+        -- Next token
+        i = next_char(str, i, space_chars, true)
+        local chr = str:sub(i, i)
+        i = i + 1
+        if chr == '}' then break end
+
+        if chr ~= ',' then decode_error(str, i, "expected '}' or ','") end
+    end
+
+    return res, i
+end
+
+
+local char_func_map = {
+    ['"'] = parse_string,
+    ['0'] = parse_number,
+    ['1'] = parse_number,
+    ['2'] = parse_number,
+    ['3'] = parse_number,
+    ['4'] = parse_number,
+    ['5'] = parse_number,
+    ['6'] = parse_number,
+    ['7'] = parse_number,
+    ['8'] = parse_number,
+    ['9'] = parse_number,
+    ['-'] = parse_number,
+    ['t'] = parse_literal,
+    ['f'] = parse_literal,
+    ['n'] = parse_literal,
+    ['['] = parse_array,
+    ['{'] = parse_object,
+}
+
+
+parse = function(str, idx)
+    local chr = str:sub(idx, idx)
+    local f = char_func_map[chr]
+    if f then
+        return f(str, idx)
+    end
+
+    decode_error(str, idx, "unexpected character '" .. chr .. "'")
+end
+
+
+---Decodes a JSON string.
+---@param str string
+---@return omi.JSONType
+function json.decode(str)
+    if type(str) ~= 'string' then
+        error('expected argument of type string, got ' .. type(str))
+    end
+
+    local res, idx = parse(str, next_char(str, 1, space_chars, true))
+    idx = next_char(str, idx, space_chars, true)
+    if idx <= #str then
+        decode_error(str, idx, 'trailing garbage')
+    end
+
+    return res
+end
+
+---Tries to decode a JSON string.
+---@param str string
+---@return boolean success
+---@return omi.JSONType resultOrError
+function json.tryDecode(str)
+    local s, e = pcall(json.decode, str)
+    return s, e
+end
+
+--#endregion
+
+
+return json
+
+end)
 __bundle_register("interpolate/Interpolator", function(require)
 local table = table
-local unpack = unpack or table.unpack
+local unpack = unpack or table.unpack ---@diagnostic disable-line: deprecated
 local newrandom = newrandom
 local class = require("class")
 local utils = require("utils")
@@ -893,6 +1501,7 @@ local NodeType = InterpolationParser.NodeType
 ---@field protected _allowTokens boolean
 ---@field protected _allowMultiMaps boolean
 ---@field protected _allowFunctions boolean
+---@field protected _allowCharacterEntities boolean
 ---@field protected _requireCustomTokenUnderscore boolean
 ---@field protected _parser omi.interpolate.Parser
 ---@field protected _rand Random?
@@ -904,8 +1513,9 @@ Interpolator.Libraries = InterpolatorLibraries
 ---@class omi.interpolate.Options
 ---@field pattern string? The initial format string of the interpolator.
 ---@field allowTokens boolean? Whether tokens should be interpreted. If false, tokens will be treated as text.
----@field allowMultiMaps boolean? Whether at-maps should be interpreted. If false, they are ignored.
----@field allowFunctions boolean? Whether functions should be interpreted. If false, they are ignored.
+---@field allowCharacterEntities boolean? Whether character entities should be interpreted. If false, they will be treated as text.
+---@field allowMultiMaps boolean? Whether at-maps should be interpreted. If false, they will be treated as text.
+---@field allowFunctions boolean? Whether functions should be interpreted. If false, they will be treated as text.
 ---@field requireCustomTokenUnderscore boolean? Whether custom tokens should require a leading underscore.
 ---@field libraryInclude table<string, boolean>? Set of library functions or modules to allow. If absent, all will be allowed.
 ---@field libraryExclude table<string, boolean>? Set of library functions or modules to exclude. If absent, none will be excluded.
@@ -964,8 +1574,8 @@ function Interpolator:evaluateNodeArray(nodes)
     end
 
     local parts = {}
-    for _, child in ipairs(nodes) do
-        self:evaluateNode(child, parts)
+    for i = 1, #nodes do
+        self:evaluateNode(nodes[i], parts)
     end
 
     return mergeParts(parts)
@@ -982,7 +1592,8 @@ function Interpolator:evaluateAtExpression(node)
 
     ---@type omi.interpolate.entry[]
     local entries = {}
-    for _, e in ipairs(node.entries) do
+    for i = 1, #node.entries do
+        local e = node.entries[i]
         local key = self:evaluateNodeArray(e.key)
         local value = self:evaluateNodeArray(e.value)
 
@@ -1027,11 +1638,12 @@ end
 function Interpolator:evaluateCallNode(node)
     local args = {}
 
-    for i, argument in ipairs(node.args) do
+    for i = 1, #node.args do
+        local argument = node.args[i]
         local parts = {}
 
-        for _, child in ipairs(argument) do
-            self:evaluateNode(child, parts)
+        for j = 1, #argument do
+            self:evaluateNode(argument[j], parts)
         end
 
         args[i] = self:convert(mergeParts(parts))
@@ -1119,8 +1731,8 @@ function Interpolator:interpolateRaw(tokens)
     end
 
     local parts = {}
-    for _, node in ipairs(self._built) do
-        self:evaluateNode(node, parts)
+    for i = 1, #self._built do
+        self:evaluateNode(self._built[i], parts)
     end
 
     return mergeParts(parts)
@@ -1147,6 +1759,7 @@ end
 
 ---Converts a value to a boolean using interpolator logic.
 ---@param value unknown
+---@return boolean
 function Interpolator:toBoolean(value)
     if utils.isinstance(value, MultiMap) then
         value = tostring(value)
@@ -1195,7 +1808,7 @@ end
 ---@param token unknown
 ---@param value unknown
 function Interpolator:setTokenValidated(token, value)
-    if self._requireCustomTokenUnderscore and not utils.startsWith(token, '_') and self._tokens[token] == nil then
+    if self._requireCustomTokenUnderscore and token:sub(1, 1) ~= '_' and self:token(token) == nil then
         return
     end
 
@@ -1213,7 +1826,18 @@ function Interpolator:setPattern(pattern)
         self._parser:reset(pattern)
     end
 
-    self._built = self._parser:postprocess(self._parser:parse())
+    local result = self._parser:parse()
+    if not result.success then
+        local list = {}
+        for i = 1, #result.errors do
+            list[#list + 1] = result.errors[i].message
+        end
+
+        local errors = table.concat(list, ', ')
+        error(string.format('interpolation of pattern `%s` failed: %s', pattern, errors))
+    end
+
+    self._built = result.value
 end
 
 ---Sets library functions which should be allowed and disallowed.
@@ -1231,7 +1855,8 @@ function Interpolator:createParser(pattern)
     return InterpolationParser:new(pattern, {
         allowTokens = self._allowTokens,
         allowFunctions = self._allowFunctions,
-        allowAtExpressions = self._allowMultiMaps
+        allowAtExpressions = self._allowMultiMaps,
+        allowCharacterEntities = self._allowCharacterEntities,
     })
 end
 
@@ -1251,6 +1876,7 @@ function Interpolator:new(options)
     this._allowTokens = utils.default(options.allowTokens, true)
     this._allowMultiMaps = utils.default(options.allowMultiMaps, true)
     this._allowFunctions = utils.default(options.allowFunctions, true)
+    this._allowCharacterEntities = utils.default(options.allowCharacterEntities, true)
     this._requireCustomTokenUnderscore = utils.default(options.requireCustomTokenUnderscore, true)
 
     this:loadLibraries(options.libraryInclude, options.libraryExclude)
@@ -1267,11 +1893,15 @@ __bundle_register("interpolate/Parser", function(require)
 local BaseParser = require("fmt/Parser")
 local utils = require("utils")
 
+local concat = table.concat
+
+
 ---Parser for the interpolated string format.
 ---@class omi.interpolate.Parser : omi.fmt.Parser
 ---@field protected _allowTokens boolean
 ---@field protected _allowAtExpr boolean
 ---@field protected _allowFunctions boolean
+---@field protected _allowCharEntities boolean
 local InterpolationParser = BaseParser:derive()
 
 
@@ -1279,38 +1909,22 @@ local InterpolationParser = BaseParser:derive()
 ---@field allowTokens boolean?
 ---@field allowFunctions boolean?
 ---@field allowAtExpressions boolean?
+---@field allowCharacterEntities boolean?
 
+---@alias omi.interpolate.Result
+---| { success: true, value: omi.interpolate.Node[], warnings: omi.fmt.ParserError[]? }
+---| { success: false, errors: omi.fmt.ParserError[], warnings: omi.fmt.ParserError[]? }
 
----@enum omi.interpolate.NodeType
-InterpolationParser.NodeType = {
-    tree = 'tree',
-    at_expression = 'at_expression',
-    at_key = 'at_key',
-    at_value = 'at_value',
-    text = 'text',
-    token = 'token',
-    string = 'string',
-    call = 'call',
-    escape = 'escape',
-    argument = 'argument',
-}
+---@alias omi.interpolate.Node
+---| omi.interpolate.ValueNode
+---| omi.interpolate.CallNode
+---| omi.interpolate.AtExpressionNode
 
-InterpolationParser.Errors = {
-    BAD_CHAR = BaseParser.Errors.BAD_CHAR,
-    WARN_UNTERM_FUNC = 'potentially unterminated function `%s`',
-    UNTERM_FUNC = 'unterminated function `%s`',
-    UNTERM_AT = 'unterminated at-expression',
-}
-
-local ERR = InterpolationParser.Errors
-local NodeType = InterpolationParser.NodeType
-
+---@alias omi.interpolate.Argument omi.interpolate.ValueNode[]
 
 ---@class omi.interpolate.ValueNode
 ---@field type omi.interpolate.NodeType
 ---@field value string
-
----@alias omi.interpolate.Argument omi.interpolate.ValueNode[]
 
 ---@class omi.interpolate.CallNode : omi.interpolate.ValueNode
 ---@field args omi.interpolate.Node[][]
@@ -1323,20 +1937,37 @@ local NodeType = InterpolationParser.NodeType
 ---@field type omi.interpolate.NodeType
 ---@field entries omi.interpolate.AtExpressionEntry[]
 
----@alias omi.interpolate.Node
----| omi.interpolate.ValueNode
----| omi.interpolate.CallNode
----| omi.interpolate.AtExpressionNode
+
+---@enum omi.interpolate.NodeType
+InterpolationParser.NodeType = {
+    at_expression = 'at_expression',
+    at_key = 'at_key',
+    at_value = 'at_value',
+    text = 'text',
+    token = 'token',
+    string = 'string',
+    call = 'call',
+    escape = 'escape',
+    argument = 'argument',
+}
+
+local NodeType = InterpolationParser.NodeType
+local ERR = {
+    BAD_CHAR = 'unexpected character: `%s`',
+    WARN_UNTERM_FUNC = 'potentially unterminated function `%s`',
+    UNTERM_FUNC = 'unterminated function `%s`',
+    UNTERM_AT = 'unterminated at-expression',
+}
 
 -- text patterns for node types
 local TEXT_PATTERNS = {
-    -- $ = token/escape/call start, space = delimiter, ( = string start, ) = call end
-    [NodeType.argument] = '^([^ $()]+)[ $()]?',
-    -- $ = token/escape/call start, @ = at-expression start, ; = delim, : = delimiter, ( = string start, ) = expression end
-    [NodeType.at_key] = '^([^:;$@()]+)[:;$@()]?',
-    [NodeType.at_value] = '^([^:;$@()]+)[:;$@()]?',
+    -- $ = token/escape/call start, space = delimiter, ( = string start, ) = call end, & = entity start
+    [NodeType.argument] = ' $%(%)&',
+    -- $ = token/escape/call start, @ = at-expression start, ; = delim, : = delimiter, ( = string start, ) = expression end, & = entity start
+    [NodeType.at_key] = ':;$@%(%)&',
+    [NodeType.at_value] = ':;$@%(%)&',
     -- $ = escape start, ) = string end
-    [NodeType.string] = '^([^$)]+)[$)]?',
+    [NodeType.string] = '$%)',
 }
 
 local SPECIAL = {
@@ -1346,23 +1977,27 @@ local SPECIAL = {
     [';'] = true,
     ['('] = true,
     [')'] = true,
+    ['&'] = true,
 }
+
 
 ---Returns a table with consecutive text nodes merged.
 ---@param tab omi.fmt.ParseTreeNode[]
 ---@return omi.fmt.ParseTreeNode[]
-local function mergeTextNodes(tab)
+---@protected
+function InterpolationParser:mergeTextNodes(tab)
     local result = {}
 
     local last
-    for _, node in ipairs(tab) do
+    for i = 1, #tab do
+        local node = tab[i]
         if node.type == NodeType.text then
             if last and last.parts and last.type == NodeType.text then
                 last.parts[#last.parts + 1] = node.value
             else
                 last = {
                     type = NodeType.text,
-                    parts = { node.value }
+                    parts = { node.value },
                 }
 
                 result[#result + 1] = last
@@ -1373,9 +2008,10 @@ local function mergeTextNodes(tab)
         end
     end
 
-    for _, node in ipairs(result) do
+    for i = 1, #result do
+        local node = result[i]
         if node.parts and node.type == NodeType.text then
-            node.value = table.concat(node.parts)
+            node.value = concat(node.parts)
             node.parts = nil
         end
     end
@@ -1383,8 +2019,11 @@ local function mergeTextNodes(tab)
     return result
 end
 
-local postprocessNode
-postprocessNode = function(node)
+---Performs postprocessing on a tree node.
+---@param node omi.fmt.ParseTreeNode
+---@return omi.fmt.ParseTreeNode?
+---@protected
+function InterpolationParser:postprocessNode(node)
     local nodeType = node.type
 
     if nodeType == NodeType.text or nodeType == NodeType.escape then
@@ -1401,8 +2040,8 @@ postprocessNode = function(node)
         -- convert string to basic text node
         local parts = {}
         if node.children then
-            for _, child in ipairs(node.children) do
-                local built = postprocessNode(child)
+            for i = 1, #node.children do
+                local built = self:postprocessNode(node.children[i])
                 if built and built.value then
                     parts[#parts + 1] = built.value
                 end
@@ -1411,29 +2050,30 @@ postprocessNode = function(node)
 
         return {
             type = NodeType.text,
-            value = table.concat(parts)
+            value = concat(parts),
         }
     elseif nodeType == NodeType.argument or nodeType == NodeType.at_key or nodeType == NodeType.at_value then
         -- convert node to list of child nodes
         local parts = {}
         if node.children then
-            for _, child in ipairs(node.children) do
-                local built = postprocessNode(child)
+            for i = 1, #node.children do
+                local built = self:postprocessNode(node.children[i])
                 if built then
                     parts[#parts + 1] = built
                 end
             end
         end
 
-        return mergeTextNodes(parts)
+        return self:mergeTextNodes(parts)
     elseif nodeType == NodeType.call then
         local args = {}
 
         if node.children then
-            for _, child in ipairs(node.children) do
+            for i = 1, #node.children do
+                local child = node.children[i]
                 local type = child.type
                 if type == NodeType.argument then
-                    args[#args + 1] = postprocessNode(child)
+                    args[#args + 1] = self:postprocessNode(child)
                 end
             end
         end
@@ -1450,11 +2090,11 @@ postprocessNode = function(node)
         local i = 1
         while i <= #children do
             local key = children[i]
-            local builtKey = key and key.type == NodeType.at_key and postprocessNode(key)
+            local builtKey = key and key.type == NodeType.at_key and self:postprocessNode(key)
 
             if builtKey then
                 local value = children[i + 1]
-                local builtValue = value and value.type == NodeType.at_value and postprocessNode(value)
+                local builtValue = value and value.type == NodeType.at_value and self:postprocessNode(value)
 
                 if builtValue then
                     entries[#entries + 1] = {
@@ -1481,6 +2121,13 @@ postprocessNode = function(node)
     end
 end
 
+---Gets the value of a named or numeric entity.
+---@param entity string
+---@return string
+---@protected
+function InterpolationParser:getEntityValue(entity)
+    return utils.getEntityValue(entity) or entity
+end
 
 ---Gets the pattern for text nodes given the current node type.
 ---@return string
@@ -1488,19 +2135,16 @@ end
 function InterpolationParser:getTextPattern()
     local type = self._node and self._node.type
 
-    if TEXT_PATTERNS[type] then
-        return TEXT_PATTERNS[type]
-    end
-
-    -- $ = token/escape/call start, @ = at-expression start
-    return '^([^$@]+)[$@]?'
+    -- $ = token/escape/call start, @ = at-expression start, & = entity start
+    local patt = TEXT_PATTERNS[type] or '$@&'
+    return string.format('^([^%s])[%s]?', patt, patt)
 end
 
 ---Reads space characters and returns a literal string of spaces.
 ---@return string?
 ---@protected
 function InterpolationParser:readSpaces()
-    local spaces = self._text:match('^( +)', self:pos())
+    local spaces = self:match('^( +)')
     if not spaces then
         return
     end
@@ -1513,7 +2157,7 @@ end
 ---@return omi.fmt.ParseTreeNode?
 ---@protected
 function InterpolationParser:readEscape()
-    local value = self._text:match('^$([$@();:])', self:pos())
+    local value = self:match('^$([$@();:&])')
     if not value then
         return
     end
@@ -1530,7 +2174,7 @@ end
 ---@return omi.fmt.ParseTreeNode?
 ---@protected
 function InterpolationParser:readText()
-    local value = self._text:match(self:getTextPattern(), self:pos())
+    local value = self:match(self:getTextPattern())
     if not value then
         return
     end
@@ -1605,13 +2249,42 @@ function InterpolationParser:readVariable()
         return
     end
 
-    local name, pos = self._text:match('^$([%w_]+)()', self:pos())
+    local name, pos = self:match('^$([%w_]+)()')
 
     if not name then
         return
     end
 
     local node = self:createNode(NodeType.token, { value = name })
+    self:setNodeEnd(node, pos - 1)
+    self:pos(pos)
+
+    return self:addNode(node)
+end
+
+---Reads a character entity (e.g., `&#171;`)
+---@return omi.fmt.ParseTreeNode?
+---@protected
+function InterpolationParser:readCharacterEntity()
+    if not self._allowCharEntities then
+        return
+    end
+
+    local entity, pos = self:match('^(&#x?%d+;)()')
+
+    if not entity then
+        entity, pos = self:match('^(&%a+;)()')
+        if not entity then
+            return
+        end
+    end
+
+    local value = self:getEntityValue(entity)
+    if not value then
+        return
+    end
+
+    local node = self:createNode(NodeType.text, { value = value })
     self:setNodeEnd(node, pos - 1)
     self:pos(pos)
 
@@ -1626,7 +2299,7 @@ function InterpolationParser:readFunction()
         return
     end
 
-    local name, start = self._text:match('^$([%w_]+)%(()', self:pos())
+    local name, start = self:match('^$([%w_]+)%(()')
     if not name then
         return
     end
@@ -1693,7 +2366,7 @@ function InterpolationParser:readAtExpression()
         return
     end
 
-    local start = self._text:match('^@%(()', self:pos())
+    local start = self:match('^@%(()')
     if not start then
         return
     end
@@ -1798,27 +2471,47 @@ function InterpolationParser:readExpression()
         or self:readFunction()
         or self:readVariable()
         or self:readAtExpression()
+        or self:readCharacterEntity()
         or self:readText()
         or self:readSpecialText()
 end
 
 ---Performs postprocessing on a result tree.
----@param tree omi.fmt.ParseTree
----@return omi.interpolate.Node[]
-function InterpolationParser:postprocess(tree)
+---@return omi.interpolate.Result
+---@protected
+function InterpolationParser:postprocess()
+    local tree = self._tree
     local result = {}
-    if tree.errors or not tree.children then
-        return result
+    if #self._errors > 0 then
+        return {
+            success = false,
+            warnings = #self._warnings > 0 and self._warnings or nil,
+            errors = self._errors,
+        }
     end
 
-    for _, child in ipairs(tree.children) do
-        local built = postprocessNode(child)
+    if not tree.children then
+        return { success = true, value = result }
+    end
+
+    for i = 1, #tree.children do
+        local built = self:postprocessNode(tree.children[i])
         if built then
             result[#result + 1] = built
         end
     end
 
-    return mergeTextNodes(result)
+    return {
+        success = true,
+        warnings = #self._warnings > 0 and self._warnings or nil,
+        value = self:mergeTextNodes(result),
+    }
+end
+
+---Performs parsing and returns a list of interpolate nodes.
+---@return omi.interpolate.Result
+function InterpolationParser:parse()
+    return BaseParser.parse(self)
 end
 
 ---Creates a new interpolation parser.
@@ -1834,6 +2527,7 @@ function InterpolationParser:new(text, options)
     this._allowTokens = utils.default(options.allowTokens, true)
     this._allowAtExpr = utils.default(options.allowAtExpressions, true)
     this._allowFunctions = utils.default(options.allowFunctions, true)
+    this._allowCharEntities = utils.default(options.allowCharacterEntities, true)
 
     return this
 end
@@ -1850,29 +2544,25 @@ local utils = require("utils/type")
 
 ---Base string parser.
 ---@class omi.fmt.Parser : omi.Class
----@field protected _errors omi.fmt.ParserError[]?
----@field protected _warnings omi.fmt.ParserError[]?
+---@field protected _errors omi.fmt.ParserError[]
+---@field protected _warnings omi.fmt.ParserError[]
 ---@field protected _ptr integer
 ---@field protected _text string
 ---@field protected _node omi.fmt.ParseTreeNode?
 ---@field protected _tree omi.fmt.ParseTree
----@field protected _treeNodeName string
+---@field protected _treeNodeType string?
 ---@field protected _raiseErrors boolean
 local Parser = class()
-
-Parser.Errors = {
-    BAD_CHAR = 'unexpected character: `%s`'
-}
 
 
 ---Base parser options.
 ---@class omi.fmt.ParserOptions
 ---@field raiseErrors boolean?
----@field treeNodeName string?
+---@field treeNodeType string?
 
 ---Describes error that occurred during parsing.
 ---@class omi.fmt.ParserError
----@field error string
+---@field message string
 ---@field node omi.fmt.ParseTreeNode?
 ---@field range integer[]
 
@@ -1886,8 +2576,6 @@ Parser.Errors = {
 ---Top-level parse tree node.
 ---@class omi.fmt.ParseTree : omi.fmt.ParseTreeNode
 ---@field source string
----@field errors omi.fmt.ParserError[]?
----@field warnings omi.fmt.ParserError[]?
 
 
 ---Moves the parser pointer forward.
@@ -1925,6 +2613,15 @@ function Parser:read(n)
     return result
 end
 
+---Matches a string pattern against the parser's current text.
+---@param pattern string The string pattern.
+---@param pos integer? A position to start from. Defaults to the current position.
+---@return ...
+---@protected
+function Parser:match(pattern, pos)
+    return self._text:match(pattern, pos or self:pos())
+end
+
 ---Returns a substring of the current text.
 ---@param i integer The index at which the substring should begin.
 ---@param n integer? The number of characters to return. Defaults to 1.
@@ -1944,6 +2641,7 @@ end
 
 ---Gets or sets the current pointer position.
 ---@param value integer?
+---@return integer
 ---@protected
 function Parser:pos(value)
     if value then
@@ -2006,7 +2704,7 @@ end
 ---@param stop integer?
 ---@protected
 function Parser:setNodeRange(node, start, stop)
-    local len = #self._text
+    local len = self:len()
     local pos = self:pos()
     node.range[1] = math.max(1, math.min(start or node.range[1] or pos, len))
     node.range[2] = math.max(1, math.min(stop or node.range[2] or pos, len))
@@ -2044,12 +2742,12 @@ end
 ---@protected
 function Parser:error(err, node, start, stop)
     self._errors[#self._errors + 1] = {
-        error = err,
+        message = err,
         node = node ~= self._tree and node or nil,
         range = {
             start or node.range[1],
-            stop or node.range[2]
-        }
+            stop or node.range[2],
+        },
     }
 
     if self._raiseErrors then
@@ -2076,12 +2774,12 @@ end
 ---@protected
 function Parser:warning(err, node, start, stop)
     self._warnings[#self._warnings + 1] = {
-        error = err,
+        message = err,
         node = node ~= self._tree and node or nil,
         range = {
             start or node.range[1],
-            stop or node.range[2]
-        }
+            stop or node.range[2],
+        },
     }
 end
 
@@ -2096,6 +2794,39 @@ function Parser:warningHere(err, node, len)
     self:warning(err, node, pos, pos + len - 1)
 end
 
+---Creates the parse tree.
+---@protected
+function Parser:createTree()
+    local tree = self:addNode(self:createNode(self._treeNodeType))
+
+    ---@cast tree omi.fmt.ParseTree
+    tree.source = self._text
+    self:setNodeEnd(tree, self:len())
+
+    self._tree = tree
+end
+
+---Performs the parsing operation.
+---@protected
+function Parser:perform()
+    while self:pos() <= self:len() do
+        if not self:readExpression() then
+            local pos = self:pos()
+            self:error(string.format('unexpected character: `%s`', self:peek()), self._tree, pos, pos)
+
+            -- avoid infinite loops
+            self:forward()
+        end
+    end
+end
+
+---Performs postprocessing on the tree.
+---@return omi.fmt.ParseTree
+---@protected
+function Parser:postprocess()
+    return self._tree
+end
+
 ---Resets the parser state.
 ---@param text string? If provided, sets the text to parse.
 function Parser:reset(text)
@@ -2104,44 +2835,14 @@ function Parser:reset(text)
     self._errors = {}
     self._warnings = {}
     self._node = nil
-
-    local tree = self:addNode(self:createNode(self._treeNodeName))
-
-    ---@cast tree omi.fmt.ParseTree
-    tree.source = self._text
-    self:setNodeEnd(tree, #self._text)
-
-    self._tree = tree
+    self:createTree()
 end
 
 ---Performs parsing and returns the tree.
 ---@return omi.fmt.ParseTree
 function Parser:parse()
-    while self:pos() <= self:len() do
-        if not self:readExpression() then
-            self:error(Parser.Errors.BAD_CHAR:format(self:peek()), self._tree, self:pos(), self:pos())
-
-            -- avoid infinite loops
-            self:forward()
-        end
-    end
-
-    if #self._errors > 0 then
-        self._tree.errors = self._errors
-    end
-
-    if #self._warnings > 0 then
-        self._tree.warnings = self._warnings
-    end
-
-    return self._tree
-end
-
----Performs postprocessing on the result tree, transforming it into a usable format.
----@param tree omi.fmt.ParseTree
----@return unknown
-function Parser:postprocess(tree)
-    return tree
+    self:perform()
+    return self:postprocess()
 end
 
 ---Creates a new parser.
@@ -2154,9 +2855,9 @@ function Parser:new(text, options)
 
     options = options or {}
 
-    this:reset(text)
     this._raiseErrors = utils.default(options.raiseErrors, false)
-    this._treeNodeName = utils.default(options.treeNodeName, 'tree')
+    this._treeNodeType = options.treeNodeType
+    this:reset(text)
 
     return this
 end
@@ -2169,7 +2870,7 @@ __bundle_register("interpolate/Libraries", function(require)
 local utils = require("utils")
 local MultiMap = require("interpolate/MultiMap")
 local entry = require("interpolate/entry")
-local unpack = unpack or table.unpack
+local unpack = unpack or table.unpack ---@diagnostic disable-line: deprecated
 local select = select
 local tostring = tostring
 local tonumber = tonumber
@@ -2177,17 +2878,21 @@ local tonumber = tonumber
 
 ---Built-in interpolator function libraries.
 ---@class omi.interpolate.Libraries
-local InterpolatorLibraries = {}
+local libraries = {}
 
-local functions = {}
-local nan = tostring(0/0)
+---Contains library function tables.
+---@type table<string, table<string, fun(interpolator: omi.interpolate.Interpolator, ...: unknown): unknown?>>
+libraries.functions = {}
+
+
+local nan = tostring(0 / 0)
 
 
 ---Wrapper that converts the first argument to a string.
 ---@param f function
 ---@return function
 local function firstToString(f)
-    return function(self, ...)
+    return function(_, ...)
         return f(tostring(select(1, ...) or ''), select(2, ...))
     end
 end
@@ -2197,7 +2902,7 @@ end
 ---@param f function
 ---@return function
 local function concatenateArgs(f)
-    return function(self, ...)
+    return function(_, ...)
         return f(utils.concat({ ... }))
     end
 end
@@ -2206,7 +2911,7 @@ end
 ---@param f function
 ---@return function
 local function comparator(f)
-    return function(self, this, other)
+    return function(_, this, other)
         this = tostring(this or '')
         other = tostring(other or '')
 
@@ -2223,8 +2928,9 @@ end
 
 ---Wrapper for unary math functions.
 ---@param f function
+---@return function
 local function unary(f)
-    return function(self, ...)
+    return function(_, ...)
         local value = tonumber(utils.concat({ ... }))
         if value then
             return f(value)
@@ -2234,6 +2940,7 @@ end
 
 ---Wrapper for unary math functions with multiple returns.
 ---@param f function
+---@return function
 local function unaryList(f)
     return function(self, ...)
         local value = tonumber(utils.concat({ ... }))
@@ -2241,14 +2948,15 @@ local function unaryList(f)
             return
         end
 
-        return functions.map.list(self, f(value))
+        return libraries.functions.map.list(self, f(value))
     end
 end
 
 ---Wrapper for binary math functions.
 ---@param f function
+---@return function
 local function binary(f)
-    return function(self, x, ...)
+    return function(_, x, ...)
         x = tonumber(tostring(x))
         if not x then
             return
@@ -2279,7 +2987,7 @@ end
 ---@param f function
 ---@param interpolator omi.interpolate.Interpolator
 ---@param ... unknown
----@return unknown?
+---@return omi.interpolate.MultiMap?
 local function tryList(f, interpolator, ...)
     local results = { pcall(f, ...) }
 
@@ -2287,15 +2995,14 @@ local function tryList(f, interpolator, ...)
         return
     end
 
-    return functions.map.list(interpolator, unpack(results, 2))
+    return libraries.functions.map.list(interpolator, unpack(results, 2))
 end
 
 
 ---Contains math functions.
-functions.math = {
+libraries.functions.math = {
     pi = function() return math.pi end,
-    ---@param interpolator omi.interpolate.Interpolator
-    isnan = function(interpolator, n) return tostring(n) == nan end,
+    isnan = function(_, n) return tostring(n) == nan end,
     abs = unary(math.abs),
     acos = unary(math.acos),
     add = binary(function(x, y) return x + y end),
@@ -2319,8 +3026,7 @@ functions.math = {
     log10 = unary(function(x)
         return try(math.log10, x)
     end),
-    ---@param interpolator omi.interpolate.Interpolator
-    max = function(interpolator, ...)
+    max = function(_, ...)
         local max
         local strComp = not utils.all(tonumber, { ... })
 
@@ -2335,8 +3041,7 @@ functions.math = {
 
         return max
     end,
-    ---@param interpolator omi.interpolate.Interpolator
-    min = function(interpolator, ...)
+    min = function(_, ...)
         local min
         local strComp = not utils.all(tonumber, { ... })
 
@@ -2366,7 +3071,7 @@ functions.math = {
 }
 
 ---Contains string functions.
-functions.string = {
+libraries.functions.string = {
     str = concatenateArgs(tostring),
     lower = concatenateArgs(string.lower),
     upper = concatenateArgs(string.upper),
@@ -2379,11 +3084,9 @@ functions.string = {
     contains = firstToString(function(s, other) return utils.contains(s, tostring(other or '')) end),
     startswith = firstToString(function(s, other) return utils.startsWith(s, tostring(other or '')) end),
     endswith = firstToString(function(s, other) return utils.endsWith(s, tostring(other or '')) end),
-    ---@param interpolator omi.interpolate.Interpolator
-    concat = function(interpolator, ...) return utils.concat({ ... }) end,
+    concat = function(_, ...) return utils.concat({ ... }) end,
     concats = firstToString(function(sep, ...) return utils.concat({ ... }, sep) end),
-    ---@param interpolator omi.interpolate.Interpolator
-    len = function(interpolator, ...) return #utils.concat({ ... }) end,
+    len = function(_, ...) return #utils.concat({ ... }) end,
     capitalize = firstToString(function(s) return s:sub(1, 1):upper() .. s:sub(2) end),
     punctuate = firstToString(function(s, punctuation, chars)
         punctuation = tostring(punctuation or '.')
@@ -2402,15 +3105,12 @@ functions.string = {
 
         return s
     end),
-    ---@param interpolator omi.interpolate.Interpolator
     gsub = function(interpolator, s, pattern, repl, n)
         s = tostring(s or '')
-
-        if not pattern or pattern == '' then
-            return functions.map.list(interpolator, s, #s + 1)
-        end
-
-        return tryList(string.gsub, interpolator, s, pattern or '', repl or '', n)
+        pattern = tostring(pattern or '')
+        repl = tostring(repl or '')
+        n = tonumber(n)
+        return tryList(string.gsub, interpolator, s, pattern, repl, n)
     end,
     sub = firstToString(function(s, i, j)
         i = tonumber(i)
@@ -2433,16 +3133,12 @@ functions.string = {
 
         return s:sub(i, i)
     end),
-    ---@param interpolator omi.interpolate.Interpolator
     match = function(interpolator, s, pattern, init)
-        if not pattern then
-            return
-        end
-
         s = tostring(s or '')
-        return tryList(string.match, interpolator, s, pattern, init or 1)
+        pattern = tostring(pattern or '')
+        init = tonumber(init) or 1
+        return tryList(string.match, interpolator, s, pattern, init)
     end,
-    ---@param interpolator omi.interpolate.Interpolator
     char = function(interpolator, ...)
         local args = {}
 
@@ -2472,7 +3168,6 @@ functions.string = {
 
         return try(string.char, unpack(args))
     end,
-    ---@param interpolator omi.interpolate.Interpolator
     byte = function(interpolator, s, i, j)
         i = tonumber(i or 1)
         if not i then
@@ -2498,8 +3193,7 @@ functions.string = {
 }
 
 ---Contains boolean functions.
-functions.boolean = {
-    ---@param interpolator omi.interpolate.Interpolator
+libraries.functions.boolean = {
     ['not'] = function(interpolator, value)
         return not interpolator:toBoolean(value)
     end,
@@ -2509,7 +3203,6 @@ functions.boolean = {
     lt = comparator(function(a, b) return a < b end),
     gte = comparator(function(a, b) return a >= b end),
     lte = comparator(function(a, b) return a <= b end),
-    ---@param interpolator omi.interpolate.Interpolator
     any = function(interpolator, ...)
         for i = 1, select('#', ...) do
             local value = select(i, ...)
@@ -2518,7 +3211,6 @@ functions.boolean = {
             end
         end
     end,
-    ---@param interpolator omi.interpolate.Interpolator
     all = function(interpolator, ...)
         local n = select('#', ...)
         if n == 0 then
@@ -2533,19 +3225,16 @@ functions.boolean = {
 
         return select(n, ...)
     end,
-    ---@param interpolator omi.interpolate.Interpolator
     ['if'] = function(interpolator, condition, ...)
         if interpolator:toBoolean(condition) then
             return utils.concat({ ... })
         end
     end,
-    ---@param interpolator omi.interpolate.Interpolator
     unless = function(interpolator, condition, ...)
         if not interpolator:toBoolean(condition) then
             return utils.concat({ ... })
         end
     end,
-    ---@param interpolator omi.interpolate.Interpolator
     ifelse = function(interpolator, condition, yes, ...)
         if interpolator:toBoolean(condition) then
             return yes
@@ -2556,24 +3245,27 @@ functions.boolean = {
 }
 
 ---Contains functions related to translation.
-functions.translation = {
+libraries.functions.translation = {
     gettext = firstToString(function(...)
-        if not getText then return '' end
+        if not getText then
+            return ''
+        end
+
         return getText(unpack(utils.pack(utils.map(tostring, { ... })), 1, 5))
     end),
     gettextornull = firstToString(function(...)
-        if not getTextOrNull then return '' end
+        if not getTextOrNull then
+            return ''
+        end
+
         return getTextOrNull(unpack(utils.pack(utils.map(tostring, { ... })), 1, 5))
     end),
 }
 
 ---Contains functions related to at-maps.
-functions.map = {
+libraries.functions.map = {
     ---Creates a list. If a single argument is provided and it is an at-map, its values will be used.
     ---Otherwise, the list is made up of all provided arguments.
-    ---@param interpolator omi.interpolate.Interpolator
-    ---@param ... unknown
-    ---@return omi.interpolate.MultiMap?
     list = function(interpolator, ...)
         local entries = {}
         local o = select(1, ...)
@@ -2598,7 +3290,6 @@ functions.map = {
 
         return MultiMap:new(entries)
     end,
-    ---@param interpolator omi.interpolate.Interpolator
     map = function(interpolator, func, o, ...)
         if not utils.isinstance(o, MultiMap) then
             return
@@ -2614,38 +3305,34 @@ functions.map = {
 
         return MultiMap:new(entries)
     end,
-    ---@param interpolator omi.interpolate.Interpolator
     len = function(interpolator, ...)
         local o = select(1, ...)
         if select('#', ...) ~= 1 or not utils.isinstance(o, MultiMap) then
-            return functions.string.len(interpolator, ...)
+            return libraries.functions.string.len(interpolator, ...)
         end
 
         ---@cast o omi.interpolate.MultiMap
         return o:size()
     end,
-    ---@param interpolator omi.interpolate.Interpolator
     concat = function(interpolator, ...)
         local o = select(1, ...)
         if select('#', ...) ~= 1 or not utils.isinstance(o, MultiMap) then
-            return functions.string.concat(interpolator, ...)
+            return libraries.functions.string.concat(interpolator, ...)
         end
 
         ---@cast o omi.interpolate.MultiMap
         return o:concat()
     end,
-    ---@param interpolator omi.interpolate.Interpolator
     concats = function(interpolator, sep, ...)
         local o = select(1, ...)
         if select('#', ...) ~= 1 or not utils.isinstance(o, MultiMap) then
-            return functions.string.concats(interpolator, sep, ...)
+            return libraries.functions.string.concats(interpolator, sep, ...)
         end
 
         ---@cast o omi.interpolate.MultiMap
         return o:concat(sep)
     end,
-    ---@param interpolator omi.interpolate.Interpolator
-    nthvalue = function(interpolator, o, n)
+    nthvalue = function(_, o, n)
         if not o or not utils.isinstance(o, MultiMap) then
             return
         end
@@ -2661,37 +3348,47 @@ functions.map = {
             return e.value
         end
     end,
-    ---@param interpolator omi.interpolate.Interpolator
     first = function(interpolator, ...)
         local o = select(1, ...)
         if select('#', ...) ~= 1 or not utils.isinstance(o, MultiMap) then
-            return functions.string.first(interpolator, ...)
+            return libraries.functions.string.first(interpolator, ...)
         end
 
         ---@cast o omi.interpolate.MultiMap
         return o:first()
     end,
-    ---@param interpolator omi.interpolate.Interpolator
     last = function(interpolator, ...)
         local o = select(1, ...)
         if select('#', ...) ~= 1 or not utils.isinstance(o, MultiMap) then
-            return functions.string.last(interpolator, ...)
+            return libraries.functions.string.last(interpolator, ...)
         end
 
         ---@cast o omi.interpolate.MultiMap
         return o:last()
     end,
-    ---@param interpolator omi.interpolate.Interpolator
+    has = function(_, o, k)
+        if not o or not utils.isinstance(o, MultiMap) then
+            return
+        end
+
+        return o:has(k)
+    end,
+    get = function(_, o, k, d)
+        if not o or not utils.isinstance(o, MultiMap) then
+            return
+        end
+
+        return o:get(k, d)
+    end,
     index = function(interpolator, o, i, d)
         if not utils.isinstance(o, MultiMap) then
-            return functions.string.index(interpolator, o, i, d)
+            return libraries.functions.string.index(interpolator, o, i, d)
         end
 
         ---@cast o omi.interpolate.MultiMap
         return o:index(i, d)
     end,
-    ---@param interpolator omi.interpolate.Interpolator
-    unique = function(interpolator, o)
+    unique = function(_, o)
         if utils.isinstance(o, MultiMap) then
             ---@cast o omi.interpolate.MultiMap
             return o:unique()
@@ -2700,18 +3397,10 @@ functions.map = {
 }
 
 ---Contains functions that can mutate interpolator state.
-functions.mutators = {
-    ---Sets the random seed for the interpolator.
-    ---@param interpolator omi.interpolate.Interpolator
-    ---@param seed unknown
+libraries.functions.mutators = {
     randomseed = function(interpolator, seed)
         return interpolator:randomseed(seed)
     end,
-    ---Returns a random number.
-    ---@param interpolator omi.interpolate.Interpolator
-    ---@param m integer?
-    ---@param n integer?
-    ---@return number?
     random = function(interpolator, m, n)
         if m and not tonumber(m) then
             return
@@ -2725,8 +3414,6 @@ functions.mutators = {
     end,
     ---Returns a random element from the given options.
     ---If the sole argument provided is an at-map, a value is chosen from its values.
-    ---@param interpolator omi.interpolate.Interpolator
-    ---@param ... unknown
     choose = function(interpolator, ...)
         local o = select(1, ...)
         if select('#', ...) ~= 1 or not utils.isinstance(o, MultiMap) then
@@ -2742,9 +3429,6 @@ functions.mutators = {
         return interpolator:randomChoice(values)
     end,
     ---Sets the value of an interpolation token.
-    ---@param interpolator omi.interpolate.Interpolator
-    ---@param token unknown
-    ---@param ... unknown
     set = function(interpolator, token, ...)
         local value
         if select('#', ...) > 1 then
@@ -2757,11 +3441,9 @@ functions.mutators = {
     end,
 }
 
----Contains library function tables.
-InterpolatorLibraries.functions = functions
 
 ---List of interpolator libraries in the order they should be loaded.
-InterpolatorLibraries.list = {
+libraries.list = {
     'math',
     'boolean',
     'string',
@@ -2775,14 +3457,15 @@ InterpolatorLibraries.list = {
 ---@param include table<string, true>? A set of function or modules to include.
 ---@param exclude table<string, true>? A set of function or modules to exclude.
 ---@return table
-function InterpolatorLibraries:load(include, exclude)
+function libraries:load(include, exclude)
     exclude = exclude or {}
 
     local result = {}
 
-    for _, lib in ipairs(self.list) do
+    for i = 1, #self.list do
+        local lib = self.list[i]
         if (not include or include[lib]) and not exclude[lib] then
-            local funcs = InterpolatorLibraries.functions[lib]
+            local funcs = libraries.functions[lib]
             for k, func in pairs(funcs) do
                 local name = table.concat({ lib, '.', k })
                 if (not include or include[name]) and not exclude[name] then
@@ -2796,7 +3479,7 @@ function InterpolatorLibraries:load(include, exclude)
 end
 
 
-return InterpolatorLibraries
+return libraries
 
 end)
 __bundle_register("sandbox", function(require)
@@ -2813,7 +3496,7 @@ local getSandboxOptions = getSandboxOptions
 local sandbox = {}
 
 ---Helper for retrieving custom sandbox options.
----@class omi.Sandbox
+---@class omi.SandboxHelper
 ---@field protected _defaults table? Table containing default option values.
 ---@field protected _name string Name of a mod's sandbox variable table.
 local SandboxHelper = {}
@@ -2863,13 +3546,12 @@ end
 
 ---Creates a new sandbox helper.
 ---@param tableName string The name of the sandbox options table.
----@return omi.Sandbox
+---@return omi.SandboxHelper
 function sandbox.new(tableName)
     return setmetatable({ _name = tableName }, SandboxHelper)
 end
 
 
----@diagnostic disable-next-line: param-type-mismatch
 setmetatable(sandbox, {
     __call = function(self, ...) return self.new(...) end,
 })
@@ -2880,7 +3562,7 @@ sandbox.Sandbox = SandboxHelper
 
 
 ---@diagnostic disable-next-line: cast-type-mismatch
----@cast sandbox omi.sandbox | (fun(tableName: string): omi.Sandbox)
+---@cast sandbox omi.sandbox | (fun(tableName: string): omi.SandboxHelper)
 return sandbox
 
 end)
@@ -2889,12 +3571,10 @@ end)
 ---@class omi.lib
 local OmiLib = {}
 
-OmiLib.VERSION = '1.0.0'
-
 ---@type omi.class | (fun(cls: table?): omi.Class)
 OmiLib.class = require("class")
 
----@type omi.sandbox | (fun(tableName: string): omi.Sandbox)
+---@type omi.sandbox | (fun(tableName: string): omi.SandboxHelper)
 OmiLib.sandbox = require("sandbox")
 
 ---@type omi.utils
