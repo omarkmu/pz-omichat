@@ -28,7 +28,7 @@ description=
 description=For more details, please see the [url=https://omarkmu.github.io/pz-omichat]documentation![/url]
 description=
 description=[h2]Features[/h2]
-description=This mod aims to be as configurable as possible. The vast majority of the features listed below can be configured or completely disabled via [url=https://omarkmu.github.io/pz-omichat/sandbox-options]sandbox options.[/url]
+description=This mod aims to be as configurable as possible. The vast majority of the features listed below can be configured or completely disabled via sandbox options.
 description=
 description=The default settings are tailored to usage for roleplay; by default, chats other than /all and /pm will use character forenames instead of usernames. Additionally, chat will use a colon for names instead of square brackets. Both of these can be reverted using the sandbox options.
 description=
@@ -50,10 +50,10 @@ description=[*]...and more!
 description=[/list]
 description=
 description=[b]Features for server operators:[/b] [list]
-description=[*]Various [url=https://omarkmu.github.io/pz-omichat/user-guide/admins.html]admin commands[/url]
+description=[*]Various admin commands
 description=[*]Configurable info text
 description=[*]Chat range options
-description=[*]Customization of names, timestamps, all chat types, and more via powerful [url=https://omarkmu.github.io/pz-omichat/format-strings]chat formats[/url]
+description=[*]Customization of names, timestamps, all chat types, and more via powerful chat formats
 description=[*]Sandbox options to control the features listed above
 description=[*]Easy configuration with [url=https://omarkmu.github.io/pz-omichat/sandbox-presets]sandbox option presets[/url]
 description=[*]Further extension of functionality using the API
@@ -61,6 +61,7 @@ description=[/list]
 description=
 description=[h2]Compatibility[/h2]
 description=I don't expect this to be compatible with other mods that heavily modify chat, but it shouldn't cause compatibility issues otherwise. If there seems to be a conflict, [url=https://github.com/omarkmu/pz-omichat/issues/new?template=bug_report.yaml]let me know![/url]
+description=
 description=The mod is confirmed to be compatible with the following mods, for which there are options to control compatibility: [list]
 description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2688676019]Chat Bubble v0.6[/url]
 description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2873010748]Search Players For Weapons[/url]
@@ -70,13 +71,13 @@ description=
 description=[h2]Permissions[/h2]
 description=This mod uses the [url=https://theindiestone.com/forums/index.php?/topic/2530-mod-permissions/#comment-36478]Ask for permission policy.[/url]
 description=You may [b]not[/b] reupload this mod or include it directly in modpacks. If there's something missing from the mod, [url=https://github.com/omarkmu/pz-omichat/blob/main/.github/CONTRIBUTING.md]contribute![/url]
-description=Permission is not required to list the mod as a requirement or extend it via the API! If you'd like to request permission to use it in another way (modpack requests will likely be denied), please create a [url=https://github.com/omarkmu/pz-omichat/discussions/new?category=general]discussion.[/url]
+description=Permission is not required to list the mod as a requirement or extend it via the API. If you'd like to request permission to use it in another way (modpack requests will likely be denied), please start a [url=https://github.com/omarkmu/pz-omichat/discussions/new?category=general]discussion.[/url]
 description=
 description=The code and associated documentation is licensed under the [url=https://github.com/omarkmu/pz-omichat/blob/main/LICENSE]MIT License.[/url]
+description=Some features were inspired by [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2688851521]buffy's roleplay chat.[/url]
 description=[hr][/hr]Questions? Use the [url=https://github.com/omarkmu/pz-omichat/discussions]GitHub discussions.[/url]
 description=Suggestions? Create a [url=https://github.com/omarkmu/pz-omichat/discussions/new?category=ideas]feature request.[/url]
 description=Problems? Create an [url=https://github.com/omarkmu/pz-omichat/issues/new?template=bug_report.yaml]issue.[/url]
 description=Want to contribute? [url=https://github.com/omarkmu/pz-omichat/blob/main/.github/CONTRIBUTING.md]You can![/url]
-description=Some features were inspired by [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2688851521]buffy's roleplay chat.[/url]
 tags=Build 41;Interface;Multiplayer;Silly/Fun
 visibility=unlisted

@@ -57,7 +57,7 @@ Please indicate how you tested your changes in the pull request.
 ## Contributing translations
 *Based on the instructions provided [here](https://steamcommunity.com/sharedfiles/filedetails/?id=3006690572).*
 
-The following steps can be used to contribute translations to the mod. If you're unsure about any of the steps, feel free to [ask about it](https://github.com/omarkmu/pz-omichat/discussions/new?category=q-a)!
+The following steps can be used to contribute translations to the mod. If you're unsure about any of the steps, feel free to [ask about it](https://github.com/omarkmu/pz-omichat/discussions/new?category=translation)!
 
 1. Create a copy of the `media/lua/shared/Translate/EN` folder.
 2. Rename the copy to one of the folder names in the table below, based on the translation language.
