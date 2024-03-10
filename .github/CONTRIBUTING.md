@@ -51,6 +51,7 @@ If that isn't possible, consider testing using a hosted server and two or more i
 Please indicate how you tested your changes in the PR.
 6. Write clear commit messages. Your commit messages should:
     - Clearly, succintly describe what you did in that commit.
+    If you need to provide further information, do so *after* the first line. The first line should provide a quick summary; subsequent lines may have more details.
     - Be written in present tense, imperative mood (e.g., “Add x function”, *not* “Added x function”).
     - If you need to provide further information, do so *after* the first line. The first line should provide a quick summary; subsequent lines may have more details.
 
