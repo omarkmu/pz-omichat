@@ -74,7 +74,7 @@ description=Permission is not required to list the mod as a requirement or exten
 description=
 description=The code and associated documentation is licensed under the [url=https://github.com/omarkmu/pz-omichat/blob/main/LICENSE]MIT License.[/url]
 description=[hr][/hr]Questions? Use the [url=https://github.com/omarkmu/pz-omichat/discussions]GitHub discussions.[/url]
-description=Suggestions? Create a [url=https://github.com/omarkmu/pz-omichat/issues/new?template=feature_request.yaml]feature request.[/url]
+description=Suggestions? Create a [url=https://github.com/omarkmu/pz-omichat/discussions/new?category=ideas]feature request.[/url]
 description=Problems? Create an [url=https://github.com/omarkmu/pz-omichat/issues/new?template=bug_report.yaml]issue.[/url]
 description=Want to contribute? [url=https://github.com/omarkmu/pz-omichat/blob/main/.github/CONTRIBUTING.md]You can![/url]
 description=Some features were inspired by [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2688851521]buffy's roleplay chat.[/url]
