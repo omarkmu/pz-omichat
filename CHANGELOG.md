@@ -1,6 +1,9 @@
+# 1.0.0
+
+- Initial release
+
 # 0.6.1
 
-### Fixed
 - Fixed an issue where the `$input` token could have a stale value while formatting input for chat
     - This may have been intended initially to reference the original input, but it was applied inconsistently.
     It's better to just give it a meaning of "the input to this option."

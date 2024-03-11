@@ -1,6 +1,6 @@
 version=1
-id=3040299907
-title=OmiChat (Beta)
+id=3178882070
+title=OmiChat
 description=It's a chat mod.
 description=This mod can be added or removed mid-save.
 description=[h2]Description[/h2]
@@ -12,7 +12,7 @@ description=[*]/faction [/f]
 description=[*]/safehouse [/sh]
 description=[*]/pm (private chat; replaces vanilla /whisper)
 description=[*]/say [/s]
-description=[*]/yell [/y, /shout]
+description=[*]/yell [/y]
 description=[*]/low (short range chat)
 description=[*]/whisper [/w] (shorter range chat)
 description=[*]/me [/m] (describes a character's actions)
@@ -80,4 +80,4 @@ description=Suggestions? Create a [url=https://github.com/omarkmu/pz-omichat/dis
 description=Problems? Create an [url=https://github.com/omarkmu/pz-omichat/issues/new?template=bug_report.yaml]issue.[/url]
 description=Want to contribute? [url=https://github.com/omarkmu/pz-omichat/blob/main/.github/CONTRIBUTING.md]You can![/url]
 tags=Build 41;Interface;Multiplayer;Silly/Fun
-visibility=unlisted
+visibility=public
