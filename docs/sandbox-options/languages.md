@@ -33,7 +33,7 @@ In addition to the default languages, translations are included for the followin
 - Urdu
 - Vietnamese
 
-If there's a language that you believe would make sense to include in the base mod, please create a [feature request](https://github.com/omarkmu/pz-omichat/issues/new?template=feature_request.yaml)!
+If there's a language that you believe would make sense to include in the base mod, please create a [feature request](https://github.com/omarkmu/pz-omichat/discussions/new?category=ideas)!
 
 ### LanguageSlots
 **Default:** `1`  
