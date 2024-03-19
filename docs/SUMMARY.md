@@ -7,6 +7,7 @@
 - [Chat Settings](user-guide/chat-settings.md)
 - [Emote Shortcuts](user-guide/emote-shortcuts.md)
 - [Admin Utilities](user-guide/admins.md)
+- [Java Mods (Optional)](user-guide/java-mods.md)
 
 # Reference Guide
 
