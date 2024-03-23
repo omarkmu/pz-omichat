@@ -9,8 +9,6 @@ To allow players to set additional languages, the [`LanguageSlots`](#languageslo
 **Default:** `English;French;Italian;German;Spanish;Danish;Dutch;Hungarian;Norwegian;Polish;Portuguese;Russian;Turkish;Japanese;Mandarin;Finnish;Korean;Thai;Ukrainian;ASL`
 
 The roleplay languages that players can use, separated by semicolons.
-The default values are based on the game's available languages (with the exception of ASL).
-
 Up to 32 languages can be specified.
 The first language in the list will be treated as the default language player characters speak.
 
@@ -18,16 +16,25 @@ Translations for each language's name can be specified by defining a `UI_OmiChat
 If the translation is absent, the language name will be used as-is regardless of the in-game language.
 
 The default languages have translations provided by the mod, in all languages for which the mod has translations.
-In addition to the default languages, translations are included for the following languages which have many native speakers:
+In addition to the default languages, translations are included for the following languages:
 
 - Arabic
 - Bengali
+- Catalan
 - Cantonese
+- Gujarati
+- Hausa
+- Hawaiian
 - Hindi
 - Javanese
+- Latvian
+- Malay
 - Marathi
+- Persian
 - Punjabi
+- Romanian
 - Shanghainese
+- Tagalog
 - Tamil
 - Telugu
 - Urdu
@@ -40,7 +47,7 @@ If there's a language that you believe would make sense to include in the base m
 **Minimum:** `0`  
 **Maximum:** `100`
 
-The chance for each roll to reveal a word in a language the player doesn't understand.
+The chance for each interpretation roll to succeed.
 This is used by the `$getunknownlanguagestring` function.
 
 ### InterpretationRolls
@@ -48,7 +55,7 @@ This is used by the `$getunknownlanguagestring` function.
 **Minimum:** `0`  
 **Maximum:** `100`
 
-The number of rolls to reveal a word in a language the player doesn't understand.
+The number of rolls to attempt to reveal a word in a message sent with a language the player doesn't understand.
 This is used by the `$getunknownlanguagestring` function.
 
 ### LanguageSlots
