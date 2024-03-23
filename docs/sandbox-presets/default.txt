@@ -64,6 +64,8 @@ OmiChat = {
     AvailableLanguages = "English;French;Italian;German;Spanish;Danish;Dutch;Hungarian;Norwegian;Polish;Portuguese;Russian;Turkish;Japanese;Mandarin;Finnish;Korean;Thai;Ukrainian;ASL",
     SignedLanguages = "ASL",
     LanguageSlots = 1,
+    InterpretationRolls = 2,
+    InterpretationChance = 25,
     FormatAliases = "@(shout:shout;quiet:low)",
     FormatInfo = "",
     FormatName = "$ifelse($has(@(general;admin;whisper) $chatType) $username @($name;$forename))",
@@ -117,6 +119,6 @@ OmiChat = {
     ChatFormatWhisper = "$name: <SPACE> $message",
     ChatFormatYell = "$name: <SPACE> $message",
     ChatFormatEcho = "",
-    ChatFormatUnknownLanguage = "$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $getunknownlanguagestring($languageRaw $stream) <SPACE>))",
-    ChatFormatUnknownLanguageRadio = "$gettext(UI_OmiChat_radio $frequency): $gettext(UI_OmiChat_rp_emote $getunknownlanguagestring($languageRaw $stream))",
+    ChatFormatUnknownLanguage = "$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $getunknownlanguagestring($languageRaw $stream () () $message say) <SPACE>))",
+    ChatFormatUnknownLanguageRadio = "$gettext(UI_OmiChat_radio $frequency): $gettext(UI_OmiChat_rp_emote $getunknownlanguagestring($languageRaw $stream () () $message say))",
 }

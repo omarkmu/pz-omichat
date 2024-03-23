@@ -35,6 +35,22 @@ In addition to the default languages, translations are included for the followin
 
 If there's a language that you believe would make sense to include in the base mod, please create a [feature request](https://github.com/omarkmu/pz-omichat/discussions/new?category=ideas)!
 
+### InterpretationChance
+**Default:** `25`  
+**Minimum:** `0`  
+**Maximum:** `100`
+
+The chance for each roll to reveal a word in a language the player doesn't understand.
+This is used by the `$getunknownlanguagestring` function.
+
+### InterpretationRolls
+**Default:** `2`  
+**Minimum:** `0`  
+**Maximum:** `100`
+
+The number of rolls to reveal a word in a language the player doesn't understand.
+This is used by the `$getunknownlanguagestring` function.
+
 ### LanguageSlots
 **Default:** `1`  
 **Minimum:** `1`  

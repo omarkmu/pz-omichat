@@ -561,7 +561,7 @@ The format used for server messages in chat.
 **See also:** [`ColorServer`](./colors.md#colorserver).
 
 ### ChatFormatUnknownLanguage
-**Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $getunknownlanguagestring($languageRaw $stream) <SPACE>))`
+**Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $getunknownlanguagestring($languageRaw $stream () () $message say) <SPACE>))`
 
 The format used when a player character does not speak the [language](./languages.md) of a chat message.
 
@@ -580,11 +580,12 @@ With the default format, this will display as `« Name says/shouts/whispers/sign
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- `$narrativeContent`: The content within the quotes in a message sent in narrative style.
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 - [`$stream`](../format-strings/tokens.md#stream)
 
 ### ChatFormatUnknownLanguageRadio
-**Default:** `$gettext(UI_OmiChat_radio $frequency): $gettext(UI_OmiChat_rp_emote $getunknownlanguagestring($languageRaw $stream))`
+**Default:** `$gettext(UI_OmiChat_radio $frequency): $gettext(UI_OmiChat_rp_emote $getunknownlanguagestring($languageRaw $stream () () $message say))`
 
 The format used when a player character does not speak the [language](./languages.md) of a chat message sent over the radio.
 
@@ -606,6 +607,7 @@ This has the same values as `$stream`, but will only be populated with custom st
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- `$narrativeContent`: The content within the quotes in a message sent in narrative style.
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 - [`$stream`](../format-strings/tokens.md#stream)
 
