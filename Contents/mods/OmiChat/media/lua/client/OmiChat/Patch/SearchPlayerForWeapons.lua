@@ -39,6 +39,7 @@ local function reportBeingSearched(player, otherPlayer)
 
     if _reportBeingSearched then
         _reportBeingSearched(player, otherPlayer)
+        return
     end
 
     player:Say(getText('UI_SearchedBy', otherPlayer:getDisplayName()))
