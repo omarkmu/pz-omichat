@@ -283,7 +283,7 @@ return {
             end
 
             local defaultLanguage = OmiChat.getDefaultRoleplayLanguage()
-            local language = info.meta.language or defaultLanguage
+            local language = info.meta.language
 
             if not language and isRadio and encodedId then
                 language = OmiChat.getRoleplayLanguageFromID(encodedId)
@@ -292,6 +292,7 @@ return {
                 end
             end
 
+            language = language or defaultLanguage
             if not language then
                 return
             end
@@ -332,10 +333,7 @@ return {
                 info.format = Option.ChatFormatUnknownLanguageRadio
             else
                 info.format = Option.ChatFormatUnknownLanguage
-                if OmiChat.isCustomStreamEnabled('me') then
-                    info.formatOptions.color = OmiChat.getColorOrDefault('me')
-                    info.tokens.stream = 'me'
-                elseif (info.context.ocIsSneakCallout or info.context.ocCustomStream == 'whisper') and OmiChat.isCustomStreamEnabled('mequiet') then
+                if (info.context.ocIsSneakCallout or info.context.ocCustomStream == 'whisper') and OmiChat.isCustomStreamEnabled('mequiet') then
                     info.context.ocStreamForRange = 'whisper'
                     info.formatOptions.color = OmiChat.getColorOrDefault('mequiet')
                     info.tokens.stream = 'mequiet'
@@ -343,6 +341,9 @@ return {
                     info.context.ocStreamForRange = 'shout'
                     info.formatOptions.color = OmiChat.getColorOrDefault('meloud')
                     info.tokens.stream = 'meloud'
+                elseif OmiChat.isCustomStreamEnabled('me') then
+                    info.formatOptions.color = OmiChat.getColorOrDefault('me')
+                    info.tokens.stream = 'me'
                 end
             end
         end,
@@ -388,6 +389,7 @@ return {
             end
 
             info.tokens.dialogueTag = dialogueTag
+            info.tokens.narrativeContent = info.context.ocNarrativeContent
             info.content = translated
         end,
     },

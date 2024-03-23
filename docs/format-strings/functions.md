@@ -43,7 +43,8 @@ To avoid collisions with tokens that may be added in the future, however, custom
 | `$endswith(this other)` | Returns `true` if `this` ends with `other`. Otherwise, returns the empty string. |
 | `$escaperichtext(...)` | Escapes the input for use in rich text. |
 | `$first(s)` | Returns the first character of a given string. |
-| `$getunknownlanguagestring(language stream author dialogueTag)` | Returns a string to use when the recipient of a message doesn't know the language used. `author` and `dialogueTag` are optional; if supplied, they apply a narrative style to the result. |
+| `$fragmented(text)` | Gets random fragments of the words in a string, replacing other words with ellipses. |
+| `$getunknownlanguagestring(language stream author dialogueTag message category)` | Returns a string to use when the recipient of a message doesn't know the language used. `author` and `dialogueTag` are optional; if supplied, they apply a narrative style to the result. `message` is also optional, and will display a fragment of the message based on the relevant [options](../sandbox-options/languages.md) if provided. `category` is the color category to use for fragmented text. |
 | `$gsub(s pattern repl n)` | Replaces the first `n` copies of the pattern `pattern` in `s` with `repl`. Returns the result string, the number of matches that occurred, and any match groups that were captured. This behaves similarly to its [Lua counterpart](https://www.lua.org/manual/5.1/manual.html#pdf). |
 | `$index(s i default)` | Returns the character at index `i` in `s`, or `default` if there is no such index. |
 | `$internal(s)` | Returns the visible part of text wrapped in invisible encoding characters (128–159 or 65535), the invisible prefix, and the invisible suffix. |
@@ -164,4 +165,3 @@ Due to a limitation of these functions, only up to 4 additional substitution arg
 | -------- | ----------- |
 | `$gettext(s ...)` | Returns a translation. The first argument must be the translation name. Subsequent arguments may be translation substitutions. |
 | `$gettextornull(s ...)` | Behaves similarly to `$gettext(...)`, but returns the empty string for unknown translations instead of the translation name. |
-

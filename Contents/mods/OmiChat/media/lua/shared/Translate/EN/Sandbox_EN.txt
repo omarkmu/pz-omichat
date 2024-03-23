@@ -95,6 +95,8 @@ Sandbox_EN = {
     Sandbox_OCAvailableLanguages = "Available Languages",
     Sandbox_OCLanguageSlots = "Language Slots",
     Sandbox_OCSignedLanguages = "Signed Languages",
+    Sandbox_OCInterpretationRolls = "Interpretation Rolls",
+    Sandbox_OCInterpretationChance = "Interpretation Chance",
 
     --[[ Component Formats ]]--
     Sandbox_OCFormatCard = "/card Text Format",

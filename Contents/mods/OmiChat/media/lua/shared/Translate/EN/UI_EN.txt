@@ -67,6 +67,7 @@ UI_EN = {
     UI_OmiChat_Language_Urdu = "Urdu",
     UI_OmiChat_Language_Vietnamese = "Vietnamese",
 
+    -- %1 = the language
     UI_OmiChat_unknown_language_says = "says something in %1.",
     UI_OmiChat_unknown_language_whispers = "whispers something in %1.",
     UI_OmiChat_unknown_language_shouts = "shouts something in %1.",
@@ -75,6 +76,7 @@ UI_EN = {
     UI_OmiChat_unknown_language_shouts_signed = "energetically signs something in %1.",
     UI_OmiChat_unknown_language_radio_no_author = "Something is said in %1.",
 
+    -- %1 = the speaker, %2 = the language
     UI_OmiChat_unknown_language_narrative_asks = "%1 asks something in %2.",
     UI_OmiChat_unknown_language_narrative_says = "%1 says something in %2.",
     UI_OmiChat_unknown_language_narrative_signs = "%1 signs something in %2.",
