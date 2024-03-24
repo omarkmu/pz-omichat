@@ -389,7 +389,7 @@ return {
             end
 
             info.tokens.dialogueTag = dialogueTag
-            info.tokens.narrativeContent = info.context.ocNarrativeContent
+            info.tokens.unstyled = info.context.ocNarrativeContent
             info.content = translated
         end,
     },

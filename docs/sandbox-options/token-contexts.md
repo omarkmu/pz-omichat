@@ -20,7 +20,7 @@ The tokens within this context can be used by all [chat format strings](../sandb
 - [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
-- `$narrativeContent`: The original content of a message sent in narrative style.
+- `$unstyled`: The original content of a message sent in narrative style.
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 - [`$stream`](../format-strings/tokens.md#stream)
 
