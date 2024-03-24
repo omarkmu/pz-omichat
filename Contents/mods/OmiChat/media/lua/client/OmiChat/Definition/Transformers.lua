@@ -2,7 +2,6 @@
 local OmiChat = require 'OmiChat/API/Client'
 
 local concat = table.concat
-local char = string.char
 local getText = getText
 local instanceof = instanceof
 
