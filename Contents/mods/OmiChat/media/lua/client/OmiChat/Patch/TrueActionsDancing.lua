@@ -472,7 +472,7 @@ local danceStream = {
             end
 
             local feedback
-            local info = processDanceCommand(args.command, player)
+            local info = processDanceCommand(args.text, player)
             if info.emote then
                 player:setPrimaryHandItem(nil)
                 player:setSecondaryHandItem(nil)

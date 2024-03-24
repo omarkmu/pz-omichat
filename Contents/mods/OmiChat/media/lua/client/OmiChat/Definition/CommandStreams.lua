@@ -29,7 +29,7 @@ return {
             isEnabled = function() return Option:isNameCommandEnabled() end,
             onUse = function(ctx)
                 if Option:isNameCommandSetNickname() then
-                    local _, feedback = OmiChat.setNickname(ctx.command)
+                    local _, feedback = OmiChat.setNickname(ctx.text)
                     if feedback then
                         OmiChat.addInfoMessage(feedback)
                     end
@@ -37,7 +37,7 @@ return {
                     return
                 end
 
-                local input = utils.trim(ctx.command or '')
+                local input = utils.trim(ctx.text or '')
                 if #input == 0 then
                     OmiChat.addInfoMessage(getText('UI_OmiChat_set_name_empty'))
                     return
@@ -66,7 +66,7 @@ return {
             helpText = 'UI_OmiChat_helptext_nickname',
             isEnabled = function() return Option:isNicknameCommandEnabled() end,
             onUse = function(ctx)
-                local _, feedback = OmiChat.setNickname(ctx.command)
+                local _, feedback = OmiChat.setNickname(ctx.text)
                 if feedback then
                     OmiChat.addInfoMessage(feedback)
                 end
@@ -93,7 +93,7 @@ return {
             helpText = 'UI_OmiChat_helptext_setname',
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                OmiChat.requestSetName(ctx.command)
+                OmiChat.requestSetName(ctx.text)
             end,
         },
     },
@@ -105,7 +105,7 @@ return {
             helpText = 'UI_OmiChat_helptext_iconinfo',
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                local command = utils.trim(ctx.command)
+                local command = utils.trim(ctx.text)
                 if #command == '' then
                     OmiChat.addInfoMessage(ctx.stream:getHelpText())
                     return
@@ -136,8 +136,8 @@ return {
             helpText = 'UI_OmiChat_helptext_seticon',
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                if not OmiChat.requestSetIcon(ctx.command) then
-                    local args = utils.parseCommandArgs(ctx.command)
+                if not OmiChat.requestSetIcon(ctx.text) then
+                    local args = utils.parseCommandArgs(ctx.text)
                     local icon = args[2]
                     if not args[1] or not icon then
                         OmiChat.addInfoMessage(ctx.stream:getHelpText())
@@ -156,7 +156,7 @@ return {
             helpText = 'UI_OmiChat_helptext_resetname',
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                OmiChat.requestResetName(ctx.command)
+                OmiChat.requestResetName(ctx.text)
             end,
         },
     },
@@ -168,7 +168,7 @@ return {
             helpText = 'UI_OmiChat_helptext_reseticon',
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                OmiChat.requestResetIcon(ctx.command)
+                OmiChat.requestResetIcon(ctx.text)
             end,
         },
     },
@@ -180,7 +180,7 @@ return {
             helpText = 'UI_OmiChat_helptext_addlanguage',
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                OmiChat.requestAddLanguage(ctx.command)
+                OmiChat.requestAddLanguage(ctx.text)
             end,
         },
     },
@@ -192,7 +192,7 @@ return {
             helpText = 'UI_OmiChat_helptext_resetlanguages',
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                OmiChat.requestResetLanguages(ctx.command)
+                OmiChat.requestResetLanguages(ctx.text)
             end,
         },
     },
@@ -204,7 +204,7 @@ return {
             helpText = 'UI_OmiChat_helptext_setlanguageslots',
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                OmiChat.requestSetLanguageSlots(ctx.command)
+                OmiChat.requestSetLanguageSlots(ctx.text)
             end,
         },
     },
@@ -262,7 +262,7 @@ return {
                 return true
             end,
             onUse = function(ctx)
-                local command = utils.trim(ctx.command)
+                local command = utils.trim(ctx.text)
                 local first = command:split(' ')[1]
                 local sides = first and tonumber(first)
                 if not sides and #command == 0 then
@@ -340,7 +340,7 @@ return {
                     accessLevel = player and player:getAccessLevel()
                 end
 
-                local command = ctx.command
+                local command = ctx.text
                 if not accessLevel then
                     -- something went wrong, defer to default help command
                     SendCommandToServer('/help ' .. command)

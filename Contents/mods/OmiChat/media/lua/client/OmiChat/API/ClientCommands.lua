@@ -236,7 +236,7 @@ function OmiChat.Commands.reportDrawCard(args)
     OmiChat.send {
         streamName = 'card',
         formatterName = 'card',
-        command = concat {
+        text = concat {
             utils.encodeInvisibleCharacter(suit),
             utils.encodeInvisibleCharacter(card),
             content,
@@ -252,9 +252,9 @@ function OmiChat.Commands.reportRoll(args)
     local content = utils.interpolate(Option.FormatRoll, { roll = roll, sides = sides })
 
     OmiChat.send {
+        text = content,
         streamName = 'roll',
         formatterName = 'roll',
-        command = content,
     }
 end
 
