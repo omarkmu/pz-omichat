@@ -119,6 +119,6 @@ OmiChat = {
     ChatFormatWhisper = "$name <SPACE> $message",
     ChatFormatYell = "$name <SPACE> $message",
     ChatFormatEcho = "(Over Radio) <SPACE>$if($icon $icon <SPACE>) $name <SPACE> $message",
-    ChatFormatUnknownLanguage = "**$if($echo ($(Over Radio$))) <SPACE> $getunknownlanguagestring($languageRaw $stream $name<SPACE> $dialogueTag @($narrativeContent;$message) say)",
-    ChatFormatUnknownLanguageRadio = "$gettext(UI_OmiChat_radio $frequency): <SPACE> $getunknownlanguagestring($languageRaw $stream $if($all($name $not($has(@(do;doloud;doquiet) $customStream))) $name<SPACE>) $dialogueTag @($narrativeContent;$message) say)",
+    ChatFormatUnknownLanguage = "**$if($echo ($(Over Radio$))) <SPACE> $getunknownlanguagestring($languageRaw $stream $name<SPACE> $dialogueTag @($unstyled;$message) say)",
+    ChatFormatUnknownLanguageRadio = "$gettext(UI_OmiChat_radio $frequency): <SPACE> $getunknownlanguagestring($languageRaw $stream $if($all($name $not($has(@(do;doloud;doquiet) $customStream))) $name<SPACE>) $dialogueTag @($unstyled;$message) say)",
 }
