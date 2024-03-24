@@ -163,7 +163,7 @@ local function transformSendArgs(args, streamIdentifier)
 
     if type(args) == 'string' then
         return {
-            command = args,
+            text = args,
             stream = stream,
         }
     end
@@ -675,8 +675,8 @@ function OmiChat.send(args)
         return
     end
 
-    local command = utils.trim(args.command)
-    if #command == 0 then
+    local text = utils.trim(args.text)
+    if #text == 0 then
         return
     end
 
@@ -692,9 +692,9 @@ function OmiChat.send(args)
     local chatType = stream:getChatType()
     if chatType == 'whisper' then
         -- don't apply formatting to the username
-        local m1, m2 = command:match('^("[^"]*%s+[^"]*"%s)(.+)$')
+        local m1, m2 = text:match('^("[^"]*%s+[^"]*"%s)(.+)$')
         if not m1 then
-            m1, m2 = command:match('^([^"]%S*%s)(.+)$')
+            m1, m2 = text:match('^([^"]%S*%s)(.+)$')
         end
 
         if not m1 then
@@ -703,7 +703,7 @@ function OmiChat.send(args)
         end
 
         prefix = m1
-        command = m2
+        text = m2
     end
 
     local language
@@ -712,9 +712,9 @@ function OmiChat.send(args)
         language = currentLanguage
     end
 
-    local initialCommand = command
+    local initialText = text
     local formatResult = OmiChat.formatForChat {
-        text = command,
+        text = text,
         language = language,
         chatType = chatType,
         isEcho = args.isEcho,
@@ -724,8 +724,8 @@ function OmiChat.send(args)
         tokens = args.tokens,
     }
 
-    command = formatResult.text
-    if command == '' then
+    text = formatResult.text
+    if text == '' then
         if formatResult.error then
             OmiChat.addInfoMessage(formatResult.error)
         end
@@ -736,7 +736,7 @@ function OmiChat.send(args)
     local processResult
     local process = OmiChat.raw[chatType] or OmiChat.raw.say
     if process then
-        processResult = process(prefix .. command)
+        processResult = process(prefix .. text)
         if processResult and chatType == 'whisper' and OmiChat.getRetainCommand(stream:getCommandType()) then
             local chatText = ISChat.instance.chatText
             chatText.lastChatCommand = concat { chatText.lastChatCommand, tostring(processResult), ' ' }
@@ -747,14 +747,14 @@ function OmiChat.send(args)
     if isSigned and args.playSignedEmote and OmiChat.getSignEmotesEnabled() then
         local player = getSpecificPlayer(0)
         if player then
-            player:playEmote(OmiChat.getSignLanguageEmote(initialCommand))
+            player:playEmote(OmiChat.getSignLanguageEmote(initialText))
         end
     end
 
     local username = utils.getPlayerUsername()
     local tokens = args.tokens and utils.copy(args.tokens) or {}
     tokens.chatType = chatType
-    tokens.input = initialCommand
+    tokens.input = initialText
     tokens.username = username
     tokens.name = OmiChat.getNameInChat(username, chatType)
     tokens.stream = stream:getIdentifier()
@@ -777,7 +777,7 @@ function OmiChat.send(args)
         useCallback {
             isEcho = true,
             stream = echoStream,
-            command = initialCommand,
+            text = initialText,
         }
     end
 

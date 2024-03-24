@@ -88,7 +88,7 @@ return OmiChat
 
 ---Context for sending chat messages.
 ---@class omichat.SendArgs
----@field command string
+---@field text string
 ---@field streamName string?
 ---@field stream omichat.StreamInfo?
 ---@field playSignedEmote boolean?
