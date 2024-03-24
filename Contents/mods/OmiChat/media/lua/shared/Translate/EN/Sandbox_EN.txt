@@ -114,6 +114,7 @@ Sandbox_EN = {
     Sandbox_OCFormatAdminIcon = "Admin Icon Format",
     Sandbox_OCFormatNarrativeDialogueTag = "Narrative Style Dialogue Tag Format",
     Sandbox_OCFormatNarrativePunctuation = "Narrative Style Punctuation Format",
+    Sandbox_OCFormatNarrativeCustomTagPrefix = "Narrative Style Custom Dialogue Tag Prefix",
 
     --[[ Overhead Message Formats ]]--
     Sandbox_OCOverheadFormatCard = "/card Overhead Format",

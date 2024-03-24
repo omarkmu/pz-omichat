@@ -81,6 +81,7 @@ OmiChat = {
     FormatChatPrefix = "$if($icon $icon <SPACE>)$if($neq($stream server) $timestamp)$tag$language",
     FormatNarrativeDialogueTag = "@($sneakCallout:hisses;$eq($stream shout):shouts;$eq($stream whisper):whispers;$endswith($input ?):asks;$endswith($input !):exclaims;$endswith($input ..):says;$lt($len($input) 10):states;says)",
     FormatNarrativePunctuation = "$unless($sneakCallout @($eq($stream shout):!;.))",
+    FormatNarrativeCustomTagPrefix = "",
     OverheadFormatFull = "$prefix$1",
     OverheadFormatDo = "",
     OverheadFormatDoLoud = "",
