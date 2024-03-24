@@ -115,7 +115,6 @@ This has the same values as `$stream`, but will only be populated with custom st
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
 - [`$iconRaw`](../format-strings/tokens.md#iconraw)
-- [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)

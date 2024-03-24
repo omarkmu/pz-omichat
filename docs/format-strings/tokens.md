@@ -59,6 +59,8 @@ The [dialogue tag](../sandbox-options/component-formats.md#formatnarrativedialog
 
 Populated if this is an [echo message](../sandbox-options/chat-formats.md#chatformatecho).
 
+Since echo messages will only be sent over `/say` or `/low`, this is relevant only to those streams and the “full” formats.
+
 ## `$forename`
 
 The relevant player character's forename.
