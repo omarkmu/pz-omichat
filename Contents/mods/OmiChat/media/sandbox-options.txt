@@ -728,6 +728,14 @@ option OmiChat.FormatNarrativePunctuation
     translation = OCFormatNarrativePunctuation,
 }
 
+option OmiChat.FormatNarrativeCustomTagPrefix
+{
+    type = string,
+    default =,
+    page = OmiChat,
+    translation = OCFormatNarrativeCustomTagPrefix,
+}
+
 
 /* Overhead Message Formats */
 option OmiChat.OverheadFormatFull

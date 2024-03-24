@@ -59,18 +59,31 @@ local function applyNarrativeStyle(input, stream, tokens)
     tokens.chatType = tokens.chatType or stream:getChatType()
     tokens.stream = tokens.stream or stream:getIdentifier()
 
+    local original = input
     if not utils.testPredicate(Option.PredicateUseNarrativeStyle, tokens) then
         return input
     end
 
-    local original = input
+    local dialogueTag
+    local customTagPrefix = utils.trim(Option.FormatNarrativeCustomTagPrefix)
+    if customTagPrefix ~= '' then
+        local patt = '^' .. utils.escape(customTagPrefix) .. '(%a+)%s+(.+)'
+        local internal, prefix, suffix = utils.getInternalText(input)
+
+        local tag, remainder = internal:match(patt)
+        if tag and remainder then
+            dialogueTag = tag
+            tokens.input = prefix .. remainder .. suffix
+        end
+    end
+
     input = utils.interpolate(Option.FilterNarrativeStyle, tokens)
     if input == '' then
         return original
     end
 
     local seed = input
-    local dialogueTag = utils.interpolate(Option.FormatNarrativeDialogueTag, tokens, seed)
+    dialogueTag = dialogueTag or utils.interpolate(Option.FormatNarrativeDialogueTag, tokens, seed)
     if dialogueTag == '' then
         return original
     end
@@ -85,7 +98,7 @@ local function applyNarrativeStyle(input, stream, tokens)
     end
 
     dialogueTag = utils.wrapStringArgument(dialogueTag, 21)
-    input = utils.wrapStringArgument(concat { prefix, input, suffix }, 22)
+    input = utils.wrapStringArgument(prefix .. input .. suffix, 22)
     local combined = format('%s, "%s"', dialogueTag, input)
 
     local formatter = OmiChat.getFormatter('narrative')

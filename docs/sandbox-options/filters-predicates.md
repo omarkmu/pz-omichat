@@ -172,6 +172,7 @@ If narrative style is used, messages will be enclosed in quotes and prefixed wit
 
 For example, with the default settings and a modified predicate, a message sent with `/yell Hey` will be transformed to `shouts, "Hey!"`.
 Note that the player name is not included; overhead and chat formats should include it as needed.
+See the [buffy preset](../sandbox-presets/index.md#buffy) for examples.
 
 **Tokens:**
 - [`$callout`](../format-strings/tokens.md#callout)
