@@ -6,6 +6,7 @@ local floor = math.floor
 ---Modal for color selection.
 ---Includes a text field for RGB input and a color picker.
 ---@class omichat.ColorModal : ISTextBox
+---@field currentColor ColorInfo
 ---@field defaultColor omichat.ColorTable The default color to set on the modal during initialization.
 ---@field emptyColor omichat.ColorTable The color that will be used if the entry is blank.
 ---@field minimumValue integer The minimum RGB value of each color component.

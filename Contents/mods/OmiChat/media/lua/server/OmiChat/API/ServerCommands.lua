@@ -5,6 +5,8 @@ if not isServer() then return end
 
 ---@class omichat.api.server
 local OmiChat = require 'OmiChat/API/Server'
+
+---@class omichat.api.server.commands
 OmiChat.Commands = {}
 
 local Option = OmiChat.Option
