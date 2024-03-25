@@ -37,15 +37,13 @@ end)(require)
 __bundle_register("interpolate", function(require)
 ---Module containing functionality for string interpolation.
 ---@class omi.interpolate
+---@field Parser omi.interpolate.Parser
+---@field Interpolator omi.interpolate.Interpolator
+---@field MultiMap omi.interpolate.MultiMap
 local interpolate = {}
 
----@type omi.interpolate.Parser
 interpolate.Parser = require("interpolate/Parser")
-
----@type omi.interpolate.Interpolator
 interpolate.Interpolator = require("interpolate/Interpolator")
-
----@type omi.interpolate.MultiMap
 interpolate.MultiMap = require("interpolate/MultiMap")
 
 
@@ -55,7 +53,6 @@ interpolate.MultiMap = require("interpolate/MultiMap")
 ---@param options omi.interpolate.Options?
 ---@return string
 function interpolate.interpolate(text, tokens, options)
-    ---@type omi.interpolate.Interpolator
     local interpolator = interpolate.Interpolator:new(options)
     interpolator:setPattern(text)
 
@@ -329,10 +326,10 @@ end)
 __bundle_register("utils", function(require)
 ---Module containing utility functions.
 ---@class omi.utils : omi.utils.string, omi.utils.table, omi.utils.type
+---@field json omi.utils.json
 local utils = {}
 
 
----@type omi.utils.json
 utils.json = require("utils/json")
 
 
@@ -439,10 +436,9 @@ function utils.deepEquals(t1, t2)
 end
 
 ---Returns `value` if non-nil. Otherwise, returns `default`.
----@generic T
----@param value? `T`
----@param default T
----@return T
+---@param value? unknown
+---@param default unknown
+---@return unknown
 function utils.default(value, default)
     if value ~= nil then
         return value
@@ -489,9 +485,8 @@ local utils = {}
 
 
 ---Returns whether the result of `func` is truthy for all values in `target`.
----@generic T
----@param predicate fun(arg: T): unknown Predicate function.
----@param target table<unknown, T> | (fun(...): T) Key-value iterator function or table.
+---@param predicate fun(arg): unknown Predicate function.
+---@param target table | (fun(...): unknown) Key-value iterator function or table.
 ---@param ... unknown Iterator state.
 ---@return boolean
 function utils.all(predicate, target, ...)
@@ -509,9 +504,8 @@ function utils.all(predicate, target, ...)
 end
 
 ---Returns whether the result of `func` is truthy for any value in `target`.
----@generic T
----@param predicate fun(arg: T): unknown Predicate function.
----@param target table<unknown, T> | (fun(...): T) Key-value iterator function or table.
+---@param predicate fun(arg): unknown Predicate function.
+---@param target table | (fun(...): unknown) Key-value iterator function or table.
 ---@param ... unknown Iterator state.
 ---@return boolean
 function utils.any(predicate, target, ...)
@@ -559,9 +553,8 @@ function utils.copy(table)
 end
 
 ---Returns an iterator with only the values in `target` for which `predicate` is truthy.
----@generic T
----@param predicate fun(value: T): unknown Predicate function.
----@param target table<unknown, T> | (fun(...): T) Key-value iterator function or table.
+---@param predicate fun(value): unknown Predicate function.
+---@param target table | (fun(...): unknown) Key-value iterator function or table.
 ---@param ... unknown Iterator state.
 ---@return function
 function utils.filter(predicate, target, ...)
@@ -586,11 +579,8 @@ function utils.filter(predicate, target, ...)
 end
 
 ---Returns an iterator which maps all elements of `target` to the return value of `func`.
----@generic K
----@generic T
----@generic U
----@param func fun(value: T, key: K): U Map function.
----@param target table | (fun(...): T) Key-value iterator function or table.
+---@param func fun(value: unknown, key: unknown): unknown Map function.
+---@param target table | (fun(...): unknown) Key-value iterator function or table.
 ---@param ... unknown Iterator state.
 ---@return function
 function utils.map(func, target, ...)
@@ -609,11 +599,8 @@ function utils.map(func, target, ...)
 end
 
 ---Returns an iterator which maps all elements of `target` to the return value of `func`.
----@generic T
----@generic K
----@generic U
----@param func fun(value: T, key: K, index: integer): U Map function.
----@param target T[] | (fun(...): T) Key-value iterator function or list.
+---@param func fun(value: unknown, key: unknown, index: integer): unknown Map function.
+---@param target unknown[] | (fun(...): unknown) Key-value iterator function or list.
 ---@param ... unknown Iterator state.
 ---@return function
 function utils.mapList(func, target, ...)
@@ -634,11 +621,9 @@ function utils.mapList(func, target, ...)
 end
 
 ---Packs the pairs from an iterator into a table.
----@generic K
----@generic T
----@param iter fun(...): K, T Key-value iterator function.
+---@param iter fun(...): unknown, unknown Key-value iterator function.
 ---@param ... unknown Iterator state.
----@return table<K, T>
+---@return table
 function utils.pack(iter, ...)
     if type(iter) == 'table' then
         return iter
@@ -653,14 +638,11 @@ function utils.pack(iter, ...)
 end
 
 ---Applies `acc` cumulatively to all elements of `target` and returns the final value.
----@generic K
----@generic T
----@generic U
----@param acc fun(result: U, element: T, key: K): U Reducer function.
----@param initial U? Initial value.
----@param target table | (fun(...): K, T) Key-value iterator function or table.
+---@param acc fun(result: unknown, element: unknown, key: unknown): unknown Reducer function.
+---@param initial unknown? Initial value.
+---@param target table | (fun(...): unknown, unknown) Key-value iterator function or table.
 ---@param ... unknown Iterator state.
----@return U
+---@return unknown
 function utils.reduce(acc, initial, target, ...)
     if type(target) == 'table' then
         return utils.reduce(acc, initial, pairs(target))
@@ -681,14 +663,11 @@ end
 
 ---Applies `acc` cumulatively to all elements of `target` and returns the final value.
 ---Assumes a given table is an array and orders elements accordingly; for maps, use `reduce`.
----@generic K
----@generic T
----@generic U
----@param acc fun(result: U, element: T, key: K): U Reducer function.
----@param initial U? Initial value.
----@param target table | (fun(...): K, T) Key-value iterator function or list.
+---@param acc fun(result: unknown, element: unknown, key: unknown): unknown Reducer function.
+---@param initial unknown? Initial value.
+---@param target table | (fun(...): unknown) Key-value iterator function or list.
 ---@param ... unknown Iterator state.
----@return U
+---@return unknown
 function utils.reduceList(acc, initial, target, ...)
     if type(target) == 'table' then
         return utils.reduce(acc, initial, ipairs(target))
@@ -1011,7 +990,7 @@ function utils.endsWith(text, other)
 end
 
 ---Stringifies a value for display.
----For non-tables, this is equivalent to `tostring.`
+---For non-tables, this is equivalent to `tostring`.
 ---Tables will stringify their values unless a `__tostring` method is present on their metatable.
 ---@param value unknown
 ---@param pretty boolean? If true, tables will include newlines and tabs.
@@ -1494,6 +1473,7 @@ local NodeType = InterpolationParser.NodeType
 
 ---Handles string interpolation.
 ---@class omi.interpolate.Interpolator : omi.Class
+---@field Libraries omi.interpolate.Libraries
 ---@field protected _tokens table<string, unknown>
 ---@field protected _functions table<string, function>
 ---@field protected _library table<string, function>
@@ -1507,7 +1487,6 @@ local NodeType = InterpolationParser.NodeType
 ---@field protected _rand Random?
 local Interpolator = class()
 
----@type omi.interpolate.Libraries
 Interpolator.Libraries = InterpolatorLibraries
 
 ---@class omi.interpolate.Options
@@ -1898,6 +1877,7 @@ local concat = table.concat
 
 ---Parser for the interpolated string format.
 ---@class omi.interpolate.Parser : omi.fmt.Parser
+---@field NodeType table<omi.interpolate.NodeType, string>
 ---@field protected _allowTokens boolean
 ---@field protected _allowAtExpr boolean
 ---@field protected _allowFunctions boolean
@@ -1938,7 +1918,17 @@ local InterpolationParser = BaseParser:derive()
 ---@field entries omi.interpolate.AtExpressionEntry[]
 
 
----@enum omi.interpolate.NodeType
+---@alias omi.interpolate.NodeType
+---| 'at_expression'
+---| 'at_key'
+---| 'at_value'
+---| 'text'
+---| 'token'
+---| 'string'
+---| 'call'
+---| 'escape'
+---| 'argument'
+
 InterpolationParser.NodeType = {
     at_expression = 'at_expression',
     at_key = 'at_key',
