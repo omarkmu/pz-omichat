@@ -9,6 +9,7 @@ require 'OmiChat/API/ClientFormat'
 ---Extended fields for ISChat.
 ---@class omichat.ISChat : ISChat
 ---@field instance omichat.ISChat? The ISChat instance.
+---@field infoButton ISButton
 ---@field focused boolean Whether the chat is currently focused.
 ---@field showTitle boolean Whether chat type titles should display.
 ---@field showTimestamp boolean Whether timestamps should display.

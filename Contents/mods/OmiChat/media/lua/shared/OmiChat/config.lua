@@ -3,6 +3,7 @@
 ---@field private _streamTable table<omichat.CustomStreamName, omichat.CustomStreamInfo>
 ---@field private _streamList omichat.CustomStreamInfo[]
 ---@field private _chatStreams omichat.CustomStreamInfo[]
+---@field private _commandStreams omichat.CustomStreamInfo[]
 ---@field private _formatters omichat.FormatterInfo[]
 local Configuration = {}
 Configuration._streamList = {}

@@ -2,6 +2,8 @@
 
 ---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Client'
+
+---@class omichat.api.client.commands
 OmiChat.Commands = {}
 
 
