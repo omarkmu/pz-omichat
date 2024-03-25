@@ -15,6 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          path: '.'
           fetch-depth: 0
       - name: Install Python
         uses: actions/setup-python@v5
@@ -36,8 +37,8 @@ jobs:
           echo `pwd`/lls/bin >> $GITHUB_PATH
       - name: Generate typestub
         run: |
-          lua-language-server --doc "."
-          python scripts/stubgen.py lls/log/doc.json -o docs/api/typestub.lua -n omi(?:chat)?\.
+          lua-language-server --doc "./Contents/mods/OmiChat/media/lua"
+          python scripts/stubgen.py lls/log/doc.json -o docs/api/typestub.lua -n "omi(?:chat)?\."
           cat docs/api/typestub.lua
       - name: Build Book
         run: mdbook build
