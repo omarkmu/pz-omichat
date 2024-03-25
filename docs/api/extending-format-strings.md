@@ -1,6 +1,6 @@
 # Extending Format Strings
 
-[Format strings](./index.md) can be extended by other mods.
+[Format strings](./index.md) can be extended using the API.
 Additional [functions](./functions.md) or overrides of existing functions can be included by calling `OmiChat.registerInterpolatorFunction`.
 
 OmiChat does not perform error handling while performing interpolation.
@@ -10,6 +10,8 @@ Return values of `nil` or `false` will be treated as the empty string.
 If you think your extension should instead be included in the mod, feel free to [contribute](https://github.com/omarkmu/pz-omichat/blob/main/.github/CONTRIBUTING.md)!
 
 ## Example
+
+A simple example which appends the length of the input:
 ```lua
 -- $example(hello) → hello5
 local OmiChat = require 'OmiChat'

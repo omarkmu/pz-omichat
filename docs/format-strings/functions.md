@@ -18,7 +18,7 @@ Escapes will still function within parentheses, but they are only necessary to e
 > `$reverse( ($)$() )` → `()`  
 > `$len(($@-sign))` → `6`
 
-Other mods can [extend](./extensions.md) the list of available functions using the API.
+Other mods can [extend](../api/extending-format-strings.md) the list of available functions using the API.
 
 ## `$set` Function
 
