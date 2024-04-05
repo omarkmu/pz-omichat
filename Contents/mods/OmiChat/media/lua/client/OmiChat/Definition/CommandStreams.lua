@@ -239,6 +239,19 @@ return {
         },
     },
     {
+        name = 'flip',
+        command = '/flip ',
+        omichat = {
+            isCommand = true,
+            helpText = 'UI_OmiChat_helptext_flip',
+            onUse = function(ctx)
+                if not OmiChat.requestFlipCoin() then
+                    OmiChat.addInfoMessage(ctx.stream:getHelpText())
+                end
+            end,
+        },
+    },
+    {
         name = 'roll',
         command = '/roll ',
         omichat = {

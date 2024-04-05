@@ -42,6 +42,13 @@ If blank, `/doquiet` messages will not display overhead.
 Defines the format used for overhead speech bubbles of [echoed](./chat-formats.md#chatformatecho) messages sent on the `/faction` or `/safehouse` streams.
 If blank, `/safehouse` and `/faction` messages will not be echoed.
 
+### OverheadFormatFlip
+**Default:** `<< $1 >>`  
+**Token Context:** [Overhead](../sandbox-options/token-contexts.md#overhead)
+
+The overhead format used for local [`/flip`](./chat-formats.md#chatformatflip) messages.
+If blank, `/flip` messages will not display overhead.
+
 ### OverheadFormatFull
 **Default:** `$prefix$1`  
 **Token Context:** [Overhead](../sandbox-options/token-contexts.md#overhead)

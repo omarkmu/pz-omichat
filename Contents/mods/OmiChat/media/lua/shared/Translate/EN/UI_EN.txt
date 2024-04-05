@@ -123,6 +123,7 @@ UI_EN = {
     UI_OmiChat_helptext_seticon = "Set a player's chat icon. Example: /seticon username crowbar",
     UI_OmiChat_helptext_reseticon = "Reset a player's chat icon. Example: /reseticon username",
     UI_OmiChat_helptext_iconinfo = "Get an icon's proper name, for use in format strings. Example: /iconinfo plushspiffo",
+    UI_OmiChat_helptext_flip = "Flip a coin. Use /flip",
 
     --[[ Error Messages ]]--
     UI_OmiChat_error_invalid_color = "Input must be a hexadecimal color value or three numbers separated by commas or spaces.",
@@ -159,11 +160,16 @@ UI_EN = {
     UI_OmiChat_card = "%1 drew %2",
     -- %1 = the name of the player who rolled, %2 = the number that was rolled, %3 = the number of sides on the dice
     UI_OmiChat_roll = "%1 rolled a %2 on a %3-sided die",
+    -- %1 = the player who flipped the coin
+    UI_OmiChat_flip_heads = "%1 flipped a coin and got heads",
+    UI_OmiChat_flip_tails = "%1 flipped a coin and got tails",
 
     -- %1 = the name of the card that was drawn
     UI_OmiChat_card_local = "draws %1",
     -- %1 = the number that was rolled, %2 = the number of sides on the dice
     UI_OmiChat_roll_local = "rolls a %1 on a %2-sided die",
+    UI_OmiChat_flip_local_heads = "flips a coin and gets heads",
+    UI_OmiChat_flip_local_tails = "flips a coin and gets tails",
 
     --[[ Context Menus ]]--
     UI_OmiChat_context_chat_settings = "Chat settings",

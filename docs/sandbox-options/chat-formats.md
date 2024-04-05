@@ -98,6 +98,19 @@ The format used for `/faction` messages in chat.
 
 **See also:** [`ColorFaction`](./colors.md#colorfaction).
 
+### ChatFormatFlip
+**Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($gettext($concat(UI_OmiChat_flip_local_ @($heads:heads;tails)))) <SPACE>))`  
+**Token Context:** [Chat](../sandbox-options/token-contexts.md#chat)
+
+The format used for local `/flip` messages in chat.
+This respects the range and color options of [`/me`](./chat-formats.md#chatformatme).
+
+If blank, `/flip` messages will be global instead of local and related options will be ignored.
+
+**Tokens:**
+- All tokens in [chat context](../sandbox-options/token-contexts.md#chat).
+- `$heads`: Populated if the result of the flip was heads.
+
 ### ChatFormatFull
 **Default:** `$prefix$content`  
 **Token Context:** [Processed Chat](../sandbox-options/token-contexts.md#processed-chat)

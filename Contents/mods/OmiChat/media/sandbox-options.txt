@@ -672,6 +672,14 @@ option OmiChat.FormatRoll
     translation = OCFormatRoll,
 }
 
+option OmiChat.FormatFlip
+{
+    type = string,
+    default = flips a coin and gets @($heads:heads;tails),
+    page = OmiChat,
+    translation = OCFormatFlip,
+}
+
 option OmiChat.FormatAdminIcon
 {
     type = string,
@@ -842,6 +850,14 @@ option OmiChat.OverheadFormatRoll
     translation = OCOverheadFormatRoll,
 }
 
+option OmiChat.OverheadFormatFlip
+{
+    type = string,
+    default = << $1 >>,
+    page = OmiChat,
+    translation = OCOverheadFormatFlip,
+}
+
 option OmiChat.OverheadFormatOther
 {
     type = string,
@@ -922,6 +938,14 @@ option OmiChat.ChatFormatRoll
     default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($gettext(UI_OmiChat_roll_local $roll $sides)) <SPACE>)),
     page = OmiChat,
     translation = OCChatFormatRoll,
+}
+
+option OmiChat.ChatFormatFlip
+{
+    type = string,
+    default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($gettext($concat(UI_OmiChat_flip_local_ @($heads:heads;tails)))) <SPACE>)),
+    page = OmiChat,
+    translation = OCChatFormatFlip,
 }
 
 option OmiChat.ChatFormatDo

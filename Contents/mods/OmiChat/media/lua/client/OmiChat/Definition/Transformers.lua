@@ -9,6 +9,40 @@ local utils = OmiChat.utils
 local Option = OmiChat.Option
 local config = OmiChat.config
 
+---Checks whether input matches a command stream.
+---@param name omichat.CustomStreamName
+---@param info omichat.MessageInfo
+---@return string?
+local function matchCommand(name, info)
+    if not OmiChat.isCustomStreamEnabled(name) then
+        return
+    end
+
+    local streamConfig = config:getCustomStreamInfo(name)
+    if not streamConfig then
+        return
+    end
+
+    local text = info.content or info.rawText
+    local formatter = OmiChat.getFormatter(name)
+    local matched = formatter:read(text)
+    if not matched then
+        return
+    end
+
+    if info.context.ocIsRadio then
+        info.message:setShowInChat(false)
+        info.message:setOverHeadSpeech(false)
+        return
+    end
+
+    if streamConfig.overheadFormatOpt and Option[streamConfig.overheadFormatOpt] == '' then
+        info.message:setOverHeadSpeech(false)
+    end
+
+    return matched
+end
+
 
 ---@type omichat.MessageTransformer[]
 return {
@@ -90,25 +124,9 @@ return {
         name = 'decode-card',
         priority = 55,
         transform = function(_, info)
-            if not OmiChat.isCustomStreamEnabled('card') then
-                return
-            end
-
-            local text = info.content or info.rawText
-            local formatter = OmiChat.getFormatter('card')
-            local matched = formatter:read(text)
+            local matched = matchCommand('card', info)
             if not matched then
                 return
-            end
-
-            if info.context.ocIsRadio then
-                info.message:setShowInChat(false)
-                info.message:setOverHeadSpeech(false)
-                return
-            end
-
-            if Option.OverheadFormatCard == '' then
-                info.message:setOverHeadSpeech(false)
             end
 
             local suit = utils.decodeInvisibleCharacter(matched)
@@ -131,28 +149,39 @@ return {
         end,
     },
     {
-        name = 'decode-roll',
-        priority = 50,
+        name = 'decode-flip',
+        priority = 54,
         transform = function(_, info)
-            if not OmiChat.isCustomStreamEnabled('roll') then
-                return
-            end
-
-            local text = info.content or info.rawText
-            local formatter = OmiChat.getFormatter('roll')
-            local matched = formatter:read(text)
+            local matched = matchCommand('flip', info)
             if not matched then
                 return
             end
 
-            if info.context.ocIsRadio then
+            local result = utils.decodeInvisibleCharacter(matched)
+
+            if result ~= 1 and result ~= 2 then
                 info.message:setShowInChat(false)
-                info.message:setOverHeadSpeech(false)
                 return
             end
 
-            if Option.OverheadFormatRoll == '' then
-                info.message:setOverHeadSpeech(false)
+            info.content = matched:sub(3)
+            info.tokens.heads = result == 1
+
+            info.format = Option.ChatFormatFlip
+            info.formatOptions.color = OmiChat.getColorOrDefault('me')
+            info.formatOptions.useDefaultChatColor = false
+
+            info.context.ocCustomStream = 'me'
+            info.tokens.stream = 'flip'
+        end,
+    },
+    {
+        name = 'decode-roll',
+        priority = 50,
+        transform = function(_, info)
+            local matched = matchCommand('roll', info)
+            if not matched then
+                return
             end
 
             local roll = tonumber(utils.unwrapStringArgument(matched, 1, '(%d+)'))

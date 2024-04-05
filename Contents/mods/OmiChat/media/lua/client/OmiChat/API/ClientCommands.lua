@@ -100,6 +100,12 @@ function OmiChat.requestDrawCard()
     return OmiChat.dispatch('requestDrawCard')
 end
 
+---Requests flipping a coin.
+---@return boolean
+function OmiChat.requestFlipCoin()
+    return OmiChat.dispatch('requestFlipCoin')
+end
+
 ---Executes the /reseticon command.
 ---@param command string
 ---@return boolean
@@ -241,6 +247,24 @@ function OmiChat.Commands.reportDrawCard(args)
         text = concat {
             utils.encodeInvisibleCharacter(suit),
             utils.encodeInvisibleCharacter(card),
+            content,
+        },
+    }
+end
+
+---Reports the results of flipping a coin.
+---@param args omichat.request.ReportFlipCoin
+function OmiChat.Commands.reportFlipCoin(args)
+    local heads = args.heads
+    local content = utils.interpolate(Option.FormatFlip, {
+        heads = args.heads and '1' or nil,
+    })
+
+    OmiChat.send {
+        streamName = 'flip',
+        formatterName = 'flip',
+        text = concat {
+            utils.encodeInvisibleCharacter(heads and 1 or 2),
             content,
         },
     }
