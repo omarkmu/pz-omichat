@@ -77,6 +77,7 @@ local floor = math.floor
 ---@field InterpretationChance integer
 ---@field FormatCard string
 ---@field FormatRoll string
+---@field FormatFlip string
 ---@field FormatAliases string
 ---@field FormatInfo string
 ---@field FormatMenuName string
@@ -94,6 +95,7 @@ local floor = math.floor
 ---@field OverheadFormatFull string
 ---@field OverheadFormatCard string
 ---@field OverheadFormatRoll string
+---@field OverheadFormatFlip string
 ---@field OverheadFormatDo string
 ---@field OverheadFormatDoLoud string
 ---@field OverheadFormatDoQuiet string
@@ -108,6 +110,7 @@ local floor = math.floor
 ---@field ChatFormatFull string
 ---@field ChatFormatCard string
 ---@field ChatFormatRoll string
+---@field ChatFormatFlip string
 ---@field ChatFormatDo string
 ---@field ChatFormatDoLoud string
 ---@field ChatFormatDoQuiet string

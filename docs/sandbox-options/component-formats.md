@@ -36,6 +36,14 @@ The format used for local [`/card`](./chat-formats.md#chatformatcard) overhead m
 
 The format used to determine the value of the `$prefix` token in [`ChatFormatFull`](./chat-formats.md#chatformatfull).
 
+### FormatFlip
+**Default:** `flips a coin and gets @($heads:heads;tails)`
+
+The format used for local [`/roll`](./chat-formats.md#chatformatflip) overhead message content.
+
+**Tokens:**
+- `$heads`: Populated if the result of the coin flip was heads.
+
 ### FormatIcon
 **Default:** `@($eq($stream card):Item_CardDeck;$eq($stream roll):Item_Dice;$has(@(say;shout;whisper;faction;safehouse;ooc;general) $stream):@($adminIcon;$icon))`
 

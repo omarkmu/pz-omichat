@@ -134,6 +134,10 @@ return OmiChat
 ---@field card integer The card number, in [1, 13].
 ---@field suit integer The suit number, in [1, 4].
 
+---Request to report the result of flipping a coin on the client.
+---@class omichat.request.ReportFlipCoin
+---@field heads boolean True if the result of the flip was heads.
+
 ---Request to report the result of rolling dice on the client.
 ---@class omichat.request.ReportRoll
 ---@field roll integer The value of the dice roll.

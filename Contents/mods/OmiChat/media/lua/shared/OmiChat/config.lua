@@ -21,6 +21,7 @@ Configuration._streamTable = {}
 ---| 'ooc'
 ---| 'card'
 ---| 'roll'
+---| 'flip'
 
 ---@see omichat.api.client.getFormatter
 ---@alias omichat.FormatterName
@@ -38,7 +39,7 @@ Configuration._streamTable = {}
 
 -- IDs 1–32 are reserved for encoding additional data
 --[[
-    1–2: /roll args
+    1–2: /roll, /flip args
     1–4: /card suit
     1–13: /card name
     21: narrative style dialogue tag
@@ -66,6 +67,17 @@ Configuration._commandStreams = {
         rangeOpt = 'RangeMe',
         chatFormatOpt = 'ChatFormatCard',
         overheadFormatOpt = 'OverheadFormatCard',
+        chatTypes = { say = true },
+        autoColorOption = false,
+    },
+    {
+        name = 'flip',
+        formatID = 35,
+        streamAlias = 'me',
+        colorOpt = 'ColorMe',
+        rangeOpt = 'RangeMe',
+        chatFormatOpt = 'ChatFormatFlip',
+        overheadFormatOpt = 'OverheadFormatFlip',
         chatTypes = { say = true },
         autoColorOption = false,
     },
