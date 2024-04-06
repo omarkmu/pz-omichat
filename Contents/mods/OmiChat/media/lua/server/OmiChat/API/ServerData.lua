@@ -21,7 +21,7 @@ function OmiChat.addRoleplayLanguage(username, language)
     end
 
     local languages = OmiChat.getRoleplayLanguages(username)
-    if #languages >= 32 then
+    if #languages >= OmiChat.config:maxLanguageSlots() then
         return false, 'FULL'
     end
 
@@ -133,7 +133,7 @@ end
 ---@param slots integer
 ---@return boolean success
 function OmiChat.setRoleplayLanguageSlots(username, slots)
-    if slots < 1 or slots > 32 then
+    if slots < 1 or slots > OmiChat.config:maxLanguageSlots() then
         return false
     end
 

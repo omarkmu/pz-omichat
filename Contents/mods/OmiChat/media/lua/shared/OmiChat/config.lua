@@ -1,4 +1,4 @@
----Configuration of custom streams and formatters.
+---Mod configuration values.
 ---@class omichat.Configuration
 ---@field private _streamTable table<omichat.CustomStreamName, omichat.CustomStreamInfo>
 ---@field private _streamList omichat.CustomStreamInfo[]
@@ -289,6 +289,18 @@ function Configuration:init()
     end
 
     return self
+end
+
+---Gets the maximum number of roleplay languages that can be configured.
+---@return 32
+function Configuration:maxDefinedLanguages()
+    return 32
+end
+
+---Gets the maximum number of language slots that a player can have.
+---@return 32
+function Configuration:maxLanguageSlots()
+    return 32
 end
 
 ---Returns an iterator over custom stream information.
