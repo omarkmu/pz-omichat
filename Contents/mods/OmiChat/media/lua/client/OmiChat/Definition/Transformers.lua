@@ -303,7 +303,7 @@ return {
             if formatter:isMatch(text) then
                 text = formatter:read(text)
                 encodedId = utils.decodeInvisibleCharacter(text)
-                if encodedId >= 1 and encodedId <= 32 then
+                if encodedId >= 1 and encodedId <= config:maxDefinedLanguages() then
                     info.content = text:sub(2)
                 else
                     encodedId = nil

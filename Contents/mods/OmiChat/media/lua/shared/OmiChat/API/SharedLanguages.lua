@@ -105,7 +105,7 @@ end
 ---@param id integer
 ---@return string?
 function OmiChat.getRoleplayLanguageFromID(id)
-    if id < 1 or id > 32 then
+    if id < 1 or id > OmiChat.config:maxDefinedLanguages() then
         return
     end
 

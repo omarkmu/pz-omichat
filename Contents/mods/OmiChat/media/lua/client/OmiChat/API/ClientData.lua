@@ -532,7 +532,7 @@ function OmiChat.setRoleplayLanguageSlots(slots)
         return false
     end
 
-    if slots < 0 or slots > 32 then
+    if slots < 1 or slots > OmiChat.config:maxLanguageSlots() then
         return false
     end
 

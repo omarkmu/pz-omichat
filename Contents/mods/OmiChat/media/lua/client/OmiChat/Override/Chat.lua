@@ -254,7 +254,7 @@ end
 ---@param context ISContextMenu
 local function addLanguageOptions(context)
     local languages = OmiChat.getRoleplayLanguages()
-    local languageSlots = OmiChat.getRoleplayLanguageSlots()
+    local languageSlots = math.min(OmiChat.getRoleplayLanguageSlots(), config:maxLanguageSlots())
     if languageSlots == 0 and #languages <= 1 then
         -- nothing to configure → don't show the menu
         return
@@ -262,8 +262,6 @@ local function addLanguageOptions(context)
 
     local isKnown = {}
     local knownLanguages = {}
-    local allLanguages = OmiChat.getConfiguredRoleplayLanguages()
-    local currentLang = OmiChat.getCurrentRoleplayLanguage() or OmiChat.getDefaultRoleplayLanguage()
     for i = 1, #languages do
         local lang = languages[i]
         if OmiChat.isConfiguredRoleplayLanguage(lang) then
@@ -273,7 +271,8 @@ local function addLanguageOptions(context)
     end
 
     local addLanguages = {}
-    if languageSlots - #languages >= 1 and #languages < 32 then
+    if languageSlots - #knownLanguages >= 1 then
+        local allLanguages = OmiChat.getConfiguredRoleplayLanguages()
         for i = 1, #allLanguages do
             local lang = allLanguages[i]
             if not isKnown[lang] then
@@ -285,15 +284,16 @@ local function addLanguageOptions(context)
         end
     end
 
-    local languageSubMenu
-    if #knownLanguages > 0 or #addLanguages > 0 then
-        local languageOptionName = getText('UI_OmiChat_context_languages')
-        local languageOption = context:addOption(languageOptionName, ISChat.instance)
-
-        languageSubMenu = context:getNew(context)
-        context:addSubMenu(languageOption, languageSubMenu)
+    if #knownLanguages == 0 and #addLanguages == 0 then
+        return
     end
 
+    local languageOptionName = getText('UI_OmiChat_context_languages')
+    local languageOption = context:addOption(languageOptionName, ISChat.instance)
+    local languageSubMenu = context:getNew(context)
+    context:addSubMenu(languageOption, languageSubMenu)
+
+    local currentLang = OmiChat.getCurrentRoleplayLanguage() or OmiChat.getDefaultRoleplayLanguage()
     for i = 1, #knownLanguages do
         local lang = knownLanguages[i]
         local name = utils.getTranslatedLanguageName(lang)

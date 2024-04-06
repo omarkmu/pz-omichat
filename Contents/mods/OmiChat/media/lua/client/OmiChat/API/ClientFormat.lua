@@ -408,7 +408,7 @@ function OmiChat.decodeLanguage(message)
         -- found a language → decode it. transformer will handle cleanup
         text = formatter:read(text)
         local encodedId = utils.decodeInvisibleCharacter(text)
-        if encodedId >= 1 and encodedId <= 32 then
+        if encodedId >= 1 and encodedId <= OmiChat.config:maxDefinedLanguages() then
             languageId = encodedId
         end
     end
