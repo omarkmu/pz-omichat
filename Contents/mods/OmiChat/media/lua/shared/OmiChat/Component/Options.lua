@@ -18,6 +18,7 @@ local floor = math.floor
 ---@field EnableCompatTAD integer
 ---@field EnableFactionColorAsDefault boolean
 ---@field EnableCharacterCustomization boolean
+---@field EnableCleanCharacter integer
 ---@field EnableDiscordColorOption integer
 ---@field EnableSetName integer
 ---@field BuffCooldown integer
@@ -254,6 +255,20 @@ function Option:getDefaultColor(category, username)
     return getColorOrDefault(self, custom and custom.colorOpt)
         or getColorOrDefault(self, colorOpts[category])
         or { r = 255, g = 255, b = 255 }
+end
+
+---Returns whether the clean character option is set to clean clothing.
+---This does not check for whether the macro character customization feature is enabled.
+---@return boolean
+function Option:isCleanClothingEnabled()
+    return Option.EnableCleanCharacter == 3
+end
+
+---Returns whether the clean character option is enabled.
+---This does not check for whether the macro character customization feature is enabled.
+---@return boolean
+function Option:isCleanCustomizationEnabled()
+    return Option.EnableCleanCharacter ~= 1
 end
 
 ---Returns whether the /name command should be enabled.

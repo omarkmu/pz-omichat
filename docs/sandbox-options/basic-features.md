@@ -28,6 +28,16 @@ Customization options available:
 - Grow long hair
 - Grow beard
 
+### EnableCleanCharacter
+**Default:** `3 - Clean body and clothing`
+
+Determines the behavior of the “clean blood & dirt” option.
+This has no effect unless [`EnableCharacterCustomization`](#enablecharactercustomization) is turned on.
+
+- `1`: Disable
+- `2`: Clean body only
+- `3`: Clean body and clothing
+
 ### EnableCustomShouts
 **Default:** `true`
 

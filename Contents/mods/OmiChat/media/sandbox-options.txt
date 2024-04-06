@@ -58,6 +58,16 @@ option OmiChat.EnableCharacterCustomization
     translation = OCEnableCharacterCustomization,
 }
 
+option OmiChat.EnableCleanCharacter
+{
+    type = enum,
+    numValues = 3,
+    default = 3,
+    page = OmiChat,
+    translation = OCEnableCleanCharacter,
+    valueTranslation = OCEnableCleanCharacter,
+}
+
 option OmiChat.EnableSetName
 {
     type = enum,
