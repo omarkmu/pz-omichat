@@ -1,6 +1,9 @@
 local lib = require 'OmiChat/lib'
 local Interpolator = require 'OmiChat/Component/Interpolator'
 
+local pow = math.pow
+local floor = math.floor
+local min = math.min
 local format = string.format
 local concat = table.concat
 local getTimestampMs = getTimestampMs
@@ -178,23 +181,33 @@ end
 ---@param text string
 ---@return integer
 function utils.decodeInvisibleCharacter(text)
-    return text:sub(1, 1):byte() - 127
+    if not text or #text == 0 then
+        return 0
+    end
+
+    return text:byte() - 127
 end
 
 ---Decodes an encoded integer value.
 ---@param text string
 ---@return integer?
 function utils.decodeInvisibleInt(text)
-    local digits = {}
-
-    for i = 1, #text do
-        local c = text:sub(i, i):byte() - 127
-        if c >= 1 and c <= 10 then
-            digits[#digits + 1] = string.char(c + 47)
-        end
+    local len = utils.decodeInvisibleCharacter(text)
+    if len < 1 or len > 32 then
+        return
     end
 
-    return tonumber(concat(digits))
+    local value = 0
+    for i = 2, min(#text, len + 1) do
+        local digit = utils.decodeInvisibleCharacter(text:sub(i, i)) - 1
+        if digit < 0 or digit > 31 then
+            return
+        end
+
+        value = value + digit * pow(32, i - 2)
+    end
+
+    return value
 end
 
 ---Encodes an integer value in [1, 32] into a character.
@@ -204,17 +217,34 @@ function utils.encodeInvisibleCharacter(n)
     return string.char(n + 127)
 end
 
----Encodes a positive integer value as an invisible representation of its digits.
+---Encodes a non-negative integer value as an invisible representation of its digits.
 ---@param value integer
 ---@return string
 function utils.encodeInvisibleInt(value)
-    local str = tostring(value)
-    local result = {}
-    for i = 1, #str do
-        result[#result + 1] = utils.encodeInvisibleCharacter(str:sub(i, i):byte() - 47)
+    value = floor(value)
+    if value < 0 then
+        utils.logError('Attempted to encode negative value: ' .. value)
+        return ''
     end
 
-    return concat(result)
+    local originalValue = value
+    local result = {}
+    while value > 0 do
+        if #result == 32 then
+            utils.logError('Value is too large to encode: ' .. originalValue)
+            return ''
+        end
+
+        result[#result + 1] = utils.encodeInvisibleCharacter((value % 32) + 1)
+        value = floor(value / 32)
+    end
+
+    if #result == 0 then
+        result[#result + 1] = utils.encodeInvisibleCharacter(1)
+    end
+
+    local len = utils.encodeInvisibleCharacter(#result)
+    return len .. concat(result)
 end
 
 ---Escapes a string for use in a rich text panel.
