@@ -599,7 +599,7 @@ option OmiChat.LanguageSlots
     type = integer,
     default = 1,
     min = 1,
-    max = 32,
+    max = 50,
     page = OmiChat,
     translation = OCLanguageSlots,
 }

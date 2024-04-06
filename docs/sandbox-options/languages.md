@@ -9,7 +9,7 @@ To allow players to set additional languages, the [`LanguageSlots`](#languageslo
 **Default:** `English;French;Italian;German;Spanish;Danish;Dutch;Hungarian;Norwegian;Polish;Portuguese;Russian;Turkish;Japanese;Mandarin;Finnish;Korean;Thai;Ukrainian;ASL`
 
 The roleplay languages that players can use, separated by semicolons.
-Up to 32 languages can be specified.
+Up to 1000 languages can be specified.
 The first language in the list will be treated as the default language player characters speak.
 
 Translations for each language's name can be specified by defining a `UI_OmiChat_Language_[Language]` string (e.g., `UI_OmiChat_Language_English`).
@@ -61,7 +61,7 @@ This is used by the `$getunknownlanguagestring` function.
 ### LanguageSlots
 **Default:** `1`  
 **Minimum:** `1`  
-**Maximum:** `32`
+**Maximum:** `50`
 
 The number of language slots players have by default.
 
