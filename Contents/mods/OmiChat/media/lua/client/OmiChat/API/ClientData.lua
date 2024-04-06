@@ -539,7 +539,7 @@ function OmiChat.setRoleplayLanguageSlots(slots)
     local modData = OmiChat.getModData()
     modData.languageSlots[username] = slots
     OmiChat.requestDataUpdate({
-        field = 'currentLanguage',
+        field = 'languageSlots',
         target = username,
         value = slots,
     })
