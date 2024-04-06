@@ -594,6 +594,22 @@ option OmiChat.SignedLanguages
     translation = OCSignedLanguages,
 }
 
+option OmiChat.AddLanguageAllowlist
+{
+    type = string,
+    default =,
+    page = OmiChat,
+    translation = OCAddLanguageAllowlist,
+}
+
+option OmiChat.AddLanguageBlocklist
+{
+    type = string,
+    default =,
+    page = OmiChat,
+    translation = OCAddLanguageBlocklist,
+}
+
 option OmiChat.LanguageSlots
 {
     type = integer,

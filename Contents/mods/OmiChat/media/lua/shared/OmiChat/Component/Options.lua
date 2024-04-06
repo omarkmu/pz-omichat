@@ -4,6 +4,8 @@ local config = require 'OmiChat/config'
 
 local getActivatedMods = getActivatedMods
 local floor = math.floor
+local trim = utils.trim
+local split = string.split
 
 
 ---Helper for retrieving sandbox variables and their defaults.
@@ -73,6 +75,8 @@ local floor = math.floor
 ---@field PredicateAllowLanguage string
 ---@field PredicateTransmitOverRadio string
 ---@field AvailableLanguages string
+---@field AddLanguageAllowlist string
+---@field AddLanguageBlocklist string
 ---@field SignedLanguages string
 ---@field LanguageSlots integer
 ---@field InterpretationRolls integer
@@ -153,6 +157,13 @@ local colorOpts = {
     server = 'ColorServer',
 }
 
+local addLanguageInfo = {
+    allowlist = {},
+    blocklist = {},
+    cachedAllowStr = '',
+    cachedBlockStr = '',
+}
+
 
 ---@param options omichat.Options
 ---@param colorOpt string?
@@ -176,6 +187,32 @@ local function getColorOrDefault(options, colorOpt)
     end
 end
 
+---Updates the cached allow and block lists for adding languages.
+local function updateAddLanguageLists()
+    local allowStr = trim(Option.AddLanguageAllowlist)
+
+    if allowStr ~= addLanguageInfo.cachedAllowStr then
+        local allowlist = {}
+        if #allowStr > 0 then
+            allowlist = split(allowStr, ';')
+        end
+
+        addLanguageInfo.cachedAllowStr = allowStr
+        addLanguageInfo.allowlist = allowlist
+    end
+
+    local blockStr = trim(Option.AddLanguageBlocklist)
+    if blockStr ~= addLanguageInfo.cachedBlockStr then
+        local blocklist = {}
+        if #blockStr > 0 then
+            blocklist = split(blockStr, ';')
+        end
+
+        addLanguageInfo.cachedBlockStr = blockStr
+        addLanguageInfo.blocklist = blocklist
+    end
+end
+
 ---Checks whether a mod compatibility option is enabled.
 ---@param value integer The value of the option.
 ---@param modId string The mod ID of the relevant mod.
@@ -188,6 +225,38 @@ local function isCompatEnabled(value, modId)
     return getActivatedMods():contains(modId)
 end
 
+
+---Checks whether the language against the add language allow/block list.
+---This does not check whether the language is a valid roleplay language.
+---@param language string
+---@return boolean
+---@see omichat.api.shared.isConfiguredRoleplayLanguage
+function Option:canAddLanguage(language)
+    updateAddLanguageLists()
+
+    local allowlist = addLanguageInfo.allowlist
+    local blocklist = addLanguageInfo.blocklist
+
+    local found = #allowlist == 0
+    for i = 1, #allowlist do
+        if allowlist[i] == language then
+            found = true
+            break
+        end
+    end
+
+    if not found then
+        return false
+    end
+
+    for i = 1, #blocklist do
+        if blocklist[i] == language then
+            return false
+        end
+    end
+
+    return true
+end
 
 ---Returns whether players have a way to set their chat nickname.
 ---@return boolean

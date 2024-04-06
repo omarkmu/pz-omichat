@@ -82,7 +82,7 @@ If blank, `/doquiet` messages will be disabled.
 - [`OverheadFormatDoQuiet`](./overhead-formats.md#overheadformatdoquiet)
 
 ### ChatFormatEcho
-**Default:** `(blank by default)`  
+`(blank by default)`  
 **Token Context:** [Chat](../sandbox-options/token-contexts.md#chat)
 
 The format used for `/safehouse` and `/faction` messages echoed onto the `/say` or `/low` stream.

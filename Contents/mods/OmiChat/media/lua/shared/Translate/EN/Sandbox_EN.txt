@@ -99,6 +99,8 @@ Sandbox_EN = {
 
     --[[ Languages ]]--
     Sandbox_OCAvailableLanguages = "Available Languages",
+    Sandbox_OCAddLanguageAllowlist = "Add Language Allowlist",
+    Sandbox_OCAddLanguageBlocklist = "Add Language Blocklist",
     Sandbox_OCLanguageSlots = "Language Slots",
     Sandbox_OCSignedLanguages = "Signed Languages",
     Sandbox_OCInterpretationRolls = "Interpretation Rolls",
