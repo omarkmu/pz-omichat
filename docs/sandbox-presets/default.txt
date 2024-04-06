@@ -1,6 +1,7 @@
 OmiChat = {
     EnableCustomShouts = true,
     EnableEmotes = true,
+    EnableCommandItemRequirements = true,
     EnableSetNameColor = false,
     EnableSetSpeechColor = true,
     EnableSpeechColorAsDefaultNameColor = true,

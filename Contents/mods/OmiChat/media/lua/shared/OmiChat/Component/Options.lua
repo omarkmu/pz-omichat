@@ -10,6 +10,7 @@ local floor = math.floor
 ---@class omichat.Options : omi.SandboxHelper
 ---@field EnableCustomShouts boolean
 ---@field EnableEmotes boolean
+---@field EnableCommandItemRequirements boolean
 ---@field EnableSetNameColor boolean
 ---@field EnableSpeechColorAsDefaultNameColor boolean
 ---@field EnableSetSpeechColor boolean

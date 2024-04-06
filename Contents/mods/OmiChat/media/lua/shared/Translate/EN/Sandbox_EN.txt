@@ -5,6 +5,7 @@ Sandbox_EN = {
     Sandbox_OCEnableChatNameAsCharacterName = "Use Chat Name as Character Name",
     Sandbox_OCEnableCustomShouts = "Enable Custom Shouts",
     Sandbox_OCEnableEmotes = "Enable Emote Shortcuts",
+    Sandbox_OCEnableCommandItemRequirements = "Enable Command Item Requirements",
     Sandbox_OCEnableSetName = "Enable /name",
     Sandbox_OCEnableCharacterCustomization = "Enable Character Customization",
     Sandbox_OCEnableCleanCharacter = "Enable Clean Character",

@@ -87,14 +87,16 @@ end
 ---Requests drawing a card from a card deck in the player's inventory.
 ---@return boolean
 function OmiChat.requestDrawCard()
-    local player = getSpecificPlayer(0)
-    if not player then
-        return false
-    end
+    if Option.EnableCommandItemRequirements then
+        local player = getSpecificPlayer(0)
+        if not player then
+            return false
+        end
 
-    local inv = player:getInventory()
-    if not inv:contains('CardDeck') and player:getAccessLevel() == 'None' then
-        return false
+        local inv = player:getInventory()
+        if not inv:contains('CardDeck') and player:getAccessLevel() == 'None' then
+            return false
+        end
     end
 
     return OmiChat.dispatch('requestDrawCard')
@@ -140,14 +142,16 @@ end
 ---@param sides integer
 ---@return boolean
 function OmiChat.requestRollDice(sides)
-    local player = getSpecificPlayer(0)
-    if not player then
-        return false
-    end
+    if Option.EnableCommandItemRequirements then
+        local player = getSpecificPlayer(0)
+        if not player then
+            return false
+        end
 
-    local inv = player:getInventory()
-    if not inv:contains('Dice') and player:getAccessLevel() == 'None' then
-        return false
+        local inv = player:getInventory()
+        if not inv:contains('Dice') and player:getAccessLevel() == 'None' then
+            return false
+        end
     end
 
     if not sides or sides < 1 or sides > 100 then

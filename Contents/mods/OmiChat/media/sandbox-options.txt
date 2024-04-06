@@ -18,6 +18,14 @@ option OmiChat.EnableEmotes
     translation = OCEnableEmotes,
 }
 
+option OmiChat.EnableCommandItemRequirements
+{
+    type = boolean,
+    default = true,
+    page = OmiChat,
+    translation = OCEnableCommandItemRequirements,
+}
+
 option OmiChat.EnableSetNameColor
 {
     type = boolean,
