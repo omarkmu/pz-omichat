@@ -215,6 +215,10 @@ return {
             isCommand = true,
             helpText = 'UI_ServerOptionDesc_Card',
             isEnabled = function()
+                if not Option.EnableCommandItemRequirements then
+                    return true
+                end
+
                 local player = getSpecificPlayer(0)
                 local inv = player and player:getInventory()
                 if not inv then
@@ -258,6 +262,10 @@ return {
             isCommand = true,
             helpText = 'UI_ServerOptionDesc_Roll',
             isEnabled = function()
+                if not Option.EnableCommandItemRequirements then
+                    return true
+                end
+
                 local player = getSpecificPlayer(0)
                 local inv = player and player:getInventory()
                 if not inv then

@@ -38,6 +38,11 @@ This has no effect unless [`EnableCharacterCustomization`](#enablecharactercusto
 - `2`: Clean body only
 - `3`: Clean body and clothing
 
+### EnableCommandItemRequirements
+**Default:** `true`
+
+If enabled, commands such as `/dice` and `/roll` will require players without an access level to have the relevant item in their inventory.
+
 ### EnableCustomShouts
 **Default:** `true`
 
