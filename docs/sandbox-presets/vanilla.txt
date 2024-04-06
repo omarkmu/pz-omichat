@@ -6,6 +6,7 @@ OmiChat = {
     EnableSpeechColorAsDefaultNameColor = false,
     EnableFactionColorAsDefault = false,
     EnableCharacterCustomization = false,
+    EnableCleanCharacter = 3,
     EnableSetName = 1,
     EnableDiscordColorOption = 3,
     EnableCompatChatBubble = 2,

@@ -454,8 +454,10 @@ local function addCharacterCustomizationSettings(context)
 
     addSignEmoteOption(submenu)
 
-    local cleanOptName = getText('UI_OmiChat_context_clean')
-    submenu:addOption(cleanOptName, instance, ISChat.onCleanCharacter)
+    if Option:isCleanCustomizationEnabled() then
+        local cleanOptName = getText('UI_OmiChat_context_clean')
+        submenu:addOption(cleanOptName, instance, ISChat.onCleanCharacter)
+    end
 
     local hairColorOptName = getText('UI_OmiChat_context_hair_color')
     submenu:addOption(hairColorOptName, instance, ISChat.onHairColorMenu)
@@ -567,25 +569,36 @@ function ISChat.onCleanCharacter(target)
         visual:setBlood(bodyPart, 0)
     end
 
-    -- update clothing
-    local items = player:getWornItems()
-    for i = 0, items:size() - 1 do
-        local item = items:getItemByIndex(i)
-        local itemVisual = item and instanceof(item, 'Clothing') and item:getVisual()
-        if itemVisual then
-            local parts = getCoveredParts(item:getBloodClothingType())
+    local shouldUpdateClothing = Option:isCleanClothingEnabled()
+    if shouldUpdateClothing then
+        -- update clothing
+        local items = player:getWornItems()
+        for i = 0, items:size() - 1 do
+            local item = items:getItemByIndex(i)
+            local itemVisual = item and instanceof(item, 'Clothing') and item:getVisual()
+            if itemVisual then
+                ---@cast item Clothing
+                local parts = getCoveredParts(item:getBloodClothingType())
 
-            for j = 0, parts:size() - 1 do
-                local part = parts:get(j)
-                itemVisual:setDirt(part, 0)
-                itemVisual:setBlood(part, 0)
+                for j = 0, parts:size() - 1 do
+                    local part = parts:get(j)
+                    itemVisual:setDirt(part, 0)
+                    itemVisual:setBlood(part, 0)
+                end
+
+                item:setDirtyness(0)
+                item:setBloodLevel(0)
             end
         end
     end
 
     player:resetModel()
     sendVisual(player)
-    sendClothing(player)
+
+    if shouldUpdateClothing then
+        sendClothing(player)
+        triggerEvent('OnClothingUpdated', player)
+    end
 end
 
 ---Event handler for the grow hair customization option.
