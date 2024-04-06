@@ -393,7 +393,7 @@ function utils.getTranslatedLanguageName(language)
         return language
     end
 
-    return getTextOrNull('UI_OmiChat_Language_' .. language) or language
+    return getTextOrNull('UI_OmiChat_Language_' .. language:gsub('%s', '_')) or language
 end
 
 ---Checks whether a given access level should have access based on provided flags.
