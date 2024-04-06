@@ -5,6 +5,22 @@ These [options](./index.md) are used to configure roleplay languages.
 With the default settings, languages must be manually added to players by admins with [`/addlanguage`](../user-guide/admins.md#commands).
 To allow players to set additional languages, the [`LanguageSlots`](#languageslots) option can be used.
 
+### AddLanguageAllowlist
+`(blank by default)`
+
+Semicolon-separated list of languages that should display in the “Add” menu for players whose language [slots](#languageslots) exceed their current number of known languages.
+If blank, all available languages will be available for adding.
+
+This is recommended for servers that have a large amount of roleplay languages and allow players to add them.
+Showing only a subset of languages that can be manually added improves player experience with the add menu.
+Languages not in this list can still be added to plyers using the `/addlanguage` [command](../user-guide/admins.md#commands).
+
+### AddLanguageBlocklist
+`(blank by default)`
+
+Semicolon-separated list of languages that will not display in the “Add” menu for players whose language [slots](#languageslots) exceed their current number of known languages.
+If blank, no languages will be excluded unless an [allowlist](#addlanguageallowlist) is configured.
+
 ### AvailableLanguages
 **Default:** `English;French;Italian;German;Spanish;Danish;Dutch;Hungarian;Norwegian;Polish;Portuguese;Russian;Turkish;Japanese;Mandarin;Finnish;Korean;Thai;Ukrainian;ASL`
 

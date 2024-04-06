@@ -275,7 +275,7 @@ local function addLanguageOptions(context)
         local allLanguages = OmiChat.getConfiguredRoleplayLanguages()
         for i = 1, #allLanguages do
             local lang = allLanguages[i]
-            if not isKnown[lang] then
+            if not isKnown[lang] and Option:canAddLanguage(lang) then
                 addLanguages[#addLanguages + 1] = {
                     language = lang,
                     translated = utils.getTranslatedLanguageName(lang),
