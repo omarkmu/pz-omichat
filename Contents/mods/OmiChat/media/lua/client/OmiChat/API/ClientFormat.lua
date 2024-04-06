@@ -397,20 +397,22 @@ function OmiChat.buildMessageTextFromInfo(info)
 end
 
 ---Returns the roleplay language encoded in message content.
----@param message omichat.Message
+---@param message omichat.Message | string A message object or string to read.
 ---@return string?
 function OmiChat.decodeLanguage(message)
-    local text = message:getText()
-    local formatter = OmiChat.getFormatter('language')
+    if type(message) ~= 'string' then
+        message = message:getText()
+    end
 
-    local languageId = 1
-    if formatter:isMatch(text) then
-        -- found a language → decode it. transformer will handle cleanup
-        text = formatter:read(text)
-        local encodedId = utils.decodeInvisibleCharacter(text)
-        if encodedId >= 1 and encodedId <= OmiChat.config:maxDefinedLanguages() then
-            languageId = encodedId
-        end
+    local formatter = OmiChat.getFormatter('language')
+    message = formatter:read(message)
+    if not message then
+        return
+    end
+
+    local languageId = utils.decodeInvisibleInt(message)
+    if not languageId or languageId < 1 or languageId > OmiChat.config:maxDefinedLanguages() then
+        return
     end
 
     return OmiChat.getRoleplayLanguageFromID(languageId)
@@ -451,7 +453,7 @@ function OmiChat.encodeLanguage(text, language)
         return text
     end
 
-    local encoded = utils.encodeInvisibleCharacter(langId) .. text
+    local encoded = utils.encodeInvisibleInt(langId) .. text
     return OmiChat.getFormatter('language'):format(encoded)
 end
 

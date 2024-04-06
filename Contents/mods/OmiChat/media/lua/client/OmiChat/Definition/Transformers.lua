@@ -298,28 +298,20 @@ return {
             local formatter = OmiChat.getFormatter('language')
             local text = info.content or info.rawText
 
-            -- radio messages don't have language metadata, so we need to grab the id
-            local encodedId
+            -- radio messages don't have language metadata, so we need to read the language from the text
+            local encodedLanguage
             if formatter:isMatch(text) then
                 text = formatter:read(text)
-                encodedId = utils.decodeInvisibleCharacter(text)
-                if encodedId >= 1 and encodedId <= config:maxDefinedLanguages() then
-                    info.content = text:sub(2)
-                else
-                    encodedId = nil
-                end
+                encodedLanguage = OmiChat.decodeLanguage(text)
+            end
+
+            local language = info.meta.language
+            if not language and isRadio and encodedLanguage then
+                language = encodedLanguage
+                utils.addMessageTagValue(info.message, 'ocLanguage', language)
             end
 
             local defaultLanguage = OmiChat.getDefaultRoleplayLanguage()
-            local language = info.meta.language
-
-            if not language and isRadio and encodedId then
-                language = OmiChat.getRoleplayLanguageFromID(encodedId)
-                if language then
-                    utils.addMessageTagValue(info.message, 'ocLanguage', language)
-                end
-            end
-
             language = language or defaultLanguage
             if not language then
                 return
@@ -332,8 +324,8 @@ return {
                 info.tokens.languageRaw = language
             end
 
+            -- hide signed messages sent over the radio
             if isSigned and isRadio then
-                -- hide signed messages sent over the radio
                 info.message:setShowInChat(false)
                 info.message:setOverHeadSpeech(false)
             end
