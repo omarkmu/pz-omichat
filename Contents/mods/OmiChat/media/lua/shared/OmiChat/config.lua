@@ -292,15 +292,15 @@ function Configuration:init()
 end
 
 ---Gets the maximum number of roleplay languages that can be configured.
----@return 32
+---@return 1000
 function Configuration:maxDefinedLanguages()
-    return 32
+    return 1000
 end
 
 ---Gets the maximum number of language slots that a player can have.
----@return 32
+---@return 50
 function Configuration:maxLanguageSlots()
-    return 32
+    return 50
 end
 
 ---Returns an iterator over custom stream information.

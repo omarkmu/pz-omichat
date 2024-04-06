@@ -280,6 +280,11 @@ local function addLanguageOptions(context)
                     language = lang,
                     translated = utils.getTranslatedLanguageName(lang),
                 }
+
+                -- hard limit add menu to 50 to avoid freezing
+                if #addLanguages == 50 then
+                    break
+                end
             end
         end
     end
