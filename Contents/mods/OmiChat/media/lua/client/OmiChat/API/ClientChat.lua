@@ -676,7 +676,7 @@ function OmiChat.send(args)
         return
     end
 
-    local text = utils.trim(args.text)
+    local text = utils.trim(args.command or args.text or '')
     if #text == 0 then
         return
     end
@@ -779,6 +779,7 @@ function OmiChat.send(args)
             isEcho = true,
             stream = echoStream,
             text = initialText,
+            command = initialText,
         }
     end
 
