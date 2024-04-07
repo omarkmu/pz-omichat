@@ -111,6 +111,7 @@ UI_EN = {
 
     --[[ Help Text ]]--
     UI_OmiChat_helptext_emotes = "Get a list of available chat emotes",
+    UI_OmiChat_helptext_switch_language = "Switch your active language. Example: /language Spanish",
     UI_OmiChat_helptext_name = "To set your name, use: /name Name. Example: /name Bob",
     UI_OmiChat_helptext_name_full = "To set your name, use: /name FirstName LastName. Example: /name Bob Smith",
     UI_OmiChat_helptext_nickname = "To set your name in chat, use: /nickname Name. Example: /name Bob",
@@ -130,7 +131,8 @@ UI_EN = {
     UI_OmiChat_error_signed_radio = "You can't use sign language over the radio.",
     UI_OmiChat_error_signed_faction_radio = "You can't use sign language over faction radio.",
     UI_OmiChat_error_signed_safehouse_radio = "You can't use sign language over safehouse radio.",
-    UI_OmiChat_error_unknown_player = "Could not find player '%1'."
+    UI_OmiChat_error_unknown_player = "Could not find player '%1'.",
+    UI_OmiChat_error_switch_unknown_language = "Cannot switch to unknown language '%1'.",
 
     -- %1 = the maximum color value (number)
     UI_OmiChat_error_color_max = "Values must be less than or equal to %1.",
@@ -233,6 +235,7 @@ UI_EN = {
     UI_OmiChat_set_name_empty = "No name specified. Use /name Name",
     UI_OmiChat_reset_name_success = "Your name has been reset.",
     UI_OmiChat_clear_names_success = "Cleared all nicknames.",
+    UI_OmiChat_switch_language_success = "Switched active language to %1.",
 
     -- %1 = a player's username, %2 = the chat name that was set with /setname
     UI_OmiChat_set_other_name_success = "Name has been set to '%2' for player '%1'.",

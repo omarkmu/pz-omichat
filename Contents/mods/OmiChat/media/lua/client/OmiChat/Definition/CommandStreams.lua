@@ -18,6 +18,34 @@ local function canUseAdminCommands()
     return utils.getNumericAccessLevel(access) >= Option.MinimumCommandAccessLevel
 end
 
+---Searches for a string in a list with loose matching.
+---@param search string
+---@param list string[]
+---@return string
+local function fuzzyFind(search, list)
+    local startsWithEl
+    local containsEl
+
+    local searchCompare = search:lower()
+    for i = 1, #list do
+        local el = list[i]
+        local elCompare = el:lower()
+        if searchCompare == elCompare then
+            return el
+        end
+
+        if utils.startsWith(elCompare, searchCompare) and not startsWithEl then
+            startsWithEl = el
+        end
+
+        if utils.contains(elCompare, searchCompare) and not containsEl then
+            containsEl = el
+        end
+    end
+
+    return startsWithEl or containsEl
+end
+
 ---@type omichat.CommandStream[]
 return {
     {
@@ -331,6 +359,29 @@ return {
                 end
 
                 OmiChat.addInfoMessage(concat(parts))
+            end,
+        },
+    },
+    {
+        name = 'language',
+        command = '/language ',
+        shortCommand = '/lang ',
+        omichat = {
+            isCommand = true,
+            helpText = 'UI_OmiChat_helptext_switch_language',
+            isEnabled = function() return #OmiChat.getRoleplayLanguages() > 1 end,
+            onUse = function(ctx)
+                local command = utils.trim(ctx.text)
+                local languages = OmiChat.getRoleplayLanguages()
+
+                local lang = fuzzyFind(command, languages)
+                if not lang or not OmiChat.setCurrentRoleplayLanguage(lang) then
+                    OmiChat.addInfoMessage(getText('UI_OmiChat_error_switch_unknown_language', command))
+                    return
+                end
+
+                lang = utils.getTranslatedLanguageName(lang)
+                OmiChat.addInfoMessage(getText('UI_OmiChat_switch_language_success', lang))
             end,
         },
     },
