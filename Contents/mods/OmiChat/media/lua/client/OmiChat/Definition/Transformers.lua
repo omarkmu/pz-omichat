@@ -311,15 +311,13 @@ return {
                 utils.addMessageTagValue(info.message, 'ocLanguage', language)
             end
 
-            local defaultLanguage = OmiChat.getDefaultRoleplayLanguage()
-            language = language or defaultLanguage
             if not language then
                 return
             end
 
             -- add language information for format strings
             local isSigned = OmiChat.isRoleplayLanguageSigned(language)
-            if language ~= defaultLanguage then
+            if language ~= OmiChat.getDefaultRoleplayLanguage() then
                 info.tokens.language = utils.getTranslatedLanguageName(language)
                 info.tokens.languageRaw = language
             end

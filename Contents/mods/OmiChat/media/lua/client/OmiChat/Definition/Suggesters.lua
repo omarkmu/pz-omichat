@@ -55,6 +55,28 @@ local function collectStreamResults(tab, command, fullCommand, currentTabID, sta
     end
 end
 
+---Collects results from a list of strings into `startsWith` and `contains`.
+---@param tab string[]
+---@param command string
+---@param startsWith string[]
+---@param contains string[]
+---@return string? exactMatch
+local function collectFuzzyResults(tab, command, startsWith, contains)
+    command = utils.trim(command:lower())
+    for i = 1, #tab do
+        local el = tab[i]
+        local elComp = el:lower()
+
+        if elComp == command then
+            return el
+        elseif utils.startsWith(elComp, command) then
+            startsWith[#startsWith + 1] = el
+        elseif utils.contains(elComp, command) then
+            contains[#contains + 1] = el
+        end
+    end
+end
+
 ---Appends members of `t1` to `t2`.
 ---@param t1 unknown[]
 ---@param t2 unknown[]
@@ -142,6 +164,57 @@ return {
 
                     seen[result] = true
                 end
+            end
+        end,
+    },
+    {
+        name = 'languages',
+        priority = 14,
+        suggest = function(_, info)
+            local command = info.input
+            if #command < 2 then
+                return
+            end
+
+            local firstSpace = command:find(' ')
+            if not firstSpace then
+                return
+            end
+
+            local stream = OmiChat.chatCommandToStream(command)
+            if not stream or not stream:isCommand() or stream:getName() ~= 'switch-language' then
+                return
+            end
+
+            local knownLanguages = OmiChat.getRoleplayLanguages()
+            if #knownLanguages < 2 then
+                return
+            end
+
+            local results
+            local search = utils.trim(command:sub(firstSpace))
+            if search == '' then
+                results = knownLanguages
+            else
+                local startsWith = {}
+                local contains = {}
+
+                if collectFuzzyResults(knownLanguages, search, startsWith, contains) then
+                    -- exact match
+                    return
+                end
+
+                results = extend(startsWith, contains)
+            end
+
+
+            local prefix = utils.trim(command:sub(1, firstSpace)) .. ' '
+            for i = 1, #results do
+                info.suggestions[#info.suggestions + 1] = {
+                    type = 'language',
+                    display = results[i],
+                    suggestion = prefix .. results[i] .. ' ',
+                }
             end
         end,
     },
