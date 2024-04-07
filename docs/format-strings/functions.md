@@ -36,15 +36,12 @@ To avoid collisions with tokens that may be added in the future, however, custom
 | `$byte(s i j)` | Returns a list of character codes in `s`, from indices `i` (default `1`) to `j` (default `i`). |
 | `$capitalize(s)` | Converts the first character in `s` to its uppercase counterpart. If `s` is wrapped in invisible encoding characters (128–159 or 65535), this will capitalize the first visible character. |
 | `$char(...)` | Returns a string made up of the characters with the integer character codes passed as arguments. |
-| `$colorquotes(s category)` | Wraps quoted text within `s` in the color category specified, or the `say` color if none is given. |
 | `$concat(...)` | Combines provided arguments into one string. |
 | `$concats(separator ...)` | Combines provided arguments into one string, using `separator` as a separator. |
 | `$contains(this other)` | Returns `true` if `this` contains `other`. Otherwise, returns the empty string. |
 | `$endswith(this other)` | Returns `true` if `this` ends with `other`. Otherwise, returns the empty string. |
 | `$escaperichtext(...)` | Escapes the input for use in rich text. |
 | `$first(s)` | Returns the first character of a given string. |
-| `$fragmented(text)` | Gets random fragments of the words in a string, replacing other words with ellipses. |
-| `$getunknownlanguagestring(language stream author dialogueTag message category)` | Returns a string to use when the recipient of a message doesn't know the language used. `author` and `dialogueTag` are optional; if supplied, they apply a narrative style to the result. `message` is also optional, and will display a fragment of the message based on the relevant [options](../sandbox-options/languages.md) if provided. `category` is the color category to use for fragmented text. |
 | `$gsub(s pattern repl n)` | Replaces the first `n` copies of the pattern `pattern` in `s` with `repl`. Returns the result string, the number of matches that occurred, and any match groups that were captured. This behaves similarly to its [Lua counterpart](https://www.lua.org/manual/5.1/manual.html#pdf). |
 | `$index(s i default)` | Returns the character at index `i` in `s`, or `default` if there is no such index. |
 | `$internal(s)` | Returns the visible part of text wrapped in invisible encoding characters (128–159 or 65535), the invisible prefix, and the invisible suffix. |
@@ -156,12 +153,22 @@ To get pseudo-random values for these, use `$randomseed` first.
 | `$random(m n)` | Returns a pseudo-random number in `[m, n]`. If `n` is excluded, returns a number up to `m`. If both are excluded, returns a random float number. |
 | `$randomseed(seed)` | Seeds the randomizer with the given value. |
 
-## Translation Functions
+## Other Functions
 
-These are direct aliases for the built-in `getText` and `getTextOrNull` functions.
-Due to a limitation of these functions, only up to 4 additional substitution arguments are allowed; arguments beyond this limit will be ignored.
+**Note:** Due to a limitation of the translation functions (`getText`, `getTextOrNull`), only up to 4 additional substitution arguments are allowed; arguments beyond this limit will be ignored.
 
 | Function | Description |
 | -------- | ----------- |
+| `$colorquotes(s category)` | Wraps quoted text within `s` in the color category specified, or the `say` color if none is given. |
+| `$cooldown(n key suppressError)` | Checks and sets a cooldown associated with `key`. `n` is the number of seconds in the cooldown. |
+| `$cooldownset(key n)` | Sets the value of the cooldown associated with `key` to `n` seconds from now. |
+| `$cooldownif(condition n key suppressError)` | The same as `$cooldown()`, but only if `condition` is truthy. |
+| `$cooldownunless(condition n key suppressError)` | The same as `$cooldown()`, but only if `condition` is falsy. |
+| `$cooldownremaining(condition key)` | Returns the number of seconds remaining on a cooldown, or the empty string if there's no such cooldown. |
+| `$disallowsignedoverradio(condition suppressError)` | Sets the `errorID` token if `condition` is true and the message language is signed. An error message will inform the player that they cannot use a signed language over the radio, unless `suppressError` is passed. Returns true if the check passed. |
+| `$fragmented(text)` | Gets random fragments of the words in a string, replacing other words with ellipses. |
 | `$gettext(s ...)` | Returns a translation. The first argument must be the translation name. Subsequent arguments may be translation substitutions. |
 | `$gettextornull(s ...)` | Behaves similarly to `$gettext(...)`, but returns the empty string for unknown translations instead of the translation name. |
+| `$getunknownlanguagestring(language stream author dialogueTag message category)` | Returns a string to use when the recipient of a message doesn't know the language used. `author` and `dialogueTag` are optional; if supplied, they apply a narrative style to the result. `message` is also optional, and will display a fragment of the message based on the relevant [options](../sandbox-options/languages.md) if provided. `category` is the color category to use for fragmented text. |
+| `$isadmin()` | Returns true if the current player is an admin or coop host. |
+| `$streamtype(stream)` | Returns `'chat'`, `'rp'`, or `'other'` based on the type of the given stream. If the stream is unknow, returns the empty string. |

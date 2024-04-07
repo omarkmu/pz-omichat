@@ -23,7 +23,7 @@ The maximum length for individual [custom shouts](#enablecustomshouts).
 If enabled, this includes a QoL option in the chat settings that allows players to customize their character. This is intended for roleplay servers.
 
 Customization options available:
-- Clean blood & dirt from the character's body and clothing
+- Clean blood & dirt from the character (configurable with [`EnableCleanCharacter`](#enablecleancharacter))
 - Change hair color
 - Grow long hair
 - Grow beard

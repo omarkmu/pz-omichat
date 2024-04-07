@@ -12,7 +12,12 @@ local concat = table.concat
 local baseLibraries = (require 'OmiChat/lib').interpolate.Interpolator.Libraries
 local stringFunctions = baseLibraries.functions.string
 
+local cooldowns = {}
 
+
+---Wraps a function so that it gets the internal value before being applied, and then reapplies the invisible characters.
+---@param f function
+---@return function
 local function internalWrap(f)
     return function(interpolator, s, ...)
         local text, prefix, suffix = utils.getInternalText(tostring(s or ''))
@@ -139,19 +144,28 @@ local function getBaseUnknownLanguageString(language, stream, author, dialogueTa
     return getText(concat(stringID), language)
 end
 
-local library = {
+---Stringifies inputs into a single string.
+---@param ... unknown
+---@return string
+local function stringify(...)
+    local t = {}
+    for i = 1, select('#', ...) do
+        t[#t + 1] = tostring(select(i, ...) or '')
+    end
+
+    return concat(t)
+end
+
+
+local library
+library = {
     capitalize = internalWrap(stringFunctions.capitalize),
     punctuate = internalWrap(stringFunctions.punctuate),
     ---@param _ omichat.Interpolator
     ---@param ... unknown
     ---@return string, string, string
     internal = function(_, ...)
-        local t = {}
-        for i = 1, select('#', ...) do
-            t[#t + 1] = tostring(select(i, ...) or '')
-        end
-
-        return utils.getInternalText(concat({ ... }))
+        return utils.getInternalText(stringify(...))
     end,
     ---@param _ omichat.Interpolator
     ---@param s string?
@@ -198,13 +212,13 @@ local library = {
     issigned = function(_, language)
         return OmiChat.isRoleplayLanguageSigned(tostring(language or ''))
     end,
-    escaperichtext = function(_, ...)
-        local t = {}
-        for i = 1, select('#', ...) do
-            t[#t + 1] = tostring(select(i, ...) or '')
+    isadmin = function()
+        if isAdmin() or isCoopHost() then
+            return 'true'
         end
-
-        return utils.escapeRichText(concat({ ... }))
+    end,
+    escaperichtext = function(_, ...)
+        return utils.escapeRichText(stringify(...))
     end,
     ---@param interpolator omichat.Interpolator
     ---@param message string
@@ -249,6 +263,151 @@ local library = {
         parts[#parts + 1] = pop and ' <POPRGB> ' or ''
 
         return concat(parts)
+    end,
+    ---@param name string
+    ---@return omichat.ChatCommandType?
+    streamtype = function(_, name)
+        ---@cast OmiChat omichat.api.client
+        if not OmiChat.getChatStreamByIdentifier then
+            return
+        end
+
+        local stream = OmiChat.getChatStreamByIdentifier(name)
+        if not stream then
+            return
+        end
+
+        return stream:getCommandType()
+    end,
+
+    ---@param interpolator omichat.Interpolator
+    ---@param condition string?
+    ---@param suppressError string?
+    ---@return boolean success
+    disallowsignedoverradio = function(interpolator, condition, suppressError)
+        if not interpolator:toBoolean(condition) then
+            return true
+        end
+
+        local language = interpolator:token('languageRaw')
+        if not language or not OmiChat.isRoleplayLanguageSigned(language) then
+            return true
+        end
+
+        if suppressError then
+            return false
+        end
+
+        local errorID = 'UI_OmiChat_error_signed_radio'
+        local stream = interpolator:token('stream')
+        if stream == 'safehouse' then
+            errorID = 'UI_OmiChat_error_signed_safehouse_radio'
+        elseif stream == 'faction' then
+            errorID = 'UI_OmiChat_error_signed_faction_radio'
+        end
+
+        interpolator:setToken('errorID', errorID)
+        return false
+    end,
+    ---@param interpolator omichat.Interpolator
+    ---@param n unknown?
+    ---@param key string?
+    ---@param suppressError string?
+    ---@return boolean
+    cooldown = function(interpolator, n, key, suppressError)
+        n = tonumber(n)
+        if not n then
+            return true
+        end
+
+        local now = getTimestampMs()
+
+        key = tostring(key or '')
+        if key == '' then
+            key = interpolator:token('stream')
+        end
+
+        local next = cooldowns[key]
+        if not next or next <= now then
+            cooldowns[key] = now + n * 1000
+            return true
+        end
+
+        if suppressError then
+            return false
+        end
+
+        local errorID = 'UI_OmiChat_error_command_cooldown'
+        local remaining = math.ceil((next - now) / 1000)
+        if remaining <= 1 then
+            errorID = 'UI_OmiChat_error_command_cooldown_1'
+        end
+
+        interpolator:setToken('error', getText(errorID, remaining))
+        return false
+    end,
+    ---@param interpolator omichat.Interpolator
+    ---@param key string?
+    ---@param n unknown?
+    cooldownset = function(interpolator, key, n)
+        n = tonumber(n)
+        if not n then
+            return
+        end
+
+        key = tostring(key or '')
+        if key == '' then
+            key = interpolator:token('stream')
+        end
+
+        if n <= 0 then
+            cooldowns[key] = nil
+        else
+            cooldowns[key] = getTimestampMs() + n * 1000
+        end
+    end,
+    ---@param interpolator omichat.Interpolator
+    ---@param condition string?
+    ---@param n unknown?
+    ---@param key string?
+    ---@param suppressError string?
+    ---@return boolean
+    cooldownif = function(interpolator, condition, n, key, suppressError)
+        if not interpolator:toBoolean(condition) then
+            return true
+        end
+
+        return library.cooldown(interpolator, n, key, suppressError)
+    end,
+    ---@param interpolator omichat.Interpolator
+    ---@param condition string?
+    ---@param n unknown?
+    ---@param key string?
+    ---@param suppressError string?
+    ---@return boolean
+    cooldownunless = function(interpolator, condition, n, key, suppressError)
+        if interpolator:toBoolean(condition) then
+            return true
+        end
+
+        return library.cooldown(interpolator, n, key, suppressError)
+    end,
+    ---@param interpolator omichat.Interpolator
+    ---@param key string?
+    ---@return number?
+    cooldownremaining = function(interpolator, key)
+        key = tostring(key or '')
+        if key == '' then
+            key = interpolator:token('stream')
+        end
+
+        local now = getTimestampMs()
+        local next = cooldowns[key]
+        if not next or next <= now then
+            return
+        end
+
+        return math.ceil((next - now) / 1000)
     end,
 }
 
