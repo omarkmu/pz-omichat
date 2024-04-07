@@ -133,6 +133,8 @@ UI_EN = {
     UI_OmiChat_error_signed_safehouse_radio = "You can't use sign language over safehouse radio.",
     UI_OmiChat_error_unknown_player = "Could not find player '%1'.",
     UI_OmiChat_error_switch_unknown_language = "Cannot switch to unknown language '%1'.",
+    UI_OmiChat_error_command_cooldown = "You need to wait %1 seconds before using this command again."
+    UI_OmiChat_error_command_cooldown_1 = "You need to wait 1 second before using this command again.",
 
     -- %1 = the maximum color value (number)
     UI_OmiChat_error_color_max = "Values must be less than or equal to %1.",
