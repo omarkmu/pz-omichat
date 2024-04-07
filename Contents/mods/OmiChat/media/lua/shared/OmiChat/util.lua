@@ -20,10 +20,21 @@ utils._interpolatorCache = {}
 ---@field interpolator omichat.Interpolator
 ---@field lastAccess number
 
+---@class omichat.utils.InternalSearchContext : omichat.SearchContext
+---@field search string
+---@field startsWith omichat.utils.InternalSearchResult[]
+---@field contains omichat.utils.InternalSearchResult[]
+---@field args table
+
+---@class omichat.utils.InternalSearchResult : omichat.SearchResult
+---@field value unknown
+
+
 local CACHE_EXPIRY_MS = 600000 -- ten minutes
 local shortHexPattern = '^%s*#?(%x)(%x)(%x)%s*$'
 local fullHexPattern = '^%s*#?(%x%x)%s*(%x%x)%s*(%x%x)%s*$'
 local rgbPattern = '^%s*(%d%d?%d?)[,%s]+(%d%d?%d?)[,%s]+(%d%d?%d?)%s*$'
+
 local accessLevels = {
     admin = 32,
     moderator = 16,
@@ -53,10 +64,53 @@ local cards = {
     'king',
 }
 
+---@type Perk[]
+local perkList = {}; do
+    local perkArrayList = PerkFactory.PerkList
+    for i = 0, perkArrayList:size() - 1 do
+        local perk = perkArrayList:get(i) ---@cast perk Perk
+        if perk:getParent() ~= Perks.None then
+            perkList[#perkList + 1] = perk
+        end
+    end
+
+    table.sort(perkList, function(a, b) return not string.sort(a:getName(), b:getName()) end)
+end
+
 ---@type table<string, string>
 local iconToTextureNameMap = {}
 local loadedIcons = false
 
+
+---Creates internal context given search context.
+---@param ctx omichat.SearchContext | string
+---@return omichat.utils.InternalSearchContext
+local function buildInternalSearchContext(ctx)
+    if type(ctx) == 'string' then
+        ctx = { search = ctx }
+    end
+
+    ---@type omichat.utils.InternalSearchContext
+    return {
+        search = utils.trim(ctx.search:lower()),
+        display = ctx.display,
+        filter = ctx.filter,
+        max = ctx.max,
+        args = ctx.args or {},
+        searchDisplay = ctx.searchDisplay,
+        terminateForExact = ctx.terminateForExact,
+        startsWith = {},
+        contains = {},
+        collectResults = true,
+    }
+end
+
+---Display function for perks.
+---@param perk Perk
+---@return string
+local function displayPerk(perk)
+    return perk:getName() .. ' (' .. perk:getParent():getName() .. ')'
+end
 
 ---Gets an interpolator from the cache.
 ---@param text string
@@ -76,6 +130,120 @@ local function loadIcons()
     iconToTextureNameMap = transformIntoKahluaTable(dest)
     iconToTextureNameMap.music = 'Icon_music_notes' -- special case for 'music'
     loadedIcons = true
+end
+
+---Internal string search.
+---@param ctx omichat.utils.InternalSearchContext Search context.
+---@param primary string Primary string to search.
+---@param value unknown? Object to use as the result value instead of `primary`.
+---@param ... string Secondary strings to search.
+---@return omichat.utils.InternalSearchResult?
+local function searchInternal(ctx, primary, value, ...)
+    if ctx.filter and not ctx.filter(primary, ctx.args) then
+        return
+    end
+
+    local search = ctx.search
+    local strings = { primary, ... }
+    local compare = {}
+    local displayStrings = {}
+
+    if value == nil then
+        value = primary
+    end
+
+    ---@type omichat.utils.InternalSearchResult?
+    local result
+
+    -- check for exact match
+    if #search > 0 then
+        for i = 1, #strings do
+            local str = strings[i]
+            local lower = str:lower()
+            local match = lower == search
+
+            local display
+            if not match and ctx.searchDisplay then
+                display = ctx.display and ctx.display(value) or nil
+                match = display ~= nil and display:lower() == search
+            end
+
+            if match then
+                result = {
+                    value = value,
+                    display = displayStrings[i] or (ctx.display and ctx.display(value) or nil),
+                    exact = true,
+                }
+
+                ctx.startsWith[#ctx.startsWith + 1] = result
+                return result
+            end
+
+            compare[i] = lower
+            displayStrings[i] = display
+        end
+    end
+
+    if ctx.max and #ctx.startsWith + #ctx.contains >= ctx.max then
+        -- exceeded maximum
+        return
+    end
+
+    if #search == 0 then
+        -- no search → include all
+        result = {
+            value = value,
+            display = ctx.display and ctx.display(value) or nil,
+            exact = false,
+        }
+
+        ctx.startsWith[#ctx.startsWith + 1] = result
+        return result
+    end
+
+    for i = 1, #strings do
+        local display
+        local match = utils.startsWith(compare[i], search)
+        if not match and ctx.searchDisplay then
+            display = displayStrings[i] or (ctx.display and ctx.display(value) or nil)
+            if display and utils.startsWith(display:lower(), search) then
+                match = true
+            end
+        end
+
+        if match then
+            result = {
+                value = value,
+                display = display or displayStrings[i] or (ctx.display and ctx.display(value) or nil),
+                exact = false,
+            }
+
+            ctx.startsWith[#ctx.startsWith + 1] = result
+            return result
+        end
+    end
+
+    for i = 1, #strings do
+        local display
+        local match = utils.contains(compare[i], search)
+        if not match and ctx.searchDisplay then
+            display = displayStrings[i] or (ctx.display and ctx.display(value) or nil)
+            if display and utils.contains(display:lower(), search) then
+                match = true
+            end
+        end
+
+        if match then
+            result = {
+                value = value,
+                display = display or displayStrings[i] or (ctx.display and ctx.display(value) or nil),
+                exact = false,
+            }
+
+            ctx.contains[#ctx.contains + 1] = result
+            return result
+        end
+    end
 end
 
 ---Adds an interpolator to the cache.
@@ -253,6 +421,18 @@ end
 ---@return string
 function utils.escapeRichText(text)
     return (text:gsub('<', '&lt;'):gsub('>', '&gt;'))
+end
+
+---Appends members of `t1` to `t2`.
+---@param t1 unknown[]
+---@param t2 unknown[]
+---@return unknown[]
+function utils.extend(t1, t2)
+    for i = 1, #t2 do
+        t1[#t1 + 1] = t2[i]
+    end
+
+    return t1
 end
 
 ---Gets an error from the error tokens, if one is set, and unsets the tokens.
@@ -539,10 +719,11 @@ end
 
 ---Parses arguments for a chat command.
 ---@param text string?
----@return string[]
+---@return string[] args
+---@return boolean hasOpenQuote
 function utils.parseCommandArgs(text)
     if not text then
-        return {}
+        return {}, false
     end
 
     local i = 1
@@ -552,9 +733,8 @@ function utils.parseCommandArgs(text)
 
     while i <= #text do
         local c = text:sub(i, i)
-        local next = text:sub(i + 1, i + 1)
 
-        if c == '\\' and next == '"' then
+        if c == '\\' and text:sub(i + 1, i + 1) == '"' then
             current[#current + 1] = '"'
             i = i + 1
         elseif c == '"' then
@@ -580,7 +760,7 @@ function utils.parseCommandArgs(text)
         args[#args + 1] = concat(current)
     end
 
-    return args
+    return args, inQuote
 end
 
 ---Replaces character entities with the characters that they represent.
@@ -593,6 +773,101 @@ function utils.replaceEntities(text)
     end)
 
     return text
+end
+
+---Collects online usernames based on a search string.
+---If there's an exact match, no results are returned.
+---@param ctxOrSearch omichat.SearchContext | string Context for the search.
+---@param includeSelf boolean? If true, player 1's username will be included in the search.
+---@return omichat.SearchResults
+function utils.searchOnlineUsernames(ctxOrSearch, includeSelf)
+    local ctx = buildInternalSearchContext(ctxOrSearch)
+    local onlinePlayers = getOnlinePlayers()
+    local player = getSpecificPlayer(0)
+    local ownUsername = player and player:getUsername()
+
+    local exact
+    for i = 0, onlinePlayers:size() - 1 do
+        local onlinePlayer = onlinePlayers:get(i)
+        local user = onlinePlayer and onlinePlayer:getUsername()
+        if user and (includeSelf or user ~= ownUsername) then
+            local result = searchInternal(ctx, user)
+            if result and result.exact then
+                exact = result
+                if ctx.terminateForExact then
+                    break
+                end
+            end
+        end
+    end
+
+    ---@type omichat.SearchResults
+    return {
+        exact = exact,
+        results = utils.extend(ctx.startsWith, ctx.contains),
+    }
+end
+
+---Collects perk IDs based on a search string.
+---@param ctxOrSearch omichat.SearchContext | string
+---@return omichat.SearchResults
+function utils.searchPerks(ctxOrSearch)
+    local ctx = buildInternalSearchContext(ctxOrSearch)
+    ctx.display = ctx.display or displayPerk
+
+    for i = 1, #perkList do
+        local perk = perkList[i]
+        local name = perk:getName():lower()
+        local id = perk:getId():lower()
+        local result = searchInternal(ctx, id, perk, name)
+        if result and result.exact and ctx.terminateForExact then
+            break
+        end
+    end
+
+    local exact
+    local results = utils.extend(ctx.startsWith, ctx.contains)
+    for i = 1, #results do
+        local result = results[i]
+        local perk = result.value
+        result.value = perk:getId()
+
+        if result.exact then
+            exact = result
+        end
+    end
+
+    ---@type omichat.SearchResults
+    return {
+        exact = exact,
+        results = results,
+    }
+end
+
+---Collects results from a list of strings based on a search string.
+---If there's an exact match, no results are returned.
+---@param ctxOrSearch omichat.SearchContext | string Context for the search.
+---@param list string[] The list of strings to search.
+---@return omichat.SearchResults
+function utils.searchStrings(ctxOrSearch, list)
+    local ctx = buildInternalSearchContext(ctxOrSearch)
+
+    local exact
+    for i = 1, #list do
+        local result = searchInternal(ctx, list[i])
+        if result and result.exact then
+            exact = result
+            if ctx.terminateForExact then
+                break
+            end
+        end
+    end
+
+    ---@type omichat.SearchResults
+    return {
+        exact = exact,
+        results = utils.extend(ctx.startsWith, ctx.contains),
+    }
 end
 
 ---Converts a color string to a color. Returns `nil` on failure.

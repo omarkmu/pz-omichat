@@ -18,32 +18,27 @@ local function canUseAdminCommands()
     return utils.getNumericAccessLevel(access) >= Option.MinimumCommandAccessLevel
 end
 
----Searches for a string in a list with loose matching.
----@param search string
----@param list string[]
----@return string
-local function fuzzyFind(search, list)
-    local startsWithEl
-    local containsEl
+---Searches for a known language with loose matching.
+---@param input string
+---@return string?
+local function matchKnownLanguage(input)
+    ---@type omichat.SearchContext
+    local ctx = {
+        terminateForExact = true,
+        searchDisplay = true,
+        search = input,
+        display = utils.getTranslatedLanguageName,
+    }
 
-    local searchCompare = search:lower()
-    for i = 1, #list do
-        local el = list[i]
-        local elCompare = el:lower()
-        if searchCompare == elCompare then
-            return el
-        end
-
-        if utils.startsWith(elCompare, searchCompare) and not startsWithEl then
-            startsWithEl = el
-        end
-
-        if utils.contains(elCompare, searchCompare) and not containsEl then
-            containsEl = el
-        end
+    local searchResult = utils.searchStrings(ctx, OmiChat.getRoleplayLanguages())
+    if searchResult.exact then
+        return searchResult.exact.value
     end
 
-    return startsWithEl or containsEl
+    local result = searchResult.results[1]
+    if result then
+        return result.value
+    end
 end
 
 ---@type omichat.CommandStream[]
@@ -119,6 +114,7 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_setname',
+            suggestSpec = { 'online-username' },
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
                 OmiChat.requestSetName(ctx.text)
@@ -162,6 +158,7 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_seticon',
+            suggestSpec = { 'online-username-with-self' },
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
                 if not OmiChat.requestSetIcon(ctx.text) then
@@ -182,6 +179,7 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_resetname',
+            suggestSpec = { 'online-username' },
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
                 OmiChat.requestResetName(ctx.text)
@@ -194,6 +192,7 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_reseticon',
+            suggestSpec = { 'online-username-with-self' },
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
                 OmiChat.requestResetIcon(ctx.text)
@@ -206,6 +205,24 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_addlanguage',
+            suggestSpec = {
+                'online-username-with-self',
+                {
+                    type = 'language',
+                    ---@param result string
+                    ---@param args string[]
+                    ---@return boolean
+                    filter = function(result, args)
+                        local username = args[1]
+                        if not username then
+                            return true
+                        end
+
+                        -- don't suggest adding already known languages
+                        return not OmiChat.checkPlayerKnowsLanguage(username, result)
+                    end,
+                },
+            },
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
                 OmiChat.requestAddLanguage(ctx.text)
@@ -218,6 +235,7 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_resetlanguages',
+            suggestSpec = { 'online-username-with-self' },
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
                 OmiChat.requestResetLanguages(ctx.text)
@@ -230,6 +248,7 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_setlanguageslots',
+            suggestSpec = { 'online-username-with-self' },
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
                 OmiChat.requestSetLanguageSlots(ctx.text)
@@ -369,12 +388,17 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_switch_language',
+            suggestSpec = { 'known-language' },
             isEnabled = function() return #OmiChat.getRoleplayLanguages() > 1 end,
             onUse = function(ctx)
-                local command = utils.trim(ctx.text)
-                local languages = OmiChat.getRoleplayLanguages()
+                local args = utils.parseCommandArgs(ctx.text)
+                local command = args[1]
+                if not command then
+                    OmiChat.addInfoMessage(getText('UI_OmiChat_helptext_switch_language'))
+                    return
+                end
 
-                local lang = fuzzyFind(command, languages)
+                local lang = matchKnownLanguage(command)
                 if not lang or not OmiChat.setCurrentRoleplayLanguage(lang) then
                     OmiChat.addInfoMessage(getText('UI_OmiChat_error_switch_unknown_language', command))
                     return

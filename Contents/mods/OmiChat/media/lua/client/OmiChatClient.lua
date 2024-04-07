@@ -24,6 +24,44 @@ return OmiChat
 ---@alias omichat.ChatFont 'small' | 'medium' | 'large'
 ---@alias omichat.Message ChatMessage | omichat.MimicMessage
 
+---@alias omichat.SuggestionType
+---| 'online-username'
+---| 'online-username-with-self'
+---| 'language'
+---| 'known-language'
+---| 'perk'
+---| 'option'
+---| '?'
+
+---@alias omichat.SuggestArgSpec omichat.SuggestArgSpecTable | omichat.SuggestionType
+---@alias omichat.SuggestSpec omichat.SuggestArgSpec[]
+
+---@class omichat.SuggestArgSpecTable
+---@field type omichat.SuggestionType The type of the argument.
+---@field prefix string? A prefix to apply to the suggestion result.
+---@field suffix string? A suffix to apply to the suggestion result.
+---@field options string[]? String options for the `string` suggestion type.
+---@field searchDisplay boolean? If true, the display string will be used for determining suggestions.
+---@field filter (fun(result: unknown, args: string[]): boolean)|nil Filter function for results.
+---@field display (fun(value: unknown): string?)|nil Function to retrieve display strings for results.
+
+---@class omichat.SearchContext
+---@field search string The string to search for.
+---@field terminateForExact boolean? If true, exact matches will terminate the search.
+---@field max integer? The maximum search results to return.
+---@field searchDisplay boolean? If true, the display string will be searched as well.
+---@field filter (fun(result: unknown, args: string[]): boolean)|nil Filter function for results.
+---@field display (fun(value: unknown): string?)|nil Function to retrieve display strings for results.
+---@field args table? Argument for the filter function.
+
+---@class omichat.SearchResult
+---@field value string
+---@field exact boolean
+---@field display string?
+
+---@class omichat.SearchResults
+---@field results omichat.SearchResult[]
+---@field exact omichat.SearchResult?
 
 ---Metadata that can be attached to a message.
 ---@class omichat.MessageMetadata
@@ -64,7 +102,7 @@ return OmiChat
 
 ---A suggestion that can display to the player.
 ---@class omichat.Suggestion
----@field type string Suggestion category.
+---@field type string Deprecated (unused); will be removed in version 2.0. Suggestion category.
 ---@field display string The text that will display in the menu.
 ---@field suggestion string Text that will replace the input text if the suggestion is selected.
 
@@ -122,8 +160,9 @@ return OmiChat
 ---@field commandType omichat.ChatCommandType? The command type used to determine whether input should be retained.
 ---@field chatType string? The chat type associated with the stream.
 ---@field isCommand boolean? Indicates that the stream is a command.
----@field suggestUsernames boolean? Whether online usernames should be suggested for the command.
----@field suggestOwnUsername boolean? Whether the player's username should also be included. Relies on `suggestUsernames`.
+---@field suggestUsernames boolean? Deprecated; will be removed in version 2.0. Use `suggestSpec` instead.
+---@field suggestOwnUsername boolean? Deprecated; will be removed in version 2.0. Use `suggestSpec` instead.
+---@field suggestSpec omichat.SuggestSpec? The spec for suggestions to the stream.
 ---@field isEnabled (fun(self: omichat.StreamInfo): boolean)? Returns a boolean representing whether the stream is enabled.
 ---@field onUse fun(ctx: omichat.SendArgs)? Callback triggered when the stream is used.
 ---@field allowEmotes boolean? Whether to allow emotes on this stream. Defaults to true for non-commands and false for commands.

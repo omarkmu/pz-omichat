@@ -1,7 +1,9 @@
+---Suggesters for input content.
+
 local vanillaCommands = require 'OmiChat/Definition/VanillaCommandList'
 
 local concat = table.concat
-local pairs = pairs
+local min = math.min
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
 ---@class omichat.api.client
@@ -12,6 +14,9 @@ local StreamInfo = OmiChat.StreamInfo
 ---@class omichat.suggester.StreamResult
 ---@field command string
 ---@field full string?
+
+
+local MAX_RESULTS = 50
 
 ---Collects results from a list of streams into `startsWith` and `contains`.
 ---@param tab (omichat.ChatStream | omichat.CommandStream)[]
@@ -27,7 +32,6 @@ local function collectStreamResults(tab, command, fullCommand, currentTabID, sta
             local streamCommand = stream:getCommand()
             local shortCommand = stream:getShortCommand()
 
-            local checkAliases = false
             if utils.startsWith(streamCommand, fullCommand) then
                 startsWith[#startsWith + 1] = { command = streamCommand }
             elseif shortCommand and utils.startsWith(shortCommand, fullCommand) then
@@ -37,10 +41,6 @@ local function collectStreamResults(tab, command, fullCommand, currentTabID, sta
             elseif shortCommand and utils.contains(shortCommand, command) then
                 contains[#contains + 1] = { command = shortCommand, full = streamCommand }
             else
-                checkAliases = true
-            end
-
-            if checkAliases then
                 for alias in stream:aliases() do
                     if utils.startsWith(alias, fullCommand) then
                         startsWith[#startsWith + 1] = { command = alias, full = streamCommand }
@@ -55,39 +55,62 @@ local function collectStreamResults(tab, command, fullCommand, currentTabID, sta
     end
 end
 
----Collects results from a list of strings into `startsWith` and `contains`.
----@param tab string[]
----@param command string
----@param startsWith string[]
----@param contains string[]
----@return string? exactMatch
-local function collectFuzzyResults(tab, command, startsWith, contains)
-    command = utils.trim(command:lower())
-    for i = 1, #tab do
-        local el = tab[i]
-        local elComp = el:lower()
+---Returns the player's current access level.
+---@return string
+local function getAccessLevel()
+    local player = getSpecificPlayer(0)
+    local accessLevel = player and player:getAccessLevel()
 
-        if elComp == command then
-            return el
-        elseif utils.startsWith(elComp, command) then
-            startsWith[#startsWith + 1] = el
-        elseif utils.contains(elComp, command) then
-            contains[#contains + 1] = el
+    if isCoopHost() then
+        accessLevel = 'admin'
+    end
+
+    return accessLevel or 'none'
+end
+
+---Reads an arg spec from a suggest spec.
+---@param spec omichat.SuggestSpec
+---@param idx integer
+---@return omichat.SuggestArgSpecTable?
+local function getArgSpec(spec, idx)
+    local argSpec = spec[idx]
+    if type(argSpec) == 'string' then
+        argSpec = { type = argSpec }
+    end
+
+    if not argSpec or argSpec.type == '?' then
+        return
+    end
+
+    return argSpec
+end
+
+---Retrieves a suggestion spec given the current input.
+---@param input string
+---@return omichat.SuggestSpec?
+local function getSuggestSpec(input)
+    local stream = OmiChat.chatCommandToStream(input, true, true)
+    if stream then
+        return stream:suggestSpec()
+    end
+
+    local accessLevel = getAccessLevel()
+    if not accessLevel then
+        return
+    end
+
+    -- vanilla command specs
+    for i = 1, #vanillaCommands do
+        local commandInfo = vanillaCommands[i]
+        if utils.hasAccess(commandInfo.access, accessLevel) then
+            local vanillaCommand = '/' .. commandInfo.name .. ' '
+            if commandInfo.suggestSpec and utils.startsWith(input, vanillaCommand) then
+                return commandInfo.suggestSpec
+            end
         end
     end
 end
 
----Appends members of `t1` to `t2`.
----@param t1 unknown[]
----@param t2 unknown[]
----@return unknown[]
-local function extend(t1, t2)
-    for i = 1, #t2 do
-        t1[#t1 + 1] = t2[i]
-    end
-
-    return t1
-end
 
 ---@type omichat.Suggester[]
 return {
@@ -100,22 +123,12 @@ return {
                 return
             end
 
-            local currentTabID = instance.currentTabID
             if OmiChat.chatCommandToStream(info.input) then
+                -- already have a stream
                 return
             end
 
-            local player = getSpecificPlayer(0)
-            local accessLevel = player and player:getAccessLevel()
-
-            if isCoopHost() then
-                accessLevel = 'admin'
-            end
-
-            if not accessLevel then
-                return
-            end
-
+            local accessLevel = getAccessLevel()
             local command = info.input:match('^/(%S+)$')
             if not command then
                 return
@@ -128,6 +141,7 @@ return {
             local contains = {}
 
             -- chat & command streams
+            local currentTabID = instance.currentTabID
             collectStreamResults(ISChat.allChatStreams, command, fullCommand, currentTabID, startsWith, contains)
             collectStreamResults(OmiChat._commandStreams, command, fullCommand, currentTabID, startsWith, contains)
 
@@ -147,7 +161,7 @@ return {
             local seen = {}
 
             ---@type omichat.suggester.StreamResult[]
-            local results = extend(startsWith, contains)
+            local results = utils.extend(startsWith, contains)
             for i = 1, #results do
                 local result = results[i]
                 local display = result.command
@@ -157,129 +171,110 @@ return {
 
                 if not seen[result.command] then
                     info.suggestions[#info.suggestions + 1] = {
-                        type = 'command',
+                        type = '',
                         display = display,
                         suggestion = result.command,
                     }
 
-                    seen[result] = true
+                    seen[result.command] = true
                 end
             end
         end,
     },
     {
-        name = 'languages',
-        priority = 14,
+        name = 'spec-suggestions',
+        priority = 10,
         suggest = function(_, info)
-            local command = info.input
-            if #command < 2 then
+            local spec = getSuggestSpec(info.input)
+            if not spec then
                 return
             end
 
+            local command = info.input
             local firstSpace = command:find(' ')
             if not firstSpace then
                 return
             end
 
-            local stream = OmiChat.chatCommandToStream(command)
-            if not stream or not stream:isCommand() or stream:getName() ~= 'switch-language' then
+            local args, hasOpenQuote = utils.parseCommandArgs(command:sub(firstSpace + 1))
+
+            local idx = #args
+            if not hasOpenQuote and utils.endsWith(command, ' ') or idx == 0 then
+                idx = idx + 1
+            end
+
+            local argSpec = getArgSpec(spec, idx)
+            if not argSpec then
                 return
             end
 
-            local knownLanguages = OmiChat.getRoleplayLanguages()
-            if #knownLanguages < 2 then
-                return
-            end
-
-            local results
-            local search = utils.trim(command:sub(firstSpace))
-            if search == '' then
-                results = knownLanguages
+            local prefix, current
+            if hasOpenQuote then
+                prefix, current = command:match('(.+)"(.*)')
             else
-                local startsWith = {}
-                local contains = {}
-
-                if collectFuzzyResults(knownLanguages, search, startsWith, contains) then
-                    -- exact match
-                    return
-                end
-
-                results = extend(startsWith, contains)
+                prefix, current = command:match('(.+%s)%s*(.*)')
             end
 
-
-            local prefix = utils.trim(command:sub(1, firstSpace)) .. ' '
-            for i = 1, #results do
-                info.suggestions[#info.suggestions + 1] = {
-                    type = 'language',
-                    display = results[i],
-                    suggestion = prefix .. results[i] .. ' ',
-                }
-            end
-        end,
-    },
-    {
-        name = 'online-usernames',
-        priority = 10,
-        suggest = function(_, info)
-            if #info.input < 2 then
+            if not prefix or not current then
                 return
             end
 
-            local stream = OmiChat.chatCommandToStream(info.input)
-            local wantsSuggestions = stream and stream:suggestUsernames()
+            local search ---@type omichat.SearchResults
+            local argType = argSpec.type
+            local applyQuotes = true
 
-            local player = getSpecificPlayer(0)
-            local isCommand = not stream and info.input:sub(1, 1) == '/' and player and player:getAccessLevel() ~= 'None'
+            ---@type omichat.SearchContext
+            local ctx = {
+                search = current,
+                terminateForExact = true,
+                filter = argSpec.filter,
+                display = argSpec.display,
+                searchDisplay = argSpec.searchDisplay,
+                args = args,
+                max = MAX_RESULTS,
+            }
 
-            if not wantsSuggestions and not isCommand then
+            if argType == 'online-username' then
+                search = utils.searchOnlineUsernames(ctx)
+            elseif argType == 'online-username-with-self' then
+                search = utils.searchOnlineUsernames(ctx, true)
+            elseif argType == 'language' then
+                ctx.display = ctx.display or utils.getTranslatedLanguageName
+                ctx.searchDisplay = utils.default(ctx.searchDisplay, true)
+                search = utils.searchStrings(ctx, OmiChat.getConfiguredRoleplayLanguages())
+            elseif argType == 'known-language' then
+                ctx.display = ctx.display or utils.getTranslatedLanguageName
+                ctx.searchDisplay = utils.default(ctx.searchDisplay, true)
+                search = utils.searchStrings(ctx, OmiChat.getRoleplayLanguages())
+            elseif argType == 'perk' then
+                search = utils.searchPerks(ctx)
+                applyQuotes = false
+            elseif argType == 'option' and argSpec.options then
+                search = utils.searchStrings(ctx, argSpec.options)
+            else
                 return
             end
 
-            local onlinePlayers = getOnlinePlayers()
-            local parts = luautils.split(info.input, ' ')
-            if #parts == 0 or (isCommand and #parts == 1) then
+            if search.exact then
                 return
             end
 
-            local startsWith = {}
-            local contains = {}
+            prefix = prefix .. (argSpec.prefix or '')
+            local suffix = argSpec.suffix or ' '
 
-            local ownUsername = player and player:getUsername()
-            local includeSelf = utils.default(stream and stream:suggestOwnUsername(), true)
-            local last = parts[#parts]:lower()
-            for i = 0, onlinePlayers:size() - 1 do
-                local onlinePlayer = onlinePlayers:get(i)
-                local username = onlinePlayer and onlinePlayer:getUsername()
+            for i = 1, min(#search.results, MAX_RESULTS) do
+                local result = search.results[i]
+                local value = result.value
+                local display = result.display or value
 
-                if includeSelf or username ~= ownUsername then
-                    local usernameLower = username and username:lower()
-                    if #parts == 1 then
-                        -- only command specified; include all options
-                        contains[#contains + 1] = username
-                    elseif usernameLower == last then
-                        -- exact match
-                        return
-                    elseif usernameLower and utils.startsWith(usernameLower, last) then
-                        startsWith[#startsWith + 1] = username
-                    elseif usernameLower and utils.contains(usernameLower, last) then
-                        contains[#contains + 1] = username
-                    end
-                end
-            end
-
-            local prefix = concat(parts, ' ', 1, #parts == 1 and 1 or #parts - 1)
-            local results = extend(startsWith, contains)
-            for i = 1, #results do
-                local username = results[i]
-                if utils.contains(username, ' ') then
-                    username = concat({ '"', username:gsub('"', '\\"'), '"' })
+                if applyQuotes and utils.contains(value, ' ') then
+                    value = concat({ '"', value:gsub('"', '\\"'), '"' })
                 end
 
                 info.suggestions[#info.suggestions + 1] = {
-                    type = 'user',
-                    display = username,
-                    suggestion = concat({ prefix, username }, ' ') .. ' ',
+                    type = '',
+                    display = display,
+                    suggestion = prefix .. value .. suffix,
                 }
             end
         end,
@@ -323,35 +318,29 @@ return {
             end
 
             local start, _, whitespace, period, text = info.input:find('(%s*)()%.([%w_]*)$')
-
-            -- require whitespace unless the emote is at the start
             if not start or (start ~= 1 and #whitespace == 0) then
+                -- require whitespace unless the emote is at the start
                 return
             end
 
-            text = text:lower()
-            local startsWith = {}
-            local contains = {}
-
+            local keys = {}
             for k in pairs(OmiChat._emotes) do
-                if k:lower() == text then
-                    -- exact match
-                    return
-                elseif utils.startsWith(k, text) then
-                    startsWith[#startsWith + 1] = k
-                elseif utils.contains(k, text) then
-                    contains[#contains + 1] = k
-                end
+                keys[#keys + 1] = k
+            end
+
+            local search = utils.searchStrings(text, keys)
+            if search.exact then
+                return
             end
 
             local prefix = info.input:sub(1, period)
-            local results = extend(startsWith, contains)
+            local results = search.results
             for i = 1, #results do
-                local emote = results[i]
+                local emote = results[i].value
                 info.suggestions[#info.suggestions + 1] = {
-                    type = 'emote',
+                    type = '',
                     display = '.' .. emote,
-                    suggestion = concat({ prefix, emote }),
+                    suggestion = prefix .. emote,
                 }
             end
         end,
