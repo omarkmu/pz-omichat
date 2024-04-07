@@ -24,13 +24,13 @@ end
 local function matchKnownLanguage(input)
     ---@type omichat.SearchContext
     local ctx = {
-        terminateForExact = true,
+        terminateOnExact = true,
         searchDisplay = true,
         search = input,
         display = utils.getTranslatedLanguageName,
     }
 
-    local searchResult = utils.searchStrings(ctx, OmiChat.getRoleplayLanguages())
+    local searchResult = OmiChat.searchStrings(ctx, OmiChat.getRoleplayLanguages())
     if searchResult.exact then
         return searchResult.exact.value
     end
