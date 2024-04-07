@@ -3,6 +3,14 @@
 ---@field helpText string The string ID of the command's help text.
 ---@field access integer Access requirements to use the command.
 ---@field helpTextArgs string[]? Arguments to supply to the command's help text.
+---@field suggestSpec omichat.SuggestSpec? Spec for suggestions.
+
+local debugTypes = {}; do
+    local list = DebugLog.getDebugTypes()
+    for i = 0, list:size() - 1 do
+        debugTypes[#debugTypes + 1] = list:get(i):name()
+    end
+end
 
 ---List of vanilla commands used for extending the /help command.
 ---Excludes disabled commands and commands without help text.
@@ -26,6 +34,10 @@ return {
     {
         name = 'addxp',
         helpText = 'UI_ServerOptionDesc_AddXp',
+        suggestSpec = {
+            'online-username-with-self',
+            { type = 'perk', suffix = '=' },
+        },
         access = 60,
     },
     {
@@ -61,6 +73,7 @@ return {
     {
         name = 'createhorde',
         helpText = 'UI_ServerOptionDesc_CreateHorde',
+        suggestSpec = { '?', 'online-username-with-self' },
         access = 56,
     },
     {
@@ -71,6 +84,7 @@ return {
     {
         name = 'godmod',
         helpText = 'UI_ServerOptionDesc_GodMod',
+        suggestSpec = { 'online-username-with-self' },
         access = 62,
     },
     {
@@ -86,6 +100,7 @@ return {
     {
         name = 'invisible',
         helpText = 'UI_ServerOptionDesc_Invisible',
+        suggestSpec = { 'online-username-with-self' },
         access = 62,
     },
     {
@@ -96,6 +111,7 @@ return {
     {
         name = 'lightning',
         helpText = 'UI_ServerOptionDesc_Lightning',
+        suggestSpec = { 'online-username-with-self' },
         access = 60,
     },
     {
@@ -103,6 +119,22 @@ return {
         helpText = 'UI_ServerOptionDesc_SetLogLevel',
         -- avoid showing %1 %2
         helpTextArgs = { '"type"', '"severity"' },
+        suggestSpec = {
+            {
+                type = 'option',
+                options = debugTypes,
+            },
+            {
+                type = 'option',
+                options = {
+                    'Trace',
+                    'Debug',
+                    'General',
+                    'Warning',
+                    'Error',
+                },
+            },
+        },
         access = 32,
     },
     {
@@ -163,6 +195,20 @@ return {
     {
         name = 'setaccesslevel',
         helpText = 'UI_ServerOptionDesc_SetAccessLevel',
+        suggestSpec = {
+            'online-username-with-self',
+            {
+                type = 'option',
+                options = {
+                    'Admin',
+                    'Moderator',
+                    'Overseer',
+                    'GM',
+                    'Observer',
+                    'None',
+                },
+            },
+        },
         access = 48,
     },
     {
@@ -198,6 +244,15 @@ return {
     {
         name = 'teleport',
         helpText = 'UI_ServerOptionDesc_Teleport',
+        suggestSpec = {
+            'online-username-with-self',
+            {
+                type = 'online-username-with-self',
+                filter = function(result, args)
+                    return result ~= args[1]
+                end,
+            },
+        },
         access = 62,
     },
     {
@@ -208,6 +263,7 @@ return {
     {
         name = 'thunder',
         helpText = 'UI_ServerOptionDesc_Thunder',
+        suggestSpec = { 'online-username-with-self' },
         access = 60,
     },
     {
@@ -223,6 +279,7 @@ return {
     {
         name = 'voiceban',
         helpText = 'UI_ServerOptionDesc_VoiceBan',
+        suggestSpec = { 'online-username' },
         access = 48,
     },
 }

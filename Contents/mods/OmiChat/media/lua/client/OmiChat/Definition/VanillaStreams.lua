@@ -18,7 +18,7 @@ return {
         chatType = 'whisper',
         streamIdentifier = 'private',
         isEnabledCommand = '/w',
-        suggestUsernames = true,
+        suggestSpec = { 'online-username' },
         appendResultToLast = true,
         validator = function(_, input)
             -- vanilla regex is /("[^"]*\s+[^"]*"|[^"]\S*)\s(.+)/

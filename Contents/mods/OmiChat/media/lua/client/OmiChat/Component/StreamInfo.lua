@@ -213,14 +213,29 @@ function StreamInfo:onHelp()
     end
 end
 
+---Returns the suggest spec for the stream.
+---@return omichat.SuggestSpec?
+function StreamInfo:suggestSpec()
+    local streamConfig = self:config()
+    if streamConfig.suggestSpec then
+        return streamConfig.suggestSpec
+    end
+
+    if streamConfig.suggestUsernames then
+        return { streamConfig.suggestOwnUsername and 'online-username-with-self' or 'online-username' }
+    end
+end
+
 ---Returns whether usernames should be suggested for commands.
 ---@return boolean
+---@deprecated This will be removed in version 2.0. Use `suggestSpec` instead.
 function StreamInfo:suggestUsernames()
     return self:config().suggestUsernames or false
 end
 
 ---Returns whether the player's own username should be suggested for commands.
 ---@return boolean
+---@deprecated This will be removed in version 2.0. Use `suggestSpec` instead.
 function StreamInfo:suggestOwnUsername()
     return self:config().suggestOwnUsername or false
 end
