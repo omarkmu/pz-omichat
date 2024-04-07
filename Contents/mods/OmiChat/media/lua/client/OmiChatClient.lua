@@ -9,7 +9,8 @@ require 'OmiChat/API/ClientChat'
 require 'OmiChat/API/ClientData'
 require 'OmiChat/API/ClientCommands'
 require 'OmiChat/API/ClientExtension'
-require 'OmiChat/Component/MimicMessage'
+require 'OmiChat/API/ClientFormat'
+require 'OmiChat/API/ClientSearch'
 
 Events.OnGameStart.Add(OmiChat._onGameStart)
 Events.OnCreatePlayer.Add(OmiChat._onCreatePlayer)
@@ -43,25 +44,7 @@ return OmiChat
 ---@field options string[]? String options for the `string` suggestion type.
 ---@field searchDisplay boolean? If true, the display string will be used for determining suggestions.
 ---@field filter (fun(result: unknown, args: string[]): boolean)|nil Filter function for results.
----@field display (fun(value: unknown): string?)|nil Function to retrieve display strings for results.
-
----@class omichat.SearchContext
----@field search string The string to search for.
----@field terminateForExact boolean? If true, exact matches will terminate the search.
----@field max integer? The maximum search results to return.
----@field searchDisplay boolean? If true, the display string will be searched as well.
----@field filter (fun(result: unknown, args: string[]): boolean)|nil Filter function for results.
----@field display (fun(value: unknown): string?)|nil Function to retrieve display strings for results.
----@field args table? Argument for the filter function.
-
----@class omichat.SearchResult
----@field value string
----@field exact boolean
----@field display string?
-
----@class omichat.SearchResults
----@field results omichat.SearchResult[]
----@field exact omichat.SearchResult?
+---@field display (fun(value: unknown, str: string): string?)|nil Function to retrieve display strings for results.
 
 ---Metadata that can be attached to a message.
 ---@class omichat.MessageMetadata

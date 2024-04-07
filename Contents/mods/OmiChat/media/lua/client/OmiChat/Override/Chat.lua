@@ -1,9 +1,6 @@
 ---Handles chat overrides and extensions.
 
-local OmiChat = require 'OmiChat/API/Client'
-
--- requires buildMessageText
-require 'OmiChat/API/ClientFormat'
+local OmiChat = require 'OmiChatClient'
 
 
 ---Extended fields for ISChat.
@@ -510,6 +507,21 @@ local function isPlayerDead()
     return not player or player:isDead()
 end
 
+---Clears the last chat command for a tab based on retain options.
+---@param tab omichat.ChatTab
+local function refreshLastCommand(tab)
+    local lastChatCommand = tab.lastChatCommand
+    if not lastChatCommand or lastChatCommand == '' then
+        return
+    end
+
+    local stream = OmiChat.chatCommandToStream(lastChatCommand, true)
+    local commandType = stream and stream:getCommandType() or 'other'
+    if not OmiChat.getRetainCommand(commandType) then
+        tab.lastChatCommand = ''
+    end
+end
+
 ---Checks whether the chat input should be reset to a slash based on the current input.
 ---@param prefix string?
 ---@param text string
@@ -827,18 +839,8 @@ function ISChat.onToggleRetainCommand(target, type)
         return
     end
 
-    -- check to see whether the last command should be cleared based on this change
     for i = 1, #instance.tabs do
-        local chatText = instance.tabs[i]
-        local lastChatCommand = chatText.lastChatCommand
-
-        if lastChatCommand then
-            local stream = OmiChat.chatCommandToStream(lastChatCommand, true)
-            local commandType = stream and stream:getCommandType()
-            if commandType == type then
-                chatText.lastChatCommand = ''
-            end
-        end
+        refreshLastCommand(instance.tabs[i])
     end
 end
 
@@ -1020,6 +1022,7 @@ local _onPressDown = ISChat.onPressDown
 local _onPressUp = ISChat.onPressUp
 local _onOtherKey = ISChat.onOtherKey
 local _onInfo = ISChat.onInfo
+local _onTabAdded = ISChat.onTabAdded
 
 local _ChatMessage = __classmetatables[ChatMessage.class].__index
 local _ServerChatMessage = __classmetatables[ServerChatMessage.class].__index
@@ -1398,6 +1401,29 @@ function ISChat.onSwitchStream()
     end
 
     OmiChat.updateCustomComponents(text)
+end
+
+---Override to respect retain options when creating chat tabs.
+---@param tabTitle string
+---@param tabID integer
+function ISChat.onTabAdded(tabTitle, tabID)
+    _onTabAdded(tabTitle, tabID)
+    local instance = ISChat.instance
+    if not instance then
+        return
+    end
+
+    local target
+    for i = 1, #instance.tabs do
+        if instance.tabs[i].tabID == tabID then
+            target = instance.tabs[i]
+            break
+        end
+    end
+
+    if target then
+        refreshLastCommand(target)
+    end
 end
 
 ---Override to update custom components and include aliases.
