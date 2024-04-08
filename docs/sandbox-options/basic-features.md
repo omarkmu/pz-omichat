@@ -15,6 +15,9 @@ The cooldown for applying [buffs](./filters-predicates.md#predicateapplybuff), i
 **Minimum:** `1`  
 **Maximum:** `200`
 
+**This option is deprecated and will be removed in a future version in favor of a hardcoded value.**
+**To apply length limits, use [`FilterChatInput`](./filters-predicates.md#filterchatinput).**
+
 The maximum length for individual [custom shouts](#enablecustomshouts).
 
 ### EnableCharacterCustomization
@@ -110,6 +113,8 @@ This can be used alongside with or independently of [`EnableSetNameColor`](#enab
 The maximum number of [custom shouts](#enablecustomshouts) that players are allowed to define.
 
 The maximums apply to regular and sneak shouts separately; a value of `10` means a player can specify 10 shouts and 10 sneak shouts.
+
+**This option is deprecated and will be removed in a future version in favor of a hardcoded value.**
 
 ### MinimumCommandAccessLevel
 **Default:** `16`
