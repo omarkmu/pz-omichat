@@ -34,11 +34,12 @@ return OmiChat
 ---| 'option'
 ---| '?'
 
----@alias omichat.SuggestArgSpec omichat.SuggestArgSpecTable | omichat.SuggestionType
+---@alias omichat.SuggestArgSpec omichat.SuggestArgSpecTable | omichat.SuggestionType | string
 ---@alias omichat.SuggestSpec omichat.SuggestArgSpec[]
+---@alias omichat.SuggestSearchCallback fun(ctx: omichat.SearchContext | string, spec: omichat.SuggestArgSpec): omichat.SearchResults?
 
 ---@class omichat.SuggestArgSpecTable
----@field type omichat.SuggestionType The type of the argument.
+---@field type omichat.SuggestionType | string The type of the argument.
 ---@field prefix string? A prefix to apply to the suggestion result.
 ---@field suffix string? A suffix to apply to the suggestion result.
 ---@field options string[]? String options for the `string` suggestion type.
