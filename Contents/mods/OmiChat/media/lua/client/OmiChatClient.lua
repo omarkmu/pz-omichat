@@ -23,6 +23,8 @@ return OmiChat
 
 ---@alias omichat.ChatCommandType 'chat' | 'rp' | 'other'
 ---@alias omichat.ChatFont 'small' | 'medium' | 'large'
+---@alias omichat.SettingCategory 'basic' | 'chat_customization' | 'character_customization' | 'language' | 'admin' | 'main'
+---@alias omichat.SettingHandlerCallback fun(submenu: ISContextMenu)
 ---@alias omichat.Message ChatMessage | omichat.MimicMessage
 
 ---@alias omichat.SuggestionType
