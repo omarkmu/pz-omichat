@@ -35,29 +35,6 @@ local perkList = {}; do
 end
 
 
----Creates internal context given search context.
----@param ctx omichat.SearchContext | string
----@return omichat.search.InternalSearchContext
-local function buildInternalSearchContext(ctx)
-    if type(ctx) == 'string' then
-        ctx = { search = ctx }
-    end
-
-    ---@type omichat.search.InternalSearchContext
-    return {
-        search = utils.trim(ctx.search:lower()),
-        display = ctx.display,
-        filter = ctx.filter,
-        max = ctx.max,
-        args = ctx.args or {},
-        searchDisplay = ctx.searchDisplay,
-        terminateOnExact = ctx.terminateOnExact,
-        startsWith = {},
-        contains = {},
-        collectResults = true,
-    }
-end
-
 ---Builds a list of streams to search.
 ---@param options omichat.StreamSearchOptions
 ---@return (omichat.StreamInfo | omichat.VanillaCommand)
@@ -145,13 +122,39 @@ local function mapPerkToId(perk)
     return perk:getId()
 end
 
+
+---Creates internal context given search context.
+---@param ctx omichat.SearchContext | string
+---@return omichat.search.InternalSearchContext
+---@private
+function OmiChat.buildInternalSearchContext(ctx)
+    if type(ctx) == 'string' then
+        ctx = { search = ctx }
+    end
+
+    ---@type omichat.search.InternalSearchContext
+    return {
+        search = utils.trim(ctx.search:lower()),
+        display = ctx.display,
+        filter = ctx.filter,
+        max = ctx.max,
+        args = ctx.args or {},
+        searchDisplay = ctx.searchDisplay,
+        terminateOnExact = ctx.terminateOnExact,
+        startsWith = {},
+        contains = {},
+        collectResults = true,
+    }
+end
+
 ---Internal string search.
 ---@param ctx omichat.search.InternalSearchContext Search context.
 ---@param primary string Primary string to search.
 ---@param value unknown? Object to use as the result value instead of `primary`.
 ---@param ... string Secondary strings to search.
 ---@return omichat.search.InternalSearchResult?
-local function searchInternal(ctx, primary, value, ...)
+---@private
+function OmiChat.searchInternal(ctx, primary, value, ...)
     if value == nil then
         value = primary
     end
@@ -260,14 +263,13 @@ local function searchInternal(ctx, primary, value, ...)
     end
 end
 
-
 ---Collects online usernames based on a search string.
 ---If there's an exact match, no results are returned.
 ---@param ctxOrSearch omichat.SearchContext | string Context for the search.
 ---@param includeSelf boolean? If true, player 1's username will be included in the search.
 ---@return omichat.SearchResults
 function OmiChat.searchOnlineUsernames(ctxOrSearch, includeSelf)
-    local ctx = buildInternalSearchContext(ctxOrSearch)
+    local ctx = OmiChat.buildInternalSearchContext(ctxOrSearch)
     local onlinePlayers = getOnlinePlayers()
     local player = getSpecificPlayer(0)
     local ownUsername = player and player:getUsername()
@@ -277,7 +279,7 @@ function OmiChat.searchOnlineUsernames(ctxOrSearch, includeSelf)
         local onlinePlayer = onlinePlayers:get(i)
         local user = onlinePlayer and onlinePlayer:getUsername()
         if user and (includeSelf or user ~= ownUsername) then
-            local result = searchInternal(ctx, user)
+            local result = OmiChat.searchInternal(ctx, user)
             if result and result.exact then
                 exact = result
                 if ctx.terminateOnExact then
@@ -297,7 +299,7 @@ end
 ---@param ctxOrSearch omichat.SearchContext | string
 ---@return omichat.SearchResults
 function OmiChat.searchPerks(ctxOrSearch)
-    local ctx = buildInternalSearchContext(ctxOrSearch)
+    local ctx = OmiChat.buildInternalSearchContext(ctxOrSearch)
     ctx.display = ctx.display or getPerkDisplay
     ctx.mapValue = mapPerkToId
 
@@ -306,7 +308,7 @@ function OmiChat.searchPerks(ctxOrSearch)
         local perk = perkList[i]
         local name = perk:getName():lower()
         local id = perk:getId():lower()
-        local result = searchInternal(ctx, id, perk, name)
+        local result = OmiChat.searchInternal(ctx, id, perk, name)
         if result and result.exact and ctx.terminateOnExact then
             exact = result
             break
@@ -324,7 +326,7 @@ end
 ---@param options omichat.StreamSearchOptions
 ---@return omichat.SearchResults
 function OmiChat.searchStreams(ctxOrSearch, options)
-    local ctx = buildInternalSearchContext(ctxOrSearch)
+    local ctx = OmiChat.buildInternalSearchContext(ctxOrSearch)
 
     ctx.searchForStartsWith = '/' .. ctx.search
     ctx.display = ctx.display or mapToCommand
@@ -337,11 +339,11 @@ function OmiChat.searchStreams(ctxOrSearch, options)
         local stream = streamList[i]
         if utils.isinstance(stream, StreamInfo) then
             ---@cast stream omichat.StreamInfo
-            result = searchInternal(ctx, stream:getCommand(), stream, stream:getShortCommand())
+            result = OmiChat.searchInternal(ctx, stream:getCommand(), stream, stream:getShortCommand())
 
             if not result then
                 for alias in stream:aliases() do
-                    result = searchInternal(ctx, alias, stream)
+                    result = OmiChat.searchInternal(ctx, alias, stream)
                     if result then
                         break
                     end
@@ -349,7 +351,7 @@ function OmiChat.searchStreams(ctxOrSearch, options)
             end
         else
             ---@cast stream omichat.VanillaCommand
-            result = searchInternal(ctx, '/' .. stream.name .. ' ', stream)
+            result = OmiChat.searchInternal(ctx, '/' .. stream.name .. ' ', stream)
         end
 
         if result and result.exact and ctx.terminateOnExact then
@@ -392,11 +394,11 @@ end
 ---@param list string[] The list of strings to search.
 ---@return omichat.SearchResults
 function OmiChat.searchStrings(ctxOrSearch, list)
-    local ctx = buildInternalSearchContext(ctxOrSearch)
+    local ctx = OmiChat.buildInternalSearchContext(ctxOrSearch)
 
     local exact
     for i = 1, #list do
-        local result = searchInternal(ctx, list[i])
+        local result = OmiChat.searchInternal(ctx, list[i])
         if result and result.exact then
             exact = result
             if ctx.terminateOnExact then

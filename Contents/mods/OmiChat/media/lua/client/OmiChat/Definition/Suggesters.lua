@@ -166,7 +166,13 @@ return {
             elseif argType == 'option' and argSpec.options then
                 search = OmiChat.searchStrings(ctx, argSpec.options)
             else
-                return
+                local callback = OmiChat.getSuggesterArgTypeCallback(argType)
+                local cbResult = callback and callback(ctx, argSpec)
+                if not cbResult then
+                    return
+                end
+
+                search = cbResult
             end
 
             if search.exact then

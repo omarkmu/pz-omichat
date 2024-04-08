@@ -125,6 +125,13 @@ function OmiChat.addMessageTransformer(transformer)
     prioritySort(OmiChat._transformers)
 end
 
+---Registers an argument type for suggester specs.
+---@param argType string
+---@param callback omichat.SuggestSearchCallback
+function OmiChat.addSuggesterArgType(argType, callback)
+    OmiChat._customSuggesterArgTypes[argType] = callback
+end
+
 ---Adds a chat stream.
 ---@param stream omichat.ChatStream
 ---@return omichat.ChatStream
@@ -169,6 +176,13 @@ end
 function OmiChat.addSuggester(suggester)
     OmiChat._suggesters[#OmiChat._suggesters + 1] = suggester
     prioritySort(OmiChat._suggesters)
+end
+
+---Retrieves the search callback for an argument type.
+---@param argType string
+---@return omichat.SuggestSearchCallback?
+function OmiChat.getSuggesterArgTypeCallback(argType)
+    return OmiChat._customSuggesterArgTypes[argType]
 end
 
 ---Removes a registered custom button.
