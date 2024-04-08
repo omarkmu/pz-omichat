@@ -34,6 +34,7 @@ local getTextOrNull = getTextOrNull
 local max = math.max
 local concat = table.concat
 
+local getServerOptions = getServerOptions
 local BloodBodyPartType = BloodBodyPartType
 local getCoveredParts = BloodClothingType.getCoveredParts
 
@@ -65,6 +66,11 @@ local function addAdminOptions(context)
         local name = getText('UI_OmiChat_context_admin_' .. option)
         local opt = subMenu:addOption(name, ISChat.instance, ISChat.onAdminOptionToggle, option)
         subMenu:setOptionChecked(opt, OmiChat.getAdminOption(option))
+    end
+
+    local handlers = OmiChat.getSettingHandlers('admin')
+    for i = 1, #handlers do
+        handlers[i](subMenu)
     end
 end
 
@@ -217,34 +223,35 @@ local function addColorOptions(context)
         end
     end
 
-    if #colorOpts > 0 then
-        local colorOptionName = getText('UI_OmiChat_context_colors_submenu_name')
-        local colorOption = context:addOption(colorOptionName, ISChat.instance)
+    if #colorOpts == 0 then
+        return
+    end
 
-        local colorSubMenu = context:getNew(context)
-        context:addSubMenu(colorOption, colorSubMenu)
+    local colorOptionName = getText('UI_OmiChat_context_colors_submenu_name')
+    local colorOption = context:addOption(colorOptionName, ISChat.instance)
 
-        for i = 1, #colorOpts do
-            local category = colorOpts[i]
-            local name = getTextOrNull('UI_OmiChat_context_submenu_color_' .. category)
-            if not name then
-                name = getText('UI_OmiChat_context_submenu_color', OmiChat.getColorCategoryCommand(category))
-            end
+    local colorSubMenu = context:getNew(context)
+    context:addSubMenu(colorOption, colorSubMenu)
 
-            colorSubMenu:addOption(name, ISChat.instance, ISChat.onCustomColorMenu, category)
+    for i = 1, #colorOpts do
+        local category = colorOpts[i]
+        local name = getTextOrNull('UI_OmiChat_context_submenu_color_' .. category)
+        if not name then
+            name = getText('UI_OmiChat_context_submenu_color', OmiChat.getColorCategoryCommand(category))
         end
+
+        colorSubMenu:addOption(name, ISChat.instance, ISChat.onCustomColorMenu, category)
     end
 end
 
 ---Adds the context menu options for custom callouts.
 ---@param context ISContextMenu
 local function addCustomCalloutOptions(context)
-    local shoutOpts = { 'callouts', 'sneakcallouts' }
-    for i = 1, #shoutOpts do
-        local shoutType = shoutOpts[i]
-        local shoutOptionName = getText('UI_OmiChat_context_set_custom_' .. shoutType)
-        context:addOption(shoutOptionName, ISChat.instance, ISChat.onCustomCalloutMenu, shoutType)
-    end
+    local calloutOptName = getText('UI_OmiChat_context_set_custom_callouts')
+    context:addOption(calloutOptName, ISChat.instance, ISChat.onCustomCalloutMenu, 'callouts')
+
+    local sneakCalloutOptName = getText('UI_OmiChat_context_set_custom_sneakcallouts')
+    context:addOption(sneakCalloutOptName, ISChat.instance, ISChat.onCustomCalloutMenu, 'sneakcallouts')
 end
 
 ---Adds the context menu options for roleplay languages.
@@ -252,10 +259,6 @@ end
 local function addLanguageOptions(context)
     local languages = OmiChat.getRoleplayLanguages()
     local languageSlots = math.min(OmiChat.getRoleplayLanguageSlots(), config:maxLanguageSlots())
-    if languageSlots == 0 and #languages <= 1 then
-        -- nothing to configure → don't show the menu
-        return
-    end
 
     local isKnown = {}
     local knownLanguages = {}
@@ -286,10 +289,6 @@ local function addLanguageOptions(context)
         end
     end
 
-    if #knownLanguages == 0 and #addLanguages == 0 then
-        return
-    end
-
     local languageOptionName = getText('UI_OmiChat_context_languages')
     local languageOption = context:addOption(languageOptionName, ISChat.instance)
     local languageSubMenu = context:getNew(context)
@@ -303,19 +302,26 @@ local function addLanguageOptions(context)
         languageSubMenu:setOptionChecked(opt, lang == currentLang)
     end
 
-    if #addLanguages == 0 then
-        return
+    if #addLanguages > 0 then
+        table.sort(addLanguages, function(a, b) return a.translated < b.translated end)
+
+        local addLanguageSubMenu = languageSubMenu:getNew(languageSubMenu)
+        local addLanguageOption = languageSubMenu:addOption(getText('UI_OmiChat_context_add_language'), ISChat.instance)
+        languageSubMenu:addSubMenu(addLanguageOption, addLanguageSubMenu)
+        for i = 1, #addLanguages do
+            local lang = addLanguages[i].language
+            local name = addLanguages[i].translated
+            addLanguageSubMenu:addOption(name, ISChat.instance, ISChat.onAddLanguage, lang)
+        end
     end
 
-    table.sort(addLanguages, function(a, b) return a.translated < b.translated end)
+    local handlers = OmiChat.getSettingHandlers('language')
+    for i = 1, #handlers do
+        handlers[i](languageSubMenu)
+    end
 
-    local addLanguageSubMenu = languageSubMenu:getNew(languageSubMenu)
-    local addLanguageOption = languageSubMenu:addOption(getText('UI_OmiChat_context_add_language'), ISChat.instance)
-    languageSubMenu:addSubMenu(addLanguageOption, addLanguageSubMenu)
-    for i = 1, #addLanguages do
-        local lang = addLanguages[i].language
-        local name = addLanguages[i].translated
-        addLanguageSubMenu:addOption(name, ISChat.instance, ISChat.onAddLanguage, lang)
+    if #languageSubMenu.options == 0 then
+        context:removeLastOption()
     end
 end
 
@@ -398,6 +404,11 @@ local function addChatSettings(context)
 
     addRetainOptions(submenu)
     addVanillaSubmenuOptions(submenu)
+
+    local handlers = OmiChat.getSettingHandlers('basic')
+    for i = 1, #handlers do
+        handlers[i](submenu)
+    end
 end
 
 ---Adds the chat customization submenu to the context menu.
@@ -428,13 +439,18 @@ local function addChatCustomizationSettings(context)
         addSignEmoteOption(submenu)
     end
 
-    if #submenu.options == 0 then
-        -- no submenu options → just add the color option to the top-level menu
+    local handlers = OmiChat.getSettingHandlers('chat_customization')
+    if #submenu.options == 0 and #handlers == 0 then
+        -- no submenu options and no handlers → add the color submenu to the top-level menu
         context:removeLastOption()
         submenu = context
     end
 
     addColorOptions(submenu)
+
+    for i = 1, #handlers do
+        handlers[i](submenu)
+    end
 end
 
 ---Adds the character customization submenu to the context menu.
@@ -470,6 +486,11 @@ local function addCharacterCustomizationSettings(context)
     if not player:isFemale() then
         local growBeardOptName = getText('UI_OmiChat_context_grow_beard')
         submenu:addOption(growBeardOptName, instance, ISChat.onGrowBeard)
+    end
+
+    local handlers = OmiChat.getSettingHandlers('character_customization')
+    for i = 1, #handlers do
+        handlers[i](submenu)
     end
 end
 
@@ -1306,6 +1327,11 @@ function ISChat:onGearButtonClick()
     addChatCustomizationSettings(context)
     addCharacterCustomizationSettings(context)
     addLanguageOptions(context)
+
+    local handlers = OmiChat.getSettingHandlers('main')
+    for i = 1, #handlers do
+        handlers[i](context)
+    end
 end
 
 ---Override to handle custom info text.

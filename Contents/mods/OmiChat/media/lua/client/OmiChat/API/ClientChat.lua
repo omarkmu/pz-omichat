@@ -564,6 +564,13 @@ function OmiChat.getInfoRichText(player)
     return utils.interpolate(Option.FormatInfo, tokens, player:getUsername())
 end
 
+---Returns the list of custom setting handlers for a given category.
+---@param category omichat.SettingCategory
+---@return omichat.SettingHandlerCallback[]
+function OmiChat.getSettingHandlers(category)
+    return OmiChat._settingHandlers[category]
+end
+
 ---Gets an emote meant to simulate sign language based on the given text.
 ---@param text string
 ---@return string
@@ -573,6 +580,13 @@ function OmiChat.getSignLanguageEmote(text)
     rand:seed(utils.trim(text:lower()))
 
     return signLanguageEmotes[rand:random(1, #signLanguageEmotes)]
+end
+
+---Retrieves the search callback for an argument type.
+---@param argType string
+---@return omichat.SuggestSearchCallback?
+function OmiChat.getSuggesterArgTypeCallback(argType)
+    return OmiChat._customSuggesterArgTypes[argType]
 end
 
 ---Suggests text based on the provided input text.
