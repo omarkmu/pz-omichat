@@ -1,18 +1,16 @@
 local lib = require 'OmiChat/lib'
 local utils = require 'OmiChat/util'
 local config = require 'OmiChat/config'
+local DelimitedList = utils.DelimitedList
 
 local getActivatedMods = getActivatedMods
 local floor = math.floor
-local trim = utils.trim
-local split = string.split
 
 
 ---Helper for retrieving sandbox variables and their defaults.
 ---@class omichat.Options : omi.SandboxHelper
 ---@field EnableCustomShouts boolean
 ---@field EnableEmotes boolean
----@field EnableCommandItemRequirements boolean
 ---@field EnableSetNameColor boolean
 ---@field EnableSpeechColorAsDefaultNameColor boolean
 ---@field EnableSetSpeechColor boolean
@@ -24,6 +22,9 @@ local split = string.split
 ---@field EnableCleanCharacter integer
 ---@field EnableDiscordColorOption integer
 ---@field EnableSetName integer
+---@field CardItems string
+---@field CoinItems string
+---@field DiceItems string
 ---@field BuffCooldown integer
 ---@field CustomShoutMaxLength integer
 ---@field MinimumCommandAccessLevel integer
@@ -157,12 +158,11 @@ local colorOpts = {
     server = 'ColorServer',
 }
 
-local addLanguageInfo = {
-    allowlist = {},
-    blocklist = {},
-    cachedAllowStr = '',
-    cachedBlockStr = '',
-}
+local addLangAllowlist = DelimitedList:new(Option.AddLanguageAllowlist)
+local addLangBlocklist = DelimitedList:new(Option.AddLanguageBlocklist)
+local cardItemsList = DelimitedList:new(Option.CardItems)
+local coinItemsList = DelimitedList:new(Option.CoinItems)
+local diceItemsList = DelimitedList:new(Option.CardItems)
 
 
 ---@param options omichat.Options
@@ -187,32 +187,6 @@ local function getColorOrDefault(options, colorOpt)
     end
 end
 
----Updates the cached allow and block lists for adding languages.
-local function updateAddLanguageLists()
-    local allowStr = trim(Option.AddLanguageAllowlist)
-
-    if allowStr ~= addLanguageInfo.cachedAllowStr then
-        local allowlist = {}
-        if #allowStr > 0 then
-            allowlist = split(allowStr, ';')
-        end
-
-        addLanguageInfo.cachedAllowStr = allowStr
-        addLanguageInfo.allowlist = allowlist
-    end
-
-    local blockStr = trim(Option.AddLanguageBlocklist)
-    if blockStr ~= addLanguageInfo.cachedBlockStr then
-        local blocklist = {}
-        if #blockStr > 0 then
-            blocklist = split(blockStr, ';')
-        end
-
-        addLanguageInfo.cachedBlockStr = blockStr
-        addLanguageInfo.blocklist = blocklist
-    end
-end
-
 ---Checks whether a mod compatibility option is enabled.
 ---@param value integer The value of the option.
 ---@param modId string The mod ID of the relevant mod.
@@ -232,10 +206,8 @@ end
 ---@return boolean
 ---@see omichat.api.shared.isConfiguredRoleplayLanguage
 function Option:canAddLanguage(language)
-    updateAddLanguageLists()
-
-    local allowlist = addLanguageInfo.allowlist
-    local blocklist = addLanguageInfo.blocklist
+    local allowlist = addLangAllowlist:update(Option.AddLanguageAllowlist)
+    local blocklist = addLangBlocklist:update(Option.AddLanguageBlocklist)
 
     local found = #allowlist == 0
     for i = 1, #allowlist do
@@ -280,6 +252,24 @@ end
 ---@return boolean
 function Option:compatTADEnabled()
     return isCompatEnabled(Option.EnableCompatTAD, 'TrueActionsDancing')
+end
+
+---Returns a table of valid items for /card.
+---@return table
+function Option:getCardItems()
+    return cardItemsList:update(Option.CardItems)
+end
+
+---Returns a table of valid items for /flip.
+---@return table
+function Option:getCoinItems()
+    return coinItemsList:update(Option.CoinItems)
+end
+
+---Returns a table of valid items for /roll.
+---@return table
+function Option:getDiceItems()
+    return diceItemsList:update(Option.DiceItems)
 end
 
 ---Returns the default color associated with a category.
@@ -371,6 +361,24 @@ end
 ---@return boolean
 function Option:isNicknameCommandEnabled()
     return self.EnableSetName > 4
+end
+
+---Checks whether an item is required for /card.
+---@return boolean
+function Option:requireCardItem()
+    return #self:getCardItems() > 0
+end
+
+---Checks whether an item is required for /flip.
+---@return boolean
+function Option:requireCoinItem()
+    return #self:getCoinItems() > 0
+end
+
+---Checks whether an item is required for /roll.
+---@return boolean
+function Option:requireDiceItem()
+    return #self:getDiceItems() > 0
 end
 
 ---Returns whether the Discord color option should be shown.

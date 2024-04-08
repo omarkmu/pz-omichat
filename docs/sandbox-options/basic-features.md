@@ -10,6 +10,30 @@ These [options](./index.md) are used to control basic features of the mod.
 
 The cooldown for applying [buffs](./filters-predicates.md#predicateapplybuff), in real-time minutes.
 
+### CardItems
+**Default:** `CardDeck`
+
+A semicolon-separated list of items players can use for the `/card` command.
+
+The `/card` command will only be available if the player has one of the items in this list in their inventory.
+If blank, the command won't require an item.
+
+### CoinItems
+`(blank by default)`
+
+A semicolon-separated list of items players can use for the `/flip` command.
+
+The `/flip` command will only be available if the player has one of the items in this list in their inventory.
+If blank, the command won't require an item.
+
+### DiceItems
+**Default:** `Dice`
+
+A semicolon-separated list of items players can use for the `/roll` command.
+
+The `/roll` command will only be available if the player has one of the items in this list in their inventory.
+If blank, the command won't require an item.
+
 ### CustomShoutMaxLength
 **Default:** `50`  
 **Minimum:** `1`  
@@ -40,11 +64,6 @@ This has no effect unless [`EnableCharacterCustomization`](#enablecharactercusto
 - `1`: Disable
 - `2`: Clean body only
 - `3`: Clean body and clothing
-
-### EnableCommandItemRequirements
-**Default:** `true`
-
-If enabled, commands such as `/dice` and `/roll` will require players without an access level to have the relevant item in their inventory.
 
 ### EnableCustomShouts
 **Default:** `true`

@@ -1,5 +1,6 @@
 local lib = require 'OmiChat/lib'
 local Interpolator = require 'OmiChat/Component/Interpolator'
+local DelimitedList = require 'OmiChat/Component/DelimitedList'
 
 local pow = math.pow
 local floor = math.floor
@@ -14,6 +15,7 @@ local getTimestampMs = getTimestampMs
 ---@field private _interpolatorCache table<string, omichat.utils.InterpolatorCacheItem>
 local utils = lib.utils.copy(lib.utils)
 utils.Interpolator = Interpolator
+utils.DelimitedList = DelimitedList
 utils._interpolatorCache = {}
 
 ---@class omichat.utils.InterpolatorCacheItem
@@ -473,6 +475,35 @@ function utils.hasAccess(flags, accessLevel)
     end
 
     return flags == 1
+end
+
+---Checks whether the player has any of the item types in the list.
+---If the item list is empty, returns `true`.
+---@param player IsoPlayer?
+---@param list string[]
+---@return boolean
+function utils.hasAnyItemType(player, list)
+    player = player or getSpecificPlayer(0)
+    if not player then
+        return false
+    end
+
+    local inv = player:getInventory()
+    if not inv then
+        return false
+    end
+
+    if #list == 0 then
+        return true
+    end
+
+    for i = 1, #list do
+        if inv:contains(list[i]) then
+            return true
+        end
+    end
+
+    return false
 end
 
 ---Interpolates substitution tokens into a string with format strings using `$var` format.

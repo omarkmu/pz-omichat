@@ -1,7 +1,6 @@
 OmiChat = {
     EnableCustomShouts = true,
     EnableEmotes = true,
-    EnableCommandItemRequirements = true,
     EnableSetNameColor = false,
     EnableSetSpeechColor = true,
     EnableSpeechColorAsDefaultNameColor = true,
@@ -13,6 +12,9 @@ OmiChat = {
     EnableCompatChatBubble = 3,
     EnableCompatSearchPlayers = 3,
     EnableCompatTAD = 3,
+    CardItems = "CardDeck",
+    CoinItems = "",
+    DiceItems = "Dice",
     BuffCooldown = 5,
     MaximumCustomShouts = 10,
     CustomShoutMaxLength = 50,

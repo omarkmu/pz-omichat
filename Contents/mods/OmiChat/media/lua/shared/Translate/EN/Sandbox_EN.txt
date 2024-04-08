@@ -5,7 +5,6 @@ Sandbox_EN = {
     Sandbox_OCEnableChatNameAsCharacterName = "Use Chat Name as Character Name",
     Sandbox_OCEnableCustomShouts = "Enable Custom Shouts",
     Sandbox_OCEnableEmotes = "Enable Emote Shortcuts",
-    Sandbox_OCEnableCommandItemRequirements = "Enable Command Item Requirements",
     Sandbox_OCEnableSetName = "Enable /name",
     Sandbox_OCEnableCharacterCustomization = "Enable Character Customization",
     Sandbox_OCEnableCleanCharacter = "Enable Clean Character",
@@ -14,6 +13,9 @@ Sandbox_EN = {
     Sandbox_OCEnableSpeechColorAsDefaultNameColor = "Use Speech Color as Default Name Color",
     Sandbox_OCEnableFactionColorAsDefault = "Use Faction Tag Color as Default Chat Color",
     Sandbox_OCEnableDiscordColorOption = "Enable Discord Color Option",
+    Sandbox_OCCardItems = "/card Items",
+    Sandbox_OCDiceItems = "/roll Items",
+    Sandbox_OCCoinItems = "/flip Items",
 
     Sandbox_OCEnableDiscordColorOption_option1 = "Yes",
     Sandbox_OCEnableDiscordColorOption_option2 = "No",

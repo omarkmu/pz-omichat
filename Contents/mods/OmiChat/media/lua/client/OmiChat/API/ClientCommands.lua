@@ -87,16 +87,13 @@ end
 ---Requests drawing a card from a card deck in the player's inventory.
 ---@return boolean
 function OmiChat.requestDrawCard()
-    if Option.EnableCommandItemRequirements then
-        local player = getSpecificPlayer(0)
-        if not player then
-            return false
-        end
+    local player = getSpecificPlayer(0)
+    if not player then
+        return false
+    end
 
-        local inv = player:getInventory()
-        if not inv:contains('CardDeck') and player:getAccessLevel() == 'None' then
-            return false
-        end
+    if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, Option:getCardItems()) then
+        return false
     end
 
     return OmiChat.dispatch('requestDrawCard')
@@ -105,6 +102,15 @@ end
 ---Requests flipping a coin.
 ---@return boolean
 function OmiChat.requestFlipCoin()
+    local player = getSpecificPlayer(0)
+    if not player then
+        return false
+    end
+
+    if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, Option:getCoinItems()) then
+        return false
+    end
+
     return OmiChat.dispatch('requestFlipCoin')
 end
 
@@ -142,16 +148,13 @@ end
 ---@param sides integer
 ---@return boolean
 function OmiChat.requestRollDice(sides)
-    if Option.EnableCommandItemRequirements then
-        local player = getSpecificPlayer(0)
-        if not player then
-            return false
-        end
+    local player = getSpecificPlayer(0)
+    if not player then
+        return false
+    end
 
-        local inv = player:getInventory()
-        if not inv:contains('Dice') and player:getAccessLevel() == 'None' then
-            return false
-        end
+    if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, Option:getDiceItems()) then
+        return false
     end
 
     if not sides or sides < 1 or sides > 100 then
