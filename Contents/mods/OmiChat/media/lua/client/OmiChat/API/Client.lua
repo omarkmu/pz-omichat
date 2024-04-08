@@ -14,6 +14,7 @@ require 'Chat/ISChat'
 ---@field private _prefsFileName string
 ---@field private _playerPrefs omichat.PlayerPreferences
 ---@field private _customChatStreams table<string, omichat.ChatStream>
+---@field private _customButtons ISButton[]
 local OmiChat = require 'OmiChatShared'
 
 OmiChat.ColorModal = require 'OmiChat/Component/ColorModal'
@@ -25,6 +26,7 @@ OmiChat._prefsVersion = 1
 OmiChat._prefsFileName = 'omichat.json'
 
 OmiChat._formatters = {}
+OmiChat._customButtons = {}
 OmiChat._iconsToExclude = {
     -- shadowed by colors
     thistle = true,

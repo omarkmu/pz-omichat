@@ -1114,7 +1114,6 @@ function ISChat:createChildren()
     self.infoButton.backgroundColorMouseOver.a = 0
     self.infoButton:setImage(self.infoBtn)
     self.infoButton:setUIName('chat info button')
-    self:addChild(self.infoButton)
     self.infoButton:setVisible(false)
 
     self.suggesterBox = SuggesterBox:new(0, 0, 0, 0)
@@ -1124,6 +1123,7 @@ function ISChat:createChildren()
     self.suggesterBox:addToUIManager()
     self.suggesterBox:setVisible(false)
 
+    OmiChat.addCustomButton(self.infoButton)
     OmiChat.updateState()
 end
 
