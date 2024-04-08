@@ -90,6 +90,16 @@ local function remove(tab, target)
 end
 
 
+---Registers a new button for the chat.
+---@param button ISButton
+---@return ISButton
+function OmiChat.addCustomButton(button)
+    OmiChat._customButtons[#OmiChat._customButtons + 1] = button
+
+    OmiChat.updateButtons()
+    return button
+end
+
 ---Adds information about a command that can be triggered from chat.
 ---@param stream omichat.CommandStream
 function OmiChat.addCommand(stream)
@@ -159,6 +169,23 @@ end
 function OmiChat.addSuggester(suggester)
     OmiChat._suggesters[#OmiChat._suggesters + 1] = suggester
     prioritySort(OmiChat._suggesters)
+end
+
+---Removes a registered custom button.
+---This does not remove the button from the chat.
+---@param button ISButton
+function OmiChat.removeCustomButton(button)
+    local pos
+    for i = 1, #OmiChat._customButtons do
+        if OmiChat._customButtons[i] == button then
+            pos = i
+            break
+        end
+    end
+
+    if pos then
+        table.remove(OmiChat._customButtons, pos)
+    end
 end
 
 ---Removes a stream from the list of available chat commands.

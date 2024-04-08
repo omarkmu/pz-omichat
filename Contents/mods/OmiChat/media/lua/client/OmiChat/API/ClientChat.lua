@@ -857,6 +857,29 @@ function OmiChat.setIconsToExclude(icons)
     OmiChat._iconsToExclude = icons or {}
 end
 
+---Updates the positions of custom buttons.
+function OmiChat.updateButtons()
+    local instance = ISChat.instance
+    if not instance or not instance.gearButton then
+        return
+    end
+
+    local th = instance:titleBarHeight()
+    local lastBtn = instance.gearButton
+    for i = 1, #OmiChat._customButtons do
+        local btn = OmiChat._customButtons[i]
+        if btn:getParent() ~= instance then
+            instance:addChild(btn)
+        end
+
+        if btn:isVisible() then
+            local pad = max(lastBtn:getWidth(), th)
+            btn:setX(lastBtn:getX() - pad - pad / 2)
+            lastBtn = btn
+        end
+    end
+end
+
 ---Updates the icon picker and suggester box based on the current input text.
 ---@param text string? The current text entry text. If omitted, the current text will be retrieved.
 function OmiChat.updateCustomComponents(text)
@@ -914,6 +937,7 @@ function OmiChat.updateState(redraw)
     updateAliases()
     addOrRemoveIconComponents()
     OmiChat.updateInfoText()
+    OmiChat.updateButtons()
 
     local player = getSpecificPlayer(0)
     local username = player and player:getUsername()
