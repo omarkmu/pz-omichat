@@ -262,21 +262,16 @@ return {
             isCommand = true,
             helpText = 'UI_ServerOptionDesc_Card',
             isEnabled = function()
-                if not Option.EnableCommandItemRequirements then
-                    return true
-                end
-
                 local player = getSpecificPlayer(0)
-                local inv = player and player:getInventory()
-                if not inv then
+                if not player then
                     return false
                 end
 
-                return inv:contains('CardDeck') or player:getAccessLevel() ~= 'None'
+                return player:getAccessLevel() ~= 'None' or utils.hasAnyItemType(player, Option:getCardItems())
             end,
             validator = function(self)
                 if not self:isEnabled() then
-                    OmiChat.addInfoMessage(getText('UI_ServerOptionDesc_Card'))
+                    OmiChat.addInfoMessage(self:getHelpText())
                     return false
                 end
 
@@ -300,6 +295,22 @@ return {
                     OmiChat.addInfoMessage(ctx.stream:getHelpText())
                 end
             end,
+            isEnabled = function()
+                local player = getSpecificPlayer(0)
+                if not player then
+                    return false
+                end
+
+                return player:getAccessLevel() ~= 'None' or utils.hasAnyItemType(player, Option:getCoinItems())
+            end,
+            validator = function(self)
+                if not self:isEnabled() then
+                    OmiChat.addInfoMessage(self:getHelpText())
+                    return false
+                end
+
+                return true
+            end,
         },
     },
     {
@@ -309,21 +320,16 @@ return {
             isCommand = true,
             helpText = 'UI_ServerOptionDesc_Roll',
             isEnabled = function()
-                if not Option.EnableCommandItemRequirements then
-                    return true
-                end
-
                 local player = getSpecificPlayer(0)
-                local inv = player and player:getInventory()
-                if not inv then
+                if not player then
                     return false
                 end
 
-                return inv:contains('Dice') or player:getAccessLevel() ~= 'None'
+                return player:getAccessLevel() ~= 'None' or utils.hasAnyItemType(player, Option:getDiceItems())
             end,
             validator = function(self)
                 if not self:isEnabled() then
-                    OmiChat.addInfoMessage(getText('UI_ServerOptionDesc_Roll'))
+                    OmiChat.addInfoMessage(self:getHelpText())
                     return false
                 end
 
