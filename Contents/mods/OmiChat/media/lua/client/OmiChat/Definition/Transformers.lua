@@ -184,17 +184,16 @@ return {
                 return
             end
 
-            local roll = tonumber(utils.unwrapStringArgument(matched, 1, '(%d+)'))
-            local sides = tonumber(utils.unwrapStringArgument(matched, 2, '(%d+)'))
-
-            if not roll or not sides then
+            local seq
+            seq, matched = utils.decodeInvisibleIntSequence(matched, 2)
+            if not matched or not seq then
                 info.message:setShowInChat(false)
                 return
             end
 
             info.content = matched
-            info.tokens.roll = roll
-            info.tokens.sides = sides
+            info.tokens.roll = seq[1]
+            info.tokens.sides = seq[2]
 
             info.format = Option.ChatFormatRoll
             info.formatOptions.color = OmiChat.getColorOrDefault('me')
@@ -378,8 +377,8 @@ return {
                 return
             end
 
-            local dialogueTag = utils.unwrapStringArgument(matched, 21)
-            local content = utils.unwrapStringArgument(matched, 22)
+            local dialogueTag = utils.unwrapStringArgument(matched, config.NARRATIVE_TAG)
+            local content = utils.unwrapStringArgument(matched, config.NARRATIVE_TEXT)
             if not dialogueTag or not content then
                 return
             end

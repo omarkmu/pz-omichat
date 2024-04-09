@@ -280,14 +280,17 @@ end
 ---Reports the results of a dice roll.
 ---@param args omichat.request.ReportRoll
 function OmiChat.Commands.reportRoll(args)
-    local roll = utils.wrapStringArgument(tostring(args.roll), 1)
-    local sides = utils.wrapStringArgument(tostring(args.sides), 2)
-    local content = utils.interpolate(Option.FormatRoll, { roll = roll, sides = sides })
+    local tokens = { roll = tostring(args.roll), sides = tostring(args.sides) }
+    local content = utils.interpolate(Option.FormatRoll, tokens)
 
     OmiChat.send {
-        text = content,
         streamName = 'roll',
         formatterName = 'roll',
+        text = concat {
+            utils.encodeInvisibleInt(args.roll),
+            utils.encodeInvisibleInt(args.sides),
+            content,
+        },
     }
 end
 
