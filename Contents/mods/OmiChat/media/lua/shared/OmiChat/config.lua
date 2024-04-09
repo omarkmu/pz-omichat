@@ -31,6 +31,7 @@ Configuration._streamTable = {}
 ---| 'language'
 ---| 'overheadFull'
 ---| 'overheadOther'
+---| 'messageIcon'
 ---| 'adminIcon'
 ---| 'narrative'
 ---| 'onlineID'
@@ -202,16 +203,20 @@ Configuration._formatters = {
         formatID = 81,
     },
     {
-        name = 'narrative',
+        name = 'messageIcon',
         formatID = 82,
     },
     {
-        name = 'onlineID',
+        name = 'narrative',
         formatID = 83,
     },
     {
-        name = 'echo',
+        name = 'onlineID',
         formatID = 84,
+    },
+    {
+        name = 'echo',
+        formatID = 85,
         overheadFormatOpt = 'OverheadFormatEcho',
     },
 }

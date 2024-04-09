@@ -351,7 +351,7 @@ function OmiChat.getSpeechColor()
     }
 end
 
----Sets whether the current player wants to use chat suggestions.
+---Gets whether the current player wants to use chat suggestions.
 ---@return boolean
 function OmiChat.getUseSuggester()
     return OmiChat.getPlayerPreferences().useSuggester
