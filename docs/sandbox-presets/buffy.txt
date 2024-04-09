@@ -58,6 +58,7 @@ OmiChat = {
     FilterChatInput = "$trim(@($eq($streamtype($stream) rp):$stripcolors($input);$input))",
     FilterNickname = "$sub($input 1 50)",
     FilterNarrativeStyle = "@($sneakCallout:$input;$capitalize($input))",
+    PredicateEnableStream = "true",
     PredicateAllowChatInput = "$disallowSignedOverRadio($has(@(faction;safehouse) $stream))",
     PredicateAllowLanguage = "$has(@(say;shout;whisper;low;faction;safehouse) $stream)",
     PredicateApplyBuff = "$has(@(me;mequiet;meloud) $stream)",

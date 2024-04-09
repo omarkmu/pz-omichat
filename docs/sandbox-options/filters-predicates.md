@@ -147,6 +147,14 @@ Determines whether a message on a stream will attract zombies.
 
 **See also:** [`RangeMultiplierZombies`](./ranges.md#rangemultiplierzombies).
 
+### PredicateEnableStream
+**Default:** `true`
+
+Determines whether a stream is enabled.
+
+**Tokens:**
+- [`$stream`](../format-strings/tokens.md#stream)
+
 ### PredicateUseNameColor
 **Default:** `$eq($stream say)`
 

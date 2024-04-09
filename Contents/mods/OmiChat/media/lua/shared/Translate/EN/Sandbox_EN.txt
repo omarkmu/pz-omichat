@@ -98,6 +98,7 @@ Sandbox_EN = {
     Sandbox_OCPredicateAllowLanguage = "Allow Roleplay Language Predicate",
     Sandbox_OCPredicateTransmitOverRadio = "Transmit Over Radio Predicate",
     Sandbox_OCPredicateUseNarrativeStyle = "Use Narrative Style Predicate",
+    Sandbox_OCPredicateEnableStream = "Enable Stream Predicate",
 
     --[[ Languages ]]--
     Sandbox_OCAvailableLanguages = "Available Languages",
