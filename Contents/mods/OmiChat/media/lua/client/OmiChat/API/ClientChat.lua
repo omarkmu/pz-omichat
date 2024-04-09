@@ -732,6 +732,7 @@ function OmiChat.send(args)
         text = text,
         language = language,
         chatType = chatType,
+        icon = args.icon,
         isEcho = args.isEcho,
         stream = args.streamName or stream:getIdentifier(),
         formatterName = args.formatterName or stream:getFormatterName(),
@@ -794,6 +795,7 @@ function OmiChat.send(args)
             stream = echoStream,
             text = initialText,
             command = initialText,
+            icon = args.icon,
         }
     end
 

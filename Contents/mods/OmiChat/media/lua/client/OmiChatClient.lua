@@ -113,6 +113,7 @@ return OmiChat
 ---Context for sending chat messages.
 ---@class omichat.SendArgs
 ---@field text string
+---@field icon string?
 ---@field command string? Deprecated. Contains the same information as `text`.
 ---@field streamName string?
 ---@field stream omichat.StreamInfo?
@@ -125,6 +126,7 @@ return OmiChat
 ---@see omichat.api.client.formatForChat
 ---@class omichat.FormatArgs
 ---@field text string
+---@field icon string?
 ---@field language string?
 ---@field isEcho boolean?
 ---@field formatterName omichat.FormatterName?

@@ -467,14 +467,27 @@ function OmiChat.encodeMessageTag(message)
         author = nil
     end
 
+    local text = message:getText()
+    local useAdminIcon = OmiChat.getFormatter('adminIcon'):isMatch(text)
+
+    local iconFormatter = OmiChat.getFormatter('messageIcon')
+    local encodedIcon = iconFormatter:read(text)
+    local icon = encodedIcon and utils.decodeInvisibleString(encodedIcon)
+
+    if icon and not getTexture(icon) then
+        icon = nil
+    elseif icon then
+        -- message-level icons suppress admin icon
+        useAdminIcon = false
+    end
+
     local color = author and OmiChat.getNameColorInChat(author)
-    local useAdminIcon = OmiChat.getFormatter('adminIcon'):isMatch(message:getText())
     local success, encoded = utils.json.tryEncode {
         ocSuppressed = false,
         ocLanguage = OmiChat.decodeLanguage(message),
         ocName = OmiChat.getNameInChatRichText(author, OmiChat.getMessageChatType(message)),
         ocNameColor = color and utils.colorToHexString(color) or nil,
-        ocIcon = author and OmiChat.getChatIcon(author) or nil,
+        ocIcon = icon or (author and OmiChat.getChatIcon(author)) or nil,
         ocAdminIcon = (author and useAdminIcon) and OmiChat.getAdminChatIcon(author) or nil,
     }
 
@@ -562,6 +575,22 @@ function OmiChat.formatForChat(args)
     local overheadFormatter = OmiChat.getFormatter('overheadFull')
     tokens.prefix = utils.trimleft(utils.interpolate(Option.FormatOverheadPrefix, tokens))
     tokens.input = overheadFormatter:format(tokens.input, tokens)
+
+    -- encode message icon
+    if args.icon then
+        local textureName
+        if getTexture(args.icon) then
+            textureName = args.icon
+        else
+            textureName = utils.getTextureNameFromIcon(args.icon)
+        end
+
+        if textureName then
+            local iconFormatter = OmiChat.getFormatter('messageIcon')
+            local encodedIcon = iconFormatter:wrap(utils.encodeInvisibleString(textureName))
+            tokens.input = tokens.input .. encodedIcon
+        end
+    end
 
     -- encode online ID for radio
     local player = getSpecificPlayer(0)

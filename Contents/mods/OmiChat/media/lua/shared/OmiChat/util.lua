@@ -239,6 +239,34 @@ function utils.decodeInvisibleIntSequence(text, amount)
     return results, text
 end
 
+---Decodes an encoded string of character indices.
+---@param text any
+---@return string? result
+---@return string? remaining
+function utils.decodeInvisibleString(text)
+    local seq
+    local length
+    local remaining
+
+    length, remaining = utils.decodeInvisibleInt(text)
+    if not length then
+        return
+    end
+
+    ---@cast remaining string
+    seq, remaining = utils.decodeInvisibleIntSequence(remaining, length)
+    if not seq then
+        return
+    end
+
+    local chars = {}
+    for i = 1, #seq do
+        chars[#chars + 1] = char(seq[i])
+    end
+
+    return concat(chars), remaining
+end
+
 ---Encodes an integer value in [1, 32] into a character.
 ---@param n integer
 ---@return string
@@ -274,6 +302,18 @@ function utils.encodeInvisibleInt(value)
 
     local len = utils.encodeInvisibleCharacter(#result)
     return len .. concat(result)
+end
+
+---Encodes a string as a sequence of invisible encoded integers.
+---@param text string
+---@return string
+function utils.encodeInvisibleString(text)
+    local chars = {}
+    for i = 1, #text do
+        chars[#chars + 1] = utils.encodeInvisibleInt(text:sub(i, i):byte())
+    end
+
+    return utils.encodeInvisibleInt(#chars) .. concat(chars)
 end
 
 ---Escapes a string for use in a rich text panel.

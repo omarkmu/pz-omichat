@@ -53,7 +53,7 @@ The format used to determine the value of `$icon` in other formats.
 - `$adminIcon`: The icon determined by [`FormatAdminIcon`](#formatadminicon).
 This is only populated when the player is an admin with the relevant [option](../user-guide/admins.md#admin-menu) enabled.
 - [`$chatType`](../format-strings/tokens.md#chattype)
-- `$icon`: The icon set with [`/seticon`](../user-guide/admins.md#commands).
+- `$icon`: The icon associated with the message, or set with [`/seticon`](../user-guide/admins.md#commands).
 - [`$stream`](../format-strings/tokens.md#stream)
 
 ### FormatInfo
