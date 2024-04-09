@@ -212,8 +212,17 @@ library = {
     issigned = function(_, language)
         return OmiChat.isRoleplayLanguageSigned(tostring(language or ''))
     end,
+    accesslevel = function()
+        local player = getSpecificPlayer(0)
+        return player and player:getAccessLevel() or 'none'
+    end,
     isadmin = function()
-        if isAdmin() or isCoopHost() then
+        if isAdmin() then
+            return 'true'
+        end
+    end,
+    iscoophost = function()
+        if isCoopHost() then
             return 'true'
         end
     end,
