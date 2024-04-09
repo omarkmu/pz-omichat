@@ -717,7 +717,7 @@ option OmiChat.FormatCard
 option OmiChat.FormatRoll
 {
     type = string,
-    default = rolls a $roll on a $sides-sided die,
+    default = rolls $roll on a $sides-sided die,
     page = OmiChat,
     translation = OCFormatRoll,
 }

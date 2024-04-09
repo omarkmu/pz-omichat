@@ -171,7 +171,7 @@ UI_EN = {
     -- %1 = the name of the card that was drawn
     UI_OmiChat_card_local = "draws %1",
     -- %1 = the number that was rolled, %2 = the number of sides on the dice
-    UI_OmiChat_roll_local = "rolls a %1 on a %2-sided die",
+    UI_OmiChat_roll_local = "rolls %1 on a %2-sided die",
     UI_OmiChat_flip_local_heads = "flips a coin and gets heads",
     UI_OmiChat_flip_local_tails = "flips a coin and gets tails",
 

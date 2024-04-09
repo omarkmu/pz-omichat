@@ -165,7 +165,7 @@ The format used to determine the value of the `$prefix` token in [`OverheadForma
 - [`$username`](../format-strings/tokens.md#username)
 
 ### FormatRoll
-**Default:** `rolls a $roll on a $sides-sided die`
+**Default:** `rolls $roll on a $sides-sided die`
 
 The format used for local [`/roll`](./chat-formats.md#chatformatroll) overhead message content.
 
