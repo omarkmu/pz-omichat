@@ -492,10 +492,11 @@ function OmiChat.formatForChat(args)
     local stream = args.stream or args.formatterName or args.chatType
     local username = args.username or utils.getPlayerUsername()
     local name = args.name or OmiChat.getNameInChat(username, args.chatType)
+    local text, before, after = utils.getInternalText(args.text)
 
     local tokens = args.tokens and utils.copy(args.tokens) or {}
     tokens.chatType = args.chatType
-    tokens.input = args.text
+    tokens.input = text
     tokens.username = username
     tokens.name = name
     tokens.stream = stream
@@ -524,6 +525,8 @@ function OmiChat.formatForChat(args)
             error = err,
         }
     end
+
+    tokens.input = before .. tokens.input .. after
 
     -- apply styles
     local streamInfo = OmiChat.getChatStreamByIdentifier(stream)
