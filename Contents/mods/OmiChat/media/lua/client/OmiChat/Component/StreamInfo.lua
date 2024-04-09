@@ -184,6 +184,11 @@ end
 ---Returns whether the stream is enabled.
 ---@return boolean
 function StreamInfo:isEnabled()
+    local tokens = { stream = self:getIdentifier() }
+    if not utils.testPredicate(Option.PredicateEnableStream, tokens) then
+        return false
+    end
+
     local cfg = self:config()
     local isEnabled = cfg.isEnabled
     if isEnabled then

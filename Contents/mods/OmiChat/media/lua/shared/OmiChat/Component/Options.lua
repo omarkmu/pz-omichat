@@ -75,6 +75,7 @@ local floor = math.floor
 ---@field PredicateUseNarrativeStyle string
 ---@field PredicateAllowLanguage string
 ---@field PredicateTransmitOverRadio string
+---@field PredicateEnableStream string
 ---@field AvailableLanguages string
 ---@field AddLanguageAllowlist string
 ---@field AddLanguageBlocklist string

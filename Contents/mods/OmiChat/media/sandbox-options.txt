@@ -536,6 +536,14 @@ option OmiChat.FilterNarrativeStyle
     translation = OCFilterNarrativeStyle,
 }
 
+option OmiChat.PredicateEnableStream
+{
+    type = string,
+    default = true,
+    page = OmiChat,
+    translation = OCPredicateEnableStream,
+}
+
 option OmiChat.PredicateAllowChatInput
 {
     type = string,

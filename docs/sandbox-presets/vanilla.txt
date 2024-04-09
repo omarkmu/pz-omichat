@@ -58,6 +58,7 @@ OmiChat = {
     FilterChatInput = "$trim($input)",
     FilterNickname = "$sub($input 1 50)",
     FilterNarrativeStyle = "@($sneakCallout:$input;$capitalize($input))",
+    PredicateEnableStream = "true",
     PredicateAllowChatInput = "true",
     PredicateAllowLanguage = "",
     PredicateApplyBuff = "",
