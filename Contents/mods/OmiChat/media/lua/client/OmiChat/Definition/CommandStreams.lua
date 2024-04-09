@@ -434,14 +434,7 @@ return {
         omichat = {
             isCommand = true,
             onUse = function(ctx)
-                local accessLevel
-                if isCoopHost() then
-                    accessLevel = 'admin'
-                else
-                    local player = getSpecificPlayer(0)
-                    accessLevel = player and player:getAccessLevel()
-                end
-
+                local accessLevel = utils.getEffectiveAccessLevel()
                 local command = ctx.text
                 if not accessLevel then
                     -- something went wrong, defer to default help command

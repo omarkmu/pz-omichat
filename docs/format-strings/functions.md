@@ -168,7 +168,9 @@ To get pseudo-random values for these, use `$randomseed` first.
 | `$disallowsignedoverradio(condition suppressError)` | Sets the `errorID` token if `condition` is true and the message language is signed. An error message will inform the player that they cannot use a signed language over the radio, unless `suppressError` is passed. Returns true if the check passed. |
 | `$fragmented(text)` | Gets random fragments of the words in a string, replacing other words with ellipses. |
 | `$gettext(s ...)` | Returns a translation. The first argument must be the translation name. Subsequent arguments may be translation substitutions. |
-| `$gettextornull(s ...)` | Behaves similarly to `$gettext(...)`, but returns the empty string for unknown translations instead of the translation name. |
+| `$gettextornull(s ...)` | Behaves similarly to `$gettext()`, but returns the empty string for unknown translations instead of the translation name. |
 | `$getunknownlanguagestring(language stream author dialogueTag message category)` | Returns a string to use when the recipient of a message doesn't know the language used. `author` and `dialogueTag` are optional; if supplied, they apply a narrative style to the result. `message` is also optional, and will display a fragment of the message based on the relevant [options](../sandbox-options/languages.md) if provided. `category` is the color category to use for fragmented text. |
-| `$isadmin()` | Returns true if the current player is an admin or coop host. |
+| `$isadmin()` | Returns true if the current player is an admin. |
+| `$iscoophost()` | Returns true if the current player is the coop host. |
+| `$accesslevel()` | Returns the access level of player 1, as a string. |
 | `$streamtype(stream)` | Returns `'chat'`, `'rp'`, or `'other'` based on the type of the given stream. If the stream is unknow, returns the empty string. |
