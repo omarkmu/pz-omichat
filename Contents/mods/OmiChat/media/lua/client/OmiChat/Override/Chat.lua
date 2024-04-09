@@ -1198,7 +1198,7 @@ function ISChat:onCommandEntered()
 
     local instance = ISChat.instance ---@cast instance omichat.ISChat
     local input = instance.textEntry:getText()
-    local stream, command, chatCommand, hasDisabled = OmiChat.chatCommandToStream(input, true, true)
+    local stream, command, chatCommand, hasDisabled, disabledStream = OmiChat.chatCommandToStream(input, true, true)
 
     local useCallback
     local callbackStream
@@ -1271,7 +1271,24 @@ function ISChat:onCommandEntered()
     end
 
     if hasDisabled then
-        OmiChat.addInfoMessage('Unknown command ' .. command:sub(2))
+        if not disabledStream or disabledStream:getCommandType() ~= 'chat' then
+            OmiChat.addInfoMessage('Unknown command ' .. command:sub(2))
+        else
+            local msg = { getText('UI_chat_chat_disabled_msg', utils.trim(disabledStream:getCommand())) }
+            for i = 1, #ISChat.allChatStreams do
+                local info = OmiChat.StreamInfo:new(ISChat.allChatStreams[i])
+                if info:isEnabled() then
+                    msg[#msg + 1] = '* '
+                    msg[#msg + 1] = utils.trim(info:getCommand())
+                    msg[#msg + 1] = ' <LINE> '
+                end
+            end
+
+            if #msg > 1 then
+                msg[#msg] = nil
+                OmiChat.addInfoMessage(concat(msg))
+            end
+        end
     elseif not shouldHandle then
         -- no special handling, pass to original function
         _onCommandEntered(self)
