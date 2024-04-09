@@ -25,20 +25,32 @@ end
 ---@return string?
 ---@return string
 function StreamInfo:checkMatch(command)
-    local longCommand = self:getCommand()
+    local isCmdStream = self:isCommand()
+    local fullCommand = self:getCommand()
     local shortCommand = self:getShortCommand()
 
-    if utils.startsWith(command, longCommand) then
-        return longCommand, command:sub(#longCommand)
-    elseif shortCommand and utils.startsWith(command, shortCommand) then
+    local commandCompare = command
+    local fullCompare = fullCommand
+    local shortCompare = shortCommand
+    if isCmdStream then
+        -- command streams are case-insensitive
+        commandCompare = command:lower()
+        fullCompare = fullCommand:lower()
+        shortCompare = shortCommand and shortCommand:lower()
+    end
+
+    if utils.startsWith(commandCompare, fullCompare) then
+        return fullCommand, command:sub(#fullCommand)
+    elseif shortCompare and utils.startsWith(commandCompare, shortCompare) then
         return shortCommand, command:sub(#shortCommand)
-    elseif self:isCommand() and command == utils.trim(longCommand) then
+    elseif isCmdStream and commandCompare == utils.trim(fullCompare) then
         -- commands can be entered with no trailing space
         return command, ' '
     end
 
     for alias in self:aliases() do
-        if utils.startsWith(command, alias) then
+        local aliasCompare = isCmdStream and alias:lower() or alias
+        if utils.startsWith(commandCompare, aliasCompare) then
             return alias, command:sub(#alias)
         end
     end
