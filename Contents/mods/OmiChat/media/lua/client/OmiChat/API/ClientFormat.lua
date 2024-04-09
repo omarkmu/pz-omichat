@@ -11,6 +11,7 @@ local OmiChat = require 'OmiChat/API/Client'
 require 'OmiChat/Component/MimicMessage'
 
 local utils = OmiChat.utils
+local config = OmiChat.config
 local Option = OmiChat.Option
 local MimicMessage = OmiChat.MimicMessage
 
@@ -97,8 +98,8 @@ local function applyNarrativeStyle(input, stream, tokens)
         end
     end
 
-    dialogueTag = utils.wrapStringArgument(dialogueTag, 21)
-    input = utils.wrapStringArgument(prefix .. input .. suffix, 22)
+    dialogueTag = utils.wrapStringArgument(dialogueTag, config.NARRATIVE_TAG)
+    input = utils.wrapStringArgument(prefix .. input .. suffix, config.NARRATIVE_TEXT)
     local combined = format('%s, "%s"', dialogueTag, input)
 
     local formatter = OmiChat.getFormatter('narrative')

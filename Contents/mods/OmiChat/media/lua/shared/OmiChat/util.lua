@@ -5,6 +5,7 @@ local DelimitedList = require 'OmiChat/Component/DelimitedList'
 local pow = math.pow
 local floor = math.floor
 local min = math.min
+local char = string.char
 local format = string.format
 local concat = table.concat
 local getTimestampMs = getTimestampMs
@@ -193,7 +194,8 @@ end
 
 ---Decodes an encoded integer value.
 ---@param text string
----@return integer?
+---@return integer? value
+---@return string? remaining
 function utils.decodeInvisibleInt(text)
     local len = utils.decodeInvisibleCharacter(text)
     if len < 1 or len > 32 then
@@ -201,7 +203,8 @@ function utils.decodeInvisibleInt(text)
     end
 
     local value = 0
-    for i = 2, min(#text, len + 1) do
+    local endPos = min(#text, len + 1)
+    for i = 2, endPos do
         local digit = utils.decodeInvisibleCharacter(text:sub(i, i)) - 1
         if digit < 0 or digit > 31 then
             return
@@ -210,7 +213,30 @@ function utils.decodeInvisibleInt(text)
         value = value + digit * pow(32, i - 2)
     end
 
-    return value
+    return value, text:sub(endPos + 1)
+end
+
+---Decodes a sequence of encoded integers.
+---@param text string
+---@param amount integer
+---@return integer[]? sequence The integer sequence.
+---@return string? remaining The remaining text, after the sequence.
+function utils.decodeInvisibleIntSequence(text, amount)
+    local decoded
+    local remaining = text ---@type string?
+
+    local results = {}
+    for _ = 1, amount do
+        decoded, remaining = utils.decodeInvisibleInt(text)
+        if not decoded or not remaining then
+            return
+        end
+
+        results[#results + 1] = decoded
+        text = remaining
+    end
+
+    return results, text
 end
 
 ---Encodes an integer value in [1, 32] into a character.
@@ -243,7 +269,7 @@ function utils.encodeInvisibleInt(value)
     end
 
     if #result == 0 then
-        result[#result + 1] = utils.encodeInvisibleCharacter(1)
+        result[1] = utils.encodeInvisibleCharacter(1)
     end
 
     local len = utils.encodeInvisibleCharacter(#result)

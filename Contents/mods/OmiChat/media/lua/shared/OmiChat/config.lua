@@ -37,14 +37,15 @@ Configuration._streamTable = {}
 ---| 'echo'
 
 
--- IDs 1–32 are reserved for encoding additional data
---[[
-    1–2: /roll, /flip args
-    1–4: /card suit
-    1–13: /card name
-    21: narrative style dialogue tag
-    22: narrative style text
-]]
+-- arguments (1–32)
+-- 1–10: general-purpose arguments
+
+---Narrative style dialogue tag.
+Configuration.NARRATIVE_TAG = 11
+
+---Narrative style content.
+Configuration.NARRATIVE_TEXT = 12
+
 
 -- command streams (33–50)
 Configuration._commandStreams = {

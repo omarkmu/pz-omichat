@@ -170,8 +170,8 @@ The format used to determine the value of the `$prefix` token in [`OverheadForma
 The format used for local [`/roll`](./chat-formats.md#chatformatroll) overhead message content.
 
 **Tokens:**
-- `$roll`: The number that was rolled. This will be wrapped in invisible characters.
-- `$sides`: The number of sides on the die that was rolled. This will be wrapped in invisible characters.
+- `$roll`: The number that was rolled.
+- `$sides`: The number of sides on the die that was rolled.
 
 ### FormatTag
 **Default:** `[$tag]`
