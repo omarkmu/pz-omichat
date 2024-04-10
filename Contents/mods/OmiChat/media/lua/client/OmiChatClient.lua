@@ -153,6 +153,7 @@ return OmiChat
 ---@field suggestSpec omichat.SuggestSpec? The spec for suggestions to the stream.
 ---@field isEnabled (fun(self: omichat.StreamInfo): boolean)? Returns a boolean representing whether the stream is enabled.
 ---@field onUse fun(ctx: omichat.SendArgs)? Callback triggered when the stream is used.
+---@field onUseDisabled fun(self: omichat.StreamInfo)? Callback triggered when attempting to use a disabled stream.
 ---@field allowEmotes boolean? Whether to allow emotes on this stream. Defaults to true for non-commands and false for commands.
 ---@field allowIconPicker boolean? Whether to enable the icon button for this stream. Defaults to false.
 ---@field streamIdentifier string? The stream identifier tied to this stream. Used for format strings and determining roleplay language. Defaults to stream name.
