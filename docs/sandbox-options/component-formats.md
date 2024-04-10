@@ -112,14 +112,6 @@ The format used to determine the values of `$name` and `$nameRaw` in other forma
 - [`$surname`](../format-strings/tokens.md#surname)
 - [`$username`](../format-strings/tokens.md#username)
 
-### FormatNarrativeCustomTagPrefix
-`(blank by default)`
-
-The option used to determine a prefix players can use to specify a custom dialogue tag in [narrative style](./filters-predicates.md#predicateusenarrativestyle).
-If blank, custom tag prefixes will be turned off.
-
-If this option is set to `~` and the other narrative style options are configured, players can use `~inquires What's your name?` to get `Jane inquires, "What's your name?"`.
-
 ### FormatNarrativeDialogueTag
 **Default:** `@($eq($stream shout):shouts;$eq($stream whisper):whispers;$endswith($input ?):asks;$endswith($input !):exclaims;$endswith($input ..):says;$lt($len($input) 10):states;says)`
 

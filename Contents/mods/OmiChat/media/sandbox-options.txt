@@ -112,6 +112,14 @@ option OmiChat.CoinItems
     translation = OCCoinItems,
 }
 
+option OmiChat.PatternNarrativeCustomTag
+{
+    type = string,
+    default =,
+    page = OmiChat,
+    translation = OCPatternNarrativeCustomTag,
+}
+
 
 /* Compatibility Feature Flags */
 option OmiChat.EnableCompatChatBubble
@@ -792,14 +800,6 @@ option OmiChat.FormatNarrativePunctuation
     default = $unless($sneakCallout @($eq($stream shout):!;.)),
     page = OmiChat,
     translation = OCFormatNarrativePunctuation,
-}
-
-option OmiChat.FormatNarrativeCustomTagPrefix
-{
-    type = string,
-    default =,
-    page = OmiChat,
-    translation = OCFormatNarrativeCustomTagPrefix,
 }
 
 
