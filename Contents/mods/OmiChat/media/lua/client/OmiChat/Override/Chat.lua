@@ -1198,7 +1198,7 @@ function ISChat:onCommandEntered()
 
     local instance = ISChat.instance ---@cast instance omichat.ISChat
     local input = instance.textEntry:getText()
-    local stream, command, chatCommand, _, disabledStream = OmiChat.chatCommandToStream(input, true, true)
+    local stream, command, chatCommand, disabledStream = OmiChat.chatCommandToStream(input, true, true)
 
     local useCallback
     local callbackStream
