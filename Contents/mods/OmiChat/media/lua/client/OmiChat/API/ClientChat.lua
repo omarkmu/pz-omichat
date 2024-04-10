@@ -354,11 +354,10 @@ end
 ---@return omichat.StreamInfo? #Information about the stream.
 ---@return string #The text following the command in the input.
 ---@return string? #The command or short command that was used.
----@return boolean #Whether there was a match on the command, but it was disabled. (Deprecated; this will be removed in favor of the disabled stream return value.)
 ---@return omichat.StreamInfo? #Information about the disabled stream.
 function OmiChat.chatCommandToStream(command, includeCommands, enabledOnly)
     if not command or command == '' then
-        return nil, '', nil, false
+        return nil, ''
     end
 
     if includeCommands == nil then
@@ -366,7 +365,6 @@ function OmiChat.chatCommandToStream(command, includeCommands, enabledOnly)
     end
 
     local disabledCommand
-    local isCommandDisabled = false
     local streamInfo
     local chatCommand
 
@@ -390,18 +388,16 @@ function OmiChat.chatCommandToStream(command, includeCommands, enabledOnly)
         if chatCommand and (not enabledOnly or info:isEnabled()) then
             streamInfo = info
             command = checkCommand
-            isCommandDisabled = false
             disabledCommand = nil
             break
         elseif chatCommand then
-            isCommandDisabled = true
             disabledCommand = info
         end
 
         i = i + 1
     end
 
-    return streamInfo, command, chatCommand, isCommandDisabled, disabledCommand
+    return streamInfo, command, chatCommand, disabledCommand
 end
 
 ---Retrieves a stream name given a chat command.
