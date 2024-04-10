@@ -280,7 +280,7 @@ end
 function utils.encodeInvisibleInt(value)
     value = floor(value)
     if value < 0 then
-        utils.logError('Attempted to encode negative value: ' .. value)
+        utils.logError('attempted to encode negative value: ' .. value)
         return ''
     end
 
@@ -288,7 +288,7 @@ function utils.encodeInvisibleInt(value)
     local result = {}
     while value > 0 do
         if #result == 32 then
-            utils.logError('Value is too large to encode: ' .. originalValue)
+            utils.logError('value is too large to encode: ' .. originalValue)
             return ''
         end
 
