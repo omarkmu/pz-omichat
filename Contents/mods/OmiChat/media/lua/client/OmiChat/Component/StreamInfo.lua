@@ -151,6 +151,12 @@ function StreamInfo:getUseCallback()
     return self:config().onUse
 end
 
+---Gets the callback to use when the stream is used while disabled.
+---@return fun(self: omichat.StreamInfo)?
+function StreamInfo:getUseDisabledCallback()
+    return self:config().onUseDisabled
+end
+
 ---Returns whether the stream allows emotes.
 ---@return boolean
 function StreamInfo:isAllowEmotes()

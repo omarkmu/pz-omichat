@@ -41,6 +41,12 @@ local function matchKnownLanguage(input)
     end
 end
 
+---Callback function to display help text for a stream.
+---@param info omichat.StreamInfo
+local function showHelpText(info)
+    OmiChat.addInfoMessage(info:getHelpText())
+end
+
 ---@type omichat.CommandStream[]
 return {
     {
@@ -261,6 +267,12 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_ServerOptionDesc_Card',
+            onUseDisabled = showHelpText,
+            onUse = function(ctx)
+                if not OmiChat.requestDrawCard() then
+                    OmiChat.addInfoMessage(ctx.stream:getHelpText())
+                end
+            end,
             isEnabled = function()
                 local player = getSpecificPlayer(0)
                 if not player then
@@ -268,19 +280,6 @@ return {
                 end
 
                 return player:getAccessLevel() ~= 'None' or utils.hasAnyItemType(player, Option:getCardItems())
-            end,
-            validator = function(self)
-                if not self:isEnabled() then
-                    OmiChat.addInfoMessage(self:getHelpText())
-                    return false
-                end
-
-                return true
-            end,
-            onUse = function(ctx)
-                if not OmiChat.requestDrawCard() then
-                    OmiChat.addInfoMessage(ctx.stream:getHelpText())
-                end
             end,
         },
     },
@@ -290,6 +289,7 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_flip',
+            onUseDisabled = showHelpText,
             onUse = function(ctx)
                 if not OmiChat.requestFlipCoin() then
                     OmiChat.addInfoMessage(ctx.stream:getHelpText())
@@ -303,14 +303,6 @@ return {
 
                 return player:getAccessLevel() ~= 'None' or utils.hasAnyItemType(player, Option:getCoinItems())
             end,
-            validator = function(self)
-                if not self:isEnabled() then
-                    OmiChat.addInfoMessage(self:getHelpText())
-                    return false
-                end
-
-                return true
-            end,
         },
     },
     {
@@ -319,22 +311,7 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_ServerOptionDesc_Roll',
-            isEnabled = function()
-                local player = getSpecificPlayer(0)
-                if not player then
-                    return false
-                end
-
-                return player:getAccessLevel() ~= 'None' or utils.hasAnyItemType(player, Option:getDiceItems())
-            end,
-            validator = function(self)
-                if not self:isEnabled() then
-                    OmiChat.addInfoMessage(self:getHelpText())
-                    return false
-                end
-
-                return true
-            end,
+            onUseDisabled = showHelpText,
             onUse = function(ctx)
                 local command = utils.trim(ctx.text)
                 local first = command:split(' ')[1]
@@ -349,6 +326,14 @@ return {
                 if not OmiChat.requestRollDice(sides) then
                     OmiChat.addInfoMessage(ctx.stream:getHelpText())
                 end
+            end,
+            isEnabled = function()
+                local player = getSpecificPlayer(0)
+                if not player then
+                    return false
+                end
+
+                return player:getAccessLevel() ~= 'None' or utils.hasAnyItemType(player, Option:getDiceItems())
             end,
         },
     },
