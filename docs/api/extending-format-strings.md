@@ -15,7 +15,7 @@ A simple example which appends the length of the input:
 ```lua
 -- $example(hello) → hello5
 local OmiChat = require 'OmiChat'
-OmiChat.registerInterpolatorFunction('example', function(s)
+OmiChat.registerInterpolatorFunction('example', function(interpolator, s)
     if not s then
         return
     end
