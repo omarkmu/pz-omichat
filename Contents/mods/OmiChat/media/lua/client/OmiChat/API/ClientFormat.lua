@@ -3,6 +3,7 @@
 local getTexture = getTexture
 local format = string.format
 local concat = table.concat
+local match = string.match
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
 
@@ -66,15 +67,16 @@ local function applyNarrativeStyle(input, stream, tokens)
     end
 
     local dialogueTag
-    local customTagPrefix = utils.trim(Option.FormatNarrativeCustomTagPrefix)
-    if customTagPrefix ~= '' then
-        local patt = '^' .. utils.escape(customTagPrefix) .. '(%a+)%s+(.+)'
+    local patt = utils.trim(Option.PatternNarrativeCustomTag)
+    if patt ~= '' then
         local internal, prefix, suffix = utils.getInternalText(input)
 
-        local tag, remainder = internal:match(patt)
-        if tag and remainder then
-            dialogueTag = tag
-            tokens.input = prefix .. remainder .. suffix
+        local success, tag, remainder = pcall(match, internal, patt)
+        if success and tag and remainder then
+            dialogueTag = tostring(tag)
+            tokens.input = prefix .. tostring(remainder) .. suffix
+        elseif not success then
+            utils.logError('invalid string pattern set for PatternNarrativeCustomTag')
         end
     end
 

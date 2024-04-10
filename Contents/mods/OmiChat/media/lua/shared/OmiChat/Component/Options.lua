@@ -99,7 +99,7 @@ local floor = math.floor
 ---@field FormatAdminIcon string
 ---@field FormatNarrativeDialogueTag string
 ---@field FormatNarrativePunctuation string
----@field FormatNarrativeCustomTagPrefix string
+---@field PatternNarrativeCustomTag string
 ---@field OverheadFormatFull string
 ---@field OverheadFormatCard string
 ---@field OverheadFormatRoll string

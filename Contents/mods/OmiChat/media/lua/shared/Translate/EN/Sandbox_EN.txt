@@ -16,6 +16,7 @@ Sandbox_EN = {
     Sandbox_OCCardItems = "/card Items",
     Sandbox_OCDiceItems = "/roll Items",
     Sandbox_OCCoinItems = "/flip Items",
+    Sandbox_OCPatternNarrativeCustomTag = "Narrative Style Custom Dialogue Tag Pattern",
 
     Sandbox_OCEnableDiscordColorOption_option1 = "Yes",
     Sandbox_OCEnableDiscordColorOption_option2 = "No",
@@ -126,7 +127,6 @@ Sandbox_EN = {
     Sandbox_OCFormatAdminIcon = "Admin Icon Format",
     Sandbox_OCFormatNarrativeDialogueTag = "Narrative Style Dialogue Tag Format",
     Sandbox_OCFormatNarrativePunctuation = "Narrative Style Punctuation Format",
-    Sandbox_OCFormatNarrativeCustomTagPrefix = "Narrative Style Custom Dialogue Tag Prefix",
 
     --[[ Overhead Message Formats ]]--
     Sandbox_OCOverheadFormatCard = "/card Overhead Format",

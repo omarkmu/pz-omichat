@@ -20,7 +20,7 @@ It's designed to loosely mimic the style of that mod through various tweaks of d
 Note that this is not a 1-to-1 correspondence; some things in this preset work differently than they do in buffy's mod.
 For example, the value for [`EnableSetName`](../sandbox-options/basic-features.md#enablesetname) sets the chat nickname rather than the character's name.
 
-Additionally, some features unique to this mod, such as [`FormatNarrativeCustomTagPrefix`](../sandbox-options/component-formats.md#formatnarrativecustomtagprefix), are turned on with this preset.
+Additionally, some features unique to this mod, such as [`PatternNarrativeCustomTag`](../sandbox-options/component-formats.md#patternnarrativecustomtag), are turned on with this preset.
 
 ```lua
 {{#include buffy.txt}}
