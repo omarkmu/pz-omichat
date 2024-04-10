@@ -11,7 +11,7 @@ The format used for `/admin` messages in chat.
 **See also:** [`ColorAdmin`](./colors.md#coloradmin).
 
 ### ChatFormatCard
-**Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($gettext(UI_OmiChat_card_local $card)) <SPACE>))`  
+**Default:** `$fmtrp(<SPACE> $name <SPACE> $punctuate($fmtcard($card)) <SPACE>)`  
 **Token Context:** [Chat](../sandbox-options/token-contexts.md#chat)
 
 The format used for local `/card` messages in chat.
@@ -38,7 +38,7 @@ Messages from Discord will not apply name colors.
 **See also:** [`ColorDiscord`](./colors.md#colordiscord).
 
 ### ChatFormatDo
-**Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $punctuate($capitalize($trim($message))) <SPACE>))`  
+**Default:** `$fmtrp(<SPACE> $punctuate($capitalize($trim($message))) <SPACE>)`  
 **Token Context:** [Chat](../sandbox-options/token-contexts.md#chat)
 
 The format used for `/do` messages in chat.
@@ -54,7 +54,7 @@ With the default setting, `/do the lights flicker` will appear in chat as `« Th
 - [`ChatFormatMe`](#chatformatme)
 
 ### ChatFormatDoLoud
-**Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $punctuate($capitalize($trim($message))) <SPACE>))`  
+**Default:** `$fmtrp(<SPACE> $punctuate($capitalize($trim($message))) <SPACE>)`  
 **Token Context:** [Chat](../sandbox-options/token-contexts.md#chat)
 
 The format used for `/doloud` (`/dl`) messages in chat.
@@ -68,7 +68,7 @@ If blank, `/doloud` messages will be disabled.
 - [`OverheadFormatDoLoud`](./overhead-formats.md#overheadformatdoloud)
 
 ### ChatFormatDoQuiet
-**Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $punctuate($capitalize($trim($message))) <SPACE>))`  
+**Default:** `$fmtrp(<SPACE> $punctuate($capitalize($trim($message))) <SPACE>)`  
 **Token Context:** [Chat](../sandbox-options/token-contexts.md#chat)
 
 The format used for `/doquiet` (`/dq`) messages in chat.
@@ -99,7 +99,7 @@ The format used for `/faction` messages in chat.
 **See also:** [`ColorFaction`](./colors.md#colorfaction).
 
 ### ChatFormatFlip
-**Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($gettext($concat(UI_OmiChat_flip_local_ @($heads:heads;tails)))) <SPACE>))`  
+**Default:** `$fmtrp(<SPACE> $name <SPACE> $punctuate($fmtflip($heads)) <SPACE>)`  
 **Token Context:** [Chat](../sandbox-options/token-contexts.md#chat)
 
 The format used for local `/flip` messages in chat.
@@ -130,7 +130,7 @@ The format used for `/all` messages in chat.
 **See also:** [`ColorGeneral`](./colors.md#colorgeneral).
 
 ### ChatFormatIncomingPrivate
-**Default:** `$($gettext(UI_OmiChat_private_chat_from $name)$): <SPACE> $message`  
+**Default:** `$fmtpmfrom($name 1): <SPACE> $message`  
 **Token Context:** [Chat](../sandbox-options/token-contexts.md#chat)
 
 The format used for incoming private messages in chat.
@@ -151,7 +151,7 @@ The format used for `/low` messages in chat.
 - [`OverheadFormatLow`](./overhead-formats.md#overheadformatlow)
 
 ### ChatFormatMe
-**Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>))`  
+**Default:** `$fmtrp(<SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>)`  
 **Token Context:** [Chat](../sandbox-options/token-contexts.md#chat)
 
 The format used for `/me` messages in chat.
@@ -167,7 +167,7 @@ With the default settings, if a player with a character named “Jane” uses `/
 - [`ChatFormatDo`](#chatformatdo)
 
 ### ChatFormatMeLoud
-**Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>))`  
+**Default:** `$fmtrp(<SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>)`  
 **Token Context:** [Chat](../sandbox-options/token-contexts.md#chat)
 
 The format used for `/meloud` (`/ml`) messages in chat.
@@ -181,7 +181,7 @@ If blank, `/meloud` messages will be disabled.
 - [`OverheadFormatMeLoud`](./overhead-formats.md#overheadformatmeloud)
 
 ### ChatFormatMeQuiet
-**Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>))`  
+**Default:** `$fmtrp(<SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>)`  
 **Token Context:** [Chat](../sandbox-options/token-contexts.md#chat)
 
 The format used for `/mequiet` (`/mq`) messages in chat.
@@ -206,7 +206,7 @@ The format used for `/ooc` (local out-of-character) messages in chat.
 - [`OverheadFormatOoc`](./overhead-formats.md#overheadformatooc)
 
 ### ChatFormatOutgoingPrivate
-**Default:** `$($gettext(UI_OmiChat_private_chat_to $recipientName)$): <SPACE> $message`  
+**Default:** `$fmtpmto($recipientName 1): <SPACE> $message`  
 **Token Context:** [Chat](../sandbox-options/token-contexts.md#chat)
 
 The format used for outgoing private messages in chat.
@@ -223,7 +223,7 @@ The format used for outgoing private messages in chat.
 - [`ChatFormatIncomingPrivate`](./chat-formats.md#chatformatincomingprivate)
 
 ### ChatFormatRadio
-**Default:** `$gettext(UI_OmiChat_radio $frequency): <SPACE> $message`  
+**Default:** `$fmtradio($frequency): <SPACE> $message`  
 **Token Context:** [Chat](../sandbox-options/token-contexts.md#chat)
 
 The format used for radio messages in chat.
@@ -237,7 +237,7 @@ This has the same values as `$stream`, but will only be populated with custom st
 **See also:** [`ColorRadio`](./colors.md#colorradio).
 
 ### ChatFormatRoll
-**Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($gettext(UI_OmiChat_roll_local $roll $sides)) <SPACE>))`  
+**Default:** `$fmtrp(<SPACE> $name <SPACE> $punctuate($fmtroll($roll $sides)) <SPACE>)`  
 **Token Context:** [Chat](../sandbox-options/token-contexts.md#chat)
 
 The format used for local `/roll` messages in chat.
@@ -280,7 +280,7 @@ The format used for server messages in chat.
 **See also:** [`ColorServer`](./colors.md#colorserver).
 
 ### ChatFormatUnknownLanguage
-**Default:** `$gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $getunknownlanguagestring($languageRaw $stream () () $message say) <SPACE>))`  
+**Default:** `$fmtrp(<SPACE> $name <SPACE> $getunknownlanguagestring($languageRaw $stream () () $message say) <SPACE>)`  
 **Token Context:** [Chat](../sandbox-options/token-contexts.md#chat)
 
 The format used when a player character does not speak the [language](./languages.md) of a chat message.
@@ -288,7 +288,7 @@ The format used when a player character does not speak the [language](./language
 With the default format, this will display as `« Name says/shouts/whispers/signs something in Language. »`.
 
 ### ChatFormatUnknownLanguageRadio
-**Default:** `$gettext(UI_OmiChat_radio $frequency): $gettext(UI_OmiChat_rp_emote $getunknownlanguagestring($languageRaw $stream () () $message say))`  
+**Default:** `$fmtradio($frequency): $fmtrp($getunknownlanguagestring($languageRaw $stream () () $message say))`  
 **Token Context:** [Chat](../sandbox-options/token-contexts.md#chat)
 
 The format used when a player character does not speak the [language](./languages.md) of a chat message sent over the radio.
