@@ -8,6 +8,7 @@ local OmiChat = require 'OmiChat/API/Shared'
 local utils = OmiChat.utils
 local Option = OmiChat.Option
 
+local rep = string.rep
 local concat = table.concat
 local baseLibraries = (require 'OmiChat/lib').interpolate.Interpolator.Libraries
 local stringFunctions = baseLibraries.functions.string
@@ -144,16 +145,24 @@ local function getBaseUnknownLanguageString(language, stream, author, dialogueTa
     return getText(concat(stringID), language)
 end
 
----Stringifies inputs into a single string.
+---Stringifies inputs into a single delimited string.
+---@param sep string
 ---@param ... unknown
 ---@return string
-local function stringify(...)
+local function stringifySep(sep, ...)
     local t = {}
     for i = 1, select('#', ...) do
         t[#t + 1] = tostring(select(i, ...) or '')
     end
 
-    return concat(t)
+    return concat(t, sep)
+end
+
+---Stringifies inputs into a single string.
+---@param ... unknown
+---@return string
+local function stringify(...)
+    return stringifySep('', ...)
 end
 
 
@@ -287,6 +296,56 @@ library = {
         end
 
         return stream:getCommandType()
+    end,
+
+    fmtcard = function(_, ...)
+        return getText('UI_OmiChat_card_local', stringify(...))
+    end,
+    fmtroll = function(_, roll, ...)
+        roll = tostring(roll or '')
+        return getText('UI_OmiChat_roll_local', roll, stringify(...))
+    end,
+    ---@param interpolator omichat.Interpolator
+    ---@param heads string?
+    ---@return string
+    fmtflip = function(interpolator, heads)
+        local s = interpolator:toBoolean(heads) and 'heads' or 'tails'
+        return getText('UI_OmiChat_flip_local_' .. s)
+    end,
+    fmtradio = function(_, ...)
+        return getText('UI_OmiChat_radio', stringify(...))
+    end,
+    fmtrp = function(_, ...)
+        return getText('UI_OmiChat_rp_emote', stringifySep(' ', ...))
+    end,
+    ---@param name string
+    ---@param parenCount string?
+    ---@return string
+    fmpmfrom = function(_, name, parenCount)
+        local s = getText('UI_OmiChat_private_chat_from', tostring(name or ''))
+        local parens = tonumber(parenCount)
+        if not parens or parens <= 0 then
+            return s
+        end
+
+
+        return rep('(', parens) .. s .. rep(')', parens)
+    end,
+    ---@param name string
+    ---@param parenCount string?
+    ---@return string
+    fmpmto = function(_, name, parenCount)
+        local s = getText('UI_OmiChat_private_chat_to', tostring(name or ''))
+        local parens = tonumber(parenCount)
+        if not parens or parens <= 0 then
+            return s
+        end
+
+
+        return rep('(', parens) .. s .. rep(')', parens)
+    end,
+    parens = function(_, ...)
+        return '(' .. stringifySep(' ', ...) .. ')'
     end,
 
     ---@param interpolator omichat.Interpolator

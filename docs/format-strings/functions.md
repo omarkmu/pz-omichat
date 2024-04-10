@@ -50,6 +50,7 @@ To avoid collisions with tokens that may be added in the future, however, custom
 | `$lower(s)` | Converts given arguments into a lowercase string. |
 | `$match(s pattern init)` |  Looks for a match of `pattern` in `s` starting from `init`. Returns any captures from the pattern, or the entire match if none are specified. This behaves similarly to its [Lua counterpart](https://www.lua.org/manual/5.1/manual.html#pdf). |
 | `$punctuate(s punctuation chars)` | Adds punctuation to the end of `s` if it isn't present. If `s` is wrapped in invisible encoding characters (128–159 or 65535), the last visible character will be considered the end.<br><br>If `punctuation` is provided, it will be used as the punctuation (default: `.`).<br><br>If `chars` is provided, the set of characters considered to be punctuation will be limited to the characters in this string. By default, the Lua [pattern](https://www.lua.org/manual/5.1/manual.html#5.4.1) `%p` is used.<br><br>`$punctuate(hi)` → `hi.`<br>`$punctuate(hello !)` → `hello!` |
+| `$parens(...)` | Returns the input wrapped in parentheses. |
 | `$rep(s n)` | Returns a string made up of `n` concatenated copies of `s`. **Use with caution; large strings can take up a lot of memory.** |
 | `$reverse(s)` | Reverses a given string. |
 | `$startswith(this other)` | Returns `true` if `this` starts with `other`. Otherwise, returns the empty string. |
@@ -167,6 +168,13 @@ To get pseudo-random values for these, use `$randomseed` first.
 | `$cooldownremaining(condition key)` | Returns the number of seconds remaining on a cooldown, or the empty string if there's no such cooldown. |
 | `$disallowsignedoverradio(condition suppressError)` | Sets the `errorID` token if `condition` is true and the message language is signed. An error message will inform the player that they cannot use a signed language over the radio, unless `suppressError` is passed. Returns true if the check passed. |
 | `$fragmented(text)` | Gets random fragments of the words in a string, replacing other words with ellipses. |
+| `$fmtcard(...)` | Returns the input formatted with the default formatting for `/card`. |
+| `$fmtflip(heads)` | Returns the input formatted with the default formatting for `/flip`. If `heads` is the empty string, it's treated as a tails flip. |
+| `$fmtradio(frequency)` | Returns the default formatting for a radio message prefix. |
+| `$fmtroll(roll sides)` | Returns the input formatted with the default formatting for `/roll`. |
+| `$fmtrp(frequency)` | Returns the default formatting for an RP emote. |
+| `$fmtpmfrom(name parenCount)` | Returns the default formatting for an incoming PM prefix. `parenCount` specifies the number of parentheses to use for wrapping. |
+| `$fmtpmto(name parenCount)` | Returns the default formatting for an outgoing PM prefix. `parenCount` specifies the number of parentheses to use for wrapping. |
 | `$gettext(s ...)` | Returns a translation. The first argument must be the translation name. Subsequent arguments may be translation substitutions. |
 | `$gettextornull(s ...)` | Behaves similarly to `$gettext()`, but returns the empty string for unknown translations instead of the translation name. |
 | `$getunknownlanguagestring(language stream author dialogueTag message category)` | Returns a string to use when the recipient of a message doesn't know the language used. `author` and `dialogueTag` are optional; if supplied, they apply a narrative style to the result. `message` is also optional, and will display a fragment of the message based on the relevant [options](../sandbox-options/languages.md) if provided. `category` is the color category to use for fragmented text. |
