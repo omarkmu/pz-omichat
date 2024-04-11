@@ -320,7 +320,7 @@ library = {
     ---@param name string
     ---@param parenCount string?
     ---@return string
-    fmpmfrom = function(_, name, parenCount)
+    fmtpmfrom = function(_, name, parenCount)
         local s = getText('UI_OmiChat_private_chat_from', tostring(name or ''))
         local parens = tonumber(parenCount)
         if not parens or parens <= 0 then
@@ -333,7 +333,7 @@ library = {
     ---@param name string
     ---@param parenCount string?
     ---@return string
-    fmpmto = function(_, name, parenCount)
+    fmtpmto = function(_, name, parenCount)
         local s = getText('UI_OmiChat_private_chat_to', tostring(name or ''))
         local parens = tonumber(parenCount)
         if not parens or parens <= 0 then
