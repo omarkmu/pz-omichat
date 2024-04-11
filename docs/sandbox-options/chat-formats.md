@@ -280,7 +280,7 @@ The format used for server messages in chat.
 **See also:** [`ColorServer`](./colors.md#colorserver).
 
 ### ChatFormatUnknownLanguage
-**Default:** `$fmtrp(<SPACE> $name <SPACE> $getunknownlanguagestring($languageRaw $stream () () $message say) <SPACE>)`  
+**Default:** `$fmtrp(<SPACE> $name <SPACE> $getunknownlanguagestring($languageRaw $stream) <SPACE>)`  
 **Token Context:** [Chat](../sandbox-options/token-contexts.md#chat)
 
 The format used when a player character does not speak the [language](./languages.md) of a chat message.
@@ -288,7 +288,7 @@ The format used when a player character does not speak the [language](./language
 With the default format, this will display as `« Name says/shouts/whispers/signs something in Language. »`.
 
 ### ChatFormatUnknownLanguageRadio
-**Default:** `$fmtradio($frequency): $fmtrp($getunknownlanguagestring($languageRaw $stream () () $message say))`  
+**Default:** `$fmtradio($frequency): $fmtrp($getunknownlanguagestring($languageRaw $stream))`  
 **Token Context:** [Chat](../sandbox-options/token-contexts.md#chat)
 
 The format used when a player character does not speak the [language](./languages.md) of a chat message sent over the radio.
