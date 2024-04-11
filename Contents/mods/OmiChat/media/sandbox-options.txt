@@ -1129,7 +1129,7 @@ option OmiChat.ChatFormatEcho
 option OmiChat.ChatFormatUnknownLanguage
 {
     type = string,
-    default = $fmtrp(<SPACE> $name <SPACE> $getunknownlanguagestring($languageRaw $stream () () $message say) <SPACE>),
+    default = $fmtrp(<SPACE> $name <SPACE> $getunknownlanguagestring($languageRaw $stream) <SPACE>),
     page = OmiChat,
     translation = OCChatFormatUnknownLanguage,
 }
@@ -1137,7 +1137,7 @@ option OmiChat.ChatFormatUnknownLanguage
 option OmiChat.ChatFormatUnknownLanguageRadio
 {
     type = string,
-    default = $fmtradio($frequency): $fmtrp($getunknownlanguagestring($languageRaw $stream () () $message say)),
+    default = $fmtradio($frequency): $fmtrp($getunknownlanguagestring($languageRaw $stream)),
     page = OmiChat,
     translation = OCChatFormatUnknownLanguageRadio,
 }

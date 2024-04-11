@@ -130,6 +130,6 @@ OmiChat = {
     ChatFormatWhisper = "$name: <SPACE> $message",
     ChatFormatYell = "$name: <SPACE> $message",
     ChatFormatEcho = "",
-    ChatFormatUnknownLanguage = "$fmtrp(<SPACE> $name <SPACE> $getunknownlanguagestring($languageRaw $stream () () $message say) <SPACE>)",
-    ChatFormatUnknownLanguageRadio = "$fmtradio($frequency): $fmtrp($getunknownlanguagestring($languageRaw $stream () () $message say))",
+    ChatFormatUnknownLanguage = "$fmtrp(<SPACE> $name <SPACE> $getunknownlanguagestring($languageRaw $stream) <SPACE>)",
+    ChatFormatUnknownLanguageRadio = "$fmtradio($frequency): $fmtrp($getunknownlanguagestring($languageRaw $stream))",
 }

@@ -250,16 +250,15 @@ library = {
     ---@param stream string?
     ---@param author string?
     ---@param dialogueTag string?
-    ---@param message string?
-    ---@param category string?
+    ---@param noQuoteColor string?
     ---@return string?
-    getunknownlanguagestring = function(interpolator, language, stream, author, dialogueTag, message, category)
+    getunknownlanguagestring = function(interpolator, language, stream, author, dialogueTag, noQuoteColor)
         local base = getBaseUnknownLanguageString(language, stream, author, dialogueTag)
         if not base then
             return
         end
 
-        message = message and tostring(message) or ''
+        local message = tostring(interpolator:token('unstyled') or interpolator:token('message') or '')
         local fragment = getFragmentedMessage(interpolator, message)
         if not fragment then
             return base
@@ -268,7 +267,7 @@ library = {
         local parts = { base, ' <SPACE> ' }
 
         local pop
-        if category ~= '' then
+        if not interpolator:toBoolean(noQuoteColor) then
             ---@cast OmiChat omichat.api.client
             local color = OmiChat.getColorOrDefault and utils.toChatColor(OmiChat.getColorOrDefault('say'), true) or ''
             if color ~= '' then
