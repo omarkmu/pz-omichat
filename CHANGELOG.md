@@ -50,7 +50,7 @@
     - Romanian
     - Tagalog
 
-## Deprecated
+### Deprecated
 
 - Deprecated the `command` field to stream use callbacks in favor of `text`
 - Deprecated `suggestUsernames` and `suggestOwnUsername` stream configuration fields in favor of suggestion specs
