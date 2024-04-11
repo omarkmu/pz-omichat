@@ -1,3 +1,90 @@
+# 1.1.0
+
+### Added
+
+- `/flip` command for coin flips and corresponding options
+- `/language` command for quickly switching active language
+- Options to control which items are required for `/roll`, `/card`, and `/flip` commands
+    - `DiceItems`, `CardItems`, and `CoinItems`.
+- `PatternNarrativeCustomTag` option to allow players to specify custom dialogue tags in narrative style
+- `EnableCleanCharacter` option to customize behavior of the “clean blood & dirt” option
+- `PredicateEnableStream` option to control which streams are enabled
+- API functions for adding and removing custom chat buttons
+- API functions for adding chat settings
+- API support for icons at the message level
+    - Message level icons override player icons and the admin icon.
+- Stream callback for using a disabled stream
+- Improved relevancy of command suggestions
+    - The chat can now suggest languages (for `/addlanguage` and `/language`) and perks (for `/addxp`), among other command inputs.
+    - The API function `addSuggesterArgType` has also been added to allow extension with more argument types.
+- Chance to understand partial messages in other languages (buffy parity)
+    - This can be configured with the new `InterpretationRolls` and `InterpretationChance` options.
+- Allow/block lists to define a subset of the available languages that can be added by players directly (`AddLanguageAllowlist` and `AddLanguageBlocklist`)
+- New format string functions for ease-of-use
+    - `$cooldown()`
+    - `$cooldownset()`
+    - `$cooldownif()`
+    - `$cooldownunless()`
+    - `$cooldownremaining()`
+    - `$disallowsignedoverradio()`
+    - `$isadmin()`
+    - `$iscoophost()`
+    - `$accesslevel()`
+    - `$fmtcard()`
+    - `$fmtroll()`
+    - `$fmtflip()`
+    - `$fmtradio()`
+    - `$fmtrp()`
+    - `$fmtpmfrom()`
+    - `$fmtpmto()`
+    - `$parens()`
+    - `$streamtype()`
+- Default translations for more roleplay languages (not added as defaults in `AvailableLanguages`)
+    - Catalan
+    - Gujarati
+    - Hausa
+    - Hawaiian
+    - Latvian
+    - Malay
+    - Persian
+    - Romanian
+    - Tagalog
+
+## Deprecated
+
+- Deprecated the `command` field to stream use callbacks in favor of `text`
+- Deprecated `suggestUsernames` and `suggestOwnUsername` stream configuration fields in favor of suggestion specs
+- Deprecated the `CustomShoutMaxLength` and `MaximumCustomShouts` options; these will be hardcoded in a future version
+- Deprecated strings that were in use by presets; these will be removed in a future version
+    - `UI_OmiChat_card_local`: use `$fmtCard(card)`
+    - `UI_OmiChat_roll_local`: use `$fmtRoll(roll sides)`
+    - `UI_OmiChat_radio`: use `$fmtRadio(frequency)`
+    - `UI_OmiChat_rp_emote`: use `$fmtRP(...)`
+    - `UI_OmiChat_private_chat_from`: use `$fmtPMFrom(name parenCount)`
+    - `UI_OmiChat_private_chat_to`: use `$fmtPMTo(name parenCount)`
+
+### Fixed
+
+- Fixed a mix-up in the Korean translations for “says” vs. “asks”
+- Fixed the “clean blood & dirt” option not changing the dirty/bloody bar in the inventory
+- Fixed a problem in the Search Players for Weapons compatibility patch that could cause a repeat info message
+- Fixed a typo in `OmiChat.setRoleplayLanguageSlots`
+- Fixed an issue that could cause retain options to not be respected
+- Fixed command streams not being case-insensitive
+    - Command streams such as `/roll` are case-insensitive in vanilla (`/ROLL` is treated as equivalent).
+    This is not the case for chat streams like `/say`.
+
+### Changed
+
+- Increased the maximum configured languages from 32 to 1000
+    - No one should configure that many roleplay languages, but now you can!
+- Increase the maximum for player language slots from 32 to 50
+- Spaces will now be replaced with underscores when retrieving translations for language names
+- Improved encoding of command arguments and added new utility functions for encoding them
+- Improved disabled command message for chat streams
+- Buffs now include fatigue
+- Slightly increased buff strength for hunger and thirst
+
 # 1.0.0
 
 - Initial release
