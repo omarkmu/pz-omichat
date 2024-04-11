@@ -42,7 +42,10 @@ This is not a comprehensive list; please see the documentation.
 
 ## Credits
 
-Thank you to 우로 for providing Korean translations.
+Thank you to the translators!
+- French: [Inkredibehl](https://github.com/Inkredibehl)
+- Korean: 우로
+
 If you'd like to see the mod translated into your language, please [contribute](https://github.com/omarkmu/pz-omichat/blob/main/.github/CONTRIBUTING.md)!
 
 Some features were inspired by [buffy's roleplay chat](https://steamcommunity.com/sharedfiles/filedetails/?id=2688851521).  
