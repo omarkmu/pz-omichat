@@ -4,6 +4,9 @@
 <img src="./images/icon.png" width=256 height=256 />
 </a>
 
+[![](https://img.shields.io/discord/1228107690354671626?style=for-the-badge&logo=discord&logoColor=%23fff&label=Discord&labelColor=%235865F2&color=%23555)](https://discord.gg/juv9TqygFu)
+
+
 OmiChat is a mod for [Project Zomboid](https://projectzomboid.com) that extends chat functionality.
 It's available on the [Steam workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3178882070).
 

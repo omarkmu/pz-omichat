@@ -2,7 +2,10 @@ version=1
 id=3178882070
 title=OmiChat
 description=It's a chat mod.
-description=This mod can be added or removed mid-save.
+description=[b]This mod can be added or removed mid-save.[/b]
+description=
+description=[url=https://discord.gg/juv9TqygFu][img]https://img.shields.io/discord/1228107690354671626?style=for-the-badge&logo=discord&logoColor=%23fff&label=Discord&labelColor=%235865F2&color=%23555[/img][/url]
+description=
 description=[h2]Description[/h2]
 description=This mod improves the chat for players and offers a plethora of sandbox options for server operators. Among other features, it includes color customization, character naming, emote shortcuts, and new chat commands for roleplay.
 description=
@@ -68,12 +71,13 @@ description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=28730
 description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556]True Actions. Act 3 - Dancing[/url]
 description=[/list]
 description=
-description=[h2]Permissions[/h2]
-description=This mod uses the [url=https://theindiestone.com/forums/index.php?/topic/2530-mod-permissions/#comment-36478]Ask for permission policy.[/url]
+description=[h2]Permissions & Credits[/h2]
+description=This mod uses the [url=https://theindiestone.com/forums/index.php?/topic/2530-mod-permissions/#comment-36478]“Ask for permission” policy.[/url]
 description=You may [b]not[/b] reupload this mod or include it directly in modpacks. If there's something missing from the mod, [url=https://github.com/omarkmu/pz-omichat/blob/main/.github/CONTRIBUTING.md]contribute![/url]
 description=Permission is not required to list the mod as a requirement or extend it via the API. If you'd like to request permission to use it in another way (modpack requests will likely be denied), please start a [url=https://github.com/omarkmu/pz-omichat/discussions/new?category=general]discussion.[/url]
-description=
 description=The code and associated documentation is licensed under the [url=https://github.com/omarkmu/pz-omichat/blob/main/LICENSE]MIT License.[/url]
+description=
+description=Thank you to 우로 and Inkredibehl for providing translations!
 description=Some features were inspired by [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2688851521]buffy's roleplay chat.[/url]
 description=[hr][/hr]Questions? Use the [url=https://github.com/omarkmu/pz-omichat/discussions]GitHub discussions.[/url]
 description=Suggestions? Create a [url=https://github.com/omarkmu/pz-omichat/discussions/new?category=ideas]feature request.[/url]
