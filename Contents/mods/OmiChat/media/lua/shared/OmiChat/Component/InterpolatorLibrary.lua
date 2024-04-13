@@ -110,7 +110,7 @@ local function getBaseUnknownLanguageString(language, stream, author, dialogueTa
     author = author and tostring(author) or ''
 
     if stream == 'radio' and author == '' then
-        return getText('UI_OmiChat_unknown_language_radio_no_author', language)
+        return getText('UI_OmiChat_UnknownLanguageRadioNoAuthor', language)
     end
 
     local isSigned = OmiChat.isRoleplayLanguageSigned(language)
@@ -119,27 +119,28 @@ local function getBaseUnknownLanguageString(language, stream, author, dialogueTa
     -- narrative style
     dialogueTag = dialogueTag and tostring(dialogueTag) or ''
     if author ~= '' and dialogueTag ~= '' then
-        local stringID = 'UI_OmiChat_unknown_language_narrative_' .. dialogueTag:gsub('%s', '_')
+        local stringID = 'UI_OmiChat_UnknownLanguageNarrative_' .. dialogueTag:gsub('%s', '_')
 
         local translated = getTextOrNull(stringID, author, language)
         if translated then
             return translated
         end
 
-        stringID = 'UI_OmiChat_unknown_language_narrative_' .. (isSigned and 'signs' or 'says')
+        stringID = 'UI_OmiChat_UnknownLanguageNarrative_' .. (isSigned and 'signs' or 'says')
         return getText(stringID, author, language)
     end
 
-    local stringID = { 'UI_OmiChat_unknown_language_' }
-    if stream == 'whisper' or stream == 'shout' then
-        stringID[#stringID + 1] = stream
-    else
-        stringID[#stringID + 1] = 'say'
+    local stringID = { 'UI_OmiChat_UnknownLanguage' }
+    if isSigned then
+        stringID[#stringID + 1] = 'Signed'
     end
 
-    stringID[#stringID + 1] = 's'
-    if isSigned then
-        stringID[#stringID + 1] = '_signed'
+    if stream == 'whisper' then
+        stringID[#stringID + 1] = 'Whisper'
+    elseif stream == 'shout' then
+        stringID[#stringID + 1] = 'Shout'
+    else
+        stringID[#stringID + 1] = 'Say'
     end
 
     return getText(concat(stringID), language)
@@ -298,30 +299,30 @@ library = {
     end,
 
     fmtcard = function(_, ...)
-        return getText('UI_OmiChat_card_local', stringify(...))
+        return getText('UI_OmiChat_CardLocal', stringify(...))
     end,
     fmtroll = function(_, roll, ...)
         roll = tostring(roll or '')
-        return getText('UI_OmiChat_roll_local', roll, stringify(...))
+        return getText('UI_OmiChat_RollLocal', roll, stringify(...))
     end,
     ---@param interpolator omichat.Interpolator
     ---@param heads string?
     ---@return string
     fmtflip = function(interpolator, heads)
-        local s = interpolator:toBoolean(heads) and 'heads' or 'tails'
-        return getText('UI_OmiChat_flip_local_' .. s)
+        local s = interpolator:toBoolean(heads) and 'Heads' or 'Tails'
+        return getText('UI_OmiChat_FlipLocal' .. s)
     end,
     fmtradio = function(_, ...)
-        return getText('UI_OmiChat_radio', stringify(...))
+        return getText('UI_OmiChat_Radio', stringify(...))
     end,
     fmtrp = function(_, ...)
-        return getText('UI_OmiChat_rp_emote', stringifySep(' ', ...))
+        return getText('UI_OmiChat_RPEmote', stringifySep(' ', ...))
     end,
     ---@param name string
     ---@param parenCount string?
     ---@return string
     fmtpmfrom = function(_, name, parenCount)
-        local s = getText('UI_OmiChat_private_chat_from', tostring(name or ''))
+        local s = getText('UI_OmiChat_PrivateChatFrom', tostring(name or ''))
         local parens = tonumber(parenCount)
         if not parens or parens <= 0 then
             return s
@@ -334,7 +335,7 @@ library = {
     ---@param parenCount string?
     ---@return string
     fmtpmto = function(_, name, parenCount)
-        local s = getText('UI_OmiChat_private_chat_to', tostring(name or ''))
+        local s = getText('UI_OmiChat_PrivateChatTo', tostring(name or ''))
         local parens = tonumber(parenCount)
         if not parens or parens <= 0 then
             return s
@@ -365,12 +366,12 @@ library = {
             return false
         end
 
-        local errorID = 'UI_OmiChat_error_signed_radio'
+        local errorID = 'UI_OmiChat_Error_SignedRadio'
         local stream = interpolator:token('stream')
         if stream == 'safehouse' then
-            errorID = 'UI_OmiChat_error_signed_safehouse_radio'
+            errorID = 'UI_OmiChat_Error_SignedSafehouseRadio'
         elseif stream == 'faction' then
-            errorID = 'UI_OmiChat_error_signed_faction_radio'
+            errorID = 'UI_OmiChat_Error_SignedFactionRadio'
         end
 
         interpolator:setToken('errorID', errorID)
@@ -404,10 +405,10 @@ library = {
             return false
         end
 
-        local errorID = 'UI_OmiChat_error_command_cooldown'
+        local errorID = 'UI_OmiChat_Error_CommandCooldown'
         local remaining = math.ceil((next - now) / 1000)
         if remaining <= 1 then
-            errorID = 'UI_OmiChat_error_command_cooldown_1'
+            errorID = 'UI_OmiChat_Error_CommandCooldown1'
         end
 
         interpolator:setToken('error', getText(errorID, remaining))

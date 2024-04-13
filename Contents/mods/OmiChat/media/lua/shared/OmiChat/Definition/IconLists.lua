@@ -1,16 +1,16 @@
 ---Very large icon list. Necessary to categorize icons and control icon order.
 return {
     {
-        'nature',
-        'food',
-        'cooking',
-        'clothing',
-        'weapons',
-        'tools',
-        'objects',
-        'items',
+        'Nature',
+        'Food',
+        'Cooking',
+        'Clothing',
+        'Weapons',
+        'Tools',
+        'Objects',
+        'Items',
     },
-    nature = {
+    Nature = {
         'rabbitdead',
         'squirreldead',
         'deadrat',
@@ -193,7 +193,7 @@ return {
         'waterdrop',
         'music',
     },
-    food = {
+    Food = {
         'soup',
         'soupopen',
         'beans',
@@ -525,7 +525,7 @@ return {
         'wine2full',
         'winefull',
     },
-    cooking = {
+    Cooking = {
         'bakingpan',
         'pot',
         'pot_water',
@@ -628,7 +628,7 @@ return {
         'butter',
         'lard',
     },
-    clothing = {
+    Clothing = {
         'baseballcapblue',
         'baseballcapgreen',
         'baseballcapred',
@@ -1043,7 +1043,7 @@ return {
         'fannypack',
         'tote',
     },
-    weapons = {
+    Weapons = {
         'spearstick',
         'spearbutterknife',
         'spearfork',
@@ -1113,7 +1113,7 @@ return {
         'rifleammo223loose',
         'rifleammo308loose',
     },
-    tools = {
+    Tools = {
         'rocksharpened',
         'knifeflint',
         'axestone',
@@ -1188,7 +1188,7 @@ return {
         'walkietalkiepolice',
         'weldingrods',
     },
-    objects = {
+    Objects = {
         'drawer',
         'media/ui/container_drawer',
         'shelf',
@@ -1256,7 +1256,7 @@ return {
         'glovecompartment',
         'stairs',
     },
-    items = {
+    Items = {
         'book',
         'book10',
         'book11',

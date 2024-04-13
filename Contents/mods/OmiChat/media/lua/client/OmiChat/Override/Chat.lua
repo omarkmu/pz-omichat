@@ -55,7 +55,7 @@ local function addAdminOptions(context)
         'ignore_message_range',
     }
 
-    local adminOptionName = getText('UI_OmiChat_context_admin')
+    local adminOptionName = getText('UI_OmiChat_ContextAdmin')
     local adminOption = context:addOption(adminOptionName, ISChat.instance)
 
     local subMenu = context:getNew(context)
@@ -63,7 +63,7 @@ local function addAdminOptions(context)
 
     for i = 1, #options do
         local option = options[i]
-        local name = getText('UI_OmiChat_context_admin_' .. option)
+        local name = getText('UI_OmiChat_ContextAdmin_' .. option)
         local opt = subMenu:addOption(name, ISChat.instance, ISChat.onAdminOptionToggle, option)
         subMenu:setOptionChecked(opt, OmiChat.getAdminOption(option))
     end
@@ -227,7 +227,7 @@ local function addColorOptions(context)
         return
     end
 
-    local colorOptionName = getText('UI_OmiChat_context_colors_submenu_name')
+    local colorOptionName = getText('UI_OmiChat_ContextColorsSubmenu')
     local colorOption = context:addOption(colorOptionName, ISChat.instance)
 
     local colorSubMenu = context:getNew(context)
@@ -235,9 +235,9 @@ local function addColorOptions(context)
 
     for i = 1, #colorOpts do
         local category = colorOpts[i]
-        local name = getTextOrNull('UI_OmiChat_context_submenu_color_' .. category)
+        local name = getTextOrNull('UI_OmiChat_ContextColor_' .. category)
         if not name then
-            name = getText('UI_OmiChat_context_submenu_color', OmiChat.getColorCategoryCommand(category))
+            name = getText('UI_OmiChat_ContextColor', OmiChat.getColorCategoryCommand(category))
         end
 
         colorSubMenu:addOption(name, ISChat.instance, ISChat.onCustomColorMenu, category)
@@ -247,10 +247,10 @@ end
 ---Adds the context menu options for custom callouts.
 ---@param context ISContextMenu
 local function addCustomCalloutOptions(context)
-    local calloutOptName = getText('UI_OmiChat_context_set_custom_callouts')
+    local calloutOptName = getText('UI_OmiChat_ContextSetCustomCallouts')
     context:addOption(calloutOptName, ISChat.instance, ISChat.onCustomCalloutMenu, 'callouts')
 
-    local sneakCalloutOptName = getText('UI_OmiChat_context_set_custom_sneakcallouts')
+    local sneakCalloutOptName = getText('UI_OmiChat_ContextSetCustomSneakCallouts')
     context:addOption(sneakCalloutOptName, ISChat.instance, ISChat.onCustomCalloutMenu, 'sneakcallouts')
 end
 
@@ -289,7 +289,7 @@ local function addLanguageOptions(context)
         end
     end
 
-    local languageOptionName = getText('UI_OmiChat_context_languages')
+    local languageOptionName = getText('UI_OmiChat_ContextLanguages')
     local languageOption = context:addOption(languageOptionName, ISChat.instance)
     local languageSubMenu = context:getNew(context)
     context:addSubMenu(languageOption, languageSubMenu)
@@ -306,7 +306,7 @@ local function addLanguageOptions(context)
         table.sort(addLanguages, function(a, b) return a.translated < b.translated end)
 
         local addLanguageSubMenu = languageSubMenu:getNew(languageSubMenu)
-        local addLanguageOption = languageSubMenu:addOption(getText('UI_OmiChat_context_add_language'), ISChat.instance)
+        local addLanguageOption = languageSubMenu:addOption(getText('UI_OmiChat_ContextAddLanguage'), ISChat.instance)
         languageSubMenu:addSubMenu(addLanguageOption, addLanguageSubMenu)
         for i = 1, #addLanguages do
             local lang = addLanguages[i].language
@@ -328,7 +328,7 @@ end
 ---Adds the context menu options for retaining commands.
 ---@param context ISContextMenu
 local function addRetainOptions(context)
-    local retainOption = context:addOption(getText('UI_OmiChat_context_retain_commands'), ISChat.instance)
+    local retainOption = context:addOption(getText('UI_OmiChat_ContextRetainCommands'), ISChat.instance)
 
     local retainSubMenu = context:getNew(context)
     context:addSubMenu(retainOption, retainSubMenu)
@@ -341,7 +341,7 @@ local function addRetainOptions(context)
 
     for i = 1, #categories do
         local cat = categories[i]
-        local name = getText('UI_OmiChat_context_retain_commands_' .. cat)
+        local name = getText('UI_OmiChat_ContextRetainCommands_' .. cat)
         local opt = retainSubMenu:addOption(name, ISChat.instance, ISChat.onToggleRetainCommand, cat)
         retainSubMenu:setOptionChecked(opt, OmiChat.getRetainCommand(cat))
     end
@@ -368,11 +368,11 @@ local function addSignEmoteOption(context)
         return
     end
 
-    local suffix = OmiChat.getSignEmotesEnabled() and 'disable' or 'enable'
-    local optName = getText('UI_OmiChat_context_sign_emotes_' .. suffix)
+    local infix = OmiChat.getSignEmotesEnabled() and 'Disable' or 'Enable'
+    local optName = getText('UI_OmiChat_Context' .. infix .. 'SignEmotes')
     local option = context:addOption(optName, ISChat.instance, ISChat.onToggleUseSignEmotes)
     option.toolTip = ISToolTip:new()
-    option.toolTip.description = getText('UI_OmiChat_context_sign_emotes_tooltip')
+    option.toolTip.description = getText('UI_OmiChat_ContextSignEmotesTooltip')
 end
 
 ---Adds the chat settings submenu to the context menu.
@@ -383,7 +383,7 @@ local function addChatSettings(context)
         return
     end
 
-    local option = context:addOption(getText('UI_OmiChat_context_chat_settings'), instance)
+    local option = context:addOption(getText('UI_OmiChat_ContextChatSettings'), instance)
     local submenu = context:getNew(context)
     context:addSubMenu(option, submenu)
 
@@ -398,8 +398,8 @@ local function addChatSettings(context)
     submenu:addOption(tagOptName, instance, ISChat.onToggleTagPrefix)
 
     local suggesterOptName = OmiChat.getUseSuggester()
-        and getText('UI_OmiChat_context_disable_suggestions')
-        or getText('UI_OmiChat_context_enable_suggestions')
+        and getText('UI_OmiChat_ContextDisableSuggestions')
+        or getText('UI_OmiChat_ContextEnableSuggestions')
     submenu:addOption(suggesterOptName, instance, ISChat.onToggleUseSuggester)
 
     addRetainOptions(submenu)
@@ -419,7 +419,7 @@ local function addChatCustomizationSettings(context)
         return
     end
 
-    local option = context:addOption(getText('UI_OmiChat_context_chat_customization'), instance)
+    local option = context:addOption(getText('UI_OmiChat_ContextChatCustomization'), instance)
     local submenu = context:getNew(context)
     context:addSubMenu(option, submenu)
 
@@ -429,8 +429,8 @@ local function addChatCustomizationSettings(context)
 
     if Option.EnableSetNameColor or Option.EnableSpeechColorAsDefaultNameColor then
         local nameColorOptName = OmiChat.getNameColorsEnabled()
-            and getText('UI_OmiChat_context_disable_name_colors')
-            or getText('UI_OmiChat_context_enable_name_colors')
+            and getText('UI_OmiChat_ContextDisableNameColors')
+            or getText('UI_OmiChat_ContextEnableNameColors')
 
         submenu:addOption(nameColorOptName, instance, ISChat.onToggleShowNameColor)
     end
@@ -466,25 +466,25 @@ local function addCharacterCustomizationSettings(context)
         return
     end
 
-    local option = context:addOption(getText('UI_OmiChat_context_character_customization'), instance)
+    local option = context:addOption(getText('UI_OmiChat_ContextCharacterCustomization'), instance)
     local submenu = context:getNew(context)
     context:addSubMenu(option, submenu)
 
     addSignEmoteOption(submenu)
 
     if Option:isCleanCustomizationEnabled() then
-        local cleanOptName = getText('UI_OmiChat_context_clean')
+        local cleanOptName = getText('UI_OmiChat_ContextClean')
         submenu:addOption(cleanOptName, instance, ISChat.onCleanCharacter)
     end
 
-    local hairColorOptName = getText('UI_OmiChat_context_hair_color')
+    local hairColorOptName = getText('UI_OmiChat_ContextHairColor')
     submenu:addOption(hairColorOptName, instance, ISChat.onHairColorMenu)
 
-    local growHairOptName = getText('UI_OmiChat_context_grow_hair')
+    local growHairOptName = getText('UI_OmiChat_ContextGrowHair')
     submenu:addOption(growHairOptName, instance, ISChat.onGrowHair)
 
     if not player:isFemale() then
-        local growBeardOptName = getText('UI_OmiChat_context_grow_beard')
+        local growBeardOptName = getText('UI_OmiChat_ContextGrowBeard')
         submenu:addOption(growBeardOptName, instance, ISChat.onGrowBeard)
     end
 
@@ -691,7 +691,7 @@ function ISChat.onHairColorMenu(target)
         b = naturalHairColor:getBlueInt(),
     }
 
-    local text = getText('UI_OmiChat_context_hair_color_desc')
+    local text = getText('UI_OmiChat_ContextHairColorDesc')
     local width = max(450, getTextManager():MeasureStringX(UIFont.Small, text) + 60)
     local modal = ColorModal:new(0, 0, width, 250, text, color, target, ISChat.onCustomHairColorMenuClick, 0)
 
@@ -741,11 +741,11 @@ function ISChat.onCustomColorMenu(target, category)
     end
 
     local color = OmiChat.getColorOrDefault(category)
-    local text = getTextOrNull('UI_OmiChat_context_color_desc_' .. category)
+    local text = getTextOrNull('UI_OmiChat_ContextColorDesc_' .. category)
     if not text then
-        local catName = getTextOrNull('UI_OmiChat_context_message_type_' .. category) or
-            OmiChat.getColorCategoryCommand(category)
-        text = getText('UI_OmiChat_context_color_desc', catName)
+        local catName = getTextOrNull('UI_OmiChat_ContextMessageType_' .. category)
+            or OmiChat.getColorCategoryCommand(category)
+        text = getText('UI_OmiChat_ContextColorDesc', catName)
     end
 
     local width = max(450, getTextManager():MeasureStringX(UIFont.Small, text) + 60)
@@ -820,7 +820,7 @@ function ISChat.onCustomCalloutMenu(target, category)
     local textManager = getTextManager()
     local boxHeight = 4 + textManager:getFontHeight(UIFont.Medium) * numLines
 
-    local desc = getText('UI_OmiChat_context_set_custom_callouts_desc')
+    local desc = getText('UI_OmiChat_ContextSetCustomCalloutsDesc')
 
     local width = 500
     local height = boxHeight + 100
@@ -967,7 +967,7 @@ function ISChat.onAddLanguage(target, language)
 
     local languages = OmiChat.getRoleplayLanguages()
     local languageTranslated = utils.getTranslatedLanguageName(language)
-    local text = getText('UI_OmiChat_context_confirm_add_language', languageTranslated, #languages + 1)
+    local text = getText('UI_OmiChat_ContextConfirmAddLanguage', languageTranslated, #languages + 1)
     local width, height = ISModalDialog.CalcSize(0, 0, text)
     local x = getPlayerScreenLeft(0) + (getPlayerScreenWidth(0) - width) / 2
     local y = getPlayerScreenTop(0) + (getPlayerScreenHeight(0) - height) / 2
@@ -1011,14 +1011,14 @@ function ISChat.validateCustomCalloutText(target, text)
     end
 
     if #lines > Option.MaximumCustomShouts then
-        target:setValidateTooltipText(getText('UI_OmiChat_error_too_many_shouts', tostring(Option.MaximumCustomShouts)))
+        target:setValidateTooltipText(getText('UI_OmiChat_Error_TooManyShouts', tostring(Option.MaximumCustomShouts)))
         return false
     end
 
     for i = 1, #lines do
         if #lines[i] > Option.CustomShoutMaxLength then
             local maxLen = tostring(Option.CustomShoutMaxLength)
-            target:setValidateTooltipText(getText('UI_OmiChat_error_shout_too_long', maxLen))
+            target:setValidateTooltipText(getText('UI_OmiChat_Error_TooLongShout', maxLen))
             return false
         end
     end

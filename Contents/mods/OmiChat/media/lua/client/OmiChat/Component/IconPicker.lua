@@ -51,12 +51,12 @@ local function prepareIcons()
     for icon in utils.iterateIcons() do
         if not known[icon] then
             -- include unknown icons in misc category
-            if not icons.miscellaneous then
-                icons.miscellaneous = {}
-                categoryOrder[#categoryOrder + 1] = 'miscellaneous'
+            if not icons.Miscellaneous then
+                icons.Miscellaneous = {}
+                categoryOrder[#categoryOrder + 1] = 'Miscellaneous'
             end
 
-            local list = icons.miscellaneous
+            local list = icons.Miscellaneous
             list[#list + 1] = icon
         end
     end
@@ -112,7 +112,7 @@ function IconPicker:buildIconList()
 
     for i = 1, #self.icons do
         local icon = self.icons[i]
-        local cat = icon.category or 'miscellaneous'
+        local cat = icon.category or 'Miscellaneous'
         local name = icon.name
         local textureName = icon.textureName
 
@@ -139,7 +139,7 @@ function IconPicker:buildIconList()
 
     for i = 1, #categoryOrder do
         local cat = categoryOrder[i]
-        if self.includeUnknownAsMiscellaneous or cat ~= 'miscellaneous' then
+        if self.includeUnknownAsMiscellaneous or cat ~= 'Miscellaneous' then
             result[#result + 1] = iconsByCategory[cat]
         end
     end
@@ -278,7 +278,7 @@ function IconPicker:updateIcons()
         local info = iconInfo[i]
         if #info.list > 0 then
             row = row + 1
-            contents[row] = getText('UI_OmiChat_icon_cat_' .. info.category)
+            contents[row] = getText('UI_OmiChat_IconCat_' .. info.category)
 
             local rowIcons = {}
             for j = 1, #info.list do
