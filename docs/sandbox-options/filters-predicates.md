@@ -47,7 +47,7 @@ Filters names set by players with `/name` or `/nickname`.
 
 The default option will limit names to 50 characters.
 
-This format can [set](../format-strings/functions.md#set-function) `error` or `errorID` to provide feedback to the player.
+This format can [set](../format-strings/functions.md#set) `error` or `errorID` to provide feedback to the player.
 If `errorID` is used, it will be interpreted as a string ID, whereas `error` will be displayed as given.
 
 If the empty string is returned, or either error token is set, the command will fail.
@@ -63,7 +63,7 @@ If the empty string is returned, or either error token is set, the command will 
 
 Determines whether chat input is allowed.
 
-This format can [set](../format-strings/functions.md#set-function) `error` or `errorID` to provide feedback to the player.
+This format can [set](../format-strings/functions.md#set) `error` or `errorID` to provide feedback to the player.
 If `errorID` is used, it will be interpreted as a string ID, whereas `error` will be displayed as given.
 If either token is set, the predicate will be considered a failure.
 

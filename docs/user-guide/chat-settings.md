@@ -10,7 +10,7 @@ You can access the chat settings by clicking on the gear icon at the top right o
 
 Most of the settings within the basic “chat settings” submenu exist in vanilla.
 The existing settings work equivalently.
-There are two new options added by OmiChat.
+There are two new options in this submenu.
 
 ![OmiChat basic settings](../images/chat-settings-1.png)
 
@@ -18,7 +18,7 @@ There are two new options added by OmiChat.
 
 The **retain commands** submenu can be used to determine whether certain commands are “retained,” so that they are set as the initial input the next time the chat is used.
 The submenu contains three options: “Chat,” “RP,” and “Other.”
-The first option refers to streams such as `/say`, the second refers to streams like [`/me`](../sandbox-options/chat-formats.md#chatformatme), and the third covers all other streams (such as commands).
+The first option refers to streams such as `/say`, the second refers to streams like [`/me`](../sandbox-options/chat-formats.md#chatformatme), and the third covers all other commands.
 
 ## Chat customization settings
 
@@ -57,7 +57,7 @@ The available color customization options depend on server configuration.
 
 ## Character customization
 
-If a server has character customization enabled, a submenu that includes QoL character modifications will be available. The available options are self-explanatory.
+If a server has [character customization](../sandbox-options/basic-features.md#enablecharactercustomization) enabled, a submenu that includes QoL character modifications will be available. The available options are self-explanatory.
 
 ![OmiChat character customization settings](../images/chat-settings-3.png)
 

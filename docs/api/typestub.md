@@ -5,9 +5,9 @@ The annotations are compatible with [Lua Language Server](https://luals.github.i
 
 Using LLS, you can add this stub as a [library](https://luals.github.io/wiki/settings/#workspacelibrary) to reference the API functions.
 
-The typestub is available on this site for download [here](./typestub.lua).
+The type stub is available on this site for download [here](./typestub.lua).
 
-<!-- typestub generated on deploy -->
+<!-- type stub generated on deploy -->
 ```lua
 {{#include typestub.lua}}
 ```
