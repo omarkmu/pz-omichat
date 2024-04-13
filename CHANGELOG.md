@@ -1,14 +1,101 @@
-# 1.0.0
+# Changelog
+
+## 1.1.0
+
+### Added
+- French translation (thank you to [Inkredibehl](https://github.com/Inkredibehl)!)
+- `/flip` command for coin flips and corresponding options
+- `/language` command for quickly switching active language
+- Options to control which items are required for `/roll`, `/card`, and `/flip` commands
+    - `DiceItems`, `CardItems`, and `CoinItems`.
+- `PatternNarrativeCustomTag` option to allow players to specify custom dialogue tags in narrative style
+- `EnableCleanCharacter` option to customize behavior of the “clean blood & dirt” option
+- `PredicateEnableStream` option to control which streams are enabled
+- API functions for adding and removing custom chat buttons
+- API functions for adding chat settings
+- API support for icons at the message level
+    - Message level icons override player icons and the admin icon.
+- Stream callback for using a disabled stream
+- Improved relevancy of command suggestions
+    - The chat can now suggest languages (for `/addlanguage` and `/language`) and perks (for `/addxp`), among other command inputs.
+    - The API function `addSuggesterArgType` has also been added to allow extension with more argument types.
+- Chance to understand partial messages in other languages (buffy parity)
+    - This can be configured with the new `InterpretationRolls` and `InterpretationChance` options.
+- Allow/block lists to define a subset of the available languages that can be added by players directly (`AddLanguageAllowlist` and `AddLanguageBlocklist`)
+- New format string functions for ease-of-use
+    - `$cooldown()`
+    - `$cooldownset()`
+    - `$cooldownif()`
+    - `$cooldownunless()`
+    - `$cooldownremaining()`
+    - `$disallowsignedoverradio()`
+    - `$isadmin()`
+    - `$iscoophost()`
+    - `$accesslevel()`
+    - `$fmtcard()`
+    - `$fmtroll()`
+    - `$fmtflip()`
+    - `$fmtradio()`
+    - `$fmtrp()`
+    - `$fmtpmfrom()`
+    - `$fmtpmto()`
+    - `$parens()`
+    - `$streamtype()`
+- Default translations for more roleplay languages (not added as defaults in `AvailableLanguages`)
+    - Catalan
+    - Gujarati
+    - Hausa
+    - Hawaiian
+    - Latvian
+    - Malay
+    - Persian
+    - Romanian
+    - Tagalog
+
+### Changed
+- Increased the maximum configured languages from 32 to 1000
+    - No one should configure that many roleplay languages, but now you can!
+- Increase the maximum for player language slots from 32 to 50
+- Spaces will now be replaced with underscores when retrieving translations for language names
+- Improved encoding of command arguments and added new utility functions for encoding them
+- Improved disabled command message for chat streams
+- Buffs now include fatigue
+- Slightly increased buff strength for hunger and thirst
+
+### Deprecated
+- Deprecated the `command` field to stream use callbacks in favor of `text`
+- Deprecated `suggestUsernames` and `suggestOwnUsername` stream configuration fields in favor of suggestion specs
+- Deprecated the `CustomShoutMaxLength` and `MaximumCustomShouts` options; these will be hardcoded in a future version
+- Deprecated strings that were in use by presets; these will be removed in a future version
+    - `UI_OmiChat_card_local`: use `$fmtCard(card)`
+    - `UI_OmiChat_roll_local`: use `$fmtRoll(roll sides)`
+    - `UI_OmiChat_radio`: use `$fmtRadio(frequency)`
+    - `UI_OmiChat_rp_emote`: use `$fmtRP(...)`
+    - `UI_OmiChat_private_chat_from`: use `$fmtPMFrom(name parenCount)`
+    - `UI_OmiChat_private_chat_to`: use `$fmtPMTo(name parenCount)`
+
+### Fixed
+- Fixed a mix-up in the Korean translations for “says” vs. “asks”
+- Fixed the “clean blood & dirt” option not changing the dirty/bloody bar in the inventory
+- Fixed a problem in the Search Players for Weapons compatibility patch that could cause a repeat info message
+- Fixed a typo in `OmiChat.setRoleplayLanguageSlots`
+- Fixed an issue that could cause retain options to not be respected
+- Fixed command streams not being case-insensitive
+    - Command streams such as `/roll` are case-insensitive in vanilla (`/ROLL` is treated as equivalent).
+    This is not the case for chat streams like `/say`.
+
+## 1.0.0
 
 - Initial release
 
-# 0.6.1
+## 0.6.1
 
+### Fixed
 - Fixed an issue where the `$input` token could have a stale value while formatting input for chat
     - This may have been intended initially to reference the original input, but it was applied inconsistently.
     It's better to just give it a meaning of "the input to this option."
 
-# 0.6.0
+## 0.6.0
 
 ### Added
 - “Narrative style” as an ease-of-use feature for “Character says” style dialogue. This includes the new options:
@@ -53,20 +140,6 @@
 - Various tokens for overhead formats
 - `StreamInfo` helper to improve access to stream information
 
-### Fixed
-- Fixed info button not displaying sometimes
-- Fixed potential stack overflow from very, very long messages
-- Fixed code to prevent empty messages from displaying
-- Fixed `/pm` being broken by invisible formatting
-- Custom admin commands now reject usernames that don't belong to any online players
-    - Changing settings for players who aren't online wasn't a bug, it was a feature—really!—but it seemed likely to cause confusion.
-- Chat spacing with `<SPACE>` is now context-based
-    - In most cases, it should now appear how a regular space would. No more gigantic spaces in the small font!
-- Players can no longer use chat after dying
-- Sandbox option updates from the admin menu will now propagate to clients
-    - This was already the case for most options, but those that required a restart should now support live-updating.
-- Significantly decreased the likelihood of MetaFormatters matching on the wrong text
-
 ### Changed
 - Default `/whisper` range is now 2 tiles
 - `FormatTimestamp` default now uses zero-padded hour for 24-hour format
@@ -86,6 +159,20 @@
     - No more strange vanilla error message that's styled as a global message.
 - Radio messages in an unknown language will now be properly hidden overhead on radios
 
+### Fixed
+- Fixed info button not displaying sometimes
+- Fixed potential stack overflow from very, very long messages
+- Fixed code to prevent empty messages from displaying
+- Fixed `/pm` being broken by invisible formatting
+- Custom admin commands now reject usernames that don't belong to any online players
+    - Changing settings for players who aren't online wasn't a bug, it was a feature—really!—but it seemed likely to cause confusion.
+- Chat spacing with `<SPACE>` is now context-based
+    - In most cases, it should now appear how a regular space would. No more gigantic spaces in the small font!
+- Players can no longer use chat after dying
+- Sandbox option updates from the admin menu will now propagate to clients
+    - This was already the case for most options, but those that required a restart should now support live-updating.
+- Significantly decreased the likelihood of MetaFormatters matching on the wrong text
+
 ### Removed
 - Removed `EnableSetName` (the old one) and `EnableChatNameAsCharacterName`
     - The new `EnableSetName` option includes the functionality of both.
@@ -102,7 +189,9 @@
     - This is “soft-removed” because the relevant code is still present. The `EnableIconPicker` and `EnableMiscellaneousIcons` options have been removed.
     - This will likely be added back in a future version with a better UI and implementation.
 
-# 0.5.0
+## 0.5.0
+
+### Added
 - Added roleplay languages and associated options
 - Added `/addlanguage`, `/resetlanguages`, and `/setlanguageslots` admin commands
 - Added final overhead chat format
@@ -110,10 +199,11 @@
 - Added support for chat icons, with `FormatIcon` format string & `/seticon`, `/reseticon`, and `/iconinfo` admin commands
 - Added admin chat menu with options for displaying an icon in chat, understanding all languages, and ignoring message ranges
 - Added support for randomization functions in format strings
+
+### Changed
 - Improved `/card` messages for non-English languages
 - Improved prevention of empty messages
 - Custom commands will now be suggested
-- Messages that shouldn't show over the radio are now hidden overhead too
 - Whisper messages now display a `[Whispering]` prefix overhead by default
 - `/card` and `/roll` messages will no longer use translations in overhead text by default
     - This is to avoid invisible text for players using in-game languages with different fonts.
@@ -123,35 +213,46 @@
     They will still display with guillemets in chat, for supported languages.
 - MetaFormatter now requires an explicit ID
 
-# 0.4.1
+### Fixed
+- Messages that shouldn't show over the radio are now hidden overhead too
+
+## 0.4.1
 - Added translation for RP chat format
 - Added Korean translations (thank you to 우로!)
 - Fixed admin sandbox options menu
 
-# 0.4.0
+## 0.4.0
+
+### Added
 - Added `EnableFactionColorAsDefault` as an off-by-default option
 - Added `RangeMultiplierZombies` option to change zombie attraction behavior of chat messages
 - Added retain command options for players
+
+### Changed
 - `/meloud` and `/doloud` commands can now attract zombies
 - Client dispatch API functions no longer accept a player argument
 - Message metadata tags and player preferences now use JSON
 - Arbitrary commands will now only suggest usernames to players with an access level
 - `/pm` command will no longer suggest the player's own username
+
+### Fixed
 - Fixed command suggester suggesting commands unavailable in the current chat tab
 - Fixed message redraws not respecting `maxLine` setting
 - Fixed message name colors not being constant if `EnableSetNameColor` is off
 - Fixed radio message color option only showing if a radio is equipped and turned on
 
-# 0.3.1
+## 0.3.1
 - Added clarification that radio messages can't be hidden overhead
 - Radio messages can now only use `$frequency` and `$message` tokens
 
-# 0.3.0
+## 0.3.0
 - Added `RangeCallout`, `RangeSneakCallout`, `RangeCalloutZombies`, and `RangeSneakCalloutZombies` options
 - Improved default PM formats
 - Fixed problems with `/pm` formatting
 
-# 0.2.0
+## 0.2.0
+
+### Added
 - Added local versions of `/card` and `/roll` and the following options to control them:
 	- `ChatFormatCard`
 	- `ChatFormatRoll`
@@ -165,11 +266,17 @@
 - Added server API functions for manipulating nicknames and name colors
 - Added chat info button and `FormatInfo` option to control info text content
 - Added functionality to mimic various message types with `MimicMessage`
-- Removed `MinimumColorValue` and `MaximumColorValue` options
-- Removed `MessageFormatOptions.showInChat` in favor of the `setShowInChat` method on messages
+
+### Changed
 - Faction and safehouse chats will no longer use usernames by default
 
-# 0.1.0
+### Removed
+- Removed `MinimumColorValue` and `MaximumColorValue` options
+- Removed `MessageFormatOptions.showInChat` in favor of the `setShowInChat` method on messages
+
+## 0.1.0
+
+### Added
 - Added the following streams and corresponding sandbox options:
     - `/looc` (`/l`)
     - `/meloud` (`/ml`)
@@ -179,10 +286,14 @@
     - `/doquiet` (`/dq`)
 - Added sandbox options to control default colors for all chat types
 - Added parsing for named and numeric character references in format strings
+
+### Changed
 - Enabled full format string functionality for overhead format strings
 - Improved handling of `<` and `>` characters
 - Renamed `/private` to `/pm`
 - Renamed various sandbox options for consistency
+
+### Removed
 - Removed `AllowMe` and `UseLocalWhisper` options
     - These chats can now be disabled by clearing `ChatFormatMe` and `ChatFormatWhisper`, respectively
 - Removed `UseNameColorInAllChats` option
@@ -192,9 +303,9 @@
     - `UppercaseCustomShouts`
     - `LowercaseCustomSneakShouts`
 
-# 0.0.1
+## 0.0.1
 - Fixed an error that occurred when clearing custom callouts
 - Fixed bugs with names containing `<` or `>`
 
-# 0.0.0
+## 0.0.0
 - Initial beta release

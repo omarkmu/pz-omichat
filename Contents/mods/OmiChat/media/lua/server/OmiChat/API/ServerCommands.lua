@@ -5,6 +5,8 @@ if not isServer() then return end
 
 ---@class omichat.api.server
 local OmiChat = require 'OmiChat/API/Server'
+
+---@class omichat.api.server.commands
 OmiChat.Commands = {}
 
 local Option = OmiChat.Option
@@ -150,6 +152,16 @@ function OmiChat.reportDrawCardGlobal(name, card, suit)
     OmiChat.dispatchAll('reportDrawCard', req)
 end
 
+---Instructs the client to report the result of a coin flip.
+---@param player IsoPlayer
+---@param heads boolean
+function OmiChat.reportFlipCoin(player, heads)
+    ---@type omichat.request.ReportFlipCoin
+    local req = { heads = heads }
+
+    OmiChat.dispatch('reportFlipCoin', player, req)
+end
+
 ---Instructs the client to report the result of a dice roll.
 ---@param player IsoPlayer
 ---@param roll integer
@@ -245,6 +257,7 @@ function OmiChat.Commands.requestAddLanguage(player, args)
         })
     end
 
+    username = utils.escapeRichText(username)
     if not success then
         if err == 'FULL' then
             OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_add_language_full', { username })
@@ -261,7 +274,6 @@ function OmiChat.Commands.requestAddLanguage(player, args)
         return
     end
 
-    username = utils.escapeRichText(username)
     OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_add_language_success', { username, language })
 end
 
@@ -314,6 +326,18 @@ function OmiChat.Commands.requestDrawCard(player)
     end
 end
 
+---Handles the /flip command.
+---@param player IsoPlayer
+function OmiChat.Commands.requestFlipCoin(player)
+    local heads = ZombRand(2) == 0
+    if OmiChat.isCustomStreamEnabled('flip') then
+        OmiChat.reportFlipCoin(player, heads)
+    else
+        local name = OmiChat.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
+        OmiChat.sendTranslatedServerMessage('UI_OmiChat_flip_' .. (heads and 'heads' or 'tails'), { name })
+    end
+end
+
 ---Handles the /reseticon command.
 ---@param player IsoPlayer
 ---@param args omichat.request.Command
@@ -331,6 +355,7 @@ function OmiChat.Commands.requestResetIcon(player, args)
         })
     end
 
+    username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
             OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_error_unknown_player', { username })
@@ -341,7 +366,6 @@ function OmiChat.Commands.requestResetIcon(player, args)
         return
     end
 
-    username = utils.escapeRichText(username)
     OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_reset_other_icon_success', { username })
 end
 
@@ -362,6 +386,7 @@ function OmiChat.Commands.requestResetLanguages(player, args)
         })
     end
 
+    username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
             OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_error_unknown_player', { username })
@@ -372,7 +397,6 @@ function OmiChat.Commands.requestResetLanguages(player, args)
         return
     end
 
-    username = utils.escapeRichText(username)
     OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_reset_other_languages_success', { username })
 end
 
@@ -393,6 +417,7 @@ function OmiChat.Commands.requestResetName(player, args)
         })
     end
 
+    username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
             OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_error_unknown_player', { username })
@@ -403,7 +428,6 @@ function OmiChat.Commands.requestResetName(player, args)
         return
     end
 
-    username = utils.escapeRichText(username)
     OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_reset_other_name_success', { username })
 end
 
@@ -450,6 +474,7 @@ function OmiChat.Commands.requestSetIcon(player, args)
         })
     end
 
+    username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
             OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_error_unknown_player', { username })
@@ -460,7 +485,6 @@ function OmiChat.Commands.requestSetIcon(player, args)
         return
     end
 
-    username = utils.escapeRichText(username)
     OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_set_other_icon_success', { username })
 end
 
@@ -483,6 +507,7 @@ function OmiChat.Commands.requestSetLanguageSlots(player, args)
         })
     end
 
+    username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
             OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_error_unknown_player', { username })
@@ -493,7 +518,6 @@ function OmiChat.Commands.requestSetLanguageSlots(player, args)
         return
     end
 
-    username = utils.escapeRichText(username)
     OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_set_language_slots_success', { username, slots })
 end
 
@@ -516,6 +540,7 @@ function OmiChat.Commands.requestSetName(player, args)
         })
     end
 
+    username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
             OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_error_unknown_player', { username })
@@ -526,7 +551,6 @@ function OmiChat.Commands.requestSetName(player, args)
         return
     end
 
-    username = utils.escapeRichText(username)
     name = utils.escapeRichText(name)
     OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_set_other_name_success', { username, name })
 end

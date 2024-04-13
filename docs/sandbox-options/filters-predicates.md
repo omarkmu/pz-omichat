@@ -47,7 +47,7 @@ Filters names set by players with `/name` or `/nickname`.
 
 The default option will limit names to 50 characters.
 
-This format can [set](../format-strings/functions.md#set-function) `error` or `errorID` to provide feedback to the player.
+This format can [set](../format-strings/functions.md#set) `error` or `errorID` to provide feedback to the player.
 If `errorID` is used, it will be interpreted as a string ID, whereas `error` will be displayed as given.
 
 If the empty string is returned, or either error token is set, the command will fail.
@@ -63,7 +63,7 @@ If the empty string is returned, or either error token is set, the command will 
 
 Determines whether chat input is allowed.
 
-This format can [set](../format-strings/functions.md#set-function) `error` or `errorID` to provide feedback to the player.
+This format can [set](../format-strings/functions.md#set) `error` or `errorID` to provide feedback to the player.
 If `errorID` is used, it will be interpreted as a string ID, whereas `error` will be displayed as given.
 If either token is set, the predicate will be considered a failure.
 
@@ -115,7 +115,6 @@ This has the same values as `$stream`, but will only be populated with custom st
 - [`$languageRaw`](../format-strings/tokens.md#languageraw)
 - [`$icon`](../format-strings/tokens.md#icon)
 - [`$iconRaw`](../format-strings/tokens.md#iconraw)
-- [`$message`](../format-strings/tokens.md#message)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$nameRaw`](../format-strings/tokens.md#nameraw)
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
@@ -148,6 +147,14 @@ Determines whether a message on a stream will attract zombies.
 
 **See also:** [`RangeMultiplierZombies`](./ranges.md#rangemultiplierzombies).
 
+### PredicateEnableStream
+**Default:** `true`
+
+Determines whether a stream is enabled.
+
+**Tokens:**
+- [`$stream`](../format-strings/tokens.md#stream)
+
 ### PredicateUseNameColor
 **Default:** `$eq($stream say)`
 
@@ -173,6 +180,7 @@ If narrative style is used, messages will be enclosed in quotes and prefixed wit
 
 For example, with the default settings and a modified predicate, a message sent with `/yell Hey` will be transformed to `shouts, "Hey!"`.
 Note that the player name is not included; overhead and chat formats should include it as needed.
+See the [buffy preset](../sandbox-presets/index.md#buffy) for examples.
 
 **Tokens:**
 - [`$callout`](../format-strings/tokens.md#callout)

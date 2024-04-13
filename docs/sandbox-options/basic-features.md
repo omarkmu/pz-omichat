@@ -10,23 +10,61 @@ These [options](./index.md) are used to control basic features of the mod.
 
 The cooldown for applying [buffs](./filters-predicates.md#predicateapplybuff), in real-time minutes.
 
+### CardItems
+**Default:** `CardDeck`
+
+A semicolon-separated list of items players can use for the `/card` command.
+
+The `/card` command will only be available if the player has one of the items in this list in their inventory.
+If blank, the command won't require an item.
+
+### CoinItems
+`(blank by default)`
+
+A semicolon-separated list of items players can use for the `/flip` command.
+
+The `/flip` command will only be available if the player has one of the items in this list in their inventory.
+If blank, the command won't require an item.
+
+### DiceItems
+**Default:** `Dice`
+
+A semicolon-separated list of items players can use for the `/roll` command.
+
+The `/roll` command will only be available if the player has one of the items in this list in their inventory.
+If blank, the command won't require an item.
+
 ### CustomShoutMaxLength
 **Default:** `50`  
 **Minimum:** `1`  
 **Maximum:** `200`
+
+**This option is deprecated and will be removed in a future version in favor of a hardcoded value.**
+**To apply length limits, use [`FilterChatInput`](./filters-predicates.md#filterchatinput).**
 
 The maximum length for individual [custom shouts](#enablecustomshouts).
 
 ### EnableCharacterCustomization
 **Default:** `false`
 
-If enabled, this includes a QoL option in the chat settings that allows players to customize their character. This is intended for roleplay servers.
+If enabled, this includes a set of QoL [options](../user-guide/chat-settings.md#character-customization) in the chat settings that allow players to customize their character.
+This is intended for roleplay servers.
 
 Customization options available:
-- Clean blood & dirt from the character's body and clothing
+- Clean blood & dirt from the character (configurable with [`EnableCleanCharacter`](#enablecleancharacter))
 - Change hair color
 - Grow long hair
 - Grow beard
+
+### EnableCleanCharacter
+**Default:** `3 - Clean body and clothing`
+
+Determines the behavior of the “clean blood & dirt” option.
+This has no effect unless [`EnableCharacterCustomization`](#enablecharactercustomization) is turned on.
+
+- `1`: Disable
+- `2`: Clean body only
+- `3`: Clean body and clothing
 
 ### EnableCustomShouts
 **Default:** `true`
@@ -96,6 +134,8 @@ The maximum number of [custom shouts](#enablecustomshouts) that players are allo
 
 The maximums apply to regular and sneak shouts separately; a value of `10` means a player can specify 10 shouts and 10 sneak shouts.
 
+**This option is deprecated and will be removed in a future version in favor of a hardcoded value.**
+
 ### MinimumCommandAccessLevel
 **Default:** `16`
 
@@ -107,3 +147,14 @@ The minimum access level needed to execute [admin commands](../user-guide/admins
 - GM: 4
 - Observer: 2
 - Player: 1
+
+### PatternNarrativeCustomTag
+`(blank by default)`
+
+The option used to determine a pattern for custom dialogue tags in [narrative style](./filters-predicates.md#predicateusenarrativestyle).
+If blank, custom tag prefixes will be turned off.
+
+For example, if this option is set to `^~(%l+)%s+(.+)` and the other narrative style options are configured, players can input `~inquires What's your name?` to get `Jane inquires, "What's your name?"`.
+
+This option should be a Lua [string pattern](https://www.lua.org/pil/20.2.html) with two [capture groups](https://www.lua.org/pil/20.3.html).
+If you're unsure about configuring this, start a [discussion](https://github.com/omarkmu/pz-omichat/discussions/new?category=q-a)!

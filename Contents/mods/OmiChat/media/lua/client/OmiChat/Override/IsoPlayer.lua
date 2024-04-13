@@ -61,7 +61,7 @@ function _IsoPlayer:Callout(playEmote)
     end
 
     OmiChat.sendShout {
-        command = shout,
+        text = shout,
         formatterName = formatterName,
         playSignedEmote = not playEmote,
         tokens = {

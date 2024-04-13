@@ -60,6 +60,29 @@ return OmiChat
 ---| 'know_all_languages'
 ---| 'ignore_message_range'
 
+---@class omichat.StreamSearchOptions
+---@field excludeChatStreams boolean? Whether to exclude chat streams from the search.
+---@field excludeCommandStreams boolean? Whether to exclude custom command streams from the search.
+---@field includeVanillaCommandStreams boolean? Whether to include vanilla command streams in the search.
+
+---@class omichat.SearchContext
+---@field search string The string to search for.
+---@field terminateOnExact boolean? If true, exact matches will terminate the search.
+---@field max integer? The maximum search results to return.
+---@field searchDisplay boolean? If true, the display string will be searched as well.
+---@field filter (fun(value: unknown, args: string[]): boolean)|nil Filter function for results.
+---@field display (fun(value: unknown, str: string): string?)|nil Function to retrieve display strings for results.
+---@field args table? Argument for the filter function.
+
+---@class omichat.SearchResult
+---@field value string
+---@field exact boolean
+---@field display string?
+
+---@class omichat.SearchResults
+---@field results omichat.SearchResult[]
+---@field exact omichat.SearchResult?
+
 
 ---@class omichat.LanguageInfoStore
 ---@field languageCount integer
@@ -133,6 +156,10 @@ return OmiChat
 ---@field name string? The name of the player who drew the card, if called for a global message.
 ---@field card integer The card number, in [1, 13].
 ---@field suit integer The suit number, in [1, 4].
+
+---Request to report the result of flipping a coin on the client.
+---@class omichat.request.ReportFlipCoin
+---@field heads boolean True if the result of the flip was heads.
 
 ---Request to report the result of rolling dice on the client.
 ---@class omichat.request.ReportRoll

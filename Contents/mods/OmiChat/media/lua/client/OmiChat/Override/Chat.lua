@@ -1,14 +1,12 @@
 ---Handles chat overrides and extensions.
 
-local OmiChat = require 'OmiChat/API/Client'
-
--- requires buildMessageText
-require 'OmiChat/API/ClientFormat'
+local OmiChat = require 'OmiChatClient'
 
 
 ---Extended fields for ISChat.
 ---@class omichat.ISChat : ISChat
 ---@field instance omichat.ISChat? The ISChat instance.
+---@field infoButton ISButton
 ---@field focused boolean Whether the chat is currently focused.
 ---@field showTitle boolean Whether chat type titles should display.
 ---@field showTimestamp boolean Whether timestamps should display.
@@ -36,6 +34,7 @@ local getTextOrNull = getTextOrNull
 local max = math.max
 local concat = table.concat
 
+local getServerOptions = getServerOptions
 local BloodBodyPartType = BloodBodyPartType
 local getCoveredParts = BloodClothingType.getCoveredParts
 
@@ -67,6 +66,11 @@ local function addAdminOptions(context)
         local name = getText('UI_OmiChat_context_admin_' .. option)
         local opt = subMenu:addOption(name, ISChat.instance, ISChat.onAdminOptionToggle, option)
         subMenu:setOptionChecked(opt, OmiChat.getAdminOption(option))
+    end
+
+    local handlers = OmiChat.getSettingHandlers('admin')
+    for i = 1, #handlers do
+        handlers[i](subMenu)
     end
 end
 
@@ -219,50 +223,45 @@ local function addColorOptions(context)
         end
     end
 
-    if #colorOpts > 0 then
-        local colorOptionName = getText('UI_OmiChat_context_colors_submenu_name')
-        local colorOption = context:addOption(colorOptionName, ISChat.instance)
+    if #colorOpts == 0 then
+        return
+    end
 
-        local colorSubMenu = context:getNew(context)
-        context:addSubMenu(colorOption, colorSubMenu)
+    local colorOptionName = getText('UI_OmiChat_context_colors_submenu_name')
+    local colorOption = context:addOption(colorOptionName, ISChat.instance)
 
-        for i = 1, #colorOpts do
-            local category = colorOpts[i]
-            local name = getTextOrNull('UI_OmiChat_context_submenu_color_' .. category)
-            if not name then
-                name = getText('UI_OmiChat_context_submenu_color', OmiChat.getColorCategoryCommand(category))
-            end
+    local colorSubMenu = context:getNew(context)
+    context:addSubMenu(colorOption, colorSubMenu)
 
-            colorSubMenu:addOption(name, ISChat.instance, ISChat.onCustomColorMenu, category)
+    for i = 1, #colorOpts do
+        local category = colorOpts[i]
+        local name = getTextOrNull('UI_OmiChat_context_submenu_color_' .. category)
+        if not name then
+            name = getText('UI_OmiChat_context_submenu_color', OmiChat.getColorCategoryCommand(category))
         end
+
+        colorSubMenu:addOption(name, ISChat.instance, ISChat.onCustomColorMenu, category)
     end
 end
 
 ---Adds the context menu options for custom callouts.
 ---@param context ISContextMenu
 local function addCustomCalloutOptions(context)
-    local shoutOpts = { 'callouts', 'sneakcallouts' }
-    for i = 1, #shoutOpts do
-        local shoutType = shoutOpts[i]
-        local shoutOptionName = getText('UI_OmiChat_context_set_custom_' .. shoutType)
-        context:addOption(shoutOptionName, ISChat.instance, ISChat.onCustomCalloutMenu, shoutType)
-    end
+    local calloutOptName = getText('UI_OmiChat_context_set_custom_callouts')
+    context:addOption(calloutOptName, ISChat.instance, ISChat.onCustomCalloutMenu, 'callouts')
+
+    local sneakCalloutOptName = getText('UI_OmiChat_context_set_custom_sneakcallouts')
+    context:addOption(sneakCalloutOptName, ISChat.instance, ISChat.onCustomCalloutMenu, 'sneakcallouts')
 end
 
 ---Adds the context menu options for roleplay languages.
 ---@param context ISContextMenu
 local function addLanguageOptions(context)
     local languages = OmiChat.getRoleplayLanguages()
-    local languageSlots = OmiChat.getRoleplayLanguageSlots()
-    if languageSlots == 0 and #languages <= 1 then
-        -- nothing to configure → don't show the menu
-        return
-    end
+    local languageSlots = math.min(OmiChat.getRoleplayLanguageSlots(), config:maxLanguageSlots())
 
     local isKnown = {}
     local knownLanguages = {}
-    local allLanguages = OmiChat.getConfiguredRoleplayLanguages()
-    local currentLang = OmiChat.getCurrentRoleplayLanguage() or OmiChat.getDefaultRoleplayLanguage()
     for i = 1, #languages do
         local lang = languages[i]
         if OmiChat.isConfiguredRoleplayLanguage(lang) then
@@ -272,27 +271,30 @@ local function addLanguageOptions(context)
     end
 
     local addLanguages = {}
-    if languageSlots - #languages >= 1 and #languages < 32 then
+    if languageSlots - #knownLanguages >= 1 then
+        local allLanguages = OmiChat.getConfiguredRoleplayLanguages()
         for i = 1, #allLanguages do
             local lang = allLanguages[i]
-            if not isKnown[lang] then
+            if not isKnown[lang] and Option:canAddLanguage(lang) then
                 addLanguages[#addLanguages + 1] = {
                     language = lang,
                     translated = utils.getTranslatedLanguageName(lang),
                 }
+
+                -- hard limit add menu to 50 to avoid freezing
+                if #addLanguages == 50 then
+                    break
+                end
             end
         end
     end
 
-    local languageSubMenu
-    if #knownLanguages > 0 or #addLanguages > 0 then
-        local languageOptionName = getText('UI_OmiChat_context_languages')
-        local languageOption = context:addOption(languageOptionName, ISChat.instance)
+    local languageOptionName = getText('UI_OmiChat_context_languages')
+    local languageOption = context:addOption(languageOptionName, ISChat.instance)
+    local languageSubMenu = context:getNew(context)
+    context:addSubMenu(languageOption, languageSubMenu)
 
-        languageSubMenu = context:getNew(context)
-        context:addSubMenu(languageOption, languageSubMenu)
-    end
-
+    local currentLang = OmiChat.getCurrentRoleplayLanguage() or OmiChat.getDefaultRoleplayLanguage()
     for i = 1, #knownLanguages do
         local lang = knownLanguages[i]
         local name = utils.getTranslatedLanguageName(lang)
@@ -300,19 +302,26 @@ local function addLanguageOptions(context)
         languageSubMenu:setOptionChecked(opt, lang == currentLang)
     end
 
-    if #addLanguages == 0 then
-        return
+    if #addLanguages > 0 then
+        table.sort(addLanguages, function(a, b) return a.translated < b.translated end)
+
+        local addLanguageSubMenu = languageSubMenu:getNew(languageSubMenu)
+        local addLanguageOption = languageSubMenu:addOption(getText('UI_OmiChat_context_add_language'), ISChat.instance)
+        languageSubMenu:addSubMenu(addLanguageOption, addLanguageSubMenu)
+        for i = 1, #addLanguages do
+            local lang = addLanguages[i].language
+            local name = addLanguages[i].translated
+            addLanguageSubMenu:addOption(name, ISChat.instance, ISChat.onAddLanguage, lang)
+        end
     end
 
-    table.sort(addLanguages, function(a, b) return a.translated < b.translated end)
+    local handlers = OmiChat.getSettingHandlers('language')
+    for i = 1, #handlers do
+        handlers[i](languageSubMenu)
+    end
 
-    local addLanguageSubMenu = languageSubMenu:getNew(languageSubMenu)
-    local addLanguageOption = languageSubMenu:addOption(getText('UI_OmiChat_context_add_language'), ISChat.instance)
-    languageSubMenu:addSubMenu(addLanguageOption, addLanguageSubMenu)
-    for i = 1, #addLanguages do
-        local lang = addLanguages[i].language
-        local name = addLanguages[i].translated
-        addLanguageSubMenu:addOption(name, ISChat.instance, ISChat.onAddLanguage, lang)
+    if #languageSubMenu.options == 0 then
+        context:removeLastOption()
     end
 end
 
@@ -395,6 +404,11 @@ local function addChatSettings(context)
 
     addRetainOptions(submenu)
     addVanillaSubmenuOptions(submenu)
+
+    local handlers = OmiChat.getSettingHandlers('basic')
+    for i = 1, #handlers do
+        handlers[i](submenu)
+    end
 end
 
 ---Adds the chat customization submenu to the context menu.
@@ -425,13 +439,18 @@ local function addChatCustomizationSettings(context)
         addSignEmoteOption(submenu)
     end
 
-    if #submenu.options == 0 then
-        -- no submenu options → just add the color option to the top-level menu
+    local handlers = OmiChat.getSettingHandlers('chat_customization')
+    if #submenu.options == 0 and #handlers == 0 then
+        -- no submenu options and no handlers → add the color submenu to the top-level menu
         context:removeLastOption()
         submenu = context
     end
 
     addColorOptions(submenu)
+
+    for i = 1, #handlers do
+        handlers[i](submenu)
+    end
 end
 
 ---Adds the character customization submenu to the context menu.
@@ -453,8 +472,10 @@ local function addCharacterCustomizationSettings(context)
 
     addSignEmoteOption(submenu)
 
-    local cleanOptName = getText('UI_OmiChat_context_clean')
-    submenu:addOption(cleanOptName, instance, ISChat.onCleanCharacter)
+    if Option:isCleanCustomizationEnabled() then
+        local cleanOptName = getText('UI_OmiChat_context_clean')
+        submenu:addOption(cleanOptName, instance, ISChat.onCleanCharacter)
+    end
 
     local hairColorOptName = getText('UI_OmiChat_context_hair_color')
     submenu:addOption(hairColorOptName, instance, ISChat.onHairColorMenu)
@@ -465,6 +486,11 @@ local function addCharacterCustomizationSettings(context)
     if not player:isFemale() then
         local growBeardOptName = getText('UI_OmiChat_context_grow_beard')
         submenu:addOption(growBeardOptName, instance, ISChat.onGrowBeard)
+    end
+
+    local handlers = OmiChat.getSettingHandlers('character_customization')
+    for i = 1, #handlers do
+        handlers[i](submenu)
     end
 end
 
@@ -500,6 +526,21 @@ end
 local function isPlayerDead()
     local player = getSpecificPlayer(0)
     return not player or player:isDead()
+end
+
+---Clears the last chat command for a tab based on retain options.
+---@param tab omichat.ChatTab
+local function refreshLastCommand(tab)
+    local lastChatCommand = tab.lastChatCommand
+    if not lastChatCommand or lastChatCommand == '' then
+        return
+    end
+
+    local stream = OmiChat.chatCommandToStream(lastChatCommand, true)
+    local commandType = stream and stream:getCommandType() or 'other'
+    if not OmiChat.getRetainCommand(commandType) then
+        tab.lastChatCommand = ''
+    end
 end
 
 ---Checks whether the chat input should be reset to a slash based on the current input.
@@ -566,25 +607,36 @@ function ISChat.onCleanCharacter(target)
         visual:setBlood(bodyPart, 0)
     end
 
-    -- update clothing
-    local items = player:getWornItems()
-    for i = 0, items:size() - 1 do
-        local item = items:getItemByIndex(i)
-        local itemVisual = item and instanceof(item, 'Clothing') and item:getVisual()
-        if itemVisual then
-            local parts = getCoveredParts(item:getBloodClothingType())
+    local shouldUpdateClothing = Option:isCleanClothingEnabled()
+    if shouldUpdateClothing then
+        -- update clothing
+        local items = player:getWornItems()
+        for i = 0, items:size() - 1 do
+            local item = items:getItemByIndex(i)
+            local itemVisual = item and instanceof(item, 'Clothing') and item:getVisual()
+            if itemVisual then
+                ---@cast item Clothing
+                local parts = getCoveredParts(item:getBloodClothingType())
 
-            for j = 0, parts:size() - 1 do
-                local part = parts:get(j)
-                itemVisual:setDirt(part, 0)
-                itemVisual:setBlood(part, 0)
+                for j = 0, parts:size() - 1 do
+                    local part = parts:get(j)
+                    itemVisual:setDirt(part, 0)
+                    itemVisual:setBlood(part, 0)
+                end
+
+                item:setDirtyness(0)
+                item:setBloodLevel(0)
             end
         end
     end
 
     player:resetModel()
     sendVisual(player)
-    sendClothing(player)
+
+    if shouldUpdateClothing then
+        sendClothing(player)
+        triggerEvent('OnClothingUpdated', player)
+    end
 end
 
 ---Event handler for the grow hair customization option.
@@ -808,18 +860,8 @@ function ISChat.onToggleRetainCommand(target, type)
         return
     end
 
-    -- check to see whether the last command should be cleared based on this change
     for i = 1, #instance.tabs do
-        local chatText = instance.tabs[i]
-        local lastChatCommand = chatText.lastChatCommand
-
-        if lastChatCommand then
-            local stream = OmiChat.chatCommandToStream(lastChatCommand, true)
-            local commandType = stream and stream:getCommandType()
-            if commandType == type then
-                chatText.lastChatCommand = ''
-            end
-        end
+        refreshLastCommand(instance.tabs[i])
     end
 end
 
@@ -1001,6 +1043,7 @@ local _onPressDown = ISChat.onPressDown
 local _onPressUp = ISChat.onPressUp
 local _onOtherKey = ISChat.onOtherKey
 local _onInfo = ISChat.onInfo
+local _onTabAdded = ISChat.onTabAdded
 
 local _ChatMessage = __classmetatables[ChatMessage.class].__index
 local _ServerChatMessage = __classmetatables[ServerChatMessage.class].__index
@@ -1092,7 +1135,6 @@ function ISChat:createChildren()
     self.infoButton.backgroundColorMouseOver.a = 0
     self.infoButton:setImage(self.infoBtn)
     self.infoButton:setUIName('chat info button')
-    self:addChild(self.infoButton)
     self.infoButton:setVisible(false)
 
     self.suggesterBox = SuggesterBox:new(0, 0, 0, 0)
@@ -1102,6 +1144,7 @@ function ISChat:createChildren()
     self.suggesterBox:addToUIManager()
     self.suggesterBox:setVisible(false)
 
+    OmiChat.addCustomButton(self.infoButton)
     OmiChat.updateState()
 end
 
@@ -1155,7 +1198,7 @@ function ISChat:onCommandEntered()
 
     local instance = ISChat.instance ---@cast instance omichat.ISChat
     local input = instance.textEntry:getText()
-    local stream, command, chatCommand, hasDisabled = OmiChat.chatCommandToStream(input, true, true)
+    local stream, command, chatCommand, disabledStream = OmiChat.chatCommandToStream(input, true, true)
 
     local useCallback
     local callbackStream
@@ -1227,8 +1270,28 @@ function ISChat:onCommandEntered()
         callbackStream = nil
     end
 
-    if hasDisabled then
-        OmiChat.addInfoMessage('Unknown command ' .. command:sub(2))
+    if disabledStream then
+        local onUseDisabled = disabledStream:getUseDisabledCallback()
+        if onUseDisabled then
+            onUseDisabled(disabledStream)
+        elseif disabledStream:getCommandType() ~= 'chat' then
+            OmiChat.addInfoMessage('Unknown command ' .. command:sub(2))
+        else
+            local msg = { getText('UI_chat_chat_disabled_msg', utils.trim(disabledStream:getCommand())) }
+            for i = 1, #ISChat.allChatStreams do
+                local info = OmiChat.StreamInfo:new(ISChat.allChatStreams[i])
+                if info:isEnabled() then
+                    msg[#msg + 1] = '* '
+                    msg[#msg + 1] = utils.trim(info:getCommand())
+                    msg[#msg + 1] = ' <LINE> '
+                end
+            end
+
+            if #msg > 1 then
+                msg[#msg] = nil
+                OmiChat.addInfoMessage(concat(msg))
+            end
+        end
     elseif not shouldHandle then
         -- no special handling, pass to original function
         _onCommandEntered(self)
@@ -1256,8 +1319,8 @@ function ISChat:onCommandEntered()
 
     if callbackStream and useCallback then
         useCallback {
+            text = command,
             stream = callbackStream,
-            command = command,
             playSignedEmote = not playedEmote,
         }
     end
@@ -1284,6 +1347,11 @@ function ISChat:onGearButtonClick()
     addChatCustomizationSettings(context)
     addCharacterCustomizationSettings(context)
     addLanguageOptions(context)
+
+    local handlers = OmiChat.getSettingHandlers('main')
+    for i = 1, #handlers do
+        handlers[i](context)
+    end
 end
 
 ---Override to handle custom info text.
@@ -1379,6 +1447,29 @@ function ISChat.onSwitchStream()
     end
 
     OmiChat.updateCustomComponents(text)
+end
+
+---Override to respect retain options when creating chat tabs.
+---@param tabTitle string
+---@param tabID integer
+function ISChat.onTabAdded(tabTitle, tabID)
+    _onTabAdded(tabTitle, tabID)
+    local instance = ISChat.instance
+    if not instance then
+        return
+    end
+
+    local target
+    for i = 1, #instance.tabs do
+        if instance.tabs[i].tabID == tabID then
+            target = instance.tabs[i]
+            break
+        end
+    end
+
+    if target then
+        refreshLastCommand(target)
+    end
 end
 
 ---Override to update custom components and include aliases.

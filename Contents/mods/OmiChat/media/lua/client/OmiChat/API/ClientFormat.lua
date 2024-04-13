@@ -3,6 +3,7 @@
 local getTexture = getTexture
 local format = string.format
 local concat = table.concat
+local match = string.match
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
 
@@ -11,6 +12,7 @@ local OmiChat = require 'OmiChat/API/Client'
 require 'OmiChat/Component/MimicMessage'
 
 local utils = OmiChat.utils
+local config = OmiChat.config
 local Option = OmiChat.Option
 local MimicMessage = OmiChat.MimicMessage
 
@@ -59,18 +61,32 @@ local function applyNarrativeStyle(input, stream, tokens)
     tokens.chatType = tokens.chatType or stream:getChatType()
     tokens.stream = tokens.stream or stream:getIdentifier()
 
+    local original = input
     if not utils.testPredicate(Option.PredicateUseNarrativeStyle, tokens) then
         return input
     end
 
-    local original = input
+    local dialogueTag
+    local patt = utils.trim(Option.PatternNarrativeCustomTag)
+    if patt ~= '' then
+        local internal, prefix, suffix = utils.getInternalText(input)
+
+        local success, tag, remainder = pcall(match, internal, patt)
+        if success and tag and remainder then
+            dialogueTag = tostring(tag)
+            tokens.input = prefix .. tostring(remainder) .. suffix
+        elseif not success then
+            utils.logError('invalid string pattern set for PatternNarrativeCustomTag')
+        end
+    end
+
     input = utils.interpolate(Option.FilterNarrativeStyle, tokens)
     if input == '' then
         return original
     end
 
     local seed = input
-    local dialogueTag = utils.interpolate(Option.FormatNarrativeDialogueTag, tokens, seed)
+    dialogueTag = dialogueTag or utils.interpolate(Option.FormatNarrativeDialogueTag, tokens, seed)
     if dialogueTag == '' then
         return original
     end
@@ -84,8 +100,8 @@ local function applyNarrativeStyle(input, stream, tokens)
         end
     end
 
-    dialogueTag = utils.wrapStringArgument(dialogueTag, 21)
-    input = utils.wrapStringArgument(concat { prefix, input, suffix }, 22)
+    dialogueTag = utils.wrapStringArgument(dialogueTag, config.NARRATIVE_TAG)
+    input = utils.wrapStringArgument(prefix .. input .. suffix, config.NARRATIVE_TEXT)
     local combined = format('%s, "%s"', dialogueTag, input)
 
     local formatter = OmiChat.getFormatter('narrative')
@@ -384,20 +400,22 @@ function OmiChat.buildMessageTextFromInfo(info)
 end
 
 ---Returns the roleplay language encoded in message content.
----@param message omichat.Message
+---@param message omichat.Message | string A message object or string to read.
 ---@return string?
 function OmiChat.decodeLanguage(message)
-    local text = message:getText()
-    local formatter = OmiChat.getFormatter('language')
+    if type(message) ~= 'string' then
+        message = message:getText()
+    end
 
-    local languageId = 1
-    if formatter:isMatch(text) then
-        -- found a language → decode it. transformer will handle cleanup
-        text = formatter:read(text)
-        local encodedId = utils.decodeInvisibleCharacter(text)
-        if encodedId >= 1 and encodedId <= 32 then
-            languageId = encodedId
-        end
+    local formatter = OmiChat.getFormatter('language')
+    message = formatter:read(message)
+    if not message then
+        return
+    end
+
+    local languageId = utils.decodeInvisibleInt(message)
+    if not languageId or languageId < 1 or languageId > OmiChat.config:maxDefinedLanguages() then
+        return
     end
 
     return OmiChat.getRoleplayLanguageFromID(languageId)
@@ -438,7 +456,7 @@ function OmiChat.encodeLanguage(text, language)
         return text
     end
 
-    local encoded = utils.encodeInvisibleCharacter(langId) .. text
+    local encoded = utils.encodeInvisibleInt(langId) .. text
     return OmiChat.getFormatter('language'):format(encoded)
 end
 
@@ -451,14 +469,27 @@ function OmiChat.encodeMessageTag(message)
         author = nil
     end
 
+    local text = message:getText()
+    local useAdminIcon = OmiChat.getFormatter('adminIcon'):isMatch(text)
+
+    local iconFormatter = OmiChat.getFormatter('messageIcon')
+    local encodedIcon = iconFormatter:read(text)
+    local icon = encodedIcon and utils.decodeInvisibleString(encodedIcon)
+
+    if icon and not getTexture(icon) then
+        icon = nil
+    elseif icon then
+        -- message-level icons suppress admin icon
+        useAdminIcon = false
+    end
+
     local color = author and OmiChat.getNameColorInChat(author)
-    local useAdminIcon = OmiChat.getFormatter('adminIcon'):isMatch(message:getText())
     local success, encoded = utils.json.tryEncode {
         ocSuppressed = false,
         ocLanguage = OmiChat.decodeLanguage(message),
         ocName = OmiChat.getNameInChatRichText(author, OmiChat.getMessageChatType(message)),
         ocNameColor = color and utils.colorToHexString(color) or nil,
-        ocIcon = author and OmiChat.getChatIcon(author) or nil,
+        ocIcon = icon or (author and OmiChat.getChatIcon(author)) or nil,
         ocAdminIcon = (author and useAdminIcon) and OmiChat.getAdminChatIcon(author) or nil,
     }
 
@@ -476,10 +507,11 @@ function OmiChat.formatForChat(args)
     local stream = args.stream or args.formatterName or args.chatType
     local username = args.username or utils.getPlayerUsername()
     local name = args.name or OmiChat.getNameInChat(username, args.chatType)
+    local text, before, after = utils.getInternalText(args.text)
 
     local tokens = args.tokens and utils.copy(args.tokens) or {}
     tokens.chatType = args.chatType
-    tokens.input = args.text
+    tokens.input = text
     tokens.username = username
     tokens.name = name
     tokens.stream = stream
@@ -508,6 +540,8 @@ function OmiChat.formatForChat(args)
             error = err,
         }
     end
+
+    tokens.input = before .. tokens.input .. after
 
     -- apply styles
     local streamInfo = OmiChat.getChatStreamByIdentifier(stream)
@@ -543,6 +577,22 @@ function OmiChat.formatForChat(args)
     local overheadFormatter = OmiChat.getFormatter('overheadFull')
     tokens.prefix = utils.trimleft(utils.interpolate(Option.FormatOverheadPrefix, tokens))
     tokens.input = overheadFormatter:format(tokens.input, tokens)
+
+    -- encode message icon
+    if args.icon then
+        local textureName
+        if getTexture(args.icon) then
+            textureName = args.icon
+        else
+            textureName = utils.getTextureNameFromIcon(args.icon)
+        end
+
+        if textureName then
+            local iconFormatter = OmiChat.getFormatter('messageIcon')
+            local encodedIcon = iconFormatter:wrap(utils.encodeInvisibleString(textureName))
+            tokens.input = tokens.input .. encodedIcon
+        end
+    end
 
     -- encode online ID for radio
     local player = getSpecificPlayer(0)

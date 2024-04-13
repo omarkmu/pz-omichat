@@ -12,6 +12,7 @@
 # Reference Guide
 
 - [Presets](sandbox-presets/index.md)
+- [Token Contexts](sandbox-options/token-contexts.md)
 - [Sandbox Options](sandbox-options/index.md)
     - [Basic Features](sandbox-options/basic-features.md)
     - [Compatibility Features](sandbox-options/compatibility-features.md)
@@ -27,4 +28,8 @@
     - [Functions](format-strings/functions.md)
     - [At-Maps](format-strings/at-maps.md)
     - [Escapes & References](format-strings/escapes-references.md)
-    - [Extending Format Strings](format-strings/extensions.md)
+
+# API
+
+- [Type Stub](api/typestub.md)
+- [Extending Format Strings](api/extending-format-strings.md)

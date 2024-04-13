@@ -25,20 +25,32 @@ end
 ---@return string?
 ---@return string
 function StreamInfo:checkMatch(command)
-    local longCommand = self:getCommand()
+    local isCmdStream = self:isCommand()
+    local fullCommand = self:getCommand()
     local shortCommand = self:getShortCommand()
 
-    if utils.startsWith(command, longCommand) then
-        return longCommand, command:sub(#longCommand)
-    elseif shortCommand and utils.startsWith(command, shortCommand) then
+    local commandCompare = command
+    local fullCompare = fullCommand
+    local shortCompare = shortCommand
+    if isCmdStream then
+        -- command streams are case-insensitive
+        commandCompare = command:lower()
+        fullCompare = fullCommand:lower()
+        shortCompare = shortCommand and shortCommand:lower()
+    end
+
+    if utils.startsWith(commandCompare, fullCompare) then
+        return fullCommand, command:sub(#fullCommand)
+    elseif shortCompare and utils.startsWith(commandCompare, shortCompare) then
         return shortCommand, command:sub(#shortCommand)
-    elseif self:isCommand() and command == utils.trim(longCommand) then
+    elseif isCmdStream and commandCompare == utils.trim(fullCompare) then
         -- commands can be entered with no trailing space
         return command, ' '
     end
 
     for alias in self:aliases() do
-        if utils.startsWith(command, alias) then
+        local aliasCompare = isCmdStream and alias:lower() or alias
+        if utils.startsWith(commandCompare, aliasCompare) then
             return alias, command:sub(#alias)
         end
     end
@@ -139,6 +151,12 @@ function StreamInfo:getUseCallback()
     return self:config().onUse
 end
 
+---Gets the callback to use when the stream is used while disabled.
+---@return fun(self: omichat.StreamInfo)?
+function StreamInfo:getUseDisabledCallback()
+    return self:config().onUseDisabled
+end
+
 ---Returns whether the stream allows emotes.
 ---@return boolean
 function StreamInfo:isAllowEmotes()
@@ -172,6 +190,11 @@ end
 ---Returns whether the stream is enabled.
 ---@return boolean
 function StreamInfo:isEnabled()
+    local tokens = { stream = self:getIdentifier() }
+    if not utils.testPredicate(Option.PredicateEnableStream, tokens) then
+        return false
+    end
+
     local cfg = self:config()
     local isEnabled = cfg.isEnabled
     if isEnabled then
@@ -213,14 +236,29 @@ function StreamInfo:onHelp()
     end
 end
 
+---Returns the suggest spec for the stream.
+---@return omichat.SuggestSpec?
+function StreamInfo:suggestSpec()
+    local streamConfig = self:config()
+    if streamConfig.suggestSpec then
+        return streamConfig.suggestSpec
+    end
+
+    if streamConfig.suggestUsernames then
+        return { streamConfig.suggestOwnUsername and 'online-username-with-self' or 'online-username' }
+    end
+end
+
 ---Returns whether usernames should be suggested for commands.
 ---@return boolean
+---@deprecated This will be removed in version 2.0. Use `suggestSpec` instead.
 function StreamInfo:suggestUsernames()
     return self:config().suggestUsernames or false
 end
 
 ---Returns whether the player's own username should be suggested for commands.
 ---@return boolean
+---@deprecated This will be removed in version 2.0. Use `suggestSpec` instead.
 function StreamInfo:suggestOwnUsername()
     return self:config().suggestOwnUsername or false
 end

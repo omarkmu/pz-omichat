@@ -1,6 +1,7 @@
 local lib = require 'OmiChat/lib'
 local utils = require 'OmiChat/util'
 local config = require 'OmiChat/config'
+local DelimitedList = utils.DelimitedList
 
 local getActivatedMods = getActivatedMods
 local floor = math.floor
@@ -18,8 +19,12 @@ local floor = math.floor
 ---@field EnableCompatTAD integer
 ---@field EnableFactionColorAsDefault boolean
 ---@field EnableCharacterCustomization boolean
+---@field EnableCleanCharacter integer
 ---@field EnableDiscordColorOption integer
 ---@field EnableSetName integer
+---@field CardItems string
+---@field CoinItems string
+---@field DiceItems string
 ---@field BuffCooldown integer
 ---@field CustomShoutMaxLength integer
 ---@field MinimumCommandAccessLevel integer
@@ -70,11 +75,17 @@ local floor = math.floor
 ---@field PredicateUseNarrativeStyle string
 ---@field PredicateAllowLanguage string
 ---@field PredicateTransmitOverRadio string
+---@field PredicateEnableStream string
 ---@field AvailableLanguages string
+---@field AddLanguageAllowlist string
+---@field AddLanguageBlocklist string
 ---@field SignedLanguages string
 ---@field LanguageSlots integer
+---@field InterpretationRolls integer
+---@field InterpretationChance integer
 ---@field FormatCard string
 ---@field FormatRoll string
+---@field FormatFlip string
 ---@field FormatAliases string
 ---@field FormatInfo string
 ---@field FormatMenuName string
@@ -88,9 +99,11 @@ local floor = math.floor
 ---@field FormatAdminIcon string
 ---@field FormatNarrativeDialogueTag string
 ---@field FormatNarrativePunctuation string
+---@field PatternNarrativeCustomTag string
 ---@field OverheadFormatFull string
 ---@field OverheadFormatCard string
 ---@field OverheadFormatRoll string
+---@field OverheadFormatFlip string
 ---@field OverheadFormatDo string
 ---@field OverheadFormatDoLoud string
 ---@field OverheadFormatDoQuiet string
@@ -105,6 +118,7 @@ local floor = math.floor
 ---@field ChatFormatFull string
 ---@field ChatFormatCard string
 ---@field ChatFormatRoll string
+---@field ChatFormatFlip string
 ---@field ChatFormatDo string
 ---@field ChatFormatDoLoud string
 ---@field ChatFormatDoQuiet string
@@ -145,6 +159,12 @@ local colorOpts = {
     server = 'ColorServer',
 }
 
+local addLangAllowlist = DelimitedList:new({ table = Option, source = 'AddLanguageAllowlist' })
+local addLangBlocklist = DelimitedList:new({ table = Option, source = 'AddLanguageBlocklist' })
+local cardItemsList = DelimitedList:new({ table = Option, source = 'CardItems' })
+local coinItemsList = DelimitedList:new({ table = Option, source = 'CoinItems' })
+local diceItemsList = DelimitedList:new({ table = Option, source = 'CardItems' })
+
 
 ---@param options omichat.Options
 ---@param colorOpt string?
@@ -181,6 +201,36 @@ local function isCompatEnabled(value, modId)
 end
 
 
+---Checks whether the language against the add language allow/block list.
+---This does not check whether the language is a valid roleplay language.
+---@param language string
+---@return boolean
+---@see omichat.api.shared.isConfiguredRoleplayLanguage
+function Option:canAddLanguage(language)
+    local allowlist = addLangAllowlist:list()
+    local blocklist = addLangBlocklist:list()
+
+    local found = #allowlist == 0
+    for i = 1, #allowlist do
+        if allowlist[i] == language then
+            found = true
+            break
+        end
+    end
+
+    if not found then
+        return false
+    end
+
+    for i = 1, #blocklist do
+        if blocklist[i] == language then
+            return false
+        end
+    end
+
+    return true
+end
+
 ---Returns whether players have a way to set their chat nickname.
 ---@return boolean
 function Option:canPlayersSetNickname()
@@ -203,6 +253,24 @@ end
 ---@return boolean
 function Option:compatTADEnabled()
     return isCompatEnabled(Option.EnableCompatTAD, 'TrueActionsDancing')
+end
+
+---Returns a table of valid items for /card.
+---@return table
+function Option:getCardItems()
+    return cardItemsList:list()
+end
+
+---Returns a table of valid items for /flip.
+---@return table
+function Option:getCoinItems()
+    return coinItemsList:list()
+end
+
+---Returns a table of valid items for /roll.
+---@return table
+function Option:getDiceItems()
+    return diceItemsList:list()
 end
 
 ---Returns the default color associated with a category.
@@ -250,6 +318,20 @@ function Option:getDefaultColor(category, username)
         or { r = 255, g = 255, b = 255 }
 end
 
+---Returns whether the clean character option is set to clean clothing.
+---This does not check for whether the macro character customization feature is enabled.
+---@return boolean
+function Option:isCleanClothingEnabled()
+    return Option.EnableCleanCharacter == 3
+end
+
+---Returns whether the clean character option is enabled.
+---This does not check for whether the macro character customization feature is enabled.
+---@return boolean
+function Option:isCleanCustomizationEnabled()
+    return Option.EnableCleanCharacter ~= 1
+end
+
 ---Returns whether the /name command should be enabled.
 ---@return boolean
 function Option:isNameCommandEnabled()
@@ -280,6 +362,24 @@ end
 ---@return boolean
 function Option:isNicknameCommandEnabled()
     return self.EnableSetName > 4
+end
+
+---Checks whether an item is required for /card.
+---@return boolean
+function Option:requireCardItem()
+    return #self:getCardItems() > 0
+end
+
+---Checks whether an item is required for /flip.
+---@return boolean
+function Option:requireCoinItem()
+    return #self:getCoinItems() > 0
+end
+
+---Checks whether an item is required for /roll.
+---@return boolean
+function Option:requireDiceItem()
+    return #self:getDiceItems() > 0
 end
 
 ---Returns whether the Discord color option should be shown.

@@ -15,7 +15,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          path: '.'
           fetch-depth: 0
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
       - name: Install latest mdbook
         run: |
           tag=$(curl 'https://api.github.com/repos/rust-lang/mdbook/releases/latest' | jq -r '.tag_name')
@@ -23,14 +28,26 @@ jobs:
           mkdir mdbook
           curl -sSL $url | tar -xz --directory=./mdbook
           echo `pwd`/mdbook >> $GITHUB_PATH
+      - name: Install Lua language server
+        run: |
+          tag=$(curl 'https://api.github.com/repos/LuaLS/lua-language-server/releases/latest' | jq -r '.tag_name')
+          url="https://github.com/LuaLS/lua-language-server/releases/download/${tag}/lua-language-server-${tag}-linux-x64.tar.gz"
+          mkdir lls
+          curl -sSL $url | tar -xz --directory=./lls
+          echo `pwd`/lls/bin >> $GITHUB_PATH
+      - name: Generate typestub
+        run: |
+          lua-language-server --doc "./Contents/mods/OmiChat/media/lua"
+          python scripts/stubgen.py lls/log/doc.json -o docs/api/typestub.lua -n "omi(?:chat)?\."
+          cat docs/api/typestub.lua
       - name: Build Book
         run: mdbook build
       - name: Setup Pages
-        uses: actions/configure-pages@v2
+        uses: actions/configure-pages@v4
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
           path: 'guide'
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v3
