@@ -83,5 +83,6 @@ description=[hr][/hr]Questions? Use the [url=https://github.com/omarkmu/pz-omich
 description=Suggestions? Create a [url=https://github.com/omarkmu/pz-omichat/discussions/new?category=ideas]feature request.[/url]
 description=Problems? Create an [url=https://github.com/omarkmu/pz-omichat/issues/new?template=bug_report.yaml]issue.[/url]
 description=Want to contribute? [url=https://github.com/omarkmu/pz-omichat/blob/main/.github/CONTRIBUTING.md]You can![/url]
+description=Don't want to use GitHub? Join the [url=https://discord.gg/juv9TqygFu]Discord.[/url]
 tags=Build 41;Interface;Multiplayer;Silly/Fun
 visibility=public

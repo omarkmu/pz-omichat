@@ -3,6 +3,7 @@
 ## 1.1.0
 
 ### Added
+- French translation (thank you to [Inkredibehl](https://github.com/Inkredibehl)!)
 - `/flip` command for coin flips and corresponding options
 - `/language` command for quickly switching active language
 - Options to control which items are required for `/roll`, `/card`, and `/flip` commands
