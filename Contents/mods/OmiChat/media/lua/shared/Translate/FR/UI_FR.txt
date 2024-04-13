@@ -220,7 +220,7 @@ UI_FR = {
     UI_OmiChat_ContextSetCustomSneakCallouts = "Personnaliser les appels furtifs",
     UI_OmiChat_ContextSetCustomCalloutsDesc = "Entrez un appel par ligne, ou rien pour réinitialiser.",
     UI_OmiChat_ContextAdmin = "Options administrateur",
-    UI_OmiChat_ContextAdmin_show_icon = "Afficher l'icône de discussion",
-    UI_OmiChat_ContextAdmin_know_all_languages = "Comprendre toutes les langues",
-    UI_OmiChat_ContextAdmin_ignore_message_range = "Ignorer la plage de message",
+    UI_OmiChat_ContextAdmin_ShowIcon = "Afficher l'icône de discussion",
+    UI_OmiChat_ContextAdmin_KnowAllLanguages = "Comprendre toutes les langues",
+    UI_OmiChat_ContextAdmin_IgnoreMessageRange = "Ignorer la plage de message",
 }

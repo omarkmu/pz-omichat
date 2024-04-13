@@ -50,9 +50,9 @@ local function addAdminOptions(context)
 
     ---@type omichat.AdminOption[]
     local options = {
-        'show_icon',
-        'know_all_languages',
-        'ignore_message_range',
+        'ShowIcon',
+        'KnowAllLanguages',
+        'IgnoreMessageRange',
     }
 
     local adminOptionName = getText('UI_OmiChat_ContextAdmin')
