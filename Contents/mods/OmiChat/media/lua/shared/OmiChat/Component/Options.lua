@@ -159,11 +159,11 @@ local colorOpts = {
     server = 'ColorServer',
 }
 
-local addLangAllowlist = DelimitedList:new(Option.AddLanguageAllowlist)
-local addLangBlocklist = DelimitedList:new(Option.AddLanguageBlocklist)
-local cardItemsList = DelimitedList:new(Option.CardItems)
-local coinItemsList = DelimitedList:new(Option.CoinItems)
-local diceItemsList = DelimitedList:new(Option.CardItems)
+local addLangAllowlist = DelimitedList:new({ table = Option, source = 'AddLanguageAllowlist' })
+local addLangBlocklist = DelimitedList:new({ table = Option, source = 'AddLanguageBlocklist' })
+local cardItemsList = DelimitedList:new({ table = Option, source = 'CardItems' })
+local coinItemsList = DelimitedList:new({ table = Option, source = 'CoinItems' })
+local diceItemsList = DelimitedList:new({ table = Option, source = 'CardItems' })
 
 
 ---@param options omichat.Options
@@ -207,8 +207,8 @@ end
 ---@return boolean
 ---@see omichat.api.shared.isConfiguredRoleplayLanguage
 function Option:canAddLanguage(language)
-    local allowlist = addLangAllowlist:update(Option.AddLanguageAllowlist)
-    local blocklist = addLangBlocklist:update(Option.AddLanguageBlocklist)
+    local allowlist = addLangAllowlist:list()
+    local blocklist = addLangBlocklist:list()
 
     local found = #allowlist == 0
     for i = 1, #allowlist do
@@ -258,19 +258,19 @@ end
 ---Returns a table of valid items for /card.
 ---@return table
 function Option:getCardItems()
-    return cardItemsList:update(Option.CardItems)
+    return cardItemsList:list()
 end
 
 ---Returns a table of valid items for /flip.
 ---@return table
 function Option:getCoinItems()
-    return coinItemsList:update(Option.CoinItems)
+    return coinItemsList:list()
 end
 
 ---Returns a table of valid items for /roll.
 ---@return table
 function Option:getDiceItems()
-    return diceItemsList:update(Option.DiceItems)
+    return diceItemsList:list()
 end
 
 ---Returns the default color associated with a category.
