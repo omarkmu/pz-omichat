@@ -350,7 +350,10 @@ return {
                 info.format = Option.ChatFormatUnknownLanguageRadio
             else
                 info.format = Option.ChatFormatUnknownLanguage
-                if (info.context.ocIsSneakCallout or info.context.ocCustomStream == 'whisper') and OmiChat.isCustomStreamEnabled('mequiet') then
+                local isQuietStream = info.context.ocIsSneakCallout
+                    or info.context.ocCustomStream == 'whisper'
+                    or info.context.ocCustomStream == 'low'
+                if isQuietStream and OmiChat.isCustomStreamEnabled('mequiet') then
                     info.context.ocStreamForRange = 'whisper'
                     info.formatOptions.color = OmiChat.getColorOrDefault('mequiet')
                     info.tokens.stream = 'mequiet'
