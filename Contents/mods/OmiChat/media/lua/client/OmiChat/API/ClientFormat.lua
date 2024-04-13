@@ -562,7 +562,7 @@ function OmiChat.formatForChat(args)
     tokens.input = formatter and formatter:format(tokens.input, tokens) or tokens.input
 
     -- add indicator for admin icon
-    if isAdmin() and OmiChat.getAdminOption('show_icon') then
+    if isAdmin() and OmiChat.getShowAdminIcon() then
         local adminIconFormatter = OmiChat.getFormatter('adminIcon')
         tokens.input = adminIconFormatter:wrap(tokens.input)
     end

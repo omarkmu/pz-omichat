@@ -220,7 +220,7 @@ UI_EN = {
     UI_OmiChat_ContextSetCustomSneakCallouts = "Customize sneak callouts",
     UI_OmiChat_ContextSetCustomCalloutsDesc = "Enter one callout per line, or nothing to reset.",
     UI_OmiChat_ContextAdmin = "Admin options",
-    UI_OmiChat_ContextAdmin_show_icon = "Display chat icon",
-    UI_OmiChat_ContextAdmin_know_all_languages = "Understand all languages",
-    UI_OmiChat_ContextAdmin_ignore_message_range = "Ignore message range",
+    UI_OmiChat_ContextAdmin_ShowIcon = "Display chat icon",
+    UI_OmiChat_ContextAdmin_KnowAllLanguages = "Understand all languages",
+    UI_OmiChat_ContextAdmin_IgnoreMessageRange = "Ignore message range",
 }

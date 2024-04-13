@@ -327,7 +327,7 @@ return {
                 info.message:setOverHeadSpeech(false)
             end
 
-            if isAdmin() and OmiChat.getAdminOption('know_all_languages') then
+            if isAdmin() and OmiChat.getUnderstandAllLanguages() then
                 return
             end
 
@@ -449,7 +449,7 @@ return {
                 end
             end
 
-            if isAdmin() and OmiChat.getAdminOption('ignore_message_range') then
+            if isAdmin() and OmiChat.getIgnoreMessageRange() then
                 return
             end
 

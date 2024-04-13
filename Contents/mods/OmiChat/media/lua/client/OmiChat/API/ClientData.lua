@@ -10,10 +10,26 @@ local getText = getText
 
 ---@type table<omichat.AdminOption, string>
 local adminOptionMap = {
-    show_icon = 'adminShowIcon',
-    know_all_languages = 'adminKnowLanguages',
-    ignore_message_range = 'adminIgnoreRange',
+    ShowIcon = 'adminShowIcon',
+    KnowAllLanguages = 'adminKnowLanguages',
+    IgnoreMessageRange = 'adminIgnoreRange',
 }
+
+
+---Maps a deprecated admin option to its updated value.
+---@param option string
+---@return omichat.AdminOption
+local function handleOldAdminOption(option)
+    if option == 'show_icon' then
+        option = 'ShowIcon'
+    elseif option == 'know_all_languages' then
+        option = 'KnowAllLanguages'
+    elseif option == 'ignore_message_range' then
+        option = 'IgnoreMessageRange'
+    end
+
+    return option
+end
 
 
 ---Adds a roleplay language to the current player's list.
@@ -110,6 +126,8 @@ end
 ---@param option omichat.AdminOption
 ---@return boolean
 function OmiChat.getAdminOption(option)
+    option = handleOldAdminOption(option)
+
     local prefs = OmiChat.getPlayerPreferences()
     local mappedPref = adminOptionMap[option]
     return prefs[mappedPref] or false
@@ -172,6 +190,13 @@ function OmiChat.getCustomShouts(shoutType)
 
     local prefs = OmiChat.getPlayerPreferences()
     return prefs[shoutType]
+end
+
+---Retrieves whether the player has the admin option to ignore message range enabled.
+---This does not check for admin permissions.
+---@return boolean
+function OmiChat.getIgnoreMessageRange()
+    return OmiChat.getAdminOption('IgnoreMessageRange')
 end
 
 ---Retrieves a boolean for whether the current player has name colors enabled.
@@ -325,6 +350,13 @@ function OmiChat.getRetainCommand(category)
     return false
 end
 
+---Retrieves whether the player has the admin option to display a chat icon enabled.
+---This does not check for admin permissions.
+---@return boolean
+function OmiChat.getShowAdminIcon()
+    return OmiChat.getAdminOption('ShowIcon')
+end
+
 ---Retrieves a boolean for whether the current player has sign language emotes enabled.
 ---@return boolean
 function OmiChat.getSignEmotesEnabled()
@@ -349,6 +381,13 @@ function OmiChat.getSpeechColor()
         g = speechColor:getGreen(),
         b = speechColor:getBlue(),
     }
+end
+
+---Retrieves whether the player has the admin option to understand all roleplay languages enabled.
+---This does not check for admin permissions.
+---@return boolean
+function OmiChat.getUnderstandAllLanguages()
+    return OmiChat.getAdminOption('KnowAllLanguages')
 end
 
 ---Gets whether the current player wants to use chat suggestions.
@@ -397,6 +436,8 @@ end
 ---@param option omichat.AdminOption
 ---@param value boolean
 function OmiChat.setAdminOption(option, value)
+    option = handleOldAdminOption(option)
+
     local prefs = OmiChat.getPlayerPreferences()
     local mappedPref = adminOptionMap[option]
     if prefs[mappedPref] == nil then
@@ -406,7 +447,7 @@ function OmiChat.setAdminOption(option, value)
     prefs[mappedPref] = not not value
     OmiChat.savePlayerPreferences()
 
-    if option == 'know_all_languages' then
+    if option == 'KnowAllLanguages' then
         OmiChat.redrawMessages()
     end
 end

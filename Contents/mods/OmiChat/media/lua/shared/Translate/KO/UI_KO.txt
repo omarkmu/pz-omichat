@@ -220,7 +220,7 @@ UI_KO = {
     UI_OmiChat_ContextSetCustomSneakCallouts = "조용한 외치기 말 설정",
     UI_OmiChat_ContextSetCustomCalloutsDesc = "한 줄에 한 문장을 입력합니다. 재설정하려면 아무것도 입력하지 마세요.",
     UI_OmiChat_ContextAdmin = "관리자",
-    UI_OmiChat_ContextAdmin_show_icon = "관리자 아이콘 표시",
-    UI_OmiChat_ContextAdmin_know_all_languages = "모든 언어 이해",
-    UI_OmiChat_ContextAdmin_ignore_message_range = "메시지 범위 무시",
+    UI_OmiChat_ContextAdmin_ShowIcon = "관리자 아이콘 표시",
+    UI_OmiChat_ContextAdmin_KnowAllLanguages = "모든 언어 이해",
+    UI_OmiChat_ContextAdmin_IgnoreMessageRange = "메시지 범위 무시",
 }

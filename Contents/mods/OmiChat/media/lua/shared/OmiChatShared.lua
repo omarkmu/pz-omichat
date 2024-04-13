@@ -56,9 +56,9 @@ return OmiChat
 ---| 'icons'
 
 ---@alias omichat.AdminOption
----| 'show_icon'
----| 'know_all_languages'
----| 'ignore_message_range'
+---| 'ShowIcon'
+---| 'KnowAllLanguages'
+---| 'IgnoreMessageRange'
 
 ---@class omichat.StreamSearchOptions
 ---@field excludeChatStreams boolean? Whether to exclude chat streams from the search.
