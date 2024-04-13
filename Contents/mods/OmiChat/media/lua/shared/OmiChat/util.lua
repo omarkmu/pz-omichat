@@ -1,6 +1,5 @@
 local lib = require 'OmiChat/lib'
 local Interpolator = require 'OmiChat/Component/Interpolator'
-local DelimitedList = require 'OmiChat/Component/DelimitedList'
 
 local pow = math.pow
 local floor = math.floor
@@ -16,7 +15,6 @@ local getTimestampMs = getTimestampMs
 ---@field private _interpolatorCache table<string, omichat.utils.InterpolatorCacheItem>
 local utils = lib.utils.copy(lib.utils)
 utils.Interpolator = Interpolator
-utils.DelimitedList = DelimitedList
 utils._interpolatorCache = {}
 
 ---@class omichat.utils.InterpolatorCacheItem
