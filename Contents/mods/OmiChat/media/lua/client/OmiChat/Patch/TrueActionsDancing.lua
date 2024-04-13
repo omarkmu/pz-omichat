@@ -318,6 +318,13 @@ local recipeDances = {
 }
 
 
+---Display function for dances.
+---@param dance table
+---@return string
+local function danceDisplay(dance)
+    return dance.display
+end
+
 ---Returns a list of available dances that are provided by inventory items.
 ---@param player IsoPlayer The player to check.
 ---@param search string? If provided, the index of the dance with this emote in the result will be returned.
@@ -390,6 +397,13 @@ local function getAvailableDanceHelpText(player)
     return concat(parts)
 end
 
+---Map function for dances. Returns the dance name.
+---@param dance table
+---@return string
+local function mapDanceValue(dance)
+    return dance.name
+end
+
 ---Returns a dance emote given command input, or information
 ---used to display an error message.
 ---@param name string
@@ -457,6 +471,44 @@ local function processDanceCommand(name, player)
     return { unknown = true }
 end
 
+---Searches known dances for the input.
+---@param ctxOrSearch omichat.SearchContext | string
+---@return omichat.SearchResults?
+local function searchKnownDances(ctxOrSearch)
+    if not Option:compatTADEnabled() then
+        return
+    end
+
+    local player = getSpecificPlayer(0)
+    if not player then
+        return
+    end
+
+    ---@diagnostic disable-next-line: invisible
+    local ctx = OmiChat.buildInternalSearchContext(ctxOrSearch)
+    ctx.display = ctx.display or danceDisplay
+    ctx.mapValue = mapDanceValue
+
+    local exact
+    local dances = getAvailableDances(player)
+    for i = 1, #dances do
+        local dance = dances[i]
+        local display = dance.display:gsub(' ', '_')
+
+        ---@diagnostic disable-next-line: invisible
+        local result = OmiChat.searchInternal(ctx, dance.name, dance, display)
+        if result and result.exact and ctx.terminateOnExact then
+            exact = result
+            break
+        end
+    end
+
+    return {
+        exact = exact,
+        results = utils.extend(ctx.startsWith, ctx.contains),
+    }
+end
+
 
 ---@type omichat.CommandStream
 local danceStream = {
@@ -465,6 +517,7 @@ local danceStream = {
     omichat = {
         helpText = 'UI_OmiChat_helptext_dance',
         isEnabled = function() return Option:compatTADEnabled() end,
+        suggestSpec = { 'known-dance' },
         onUse = function(args)
             local player = getSpecificPlayer(0)
             if not player then
@@ -472,7 +525,7 @@ local danceStream = {
             end
 
             local feedback
-            local info = processDanceCommand(args.command, player)
+            local info = processDanceCommand(args.text, player)
             if info.emote then
                 player:setPrimaryHandItem(nil)
                 player:setSecondaryHandItem(nil)
@@ -494,39 +547,6 @@ local danceStream = {
     },
 }
 
----@type omichat.Suggester
-local danceSuggester = {
-    suggest = function(_, info)
-        if not Option:compatTADEnabled() then
-            return
-        end
-
-        local player = getSpecificPlayer(0)
-        if not player then
-            return
-        end
-
-        local matched = info.input:match('^/dance%s+(.*)')
-        local input = matched and trim(matched:gsub(' ', '_'))
-        if not input then
-            return
-        end
-
-        local dances = getAvailableDances(player)
-        for i = 1, #dances do
-            local dance = dances[i]
-            local displayUnderscore = dance.display:gsub(' ', '_')
-            if utils.contains(displayUnderscore, input) or utils.contains(dance.name, input) then
-                info.suggestions[#info.suggestions + 1] = {
-                    type = 'dance',
-                    display = dance.display,
-                    suggestion = concat({ '/dance ', dance.name:gsub('_', ' '), ' ' }),
-                }
-            end
-        end
-    end,
-}
-
 ---Applies the TAD patch.
 local function applyPatch()
     for k, v in pairs(itemDances) do
@@ -541,7 +561,7 @@ local function applyPatch()
     end
 
     OmiChat.addCommand(danceStream)
-    OmiChat.addSuggester(danceSuggester)
+    OmiChat.addSuggesterArgType('known-dance', searchKnownDances)
 end
 
 Events.OnGameStart.Add(applyPatch)

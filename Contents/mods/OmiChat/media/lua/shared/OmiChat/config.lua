@@ -1,8 +1,9 @@
----Configuration of custom streams and formatters.
+---Mod configuration values.
 ---@class omichat.Configuration
 ---@field private _streamTable table<omichat.CustomStreamName, omichat.CustomStreamInfo>
 ---@field private _streamList omichat.CustomStreamInfo[]
 ---@field private _chatStreams omichat.CustomStreamInfo[]
+---@field private _commandStreams omichat.CustomStreamInfo[]
 ---@field private _formatters omichat.FormatterInfo[]
 local Configuration = {}
 Configuration._streamList = {}
@@ -20,6 +21,7 @@ Configuration._streamTable = {}
 ---| 'ooc'
 ---| 'card'
 ---| 'roll'
+---| 'flip'
 
 ---@see omichat.api.client.getFormatter
 ---@alias omichat.FormatterName
@@ -29,20 +31,22 @@ Configuration._streamTable = {}
 ---| 'language'
 ---| 'overheadFull'
 ---| 'overheadOther'
+---| 'messageIcon'
 ---| 'adminIcon'
 ---| 'narrative'
 ---| 'onlineID'
 ---| 'echo'
 
 
--- IDs 1–32 are reserved for encoding additional data
---[[
-    1–2: /roll args
-    1–4: /card suit
-    1–13: /card name
-    21: narrative style dialogue tag
-    22: narrative style text
-]]
+-- arguments (1–32)
+-- 1–10: general-purpose arguments
+
+---Narrative style dialogue tag.
+Configuration.NARRATIVE_TAG = 11
+
+---Narrative style content.
+Configuration.NARRATIVE_TEXT = 12
+
 
 -- command streams (33–50)
 Configuration._commandStreams = {
@@ -65,6 +69,17 @@ Configuration._commandStreams = {
         rangeOpt = 'RangeMe',
         chatFormatOpt = 'ChatFormatCard',
         overheadFormatOpt = 'OverheadFormatCard',
+        chatTypes = { say = true },
+        autoColorOption = false,
+    },
+    {
+        name = 'flip',
+        formatID = 35,
+        streamAlias = 'me',
+        colorOpt = 'ColorMe',
+        rangeOpt = 'RangeMe',
+        chatFormatOpt = 'ChatFormatFlip',
+        overheadFormatOpt = 'OverheadFormatFlip',
         chatTypes = { say = true },
         autoColorOption = false,
     },
@@ -188,16 +203,20 @@ Configuration._formatters = {
         formatID = 81,
     },
     {
-        name = 'narrative',
+        name = 'messageIcon',
         formatID = 82,
     },
     {
-        name = 'onlineID',
+        name = 'narrative',
         formatID = 83,
     },
     {
-        name = 'echo',
+        name = 'onlineID',
         formatID = 84,
+    },
+    {
+        name = 'echo',
+        formatID = 85,
         overheadFormatOpt = 'OverheadFormatEcho',
     },
 }
@@ -276,6 +295,18 @@ function Configuration:init()
     end
 
     return self
+end
+
+---Gets the maximum number of roleplay languages that can be configured.
+---@return 1000
+function Configuration:maxDefinedLanguages()
+    return 1000
+end
+
+---Gets the maximum number of language slots that a player can have.
+---@return 50
+function Configuration:maxLanguageSlots()
+    return 50
 end
 
 ---Returns an iterator over custom stream information.

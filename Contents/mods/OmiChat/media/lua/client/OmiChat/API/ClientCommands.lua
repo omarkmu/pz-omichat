@@ -2,6 +2,8 @@
 
 ---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Client'
+
+---@class omichat.api.client.commands
 OmiChat.Commands = {}
 
 
@@ -90,12 +92,26 @@ function OmiChat.requestDrawCard()
         return false
     end
 
-    local inv = player:getInventory()
-    if not inv:contains('CardDeck') and player:getAccessLevel() == 'None' then
+    if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, Option:getCardItems()) then
         return false
     end
 
     return OmiChat.dispatch('requestDrawCard')
+end
+
+---Requests flipping a coin.
+---@return boolean
+function OmiChat.requestFlipCoin()
+    local player = getSpecificPlayer(0)
+    if not player then
+        return false
+    end
+
+    if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, Option:getCoinItems()) then
+        return false
+    end
+
+    return OmiChat.dispatch('requestFlipCoin')
 end
 
 ---Executes the /reseticon command.
@@ -137,8 +153,7 @@ function OmiChat.requestRollDice(sides)
         return false
     end
 
-    local inv = player:getInventory()
-    if not inv:contains('Dice') and player:getAccessLevel() == 'None' then
+    if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, Option:getDiceItems()) then
         return false
     end
 
@@ -236,9 +251,27 @@ function OmiChat.Commands.reportDrawCard(args)
     OmiChat.send {
         streamName = 'card',
         formatterName = 'card',
-        command = concat {
+        text = concat {
             utils.encodeInvisibleCharacter(suit),
             utils.encodeInvisibleCharacter(card),
+            content,
+        },
+    }
+end
+
+---Reports the results of flipping a coin.
+---@param args omichat.request.ReportFlipCoin
+function OmiChat.Commands.reportFlipCoin(args)
+    local heads = args.heads
+    local content = utils.interpolate(Option.FormatFlip, {
+        heads = args.heads and '1' or nil,
+    })
+
+    OmiChat.send {
+        streamName = 'flip',
+        formatterName = 'flip',
+        text = concat {
+            utils.encodeInvisibleCharacter(heads and 1 or 2),
             content,
         },
     }
@@ -247,14 +280,17 @@ end
 ---Reports the results of a dice roll.
 ---@param args omichat.request.ReportRoll
 function OmiChat.Commands.reportRoll(args)
-    local roll = utils.wrapStringArgument(tostring(args.roll), 1)
-    local sides = utils.wrapStringArgument(tostring(args.sides), 2)
-    local content = utils.interpolate(Option.FormatRoll, { roll = roll, sides = sides })
+    local tokens = { roll = tostring(args.roll), sides = tostring(args.sides) }
+    local content = utils.interpolate(Option.FormatRoll, tokens)
 
     OmiChat.send {
         streamName = 'roll',
         formatterName = 'roll',
-        command = content,
+        text = concat {
+            utils.encodeInvisibleInt(args.roll),
+            utils.encodeInvisibleInt(args.sides),
+            content,
+        },
     }
 end
 

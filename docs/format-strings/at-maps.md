@@ -3,7 +3,7 @@
 **At-maps** are multimaps that can be declared and used in [format strings](./index.md).
 Their keys can be associated with multiple values.
 
-When used with [functions](./functions.md#at-map-functions) that accept at-maps, the objects are used directly. When converted to a string, at-maps use the stringified version of the first available value. This behavior allows use of at-maps to represent logic branches in a straightforward fashion.
+When used with [functions](./functions.md#section-at-map) that accept at-maps, the objects are used directly. When converted to a string, at-maps use the stringified version of the first available value. This behavior allows use of at-maps to represent logic branches in a straightforward fashion.
 
 For example, the following expressions have equivalent results:
 

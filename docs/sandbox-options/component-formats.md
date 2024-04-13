@@ -31,23 +31,18 @@ The format used for local [`/card`](./chat-formats.md#chatformatcard) overhead m
 - `$suit`: The suit  of the card, from 1 to 4. 1 is clubs, 2 is diamonds, 3 is hearts, and 4 is spades.
 
 ### FormatChatPrefix
-**Default:** `$if($icon $icon <SPACE>)$if($neq($stream server) $timestamp)$tag$language`
+**Default:** `$if($icon $icon <SPACE>)$if($neq($stream server) $timestamp)$tag$language`  
+**Token Context:** [Processed Chat](../sandbox-options/token-contexts.md#processed-chat)
 
 The format used to determine the value of the `$prefix` token in [`ChatFormatFull`](./chat-formats.md#chatformatfull).
 
+### FormatFlip
+**Default:** `flips a coin and gets @($heads:heads;tails)`
+
+The format used for local [`/roll`](./chat-formats.md#chatformatflip) overhead message content.
+
 **Tokens:**
-- [`$admin`](../format-strings/tokens.md#admin)
-- [`$author`](../format-strings/tokens.md#author)
-- [`$authorRaw`](../format-strings/tokens.md#authorraw)
-- [`$echo`](../format-strings/tokens.md#echo)
-- [`$icon`](../format-strings/tokens.md#icon)
-- [`$iconRaw`](../format-strings/tokens.md#iconraw)
-- `$language`: The result of the [`FormatLanguage`](../sandbox-options/component-formats.md#formatlanguage) option.
-- [`$message`](../format-strings/tokens.md#message)
-- [`$name`](../format-strings/tokens.md#name)
-- [`$nameRaw`](../format-strings/tokens.md#nameraw)
-- `$tag`: The result of the [`FormatTag`](../sandbox-options/component-formats.md#formattag) option.
-- `$timestamp`: The result of the [`FormatTimestamp`](../sandbox-options/component-formats.md#formattimestamp) option.
+- `$heads`: Populated if the result of the coin flip was heads.
 
 ### FormatIcon
 **Default:** `@($eq($stream card):Item_CardDeck;$eq($stream roll):Item_Dice;$has(@(say;shout;whisper;faction;safehouse;ooc;general) $stream):@($adminIcon;$icon))`
@@ -58,7 +53,7 @@ The format used to determine the value of `$icon` in other formats.
 - `$adminIcon`: The icon determined by [`FormatAdminIcon`](#formatadminicon).
 This is only populated when the player is an admin with the relevant [option](../user-guide/admins.md#admin-menu) enabled.
 - [`$chatType`](../format-strings/tokens.md#chattype)
-- `$icon`: The icon set with [`/seticon`](../user-guide/admins.md#commands).
+- `$icon`: The icon associated with the message, or set with [`/seticon`](../user-guide/admins.md#commands).
 - [`$stream`](../format-strings/tokens.md#stream)
 
 ### FormatInfo
@@ -162,13 +157,13 @@ The format used to determine the value of the `$prefix` token in [`OverheadForma
 - [`$username`](../format-strings/tokens.md#username)
 
 ### FormatRoll
-**Default:** `rolls a $roll on a $sides-sided die`
+**Default:** `rolls $roll on a $sides-sided die`
 
 The format used for local [`/roll`](./chat-formats.md#chatformatroll) overhead message content.
 
 **Tokens:**
-- `$roll`: The number that was rolled. This will be wrapped in invisible characters.
-- `$sides`: The number of sides on the die that was rolled. This will be wrapped in invisible characters.
+- `$roll`: The number that was rolled.
+- `$sides`: The number of sides on the die that was rolled.
 
 ### FormatTag
 **Default:** `[$tag]`

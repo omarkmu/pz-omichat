@@ -163,7 +163,7 @@ local function transformSendArgs(args, streamIdentifier)
 
     if type(args) == 'string' then
         return {
-            command = args,
+            text = args,
             stream = stream,
         }
     end
@@ -195,8 +195,9 @@ local function tryApplyBuff()
     local stats = player:getStats()
     local bodyDamage = player:getBodyDamage()
 
-    stats:setHunger(stats:getHunger() - 0.02)
-    stats:setThirst(stats:getThirst() - 0.02)
+    stats:setHunger(stats:getHunger() - 0.04)
+    stats:setThirst(stats:getThirst() - 0.04)
+    stats:setFatigue(stats:getFatigue() - 0.1)
     stats:setStressFromCigarettes(stats:getStressFromCigarettes() - 0.25)
     bodyDamage:setBoredomLevel(bodyDamage:getBoredomLevel() - 50)
     bodyDamage:setUnhappynessLevel(bodyDamage:getUnhappynessLevel() - 50)
@@ -353,17 +354,17 @@ end
 ---@return omichat.StreamInfo? #Information about the stream.
 ---@return string #The text following the command in the input.
 ---@return string? #The command or short command that was used.
----@return boolean #Whether there was a match on the command, but it was disabled.
+---@return omichat.StreamInfo? #Information about the disabled stream.
 function OmiChat.chatCommandToStream(command, includeCommands, enabledOnly)
     if not command or command == '' then
-        return nil, '', nil, false
+        return nil, ''
     end
 
     if includeCommands == nil then
         includeCommands = true
     end
 
-    local isCommandDisabled = false
+    local disabledCommand
     local streamInfo
     local chatCommand
 
@@ -387,16 +388,16 @@ function OmiChat.chatCommandToStream(command, includeCommands, enabledOnly)
         if chatCommand and (not enabledOnly or info:isEnabled()) then
             streamInfo = info
             command = checkCommand
-            isCommandDisabled = false
+            disabledCommand = nil
             break
         elseif chatCommand then
-            isCommandDisabled = true
+            disabledCommand = info
         end
 
         i = i + 1
     end
 
-    return streamInfo, command, chatCommand, isCommandDisabled
+    return streamInfo, command, chatCommand, disabledCommand
 end
 
 ---Retrieves a stream name given a chat command.
@@ -563,6 +564,13 @@ function OmiChat.getInfoRichText(player)
     return utils.interpolate(Option.FormatInfo, tokens, player:getUsername())
 end
 
+---Returns the list of custom setting handlers for a given category.
+---@param category omichat.SettingCategory
+---@return omichat.SettingHandlerCallback[]
+function OmiChat.getSettingHandlers(category)
+    return OmiChat._settingHandlers[category]
+end
+
 ---Gets an emote meant to simulate sign language based on the given text.
 ---@param text string
 ---@return string
@@ -572,6 +580,13 @@ function OmiChat.getSignLanguageEmote(text)
     rand:seed(utils.trim(text:lower()))
 
     return signLanguageEmotes[rand:random(1, #signLanguageEmotes)]
+end
+
+---Retrieves the search callback for an argument type.
+---@param argType string
+---@return omichat.SuggestSearchCallback?
+function OmiChat.getSuggesterArgTypeCallback(argType)
+    return OmiChat._customSuggesterArgTypes[argType]
 end
 
 ---Suggests text based on the provided input text.
@@ -675,8 +690,8 @@ function OmiChat.send(args)
         return
     end
 
-    local command = utils.trim(args.command)
-    if #command == 0 then
+    local text = utils.trim(args.command or args.text or '')
+    if #text == 0 then
         return
     end
 
@@ -692,9 +707,9 @@ function OmiChat.send(args)
     local chatType = stream:getChatType()
     if chatType == 'whisper' then
         -- don't apply formatting to the username
-        local m1, m2 = command:match('^("[^"]*%s+[^"]*"%s)(.+)$')
+        local m1, m2 = text:match('^("[^"]*%s+[^"]*"%s)(.+)$')
         if not m1 then
-            m1, m2 = command:match('^([^"]%S*%s)(.+)$')
+            m1, m2 = text:match('^([^"]%S*%s)(.+)$')
         end
 
         if not m1 then
@@ -703,7 +718,7 @@ function OmiChat.send(args)
         end
 
         prefix = m1
-        command = m2
+        text = m2
     end
 
     local language
@@ -712,11 +727,12 @@ function OmiChat.send(args)
         language = currentLanguage
     end
 
-    local initialCommand = command
+    local initialText = text
     local formatResult = OmiChat.formatForChat {
-        text = command,
+        text = text,
         language = language,
         chatType = chatType,
+        icon = args.icon,
         isEcho = args.isEcho,
         stream = args.streamName or stream:getIdentifier(),
         formatterName = args.formatterName or stream:getFormatterName(),
@@ -724,8 +740,8 @@ function OmiChat.send(args)
         tokens = args.tokens,
     }
 
-    command = formatResult.text
-    if command == '' then
+    text = formatResult.text
+    if text == '' then
         if formatResult.error then
             OmiChat.addInfoMessage(formatResult.error)
         end
@@ -736,7 +752,7 @@ function OmiChat.send(args)
     local processResult
     local process = OmiChat.raw[chatType] or OmiChat.raw.say
     if process then
-        processResult = process(prefix .. command)
+        processResult = process(prefix .. text)
         if processResult and chatType == 'whisper' and OmiChat.getRetainCommand(stream:getCommandType()) then
             local chatText = ISChat.instance.chatText
             chatText.lastChatCommand = concat { chatText.lastChatCommand, tostring(processResult), ' ' }
@@ -747,14 +763,14 @@ function OmiChat.send(args)
     if isSigned and args.playSignedEmote and OmiChat.getSignEmotesEnabled() then
         local player = getSpecificPlayer(0)
         if player then
-            player:playEmote(OmiChat.getSignLanguageEmote(initialCommand))
+            player:playEmote(OmiChat.getSignLanguageEmote(initialText))
         end
     end
 
     local username = utils.getPlayerUsername()
     local tokens = args.tokens and utils.copy(args.tokens) or {}
     tokens.chatType = chatType
-    tokens.input = initialCommand
+    tokens.input = initialText
     tokens.username = username
     tokens.name = OmiChat.getNameInChat(username, chatType)
     tokens.stream = stream:getIdentifier()
@@ -777,7 +793,9 @@ function OmiChat.send(args)
         useCallback {
             isEcho = true,
             stream = echoStream,
-            command = initialCommand,
+            text = initialText,
+            command = initialText,
+            icon = args.icon,
         }
     end
 
@@ -855,6 +873,29 @@ function OmiChat.setIconsToExclude(icons)
     OmiChat._iconsToExclude = icons or {}
 end
 
+---Updates the positions of custom buttons.
+function OmiChat.updateButtons()
+    local instance = ISChat.instance
+    if not instance or not instance.gearButton then
+        return
+    end
+
+    local th = instance:titleBarHeight()
+    local lastBtn = instance.gearButton
+    for i = 1, #OmiChat._customButtons do
+        local btn = OmiChat._customButtons[i]
+        if btn:getParent() ~= instance then
+            instance:addChild(btn)
+        end
+
+        if btn:isVisible() then
+            local pad = max(lastBtn:getWidth(), th)
+            btn:setX(lastBtn:getX() - pad - pad / 2)
+            lastBtn = btn
+        end
+    end
+end
+
 ---Updates the icon picker and suggester box based on the current input text.
 ---@param text string? The current text entry text. If omitted, the current text will be retrieved.
 function OmiChat.updateCustomComponents(text)
@@ -912,6 +953,7 @@ function OmiChat.updateState(redraw)
     updateAliases()
     addOrRemoveIconComponents()
     OmiChat.updateInfoText()
+    OmiChat.updateButtons()
 
     local player = getSpecificPlayer(0)
     local username = player and player:getUsername()

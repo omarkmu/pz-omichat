@@ -10,7 +10,13 @@ local utils = require 'OmiChat/util'
 
 
 ---@class omichat.ISRichTextPanel : ISRichTextPanel
----@field ocIsChatTab boolean?
+---@field font UIFont
+---@field indent number
+---@field rgbCurrent { r: integer, g: integer, b: integer }
+---@field currentLine number
+---@field fonts table
+---@field ocLastChar string | nil
+---@field ocIsChatTab boolean | nil
 local ISRichTextPanel = ISRichTextPanel
 
 local _processCommand = ISRichTextPanel.processCommand

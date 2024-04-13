@@ -40,10 +40,10 @@ local function getLanguageInfo()
         if lang ~= '' and not langInfo.languageToID[lang] then
             langInfo.languageToID[lang] = nextId
             langInfo.idToLanguage[nextId] = lang
-            nextId = nextId + 1
 
-            if nextId == 33 then
-                -- maximum of 32 languages
+            nextId = nextId + 1
+            if nextId > OmiChat.config:maxDefinedLanguages() then
+                -- skip languages after the maximum
                 break
             end
         end
@@ -105,7 +105,7 @@ end
 ---@param id integer
 ---@return string?
 function OmiChat.getRoleplayLanguageFromID(id)
-    if id < 1 or id > 32 then
+    if id < 1 or id > OmiChat.config:maxDefinedLanguages() then
         return
     end
 

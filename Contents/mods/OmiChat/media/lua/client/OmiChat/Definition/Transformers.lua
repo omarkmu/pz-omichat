@@ -2,13 +2,46 @@
 local OmiChat = require 'OmiChat/API/Client'
 
 local concat = table.concat
-local char = string.char
 local getText = getText
 local instanceof = instanceof
 
 local utils = OmiChat.utils
 local Option = OmiChat.Option
 local config = OmiChat.config
+
+---Checks whether input matches a command stream.
+---@param name omichat.CustomStreamName
+---@param info omichat.MessageInfo
+---@return string?
+local function matchCommand(name, info)
+    if not OmiChat.isCustomStreamEnabled(name) then
+        return
+    end
+
+    local streamConfig = config:getCustomStreamInfo(name)
+    if not streamConfig then
+        return
+    end
+
+    local text = info.content or info.rawText
+    local formatter = OmiChat.getFormatter(name)
+    local matched = formatter:read(text)
+    if not matched then
+        return
+    end
+
+    if info.context.ocIsRadio then
+        info.message:setShowInChat(false)
+        info.message:setOverHeadSpeech(false)
+        return
+    end
+
+    if streamConfig.overheadFormatOpt and Option[streamConfig.overheadFormatOpt] == '' then
+        info.message:setOverHeadSpeech(false)
+    end
+
+    return matched
+end
 
 
 ---@type omichat.MessageTransformer[]
@@ -91,25 +124,9 @@ return {
         name = 'decode-card',
         priority = 55,
         transform = function(_, info)
-            if not OmiChat.isCustomStreamEnabled('card') then
-                return
-            end
-
-            local text = info.content or info.rawText
-            local formatter = OmiChat.getFormatter('card')
-            local matched = formatter:read(text)
+            local matched = matchCommand('card', info)
             if not matched then
                 return
-            end
-
-            if info.context.ocIsRadio then
-                info.message:setShowInChat(false)
-                info.message:setOverHeadSpeech(false)
-                return
-            end
-
-            if Option.OverheadFormatCard == '' then
-                info.message:setOverHeadSpeech(false)
             end
 
             local suit = utils.decodeInvisibleCharacter(matched)
@@ -132,41 +149,51 @@ return {
         end,
     },
     {
-        name = 'decode-roll',
-        priority = 50,
+        name = 'decode-flip',
+        priority = 54,
         transform = function(_, info)
-            if not OmiChat.isCustomStreamEnabled('roll') then
-                return
-            end
-
-            local text = info.content or info.rawText
-            local formatter = OmiChat.getFormatter('roll')
-            local matched = formatter:read(text)
+            local matched = matchCommand('flip', info)
             if not matched then
                 return
             end
 
-            if info.context.ocIsRadio then
+            local result = utils.decodeInvisibleCharacter(matched)
+
+            if result ~= 1 and result ~= 2 then
                 info.message:setShowInChat(false)
-                info.message:setOverHeadSpeech(false)
                 return
             end
 
-            if Option.OverheadFormatRoll == '' then
-                info.message:setOverHeadSpeech(false)
+            info.content = matched:sub(3)
+            info.tokens.heads = result == 1
+
+            info.format = Option.ChatFormatFlip
+            info.formatOptions.color = OmiChat.getColorOrDefault('me')
+            info.formatOptions.useDefaultChatColor = false
+
+            info.context.ocCustomStream = 'me'
+            info.tokens.stream = 'flip'
+        end,
+    },
+    {
+        name = 'decode-roll',
+        priority = 50,
+        transform = function(_, info)
+            local matched = matchCommand('roll', info)
+            if not matched then
+                return
             end
 
-            local roll = tonumber(utils.unwrapStringArgument(matched, 1, '(%d+)'))
-            local sides = tonumber(utils.unwrapStringArgument(matched, 2, '(%d+)'))
-
-            if not roll or not sides then
+            local seq
+            seq, matched = utils.decodeInvisibleIntSequence(matched, 2)
+            if not matched or not seq then
                 info.message:setShowInChat(false)
                 return
             end
 
             info.content = matched
-            info.tokens.roll = roll
-            info.tokens.sides = sides
+            info.tokens.roll = seq[1]
+            info.tokens.sides = seq[2]
 
             info.format = Option.ChatFormatRoll
             info.formatOptions.color = OmiChat.getColorOrDefault('me')
@@ -270,26 +297,17 @@ return {
             local formatter = OmiChat.getFormatter('language')
             local text = info.content or info.rawText
 
-            -- radio messages don't have language metadata, so we need to grab the id
-            local encodedId
+            -- radio messages don't have language metadata, so we need to read the language from the text
+            local encodedLanguage
             if formatter:isMatch(text) then
                 text = formatter:read(text)
-                encodedId = utils.decodeInvisibleCharacter(text)
-                if encodedId >= 1 and encodedId <= 32 then
-                    info.content = text:sub(2)
-                else
-                    encodedId = nil
-                end
+                encodedLanguage = OmiChat.decodeLanguage(text)
             end
 
-            local defaultLanguage = OmiChat.getDefaultRoleplayLanguage()
-            local language = info.meta.language or defaultLanguage
-
-            if not language and isRadio and encodedId then
-                language = OmiChat.getRoleplayLanguageFromID(encodedId)
-                if language then
-                    utils.addMessageTagValue(info.message, 'ocLanguage', language)
-                end
+            local language = info.meta.language
+            if not language and isRadio and encodedLanguage then
+                language = encodedLanguage
+                utils.addMessageTagValue(info.message, 'ocLanguage', language)
             end
 
             if not language then
@@ -298,13 +316,13 @@ return {
 
             -- add language information for format strings
             local isSigned = OmiChat.isRoleplayLanguageSigned(language)
-            if language ~= defaultLanguage then
+            if language ~= OmiChat.getDefaultRoleplayLanguage() then
                 info.tokens.language = utils.getTranslatedLanguageName(language)
                 info.tokens.languageRaw = language
             end
 
+            -- hide signed messages sent over the radio
             if isSigned and isRadio then
-                -- hide signed messages sent over the radio
                 info.message:setShowInChat(false)
                 info.message:setOverHeadSpeech(false)
             end
@@ -332,10 +350,10 @@ return {
                 info.format = Option.ChatFormatUnknownLanguageRadio
             else
                 info.format = Option.ChatFormatUnknownLanguage
-                if OmiChat.isCustomStreamEnabled('me') then
-                    info.formatOptions.color = OmiChat.getColorOrDefault('me')
-                    info.tokens.stream = 'me'
-                elseif (info.context.ocIsSneakCallout or info.context.ocCustomStream == 'whisper') and OmiChat.isCustomStreamEnabled('mequiet') then
+                local isQuietStream = info.context.ocIsSneakCallout
+                    or info.context.ocCustomStream == 'whisper'
+                    or info.context.ocCustomStream == 'low'
+                if isQuietStream and OmiChat.isCustomStreamEnabled('mequiet') then
                     info.context.ocStreamForRange = 'whisper'
                     info.formatOptions.color = OmiChat.getColorOrDefault('mequiet')
                     info.tokens.stream = 'mequiet'
@@ -343,6 +361,9 @@ return {
                     info.context.ocStreamForRange = 'shout'
                     info.formatOptions.color = OmiChat.getColorOrDefault('meloud')
                     info.tokens.stream = 'meloud'
+                elseif OmiChat.isCustomStreamEnabled('me') then
+                    info.formatOptions.color = OmiChat.getColorOrDefault('me')
+                    info.tokens.stream = 'me'
                 end
             end
         end,
@@ -359,8 +380,8 @@ return {
                 return
             end
 
-            local dialogueTag = utils.unwrapStringArgument(matched, 21)
-            local content = utils.unwrapStringArgument(matched, 22)
+            local dialogueTag = utils.unwrapStringArgument(matched, config.NARRATIVE_TAG)
+            local content = utils.unwrapStringArgument(matched, config.NARRATIVE_TEXT)
             if not dialogueTag or not content then
                 return
             end
@@ -388,6 +409,7 @@ return {
             end
 
             info.tokens.dialogueTag = dialogueTag
+            info.tokens.unstyled = info.context.ocNarrativeContent
             info.content = translated
         end,
     },

@@ -58,6 +58,16 @@ option OmiChat.EnableCharacterCustomization
     translation = OCEnableCharacterCustomization,
 }
 
+option OmiChat.EnableCleanCharacter
+{
+    type = enum,
+    numValues = 3,
+    default = 3,
+    page = OmiChat,
+    translation = OCEnableCleanCharacter,
+    valueTranslation = OCEnableCleanCharacter,
+}
+
 option OmiChat.EnableSetName
 {
     type = enum,
@@ -76,6 +86,38 @@ option OmiChat.EnableDiscordColorOption
     page = OmiChat,
     translation = OCEnableDiscordColorOption,
     valueTranslation = OCEnableDiscordColorOption,
+}
+
+option OmiChat.CardItems
+{
+    type = string,
+    default = CardDeck,
+    page = OmiChat,
+    translation = OCCardItems,
+}
+
+option OmiChat.DiceItems
+{
+    type = string,
+    default = Dice,
+    page = OmiChat,
+    translation = OCDiceItems,
+}
+
+option OmiChat.CoinItems
+{
+    type = string,
+    default =,
+    page = OmiChat,
+    translation = OCCoinItems,
+}
+
+option OmiChat.PatternNarrativeCustomTag
+{
+    type = string,
+    default =,
+    page = OmiChat,
+    translation = OCPatternNarrativeCustomTag,
 }
 
 
@@ -502,6 +544,14 @@ option OmiChat.FilterNarrativeStyle
     translation = OCFilterNarrativeStyle,
 }
 
+option OmiChat.PredicateEnableStream
+{
+    type = string,
+    default = true,
+    page = OmiChat,
+    translation = OCPredicateEnableStream,
+}
+
 option OmiChat.PredicateAllowChatInput
 {
     type = string,
@@ -576,14 +626,50 @@ option OmiChat.SignedLanguages
     translation = OCSignedLanguages,
 }
 
+option OmiChat.AddLanguageAllowlist
+{
+    type = string,
+    default =,
+    page = OmiChat,
+    translation = OCAddLanguageAllowlist,
+}
+
+option OmiChat.AddLanguageBlocklist
+{
+    type = string,
+    default =,
+    page = OmiChat,
+    translation = OCAddLanguageBlocklist,
+}
+
 option OmiChat.LanguageSlots
 {
     type = integer,
     default = 1,
     min = 1,
-    max = 32,
+    max = 50,
     page = OmiChat,
     translation = OCLanguageSlots,
+}
+
+option OmiChat.InterpretationRolls
+{
+    type = integer,
+    default = 2,
+    min = 0,
+    max = 100,
+    page = OmiChat,
+    translation = OCInterpretationRolls,
+}
+
+option OmiChat.InterpretationChance
+{
+    type = integer,
+    default = 25,
+    min = 0,
+    max = 100,
+    page = OmiChat,
+    translation = OCInterpretationChance,
 }
 
 
@@ -647,9 +733,17 @@ option OmiChat.FormatCard
 option OmiChat.FormatRoll
 {
     type = string,
-    default = rolls a $roll on a $sides-sided die,
+    default = rolls $roll on a $sides-sided die,
     page = OmiChat,
     translation = OCFormatRoll,
+}
+
+option OmiChat.FormatFlip
+{
+    type = string,
+    default = flips a coin and gets @($heads:heads;tails),
+    page = OmiChat,
+    translation = OCFormatFlip,
 }
 
 option OmiChat.FormatAdminIcon
@@ -814,6 +908,14 @@ option OmiChat.OverheadFormatRoll
     translation = OCOverheadFormatRoll,
 }
 
+option OmiChat.OverheadFormatFlip
+{
+    type = string,
+    default = << $1 >>,
+    page = OmiChat,
+    translation = OCOverheadFormatFlip,
+}
+
 option OmiChat.OverheadFormatOther
 {
     type = string,
@@ -843,7 +945,7 @@ option OmiChat.ChatFormatDiscord
 option OmiChat.ChatFormatIncomingPrivate
 {
     type = string,
-    default = $($gettext(UI_OmiChat_private_chat_from $name)$): <SPACE> $message,
+    default = $fmtpmfrom($name 1): <SPACE> $message,
     page = OmiChat,
     translation = OCChatFormatIncomingPrivate,
 }
@@ -851,7 +953,7 @@ option OmiChat.ChatFormatIncomingPrivate
 option OmiChat.ChatFormatOutgoingPrivate
 {
     type = string,
-    default = $($gettext(UI_OmiChat_private_chat_to $recipientName)$): <SPACE> $message,
+    default = $fmtpmto($recipientName 1): <SPACE> $message,
     page = OmiChat,
     translation = OCChatFormatOutgoingPrivate,
 }
@@ -867,7 +969,7 @@ option OmiChat.ChatFormatServer
 option OmiChat.ChatFormatRadio
 {
     type = string,
-    default = $gettext(UI_OmiChat_radio $frequency): <SPACE> $message,
+    default = $fmtradio($frequency): <SPACE> $message,
     page = OmiChat,
     translation = OCChatFormatRadio,
 }
@@ -883,7 +985,7 @@ option OmiChat.ChatFormatAdmin
 option OmiChat.ChatFormatCard
 {
     type = string,
-    default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($gettext(UI_OmiChat_card_local $card)) <SPACE>)),
+    default = $fmtrp(<SPACE> $name <SPACE> $punctuate($fmtcard($card)) <SPACE>),
     page = OmiChat,
     translation = OCChatFormatCard,
 }
@@ -891,15 +993,23 @@ option OmiChat.ChatFormatCard
 option OmiChat.ChatFormatRoll
 {
     type = string,
-    default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($gettext(UI_OmiChat_roll_local $roll $sides)) <SPACE>)),
+    default = $fmtrp(<SPACE> $name <SPACE> $punctuate($fmtroll($roll $sides)) <SPACE>),
     page = OmiChat,
     translation = OCChatFormatRoll,
+}
+
+option OmiChat.ChatFormatFlip
+{
+    type = string,
+    default = $fmtrp(<SPACE> $name <SPACE> $punctuate($fmtflip($heads)) <SPACE>),
+    page = OmiChat,
+    translation = OCChatFormatFlip,
 }
 
 option OmiChat.ChatFormatDo
 {
     type = string,
-    default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $punctuate($capitalize($trim($message))) <SPACE>)),
+    default = $fmtrp(<SPACE> $punctuate($capitalize($trim($message))) <SPACE>),
     page = OmiChat,
     translation = OCChatFormatDo,
 }
@@ -907,7 +1017,7 @@ option OmiChat.ChatFormatDo
 option OmiChat.ChatFormatDoLoud
 {
     type = string,
-    default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $punctuate($capitalize($trim($message))) <SPACE>)),
+    default = $fmtrp(<SPACE> $punctuate($capitalize($trim($message))) <SPACE>),
     page = OmiChat,
     translation = OCChatFormatDoLoud,
 }
@@ -915,7 +1025,7 @@ option OmiChat.ChatFormatDoLoud
 option OmiChat.ChatFormatDoQuiet
 {
     type = string,
-    default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $punctuate($capitalize($trim($message))) <SPACE>)),
+    default = $fmtrp(<SPACE> $punctuate($capitalize($trim($message))) <SPACE>),
     page = OmiChat,
     translation = OCChatFormatDoQuiet,
 }
@@ -939,7 +1049,7 @@ option OmiChat.ChatFormatOoc
 option OmiChat.ChatFormatMe
 {
     type = string,
-    default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>)),
+    default = $fmtrp(<SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>),
     page = OmiChat,
     translation = OCChatFormatMe,
 }
@@ -947,7 +1057,7 @@ option OmiChat.ChatFormatMe
 option OmiChat.ChatFormatMeLoud
 {
     type = string,
-    default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>)),
+    default = $fmtrp(<SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>),
     page = OmiChat,
     translation = OCChatFormatMeLoud,
 }
@@ -955,7 +1065,7 @@ option OmiChat.ChatFormatMeLoud
 option OmiChat.ChatFormatMeQuiet
 {
     type = string,
-    default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>)),
+    default = $fmtrp(<SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>),
     page = OmiChat,
     translation = OCChatFormatMeQuiet,
 }
@@ -1019,7 +1129,7 @@ option OmiChat.ChatFormatEcho
 option OmiChat.ChatFormatUnknownLanguage
 {
     type = string,
-    default = $gettext(UI_OmiChat_rp_emote $concats(( ) <SPACE> $name <SPACE> $getunknownlanguagestring($languageRaw $stream) <SPACE>)),
+    default = $fmtrp(<SPACE> $name <SPACE> $getunknownlanguagestring($languageRaw $stream) <SPACE>),
     page = OmiChat,
     translation = OCChatFormatUnknownLanguage,
 }
@@ -1027,7 +1137,7 @@ option OmiChat.ChatFormatUnknownLanguage
 option OmiChat.ChatFormatUnknownLanguageRadio
 {
     type = string,
-    default = $gettext(UI_OmiChat_radio $frequency): $gettext(UI_OmiChat_rp_emote $getunknownlanguagestring($languageRaw $stream)),
+    default = $fmtradio($frequency): $fmtrp($getunknownlanguagestring($languageRaw $stream)),
     page = OmiChat,
     translation = OCChatFormatUnknownLanguageRadio,
 }

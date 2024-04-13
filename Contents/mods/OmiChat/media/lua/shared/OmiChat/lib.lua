@@ -37,15 +37,13 @@ end)(require)
 __bundle_register("interpolate", function(require)
 ---Module containing functionality for string interpolation.
 ---@class omi.interpolate
+---@field Parser omi.interpolate.Parser
+---@field Interpolator omi.interpolate.Interpolator
+---@field MultiMap omi.interpolate.MultiMap
 local interpolate = {}
 
----@type omi.interpolate.Parser
 interpolate.Parser = require("interpolate/Parser")
-
----@type omi.interpolate.Interpolator
 interpolate.Interpolator = require("interpolate/Interpolator")
-
----@type omi.interpolate.MultiMap
 interpolate.MultiMap = require("interpolate/MultiMap")
 
 
@@ -55,7 +53,6 @@ interpolate.MultiMap = require("interpolate/MultiMap")
 ---@param options omi.interpolate.Options?
 ---@return string
 function interpolate.interpolate(text, tokens, options)
-    ---@type omi.interpolate.Interpolator
     local interpolator = interpolate.Interpolator:new(options)
     interpolator:setPattern(text)
 
@@ -329,11 +326,13 @@ end)
 __bundle_register("utils", function(require)
 ---Module containing utility functions.
 ---@class omi.utils : omi.utils.string, omi.utils.table, omi.utils.type
+---@field json omi.utils.json
+---@field DelimitedList omi.DelimitedList
 local utils = {}
 
 
----@type omi.utils.json
 utils.json = require("utils/json")
+utils.DelimitedList = require("DelimitedList")
 
 
 local submodules = {
@@ -439,10 +438,9 @@ function utils.deepEquals(t1, t2)
 end
 
 ---Returns `value` if non-nil. Otherwise, returns `default`.
----@generic T
----@param value? `T`
----@param default T
----@return T
+---@param value? unknown
+---@param default unknown
+---@return unknown
 function utils.default(value, default)
     if value ~= nil then
         return value
@@ -489,9 +487,8 @@ local utils = {}
 
 
 ---Returns whether the result of `func` is truthy for all values in `target`.
----@generic T
----@param predicate fun(arg: T): unknown Predicate function.
----@param target table<unknown, T> | (fun(...): T) Key-value iterator function or table.
+---@param predicate fun(arg): unknown Predicate function.
+---@param target table | (fun(...): unknown) Key-value iterator function or table.
 ---@param ... unknown Iterator state.
 ---@return boolean
 function utils.all(predicate, target, ...)
@@ -509,9 +506,8 @@ function utils.all(predicate, target, ...)
 end
 
 ---Returns whether the result of `func` is truthy for any value in `target`.
----@generic T
----@param predicate fun(arg: T): unknown Predicate function.
----@param target table<unknown, T> | (fun(...): T) Key-value iterator function or table.
+---@param predicate fun(arg): unknown Predicate function.
+---@param target table | (fun(...): unknown) Key-value iterator function or table.
 ---@param ... unknown Iterator state.
 ---@return boolean
 function utils.any(predicate, target, ...)
@@ -559,9 +555,8 @@ function utils.copy(table)
 end
 
 ---Returns an iterator with only the values in `target` for which `predicate` is truthy.
----@generic T
----@param predicate fun(value: T): unknown Predicate function.
----@param target table<unknown, T> | (fun(...): T) Key-value iterator function or table.
+---@param predicate fun(value): unknown Predicate function.
+---@param target table | (fun(...): unknown) Key-value iterator function or table.
 ---@param ... unknown Iterator state.
 ---@return function
 function utils.filter(predicate, target, ...)
@@ -586,11 +581,8 @@ function utils.filter(predicate, target, ...)
 end
 
 ---Returns an iterator which maps all elements of `target` to the return value of `func`.
----@generic K
----@generic T
----@generic U
----@param func fun(value: T, key: K): U Map function.
----@param target table | (fun(...): T) Key-value iterator function or table.
+---@param func fun(value: unknown, key: unknown): unknown Map function.
+---@param target table | (fun(...): unknown) Key-value iterator function or table.
 ---@param ... unknown Iterator state.
 ---@return function
 function utils.map(func, target, ...)
@@ -609,11 +601,8 @@ function utils.map(func, target, ...)
 end
 
 ---Returns an iterator which maps all elements of `target` to the return value of `func`.
----@generic T
----@generic K
----@generic U
----@param func fun(value: T, key: K, index: integer): U Map function.
----@param target T[] | (fun(...): T) Key-value iterator function or list.
+---@param func fun(value: unknown, key: unknown, index: integer): unknown Map function.
+---@param target unknown[] | (fun(...): unknown) Key-value iterator function or list.
 ---@param ... unknown Iterator state.
 ---@return function
 function utils.mapList(func, target, ...)
@@ -634,11 +623,9 @@ function utils.mapList(func, target, ...)
 end
 
 ---Packs the pairs from an iterator into a table.
----@generic K
----@generic T
----@param iter fun(...): K, T Key-value iterator function.
+---@param iter fun(...): unknown, unknown Key-value iterator function.
 ---@param ... unknown Iterator state.
----@return table<K, T>
+---@return table
 function utils.pack(iter, ...)
     if type(iter) == 'table' then
         return iter
@@ -653,14 +640,11 @@ function utils.pack(iter, ...)
 end
 
 ---Applies `acc` cumulatively to all elements of `target` and returns the final value.
----@generic K
----@generic T
----@generic U
----@param acc fun(result: U, element: T, key: K): U Reducer function.
----@param initial U? Initial value.
----@param target table | (fun(...): K, T) Key-value iterator function or table.
+---@param acc fun(result: unknown, element: unknown, key: unknown): unknown Reducer function.
+---@param initial unknown? Initial value.
+---@param target table | (fun(...): unknown, unknown) Key-value iterator function or table.
 ---@param ... unknown Iterator state.
----@return U
+---@return unknown
 function utils.reduce(acc, initial, target, ...)
     if type(target) == 'table' then
         return utils.reduce(acc, initial, pairs(target))
@@ -681,14 +665,11 @@ end
 
 ---Applies `acc` cumulatively to all elements of `target` and returns the final value.
 ---Assumes a given table is an array and orders elements accordingly; for maps, use `reduce`.
----@generic K
----@generic T
----@generic U
----@param acc fun(result: U, element: T, key: K): U Reducer function.
----@param initial U? Initial value.
----@param target table | (fun(...): K, T) Key-value iterator function or list.
+---@param acc fun(result: unknown, element: unknown, key: unknown): unknown Reducer function.
+---@param initial unknown? Initial value.
+---@param target table | (fun(...): unknown) Key-value iterator function or list.
 ---@param ... unknown Iterator state.
----@return U
+---@return unknown
 function utils.reduceList(acc, initial, target, ...)
     if type(target) == 'table' then
         return utils.reduce(acc, initial, ipairs(target))
@@ -912,7 +893,7 @@ end
 ---@param text string
 ---@return string
 function utils.escape(text)
-    return (text:gsub('([[%]%+-*?().^$])', '%%%1'))
+    return (text:gsub('([[%]%+%-%*?().^$%%])', '%%%1'))
 end
 
 ---Returns the value of a numeric character reference or character entity reference.
@@ -1011,7 +992,7 @@ function utils.endsWith(text, other)
 end
 
 ---Stringifies a value for display.
----For non-tables, this is equivalent to `tostring.`
+---For non-tables, this is equivalent to `tostring`.
 ---Tables will stringify their values unless a `__tostring` method is present on their metatable.
 ---@param value unknown
 ---@param pretty boolean? If true, tables will include newlines and tabs.
@@ -1027,6 +1008,92 @@ end
 
 
 return utils
+
+end)
+__bundle_register("DelimitedList", function(require)
+local class = require("class")
+local split = string.split
+
+---@class omi.DelimitedList : omi.Class
+---@field private _cached string
+---@field private _delimiter string
+---@field private _table table?
+---@field private _key string?
+---@field private _list string[]
+local DelimitedList = class()
+
+---@class omi.DelimitedListOptions
+---@field source string? The initial source string. If a table is given, this will be interpreted as the source key to use.
+---@field table table? The source table to use to check for the source string.
+---@field delimiter string? The delimiter.
+
+
+---Updates the delimited list by comparing with the underlying string.
+---If the string is the same, this has no effect.
+---@param str string?
+---@return string[] list
+function DelimitedList:update(str)
+    if not str and self._table and self._key then
+        str = self._table[self._key]
+    elseif not str then
+        str = ''
+    end
+
+    str = tostring(str):trim()
+    if str == self._cached then
+        return self._list
+    end
+
+    local list = self._list
+    table.wipe(list)
+
+    local elements = split(str, self._delimiter)
+    for i = 1, #elements do
+        local el = elements[i]:trim()
+        if el ~= '' then
+            list[#list + 1] = el
+        end
+    end
+
+    self._cached = str
+    return list
+end
+
+---Returns the underlying list.
+---@return string[]
+function DelimitedList:list()
+    if self._table and self._key then
+        -- if it's in a table, auto-update
+        self:update()
+    end
+
+    return self._list
+end
+
+---Creates a new delimited list.
+---@param options omi.DelimitedListOptions?
+---@return omi.DelimitedList
+function DelimitedList:new(options)
+    ---@type omi.DelimitedList
+    local this = setmetatable({}, self)
+    options = options or {}
+
+    this._cached = ''
+    this._list = {}
+    this._delimiter = options.delimiter or ';'
+
+    if options.table then
+        this._table = options.table
+        this._key = options.source
+    elseif options.source then
+        this:update(options.source)
+    end
+
+    return this
+end
+
+
+return DelimitedList
 
 end)
 __bundle_register("utils/json", function(require)
@@ -1494,6 +1561,7 @@ local NodeType = InterpolationParser.NodeType
 
 ---Handles string interpolation.
 ---@class omi.interpolate.Interpolator : omi.Class
+---@field Libraries omi.interpolate.Libraries
 ---@field protected _tokens table<string, unknown>
 ---@field protected _functions table<string, function>
 ---@field protected _library table<string, function>
@@ -1507,7 +1575,6 @@ local NodeType = InterpolationParser.NodeType
 ---@field protected _rand Random?
 local Interpolator = class()
 
----@type omi.interpolate.Libraries
 Interpolator.Libraries = InterpolatorLibraries
 
 ---@class omi.interpolate.Options
@@ -1898,6 +1965,7 @@ local concat = table.concat
 
 ---Parser for the interpolated string format.
 ---@class omi.interpolate.Parser : omi.fmt.Parser
+---@field NodeType table<omi.interpolate.NodeType, string>
 ---@field protected _allowTokens boolean
 ---@field protected _allowAtExpr boolean
 ---@field protected _allowFunctions boolean
@@ -1938,7 +2006,17 @@ local InterpolationParser = BaseParser:derive()
 ---@field entries omi.interpolate.AtExpressionEntry[]
 
 
----@enum omi.interpolate.NodeType
+---@alias omi.interpolate.NodeType
+---| 'at_expression'
+---| 'at_key'
+---| 'at_value'
+---| 'text'
+---| 'token'
+---| 'string'
+---| 'call'
+---| 'escape'
+---| 'argument'
+
 InterpolationParser.NodeType = {
     at_expression = 'at_expression',
     at_key = 'at_key',

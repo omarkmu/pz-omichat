@@ -2,7 +2,6 @@
 ---@diagnostic disable: duplicate-set-field
 
 local OmiChat = require 'OmiChatClient'
-local Option = OmiChat.Option
 
 
 --#region Medical

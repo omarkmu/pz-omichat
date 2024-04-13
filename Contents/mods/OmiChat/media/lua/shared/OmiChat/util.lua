@@ -1,6 +1,10 @@
 local lib = require 'OmiChat/lib'
 local Interpolator = require 'OmiChat/Component/Interpolator'
 
+local pow = math.pow
+local floor = math.floor
+local min = math.min
+local char = string.char
 local format = string.format
 local concat = table.concat
 local getTimestampMs = getTimestampMs
@@ -21,6 +25,7 @@ local CACHE_EXPIRY_MS = 600000 -- ten minutes
 local shortHexPattern = '^%s*#?(%x)(%x)(%x)%s*$'
 local fullHexPattern = '^%s*#?(%x%x)%s*(%x%x)%s*(%x%x)%s*$'
 local rgbPattern = '^%s*(%d%d?%d?)[,%s]+(%d%d?%d?)[,%s]+(%d%d?%d?)%s*$'
+
 local accessLevels = {
     admin = 32,
     moderator = 16,
@@ -178,23 +183,86 @@ end
 ---@param text string
 ---@return integer
 function utils.decodeInvisibleCharacter(text)
-    return text:sub(1, 1):byte() - 127
+    if not text or #text == 0 then
+        return 0
+    end
+
+    return text:byte() - 127
 end
 
 ---Decodes an encoded integer value.
 ---@param text string
----@return integer?
+---@return integer? value
+---@return string? remaining
 function utils.decodeInvisibleInt(text)
-    local digits = {}
-
-    for i = 1, #text do
-        local c = text:sub(i, i):byte() - 127
-        if c >= 1 and c <= 10 then
-            digits[#digits + 1] = string.char(c + 47)
-        end
+    local len = utils.decodeInvisibleCharacter(text)
+    if len < 1 or len > 32 then
+        return
     end
 
-    return tonumber(concat(digits))
+    local value = 0
+    local endPos = min(#text, len + 1)
+    for i = 2, endPos do
+        local digit = utils.decodeInvisibleCharacter(text:sub(i, i)) - 1
+        if digit < 0 or digit > 31 then
+            return
+        end
+
+        value = value + digit * pow(32, i - 2)
+    end
+
+    return value, text:sub(endPos + 1)
+end
+
+---Decodes a sequence of encoded integers.
+---@param text string
+---@param amount integer
+---@return integer[]? sequence The integer sequence.
+---@return string? remaining The remaining text, after the sequence.
+function utils.decodeInvisibleIntSequence(text, amount)
+    local decoded
+    local remaining = text ---@type string?
+
+    local results = {}
+    for _ = 1, amount do
+        decoded, remaining = utils.decodeInvisibleInt(text)
+        if not decoded or not remaining then
+            return
+        end
+
+        results[#results + 1] = decoded
+        text = remaining
+    end
+
+    return results, text
+end
+
+---Decodes an encoded string of character indices.
+---@param text any
+---@return string? result
+---@return string? remaining
+function utils.decodeInvisibleString(text)
+    local seq
+    local length
+    local remaining
+
+    length, remaining = utils.decodeInvisibleInt(text)
+    if not length then
+        return
+    end
+
+    ---@cast remaining string
+    seq, remaining = utils.decodeInvisibleIntSequence(remaining, length)
+    if not seq then
+        return
+    end
+
+    local chars = {}
+    for i = 1, #seq do
+        chars[#chars + 1] = char(seq[i])
+    end
+
+    return concat(chars), remaining
 end
 
 ---Encodes an integer value in [1, 32] into a character.
@@ -204,17 +272,46 @@ function utils.encodeInvisibleCharacter(n)
     return string.char(n + 127)
 end
 
----Encodes a positive integer value as an invisible representation of its digits.
+---Encodes a non-negative integer value as an invisible representation of its digits.
 ---@param value integer
 ---@return string
 function utils.encodeInvisibleInt(value)
-    local str = tostring(value)
-    local result = {}
-    for i = 1, #str do
-        result[#result + 1] = utils.encodeInvisibleCharacter(str:sub(i, i):byte() - 47)
+    value = floor(value)
+    if value < 0 then
+        utils.logError('attempted to encode negative value: ' .. value)
+        return ''
     end
 
-    return concat(result)
+    local originalValue = value
+    local result = {}
+    while value > 0 do
+        if #result == 32 then
+            utils.logError('value is too large to encode: ' .. originalValue)
+            return ''
+        end
+
+        result[#result + 1] = utils.encodeInvisibleCharacter((value % 32) + 1)
+        value = floor(value / 32)
+    end
+
+    if #result == 0 then
+        result[1] = utils.encodeInvisibleCharacter(1)
+    end
+
+    local len = utils.encodeInvisibleCharacter(#result)
+    return len .. concat(result)
+end
+
+---Encodes a string as a sequence of invisible encoded integers.
+---@param text string
+---@return string
+function utils.encodeInvisibleString(text)
+    local chars = {}
+    for i = 1, #text do
+        chars[#chars + 1] = utils.encodeInvisibleInt(text:sub(i, i):byte())
+    end
+
+    return utils.encodeInvisibleInt(#chars) .. concat(chars)
 end
 
 ---Escapes a string for use in a rich text panel.
@@ -223,6 +320,18 @@ end
 ---@return string
 function utils.escapeRichText(text)
     return (text:gsub('<', '&lt;'):gsub('>', '&gt;'))
+end
+
+---Appends members of `t1` to `t2`.
+---@param t1 unknown[]
+---@param t2 unknown[]
+---@return unknown[]
+function utils.extend(t1, t2)
+    for i = 1, #t2 do
+        t1[#t1 + 1] = t2[i]
+    end
+
+    return t1
 end
 
 ---Gets an error from the error tokens, if one is set, and unsets the tokens.
@@ -243,6 +352,18 @@ function utils.extractError(tokens)
     tokens.errorID = nil
 
     return err
+end
+
+---Returns the player's current access level.
+---If the connection is a coop host, returns `admin`.
+---@return string
+function utils.getEffectiveAccessLevel()
+    if isCoopHost() then
+        return 'admin'
+    end
+
+    local player = getSpecificPlayer(0)
+    return player and player:getAccessLevel() or 'none'
 end
 
 ---Gets the text within invisible character wrapping.
@@ -363,7 +484,7 @@ function utils.getTranslatedLanguageName(language)
         return language
     end
 
-    return getTextOrNull('UI_OmiChat_Language_' .. language) or language
+    return getTextOrNull('UI_OmiChat_Language_' .. language:gsub('%s', '_')) or language
 end
 
 ---Checks whether a given access level should have access based on provided flags.
@@ -418,6 +539,35 @@ function utils.hasAccess(flags, accessLevel)
     end
 
     return flags == 1
+end
+
+---Checks whether the player has any of the item types in the list.
+---If the item list is empty, returns `true`.
+---@param player IsoPlayer?
+---@param list string[]
+---@return boolean
+function utils.hasAnyItemType(player, list)
+    player = player or getSpecificPlayer(0)
+    if not player then
+        return false
+    end
+
+    local inv = player:getInventory()
+    if not inv then
+        return false
+    end
+
+    if #list == 0 then
+        return true
+    end
+
+    for i = 1, #list do
+        if inv:contains(list[i]) then
+            return true
+        end
+    end
+
+    return false
 end
 
 ---Interpolates substitution tokens into a string with format strings using `$var` format.
@@ -509,10 +659,11 @@ end
 
 ---Parses arguments for a chat command.
 ---@param text string?
----@return string[]
+---@return string[] args
+---@return boolean hasOpenQuote
 function utils.parseCommandArgs(text)
     if not text then
-        return {}
+        return {}, false
     end
 
     local i = 1
@@ -522,9 +673,8 @@ function utils.parseCommandArgs(text)
 
     while i <= #text do
         local c = text:sub(i, i)
-        local next = text:sub(i + 1, i + 1)
 
-        if c == '\\' and next == '"' then
+        if c == '\\' and text:sub(i + 1, i + 1) == '"' then
             current[#current + 1] = '"'
             i = i + 1
         elseif c == '"' then
@@ -550,7 +700,7 @@ function utils.parseCommandArgs(text)
         args[#args + 1] = concat(current)
     end
 
-    return args
+    return args, inQuote
 end
 
 ---Replaces character entities with the characters that they represent.

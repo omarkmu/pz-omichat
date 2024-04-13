@@ -90,6 +90,16 @@ local function remove(tab, target)
 end
 
 
+---Registers a new button for the chat.
+---@param button ISButton
+---@return ISButton
+function OmiChat.addCustomButton(button)
+    OmiChat._customButtons[#OmiChat._customButtons + 1] = button
+
+    OmiChat.updateButtons()
+    return button
+end
+
 ---Adds information about a command that can be triggered from chat.
 ---@param stream omichat.CommandStream
 function OmiChat.addCommand(stream)
@@ -113,6 +123,16 @@ end
 function OmiChat.addMessageTransformer(transformer)
     OmiChat._transformers[#OmiChat._transformers + 1] = transformer
     prioritySort(OmiChat._transformers)
+end
+
+---Adds a handler for adding setting context menu options.
+---@param category omichat.SettingCategory
+---@param callback omichat.SettingHandlerCallback
+function OmiChat.addSettingHandler(category, callback)
+    local tab = OmiChat._settingHandlers[category]
+    if tab then
+        tab[#tab + 1] = callback
+    end
 end
 
 ---Adds a chat stream.
@@ -161,13 +181,33 @@ function OmiChat.addSuggester(suggester)
     prioritySort(OmiChat._suggesters)
 end
 
+---Registers an argument type for suggester specs.
+---@param argType string
+---@param callback omichat.SuggestSearchCallback
+function OmiChat.addSuggesterArgType(argType, callback)
+    OmiChat._customSuggesterArgTypes[argType] = callback
+end
+
+---Removes a registered custom button.
+---This does not remove the button from the chat.
+---@param button ISButton
+function OmiChat.removeCustomButton(button)
+    local pos
+    for i = 1, #OmiChat._customButtons do
+        if OmiChat._customButtons[i] == button then
+            pos = i
+            break
+        end
+    end
+
+    if pos then
+        table.remove(OmiChat._customButtons, pos)
+    end
+end
+
 ---Removes a stream from the list of available chat commands.
 ---@param stream omichat.CommandStream
 function OmiChat.removeCommand(stream)
-    if not stream then
-        return
-    end
-
     remove(OmiChat._commandStreams, stream)
 end
 
@@ -200,6 +240,16 @@ function OmiChat.removeMessageTransformerByName(name)
     end
 end
 
+---Removes a handler for adding setting context menu options.
+---@param category omichat.SettingCategory
+---@param callback omichat.SettingHandlerCallback
+function OmiChat.removeSettingHandler(category, callback)
+    local tab = OmiChat._settingHandlers[category]
+    if tab then
+        remove(tab, callback)
+    end
+end
+
 ---Removes a stream from the list of available chat streams.
 ---@param stream omichat.ChatStream
 function OmiChat.removeStream(stream)
@@ -221,6 +271,12 @@ end
 ---@param suggester omichat.Suggester
 function OmiChat.removeSuggester(suggester)
     remove(OmiChat._suggesters, suggester)
+end
+
+---Removes an argument type for suggester specs.
+---@param argType string
+function OmiChat.removeSuggesterArgType(argType)
+    OmiChat._customSuggesterArgTypes[argType] = nil
 end
 
 ---Removes the first suggester with the provided name.

@@ -18,6 +18,35 @@ local function canUseAdminCommands()
     return utils.getNumericAccessLevel(access) >= Option.MinimumCommandAccessLevel
 end
 
+---Searches for a known language with loose matching.
+---@param input string
+---@return string?
+local function matchKnownLanguage(input)
+    ---@type omichat.SearchContext
+    local ctx = {
+        terminateOnExact = true,
+        searchDisplay = true,
+        search = input,
+        display = utils.getTranslatedLanguageName,
+    }
+
+    local searchResult = OmiChat.searchStrings(ctx, OmiChat.getRoleplayLanguages())
+    if searchResult.exact then
+        return searchResult.exact.value
+    end
+
+    local result = searchResult.results[1]
+    if result then
+        return result.value
+    end
+end
+
+---Callback function to display help text for a stream.
+---@param info omichat.StreamInfo
+local function showHelpText(info)
+    OmiChat.addInfoMessage(info:getHelpText())
+end
+
 ---@type omichat.CommandStream[]
 return {
     {
@@ -29,7 +58,7 @@ return {
             isEnabled = function() return Option:isNameCommandEnabled() end,
             onUse = function(ctx)
                 if Option:isNameCommandSetNickname() then
-                    local _, feedback = OmiChat.setNickname(ctx.command)
+                    local _, feedback = OmiChat.setNickname(ctx.text)
                     if feedback then
                         OmiChat.addInfoMessage(feedback)
                     end
@@ -37,7 +66,7 @@ return {
                     return
                 end
 
-                local input = utils.trim(ctx.command or '')
+                local input = utils.trim(ctx.text or '')
                 if #input == 0 then
                     OmiChat.addInfoMessage(getText('UI_OmiChat_set_name_empty'))
                     return
@@ -66,7 +95,7 @@ return {
             helpText = 'UI_OmiChat_helptext_nickname',
             isEnabled = function() return Option:isNicknameCommandEnabled() end,
             onUse = function(ctx)
-                local _, feedback = OmiChat.setNickname(ctx.command)
+                local _, feedback = OmiChat.setNickname(ctx.text)
                 if feedback then
                     OmiChat.addInfoMessage(feedback)
                 end
@@ -91,9 +120,10 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_setname',
+            suggestSpec = { 'online-username' },
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                OmiChat.requestSetName(ctx.command)
+                OmiChat.requestSetName(ctx.text)
             end,
         },
     },
@@ -105,7 +135,7 @@ return {
             helpText = 'UI_OmiChat_helptext_iconinfo',
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                local command = utils.trim(ctx.command)
+                local command = utils.trim(ctx.text)
                 if #command == '' then
                     OmiChat.addInfoMessage(ctx.stream:getHelpText())
                     return
@@ -134,10 +164,11 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_seticon',
+            suggestSpec = { 'online-username-with-self' },
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                if not OmiChat.requestSetIcon(ctx.command) then
-                    local args = utils.parseCommandArgs(ctx.command)
+                if not OmiChat.requestSetIcon(ctx.text) then
+                    local args = utils.parseCommandArgs(ctx.text)
                     local icon = args[2]
                     if not args[1] or not icon then
                         OmiChat.addInfoMessage(ctx.stream:getHelpText())
@@ -154,9 +185,10 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_resetname',
+            suggestSpec = { 'online-username' },
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                OmiChat.requestResetName(ctx.command)
+                OmiChat.requestResetName(ctx.text)
             end,
         },
     },
@@ -166,9 +198,10 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_reseticon',
+            suggestSpec = { 'online-username-with-self' },
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                OmiChat.requestResetIcon(ctx.command)
+                OmiChat.requestResetIcon(ctx.text)
             end,
         },
     },
@@ -178,9 +211,27 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_addlanguage',
+            suggestSpec = {
+                'online-username-with-self',
+                {
+                    type = 'language',
+                    ---@param result string
+                    ---@param args string[]
+                    ---@return boolean
+                    filter = function(result, args)
+                        local username = args[1]
+                        if not username then
+                            return true
+                        end
+
+                        -- don't suggest adding already known languages
+                        return not OmiChat.checkPlayerKnowsLanguage(username, result)
+                    end,
+                },
+            },
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                OmiChat.requestAddLanguage(ctx.command)
+                OmiChat.requestAddLanguage(ctx.text)
             end,
         },
     },
@@ -190,9 +241,10 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_resetlanguages',
+            suggestSpec = { 'online-username-with-self' },
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                OmiChat.requestResetLanguages(ctx.command)
+                OmiChat.requestResetLanguages(ctx.text)
             end,
         },
     },
@@ -202,9 +254,10 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_OmiChat_helptext_setlanguageslots',
+            suggestSpec = { 'online-username-with-self' },
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                OmiChat.requestSetLanguageSlots(ctx.command)
+                OmiChat.requestSetLanguageSlots(ctx.text)
             end,
         },
     },
@@ -214,27 +267,41 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_ServerOptionDesc_Card',
-            isEnabled = function()
-                local player = getSpecificPlayer(0)
-                local inv = player and player:getInventory()
-                if not inv then
-                    return false
-                end
-
-                return inv:contains('CardDeck') or player:getAccessLevel() ~= 'None'
-            end,
-            validator = function(self)
-                if not self:isEnabled() then
-                    OmiChat.addInfoMessage(getText('UI_ServerOptionDesc_Card'))
-                    return false
-                end
-
-                return true
-            end,
+            onUseDisabled = showHelpText,
             onUse = function(ctx)
                 if not OmiChat.requestDrawCard() then
                     OmiChat.addInfoMessage(ctx.stream:getHelpText())
                 end
+            end,
+            isEnabled = function()
+                local player = getSpecificPlayer(0)
+                if not player then
+                    return false
+                end
+
+                return player:getAccessLevel() ~= 'None' or utils.hasAnyItemType(player, Option:getCardItems())
+            end,
+        },
+    },
+    {
+        name = 'flip',
+        command = '/flip ',
+        omichat = {
+            isCommand = true,
+            helpText = 'UI_OmiChat_helptext_flip',
+            onUseDisabled = showHelpText,
+            onUse = function(ctx)
+                if not OmiChat.requestFlipCoin() then
+                    OmiChat.addInfoMessage(ctx.stream:getHelpText())
+                end
+            end,
+            isEnabled = function()
+                local player = getSpecificPlayer(0)
+                if not player then
+                    return false
+                end
+
+                return player:getAccessLevel() ~= 'None' or utils.hasAnyItemType(player, Option:getCoinItems())
             end,
         },
     },
@@ -244,25 +311,9 @@ return {
         omichat = {
             isCommand = true,
             helpText = 'UI_ServerOptionDesc_Roll',
-            isEnabled = function()
-                local player = getSpecificPlayer(0)
-                local inv = player and player:getInventory()
-                if not inv then
-                    return false
-                end
-
-                return inv:contains('Dice') or player:getAccessLevel() ~= 'None'
-            end,
-            validator = function(self)
-                if not self:isEnabled() then
-                    OmiChat.addInfoMessage(getText('UI_ServerOptionDesc_Roll'))
-                    return false
-                end
-
-                return true
-            end,
+            onUseDisabled = showHelpText,
             onUse = function(ctx)
-                local command = utils.trim(ctx.command)
+                local command = utils.trim(ctx.text)
                 local first = command:split(' ')[1]
                 local sides = first and tonumber(first)
                 if not sides and #command == 0 then
@@ -275,6 +326,14 @@ return {
                 if not OmiChat.requestRollDice(sides) then
                     OmiChat.addInfoMessage(ctx.stream:getHelpText())
                 end
+            end,
+            isEnabled = function()
+                local player = getSpecificPlayer(0)
+                if not player then
+                    return false
+                end
+
+                return player:getAccessLevel() ~= 'None' or utils.hasAnyItemType(player, Option:getDiceItems())
             end,
         },
     },
@@ -314,6 +373,34 @@ return {
         },
     },
     {
+        name = 'language',
+        command = '/language ',
+        shortCommand = '/lang ',
+        omichat = {
+            isCommand = true,
+            helpText = 'UI_OmiChat_helptext_switch_language',
+            suggestSpec = { 'known-language' },
+            isEnabled = function() return #OmiChat.getRoleplayLanguages() > 1 end,
+            onUse = function(ctx)
+                local args = utils.parseCommandArgs(ctx.text)
+                local command = args[1]
+                if not command then
+                    OmiChat.addInfoMessage(getText('UI_OmiChat_helptext_switch_language'))
+                    return
+                end
+
+                local lang = matchKnownLanguage(command)
+                if not lang or not OmiChat.setCurrentRoleplayLanguage(lang) then
+                    OmiChat.addInfoMessage(getText('UI_OmiChat_error_switch_unknown_language', command))
+                    return
+                end
+
+                lang = utils.getTranslatedLanguageName(lang)
+                OmiChat.addInfoMessage(getText('UI_OmiChat_switch_language_success', lang))
+            end,
+        },
+    },
+    {
         -- reimplementing this because the vanilla clear doesn't actually clear the chatbox
         name = 'clear',
         command = '/clear ',
@@ -332,15 +419,8 @@ return {
         omichat = {
             isCommand = true,
             onUse = function(ctx)
-                local accessLevel
-                if isCoopHost() then
-                    accessLevel = 'admin'
-                else
-                    local player = getSpecificPlayer(0)
-                    accessLevel = player and player:getAccessLevel()
-                end
-
-                local command = ctx.command
+                local accessLevel = utils.getEffectiveAccessLevel()
+                local command = ctx.text
                 if not accessLevel then
                     -- something went wrong, defer to default help command
                     SendCommandToServer('/help ' .. command)

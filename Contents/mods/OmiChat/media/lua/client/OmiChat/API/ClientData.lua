@@ -351,7 +351,7 @@ function OmiChat.getSpeechColor()
     }
 end
 
----Sets whether the current player wants to use chat suggestions.
+---Gets whether the current player wants to use chat suggestions.
 ---@return boolean
 function OmiChat.getUseSuggester()
     return OmiChat.getPlayerPreferences().useSuggester
@@ -532,14 +532,14 @@ function OmiChat.setRoleplayLanguageSlots(slots)
         return false
     end
 
-    if slots < 0 or slots > 32 then
+    if slots < 1 or slots > OmiChat.config:maxLanguageSlots() then
         return false
     end
 
     local modData = OmiChat.getModData()
     modData.languageSlots[username] = slots
     OmiChat.requestDataUpdate({
-        field = 'currentLanguage',
+        field = 'languageSlots',
         target = username,
         value = slots,
     })
