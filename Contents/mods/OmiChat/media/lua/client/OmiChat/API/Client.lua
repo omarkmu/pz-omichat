@@ -24,7 +24,7 @@ OmiChat.IconPicker = require 'OmiChat/Component/IconPicker'
 OmiChat.SuggesterBox = require 'OmiChat/Component/SuggesterBox'
 OmiChat.StreamInfo = require 'OmiChat/Component/StreamInfo'
 
-OmiChat._prefsVersion = 1
+OmiChat._prefsVersion = 2
 OmiChat._prefsFileName = 'omichat.json'
 
 OmiChat._formatters = {}
