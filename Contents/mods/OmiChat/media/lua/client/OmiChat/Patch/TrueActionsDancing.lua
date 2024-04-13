@@ -386,7 +386,7 @@ local function getAvailableDanceHelpText(player)
     end)
 
     if #dances > 0 then
-        parts[#parts + 1] = getText('UI_OmiChat_available_dances')
+        parts[#parts + 1] = getText('UI_OmiChat_Info_AvailableDances')
     end
 
     for i = 1, #dances do
@@ -515,7 +515,7 @@ local danceStream = {
     name = 'dance',
     command = '/dance ',
     omichat = {
-        helpText = 'UI_OmiChat_helptext_dance',
+        helpText = 'UI_OmiChat_HelpText_Dance',
         isEnabled = function() return Option:compatTADEnabled() end,
         suggestSpec = { 'known-dance' },
         onUse = function(args)
@@ -531,13 +531,13 @@ local danceStream = {
                 player:setSecondaryHandItem(nil)
                 player:playEmote(info.emote)
             elseif info.unknownRecipe then
-                feedback = getText('UI_OmiChat_unknown_dance_recipe', info.name)
+                feedback = getText('UI_OmiChat_Info_DanceUnknownRecipe', info.name)
             elseif info.missingItem then
-                feedback = getText('UI_OmiChat_missing_dance_item', info.name)
+                feedback = getText('UI_OmiChat_Info_DanceMissingItem', info.name)
             elseif info.list then
                 feedback = getAvailableDanceHelpText(player)
             else
-                feedback = getText('UI_OmiChat_unknown_dance')
+                feedback = getText('UI_OmiChat_Info_DanceUnknown')
             end
 
             if feedback then

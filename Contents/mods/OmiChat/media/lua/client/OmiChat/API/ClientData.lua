@@ -480,7 +480,7 @@ function OmiChat.setNickname(nickname)
             field = 'nicknames',
         })
 
-        return true, getText('UI_OmiChat_reset_name_success')
+        return true, getText('UI_OmiChat_Success_ResetName')
     end
 
     local original = nickname
@@ -494,7 +494,7 @@ function OmiChat.setNickname(nickname)
     nickname = utils.interpolate(Option.FilterNickname, tokens)
     local err = utils.extractError(tokens)
     if nickname == '' or err then
-        return false, err or getText('UI_OmiChat_set_name_failure', utils.escapeRichText(original))
+        return false, err or getText('UI_OmiChat_Error_InvalidName', utils.escapeRichText(original))
     end
 
     modData.nicknames[username] = nickname
@@ -504,7 +504,7 @@ function OmiChat.setNickname(nickname)
         field = 'nicknames',
     })
 
-    return true, getText('UI_OmiChat_set_name_success', utils.escapeRichText(nickname))
+    return true, getText('UI_OmiChat_Success_SetNameSelf', utils.escapeRichText(nickname))
 end
 
 ---Sets whether a retain command category will retain commands.
@@ -589,7 +589,7 @@ function OmiChat.updateCharacterName(name, updateSurname)
 
     local err = utils.extractError(tokens)
     if name == '' then
-        return false, err or getText('UI_OmiChat_set_name_failure', utils.escapeRichText(name))
+        return false, err or getText('UI_OmiChat_Error_InvalidName', utils.escapeRichText(name))
     end
 
     local surname
@@ -618,5 +618,5 @@ function OmiChat.updateCharacterName(name, updateSurname)
         data.playerInventory:refreshBackpacks()
     end
 
-    return true, getText('UI_OmiChat_set_name_success', utils.escapeRichText(name))
+    return true, getText('UI_OmiChat_Success_SetNameSelf', utils.escapeRichText(name))
 end

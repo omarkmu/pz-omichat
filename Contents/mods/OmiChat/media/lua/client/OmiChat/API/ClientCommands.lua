@@ -235,7 +235,7 @@ function OmiChat.Commands.reportDrawCard(args)
     -- global message
     if args.name then
         local cardName = utils.getTranslatedCardName(card, suit)
-        OmiChat.addInfoMessage(getText('UI_OmiChat_card', args.name, cardName))
+        OmiChat.addInfoMessage(getText('UI_OmiChat_Card', args.name, cardName))
         return
     end
 

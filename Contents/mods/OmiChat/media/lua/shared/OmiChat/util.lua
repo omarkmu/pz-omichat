@@ -34,25 +34,25 @@ local accessLevels = {
     observer = 2,
 }
 local suits = {
-    'clubs',
-    'diamonds',
-    'hearts',
-    'spades',
+    'Clubs',
+    'Diamonds',
+    'Hearts',
+    'Spades',
 }
 local cards = {
-    'ace',
-    'two',
-    'three',
-    'four',
-    'five',
-    'six',
-    'seven',
-    'eight',
-    'nine',
-    'ten',
-    'jack',
-    'queen',
-    'king',
+    'Ace',
+    'Two',
+    'Three',
+    'Four',
+    'Five',
+    'Six',
+    'Seven',
+    'Eight',
+    'Nine',
+    'Ten',
+    'Jack',
+    'Queen',
+    'King',
 }
 
 ---@type table<string, string>
@@ -470,9 +470,9 @@ function utils.getTranslatedCardName(card, suit)
         return ''
     end
 
-    local cardTranslated = getText('UI_OmiChat_card_' .. cards[card])
-    local suitTranslated = getText('UI_OmiChat_suit_' .. suits[suit])
-    return getText('UI_OmiChat_card_name', cardTranslated, suitTranslated)
+    local cardTranslated = getText('UI_OmiChat_Card_' .. cards[card])
+    local suitTranslated = getText('UI_OmiChat_CardSuit_' .. suits[suit])
+    return getText('UI_OmiChat_CardName', cardTranslated, suitTranslated)
 end
 
 ---Returns the translation of the given language.
@@ -785,22 +785,22 @@ end
 ---@return omi.Result<omichat.ColorTable>
 function utils.tryStringToColor(text, minColor, maxColor)
     if not text then
-        return { success = false, error = getText('UI_OmiChat_error_invalid_color') }
+        return { success = false, error = getText('UI_OmiChat_Error_InvalidColor') }
     end
 
     local r, g, b = readColor(text)
     if not r then
-        return { success = false, error = getText('UI_OmiChat_error_invalid_color') }
+        return { success = false, error = getText('UI_OmiChat_Error_InvalidColor') }
     end
 
     maxColor = maxColor or 255
     if r > maxColor or g > maxColor or b > maxColor then
-        return { success = false, error = getText('UI_OmiChat_error_color_max', tostring(maxColor)) }
+        return { success = false, error = getText('UI_OmiChat_Error_ColorMax', tostring(maxColor)) }
     end
 
     minColor = minColor or 0
     if r < minColor or g < minColor or b < minColor then
-        return { success = false, error = getText('UI_OmiChat_error_color_min', tostring(minColor)) }
+        return { success = false, error = getText('UI_OmiChat_Error_ColorMin', tostring(minColor)) }
     end
 
     return { success = true, value = { r = r, g = g, b = b } }
