@@ -19,8 +19,7 @@ For details, please see the [documentation](https://omarkmu.github.io/pz-omichat
 ## Features
 
 This mod aims to be as extensible and configurable as possible.
-The vast majority of the features listed below can be configured or completely disabled via [sandbox options](https://omarkmu.github.io/pz-omichat/sandbox-options).
-This is not a comprehensive list; please see the documentation.
+The vast majority of the features in the mod can be configured or completely disabled via [sandbox options](https://omarkmu.github.io/pz-omichat/sandbox-options).
 
 - Customization of names, timestamps, all chat types, and more via powerful chat [formats](https://omarkmu.github.io/pz-omichat/format-strings)
 - Chat color [customization](https://omarkmu.github.io/pz-omichat/user-guide/chat-settings.html#color-customization)
@@ -41,6 +40,7 @@ This is not a comprehensive list; please see the documentation.
 - Compatibility with [True Actions Act 3 - Dancing](https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556) with [`/dance`](https://omarkmu.github.io/pz-omichat/sandbox-options/compatibility-features.html#enablecompattad)
 - Chat range [options](https://omarkmu.github.io/pz-omichat/sandbox-options/ranges.html)
 - Info text [option](https://omarkmu.github.io/pz-omichat/sandbox-options/component-formats.html#formatinfo)
+- Various other options for chat customization
 - API for extension by other mods
 
 ## Credits
@@ -49,8 +49,7 @@ Thank you to the translators!
 - French: [Inkredibehl](https://github.com/Inkredibehl)
 - Korean: 우로
 
-If you'd like to see the mod translated into your language, please [contribute](https://github.com/omarkmu/pz-omichat/blob/main/.github/CONTRIBUTING.md)!
-
+If you'd like to see the mod translated into your language, please [contribute](https://github.com/omarkmu/pz-omichat/blob/main/.github/CONTRIBUTING.md)!  
 Some features were inspired by [buffy's roleplay chat](https://steamcommunity.com/sharedfiles/filedetails/?id=2688851521).  
 
 <!-- ANCHOR_END: content -->

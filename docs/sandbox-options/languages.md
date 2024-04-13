@@ -64,7 +64,7 @@ If there's a language that you believe would make sense to include in the base m
 **Maximum:** `100`
 
 The chance for each interpretation roll to succeed.
-This is used by the `$getunknownlanguagestring` function.
+This is used by the [`$getunknownlanguagestring`](../format-strings/functions.md#other-getunknownlanguagestring) function.
 
 ### InterpretationRolls
 **Default:** `2`  
@@ -72,7 +72,7 @@ This is used by the `$getunknownlanguagestring` function.
 **Maximum:** `100`
 
 The number of rolls to attempt to reveal a word in a message sent with a language the player doesn't understand.
-This is used by the `$getunknownlanguagestring` function.
+This is used by the [`$getunknownlanguagestring`](../format-strings/functions.md#other-getunknownlanguagestring) function.
 
 ### LanguageSlots
 **Default:** `1`  
