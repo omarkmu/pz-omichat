@@ -8,29 +8,6 @@ local Option = OmiChat.Option
 local concat = table.concat
 local getText = getText
 
----@type table<omichat.AdminOption, string>
-local adminOptionMap = {
-    ShowIcon = 'adminShowIcon',
-    KnowAllLanguages = 'adminKnowLanguages',
-    IgnoreMessageRange = 'adminIgnoreRange',
-}
-
-
----Maps a deprecated admin option to its updated value.
----@param option string
----@return omichat.AdminOption
-local function handleOldAdminOption(option)
-    if option == 'show_icon' then
-        option = 'ShowIcon'
-    elseif option == 'know_all_languages' then
-        option = 'KnowAllLanguages'
-    elseif option == 'ignore_message_range' then
-        option = 'IgnoreMessageRange'
-    end
-
-    return option
-end
-
 
 ---Adds a roleplay language to the current player's list.
 ---@param language string
@@ -62,10 +39,7 @@ function OmiChat.changeColor(category, color)
 
     if category ~= 'name' then
         -- no syncing necessary for chat colors; just set in player preferences
-        local prefs = OmiChat.getPlayerPreferences()
-        prefs.colors[category] = color
-        OmiChat.savePlayerPreferences()
-
+        OmiChat.setPreferredColor(category, color)
         return
     end
 
@@ -122,17 +96,6 @@ function OmiChat.checkKnowsLanguage(language)
     return OmiChat.checkPlayerKnowsLanguage(username, language)
 end
 
----Gets the value of a given admin option preference.
----@param option omichat.AdminOption
----@return boolean
-function OmiChat.getAdminOption(option)
-    option = handleOldAdminOption(option)
-
-    local prefs = OmiChat.getPlayerPreferences()
-    local mappedPref = adminOptionMap[option]
-    return prefs[mappedPref] or false
-end
-
 ---Gets a color table for the current player, or `nil` if unset.
 ---@param category omichat.ColorCategory
 ---@return omichat.ColorTable?
@@ -146,8 +109,7 @@ function OmiChat.getColor(category)
         return OmiChat.getSpeechColor()
     end
 
-    local prefs = OmiChat.getPlayerPreferences()
-    return prefs.colors[category]
+    return OmiChat.getPreferredColor(category)
 end
 
 ---Returns a color table associated with the current player,
@@ -175,36 +137,6 @@ function OmiChat.getCurrentRoleplayLanguage()
     return language
 end
 
----Retrieves the player's custom shouts.
----@param shoutType omichat.CalloutCategory The type of shouts to retrieve.
----@return string[]?
-function OmiChat.getCustomShouts(shoutType)
-    if not Option.EnableCustomShouts then
-        return
-    end
-
-    local player = getSpecificPlayer(0)
-    if not player then
-        return
-    end
-
-    local prefs = OmiChat.getPlayerPreferences()
-    return prefs[shoutType]
-end
-
----Retrieves whether the player has the admin option to ignore message range enabled.
----This does not check for admin permissions.
----@return boolean
-function OmiChat.getIgnoreMessageRange()
-    return OmiChat.getAdminOption('IgnoreMessageRange')
-end
-
----Retrieves a boolean for whether the current player has name colors enabled.
----@return boolean
-function OmiChat.getNameColorsEnabled()
-    return OmiChat.getPlayerPreferences().showNameColors
-end
-
 ---Gets the nickname for the current player, if one is set.
 ---@return string?
 function OmiChat.getNickname()
@@ -215,100 +147,6 @@ function OmiChat.getNickname()
 
     local modData = OmiChat.getModData()
     return modData.nicknames[username]
-end
-
----Gets or creates the player preferences table.
----@return omichat.PlayerPreferences
-function OmiChat.getPlayerPreferences()
-    if OmiChat._playerPrefs then
-        return OmiChat._playerPrefs
-    end
-
-    OmiChat._playerPrefs = {
-        HIGHER_VERSION = false,
-        showNameColors = true,
-        useSuggester = true,
-        useSignEmotes = true,
-        retainChatInput = true,
-        retainRPInput = true,
-        retainOtherInput = false,
-        adminShowIcon = true,
-        adminKnowLanguages = true,
-        adminIgnoreRange = true,
-        colors = {},
-        callouts = {},
-        sneakcallouts = {},
-    }
-
-    local line
-    local content = {}
-    local prefsFile = getFileReader(OmiChat._prefsFileName, true)
-    while true do
-        line = prefsFile:readLine()
-        if line == nil then
-            prefsFile:close()
-            break
-        end
-
-        content[#content + 1] = line
-    end
-
-    local prefs = OmiChat._playerPrefs
-    local encoded = utils.trim(concat(content))
-    if #encoded == 0 then
-        return prefs
-    end
-
-    local success, decoded = utils.json.tryDecode(encoded)
-    if type(decoded) ~= 'table' then
-        if success then
-            decoded = 'invalid file content'
-        end
-
-        utils.logError('failed to read preferences (%s)', decoded)
-
-        -- reset to default on failed read
-        return prefs
-    end
-
-    local version = decoded.VERSION
-    if type(version) == 'number' and version > OmiChat._prefsVersion then
-        utils.logError('preferences file has a higher version (%d > %d)', version, OmiChat._prefsVersion)
-
-        -- use default settings & add flag to avoid overwrite
-        prefs.HIGHER_VERSION = true
-        return prefs
-    end
-
-    prefs.showNameColors = not not utils.default(decoded.showNameColors, prefs.showNameColors)
-    prefs.useSuggester = not not utils.default(decoded.useSuggester, prefs.useSuggester)
-    prefs.useSignEmotes = not not utils.default(decoded.useSignEmotes, prefs.useSignEmotes)
-    prefs.retainChatInput = not not utils.default(decoded.retainChatInput, prefs.retainChatInput)
-    prefs.retainRPInput = not not utils.default(decoded.retainRPInput, prefs.retainRPInput)
-    prefs.retainOtherInput = not not utils.default(decoded.retainOtherInput, prefs.retainOtherInput)
-    prefs.adminShowIcon = not not utils.default(decoded.adminShowIcon, prefs.adminShowIcon)
-    prefs.adminKnowLanguages = not not utils.default(decoded.adminKnowLanguages, prefs.adminShowIcon)
-    prefs.adminIgnoreRange = not not utils.default(decoded.adminIgnoreRange, prefs.adminShowIcon)
-
-    if type(decoded.callouts) == 'table' then
-        prefs.callouts = utils.pack(utils.mapList(tostring, decoded.callouts))
-    end
-
-    if type(decoded.sneakcallouts) == 'table' then
-        prefs.sneakcallouts = utils.pack(utils.mapList(tostring, decoded.sneakcallouts))
-    end
-
-    if type(decoded.colors) == 'table' then
-        prefs.colors = {}
-        for k, v in pairs(decoded.colors) do
-            local color = utils.stringToColor(v)
-            if color then
-                prefs.colors[k] = color
-            end
-        end
-    end
-
-    return prefs
 end
 
 ---Gets a list of the current player's known roleplay languages.
@@ -334,35 +172,6 @@ function OmiChat.getRoleplayLanguageSlots()
     return username and OmiChat.getModData().languageSlots[username] or Option.LanguageSlots
 end
 
----Gets whether a retain command category is set to retain commands.
----@param category omichat.ChatCommandType
----@return boolean
-function OmiChat.getRetainCommand(category)
-    local prefs = OmiChat.getPlayerPreferences()
-    if category == 'chat' then
-        return prefs.retainChatInput
-    elseif category == 'rp' then
-        return prefs.retainRPInput
-    elseif category == 'other' then
-        return prefs.retainOtherInput
-    end
-
-    return false
-end
-
----Retrieves whether the player has the admin option to display a chat icon enabled.
----This does not check for admin permissions.
----@return boolean
-function OmiChat.getShowAdminIcon()
-    return OmiChat.getAdminOption('ShowIcon')
-end
-
----Retrieves a boolean for whether the current player has sign language emotes enabled.
----@return boolean
-function OmiChat.getSignEmotesEnabled()
-    return OmiChat.getPlayerPreferences().useSignEmotes
-end
-
 ---Returns a color table for the current player's speech color.
 ---@return omichat.ColorTable?
 function OmiChat.getSpeechColor()
@@ -381,75 +190,6 @@ function OmiChat.getSpeechColor()
         g = speechColor:getGreen(),
         b = speechColor:getBlue(),
     }
-end
-
----Retrieves whether the player has the admin option to understand all roleplay languages enabled.
----This does not check for admin permissions.
----@return boolean
-function OmiChat.getUnderstandAllLanguages()
-    return OmiChat.getAdminOption('KnowAllLanguages')
-end
-
----Gets whether the current player wants to use chat suggestions.
----@return boolean
-function OmiChat.getUseSuggester()
-    return OmiChat.getPlayerPreferences().useSuggester
-end
-
----Saves the current player preferences to a file.
----@return boolean success
-function OmiChat.savePlayerPreferences()
-    if not OmiChat._playerPrefs or OmiChat._playerPrefs.HIGHER_VERSION then
-        return false
-    end
-
-    local prefs = OmiChat._playerPrefs
-    local success, encoded = utils.json.tryEncode {
-        VERSION = OmiChat._prefsVersion,
-        useSuggester = prefs.useSuggester,
-        useSignEmotes = prefs.useSignEmotes,
-        showNameColors = prefs.showNameColors,
-        retainChatInput = prefs.retainChatInput,
-        retainRPInput = prefs.retainRPInput,
-        retainOtherInput = prefs.retainOtherInput,
-        adminShowIcon = prefs.adminShowIcon,
-        adminKnowLanguages = prefs.adminKnowLanguages,
-        adminIgnoreRange = prefs.adminIgnoreRange,
-        colors = utils.pack(utils.map(utils.colorToHexString, prefs.colors)),
-        callouts = prefs.callouts,
-        sneakcallouts = prefs.sneakcallouts,
-    }
-
-    if not success or type(encoded) ~= 'string' then
-        utils.logError('failed to write preferences (%s)', tostring(encoded))
-        return false
-    end
-
-    local outFile = getFileWriter(OmiChat._prefsFileName, true, false)
-    outFile:write(encoded)
-    outFile:close()
-
-    return true
-end
-
----Sets the value of a given admin option preference.
----@param option omichat.AdminOption
----@param value boolean
-function OmiChat.setAdminOption(option, value)
-    option = handleOldAdminOption(option)
-
-    local prefs = OmiChat.getPlayerPreferences()
-    local mappedPref = adminOptionMap[option]
-    if prefs[mappedPref] == nil then
-        return
-    end
-
-    prefs[mappedPref] = not not value
-    OmiChat.savePlayerPreferences()
-
-    if option == 'KnowAllLanguages' then
-        OmiChat.redrawMessages()
-    end
 end
 
 ---Sets the player's current roleplay language.
@@ -473,32 +213,6 @@ function OmiChat.setCurrentRoleplayLanguage(language)
     })
 
     return true
-end
-
----Sets the player's custom shouts.
----@param shouts string[]?
----@param shoutType omichat.CalloutCategory The type of shouts to set.
-function OmiChat.setCustomShouts(shouts, shoutType)
-    if not Option.EnableCustomShouts then
-        return
-    end
-
-    local prefs = OmiChat.getPlayerPreferences()
-
-    if not shouts then
-        prefs[shoutType] = {}
-    else
-        prefs[shoutType] = shouts
-    end
-
-    OmiChat.savePlayerPreferences()
-end
-
----Sets whether the current player has name colors enabled.
----@param enabled boolean True to enable, false to disable.
-function OmiChat.setNameColorEnabled(enabled)
-    OmiChat.getPlayerPreferences().showNameColors = not not enabled
-    OmiChat.savePlayerPreferences()
 end
 
 ---Sets the nickname of the current player.
@@ -548,22 +262,6 @@ function OmiChat.setNickname(nickname)
     return true, getText('UI_OmiChat_Success_SetNameSelf', utils.escapeRichText(nickname))
 end
 
----Sets whether a retain command category will retain commands.
----@param category omichat.ChatCommandType
----@param value boolean
-function OmiChat.setRetainCommand(category, value)
-    local prefs = OmiChat.getPlayerPreferences()
-    if category == 'chat' then
-        prefs.retainChatInput = value
-    elseif category == 'rp' then
-        prefs.retainRPInput = value
-    elseif category == 'other' then
-        prefs.retainOtherInput = value
-    end
-
-    OmiChat.savePlayerPreferences()
-end
-
 ---Sets the number of available roleplay language slots for the current player.
 ---@param slots integer
 ---@return boolean success
@@ -586,20 +284,6 @@ function OmiChat.setRoleplayLanguageSlots(slots)
     })
 
     return true
-end
-
----Sets whether sign language emotes are enabled for the current player.
----@param enable boolean
-function OmiChat.setSignEmotesEnabled(enable)
-    OmiChat.getPlayerPreferences().useSignEmotes = not not enable
-    OmiChat.savePlayerPreferences()
-end
-
----Sets whether the current player wants to use chat suggestions.
----@param useSuggester boolean
-function OmiChat.setUseSuggester(useSuggester)
-    OmiChat.getPlayerPreferences().useSuggester = not not useSuggester
-    OmiChat.savePlayerPreferences()
 end
 
 ---Updates the current player's character name.
