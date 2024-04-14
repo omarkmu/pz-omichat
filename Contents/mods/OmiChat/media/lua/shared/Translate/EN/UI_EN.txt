@@ -12,6 +12,10 @@ UI_EN = {
     UI_OmiChat_RollLocal = "rolls %1 on a %2-sided die",
     UI_OmiChat_FlipLocalHeads = "flips a coin and gets heads",
     UI_OmiChat_FlipLocalTails = "flips a coin and gets tails",
+    UI_OmiChat_Typing1 = "%1 is typing...",
+    UI_OmiChat_Typing2 = "%1 and %2 are typing...",
+    UI_OmiChat_Typing3 = "%1, %2, and %3 are typing...",
+    UI_OmiChat_TypingMany = "Several people are typing...",
 
     --[[ Info Messages ]]--
     UI_OmiChat_Info_SetNameEmpty = "No name specified. Use /name Name",
@@ -194,6 +198,8 @@ UI_EN = {
     UI_OmiChat_ContextDisableNameColors = "Disable name colors",
     UI_OmiChat_ContextEnableSuggestions = "Enable suggestions",
     UI_OmiChat_ContextDisableSuggestions = "Disable suggestions",
+    UI_OmiChat_ContextEnableTypingIndicator = "Enable typing indicator",
+    UI_OmiChat_ContextDisableTypingIndicator = "Disable typing indicator",
     UI_OmiChat_ContextColorsSubmenu = "Set chat colors",
     UI_OmiChat_ContextRetainCommands = "Retain commands",
     UI_OmiChat_ContextRetainCommands_chat = "Chat",

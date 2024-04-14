@@ -4,7 +4,9 @@ local lib = require 'OmiChat/lib'
 local getTexture = getTexture
 local min = math.min
 local max = math.max
+local sort = table.sort
 local concat = table.concat
+local getTimestampMs = getTimestampMs
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
 local MultiMap = lib.interpolate.MultiMap
 
@@ -62,6 +64,9 @@ local echoChatTypes = {
     faction = true,
     safehouse = true,
 }
+
+local wasTyping = false
+local lastTypingUpdate = getTimestampMs()
 
 
 ---Creates or removes the icon button and picker from the chat box based on sandbox options.
@@ -564,6 +569,19 @@ function OmiChat.getInfoRichText(player)
     return utils.interpolate(Option.FormatInfo, tokens, player:getUsername())
 end
 
+---Returns the current leftmost button.
+---@return ISButton?
+function OmiChat.getLeftmostButton()
+    if OmiChat._leftmostBtn then
+        return OmiChat._leftmostBtn
+    end
+
+    local instance = ISChat.instance
+    if instance then
+        return instance.gearButton
+    end
+end
+
 ---Returns the list of custom setting handlers for a given category.
 ---@param category omichat.SettingCategory
 ---@return omichat.SettingHandlerCallback[]
@@ -612,6 +630,26 @@ function OmiChat.getSuggestions(text)
     end
 
     return info.suggestions
+end
+
+---Returns whether the player is currently typing.
+---@return boolean
+function OmiChat.getTyping()
+    return OmiChat._isTyping
+end
+
+---Returns the current display string for the typing indicator.
+---@param maxWidth integer?
+---@return string?
+function OmiChat.getTypingDisplay(maxWidth)
+    local display = OmiChat._typingDisplay
+    local txtMgr = getTextManager()
+
+    if display and maxWidth and txtMgr:MeasureStringX(UIFont.Small, display) > maxWidth then
+        display = utils.interpolate(Option.FormatTyping, { alt = true })
+    end
+
+    return display
 end
 
 ---Hides the suggester box if it's currently visible.
@@ -873,6 +911,12 @@ function OmiChat.setIconsToExclude(icons)
     OmiChat._iconsToExclude = icons or {}
 end
 
+---Sets whether the player is currently typing.
+---@param isTyping boolean
+function OmiChat.setTyping(isTyping)
+    OmiChat._isTyping = isTyping
+end
+
 ---Updates the positions of custom buttons.
 function OmiChat.updateButtons()
     local instance = ISChat.instance
@@ -892,6 +936,37 @@ function OmiChat.updateButtons()
             local pad = max(lastBtn:getWidth(), th)
             btn:setX(lastBtn:getX() - pad - pad / 2)
             lastBtn = btn
+        end
+    end
+
+    OmiChat._leftmostBtn = lastBtn
+end
+
+---Updates the chat panel size based on the configured options.
+function OmiChat.updateChatPanelSize()
+    local instance = ISChat.instance
+    if not instance then
+        return
+    end
+
+    local oldTabCnt = instance.tabCnt
+    if oldTabCnt == 1 then
+        -- calcTabSize assumes calling before increment
+        instance.tabCnt = 0
+    end
+
+    local size = instance:calcTabSize()
+    instance.tabCnt = oldTabCnt
+
+    local height = size.height
+    if Option.PredicateShowTypingIndicator ~= '' and OmiChat.getShowTyping() then
+        height = height - instance.typingFontHgt - 4
+    end
+
+    for i = 1, #instance.tabs do
+        local tab = instance.tabs[i]
+        if tab.tabID == 0 then
+            tab:setHeight(height)
         end
     end
 end
@@ -952,6 +1027,7 @@ function OmiChat.updateState(redraw)
     updateFormatters()
     updateAliases()
     addOrRemoveIconComponents()
+    OmiChat.updateChatPanelSize()
     OmiChat.updateInfoText()
     OmiChat.updateButtons()
 
@@ -998,5 +1074,116 @@ function OmiChat.updateSuggesterComponent(text)
 
     if suggesterBox.vscroll then
         suggesterBox.vscroll:setHeight(suggesterBox.height)
+    end
+end
+
+---Updates the display string for typing players based on the current typing information.
+function OmiChat.updateTypingDisplay()
+    if not OmiChat.getShowTyping() then
+        OmiChat._typingDisplay = nil
+        return
+    end
+
+    local list = {}
+    local inactive = {}
+
+    local now = getTimestampMs()
+    for username, info in pairs(OmiChat._typingInfo) do
+        if now - info.lastUpdate >= 5000 then
+            inactive[#inactive + 1] = username
+        else
+            list[#list + 1] = info.display
+        end
+    end
+
+    for _, username in pairs(inactive) do
+        OmiChat._typingInfo[username] = nil
+    end
+
+    if #list == 0 then
+        OmiChat._typingDisplay = nil
+        return
+    end
+
+    local entries = {}
+    sort(list)
+    for i = 1, #list do
+        entries[#entries + 1] = {
+            key = i,
+            value = list[i],
+        }
+    end
+
+    local tokens = {
+        names = MultiMap:new(entries),
+    }
+
+    local text = utils.interpolate(Option.FormatTyping, tokens) ---@type string?
+    if text == '' then
+        text = nil
+    end
+
+    OmiChat._typingDisplay = text
+end
+
+---Updates the typing status based on the current input.
+---@param skipTimer boolean?
+function OmiChat.updateTypingStatus(skipTimer)
+    if not OmiChat.getShowTyping() then
+        if wasTyping then
+            wasTyping = false
+            OmiChat.setTyping(false)
+            OmiChat.sendTypingStatus()
+        end
+
+        return
+    end
+
+    local instance = ISChat.instance
+    local entry = instance and instance.textEntry
+    if not entry or not instance then
+        return
+    end
+
+    local now = getTimestampMs()
+    if not skipTimer and now - lastTypingUpdate <= 1000 then
+        return
+    end
+
+    local range
+    local isTyping = entry:isFocused() and instance.currentTabID == 1
+    if isTyping then
+        local text = entry:getInternalText()
+        local trimmed = text:trim()
+        local stream, command = OmiChat.chatCommandToStream(text, false, true)
+
+        if not stream and not utils.startsWith(trimmed, '/') then
+            stream = OmiChat.getDefaultTabStream(1)
+            command = trimmed
+        end
+
+        local tokens
+        if stream and #command:trim() > 0 and stream:isTabID(instance.currentTabID) then
+            range = stream:getRange()
+            tokens = {
+                input = command,
+                range = range,
+                isRanged = range ~= nil,
+                chatType = stream:getChatType(),
+                stream = stream:getIdentifier(),
+            }
+        end
+
+        if not tokens or not utils.testPredicate(Option.PredicateShowTypingIndicator, tokens) then
+            isTyping = false
+        end
+    end
+
+    lastTypingUpdate = now
+    OmiChat.setTyping(isTyping)
+    if isTyping or wasTyping then
+        wasTyping = isTyping
+
+        OmiChat.sendTypingStatus(range)
     end
 end

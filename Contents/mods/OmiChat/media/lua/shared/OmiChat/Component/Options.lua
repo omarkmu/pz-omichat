@@ -76,6 +76,7 @@ local floor = math.floor
 ---@field PredicateAllowLanguage string
 ---@field PredicateTransmitOverRadio string
 ---@field PredicateEnableStream string
+---@field PredicateShowTypingIndicator string
 ---@field AvailableLanguages string
 ---@field AddLanguageAllowlist string
 ---@field AddLanguageBlocklist string
@@ -99,6 +100,7 @@ local floor = math.floor
 ---@field FormatAdminIcon string
 ---@field FormatNarrativeDialogueTag string
 ---@field FormatNarrativePunctuation string
+---@field FormatTyping string
 ---@field PatternNarrativeCustomTag string
 ---@field OverheadFormatFull string
 ---@field OverheadFormatCard string

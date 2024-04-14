@@ -99,6 +99,7 @@ If blank, menus will not be affected.
     - `mini_scoreboard`
     - `search_player` (see [`EnableCompatSearchPlayers`](../sandbox-options/compatibility-features.md#enablecompatsearchplayers))
     - `trade`
+    - `typing` (see [`PredicateShowTypingIndicator`](../sandbox-options/filters-predicates.md#predicateshowtypingindicator))
 
 ### FormatName
 **Default:** `$ifelse($has(@(general;admin;whisper) $chatType) $username @($name;$forename))`
@@ -139,6 +140,17 @@ The format used to determine the punctuation used in [narrative style](./filters
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 - [`$stream`](../format-strings/tokens.md#stream)
 - [`$username`](../format-strings/tokens.md#username)
+
+### FormatTyping
+**Default:** `$fmttyping($names $alt)`
+
+The format used to determine the text used for [typing indicators](./filters-predicates.md#predicateshowtypingindicator).
+
+**Tokens:**
+- `$alt`: Populated when requesting an alternative, shorter string.
+This is used when the content of the regular string was too long to fit the chat box.
+- `$names`: An [at-map](../format-strings/at-maps.md) containing the names of the people typing.
+Not populated when requesting an alternative string.
 
 ### FormatOverheadPrefix
 **Default:** `$concats(( ) $index(@(low:[Low];whisper:[Whisper]) $stream) $if($languageRaw [$languageRaw]))&#32;`

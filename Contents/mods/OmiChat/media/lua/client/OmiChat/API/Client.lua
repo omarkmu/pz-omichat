@@ -17,12 +17,17 @@ require 'Chat/ISChat'
 ---@field private _customButtons ISButton[]
 ---@field private _customSuggesterArgTypes table<string, omichat.SuggestSearchCallback>
 ---@field private _settingHandlers table<omichat.SettingCategory, omichat.SettingHandlerCallback[]>
+---@field private _isTyping boolean
+---@field private _typingDisplay string?
+---@field private _typingInfo table<string, omichat.TypingInformation>
+---@field private _leftmostBtn ISButton?
 local OmiChat = require 'OmiChatShared'
 
 OmiChat.ColorModal = require 'OmiChat/Component/ColorModal'
 OmiChat.IconPicker = require 'OmiChat/Component/IconPicker'
 OmiChat.SuggesterBox = require 'OmiChat/Component/SuggesterBox'
 OmiChat.StreamInfo = require 'OmiChat/Component/StreamInfo'
+OmiChat.TextPanel = require 'OmiChat/Component/TextPanel'
 
 OmiChat._prefsVersion = 2
 OmiChat._prefsFileName = 'omichat.json'
@@ -30,6 +35,9 @@ OmiChat._prefsFileName = 'omichat.json'
 OmiChat._formatters = {}
 OmiChat._customButtons = {}
 OmiChat._customSuggesterArgTypes = {}
+OmiChat._typingDisplay = nil
+OmiChat._typingInfo = {}
+OmiChat._isTyping = false
 
 OmiChat._settingHandlers = {
     admin = {},

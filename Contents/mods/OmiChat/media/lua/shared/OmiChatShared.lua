@@ -27,6 +27,7 @@ return OmiChat
 ---| 'medical'
 ---| 'mini_scoreboard'
 ---| 'search_player'
+---| 'typing'
 
 ---@alias omichat.CalloutCategory
 ---| 'callouts'
@@ -176,6 +177,16 @@ return OmiChat
 ---Request to roll dice on the server.
 ---@class omichat.request.RollDice
 ---@field sides integer The number of sides on the dice to roll.
+
+---Request to notify other players about typing status.
+---@class omichat.request.Typing
+---@field typing boolean Whether the source player is typing.
+---@field range integer? Optional range to limit notifications to.
+
+---Request to update client information about typing.
+---@class omichat.request.UpdateTyping
+---@field username string Whether the target player is typing.
+---@field typing boolean Whether the target player is typing.
 
 ---Request to handle a command on the server.
 ---@class omichat.request.Command

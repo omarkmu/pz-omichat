@@ -67,19 +67,28 @@ local function readPrefsJson()
     return decoded
 end
 
+---Converts the input to a boolean.
+---If the input is `nil`, `default` is returned.
+---@param value unknown
+---@param default boolean
+---@return boolean
+local function readBool(value, default)
+    return not not utils.default(value, default)
+end
+
 ---Reads player preferences file with format version 1.
 ---@param decoded table
 ---@param prefs omichat.PlayerPreferences
 local function readPrefsV1(decoded, prefs)
-    prefs.showNameColors = not not utils.default(decoded.showNameColors, prefs.showNameColors)
-    prefs.useSuggester = not not utils.default(decoded.useSuggester, prefs.useSuggester)
-    prefs.useSignEmotes = not not utils.default(decoded.useSignEmotes, prefs.useSignEmotes)
-    prefs.retainChatInput = not not utils.default(decoded.retainChatInput, prefs.retainChatInput)
-    prefs.retainRPInput = not not utils.default(decoded.retainRPInput, prefs.retainRPInput)
-    prefs.retainOtherInput = not not utils.default(decoded.retainOtherInput, prefs.retainOtherInput)
-    prefs.adminShowIcon = not not utils.default(decoded.adminShowIcon, prefs.adminShowIcon)
-    prefs.adminKnowLanguages = not not utils.default(decoded.adminKnowLanguages, prefs.adminShowIcon)
-    prefs.adminIgnoreRange = not not utils.default(decoded.adminIgnoreRange, prefs.adminShowIcon)
+    prefs.showNameColors = readBool(decoded.showNameColors, prefs.showNameColors)
+    prefs.useSuggester = readBool(decoded.useSuggester, prefs.useSuggester)
+    prefs.useSignEmotes = readBool(decoded.useSignEmotes, prefs.useSignEmotes)
+    prefs.retainChatInput = readBool(decoded.retainChatInput, prefs.retainChatInput)
+    prefs.retainRPInput = readBool(decoded.retainRPInput, prefs.retainRPInput)
+    prefs.retainOtherInput = readBool(decoded.retainOtherInput, prefs.retainOtherInput)
+    prefs.adminShowIcon = readBool(decoded.adminShowIcon, prefs.adminShowIcon)
+    prefs.adminKnowLanguages = readBool(decoded.adminKnowLanguages, prefs.adminShowIcon)
+    prefs.adminIgnoreRange = readBool(decoded.adminIgnoreRange, prefs.adminShowIcon)
 
     if type(decoded.callouts) == 'table' then
         prefs.callouts = readStringList(decoded.callouts)
@@ -104,8 +113,11 @@ end
 ---@param decoded table
 ---@param prefs omichat.PlayerPreferences
 local function readPrefsV2(decoded, prefs)
-    if type(decoded.settings) == 'table' then
-        readPrefsV1(decoded.settings, prefs)
+    local settings = decoded.settings
+    if type(settings) == 'table' then
+        readPrefsV1(settings, prefs)
+
+        prefs.showTyping = readBool(decoded.showTyping, prefs.showTyping)
     end
 end
 
@@ -150,6 +162,7 @@ function OmiChat.getDefaultPlayerPreferences()
         adminShowIcon = true,
         adminKnowLanguages = true,
         adminIgnoreRange = true,
+        showTyping = true,
         colors = {},
         callouts = {},
         sneakcallouts = {},
@@ -238,6 +251,12 @@ function OmiChat.getShowAdminIcon()
     return OmiChat.getAdminOption('ShowIcon')
 end
 
+---Retrieves whether the player has the option to show typing indicators enabled.
+function OmiChat.getShowTyping()
+    local prefs = OmiChat.getPlayerPreferences()
+    return prefs.showTyping
+end
+
 ---Retrieves whether the player has the admin option to understand all roleplay languages enabled.
 ---This does not check for admin permissions.
 ---@return boolean
@@ -272,6 +291,7 @@ function OmiChat.savePlayerPreferences()
             adminShowIcon = prefs.adminShowIcon,
             adminKnowLanguages = prefs.adminKnowLanguages,
             adminIgnoreRange = prefs.adminIgnoreRange,
+            showTyping = prefs.showTyping,
             colors = utils.pack(utils.map(utils.colorToHexString, prefs.colors)),
             callouts = prefs.callouts,
             sneakcallouts = prefs.sneakcallouts,
@@ -357,6 +377,14 @@ function OmiChat.setRetainCommand(category, value)
         prefs.retainOtherInput = value
     end
 
+    OmiChat.savePlayerPreferences()
+end
+
+---Sets whether typing indicators should be shown for the current player.
+---@param enable boolean
+function OmiChat.setShowTyping(enable)
+    local prefs = OmiChat.getPlayerPreferences()
+    prefs.showTyping = not not enable
     OmiChat.savePlayerPreferences()
 end
 

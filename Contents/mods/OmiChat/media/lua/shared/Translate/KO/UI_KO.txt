@@ -12,6 +12,10 @@ UI_KO = {
     UI_OmiChat_RollLocal = "%2면 주사위를 굴려서 %1이/가 나왔습니다",
     UI_OmiChat_FlipLocalHeads = "동전을 뒤집고 머리를 잡았습니다",
     UI_OmiChat_FlipLocalTails = "동전을 뒤집고 꼬리를 잡았습니다",
+    UI_OmiChat_Typing1 = "%1이/가 입력하고 있습니다...",
+    UI_OmiChat_Typing2 = "%1과/와 %2이/가 입력하고 있습니다...",
+    UI_OmiChat_Typing3 = "%1, %2과/와 %3이/가 입력하고 있습니다...",
+    UI_OmiChat_TypingMany = "여러 사람이 입력하고 있습니다...",
 
     --[[ Info Messages ]]--
     UI_OmiChat_Info_SetNameEmpty = "이름이 설정되지 않았습니다. '/name Name'을 사용하세요.",
@@ -194,6 +198,8 @@ UI_KO = {
     UI_OmiChat_ContextDisableNameColors = "이름 색 끄기",
     UI_OmiChat_ContextEnableSuggestions = "추천 활성화",
     UI_OmiChat_ContextDisableSuggestions = "추천 끄기",
+    UI_OmiChat_ContextEnableTypingIndicator = "입력 표시기 활성화",
+    UI_OmiChat_ContextDisableTypingIndicator = "입력 표시기 끄기",
     UI_OmiChat_ContextColorsSubmenu = "색 설정",
     UI_OmiChat_ContextRetainCommands = "입력 유지",
     UI_OmiChat_ContextRetainCommands_chat = "채팅",
