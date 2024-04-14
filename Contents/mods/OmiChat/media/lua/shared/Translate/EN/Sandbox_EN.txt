@@ -100,6 +100,7 @@ Sandbox_EN = {
     Sandbox_OCPredicateTransmitOverRadio = "Transmit Over Radio Predicate",
     Sandbox_OCPredicateUseNarrativeStyle = "Use Narrative Style Predicate",
     Sandbox_OCPredicateEnableStream = "Enable Stream Predicate",
+    Sandbox_OCPredicateShowTypingIndicator = "Show Typing Indicator Predicate",
 
     --[[ Languages ]]--
     Sandbox_OCAvailableLanguages = "Available Languages",
@@ -120,6 +121,7 @@ Sandbox_EN = {
     Sandbox_OCFormatName = "Chat Name Format",
     Sandbox_OCFormatTag = "Chat Tag Format",
     Sandbox_OCFormatTimestamp = "Chat Timestamp Format",
+    Sandbox_OCFormatTyping = "Typing Message Format",
     Sandbox_OCFormatIcon = "Icon Format",
     Sandbox_OCFormatLanguage = "Language Format",
     Sandbox_OCFormatChatPrefix = "Chat Prefix Format",

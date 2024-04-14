@@ -11,6 +11,7 @@ local utils = OmiChat.utils
 local Option = OmiChat.Option
 local unpack = unpack
 local concat = table.concat
+local getTimestampMs = getTimestampMs
 
 local englishSuits = {
     'Clubs',
@@ -215,6 +216,19 @@ function OmiChat.requestSetName(command)
     return OmiChat.dispatch('requestSetName', req)
 end
 
+---Sends the current typing status to the server.
+---@param range integer?
+---@return boolean
+function OmiChat.sendTypingStatus(range)
+    ---@type omichat.request.Typing
+    local req = {
+        range = range,
+        typing = OmiChat.getTyping(),
+    }
+
+    return OmiChat.dispatch('requestTyping', req)
+end
+
 --#endregion
 
 --#region handlers
@@ -315,6 +329,24 @@ end
 ---Updates chat state.
 function OmiChat.Commands.updateState()
     OmiChat.updateState(true)
+end
+
+---Updates typing state for another player.
+---@param args omichat.request.UpdateTyping
+function OmiChat.Commands.updateTyping(args)
+    local typingInfo ---@type omichat.TypingInformation?
+
+    local player = args.typing and utils.getPlayerByUsername(args.username)
+    local display = player and OmiChat.getPlayerMenuName(player, 'typing')
+    if display then
+        typingInfo = {
+            display = display,
+            lastUpdate = getTimestampMs(),
+        }
+    end
+
+    OmiChat._typingInfo[args.username] = typingInfo
+    OmiChat.updateTypingDisplay()
 end
 
 --#endregion

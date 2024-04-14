@@ -22,6 +22,8 @@ local OmiChat = require 'OmiChatClient'
 ---@field iconButton ISButton? The icon button UI element.
 ---@field iconPicker omichat.IconPicker? The icon picker UI element.
 ---@field suggesterBox omichat.SuggesterBox? The suggester box UI element.
+---@field typingFont UIFont The font used for the typing indicator.
+---@field typingFontHgt integer The height of the font used for the typing indicator.
 local ISChat = ISChat
 
 local utils = OmiChat.utils
@@ -401,6 +403,11 @@ local function addChatSettings(context)
         and getText('UI_OmiChat_ContextDisableSuggestions')
         or getText('UI_OmiChat_ContextEnableSuggestions')
     submenu:addOption(suggesterOptName, instance, ISChat.onToggleUseSuggester)
+
+    local typingOptName = OmiChat.getShowTyping()
+        and getText('UI_OmiChat_ContextDisableTypingIndicator')
+        or getText('UI_OmiChat_ContextEnableTypingIndicator')
+    submenu:addOption(typingOptName, instance, ISChat.onToggleShowTyping)
 
     addRetainOptions(submenu)
     addVanillaSubmenuOptions(submenu)
@@ -873,6 +880,15 @@ function ISChat.onToggleShowNameColor(target)
     OmiChat.redrawMessages()
 end
 
+---Event handler for toggling using the suggester.
+---@param target omichat.ISChat
+---@diagnostic disable-next-line: unused-local
+function ISChat.onToggleShowTyping(target)
+    OmiChat.setShowTyping(not OmiChat.getShowTyping())
+    OmiChat.updateTypingDisplay()
+    OmiChat.updateChatPanelSize()
+end
+
 ---Event handler for toggling sign language emotes.
 ---@param target omichat.ISChat
 ---@diagnostic disable-next-line: unused-local
@@ -1044,6 +1060,9 @@ local _onPressUp = ISChat.onPressUp
 local _onOtherKey = ISChat.onOtherKey
 local _onInfo = ISChat.onInfo
 local _onTabAdded = ISChat.onTabAdded
+local _onTabRemoved = ISChat.onTabRemoved
+local _update = ISChat.update
+local _render = ISChat.render
 
 local _ChatMessage = __classmetatables[ChatMessage.class].__index
 local _ServerChatMessage = __classmetatables[ServerChatMessage.class].__index
@@ -1118,12 +1137,16 @@ function ISChat:close()
 
     if not self.locked then
         self:unfocus()
+        OmiChat.updateTypingStatus(true)
     end
 end
 
 ---Override to add custom components.
 function ISChat:createChildren()
     _createChildren(self)
+
+    self.typingFont = UIFont.Small
+    self.typingFontHgt = getTextManager():getFontFromEnum(self.typingFont):getLineHeight()
 
     local th = self:titleBarHeight()
     self.infoButton = ISButton:new(self.gearButton:getX() - th / 2 - th, 0, th, th, '', self, self.onInfo)
@@ -1470,9 +1493,19 @@ function ISChat.onTabAdded(tabTitle, tabID)
     if target then
         refreshLastCommand(target)
     end
+
+    OmiChat.updateChatPanelSize()
 end
 
----Override to update custom components and include aliases.
+---Override to correct the chat panel sizes after removing a tab.
+---@param tabTitle string
+---@param tabID integer
+function ISChat.onTabRemoved(tabTitle, tabID)
+    _onTabRemoved(tabTitle, tabID)
+    OmiChat.updateChatPanelSize()
+end
+
+---Override to update custom components and include aliases in determination for resetting input.
 function ISChat.onTextChange()
     local instance = ISChat.instance
     local chatText = instance and instance.chatText
@@ -1526,11 +1559,39 @@ function ISChat.onTextChange()
     OmiChat.updateCustomComponents()
 end
 
+---Override to render the typing indicator.
+function ISChat:render()
+    _render(self)
+
+    if self.currentTabID ~= 1 then
+        return
+    end
+
+    local w = self:getWidth()
+    local text = OmiChat.getTypingDisplay(w)
+    if not text then
+        return
+    end
+
+    local x = 4
+    local y = self.textEntry:getY() - self.typingFontHgt - 3
+    self:setStencilRect(0, 0, w, self:getHeight())
+    self:drawText(text, x, y, 1, 1, 1, 1, self.typingFont)
+    self:clearStencilRect()
+end
+
 ---Override to hide icon picker and disable button on unfocus.
 function ISChat:unfocus()
     _unfocus(self)
     OmiChat.hideSuggesterBox()
     OmiChat.setIconButtonEnabled(false)
+end
+
+---Override to process typing indicators.
+function ISChat:update()
+    _update(self)
+    OmiChat.updateTypingDisplay()
+    OmiChat.updateTypingStatus()
 end
 
 ---Override to improve performance of text refresh.

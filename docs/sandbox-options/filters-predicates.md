@@ -147,6 +147,20 @@ Determines whether a message on a stream will attract zombies.
 
 **See also:** [`RangeMultiplierZombies`](./ranges.md#rangemultiplierzombies).
 
+### PredicateShowTypingIndicator
+`(blank by default)`
+
+Determines whether input will trigger the typing indicator.
+
+**Tokens:**
+- [`$chatType`](../format-strings/tokens.md#chattype)
+- [`$input`](../format-strings/tokens.md#input)
+- `$isRanged`: Populated if the stream is a ranged stream.
+- `$range`: The range of the chat stream. Not included if it's not a ranged stream.
+- [`$stream`](../format-strings/tokens.md#stream)
+
+**See also:** [`FormatTyping`](./component-formats.md#formattyping).
+
 ### PredicateEnableStream
 **Default:** `true`
 

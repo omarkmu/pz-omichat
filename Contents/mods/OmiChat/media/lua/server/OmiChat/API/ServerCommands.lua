@@ -50,6 +50,28 @@ local function isOnlinePlayer(username)
     return player ~= nil
 end
 
+---Checks whether the typing indicator should be sent for a pair of players.
+---@param player IsoPlayer
+---@param otherPlayer IsoPlayer
+---@param range integer?
+---@return boolean
+local function shouldSendTyping(player, otherPlayer, range)
+    if range then
+        local xDiff = otherPlayer:getX() - player:getX()
+        local yDiff = otherPlayer:getY() - player:getY()
+        if math.sqrt(xDiff * xDiff + yDiff * yDiff) > range then
+            return false
+        end
+    end
+
+    if player:isInvisible() ~= otherPlayer:isInvisible() then
+        return false
+    end
+
+    return true
+end
+
+
 ---@param args omichat.request.ModDataUpdate
 ---@return boolean
 function updateModData.currentLanguage(args)
@@ -171,6 +193,17 @@ function OmiChat.reportRoll(player, roll, sides)
     local req = { roll = roll, sides = sides }
 
     OmiChat.dispatch('reportRoll', player, req)
+end
+
+---Notifies the client about another typing player.
+---@param player IsoPlayer
+---@param target IsoPlayer
+---@param isTyping boolean
+function OmiChat.sendTyping(player, target, isTyping)
+    ---@type omichat.request.UpdateTyping
+    local req = { username = target:getUsername(), typing = isTyping }
+
+    OmiChat.dispatch('updateTyping', player, req)
 end
 
 ---Sends an info message that will show only for the specified player.
@@ -553,6 +586,21 @@ function OmiChat.Commands.requestSetName(player, args)
 
     name = utils.escapeRichText(name)
     OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_SetNameOther', { username, name })
+end
+
+---Handles a request to notify other players of typing status.
+---@param player IsoPlayer
+---@param args omichat.request.Typing
+function OmiChat.Commands.requestTyping(player, args)
+    local onlinePlayers = getOnlinePlayers()
+    for i = 0, onlinePlayers:size() - 1 do
+        local otherPlayer = onlinePlayers:get(i)
+
+        if player ~= otherPlayer or isDebugEnabled() then
+            local typing = args.typing and shouldSendTyping(player, otherPlayer, args.range)
+            OmiChat.sendTyping(otherPlayer, player, typing)
+        end
+    end
 end
 
 --#endregion

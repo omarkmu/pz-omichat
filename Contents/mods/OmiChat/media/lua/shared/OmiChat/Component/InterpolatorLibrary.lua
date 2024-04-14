@@ -1,3 +1,6 @@
+local lib = require 'OmiChat/lib'
+local MultiMap = lib.interpolate.MultiMap
+
 ---@class omichat.Interpolator
 local Interpolator = require 'OmiChat/Component/Interpolator'
 
@@ -328,7 +331,6 @@ library = {
             return s
         end
 
-
         return rep('(', parens) .. s .. rep(')', parens)
     end,
     ---@param name string
@@ -341,8 +343,35 @@ library = {
             return s
         end
 
-
         return rep('(', parens) .. s .. rep(')', parens)
+    end,
+    ---@param interpolator omichat.Interpolator
+    ---@param names omi.interpolate.MultiMap
+    ---@param alt string?
+    ---@return string?
+    fmttyping = function(interpolator, names, alt)
+        if interpolator:toBoolean(alt) then
+            return getText('UI_OmiChat_TypingMany')
+        elseif utils.isinstance(names, MultiMap) then
+            local size = names:size()
+            if size == 0 then
+                return
+            end
+
+            local text
+            if size < 4 then
+                local list = {}
+                for _, el in names:values() do
+                    list[#list + 1] = el
+                end
+
+                text = getText('UI_OmiChat_Typing' .. size, unpack(list))
+            else
+                text = getText('UI_OmiChat_TypingMany')
+            end
+
+            return text
+        end
     end,
     parens = function(_, ...)
         return '(' .. stringifySep(' ', ...) .. ')'

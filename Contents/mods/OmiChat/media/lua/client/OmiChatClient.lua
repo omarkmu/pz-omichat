@@ -11,6 +11,7 @@ require 'OmiChat/API/ClientCommands'
 require 'OmiChat/API/ClientExtension'
 require 'OmiChat/API/ClientFormat'
 require 'OmiChat/API/ClientSearch'
+require 'OmiChat/API/ClientPreferences'
 
 Events.OnGameStart.Add(OmiChat._onGameStart)
 Events.OnCreatePlayer.Add(OmiChat._onCreatePlayer)
@@ -182,6 +183,11 @@ return OmiChat
 ---@class omichat.CommandStream : omichat.BaseStream
 ---@field omichat omichat.CommandStreamConfig Additional configuration options.
 
+---Typing information record.
+---@class omichat.TypingInformation
+---@field display string
+---@field lastUpdate integer
+
 ---@alias omichat.Stream
 ---| omichat.ChatStream
 ---| omichat.CommandStream
@@ -192,6 +198,7 @@ return OmiChat
 ---@field showNameColors boolean Whether name colors are enabled.
 ---@field useSuggester boolean Whether suggestions are enabled.
 ---@field useSignEmotes boolean Whether signed roleplay languages should play a random emote.
+---@field showTyping boolean Whether typing indicators should be shown and sent.
 ---@field callouts string[] Custom callouts.
 ---@field sneakcallouts string[] Custom sneak callouts.
 ---@field colors table<omichat.ColorCategory, omichat.ColorTable> Custom chat colors.

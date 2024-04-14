@@ -584,6 +584,14 @@ option OmiChat.PredicateAttractZombies
     translation = OCPredicateAttractZombies,
 }
 
+option OmiChat.PredicateShowTypingIndicator
+{
+    type = string,
+    default =,
+    page = OmiChat,
+    translation = OCPredicateShowTypingIndicator,
+}
+
 option OmiChat.PredicateTransmitOverRadio
 {
     type = string,
@@ -720,6 +728,14 @@ option OmiChat.FormatMenuName
     default = $ifelse($neq($menuType mini_scoreboard) $name $username &#32;[ $name ]),
     page = OmiChat,
     translation = OCFormatMenuName,
+}
+
+option OmiChat.FormatTyping
+{
+    type = string,
+    default = $fmttyping($names $alt),
+    page = OmiChat,
+    translation = OCFormatTyping,
 }
 
 option OmiChat.FormatCard
