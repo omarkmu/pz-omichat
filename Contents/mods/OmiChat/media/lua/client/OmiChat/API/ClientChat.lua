@@ -518,16 +518,17 @@ end
 ---Returns a playable emote given an emote name.
 ---Returns `nil` if there is not an emote associated with the emote name.
 ---@param emote string
----@return string?
+---@return (string | omichat.EmoteHandler)?
 function OmiChat.getEmote(emote)
     return OmiChat._emotes[emote]
 end
 
 ---Returns the first emote found from an emote shortcut in the provided text.
 ---@param text string
----@return string? emote
+---@return (string | omichat.EmoteHandler)? emoteOrHandler
 ---@return integer? start
 ---@return integer? finish
+---@return string? inputEmote
 function OmiChat.getEmoteFromCommand(text)
     local startPos = 1
     while startPos < #text do
@@ -542,8 +543,8 @@ function OmiChat.getEmoteFromCommand(text)
         end
 
         local emoteToPlay = emote and OmiChat.getEmote(emote:lower())
-        if type(emoteToPlay) == 'string' then
-            return emoteToPlay, start, finish
+        if emoteToPlay then
+            return emoteToPlay, start, finish, emote:lower()
         end
 
         startPos = finish + 1

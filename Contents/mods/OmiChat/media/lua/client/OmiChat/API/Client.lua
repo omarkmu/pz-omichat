@@ -5,7 +5,7 @@ require 'Chat/ISChat'
 
 ---@class omichat.api.client : omichat.api.shared
 ---@field private _commandStreams omichat.CommandStream[]
----@field private _emotes table<string, string>
+---@field private _emotes table<string, string | omichat.EmoteHandler>
 ---@field private _formatters table<string, omichat.MetaFormatter>
 ---@field private _iconsToExclude table<string, true>
 ---@field private _transformers omichat.MessageTransformer[]

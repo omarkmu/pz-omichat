@@ -1310,16 +1310,21 @@ function ISChat:onCommandEntered()
     -- handle emotes specified with .emote
     local playedEmote
     if allowEmotes and Option.EnableEmotes then
-        local emoteToPlay, start, finish = OmiChat.getEmoteFromCommand(command)
+        local emoteToPlay, start, finish, emote = OmiChat.getEmoteFromCommand(command)
         if emoteToPlay then
             -- remove the emote text
             shouldHandle = true
+            playedEmote = true
             command = utils.trim(command:sub(1, start - 1) .. command:sub(finish + 1))
 
             local player = getSpecificPlayer(0)
             if player then
-                player:playEmote(emoteToPlay)
-                playedEmote = true
+                if type(emoteToPlay) == 'string' then
+                    player:playEmote(emoteToPlay)
+                else
+                    ---@cast emote string
+                    emoteToPlay(player, emote)
+                end
             end
         end
     end

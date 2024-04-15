@@ -49,6 +49,7 @@ return OmiChat
 ---@alias omichat.SuggestArgSpec omichat.SuggestArgSpecTable | omichat.SuggestionType | string
 ---@alias omichat.SuggestSpec omichat.SuggestArgSpec[]
 ---@alias omichat.SuggestSearchCallback fun(ctx: omichat.SearchContext | string, spec: omichat.SuggestArgSpec): omichat.SearchResults?
+---@alias omichat.EmoteHandler fun(player: IsoPlayer, emote: string)
 
 ---@class omichat.SuggestArgSpecTable
 ---@field type omichat.SuggestionType | string The type of the argument.
