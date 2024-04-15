@@ -24,7 +24,16 @@ return OmiChat
 
 ---@alias omichat.ChatCommandType 'chat' | 'rp' | 'other'
 ---@alias omichat.ChatFont 'small' | 'medium' | 'large'
----@alias omichat.SettingCategory 'basic' | 'chat_customization' | 'character_customization' | 'language' | 'admin' | 'main'
+
+---@alias omichat.SettingCategory
+---| 'basic'
+---| 'chat_customization'
+---| 'character_customization'
+---| 'language'
+---| 'admin'
+---| 'suggestions'
+---| 'main'
+
 ---@alias omichat.SettingHandlerCallback fun(submenu: ISContextMenu)
 ---@alias omichat.Message ChatMessage | omichat.MimicMessage
 
@@ -199,6 +208,8 @@ return OmiChat
 ---@field useSuggester boolean Whether suggestions are enabled.
 ---@field useSignEmotes boolean Whether signed roleplay languages should play a random emote.
 ---@field showTyping boolean Whether typing indicators should be shown and sent.
+---@field suggestOnEnter boolean Whether suggestions should be entered when pressing Enter.
+---@field suggestOnTab boolean Whether suggestions should be entered when pressing Tab.
 ---@field callouts string[] Custom callouts.
 ---@field sneakcallouts string[] Custom sneak callouts.
 ---@field colors table<omichat.ColorCategory, omichat.ColorTable> Custom chat colors.
