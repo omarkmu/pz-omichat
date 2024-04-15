@@ -117,7 +117,9 @@ local function readPrefsV2(decoded, prefs)
     if type(settings) == 'table' then
         readPrefsV1(settings, prefs)
 
-        prefs.showTyping = readBool(decoded.showTyping, prefs.showTyping)
+        prefs.showTyping = readBool(settings.showTyping, prefs.showTyping)
+        prefs.suggestOnEnter = readBool(settings.suggestOnEnter, prefs.suggestOnEnter)
+        prefs.suggestOnTab = readBool(settings.suggestOnTab, prefs.suggestOnTab)
     end
 end
 
@@ -155,6 +157,8 @@ function OmiChat.getDefaultPlayerPreferences()
         HIGHER_VERSION = false,
         showNameColors = true,
         useSuggester = true,
+        suggestOnEnter = true,
+        suggestOnTab = true,
         useSignEmotes = true,
         retainChatInput = true,
         retainRPInput = true,
@@ -200,9 +204,8 @@ function OmiChat.getPlayerPreferences()
 
     local version = decoded.VERSION
     if version > OmiChat._prefsVersion then
-        utils.logError('preferences file has a higher version (%d > %d)', version, OmiChat._prefsVersion)
-
         -- use default settings & add flag to avoid overwrite
+        utils.logError('preferences file has a higher version (%d > %d)', version, OmiChat._prefsVersion)
         prefs.HIGHER_VERSION = true
         return prefs
     elseif version == 1 then
@@ -257,6 +260,20 @@ function OmiChat.getShowTyping()
     return prefs.showTyping
 end
 
+---Retrieves whether suggestions should be applied on Enter.
+---@return boolean
+function OmiChat.getSuggestOnEnter()
+    local prefs = OmiChat.getPlayerPreferences()
+    return prefs.suggestOnEnter
+end
+
+---Retrieves whether suggestions should be applied on Tab.
+---@return boolean
+function OmiChat.getSuggestOnTab()
+    local prefs = OmiChat.getPlayerPreferences()
+    return prefs.suggestOnTab
+end
+
 ---Retrieves whether the player has the admin option to understand all roleplay languages enabled.
 ---This does not check for admin permissions.
 ---@return boolean
@@ -283,6 +300,8 @@ function OmiChat.savePlayerPreferences()
         VERSION = OmiChat._prefsVersion,
         settings = {
             useSuggester = prefs.useSuggester,
+            suggestOnEnter = prefs.suggestOnEnter,
+            suggestOnTab = prefs.suggestOnTab,
             useSignEmotes = prefs.useSignEmotes,
             showNameColors = prefs.showNameColors,
             retainChatInput = prefs.retainChatInput,
@@ -393,6 +412,22 @@ end
 function OmiChat.setSignEmotesEnabled(enable)
     local prefs = OmiChat.getPlayerPreferences()
     prefs.useSignEmotes = not not enable
+    OmiChat.savePlayerPreferences()
+end
+
+---Sets whether suggestions should be applied on Enter.
+---@param enable boolean
+function OmiChat.setSuggestOnEnter(enable)
+    local prefs = OmiChat.getPlayerPreferences()
+    prefs.suggestOnEnter = enable
+    OmiChat.savePlayerPreferences()
+end
+
+---Sets whether suggestions should be applied on Tab.
+---@param enable boolean
+function OmiChat.setSuggestOnTab(enable)
+    local prefs = OmiChat.getPlayerPreferences()
+    prefs.suggestOnTab = enable
     OmiChat.savePlayerPreferences()
 end
 

@@ -45,6 +45,7 @@ OmiChat._settingHandlers = {
     chat_customization = {},
     character_customization = {},
     language = {},
+    suggestions = {},
     main = {},
 }
 OmiChat._iconsToExclude = {

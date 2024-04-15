@@ -377,6 +377,38 @@ local function addSignEmoteOption(context)
     option.toolTip.description = getText('UI_OmiChat_ContextSignEmotesTooltip')
 end
 
+---Adds the context menu options for suggestions.
+---@param context ISContextMenu
+local function addSuggestionOptions(context)
+    local instance = ISChat.instance
+    local isUseSuggester = OmiChat.getUseSuggester()
+    if not isUseSuggester then
+        local optName = getText('UI_OmiChat_ContextSuggestions_Enable')
+        context:addOption(optName, instance, ISChat.onToggleUseSuggester)
+        return
+    end
+
+    local suggestOption = context:addOption(getText('UI_OmiChat_ContextSuggestions'), instance)
+    local submenu = context:getNew(context)
+    context:addSubMenu(suggestOption, submenu)
+
+    local disableOptName = getText('UI_OmiChat_ContextSuggestions_Disable')
+    local onEnterOptName = getText('UI_OmiChat_ContextSuggestions_OnEnter')
+    local onTabOptName = getText('UI_OmiChat_ContextSuggestions_OnTab')
+
+    submenu:addOption(disableOptName, instance, ISChat.onToggleUseSuggester)
+
+    local onEnterOpt = submenu:addOption(onEnterOptName, instance, ISChat.onToggleSuggestOnEnter)
+    local onTabOpt = submenu:addOption(onTabOptName, instance, ISChat.onToggleSuggestOnTab)
+    submenu:setOptionChecked(onEnterOpt, OmiChat.getSuggestOnEnter())
+    submenu:setOptionChecked(onTabOpt, OmiChat.getSuggestOnTab())
+
+    local handlers = OmiChat.getSettingHandlers('suggestions')
+    for i = 1, #handlers do
+        handlers[i](submenu)
+    end
+end
+
 ---Adds the chat settings submenu to the context menu.
 ---@param context ISContextMenu
 local function addChatSettings(context)
@@ -399,16 +431,12 @@ local function addChatSettings(context)
     submenu:addOption(timestampOptName, instance, ISChat.onToggleTimestampPrefix)
     submenu:addOption(tagOptName, instance, ISChat.onToggleTagPrefix)
 
-    local suggesterOptName = OmiChat.getUseSuggester()
-        and getText('UI_OmiChat_ContextDisableSuggestions')
-        or getText('UI_OmiChat_ContextEnableSuggestions')
-    submenu:addOption(suggesterOptName, instance, ISChat.onToggleUseSuggester)
-
     local typingOptName = OmiChat.getShowTyping()
         and getText('UI_OmiChat_ContextDisableTypingIndicator')
         or getText('UI_OmiChat_ContextEnableTypingIndicator')
     submenu:addOption(typingOptName, instance, ISChat.onToggleShowTyping)
 
+    addSuggestionOptions(submenu)
     addRetainOptions(submenu)
     addVanillaSubmenuOptions(submenu)
 
@@ -889,6 +917,20 @@ function ISChat.onToggleShowTyping(target)
     OmiChat.updateChatPanelSize()
 end
 
+---Event handler for toggling applying suggestions on Enter.
+---@param target omichat.ISChat
+---@diagnostic disable-next-line: unused-local
+function ISChat.onToggleSuggestOnEnter(target)
+    OmiChat.setSuggestOnEnter(not OmiChat.getSuggestOnEnter())
+end
+
+---Event handler for toggling applying suggestions on Tab.
+---@param target omichat.ISChat
+---@diagnostic disable-next-line: unused-local
+function ISChat.onToggleSuggestOnTab(target)
+    OmiChat.setSuggestOnTab(not OmiChat.getSuggestOnTab())
+end
+
 ---Event handler for toggling sign language emotes.
 ---@param target omichat.ISChat
 ---@diagnostic disable-next-line: unused-local
@@ -1214,7 +1256,7 @@ function ISChat:onCommandEntered()
         return
     end
 
-    if tryInputSuggestedItem() then
+    if OmiChat.getSuggestOnEnter() and tryInputSuggestedItem() then
         OmiChat.updateCustomComponents()
         return
     end
@@ -1463,7 +1505,7 @@ function ISChat.onSwitchStream()
     end
 
     local text
-    if not tryInputSuggestedItem() then
+    if not (OmiChat.getSuggestOnTab() and tryInputSuggestedItem()) then
         text = OmiChat.cycleStream()
         local entry = ISChat.instance.textEntry
         entry:setText(text)
