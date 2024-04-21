@@ -505,6 +505,83 @@ function OmiChat.getColorCategoryCommand(cat)
     return '/' .. cat
 end
 
+---Determines the color options that should be enabled based on the server configuration.
+---@param all boolean? If given, all possible color options will be returned instead.
+---@return omichat.ColorCategory[]
+function OmiChat.getColorOptions(all)
+    local colorOpts = {}
+    local canUsePM = checkPlayerCanUseChat('/w')
+    local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
+
+    if all or Option.EnableSetNameColor then
+        colorOpts[#colorOpts + 1] = 'name'
+    end
+
+    if all or Option.EnableSetSpeechColor then
+        colorOpts[#colorOpts + 1] = 'speech'
+    end
+
+    colorOpts[#colorOpts + 1] = 'server'
+
+    if all or Option:showDiscordColorOption() then
+        colorOpts[#colorOpts + 1] = 'discord'
+    end
+
+    if all then
+        colorOpts[#colorOpts + 1] = 'radio'
+    else
+        -- need to check the option because checkPlayerCanUseChat checks for a radio item
+        local allowedStreams = getServerOptions():getOption('ChatStreams'):split(',')
+        for i = 1, #allowedStreams do
+            if allowedStreams[i] == 'r' then
+                colorOpts[#colorOpts + 1] = 'radio'
+                break
+            end
+        end
+    end
+
+    if all or checkPlayerCanUseChat('/a') then
+        colorOpts[#colorOpts + 1] = 'admin'
+    end
+
+    if all or checkPlayerCanUseChat('/all') then
+        colorOpts[#colorOpts + 1] = 'general'
+    end
+
+    if all or checkPlayerCanUseChat('/f') then
+        colorOpts[#colorOpts + 1] = 'faction'
+    end
+
+    if all or checkPlayerCanUseChat('/sh') then
+        colorOpts[#colorOpts + 1] = 'safehouse'
+    end
+
+    if all or (useLocalWhisper and canUsePM) then
+        colorOpts[#colorOpts + 1] = 'private' -- /pm
+    end
+
+    if all or checkPlayerCanUseChat('/s') then
+        colorOpts[#colorOpts + 1] = 'say'
+    end
+
+    if all or checkPlayerCanUseChat('/y') then
+        colorOpts[#colorOpts + 1] = 'shout'
+    end
+
+    if not all and (not useLocalWhisper and canUsePM) then
+        colorOpts[#colorOpts + 1] = 'private' -- /whisper
+    end
+
+    for info in config:chatStreams() do
+        local name = info.name
+        if info.autoColorOption ~= false and (all or OmiChat.isCustomStreamEnabled(name)) then
+            colorOpts[#colorOpts + 1] = name
+        end
+    end
+
+    return colorOpts
+end
+
 ---Returns information about the default stream for a given tab ID.
 ---@param tabID integer
 ---@return omichat.StreamInfo?
