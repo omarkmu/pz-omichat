@@ -366,6 +366,12 @@ function Option:isNicknameCommandEnabled()
     return self.EnableSetName > 4
 end
 
+---Returns whether the /nickname command is enabled, or /name sets nicknames.
+---@return boolean
+function Option:isNicknameEnabled()
+    return self.EnableSetName > 4 or self.EnableSetName == 2
+end
+
 ---Checks whether an item is required for /card.
 ---@return boolean
 function Option:requireCardItem()

@@ -9,6 +9,7 @@ local floor = math.floor
 ---@field currentColor ColorInfo
 ---@field defaultColor omichat.ColorTable The default color to set on the modal during initialization.
 ---@field emptyColor omichat.ColorTable The color that will be used if the entry is blank.
+---@field entry ISTextEntryBox
 ---@field minimumValue integer The minimum RGB value of each color component.
 ---@field maximumValue integer The maximum RGB value of each color component.
 ---@field requireValue boolean If true, the text entry will not be valid if empty.
@@ -50,7 +51,10 @@ end
 function ColorModal:initialise()
     ISTextBox.initialise(self)
 
-    self:setValidateFunction(self, self.validate)
+    if not self.validateFunc then
+        self:setValidateFunction(self, ColorModal.validate)
+    end
+
     self.colorBtn.onclick = self.onColorPicker
     self.colorPicker.onMouseDownOutside = ColorModal.onColorPickerMouseDownOutside
     self:enableColorPicker()
@@ -205,9 +209,9 @@ end
 ---@param width number
 ---@param height number
 ---@param text string
----@param defaultColor omichat.ColorTable
+---@param defaultColor omichat.ColorTable?
 ---@param target table?
----@param onclick function
+---@param onclick function?
 ---@param player integer?
 ---@param ... any
 ---@return omichat.ColorModal

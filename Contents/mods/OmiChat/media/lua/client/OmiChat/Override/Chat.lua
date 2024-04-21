@@ -190,6 +190,30 @@ local function addCustomCalloutOptions(context)
     context:addOption(sneakCalloutOptName, ISChat.instance, ISChat.onCustomCalloutMenu, 'sneakcallouts')
 end
 
+---Adds the context menu options for player preference profiles.
+---@param context ISContextMenu
+local function addProfileOptions(context)
+    local instance = ISChat.instance
+    local profiles = OmiChat.getProfiles()
+
+    local manageOptName = getText('UI_OmiChat_ContextManageProfiles')
+    context:addOption(manageOptName, instance, ISChat.onManageProfiles)
+
+    if #profiles == 0 then
+        return
+    end
+
+    local submenuName = getText('UI_OmiChat_ContextProfiles')
+    local submenuOption = context:addOption(submenuName, instance)
+    local submenu = context:getNew(context)
+    context:addSubMenu(submenuOption, submenu)
+
+    for i = 1, #profiles do
+        local profile = profiles[i]
+        submenu:addOption(profile.name, instance, ISChat.onSwitchProfile, i)
+    end
+end
+
 ---Adds the context menu options for roleplay languages.
 ---@param context ISContextMenu
 local function addLanguageOptions(context)
@@ -408,15 +432,10 @@ local function addChatCustomizationSettings(context)
         addSignEmoteOption(submenu)
     end
 
-    local handlers = OmiChat.getSettingHandlers('chat_customization')
-    if #submenu.options == 0 and #handlers == 0 then
-        -- no submenu options and no handlers → add the color submenu to the top-level menu
-        context:removeLastOption()
-        submenu = context
-    end
-
+    addProfileOptions(submenu)
     addColorOptions(submenu)
 
+    local handlers = OmiChat.getSettingHandlers('chat_customization')
     for i = 1, #handlers do
         handlers[i](submenu)
     end
@@ -693,8 +712,11 @@ function ISChat.onCustomColorMenu(target, category)
     local width = max(450, getTextManager():MeasureStringX(UIFont.Small, text) + 60)
     local modal = ColorModal:new(0, 0, width, 250, text, color, target, ISChat.onCustomColorMenuClick, 0, category)
 
+    local player = getSpecificPlayer(0)
+    local username = player and player:getUsername()
+
     modal:setMinValue(category == 'speech' and 48 or 0)
-    modal:setEmptyColor(Option:getDefaultColor(category))
+    modal:setEmptyColor(Option:getDefaultColor(category, username))
     modal:initialise()
     modal:addToUIManager()
 
@@ -961,8 +983,30 @@ function ISChat.onLanguageSelect(target, language)
     OmiChat.setCurrentRoleplayLanguage(language)
 end
 
+---Event handler for clicking the manage profiles context option.
+---@param target omichat.ISChat
+function ISChat.onManageProfiles(target)
+    if target.activeProfilesPanel then
+        target.activeProfilesPanel:destroy()
+    end
+
+    local panel = OmiChat.ProfileManager:new(150, 150, 800, 600, OmiChat.getProfiles())
+    panel:initialise()
+    panel:addToUIManager()
+    target.activeProfilesPanel = panel
+end
+
+---Event handler for switching a chat profile.
+---@param target omichat.ISChat
+---@param idx integer
+---@diagnostic disable-next-line: unused-local
+function ISChat.onSwitchProfile(target, idx)
+    OmiChat.applyProfile(idx)
+    OmiChat.redrawMessages()
+end
+
 ---Validation function for custom callout menu.
----@param target ISTextBox
+---@param target ISTextBox | omichat.ValidatedTextEntry
 ---@param text string
 ---@return boolean
 function ISChat.validateCustomCalloutText(target, text)
