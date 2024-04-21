@@ -205,6 +205,7 @@ return OmiChat
 ---Player preference profile.
 ---@class omichat.PlayerProfile
 ---@field name string
+---@field chatNickname string? Nickname to use in chat alongside a profile.
 ---@field callouts string[] Custom callouts.
 ---@field sneakcallouts string[] Custom sneak callouts.
 ---@field colors table<omichat.ColorCategory, omichat.ColorTable> Custom chat colors.

@@ -141,7 +141,7 @@ function OmiChat.applyProfile(idx)
     prefs.callouts = utils.copy(profile.callouts)
     prefs.sneakcallouts = utils.copy(profile.sneakcallouts)
 
-    local opts = OmiChat.getColorOptions()
+    local opts = OmiChat.getColorOptions(true)
     for i = 1, #opts do
         local opt = opts[i]
         local value = profile.colors[opt]
@@ -151,6 +151,10 @@ function OmiChat.applyProfile(idx)
         else
             prefs.colors[opt] = value
         end
+    end
+
+    if profile.chatNickname and Option:isNicknameEnabled() then
+        OmiChat.setNickname(profile.chatNickname)
     end
 
     OmiChat.savePlayerPreferences()
