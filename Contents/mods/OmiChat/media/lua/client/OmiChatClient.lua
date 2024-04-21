@@ -202,6 +202,13 @@ return OmiChat
 ---| omichat.ChatStream
 ---| omichat.CommandStream
 
+---Player preference profile.
+---@class omichat.PlayerProfile
+---@field name string
+---@field callouts string[] Custom callouts.
+---@field sneakcallouts string[] Custom sneak callouts.
+---@field colors table<omichat.ColorCategory, omichat.ColorTable> Custom chat colors.
+
 ---Player preferences.
 ---@class omichat.PlayerPreferences
 ---@field HIGHER_VERSION boolean Flag that's set when the preferences file had a higher verson than the current version, to avoid bad overwrites.
@@ -220,6 +227,7 @@ return OmiChat
 ---@field adminShowIcon boolean Whether the admin icon should display in chat.
 ---@field adminKnowLanguages boolean Whether all languages should be treated as known.
 ---@field adminIgnoreRange boolean Whether message range should be ignored.
+---@field profiles omichat.PlayerProfile[] List of chat profiles.
 
 ---Description of a chat tab object.
 ---@class omichat.ChatTab : ISRichTextPanel
