@@ -36,7 +36,6 @@ local getTextOrNull = getTextOrNull
 local max = math.max
 local concat = table.concat
 
-local getServerOptions = getServerOptions
 local BloodBodyPartType = BloodBodyPartType
 local getCoveredParts = BloodClothingType.getCoveredParts
 
@@ -159,72 +158,7 @@ end
 ---Adds context menu options for chat colors.
 ---@param context ISContextMenu
 local function addColorOptions(context)
-    local colorOpts = {}
-    local canUsePM = checkPlayerCanUseChat('/w')
-    local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
-
-    if Option.EnableSetNameColor then
-        colorOpts[#colorOpts + 1] = 'name'
-    end
-
-    if Option.EnableSetSpeechColor then
-        colorOpts[#colorOpts + 1] = 'speech'
-    end
-
-    colorOpts[#colorOpts + 1] = 'server'
-
-    if Option:showDiscordColorOption() then
-        colorOpts[#colorOpts + 1] = 'discord'
-    end
-
-    -- need to check the option because checkPlayerCanUseChat checks for a radio item
-    local allowedStreams = getServerOptions():getOption('ChatStreams'):split(',')
-    for i = 1, #allowedStreams do
-        if allowedStreams[i] == 'r' then
-            colorOpts[#colorOpts + 1] = 'radio'
-            break
-        end
-    end
-
-    if checkPlayerCanUseChat('/a') then
-        colorOpts[#colorOpts + 1] = 'admin'
-    end
-
-    if checkPlayerCanUseChat('/all') then
-        colorOpts[#colorOpts + 1] = 'general'
-    end
-
-    if checkPlayerCanUseChat('/f') then
-        colorOpts[#colorOpts + 1] = 'faction'
-    end
-
-    if checkPlayerCanUseChat('/sh') then
-        colorOpts[#colorOpts + 1] = 'safehouse'
-    end
-
-    if useLocalWhisper and canUsePM then
-        colorOpts[#colorOpts + 1] = 'private' -- /pm
-    end
-
-    if checkPlayerCanUseChat('/s') then
-        colorOpts[#colorOpts + 1] = 'say'
-    end
-
-    if checkPlayerCanUseChat('/y') then
-        colorOpts[#colorOpts + 1] = 'shout'
-    end
-
-    if not useLocalWhisper and canUsePM then
-        colorOpts[#colorOpts + 1] = 'private' -- /whisper
-    end
-
-    for info in config:chatStreams() do
-        local name = info.name
-        if info.autoColorOption ~= false and OmiChat.isCustomStreamEnabled(name) then
-            colorOpts[#colorOpts + 1] = name
-        end
-    end
-
+    local colorOpts = OmiChat.getColorOptions()
     if #colorOpts == 0 then
         return
     end
@@ -529,33 +463,6 @@ local function addCharacterCustomizationSettings(context)
     end
 end
 
----Returns the non-empty lines of a string.
----If there are no non-empty lines, returns `nil`.
----@param text string
----@param maxLen integer?
----@return string[]?
-local function getLines(text, maxLen)
-    if not text then
-        return
-    end
-
-    local lines = {}
-    for line in text:gmatch('[^\n]+\n?') do
-        line = utils.trim(line)
-        if maxLen and #line > maxLen then
-            lines[#lines + 1] = line:sub(1, maxLen)
-        elseif #line > 0 then
-            lines[#lines + 1] = line
-        end
-    end
-
-    if #lines == 0 then
-        return
-    end
-
-    return lines
-end
-
 ---Checks whether the player is dead or unavailable.
 ---@return boolean
 local function isPlayerDead()
@@ -820,11 +727,7 @@ function ISChat.onCustomCalloutClick(target, button, category)
     end
 
     local maxLen = Option.CustomShoutMaxLength > 0 and Option.CustomShoutMaxLength or nil
-    local lines = getLines(button.parent.entry:getText(), maxLen)
-    if not lines then
-        lines = nil
-    end
-
+    local lines = utils.getLines(button.parent.entry:getText(), maxLen)
     if lines and category == 'sneakcallouts' then
         for i = 1, #lines do
             lines[i] = lines[i]:lower()
@@ -1063,7 +966,7 @@ end
 ---@param text string
 ---@return boolean
 function ISChat.validateCustomCalloutText(target, text)
-    local lines = getLines(text)
+    local lines = utils.getLines(text)
     if not lines then
         return true
     end

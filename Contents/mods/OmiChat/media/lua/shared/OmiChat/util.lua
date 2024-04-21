@@ -412,6 +412,33 @@ function utils.getInternalText(text)
     return text:sub(start, finish), prefix, suffix
 end
 
+---Returns the non-empty lines of a string.
+---If there are no non-empty lines, returns `nil`.
+---@param text string
+---@param maxLen integer?
+---@return string[]?
+function utils.getLines(text, maxLen)
+    if not text then
+        return
+    end
+
+    local lines = {}
+    for line in text:gmatch('[^\n]+\n?') do
+        line = utils.trim(line)
+        if maxLen and #line > maxLen then
+            lines[#lines + 1] = line:sub(1, maxLen)
+        elseif #line > 0 then
+            lines[#lines + 1] = line
+        end
+    end
+
+    if #lines == 0 then
+        return
+    end
+
+    return lines
+end
+
 ---Gets a numeric access level given an access level string.
 ---@param access string
 ---@return integer
