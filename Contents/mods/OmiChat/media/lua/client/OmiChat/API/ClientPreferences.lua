@@ -121,8 +121,41 @@ local function readPrefsV2(decoded, prefs)
         prefs.suggestOnEnter = readBool(settings.suggestOnEnter, prefs.suggestOnEnter)
         prefs.suggestOnTab = readBool(settings.suggestOnTab, prefs.suggestOnTab)
     end
+
+    local profiles = decoded.profiles
+    if type(profiles) == 'table' then
+        prefs.profiles = profiles
+    end
 end
 
+---Applies a player preference profile to the current preferences.
+---@param idx integer
+---@return boolean success
+function OmiChat.applyProfile(idx)
+    local prefs = OmiChat.getPlayerPreferences()
+    local profile = prefs.profiles[idx]
+    if not profile then
+        return false
+    end
+
+    prefs.callouts = utils.copy(profile.callouts)
+    prefs.sneakcallouts = utils.copy(profile.sneakcallouts)
+
+    local opts = OmiChat.getColorOptions()
+    for i = 1, #opts do
+        local opt = opts[i]
+        local value = profile.colors[opt]
+
+        if opt == 'name' or opt == 'speech' then
+            OmiChat.changeColor(opt, value)
+        else
+            prefs.colors[opt] = value
+        end
+    end
+
+    OmiChat.savePlayerPreferences()
+    return true
+end
 
 ---Gets the value of a given admin option preference.
 ---@param option omichat.AdminOption
@@ -170,6 +203,7 @@ function OmiChat.getDefaultPlayerPreferences()
         colors = {},
         callouts = {},
         sneakcallouts = {},
+        profiles = {},
     }
 end
 
@@ -223,6 +257,13 @@ end
 function OmiChat.getPreferredColor(category)
     local prefs = OmiChat.getPlayerPreferences()
     return prefs.colors[category]
+end
+
+---Returns the configured player profiles.
+---@return omichat.PlayerProfile[]
+function OmiChat.getProfiles()
+    local prefs = OmiChat.getPlayerPreferences()
+    return prefs.profiles
 end
 
 ---Gets whether a command category is set to retain commands.
@@ -298,6 +339,7 @@ function OmiChat.savePlayerPreferences()
     local prefs = OmiChat._playerPrefs
     local success, encoded = utils.json.tryEncode {
         VERSION = OmiChat._prefsVersion,
+        profiles = prefs.profiles,
         settings = {
             useSuggester = prefs.useSuggester,
             suggestOnEnter = prefs.suggestOnEnter,
@@ -380,6 +422,14 @@ end
 function OmiChat.setPreferredColor(category, color)
     local prefs = OmiChat.getPlayerPreferences()
     prefs.colors[category] = color
+end
+
+---Sets the list of player profiles.
+---This assumes the input is a valid list of PlayerProfile tables.
+---@param profiles omichat.PlayerProfile[]
+function OmiChat.setProfiles(profiles)
+    local prefs = OmiChat.getPlayerPreferences()
+    prefs.profiles = profiles
     OmiChat.savePlayerPreferences()
 end
 
