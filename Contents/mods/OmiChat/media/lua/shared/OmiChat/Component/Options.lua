@@ -275,7 +275,7 @@ function Option:getDiceItems()
     return diceItemsList:list()
 end
 
----Returns the default color associated with a category.
+---Returns the configured default color associated with a category.
 ---@param category omichat.ColorCategory
 ---@param username string? The username of the user to use for getting defaults, if applicable.
 ---@return omichat.ColorTable
@@ -318,6 +318,16 @@ function Option:getDefaultColor(category, username)
     return getColorOrDefault(self, custom and custom.colorOpt)
         or getColorOrDefault(self, colorOpts[category])
         or { r = 255, g = 255, b = 255 }
+end
+
+---Returns the default value for a color option.
+---@param option string
+---@return omichat.ColorTable
+function Option:getOptionDefaultColor(option)
+    local defaultStr = Option:getDefault(option)
+    local defaultColor = defaultStr and utils.stringToColor(defaultStr) or { r = 255, g = 255, b = 255 }
+
+    return defaultColor
 end
 
 ---Returns whether the clean character option is set to clean clothing.
