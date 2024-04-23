@@ -24,6 +24,8 @@ require 'Chat/ISChat'
 local OmiChat = require 'OmiChatShared'
 
 OmiChat.ColorModal = require 'OmiChat/Component/ColorModal'
+OmiChat.ValidatedColorEntry = require 'OmiChat/Component/ValidatedColorEntry'
+OmiChat.ValidatedTextEntry = require 'OmiChat/Component/ValidatedTextEntry'
 OmiChat.IconPicker = require 'OmiChat/Component/IconPicker'
 OmiChat.SuggesterBox = require 'OmiChat/Component/SuggesterBox'
 OmiChat.StreamInfo = require 'OmiChat/Component/StreamInfo'

@@ -13,6 +13,8 @@ local floor = math.floor
 ---@field minimumValue integer The minimum RGB value of each color component.
 ---@field maximumValue integer The maximum RGB value of each color component.
 ---@field requireValue boolean If true, the text entry will not be valid if empty.
+---@field btnPadding integer The padding between the entry and the color picker button.
+---@field font UIFont The font of the entry.
 local ColorModal = ISTextBox:derive('ColorModal')
 
 
@@ -53,6 +55,31 @@ function ColorModal:initialise()
 
     if not self.validateFunc then
         self:setValidateFunction(self, ColorModal.validate)
+    end
+
+    if self.font ~= UIFont.Medium then
+        -- no way to set the font on an ISTextEntryBox, so we need to recreate it
+        self:removeChild(self.entry)
+
+        local textManager = getTextManager()
+        self.fontHgt = textManager:getFontHeight(self.font)
+
+        local inset = 2
+        local height = inset + self.fontHgt * self.numLines + inset
+        local entry = ISTextEntryBox:new(self.defaultEntryText, 0, (self:getHeight() - height) / 2, 0, height)
+        entry.font = self.font
+        entry:initialise()
+        entry:instantiate()
+        entry:setMaxLines(self.maxLines)
+        entry:setMultipleLine(self.multipleLine)
+        self:addChild(entry)
+        self.entry = entry
+
+        self.colorBtn:setWidth(height)
+        self.colorBtn:setHeight(height)
+        self.colorBtn:setY(entry.y)
+
+        self.btnPadding = 5 * (self.fontHgt / textManager:getFontHeight(UIFont.Medium))
     end
 
     self.colorBtn.onclick = self.onColorPicker
@@ -228,8 +255,11 @@ function ColorModal:new(x, y, width, height, text, defaultColor, target, onclick
 
     local o = ISTextBox:new(x, y, width, height, text, '', target, onclick, player, ...)
 
+    ---@cast o omichat.ColorModal
     o.defaultColor = defaultColor or { r = 255, g = 255, b = 255 }
     o.emptyColor = o.defaultColor
+    o.font = UIFont.Medium
+    o.btnPadding = 5
     o.minimumValue = 0
     o.maximumValue = 255
     o.requireValue = false
@@ -237,7 +267,6 @@ function ColorModal:new(x, y, width, height, text, defaultColor, target, onclick
     setmetatable(o, self)
     self.__index = self
 
-    ---@cast o omichat.ColorModal
     return o
 end
 
