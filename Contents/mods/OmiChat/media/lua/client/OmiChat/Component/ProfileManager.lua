@@ -78,7 +78,6 @@ function ProfileManager:createContentPanel()
     panel:setAnchorBottom(true)
     panel:setScrollChildren(true)
     panel:addScrollBars()
-    panel.vscroll.doSetStencil = true
 
     return panel
 end
