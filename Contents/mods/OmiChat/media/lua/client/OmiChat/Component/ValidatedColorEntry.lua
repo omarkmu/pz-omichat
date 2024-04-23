@@ -16,8 +16,8 @@ function ColorEntry:initialise()
     self.yes:setVisible(false)
     self.no:setVisible(false)
     self.entry:setX(0)
-    self.entry:setWidth(self.width - self.colorBtn.width - 5)
-    self.colorBtn:setX(self.entry:getWidth() + 5)
+    self.entry:setWidth(self.width - self.colorBtn.width - self.btnPadding)
+    self.colorBtn:setX(self.entry:getWidth() + self.btnPadding)
 
     if not self.entry.borderColorEnabled then
         self.entry.borderColorEnabled = {
@@ -27,6 +27,18 @@ function ColorEntry:initialise()
             a = self.borderColor.a,
         }
     end
+end
+
+---Gets the current internal text of the color entry.
+---@return string
+function ColorEntry:getInternalText()
+    return self.entry:getInternalText()
+end
+
+---Gets the current text of the color entry.
+---@return string
+function ColorEntry:getText()
+    return self.entry:getText()
 end
 
 ---Callback for text entry change.
@@ -58,6 +70,13 @@ end
 ---@param f fun(target: unknown, self: omichat.ValidatedColorEntry, ...)
 function ColorEntry:setOnChange(f)
     self.onchange = f
+end
+
+---Sets the text of the color entry.
+---@param text string
+function ColorEntry:setText(text)
+    self.entry:setText(text)
+    ColorModal.onTextChange(self, self.entry)
 end
 
 ---Sets the tooltip of the entry box.
