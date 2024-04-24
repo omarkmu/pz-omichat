@@ -94,6 +94,7 @@ local function applyNarrativeStyle(input, stream, tokens)
     local prefix, suffix
     input, prefix, suffix = utils.getInternalText(input) -- get the actual end, not an invisible character
     if not input:match('%p$') then
+        tokens.dialogueTag = dialogueTag
         local punctuation = utils.interpolate(Option.FormatNarrativePunctuation, tokens, seed)
         if punctuation then
             input = input .. punctuation

@@ -135,6 +135,7 @@ The format used to determine the punctuation used in [narrative style](./filters
 **Tokens:**
 - [`$callout`](../format-strings/tokens.md#callout)
 - [`$chatType`](../format-strings/tokens.md#chattype)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$input`](../format-strings/tokens.md#input)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
