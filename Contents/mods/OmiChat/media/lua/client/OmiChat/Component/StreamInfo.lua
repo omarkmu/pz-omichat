@@ -32,7 +32,7 @@ function StreamInfo:checkMatch(command)
     local commandCompare = command
     local fullCompare = fullCommand
     local shortCompare = shortCommand
-    if isCmdStream or Option.EnableCaseInsensitiveChatStreams then
+    if self:isCaseInsensitive() then
         -- case-insensitive matching
         commandCompare = command:lower()
         fullCompare = fullCommand:lower()
@@ -197,6 +197,12 @@ end
 ---@return boolean
 function StreamInfo:isAllowIconPicker()
     return self:config().allowIconPicker or false
+end
+
+---Returns whether the stream should be treated as case-insensitive.
+---@return boolean
+function StreamInfo:isCaseInsensitive()
+    return self:isCommand() or Option.EnableCaseInsensitiveChatStreams
 end
 
 ---Returns whether this object represents a command stream.
