@@ -571,7 +571,12 @@ function OmiChat.formatForChat(args)
     -- mark as echo message
     if args.isEcho then
         local echoFormatter = OmiChat.getFormatter('echo')
-        tokens.input = echoFormatter:format(tokens.input, tokens)
+        local input = tokens.input
+        if args.echoType then
+            input = utils.encodeInvisibleCharacter(args.echoType) .. input
+        end
+
+        tokens.input = echoFormatter:format(input, tokens)
     end
 
     -- apply full overhead format
