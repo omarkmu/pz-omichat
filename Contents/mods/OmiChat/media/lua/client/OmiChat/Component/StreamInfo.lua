@@ -32,8 +32,8 @@ function StreamInfo:checkMatch(command)
     local commandCompare = command
     local fullCompare = fullCommand
     local shortCompare = shortCommand
-    if isCmdStream then
-        -- command streams are case-insensitive
+    if isCmdStream or Option.EnableCaseInsensitiveChatStreams then
+        -- case-insensitive matching
         commandCompare = command:lower()
         fullCompare = fullCommand:lower()
         shortCompare = shortCommand and shortCommand:lower()
