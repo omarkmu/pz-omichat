@@ -5,6 +5,101 @@ local OmiChat = require 'OmiChat/API/Shared'
 require 'OmiChat/API/SharedLanguages'
 require 'OmiChat/Component/InterpolatorLibrary'
 
+--#region deprecated string conversion
+-- this will be removed in the next major version
+
+local radioReplacement = { 'UI_OmiChat_radio', 'UI_OmiChat_Radio' }
+local rpReplacement = { 'UI_OmiChat_rp_emote', 'UI_OmiChat_RPEmote' }
+local replacementMap = {
+    ChatFormatCard = { { 'UI_OmiChat_card_local', 'UI_OmiChat_CardLocal' }, rpReplacement },
+    ChatFormatRoll = { { 'UI_OmiChat_roll_local', 'UI_OmiChat_RollLocal' }, rpReplacement },
+    ChatFormatRadio = { radioReplacement },
+    ChatFormatFlip = { rpReplacement },
+    ChatFormatDo = { rpReplacement },
+    ChatFormatDoLoud = { rpReplacement },
+    ChatFormatDoQuiet = { rpReplacement },
+    ChatFormatMe = { rpReplacement },
+    ChatFormatMeLoud = { rpReplacement },
+    ChatFormatMeQuiet = { rpReplacement },
+    ChatFormatUnknownLanguage = { rpReplacement },
+    ChatFormatUnknownLanguageRadio = { radioReplacement, rpReplacement },
+    ChatFormatIncomingPrivate = { { 'UI_OmiChat_private_chat_from', 'UI_OmiChat_PrivateChatFrom' } },
+    ChatFormatOutgoingPrivate = { { 'UI_OmiChat_private_chat_to', 'UI_OmiChat_PrivateChatTo' } },
+}
+
+---Attempts to apply replacements to a sandbox option.
+---@param opt StringSandboxOption
+---@return string?
+local function tryApplyReplacements(opt)
+    if opt:getTableName() ~= 'OmiChat' then
+        return
+    end
+
+    local name = opt:getShortName()
+    local replacements = replacementMap[name]
+    if not replacements then
+        return
+    end
+
+    local value = opt:getValue()
+    if not value then
+        return
+    end
+
+    local originalValue = value
+    for i = 1, #replacements do
+        local replace = replacements[i]
+        value = value:gsub(replace[1], replace[2])
+    end
+
+    if value ~= originalValue then
+        return value
+    end
+end
+
+---Updates sandbox options containing deprecated strings.
+local function updateDeprecatedStrings()
+    local hasChanges = false
+    local options = getSandboxOptions()
+
+    -- old strings are deprecated, but removing them entirely would be a breaking change for presets
+    -- to prevent broken options, replace them with the corresponding new string. this logic will be removed in 2.0
+    for i = 0, options:getNumOptions() - 1 do
+        local opt = options:getOptionByIndex(i) ---@type unknown
+        local value = tryApplyReplacements(opt)
+        if value then
+            hasChanges = true
+            opt:setValue(value)
+        end
+    end
+
+    if hasChanges then
+        options:toLua()
+        options:sendToServer()
+    end
+end
+
+Events.OnGameBoot.Add(function()
+    -- fired after sandbox options load server-side
+    -- this should be before clients connect
+    if not isServer() then
+        return
+    end
+
+    updateDeprecatedStrings()
+end)
+
+Events.OnGameStart.Add(function()
+    -- sandbox options have loaded by this point in Host mode
+    if not isCoopHost() then
+        return
+    end
+
+    updateDeprecatedStrings()
+end)
+
+--#endregion
+
 Events.EveryDays.Add(OmiChat.utils.cleanupCache)
 
 
