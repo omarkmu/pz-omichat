@@ -163,7 +163,7 @@ local addLangAllowlist = DelimitedList:new({ table = Option, source = 'AddLangua
 local addLangBlocklist = DelimitedList:new({ table = Option, source = 'AddLanguageBlocklist' })
 local cardItemsList = DelimitedList:new({ table = Option, source = 'CardItems' })
 local coinItemsList = DelimitedList:new({ table = Option, source = 'CoinItems' })
-local diceItemsList = DelimitedList:new({ table = Option, source = 'CardItems' })
+local diceItemsList = DelimitedList:new({ table = Option, source = 'DiceItems' })
 
 
 ---@param options omichat.Options
