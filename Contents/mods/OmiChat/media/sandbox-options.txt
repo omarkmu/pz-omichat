@@ -50,6 +50,14 @@ option OmiChat.EnableFactionColorAsDefault
     translation = OCEnableFactionColorAsDefault,
 }
 
+option OmiChat.EnableCaseInsensitiveChatStreams
+{
+    type = boolean,
+    default = true,
+    page = OmiChat,
+    translation = OCEnableCaseInsensitiveChatStreams,
+}
+
 option OmiChat.EnableCharacterCustomization
 {
     type = boolean,

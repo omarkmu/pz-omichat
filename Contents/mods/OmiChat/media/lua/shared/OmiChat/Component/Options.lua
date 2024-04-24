@@ -22,6 +22,7 @@ local floor = math.floor
 ---@field EnableCleanCharacter integer
 ---@field EnableDiscordColorOption integer
 ---@field EnableSetName integer
+---@field EnableCaseInsensitiveChatStreams boolean
 ---@field CardItems string
 ---@field CoinItems string
 ---@field DiceItems string

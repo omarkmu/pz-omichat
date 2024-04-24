@@ -44,6 +44,12 @@ If blank, the command won't require an item.
 
 The maximum length for individual [custom shouts](#enablecustomshouts).
 
+### EnableCaseInsensitiveChatStreams
+**Default:** `true`
+
+If enabled, chat streams such as `/say` will be case-insensitive.
+This will allow players to use `/SAY` or `/Say` for the equivalent effect.
+
 ### EnableCharacterCustomization
 **Default:** `false`
 

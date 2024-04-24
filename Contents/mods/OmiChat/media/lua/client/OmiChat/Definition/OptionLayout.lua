@@ -71,6 +71,7 @@ return check {
     'EnableSetSpeechColor',
     'EnableSpeechColorAsDefaultNameColor',
     'EnableFactionColorAsDefault',
+    'EnableCaseInsensitiveChatStreams',
 
     padding(),
     'EnableCustomShouts',
