@@ -129,7 +129,8 @@ return OmiChat
 ---@field streamName string?
 ---@field stream omichat.StreamInfo?
 ---@field playSignedEmote boolean?
----@field isEcho boolean?
+---@field isEcho boolean? Deprecated. This will be removed in a future version in favor of `echoType`.
+---@field echoType integer?
 ---@field formatterName omichat.FormatterName?
 ---@field tokens table?
 
@@ -139,7 +140,8 @@ return OmiChat
 ---@field text string
 ---@field icon string?
 ---@field language string?
----@field isEcho boolean?
+---@field isEcho boolean? Deprecated. This will be removed in a future version in favor of `echoType`.
+---@field echoType integer?
 ---@field formatterName omichat.FormatterName?
 ---@field stream string?
 ---@field chatType omichat.ChatTypeString

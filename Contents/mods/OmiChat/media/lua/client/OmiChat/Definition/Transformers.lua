@@ -114,7 +114,28 @@ return {
 
             local player = getSpecificPlayer(0)
             local username = player and player:getUsername()
-            if info.message:getAuthor() == username then
+            local author = info.message:getAuthor()
+            if author == username then
+                info.message:setShowInChat(false)
+                info.message:setOverHeadSpeech(false)
+                return
+            end
+
+            if not author or not username then
+                return
+            end
+
+            local shouldSuppress = false
+            local echoType = utils.decodeInvisibleCharacter(matched)
+            if echoType == 1 then -- faction
+                local playerFaction = Faction.getPlayerFaction(username)
+                shouldSuppress = playerFaction and (playerFaction:isOwner(author) or playerFaction:isMember(author))
+            elseif echoType == 2 then -- safehouse
+                local playerSafehouse = SafeHouse.hasSafehouse(username)
+                shouldSuppress = playerSafehouse and playerSafehouse:playerAllowed(author)
+            end
+
+            if shouldSuppress then
                 info.message:setShowInChat(false)
                 info.message:setOverHeadSpeech(false)
             end

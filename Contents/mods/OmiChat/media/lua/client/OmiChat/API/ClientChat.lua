@@ -60,9 +60,9 @@ local signLanguageEmotes = {
     'freeze',
     'comefront',
 }
-local echoChatTypes = {
-    faction = true,
-    safehouse = true,
+local echoTypes = {
+    faction = 1,
+    safehouse = 2,
 }
 
 local wasTyping = false
@@ -850,6 +850,7 @@ function OmiChat.send(args)
         chatType = chatType,
         icon = args.icon,
         isEcho = args.isEcho,
+        echoType = args.echoType,
         stream = args.streamName or stream:getIdentifier(),
         formatterName = args.formatterName or stream:getFormatterName(),
         playSignedEmote = args.playSignedEmote,
@@ -895,7 +896,8 @@ function OmiChat.send(args)
         tryApplyBuff()
     end
 
-    if Option.ChatFormatEcho ~= '' and echoChatTypes[chatType] then
+    local echoType = echoTypes[chatType]
+    if Option.ChatFormatEcho ~= '' and echoType then
         local echoStream = OmiChat.getChatStreamByIdentifier('low')
         if not echoStream or not echoStream:isEnabled() then
             echoStream = OmiChat.getChatStreamByIdentifier('say')
@@ -908,6 +910,7 @@ function OmiChat.send(args)
         local useCallback = echoStream:getUseCallback() or OmiChat.send
         useCallback {
             isEcho = true,
+            echoType = echoType,
             stream = echoStream,
             text = initialText,
             command = initialText,
