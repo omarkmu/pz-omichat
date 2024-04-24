@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.1
+
+### Fixed
+- `/roll` now respects the correct sandbox option for items
+
 ## 1.1.0
 
 ### Added
