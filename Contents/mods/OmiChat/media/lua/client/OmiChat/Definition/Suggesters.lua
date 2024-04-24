@@ -48,7 +48,7 @@ local function getSuggestSpec(input)
         local commandInfo = vanillaCommands[i]
         if utils.hasAccess(commandInfo.access, accessLevel) then
             local vanillaCommand = '/' .. commandInfo.name .. ' '
-            if commandInfo.suggestSpec and utils.startsWith(input, vanillaCommand) then
+            if commandInfo.suggestSpec and utils.startsWith(input:lower(), vanillaCommand) then
                 return commandInfo.suggestSpec
             end
         end
