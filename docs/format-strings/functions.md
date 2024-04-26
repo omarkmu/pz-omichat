@@ -59,7 +59,7 @@ Escapes the input for use in rich text.
 Returns the first character of a given string.
 
 ### `$gsub(s pattern repl n)` {#string-gsub}
-Replaces the first `n` copies of the pattern `pattern` in `s` with `repl`. Returns the result string, the number of matches that occurred, and any match groups that were captured. This behaves similarly to its [Lua counterpart](https://www.lua.org/manual/5.1/manual.html#pdf).
+Replaces the first `n` copies of the pattern `pattern` in `s` with `repl`. Returns the result string, the number of matches that occurred, and any match groups that were captured. This behaves similarly to its [Lua counterpart](https://www.lua.org/manual/5.1/manual.html#pdf-string.gsub).
 
 ### `$index(s i default)` {#string-index}
 Returns the character at index `i` in `s`, or `default` if there is no such index.
@@ -77,7 +77,7 @@ Returns the length of `s`.
 Converts given arguments into a lowercase string.
 
 ### `$match(s pattern init)` {#string-match}
-Looks for a match of `pattern` in `s` starting from `init`. Returns any captures from the pattern, or the entire match if none are specified. This behaves similarly to its [Lua counterpart](https://www.lua.org/manual/5.1/manual.html#pdf).
+Looks for a match of `pattern` in `s` starting from `init`. Returns any captures from the pattern, or the entire match if none are specified. This behaves similarly to its [Lua counterpart](https://www.lua.org/manual/5.1/manual.html#pdf-string.match).
 
 ### `$punctuate(s punctuation chars)` {#string-punctuate}
 Adds punctuation to the end of `s` if it isn't present.
