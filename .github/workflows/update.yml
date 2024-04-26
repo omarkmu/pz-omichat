@@ -22,31 +22,25 @@ jobs:
     - name: Checkout library
       uses: actions/checkout@v4
       with:
-        path: OmiLib
-        repository: omarkmu/pz-omi-lib
-    - name: Checkout luabun
-      uses: actions/checkout@v4
-      with:
-        path: luabun
-        repository: omarkmu/luabun
-    - name: Install luabun
-      run: cd luabun && npm i && cd ..
+        path: OmiLibrary
+        repository: omarkmu/pz-library
     - name: Read library version
       id: read_version
       run: |
-        version=`cat OmiLib/library.json | jq -r '.version'`
+        version=`cat OmiLibrary/library.json | jq -r '.version'`
         echo "version=$version" >> $GITHUB_OUTPUT
     - name: Build library
-      run: node luabun create OmiLib -m ${{ vars.LIB_MODULES }} -o ${{ vars.LIB_PATH }}
-    - name: Cleanup files
-      run: rm -rf OmiLib luabun
+      run: |
+        cd OmiLibrary/scripts
+        build.sh
+        bundle.sh -m ${{ vars.LIB_MODULES }} -o ${{ vars.LIB_PATH }}
     - name: Create pull request
       uses: peter-evans/create-pull-request@v6
       with:
         title: Update library to version ${{ steps.read_version.outputs.version }}
         commit-message: Update library to version ${{ steps.read_version.outputs.version }}
         add-paths: ${{ vars.LIB_PATH }}
-        body: Pulled in new [library](https://github.com/omarkmu/pz-omi-lib) changes.
+        body: Pulled in new [library](https://github.com/omarkmu/pz-library) changes.
         base: dev
         branch: update-library
         labels: dependencies,automated
