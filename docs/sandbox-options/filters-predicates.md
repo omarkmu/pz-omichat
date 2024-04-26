@@ -94,32 +94,6 @@ Determines whether [roleplay languages](./languages.md) can be used for a messag
 - [`$stream`](../format-strings/tokens.md#stream)
 - [`$username`](../format-strings/tokens.md#username)
 
-### PredicateTransmitOverRadio
-**Default:** `$any($has(@(whisper;low) $customStream) $not($customStream))`
-
-Determines whether a message should be transmitted over the radio.
-
-This only controls whether messages that have already been transmitted will be visible.
-For faction/safehouse echo messages, use [`ChatFormatEcho`](./chat-formats.md#chatformatecho).
-
-**Tokens:**
-- [`$admin`](../format-strings/tokens.md#admin)
-- [`$author`](../format-strings/tokens.md#author)
-- [`$authorRaw`](../format-strings/tokens.md#authorraw)
-- [`$callout`](../format-strings/tokens.md#callout)
-- `$customStream`: The name of the custom stream the original message was sent over, if any.
-This has the same values as `$stream`, but will only be populated with custom streams.
-- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
-- [`$echo`](../format-strings/tokens.md#echo)
-- [`$language`](../format-strings/tokens.md#language)
-- [`$languageRaw`](../format-strings/tokens.md#languageraw)
-- [`$icon`](../format-strings/tokens.md#icon)
-- [`$iconRaw`](../format-strings/tokens.md#iconraw)
-- [`$name`](../format-strings/tokens.md#name)
-- [`$nameRaw`](../format-strings/tokens.md#nameraw)
-- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
-- [`$stream`](../format-strings/tokens.md#stream)
-
 ### PredicateApplyBuff
 `(blank by default)`
 
@@ -147,6 +121,14 @@ Determines whether a message on a stream will attract zombies.
 
 **See also:** [`RangeMultiplierZombies`](./ranges.md#rangemultiplierzombies).
 
+### PredicateEnableStream
+**Default:** `true`
+
+Determines whether a stream is enabled.
+
+**Tokens:**
+- [`$stream`](../format-strings/tokens.md#stream)
+
 ### PredicateShowTypingIndicator
 `(blank by default)`
 
@@ -161,12 +143,30 @@ Determines whether input will trigger the typing indicator.
 
 **See also:** [`FormatTyping`](./component-formats.md#formattyping).
 
-### PredicateEnableStream
-**Default:** `true`
+### PredicateTransmitOverRadio
+**Default:** `$any($has(@(whisper;low) $customStream) $not($customStream))`
 
-Determines whether a stream is enabled.
+Determines whether a message should be transmitted over the radio.
+
+This only controls whether messages that have already been transmitted will be visible.
+For faction/safehouse echo messages, use [`ChatFormatEcho`](./chat-formats.md#chatformatecho).
 
 **Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
+- [`$author`](../format-strings/tokens.md#author)
+- [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
+- `$customStream`: The name of the custom stream the original message was sent over, if any.
+This has the same values as `$stream`, but will only be populated with custom streams.
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
+- [`$echo`](../format-strings/tokens.md#echo)
+- [`$language`](../format-strings/tokens.md#language)
+- [`$languageRaw`](../format-strings/tokens.md#languageraw)
+- [`$icon`](../format-strings/tokens.md#icon)
+- [`$iconRaw`](../format-strings/tokens.md#iconraw)
+- [`$name`](../format-strings/tokens.md#name)
+- [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 - [`$stream`](../format-strings/tokens.md#stream)
 
 ### PredicateUseNameColor

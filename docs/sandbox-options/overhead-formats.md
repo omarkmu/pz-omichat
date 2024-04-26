@@ -40,7 +40,6 @@ If blank, `/doquiet` messages will not display overhead.
 **Token Context:** [Overhead](../sandbox-options/token-contexts.md#overhead)
 
 Defines the format used for overhead speech bubbles of [echoed](./chat-formats.md#chatformatecho) messages sent on the `/faction` or `/safehouse` streams.
-If blank, `/safehouse` and `/faction` messages will not be echoed.
 
 ### OverheadFormatFlip
 **Default:** `<< $1 >>`  
