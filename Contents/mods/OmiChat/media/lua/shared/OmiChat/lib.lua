@@ -1,39 +1,40 @@
 ---@format disable
 ---@diagnostic disable: codestyle-check, name-style-check, no-unknown, redefined-local, spell-check, unused-local
 local require, __bundle_register = (function(_require)
-	local require
-	local loadingPlaceholder = {}
-	local modules = {}
+    local require
+    local loadingPlaceholder = {}
+    local modules = {}
     local loaded = {}
 
-	require = function(name)
-		local ret = loaded[name]
-		if loadingPlaceholder == ret then
+    require = function(name)
+        local ret = loaded[name]
+        if loadingPlaceholder == ret then
             return
         elseif ret == nil then
-			if not modules[name] then
+            if not modules[name] then
                 return _require(name)
-			end
+            end
 
-			loaded[name] = loadingPlaceholder
-			ret = modules[name](require)
+            loaded[name] = loadingPlaceholder
+            ret = modules[name](require)
 
-			if ret == nil then
-				loaded[name] = true
-			else
-				loaded[name] = ret
-			end
-		end
+            if ret == nil then
+                loaded[name] = true
+            else
+                loaded[name] = ret
+            end
+        end
 
-		return ret
-	end
+        return ret
+    end
 
-	return require, function(name, body)
-		if not modules[name] then
-			modules[name] = body
-		end
-	end
+    return require, function(name, body)
+        if not modules[name] then
+            modules[name] = body
+        end
+    end
 end)(require)
+
 __bundle_register("interpolate", function(require)
 ---Module containing functionality for string interpolation.
 ---@class omi.interpolate
@@ -1791,7 +1792,7 @@ end
 
 ---Performs string interpolation.
 ---@param tokens table? Interpolation tokens. If excluded, the current tokens will be unchanged.
----@return string
+---@return unknown
 function Interpolator:interpolateRaw(tokens)
     if tokens then
         self._tokens = tokens
@@ -3646,19 +3647,19 @@ return sandbox
 end)
 ---@class omi.Result<T>: { success: boolean, value: T?, error: string? }
 
----@class omi.lib
-local OmiLib = {}
+---@class omi.library
+local OmiLibrary = {}
 
 ---@type omi.class | (fun(cls: table?): omi.Class)
-OmiLib.class = require("class")
+OmiLibrary.class = require("class")
 
 ---@type omi.sandbox | (fun(tableName: string): omi.SandboxHelper)
-OmiLib.sandbox = require("sandbox")
+OmiLibrary.sandbox = require("sandbox")
 
 ---@type omi.utils
-OmiLib.utils = require("utils")
+OmiLibrary.utils = require("utils")
 
 ---@type omi.interpolate | (fun(text: string, tokens: table?, options: omi.interpolate.Options?): string)
-OmiLib.interpolate = require("interpolate")
+OmiLibrary.interpolate = require("interpolate")
 
-return OmiLib
+return OmiLibrary
