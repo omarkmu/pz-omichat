@@ -217,13 +217,13 @@ return OmiChat
 ---@field b integer The blue value.
 
 ---A table containing color values in [0.0, 1.0].
----@class omichat.DecimalRGBColorTable
+---@class omichat.DecimalColorTable
 ---@field r number The red value.
 ---@field g number The green value.
 ---@field b number The blue value.
 
 ---A table containing color values in [0.0, 1.0].
----@class omichat.DecimalRGBAColorTable : omichat.DecimalRGBColorTable
+---@class omichat.DecimalColorTableRGBA : omichat.DecimalColorTable
 ---@field a number The alpha value.
 
 ---Global mod data.
