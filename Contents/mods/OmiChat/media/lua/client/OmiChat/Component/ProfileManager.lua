@@ -254,12 +254,11 @@ function ProfileManager:onCalloutsChange(entry, category)
 end
 
 ---Callback for color update.
----@param entryBox omichat.ValidatedColorEntry
+---@param entry omichat.ValidatedColorEntry
 ---@param category omichat.ColorCategory
-function ProfileManager:onColorChange(entryBox, category)
+function ProfileManager:onColorChange(entry, category)
     local profile = self.current
-    local text = entryBox.entry:getInternalText()
-    local color = utils.tryStringToColor(text, entryBox.minimumValue, entryBox.maximumValue).value
+    local color = entry:getColorTable()
     if profile and color then
         profile.colors[category] = utils.copy(color)
     elseif profile then
@@ -267,14 +266,8 @@ function ProfileManager:onColorChange(entryBox, category)
     end
 
     local nameControl = self.colorControls.name
-    if not nameControl or not Option.EnableSpeechColorAsDefaultNameColor or category ~= 'speech' then
-        return
-    end
-
-    nameControl:setEmptyColor(color or entryBox.emptyColor)
-    if nameControl.entry:getInternalText():trim() == '' then
-        -- trigger a refresh of the color button
-        nameControl:clear()
+    if nameControl and Option.EnableSpeechColorAsDefaultNameColor and category == 'speech' then
+        nameControl:setEmptyColor(color or entry:getEmptyColor())
     end
 end
 
@@ -288,8 +281,8 @@ function ProfileManager:onNicknameChange(entry)
     if #text == 0 then
         valid = false
     else
-        valid, filtered = self:validateNicknameText(entry, text)
-        if filtered then
+        valid, filtered = OmiChat.validateNicknameText(entry, text)
+        if filtered and text ~= filtered then
             entry:setText(filtered)
         end
     end
@@ -345,7 +338,7 @@ function ProfileManager:updateControlState(force)
     self.profileNameControl:setText(self.current.name)
 
     if self.nicknameControl then
-        self.nicknameControl:setText(self.current.chatNickname or '')
+        self.nicknameControl:setText(self.current.chatNickname)
     end
 
     for k, control in pairs(self.colorControls) do
@@ -353,14 +346,10 @@ function ProfileManager:updateControlState(force)
         control:setEmptyColor(defaultColor)
 
         local color = self.current.colors[k]
-        if not color then
-            control:clear()
+        if color then
+            control:selectColor(color)
         else
-            control:selectColor({
-                r = color.r / 255,
-                g = color.g / 255,
-                b = color.b / 255,
-            })
+            control:clear(true)
         end
     end
 
@@ -427,38 +416,6 @@ function ProfileManager:updateUIState(resetItems, selectIdx)
     createButton:setX(listbox.x + (listbox.width - createButton.width) / 2)
     createButton:setY(self.height - 10 - math.max(25, FONT_H_SMALL + 6))
     self:updateControlState()
-end
-
----Validates the input nickname against the nickname filter.
----@param entry omichat.ValidatedTextEntry
----@param text string?
----@return boolean
----@return string? nickname
-function ProfileManager:validateNicknameText(entry, text)
-    if not text then
-        text = entry:getInternalText()
-    end
-
-    text = utils.trim(text)
-    if #text == 0 then
-        return true
-    end
-
-    local tokens = {
-        target = 'nickname',
-        input = text,
-        error = '',
-        errorID = '',
-    }
-
-    local nickname = utils.interpolate(Option.FilterNickname, tokens)
-    local err = utils.extractError(tokens)
-    if nickname ~= '' and not err then
-        return true, nickname
-    end
-
-    entry:setValidateTooltipText(err or getText('UI_OmiChat_Error_InvalidName', utils.escapeRichText(text)))
-    return false
 end
 
 ---Creates a new panel for managing profiles.

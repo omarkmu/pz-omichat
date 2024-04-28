@@ -67,18 +67,21 @@ local function transformPanel(panel, page, parent)
                     label:setX(settingX)
 
                     local oldControl = control
-                    control = ColorEntry:new(0, nextY + label:getHeight(), control.width, control.height)
-                    control.anchorRight = false
-                    control.anchorBottom = false
-                    control.keepOnScreen = false
-                    control.font = controlFont
-                    control:setEmptyColor(Option:getOptionDefaultColor(el))
+                    control = ColorEntry:new {
+                        x = settingX,
+                        y = nextY + label:getHeight(),
+                        w = control.width,
+                        h = control.height,
+                        font = controlFont,
+                        emptyColor = Option:getOptionDefaultColor(el),
+                        tooltipText = oldControl.tooltip,
+                        anchorRight = false,
+                        anchorBottom = false,
+                    }
+
                     control:initialise()
-                    control.tooltipValid = oldControl.tooltip
 
                     panel:addChild(control)
-                    control:setX(settingX)
-
                     padY = label:getHeight() + control:getHeight() + 8
 
                     panel.controls[name] = control

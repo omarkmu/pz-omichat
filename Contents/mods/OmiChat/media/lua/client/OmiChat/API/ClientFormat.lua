@@ -632,3 +632,35 @@ function OmiChat.getMessageChatType(message)
     ---@cast message ChatMessage
     return tostring(_getChatType(message:getChat()))
 end
+
+---Text entry validator that validates against the nickname filter.
+---@param entry omichat.ValidatedTextEntry
+---@param text string?
+---@return boolean
+---@return string? nickname
+function OmiChat.validateNicknameText(entry, text)
+    if not text then
+        text = entry:getInternalText()
+    end
+
+    text = utils.trim(text)
+    if #text == 0 then
+        return true
+    end
+
+    local tokens = {
+        target = 'nickname',
+        input = text,
+        error = '',
+        errorID = '',
+    }
+
+    local nickname = utils.interpolate(Option.FilterNickname, tokens)
+    local err = utils.extractError(tokens)
+    if nickname ~= '' and not err then
+        return true, nickname
+    end
+
+    entry:setValidateTooltipText(err or getText('UI_OmiChat_Error_InvalidName', utils.escapeRichText(text)))
+    return false
+end

@@ -2,7 +2,6 @@ local TextEntry = require 'OmiChat/Component/ValidatedTextEntry'
 local ColorEntry = require 'OmiChat/Component/ValidatedColorEntry'
 local OmiChat = require 'OmiChatClient'
 local Option = OmiChat.Option
-local utils = OmiChat.utils
 
 local ISLabel = ISLabel
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
@@ -33,12 +32,18 @@ function ContentPanel:addControls(manager)
     nameLabel:initialise()
 
     local nameControlY = nameLabel.y + nameLabel.height
-    local nameControl = TextEntry:new('', PAD_X, nameControlY, controlW, LABEL_H, FONT)
-    nameControl.minLength = 1
-    nameControl.maxLength = 50
-    nameControl:setOnChange(manager, manager.onProfileNameChange)
+    local nameControl = TextEntry:new {
+        x = PAD_X,
+        y = nameControlY,
+        w = controlW,
+        h = LABEL_H,
+        font = FONT,
+        minLength = 1,
+        maxLength = 50,
+    }
+
+    nameControl:setOnChange(manager, manager.onProfileNameChange, nameControl)
     nameControl:initialise()
-    nameControl:instantiate()
 
     manager.profileNameControl = nameControl
     self:addChild(nameLabel)
@@ -53,12 +58,18 @@ function ContentPanel:addControls(manager)
         nicknameLabel:initialise()
 
         local nicknameControlY = nicknameLabel.y + nicknameLabel.height
-        local nicknameControl = TextEntry:new('', PAD_X, nicknameControlY, controlW, LABEL_H, FONT)
-        nicknameControl.tooltipValid = getText('UI_OmiChat_ProfileManager_Tooltip_Nickname')
-        nicknameControl:setValidateFunction(nicknameControl, utils.bind(manager.validateNicknameText, manager))
-        nicknameControl:setOnChange(manager, manager.onNicknameChange)
+        local nicknameControl = TextEntry:new {
+            x = PAD_X,
+            y = nicknameControlY,
+            w = controlW,
+            h = LABEL_H,
+            font = FONT,
+            tooltipText = getText('UI_OmiChat_ProfileManager_Tooltip_Nickname'),
+        }
+
+        nicknameControl:setValidateFunction(nicknameControl, OmiChat.validateNicknameText)
+        nicknameControl:setOnChange(manager, manager.onNicknameChange, nicknameControl)
         nicknameControl:initialise()
-        nicknameControl:instantiate()
 
         manager.nicknameControl = nicknameControl
         self:addChild(nicknameLabel)
@@ -144,26 +155,30 @@ function ContentPanel:createCalloutControls(manager, startY)
 
         local label = ISLabel:new(PAD_X, nextY, LABEL_H, calloutText, 1, 1, 1, 1, FONT, true)
         label:initialise()
+        self:addChild(label)
 
         local controlY = label.y + label.height
         local controlH = FONT_H * numLines + 4
-        local control = TextEntry:new('', PAD_X, controlY, self.width - PAD_X * 2, controlH, FONT)
-        control.tooltipValid = getText('UI_OmiChat_ProfileManager_Tooltip_Callouts')
+        local control = TextEntry:new {
+            x = PAD_X,
+            y = controlY,
+            w = self.width - PAD_X * 2,
+            h = controlH,
+            font = FONT,
+            tooltipText = getText('UI_OmiChat_ProfileManager_Tooltip_Callouts'),
+            maxLines = numLines,
+        }
+
         control:setValidateFunction(control, ISChat.validateCustomCalloutText)
-        control:setOnChange(manager, manager.onCalloutsChange, category)
+        control:setOnChange(manager, manager.onCalloutsChange, control, category)
         control:initialise()
-        control:instantiate()
-        control:setMaxLines(numLines)
-        control:setMultipleLine(numLines > 1)
+        self:addChild(control)
 
         if category == 'callouts' then
             control:setForceUpperCase(true)
         end
 
         controls[category] = control
-        self:addChild(label)
-        self:addChild(control)
-
         nextY = control.y + control.height + CONTROL_PAD_Y
         maxY = math.max(maxY, nextY)
     end
@@ -196,13 +211,6 @@ function ContentPanel:createColorControls(manager, startY)
         local leftCol = i <= splitIdx
         local x = leftCol and PAD_X or (controlW + PAD_X * 2)
 
-        local label = ISLabel:new(x, nextY, LABEL_H, labelText, 1, 1, 1, 1, FONT, true)
-        local control = ColorEntry:new(x, label.y + label.height, controlW, LABEL_H, nil, manager, nil, nil, opt)
-        control:setMinValue(opt == 'speech' and 48 or 0)
-        control:initialise()
-        control:clear()
-        control:setOnChange(manager.onColorChange)
-
         local tooltip = getTextOrNull('UI_OmiChat_ProfileManager_Tooltip_Color_' .. opt)
         if not tooltip then
             local optName = getTextOrNull('UI_OmiChat_ContextMessageType_' .. opt)
@@ -210,7 +218,20 @@ function ContentPanel:createColorControls(manager, startY)
             tooltip = getText('UI_OmiChat_ProfileManager_Tooltip_Color', optName)
         end
 
-        control.tooltipValid = tooltip
+        local label = ISLabel:new(x, nextY, LABEL_H, labelText, 1, 1, 1, 1, FONT, true)
+        local control = ColorEntry:new {
+            text = '',
+            x = x,
+            y = label.y + label.height,
+            w = controlW,
+            h = LABEL_H,
+            font = FONT,
+            minValue = opt == 'speech' and 48 or 0,
+            tooltipText = tooltip,
+        }
+
+        control:setOnChange(manager, manager.onColorChange, control, opt)
+        control:initialise()
 
         nextY = control.y + control.height + CONTROL_PAD_Y
         maxY = math.max(maxY, nextY)

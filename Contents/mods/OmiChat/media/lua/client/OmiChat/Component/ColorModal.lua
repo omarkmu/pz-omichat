@@ -1,6 +1,5 @@
 local utils = require 'OmiChat/util'
-local min = math.min
-local max = math.max
+local ColorEntry = require 'OmiChat/Component/ValidatedColorEntry'
 local floor = math.floor
 
 ---Modal for color selection.
@@ -10,29 +9,11 @@ local floor = math.floor
 ---@field defaultColor omichat.ColorTable The default color to set on the modal during initialization.
 ---@field emptyColor omichat.ColorTable The color that will be used if the entry is blank.
 ---@field entry ISTextEntryBox
----@field minimumValue integer The minimum RGB value of each color component.
----@field maximumValue integer The maximum RGB value of each color component.
+---@field minValue integer The minimum RGB value of each color component.
+---@field maxValue integer The maximum RGB value of each color component.
 ---@field requireValue boolean If true, the text entry will not be valid if empty.
----@field btnPadding integer The padding between the entry and the color picker button.
 ---@field font UIFont The font of the entry.
 local ColorModal = ISTextBox:derive('ColorModal')
-
-
----Clamps the RGB color values in `color` to within the provided range.
----@param color omichat.ColorTable
----@param minVal integer
----@param maxVal integer
----@return omichat.ColorTable
-local function clamp(color, minVal, maxVal)
-    minVal = minVal / 255
-    maxVal = maxVal / 255
-
-    return {
-        r = min(max(color.r, minVal), maxVal),
-        g = min(max(color.g, minVal), maxVal),
-        b = min(max(color.b, minVal), maxVal),
-    }
-end
 
 
 ---Removes the color modal and the associated color picker.
@@ -45,7 +26,7 @@ end
 ---Gets a color table for the current text, or `nil` if the color is not valid.
 ---@return omichat.ColorTable?
 function ColorModal:getColorTable()
-    local result = utils.tryStringToColor(self.entry:getText(), self.minimumValue, self.maximumValue)
+    local result = utils.tryStringToColor(self.entry:getInternalText(), self.minValue, self.maxValue)
     return result.value
 end
 
@@ -55,31 +36,6 @@ function ColorModal:initialise()
 
     if not self.validateFunc then
         self:setValidateFunction(self, ColorModal.validate)
-    end
-
-    if self.font ~= UIFont.Medium then
-        -- no way to set the font on an ISTextEntryBox, so we need to recreate it
-        self:removeChild(self.entry)
-
-        local textManager = getTextManager()
-        self.fontHgt = textManager:getFontHeight(self.font)
-
-        local inset = 2
-        local height = inset + self.fontHgt * self.numLines + inset
-        local entry = ISTextEntryBox:new(self.defaultEntryText, 0, (self:getHeight() - height) / 2, 0, height)
-        entry.font = self.font
-        entry:initialise()
-        entry:instantiate()
-        entry:setMaxLines(self.maxLines)
-        entry:setMultipleLine(self.multipleLine)
-        self:addChild(entry)
-        self.entry = entry
-
-        self.colorBtn:setWidth(height)
-        self.colorBtn:setHeight(height)
-        self.colorBtn:setY(entry.y)
-
-        self.btnPadding = 5 * (self.fontHgt / textManager:getFontHeight(UIFont.Medium))
     end
 
     self.colorBtn.onclick = self.onColorPicker
@@ -94,7 +50,7 @@ function ColorModal:initialise()
         b = self.defaultColor.b / 255,
     })
 
-    if self.minimumValue ~= 0 or self.maximumValue ~= 255 then
+    if self.minValue ~= 0 or self.maxValue ~= 255 then
         self:updateColorPickerColors()
     end
 end
@@ -123,7 +79,7 @@ function ColorModal:onTextChange(entry)
     if not self.requireValue and #utils.trim(text) == 0 then
         color = self.emptyColor
     else
-        local result = utils.tryStringToColor(text, self.minimumValue, self.maximumValue)
+        local result = utils.tryStringToColor(text, self.minValue, self.maxValue)
         color = result.value
         if not color then
             return
@@ -147,19 +103,19 @@ end
 ---Sets the maximum value of color components.
 ---@param val integer A number in the range [0, 255].
 function ColorModal:setMaxValue(val)
-    self.maximumValue = val
+    self.maxValue = val
 end
 
 ---Sets the minimum value of color components.
 ---@param val integer A number in the range [0, 255].
 function ColorModal:setMinValue(val)
-    self.minimumValue = val
+    self.minValue = val
 end
 
 ---Handler for when a color option in the color picker is clicked.
----@param color omichat.ColorTable
+---@param color omichat.DecimalColorTable
 function ColorModal:selectColor(color)
-    color = clamp(color, self.minimumValue, self.maximumValue)
+    color = utils.clampDecimalColor(color, self.minValue / 255, self.maxValue / 255)
 
     self.currentColor = ColorInfo.new(color.r, color.g, color.b, 1)
     self.colorBtn.backgroundColor = { r = color.r, g = color.g, b = color.b, a = 1 }
@@ -172,45 +128,10 @@ function ColorModal:selectColor(color)
     }))
 end
 
----Updates the color picker's colors based on the set minimum
----and maximum values.
+---Updates the color picker's colors based on the set minimum and maximum values.
 function ColorModal:updateColorPickerColors()
-    local columns = 18
-    local rows = 12
-
-    local minVal = self.minimumValue
-    local maxVal = self.maximumValue
-
-    local colors = {}
-    local delta = floor((maxVal - minVal) / 5)
-
-    --#region modified code from ISColorPicker
-
-    local i = 0
-    local newColor = Color.new(1, 1, 1, 1)
-    for red = minVal, maxVal, delta do
-        for green = minVal, maxVal, delta do
-            for blue = minVal, maxVal, delta do
-                local col = i % columns
-                local row = floor(i / columns)
-                if row % 2 == 0 then row = row / 2 else row = floor(row / 2) + 6 end
-
-                ---@diagnostic disable-next-line: redundant-parameter
-                newColor:set(red / 255, green / 255, blue / 255, 1.0)
-                colors[col + row * columns + 1] = {
-                    r = newColor:getRedFloat(),
-                    g = newColor:getGreenFloat(),
-                    b = newColor:getBlueFloat(),
-                }
-
-                i = i + 1
-            end
-        end
-    end
-
-    --#endregion
-
-    self.colorPicker:setColors(colors, columns, rows)
+    ---@diagnostic disable-next-line: param-type-mismatch
+    ColorEntry.updateColorPickerColors(self)
 end
 
 ---Validates text input.
@@ -222,7 +143,7 @@ function ColorModal:validate(text)
         return true
     end
 
-    local result = utils.tryStringToColor(text, self.minimumValue, self.maximumValue)
+    local result = utils.tryStringToColor(text, self.minValue, self.maxValue)
     if result.error then
         self:setValidateTooltipText(result.error)
     end
@@ -259,9 +180,8 @@ function ColorModal:new(x, y, width, height, text, defaultColor, target, onclick
     o.defaultColor = defaultColor or { r = 255, g = 255, b = 255 }
     o.emptyColor = o.defaultColor
     o.font = UIFont.Medium
-    o.btnPadding = 5
-    o.minimumValue = 0
-    o.maximumValue = 255
+    o.minValue = 0
+    o.maxValue = 255
     o.requireValue = false
 
     setmetatable(o, self)

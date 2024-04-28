@@ -3,6 +3,7 @@ local Interpolator = require 'OmiChat/Component/Interpolator'
 
 local pow = math.pow
 local floor = math.floor
+local max = math.max
 local min = math.min
 local char = string.char
 local format = string.format
@@ -144,6 +145,19 @@ function utils.addMessageTagValue(message, key, value)
     message:setCustomTag(encodedTag)
 end
 
+---Clamps the RGB color values in `color` to within the provided range.
+---@param color omichat.DecimalColorTable An RGB color table with values in [0, 1].
+---@param minVal number A value in [0, 1].
+---@param maxVal number A value in [0, 1].
+---@return omichat.DecimalColorTable
+function utils.clampDecimalColor(color, minVal, maxVal)
+    return {
+        r = min(max(color.r, minVal), maxVal),
+        g = min(max(color.g, minVal), maxVal),
+        b = min(max(color.b, minVal), maxVal),
+    }
+end
+
 ---Cleans up unused cache items.
 ---@param clear boolean If true, the cache will be cleared entirely.
 function utils.cleanupCache(clear)
@@ -177,6 +191,32 @@ end
 ---@return string
 function utils.colorToRGBString(color)
     return format('%d,%d,%d', color.r, color.g, color.b)
+end
+
+---Builds a callback info object.
+---@param target unknown? The first argument to pass to the callback function.
+---@param callback function? The callback function.
+---@param ... unknown Callback arguments.
+---@return omichat.CallbackInfo?
+function utils.createCallback(target, callback, ...)
+    if not callback then
+        return
+    end
+
+    local n = select('#', ...)
+    local args = { n = n }
+    for i = 1, n do
+        args[i] = select(i, ...)
+    end
+
+    ---@type omichat.CallbackInfo
+    local info = {
+        target = target,
+        callback = callback,
+        args = args,
+    }
+
+    return info
 end
 
 ---Decodes an encoded character.
@@ -805,6 +845,30 @@ function utils.toOverheadColor(color, bbCodeFormat)
     }
 end
 
+---Triggers a callback.
+---@param info omichat.CallbackInfo? The callback info object.
+---@param ... unknown Prefix arguments to include before the callback arguments.
+---@return unknown?
+function utils.triggerCallback(info, ...)
+    if not info or not info.callback then
+        return
+    end
+
+    local args = {}
+    for i = 1, select('#', ...) do
+        args[i] = select(i, ...)
+    end
+
+    local count = #args
+    local cbArgs = info.args or {}
+    for i = 1, cbArgs.n do
+        count = count + 1
+        args[count] = cbArgs[i]
+    end
+
+    return info.callback(info.target, unpack(args, 1, count or 1))
+end
+
 ---Attempts to convert a color string to a color. Returns false and an error message on failure.
 ---@param text string A color string, in RGB or hex.
 ---@param minColor integer? Minimum color value [0, 255].
@@ -822,12 +886,12 @@ function utils.tryStringToColor(text, minColor, maxColor)
 
     maxColor = maxColor or 255
     if r > maxColor or g > maxColor or b > maxColor then
-        return { success = false, error = getText('UI_OmiChat_Error_ColorMax', tostring(maxColor)) }
+        return { success = false, error = getText('UI_OmiChat_Error_ValuesMax', tostring(maxColor)) }
     end
 
     minColor = minColor or 0
     if r < minColor or g < minColor or b < minColor then
-        return { success = false, error = getText('UI_OmiChat_Error_ColorMin', tostring(minColor)) }
+        return { success = false, error = getText('UI_OmiChat_Error_ValuesMin', tostring(minColor)) }
     end
 
     return { success = true, value = { r = r, g = g, b = b } }

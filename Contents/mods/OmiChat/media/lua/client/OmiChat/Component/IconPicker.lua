@@ -12,8 +12,8 @@ local ISPanel_render = ISPanel.render
 ---@field includeUnknownAsMiscellaneous boolean Whether unknown icons should be added to a miscellaneous category.
 ---@field padSize integer The size of the padding on all sides.
 ---@field buttonSize integer The size of each icon button.
----@field backgroundColor omichat.DecimalRGBAColorTable The background color of the panel.
----@field borderColor omichat.DecimalRGBAColorTable The border color of the panel.
+---@field backgroundColor omichat.DecimalColorTableRGBA The background color of the panel.
+---@field borderColor omichat.DecimalColorTableRGBA The border color of the panel.
 ---@field columns integer The number of columns to use.
 ---@field scrollMultiplier integer Multiplier for scroll speed.
 ---@field target ISUIElement? Target object for callbacks.
