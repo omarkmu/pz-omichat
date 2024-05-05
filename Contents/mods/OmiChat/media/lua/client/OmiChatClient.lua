@@ -221,15 +221,13 @@ return OmiChat
 ---@field showTyping boolean Whether typing indicators should be shown and sent.
 ---@field suggestOnEnter boolean Whether suggestions should be entered when pressing Enter.
 ---@field suggestOnTab boolean Whether suggestions should be entered when pressing Tab.
----@field callouts string[] Custom callouts.
----@field sneakcallouts string[] Custom sneak callouts.
----@field colors table<omichat.ColorCategory, omichat.ColorTable> Custom chat colors.
 ---@field retainChatInput boolean Whether to retain chat input for chat streams.
 ---@field retainRPInput boolean Whether to retain chat input for roleplay streams (/me).
 ---@field retainOtherInput boolean Whether to retain other chat input.
 ---@field adminShowIcon boolean Whether the admin icon should display in chat.
 ---@field adminKnowLanguages boolean Whether all languages should be treated as known.
 ---@field adminIgnoreRange boolean Whether message range should be ignored.
+---@field profileIndex integer The index of the current profile.
 ---@field profiles omichat.PlayerProfile[] List of chat profiles.
 
 ---Description of a chat tab object.

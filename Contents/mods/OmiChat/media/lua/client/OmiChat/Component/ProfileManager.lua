@@ -46,11 +46,16 @@ end
 
 ---Clones a list of player profiles.
 ---@param profiles omichat.PlayerProfile[]
+---@param markIndices boolean?
 ---@return omichat.PlayerProfile[]
-local function cloneProfiles(profiles)
+local function cloneProfiles(profiles, markIndices)
     local result = {}
     for i = 1, #profiles do
         result[i] = cloneProfile(profiles[i])
+
+        if markIndices then
+            result[i]._originalIndex = i
+        end
     end
 
     return result
@@ -140,7 +145,7 @@ function ProfileManager:createChildren()
     createButton:initialise()
     createButton:instantiate()
     createButton:setAnchorLeft(true)
-    createButton:setAnchorTop(true)
+    createButton:setAnchorTop(false)
     createButton:setAnchorRight(true)
     createButton:setAnchorBottom(true)
     createButton:setWidthToTitle(btnWidth)
@@ -200,37 +205,18 @@ end
 ---Deletes the currently selected profile.
 function ProfileManager:deleteProfile()
     local idx = self.listbox.selected
-    if not self.listbox:removeItemByIndex(idx) then
+    local item = self.listbox:removeItemByIndex(idx)
+    if not item or not item.item then
         return
+    end
+
+    item = item.item
+    if not self.deletedCurrentProfile and item._originalIndex then
+        self.deletedCurrentProfile = item._originalIndex == OmiChat.getCurrentProfileIndex()
     end
 
     table.remove(self.profiles, idx)
     self:updateUIState(true, idx)
-end
-
----Copies the current settings into the current profile.
-function ProfileManager:copyFromCurrent()
-    local idx = self.listbox.selected
-    local profile = self.profiles[idx]
-    if not profile then
-        return
-    end
-
-    local prefs = OmiChat.getPlayerPreferences()
-    profile.callouts = utils.copy(prefs.callouts)
-    profile.sneakcallouts = utils.copy(prefs.sneakcallouts)
-    profile.colors = utils.copy(prefs.colors)
-
-    profile.colors.speech = OmiChat.getSpeechColor() ---@diagnostic disable-line: assign-type-mismatch
-
-    local player = getSpecificPlayer(0)
-    local username = player and player:getUsername()
-    if username then
-        local nameColor = OmiChat.getNameColor(username)
-        profile.colors.name = nameColor ---@diagnostic disable-line: assign-type-mismatch
-    end
-
-    self:updateControlState(true)
 end
 
 ---Callback for callout update.
@@ -316,6 +302,11 @@ end
 ---Callback for apply changes button.
 function ProfileManager:onSave()
     OmiChat.setProfiles(cloneProfiles(self.profiles))
+    if self.deletedCurrentProfile then
+        OmiChat.switchToDefaultProfile()
+        OmiChat.redrawMessages()
+    end
+
     self:removeFromUIManager()
 end
 
@@ -437,9 +428,10 @@ function ProfileManager:new(x, y, width, height, profiles)
     this.anchorTop = true
     this.anchorBottom = false
     this.moveWithMouse = true
+    this.deletedCurrentProfile = false
     this.borderColor = { r = 0.4, g = 0.4, b = 0.4, a = 1 }
     this.backgroundColor = { r = 0, g = 0, b = 0, a = 0.8 }
-    this.profiles = cloneProfiles(profiles)
+    this.profiles = cloneProfiles(profiles, true)
     this.colorControls = {}
     this.calloutControls = {}
 
