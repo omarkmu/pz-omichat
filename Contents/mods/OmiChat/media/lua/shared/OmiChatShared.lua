@@ -25,6 +25,10 @@ local replacementMap = {
     ChatFormatUnknownLanguageRadio = { radioReplacement, rpReplacement },
     ChatFormatIncomingPrivate = { { 'UI_OmiChat_private_chat_from', 'UI_OmiChat_PrivateChatFrom' } },
     ChatFormatOutgoingPrivate = { { 'UI_OmiChat_private_chat_to', 'UI_OmiChat_PrivateChatTo' } },
+    PredicateAllowChatInput = {
+        { 'UI_OmiChat_error_signed_faction_radio', 'UI_OmiChat_Error_SignedFactionRadio' },
+        { 'UI_OmiChat_error_signed_safehouse_radio', 'UI_OmiChat_Error_SignedSafehouseRadio' },
+    },
 }
 
 ---Attempts to apply replacements to a sandbox option.
