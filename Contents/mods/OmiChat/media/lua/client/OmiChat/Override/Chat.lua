@@ -953,9 +953,7 @@ function ISChat.onAddLanguage(target, language)
         target.activeLanguageModal:destroy()
     end
 
-    local languages = OmiChat.getRoleplayLanguages()
-    local languageTranslated = utils.getTranslatedLanguageName(language)
-    local text = getText('UI_OmiChat_ContextConfirmAddLanguage', languageTranslated, #languages + 1)
+    local text = getText('UI_OmiChat_ContextConfirmAddLanguage', utils.getTranslatedLanguageName(language))
     target.activeLanguageModal = utils.createModal(text, target, ISChat.onConfirmAddLanguage, language)
 end
 
