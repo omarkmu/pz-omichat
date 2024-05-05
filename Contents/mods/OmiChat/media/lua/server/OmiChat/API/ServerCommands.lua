@@ -74,6 +74,17 @@ end
 
 ---@param args omichat.request.ModDataUpdate
 ---@return boolean
+function updateModData.all(args)
+    if not args.value then
+        return false
+    end
+
+    OmiChat.setUserModData(args.target, args.value)
+    return true
+end
+
+---@param args omichat.request.ModDataUpdate
+---@return boolean
 function updateModData.currentLanguage(args)
     if not args.value then
         return false
@@ -323,6 +334,18 @@ function OmiChat.Commands.requestClearNames(player)
     OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ClearNames')
 end
 
+---Handles a request to clear mod data for a given username.
+---@param player IsoPlayer
+---@param req omichat.request.ClearModData
+function OmiChat.Commands.requestClearModData(player, req)
+    if player:getAccessLevel() ~= 'Admin' then
+        return
+    end
+
+    OmiChat.clearModData(req.username)
+    OmiChat.transmitModData()
+end
+
 ---Updates global mod data.
 ---@param player IsoPlayer
 ---@param args omichat.request.ModDataUpdate
@@ -331,7 +354,7 @@ end
 function OmiChat.Commands.requestDataUpdate(player, args)
     local err
     local success = false
-    if not isOnlinePlayer(args.target) then
+    if args.field ~= 'all' and not isOnlinePlayer(args.target) then
         return false, 'UNKNOWN_PLAYER'
     end
 

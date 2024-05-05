@@ -62,6 +62,9 @@ local function addAdminOptions(context)
     local subMenu = context:getNew(context)
     context:addSubMenu(adminOption, subMenu)
 
+    local manageName = getText('UI_OmiChat_ContextAdminManageModData')
+    subMenu:addOption(manageName, ISChat.instance, ISChat.onManageModData)
+
     for i = 1, #options do
         local option = options[i]
         local name = getText('UI_OmiChat_ContextAdmin_' .. option)
@@ -994,6 +997,21 @@ function ISChat.onManageProfiles(target)
     panel:initialise()
     panel:addToUIManager()
     target.activeProfilesPanel = panel
+end
+
+---Event handler for clicking the manage mod data admin context option.
+---@param target omichat.ISChat
+function ISChat.onManageModData(target)
+    if target.activeModDataPanel then
+        target.activeModDataPanel:destroy()
+    end
+
+    local x, y = utils.getScreenCenter(1200, 650)
+    local panel = OmiChat.ModDataManager:new(x, y, 1200, 650)
+    panel:initialise()
+    panel:addToUIManager()
+
+    target.activeModDataPanel = panel
 end
 
 ---Event handler for switching a chat profile.

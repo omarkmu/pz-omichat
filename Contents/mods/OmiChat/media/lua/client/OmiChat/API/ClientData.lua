@@ -96,6 +96,13 @@ function OmiChat.checkKnowsLanguage(language)
     return OmiChat.checkPlayerKnowsLanguage(username, language)
 end
 
+---Removes the mod data associated with a username.
+---@param username string
+function OmiChat.clearModData(username)
+    OmiChat._clearModData(username)
+    OmiChat.requestClearModData(username)
+end
+
 ---Gets a color table for the current player, or `nil` if unset.
 ---@param category omichat.ColorCategory
 ---@return omichat.ColorTable?
@@ -213,6 +220,27 @@ function OmiChat.setCurrentRoleplayLanguage(language)
     })
 
     return true
+end
+
+---Sets the mod data for the given username.
+---@param username string
+---@param data omichat.UserModData?
+function OmiChat.setModData(username, data)
+    local modData = OmiChat.getModData()
+
+    data = data or {}
+    modData.nicknames[username] = data.nickname
+    modData.icons[username] = data.icon
+    modData.nameColors[username] = data.nameColor
+    modData.languageSlots[username] = data.languageSlots
+    modData.languages[username] = data.languages
+    modData.currentLanguage[username] = data.currentLanguage
+
+    OmiChat.requestDataUpdate({
+        target = username,
+        field = 'all',
+        value = data,
+    })
 end
 
 ---Sets the nickname of the current player.

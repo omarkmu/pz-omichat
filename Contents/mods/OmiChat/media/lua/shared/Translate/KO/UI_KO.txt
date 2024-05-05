@@ -66,6 +66,7 @@ UI_KO = {
     UI_OmiChat_Error_AddLanguageFull = "플레이어 '%1'이/가 이미 쵀대 롤플레이 언어 수를 알고 있습니다.",
     UI_OmiChat_Error_AddLanguageKnown = "플레이어 '%1'이/가 %2을(를) 이미 알고 있습니다.",
     UI_OmiChat_Error_AddLanguageNotConfigured = "설정에 '%1' 언어가 포함되어 있지 않습니다.",
+    UI_OmiChat_Error_LanguageUnknown = "Player '%1' does not know %2.",
 
     --[[ Help Text ]]--
     UI_OmiChat_HelpText_Emotes = "사용가능한 채팅 이모티콘 불러오기",
@@ -207,6 +208,18 @@ UI_KO = {
     UI_OmiChat_ProfileManager_Tooltip_Color = "Enter a color in RGB or hex format to set the color used for %1 messages.",
     UI_OmiChat_ProfileManager_Tooltip_Color_name = "Enter a color in RGB or hex format to set the color of your name in chat.",
     UI_OmiChat_ProfileManager_Tooltip_Color_speech = "Enter a color in RGB or hex format to set the color of your overhead speech bubbles.",
+    
+    --[[ Mod Data Manager ]]--
+    UI_OmiChat_ModDataManager_Title = "OmiChat Mod Data Viewer",
+    UI_OmiChat_ModDataManager_EditorTitle = "Edit Mod Data",
+    UI_OmiChat_ModDataManager_NoData = "(empty)",
+    UI_OmiChat_ModDataManager_Column_username = "Username",
+    UI_OmiChat_ModDataManager_Column_nickname = "Chat Nickname",
+    UI_OmiChat_ModDataManager_Column_nameColor = "Name Color",
+    UI_OmiChat_ModDataManager_Column_icon = "Icon",
+    UI_OmiChat_ModDataManager_Column_currentLanguage = "Current Language",
+    UI_OmiChat_ModDataManager_Column_languages = "Languages",
+    UI_OmiChat_ModDataManager_Column_languageSlots = "Language Slots",
 
     --[[ Context Menus ]]--
     UI_OmiChat_ContextChatSettings = "채팅 설정",
@@ -255,6 +268,7 @@ UI_KO = {
     UI_OmiChat_ContextProfiles = "Switch profile",
     UI_OmiChat_ContextManageProfiles = "Manage profiles",
     UI_OmiChat_ContextAdmin = "관리자",
+    UI_OmiChat_ContextAdminManageModData = "View mod data",
     UI_OmiChat_ContextAdmin_ShowIcon = "관리자 아이콘 표시",
     UI_OmiChat_ContextAdmin_KnowAllLanguages = "모든 언어 이해",
     UI_OmiChat_ContextAdmin_IgnoreMessageRange = "메시지 범위 무시",
