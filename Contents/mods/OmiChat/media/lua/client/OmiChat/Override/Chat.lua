@@ -32,7 +32,6 @@ local Option = OmiChat.Option
 local ColorModal = OmiChat.ColorModal
 local SuggesterBox = OmiChat.SuggesterBox
 local getText = getText
-local getTextOrNull = getTextOrNull
 local max = math.max
 local concat = table.concat
 
@@ -158,50 +157,11 @@ local function addVanillaSubmenuOptions(context)
     opaqueOnFocusSubMenu:setOptionChecked(opaqueOnFocusSubMenu.options[instance.opaqueOnFocus and 2 or 1], true)
 end
 
----Adds context menu options for chat colors.
+---Adds the submenu for switching between player preference profiles.
 ---@param context ISContextMenu
-local function addColorOptions(context)
-    local colorOpts = OmiChat.getColorOptions()
-    if #colorOpts == 0 then
-        return
-    end
-
-    local colorOptionName = getText('UI_OmiChat_ContextColorsSubmenu')
-    local colorOption = context:addOption(colorOptionName, ISChat.instance)
-
-    local colorSubMenu = context:getNew(context)
-    context:addSubMenu(colorOption, colorSubMenu)
-
-    for i = 1, #colorOpts do
-        local category = colorOpts[i]
-        local name = getTextOrNull('UI_OmiChat_ContextColor_' .. category)
-        if not name then
-            name = getText('UI_OmiChat_ContextColor', OmiChat.getColorCategoryCommand(category))
-        end
-
-        colorSubMenu:addOption(name, ISChat.instance, ISChat.onCustomColorMenu, category)
-    end
-end
-
----Adds the context menu options for custom callouts.
----@param context ISContextMenu
-local function addCustomCalloutOptions(context)
-    local calloutOptName = getText('UI_OmiChat_ContextSetCustomCallouts')
-    context:addOption(calloutOptName, ISChat.instance, ISChat.onCustomCalloutMenu, 'callouts')
-
-    local sneakCalloutOptName = getText('UI_OmiChat_ContextSetCustomSneakCallouts')
-    context:addOption(sneakCalloutOptName, ISChat.instance, ISChat.onCustomCalloutMenu, 'sneakcallouts')
-end
-
----Adds the context menu options for player preference profiles.
----@param context ISContextMenu
-local function addProfileOptions(context)
+local function addProfileSwitchSubmenu(context)
     local instance = ISChat.instance
     local profiles = OmiChat.getProfiles()
-
-    local manageOptName = getText('UI_OmiChat_ContextManageProfiles')
-    context:addOption(manageOptName, instance, ISChat.onManageProfiles)
-
     if #profiles == 0 then
         return
     end
@@ -426,10 +386,6 @@ local function addChatCustomizationSettings(context)
     local submenu = context:getNew(context)
     context:addSubMenu(option, submenu)
 
-    if Option.EnableCustomShouts then
-        addCustomCalloutOptions(submenu)
-    end
-
     if Option.EnableSetNameColor or Option.EnableSpeechColorAsDefaultNameColor then
         local nameColorOptName = OmiChat.getNameColorsEnabled()
             and getText('UI_OmiChat_ContextDisableNameColors')
@@ -442,8 +398,8 @@ local function addChatCustomizationSettings(context)
         addSignEmoteOption(submenu)
     end
 
-    addProfileOptions(submenu)
-    addColorOptions(submenu)
+    local manageOptName = getText('UI_OmiChat_ContextManageProfiles')
+    submenu:addOption(manageOptName, instance, ISChat.onManageProfiles)
 
     local handlers = OmiChat.getSettingHandlers('chat_customization')
     for i = 1, #handlers do
@@ -701,115 +657,6 @@ function ISChat.onCustomHairColorMenuClick(target, button)
 
     player:resetModel()
     sendVisual(player)
-end
-
----Event handler for color menu initialization.
----@param target omichat.ISChat
----@param category omichat.ColorCategory The target color category.
-function ISChat.onCustomColorMenu(target, category)
-    if target.activeColorModal then
-        target.activeColorModal:destroy()
-    end
-
-    local color = OmiChat.getColorOrDefault(category)
-    local text = getTextOrNull('UI_OmiChat_ContextColorDesc_' .. category)
-    if not text then
-        local catName = getTextOrNull('UI_OmiChat_ContextMessageType_' .. category)
-            or OmiChat.getColorCategoryCommand(category)
-        text = getText('UI_OmiChat_ContextColorDesc', catName)
-    end
-
-    local width = max(450, getTextManager():MeasureStringX(UIFont.Small, text) + 60)
-    local modal = ColorModal:new(0, 0, width, 250, text, color, target, ISChat.onCustomColorMenuClick, 0, category)
-
-    local player = getSpecificPlayer(0)
-    local username = player and player:getUsername()
-
-    modal:setMinValue(category == 'speech' and 48 or 0)
-    modal:setEmptyColor(Option:getDefaultColor(category, username))
-    modal:initialise()
-    modal:addToUIManager()
-
-    target.activeColorModal = modal
-end
-
----Event handler for color picker selection.
----@param target omichat.ISChat
----@param button table
----@param category omichat.ColorCategory The color category that has been changed.
----@diagnostic disable-next-line: unused-local
-function ISChat.onCustomColorMenuClick(target, button, category)
-    if button.internal == 'OK' then
-        OmiChat.changeColor(category, button.parent:getColorTable())
-
-        if category ~= 'name' and category ~= 'speech' then
-            OmiChat.redrawMessages()
-        end
-    end
-end
-
----Event handler for accepting the custom callout dialog.
----@param target omichat.ISChat
----@param button table
----@param category omichat.CalloutCategory
----@diagnostic disable-next-line: unused-local
-function ISChat.onCustomCalloutClick(target, button, category)
-    if button.internal ~= 'OK' then
-        return
-    end
-
-    local maxLen = Option.CustomShoutMaxLength > 0 and Option.CustomShoutMaxLength or nil
-    local lines = utils.getLines(button.parent.entry:getText(), maxLen)
-    if lines and category == 'sneakcallouts' then
-        for i = 1, #lines do
-            lines[i] = lines[i]:lower()
-        end
-    end
-
-    OmiChat.setCustomShouts(lines, category)
-end
-
----Event handler for custom callout menu initialization.
----@param target omichat.ISChat
----@param category omichat.CalloutCategory
-function ISChat.onCustomCalloutMenu(target, category)
-    if target.activeCalloutModal then
-        target.activeCalloutModal:destroy()
-    end
-
-    local shouts = OmiChat.getCustomShouts(category)
-    local defaultText = shouts and concat(shouts, '\n') or ''
-
-    local numLines = Option.MaximumCustomShouts
-    if numLines <= 0 then
-        numLines = Option:getDefault('MaximumCustomShouts') or 1
-    elseif numLines > 20 then
-        numLines = 20
-    end
-
-    local textManager = getTextManager()
-    local boxHeight = 4 + textManager:getFontHeight(UIFont.Medium) * numLines
-
-    local desc = getText('UI_OmiChat_ContextSetCustomCalloutsDesc')
-
-    local width = 500
-    local height = boxHeight + 100
-    local x = getPlayerScreenLeft(0) + (getPlayerScreenWidth(0) - width) / 2
-    local y = getPlayerScreenTop(0) + (getPlayerScreenHeight(0) - height) / 2
-    local modal = ISTextBox:new(x, y, width, height, desc, defaultText, target, ISChat.onCustomCalloutClick, 0, category)
-
-    modal:setValidateFunction(modal, ISChat.validateCustomCalloutText)
-    modal:setMultipleLine(numLines > 1)
-    modal:setNumberOfLines(numLines)
-    modal:initialise()
-
-    modal.entry:setMaxLines(numLines)
-    if category == 'callouts' then
-        modal.entry:setForceUpperCase(true)
-    end
-
-    modal:addToUIManager()
-    target.activeCalloutModal = modal
 end
 
 ---Event handler for toggling command retaining.
@@ -1379,6 +1226,7 @@ function ISChat:onGearButtonClick()
     addChatSettings(context)
     addChatCustomizationSettings(context)
     addCharacterCustomizationSettings(context)
+    addProfileSwitchSubmenu(context)
     addLanguageOptions(context)
 
     local handlers = OmiChat.getSettingHandlers('main')
