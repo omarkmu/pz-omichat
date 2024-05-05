@@ -44,6 +44,14 @@ function OmiChat.clearNicknames()
     modData.nicknames = {}
 end
 
+---Clears mod data for a given username.
+---This does not transmit changes to clients.
+---@see omichat.api.server.transmitModData
+---@param username string
+function OmiChat.clearModData(username)
+    OmiChat._clearModData(username)
+end
+
 ---Gets the current roleplay language for the player with the given username.
 ---@param username string
 ---@return string?
@@ -93,6 +101,8 @@ function OmiChat.resetRoleplayLanguages(username)
 end
 
 ---Sets the chat icon for the player with the given username.
+---This does not transmit changes to clients.
+---@see omichat.api.server.transmitModData
 ---@param username string
 ---@param icon string?
 function OmiChat.setChatIcon(username, icon)
@@ -104,10 +114,10 @@ end
 ---This does not transmit changes to clients.
 ---@see omichat.api.server.transmitModData
 ---@param username string
----@param language string
+---@param language string?
 ---@return boolean success
 function OmiChat.setCurrentRoleplayLanguage(username, language)
-    if not OmiChat.isConfiguredRoleplayLanguage(language) then
+    if language and not OmiChat.isConfiguredRoleplayLanguage(language) then
         return false
     end
 
@@ -128,12 +138,25 @@ function OmiChat.setNameColorString(username, color)
     modData.nameColors[username] = color
 end
 
----Sets the number of roleplay language slots for the player with the given username.
+---Sets the roleplay languages for the player with the given username.
+---This does not transmit changes to clients.
+---@see omichat.api.server.transmitModData
 ---@param username string
----@param slots integer
+---@param languages string[]?
+function OmiChat.setRoleplayLanguages(username, languages)
+    local modData = OmiChat.getModData()
+    modData.languages[username] = languages
+    OmiChat.refreshLanguageInfo(username)
+end
+
+---Sets the number of roleplay language slots for the player with the given username.
+---This does not transmit changes to clients.
+---@see omichat.api.server.transmitModData
+---@param username string
+---@param slots integer?
 ---@return boolean success
 function OmiChat.setRoleplayLanguageSlots(username, slots)
-    if slots < 1 or slots > OmiChat.config:maxLanguageSlots() then
+    if slots and (slots < 1 or slots > OmiChat.config:maxLanguageSlots()) then
         return false
     end
 
@@ -150,6 +173,21 @@ end
 function OmiChat.setNickname(username, nickname)
     local modData = OmiChat.getModData()
     modData.nicknames[username] = nickname
+end
+
+---Sets the mod data for a given user.
+---This does not transmit changes to clients.
+---@see omichat.api.server.transmitModData
+---@param username string
+---@param data omichat.UserModData?
+function OmiChat.setUserModData(username, data)
+    data = data or {}
+    OmiChat.setNickname(username, data.nickname)
+    OmiChat.setChatIcon(username, data.icon)
+    OmiChat.setNameColorString(username, data.nameColor)
+    OmiChat.setRoleplayLanguageSlots(username, data.languageSlots)
+    OmiChat.setRoleplayLanguages(username, data.languages)
+    OmiChat.setCurrentRoleplayLanguage(username, data.currentLanguage)
 end
 
 ---Transmits mod data to clients.

@@ -517,6 +517,20 @@ function utils.getPlayerUsername()
     end
 end
 
+---Gets the position for the center of the screen given a UI width and height.
+---@param width number
+---@param height number
+---@param playerIndex number?
+---@return number
+---@return number
+function utils.getScreenCenter(width, height, playerIndex)
+    playerIndex = playerIndex or 0
+    local x = (getPlayerScreenWidth(playerIndex) - width) * 0.5
+    local y = (getPlayerScreenHeight(playerIndex) - height) * 0.5
+
+    return x, y
+end
+
 ---Retrieves a texture name given a chat icon name.
 ---@param icon string
 ---@return string?

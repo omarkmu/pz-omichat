@@ -144,6 +144,7 @@ return OmiChat
 ---| 'speech'
 
 ---@alias omichat.ModDataField
+---| 'all'
 ---| 'nicknames'
 ---| 'nameColors'
 ---| 'languages'
@@ -179,6 +180,10 @@ return OmiChat
 ---@field results omichat.SearchResult[]
 ---@field exact omichat.SearchResult?
 
+---@class omichat.CallbackInfo
+---@field target unknown
+---@field callback function
+---@field args table
 
 ---@class omichat.LanguageInfoStore
 ---@field languageCount integer
@@ -236,9 +241,19 @@ return OmiChat
 ---@field languageSlots table<string, integer> Map of usernames to roleplay language slots.
 ---@field currentLanguage table<string, string> Map of usernames to currently selected roleplay languages.
 
----Player mod data.
----@class omichat.PlayerModData
+---Global mod data associated with a username.
+---@class omichat.UserModData
+---@field username string
+---@field nickname string?
+---@field nameColor string?
+---@field icon string?
+---@field languages string[]?
+---@field languageSlots integer?
 ---@field currentLanguage string?
+
+---Request to clear mod data for a username.
+---@class omichat.request.ClearModData
+---@field username string
 
 ---Request to update global mod data fields on the server.
 ---@class omichat.request.ModDataUpdate

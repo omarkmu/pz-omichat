@@ -78,6 +78,16 @@ function OmiChat.requestClearNames()
     return OmiChat.dispatch('requestClearNames')
 end
 
+---Requests clearing mod data for a given username.
+---@param username string
+---@return boolean success
+function OmiChat.requestClearModData(username)
+    ---@type omichat.request.ClearModData
+    local req = { username = username }
+
+    return OmiChat.dispatch('requestClearModData', req)
+end
+
 ---Requests an update to global mod data.
 ---@param updates omichat.request.ModDataUpdate
 ---@return boolean

@@ -22,6 +22,35 @@ OmiChat._modDataVersion = 1
 OmiChat._playerModDataVersion = 1
 
 
+local modDataFields = {
+    { key = 'nicknames', name = 'nickname' },
+    { key = 'nameColors', name = 'nameColor' },
+    { key = 'icons', name = 'icon' },
+    { key = 'currentLanguage', name = 'currentLanguage' },
+    { key = 'languageSlots', name = 'languageSlots' },
+    { key = 'languages', name = 'languages' },
+}
+
+local modDataKeys = { 'username' }
+for i = 1, #modDataFields do
+    modDataKeys[#modDataKeys + 1] = modDataFields[i].name
+end
+
+
+---Clears mod data for a given username.
+---@param username string
+---@protected
+function OmiChat._clearModData(username)
+    local modData = OmiChat.getModData()
+
+    modData.currentLanguage[username] = nil
+    modData.icons[username] = nil
+    modData.languageSlots[username] = nil
+    modData.languages[username] = nil
+    modData.nameColors[username] = nil
+    modData.nicknames[username] = nil
+end
+
 ---Returns the admin chat icon for a given username.
 ---@param username string
 ---@return string?
@@ -59,6 +88,52 @@ function OmiChat.getModData()
     modData.icons = modData.icons or {}
 
     return modData
+end
+
+---Gets the global mod data as a list associated with usernames.
+---@return omichat.UserModData[] data
+---@return string[] fieldList
+function OmiChat.getModDataList()
+    local list = {}
+    local map = {}
+    local modData = OmiChat.getModData()
+
+    for _, field in pairs(modDataFields) do
+        local key, fieldName
+        if type(field) == 'string' then
+            key = field
+            fieldName = field
+        else
+            key = field.key
+            fieldName = field.name
+        end
+
+        for username, v in pairs(modData[key]) do
+            if not map[username] then
+                local userData = { username = username }
+                list[#list + 1] = userData
+                map[username] = userData
+            end
+
+            map[username][fieldName] = v
+        end
+    end
+
+    return list, utils.copy(modDataKeys)
+end
+
+---Retrieves mod data for a given user.
+---@param username string
+---@return omichat.UserModData
+function OmiChat.getUserModData(username)
+    local data = { username = username }
+    local modData = OmiChat.getModData()
+
+    for _, field in pairs(modDataFields) do
+        data[field.name] = modData[field.key][username]
+    end
+
+    return data
 end
 
 ---Returns the color table for a player's name color, or `nil` if unset.

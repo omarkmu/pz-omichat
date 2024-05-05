@@ -66,6 +66,7 @@ UI_EN = {
     UI_OmiChat_Error_AddLanguageFull = "Player '%1' already knows the maximum number of languages.",
     UI_OmiChat_Error_AddLanguageKnown = "Player '%1' already knows %2.",
     UI_OmiChat_Error_AddLanguageNotConfigured = "'%1' is not a configured language.",
+    UI_OmiChat_Error_LanguageUnknown = "Player '%1' does not know %2.",
 
     --[[ Help Text ]]--
     UI_OmiChat_HelpText_Emotes = "Get a list of available chat emotes",
@@ -208,6 +209,18 @@ UI_EN = {
     UI_OmiChat_ProfileManager_Tooltip_Color_name = "Enter a color in RGB or hex format to set the color of your name in chat.",
     UI_OmiChat_ProfileManager_Tooltip_Color_speech = "Enter a color in RGB or hex format to set the color of your overhead speech bubbles.",
 
+    --[[ Mod Data Manager ]]--
+    UI_OmiChat_ModDataManager_Title = "OmiChat Mod Data Viewer",
+    UI_OmiChat_ModDataManager_EditorTitle = "Edit Mod Data",
+    UI_OmiChat_ModDataManager_NoData = "(empty)",
+    UI_OmiChat_ModDataManager_Column_username = "Username",
+    UI_OmiChat_ModDataManager_Column_nickname = "Chat Nickname",
+    UI_OmiChat_ModDataManager_Column_nameColor = "Name Color",
+    UI_OmiChat_ModDataManager_Column_icon = "Icon",
+    UI_OmiChat_ModDataManager_Column_currentLanguage = "Current Language",
+    UI_OmiChat_ModDataManager_Column_languages = "Languages",
+    UI_OmiChat_ModDataManager_Column_languageSlots = "Language Slots",
+
     --[[ Context Menus ]]--
     UI_OmiChat_ContextChatSettings = "Chat settings",
     UI_OmiChat_ContextChatCustomization = "Chat customization",
@@ -255,6 +268,7 @@ UI_EN = {
     UI_OmiChat_ContextProfiles = "Switch profile",
     UI_OmiChat_ContextManageProfiles = "Manage profiles",
     UI_OmiChat_ContextAdmin = "Admin options",
+    UI_OmiChat_ContextAdminManageModData = "View mod data",
     UI_OmiChat_ContextAdmin_ShowIcon = "Display chat icon",
     UI_OmiChat_ContextAdmin_KnowAllLanguages = "Understand all languages",
     UI_OmiChat_ContextAdmin_IgnoreMessageRange = "Ignore message range",
