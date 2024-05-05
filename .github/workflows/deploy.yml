@@ -35,10 +35,8 @@ jobs:
           mkdir lls
           curl -sSL $url | tar -xz --directory=./lls
           echo `pwd`/lls/bin >> $GITHUB_PATH
-      - name: Generate typestub
-        run: |
-          lua-language-server --doc "./Contents/mods/OmiChat/media/lua"
-          python scripts/stubgen.py lls/log/doc.json -o docs/api/typestub.lua -n "omi(?:chat)?\."
+      - name: Run pre-deploy script
+        run: ./scripts/predeploy.sh
       - name: Build Book
         run: mdbook build
       - name: Setup Pages
