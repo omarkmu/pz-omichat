@@ -10,6 +10,8 @@ local ColorEntry = OmiChat.ValidatedColorEntry
 local ISServerSandboxOptionsUI = ISServerSandboxOptionsUI
 
 local _createPanel = ISServerSandboxOptionsUI.createPanel
+local _settingsToUI = ISServerSandboxOptionsUI.settingsToUI
+local _settingsFromUI = ISServerSandboxOptionsUI.settingsFromUI
 
 
 ---Callback for applying a sandbox options preset.
@@ -138,7 +140,6 @@ local function transformPanel(panel, page, parent)
                     -- special case
                     if el == 'FormatInfo' then
                         control:setMultipleLine(true)
-                        control:setMaxLines(50)
                         control:addScrollBars()
                         control:setHeight(fontH * 10 + 8)
                     end
@@ -235,4 +236,33 @@ function ISServerSandboxOptionsUI:createPanel(page)
 
     local panel = _createPanel(self, page)
     return transformPanel(panel, page, self)
+end
+
+---Override to handle newlines in the `FormatInfo` option.
+---@param options SandboxOptions
+function ISServerSandboxOptionsUI:settingsFromUI(options)
+    _settingsFromUI(self, options)
+
+    local option = options:getOptionByName('OmiChat.FormatInfo') ---@type unknown
+    if not option then
+        return
+    end
+
+    local value = (option:getValue() or ''):gsub('\n', ' <LINE> ')
+    option:setValue(value)
+end
+
+---Override to handle newlines in the `FormatInfo` option.
+---@param options SandboxOptions
+function ISServerSandboxOptionsUI:settingsToUI(options)
+    _settingsToUI(self, options)
+
+    local option = options:getOptionByName('OmiChat.FormatInfo') ---@type unknown
+    local control = option and self.controls[option:getName()]
+    if not option or not control then
+        return
+    end
+
+    local value = (option:getValue() or ''):gsub('%s?<LINE>%s?', '\n')
+    control:setText(value)
 end
