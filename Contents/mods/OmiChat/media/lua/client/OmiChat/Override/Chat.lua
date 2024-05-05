@@ -211,9 +211,14 @@ local function addProfileOptions(context)
     local submenu = context:getNew(context)
     context:addSubMenu(submenuOption, submenu)
 
+    local currentIndex = OmiChat.getCurrentProfileIndex()
+    local option = submenu:addOption(getText('UI_OmiChat_ContextProfileDefault'), instance, ISChat.onSwitchProfile, 0)
+    submenu:setOptionChecked(option, currentIndex == nil)
+
     for i = 1, #profiles do
         local profile = profiles[i]
-        submenu:addOption(profile.name, instance, ISChat.onSwitchProfile, i)
+        option = submenu:addOption(profile.name, instance, ISChat.onSwitchProfile, i)
+        submenu:setOptionChecked(option, i == currentIndex)
     end
 end
 
@@ -985,7 +990,8 @@ function ISChat.onManageProfiles(target)
         target.activeProfilesPanel:destroy()
     end
 
-    local panel = OmiChat.ProfileManager:new(150, 150, 800, 600, OmiChat.getProfiles())
+    local x, y = utils.getScreenCenter(800, 600)
+    local panel = OmiChat.ProfileManager:new(x, y, 800, 600, OmiChat.getProfiles())
     panel:initialise()
     panel:addToUIManager()
     target.activeProfilesPanel = panel
@@ -1011,7 +1017,7 @@ end
 ---@param idx integer
 ---@diagnostic disable-next-line: unused-local
 function ISChat.onSwitchProfile(target, idx)
-    OmiChat.applyProfile(idx)
+    OmiChat.switchProfile(idx)
     OmiChat.redrawMessages()
 end
 

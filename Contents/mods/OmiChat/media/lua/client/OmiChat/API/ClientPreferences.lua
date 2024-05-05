@@ -79,7 +79,8 @@ end
 ---Reads player preferences file with format version 1.
 ---@param decoded table
 ---@param prefs omichat.PlayerPreferences
-local function readPrefsV1(decoded, prefs)
+---@param ignoreObsolete boolean?
+local function readPrefsV1(decoded, prefs, ignoreObsolete)
     prefs.showNameColors = readBool(decoded.showNameColors, prefs.showNameColors)
     prefs.useSuggester = readBool(decoded.useSuggester, prefs.useSuggester)
     prefs.useSignEmotes = readBool(decoded.useSignEmotes, prefs.useSignEmotes)
@@ -90,22 +91,52 @@ local function readPrefsV1(decoded, prefs)
     prefs.adminKnowLanguages = readBool(decoded.adminKnowLanguages, prefs.adminShowIcon)
     prefs.adminIgnoreRange = readBool(decoded.adminIgnoreRange, prefs.adminShowIcon)
 
+    if ignoreObsolete then
+        return
+    end
+
+    local callouts, sneakcallouts, colors
     if type(decoded.callouts) == 'table' then
-        prefs.callouts = readStringList(decoded.callouts)
+        callouts = readStringList(decoded.callouts)
+        if #callouts == 0 then
+            callouts = nil
+        end
     end
 
     if type(decoded.sneakcallouts) == 'table' then
-        prefs.sneakcallouts = readStringList(decoded.sneakcallouts)
+        sneakcallouts = readStringList(decoded.sneakcallouts)
+        if #sneakcallouts == 0 then
+            sneakcallouts = nil
+        end
     end
 
     if type(decoded.colors) == 'table' then
-        prefs.colors = {}
+        colors = {}
+
+        local hasColor
         for k, v in pairs(decoded.colors) do
             local color = utils.stringToColor(v)
             if color then
-                prefs.colors[k] = color
+                hasColor = true
+                colors[k] = color
             end
         end
+
+        if not hasColor then
+            colors = nil
+        end
+    end
+
+    if callouts or sneakcallouts or colors then
+        prefs.profileIndex = 1
+        prefs.profiles = {
+            {
+                name = getText('UI_OmiChat_ProfileManager_DefaultProfileName', '1'),
+                colors = colors or {},
+                callouts = callouts or {},
+                sneakcallouts = sneakcallouts or {},
+            },
+        }
     end
 end
 
@@ -115,8 +146,7 @@ end
 local function readPrefsV2(decoded, prefs)
     local settings = decoded.settings
     if type(settings) == 'table' then
-        readPrefsV1(settings, prefs)
-
+        readPrefsV1(settings, prefs, true)
         prefs.showTyping = readBool(settings.showTyping, prefs.showTyping)
         prefs.suggestOnEnter = readBool(settings.suggestOnEnter, prefs.suggestOnEnter)
         prefs.suggestOnTab = readBool(settings.suggestOnTab, prefs.suggestOnTab)
@@ -125,40 +155,10 @@ local function readPrefsV2(decoded, prefs)
     local profiles = decoded.profiles
     if type(profiles) == 'table' then
         prefs.profiles = profiles
+
+        local idx = tonumber(decoded.profileIndex) or 0
+        prefs.profileIndex = math.max(0, math.min(idx, #profiles))
     end
-end
-
----Applies a player preference profile to the current preferences.
----@param idx integer
----@return boolean success
-function OmiChat.applyProfile(idx)
-    local prefs = OmiChat.getPlayerPreferences()
-    local profile = prefs.profiles[idx]
-    if not profile then
-        return false
-    end
-
-    prefs.callouts = utils.copy(profile.callouts)
-    prefs.sneakcallouts = utils.copy(profile.sneakcallouts)
-
-    local opts = OmiChat.getColorOptions(true)
-    for i = 1, #opts do
-        local opt = opts[i]
-        local value = profile.colors[opt]
-
-        if opt == 'name' or opt == 'speech' then
-            OmiChat.changeColor(opt, value)
-        else
-            prefs.colors[opt] = value
-        end
-    end
-
-    if profile.chatNickname and Option:isNicknameEnabled() then
-        OmiChat.setNickname(profile.chatNickname)
-    end
-
-    OmiChat.savePlayerPreferences()
-    return true
 end
 
 ---Gets the value of a given admin option preference.
@@ -170,7 +170,7 @@ function OmiChat.getAdminOption(option)
     return prefs[mappedPref] or false
 end
 
----Retrieves the player's custom shouts.
+---Retrieves the player's custom shouts for the current profile.
 ---@param shoutType omichat.CalloutCategory The type of shouts to retrieve.
 ---@return string[]?
 function OmiChat.getCustomShouts(shoutType)
@@ -178,13 +178,32 @@ function OmiChat.getCustomShouts(shoutType)
         return
     end
 
-    local player = getSpecificPlayer(0)
-    if not player then
+    local profile = OmiChat.getCurrentProfile()
+    if not profile then
         return
     end
 
+    return profile[shoutType]
+end
+
+---Returns the current player profile.
+---@return omichat.PlayerProfile?
+function OmiChat.getCurrentProfile()
     local prefs = OmiChat.getPlayerPreferences()
-    return prefs[shoutType]
+    local idx = prefs.profileIndex
+    local profile = prefs.profiles[idx]
+    return profile
+end
+
+---Returns the index of the current player profile.
+---@return integer?
+function OmiChat.getCurrentProfileIndex()
+    local prefs = OmiChat.getPlayerPreferences()
+    if prefs.profileIndex < 1 then
+        return
+    end
+
+    return prefs.profileIndex
 end
 
 ---Gets a table with the default player preferences.
@@ -207,6 +226,7 @@ function OmiChat.getDefaultPlayerPreferences()
         colors = {},
         callouts = {},
         sneakcallouts = {},
+        profileIndex = 0,
         profiles = {},
     }
 end
@@ -259,8 +279,12 @@ end
 ---@param category omichat.ColorCategory
 ---@return omichat.ColorTable?
 function OmiChat.getPreferredColor(category)
-    local prefs = OmiChat.getPlayerPreferences()
-    return prefs.colors[category]
+    local profile = OmiChat.getCurrentProfile()
+    if not profile then
+        return
+    end
+
+    return profile.colors[category]
 end
 
 ---Returns the configured player profiles.
@@ -343,6 +367,7 @@ function OmiChat.savePlayerPreferences()
     local prefs = OmiChat._playerPrefs
     local success, encoded = utils.json.tryEncode {
         VERSION = OmiChat._prefsVersion,
+        profileIndex = prefs.profileIndex,
         profiles = prefs.profiles,
         settings = {
             useSuggester = prefs.useSuggester,
@@ -357,9 +382,6 @@ function OmiChat.savePlayerPreferences()
             adminKnowLanguages = prefs.adminKnowLanguages,
             adminIgnoreRange = prefs.adminIgnoreRange,
             showTyping = prefs.showTyping,
-            colors = utils.pack(utils.map(utils.colorToHexString, prefs.colors)),
-            callouts = prefs.callouts,
-            sneakcallouts = prefs.sneakcallouts,
         },
     }
 
@@ -396,20 +418,20 @@ end
 ---Sets the player's custom shouts.
 ---@param shouts string[]?
 ---@param shoutType omichat.CalloutCategory The type of shouts to set.
+---@return boolean success
 function OmiChat.setCustomShouts(shouts, shoutType)
     if not Option.EnableCustomShouts then
-        return
+        return false
     end
 
-    local prefs = OmiChat.getPlayerPreferences()
-
-    if not shouts then
-        prefs[shoutType] = {}
-    else
-        prefs[shoutType] = shouts
+    local profile = OmiChat.getCurrentProfile()
+    if not profile then
+        return false
     end
 
+    profile[shoutType] = shouts and shouts or {}
     OmiChat.savePlayerPreferences()
+    return true
 end
 
 ---Sets whether the current player has name colors enabled.
@@ -420,12 +442,17 @@ function OmiChat.setNameColorEnabled(enabled)
     OmiChat.savePlayerPreferences()
 end
 
----Sets a color table for the current player's preference for a category.
+---Sets a color table for the current player's preference for a category, on the current profile.
+---This sets the value in the current profile.
 ---@param category omichat.ColorCategory
 ---@param color omichat.ColorTable?
 function OmiChat.setPreferredColor(category, color)
-    local prefs = OmiChat.getPlayerPreferences()
-    prefs.colors[category] = color
+    local profile = OmiChat.getCurrentProfile()
+    if not profile then
+        return
+    end
+
+    profile.colors[category] = color
 end
 
 ---Sets the list of player profiles.
@@ -434,6 +461,7 @@ end
 function OmiChat.setProfiles(profiles)
     local prefs = OmiChat.getPlayerPreferences()
     prefs.profiles = profiles
+    prefs.profileIndex = math.max(0, math.min(prefs.profileIndex, #profiles))
     OmiChat.savePlayerPreferences()
 end
 
@@ -491,4 +519,33 @@ function OmiChat.setUseSuggester(useSuggester)
     local prefs = OmiChat.getPlayerPreferences()
     prefs.useSuggester = not not useSuggester
     OmiChat.savePlayerPreferences()
+end
+
+---Switches to a player preference profile.
+---@param idx integer
+---@return boolean success
+function OmiChat.switchProfile(idx)
+    local prefs = OmiChat.getPlayerPreferences()
+    local profile = prefs.profiles[idx] ---@type omichat.PlayerProfile?
+    if not profile and idx >= 1 then
+        return false
+    end
+
+    prefs.profileIndex = math.max(0, math.min(idx, #prefs.profiles))
+
+    local colors = profile and profile.colors or {}
+    OmiChat.changeColor('name', colors.name)
+    OmiChat.changeSpeechColor(colors.speech)
+
+    if profile and profile.chatNickname and Option:isNicknameEnabled() then
+        OmiChat.setNickname(profile.chatNickname)
+    end
+
+    OmiChat.savePlayerPreferences()
+    return true
+end
+
+---Switches to the default player preference profile.
+function OmiChat.switchToDefaultProfile()
+    OmiChat.switchProfile(0)
 end

@@ -111,19 +111,8 @@ function ContentPanel:createButtons(manager)
     deleteBtn:initialise()
     deleteBtn:instantiate()
 
-    local copyText = getText('UI_OmiChat_ProfileManager_CopyButton')
-    local copyX = btnX + btnWidth + PAD_X
-    local copyBtn = ISButton:new(copyX, btnY, btnWidth, btnHgt, copyText, manager, manager.copyFromCurrent)
-    copyBtn.borderColor.a = 0.5
-    copyBtn.internal = 'COPY'
-    copyBtn:initialise()
-    copyBtn:instantiate()
-
     manager.deleteButton = deleteBtn
-    manager.copyButton = copyBtn
-
     self:addChild(deleteBtn)
-    self:addChild(copyBtn)
 end
 
 ---Creates the labels and controls for callout text.
