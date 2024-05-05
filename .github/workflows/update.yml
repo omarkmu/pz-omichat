@@ -32,8 +32,8 @@ jobs:
     - name: Build library
       run: |
         cd OmiLibrary/scripts
-        build.sh
-        bundle.sh -m ${{ vars.LIB_MODULES }} -o ${{ vars.LIB_PATH }}
+        ./build.sh
+        ./bundle.sh -m ${{ vars.LIB_MODULES }} -o ${{ vars.LIB_PATH }}
     - name: Create pull request
       uses: peter-evans/create-pull-request@v6
       with:
