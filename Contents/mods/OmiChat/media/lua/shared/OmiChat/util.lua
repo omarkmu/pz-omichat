@@ -219,6 +219,25 @@ function utils.createCallback(target, callback, ...)
     return info
 end
 
+---Creates a yes/no modal dialog.
+---@param text string
+---@param target unknown?
+---@param onclick function?
+---@param param1 unknown?
+---@param param2 unknown?
+---@return ISModalDialog
+function utils.createModal(text, target, onclick, param1, param2)
+    local w, h = ISModalDialog.CalcSize(0, 0, text) ---@cast h number
+    local x, y = utils.getScreenCenter(w, h)
+
+    local modal = ISModalDialog:new(x, y, w, h, text, true, target, onclick, nil, param1, param2)
+    modal.moveWithMouse = true
+    modal:initialise()
+    modal:addToUIManager()
+
+    return modal
+end
+
 ---Decodes an encoded character.
 ---@param text string
 ---@return integer

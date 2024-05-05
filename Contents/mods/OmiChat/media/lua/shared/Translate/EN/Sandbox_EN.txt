@@ -9,6 +9,10 @@ Sandbox_EN = {
     Sandbox_OCCategory_ChatStreams = "Chat Streams",
     Sandbox_OCCategory_OtherFormats = "Other Formats",
 
+    --[[ Presets ]]--
+    Sandbox_OCPreset_Title = "Preset",
+    Sandbox_OCPreset_Confirm = "Apply the %1 preset? This will overwrite the current options.",
+
     --[[ Basic Features ]]--
     Sandbox_OCEnableCustomShouts = "Custom Shouts",
     Sandbox_OCEnableEmotes = "Emote Shortcuts",
