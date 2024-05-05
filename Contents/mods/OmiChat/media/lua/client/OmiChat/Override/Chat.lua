@@ -392,10 +392,12 @@ local function addChatSettings(context)
     submenu:addOption(timestampOptName, instance, ISChat.onToggleTimestampPrefix)
     submenu:addOption(tagOptName, instance, ISChat.onToggleTagPrefix)
 
-    local typingOptName = OmiChat.getShowTyping()
-        and getText('UI_OmiChat_ContextDisableTypingIndicator')
-        or getText('UI_OmiChat_ContextEnableTypingIndicator')
-    submenu:addOption(typingOptName, instance, ISChat.onToggleShowTyping)
+    if Option.PredicateShowTypingIndicator ~= '' then
+        local typingOptName = OmiChat.getShowTyping()
+            and getText('UI_OmiChat_ContextDisableTypingIndicator')
+            or getText('UI_OmiChat_ContextEnableTypingIndicator')
+        submenu:addOption(typingOptName, instance, ISChat.onToggleShowTyping)
+    end
 
     addSuggestionOptions(submenu)
     addRetainOptions(submenu)
