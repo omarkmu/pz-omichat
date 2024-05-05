@@ -2,11 +2,13 @@
 
 ---@alias omichat.CategoryLayoutElement { type: 'heading', text: string }
 ---@alias omichat.PaddingLayoutElement { type: 'padding', pad: integer? }
+---@alias omichat.PresetLayoutElement { type: 'presets', presets: table }
 
 ---@alias omichat.LayoutElement
----| omichat.PaddingLayoutElement
----| omichat.CategoryLayoutElement
 ---| string
+---| omichat.CategoryLayoutElement
+---| omichat.PaddingLayoutElement
+---| omichat.PresetLayoutElement
 
 
 ---Creates a layout element for a category heading.
@@ -26,6 +28,28 @@ local function padding(padAmount)
     return {
         type = 'padding',
         pad = padAmount,
+    }
+end
+
+---Returns a layout element for sandbox option presets.
+---@return omichat.PresetLayoutElement
+local function presets()
+    return {
+        type = 'presets',
+        presets = {
+            {
+                name = 'Default',
+                options = require 'OmiChat/SandboxPreset/default',
+            },
+            {
+                name = 'Buffy',
+                options = require 'OmiChat/SandboxPreset/buffy',
+            },
+            {
+                name = 'Vanilla',
+                options = require 'OmiChat/SandboxPreset/vanilla',
+            },
+        },
     }
 end
 
@@ -65,6 +89,8 @@ end
 
 
 return check {
+    presets(),
+
     category('Basic'),
     'EnableEmotes',
     'EnableSetNameColor',

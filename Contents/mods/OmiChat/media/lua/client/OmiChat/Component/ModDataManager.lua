@@ -32,12 +32,7 @@ function ModDataManager:confirmDeleteItem()
         return
     end
 
-    local text = getText('IGUI_DbViewer_DeleteConfirm')
-    local x, y = utils.getScreenCenter(150, 250)
-    local modal = ISModalDialog:new(x, y, 250, 150, text, true, self, self.onConfirmDelete, nil, item, idx)
-    modal.moveWithMouse = true
-    modal:initialise()
-    modal:addToUIManager()
+    utils.createModal(getText('IGUI_DbViewer_DeleteConfirm'), self, self.onConfirmDelete, item, idx)
 end
 
 ---Creates the children of the mod data manager.

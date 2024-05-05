@@ -1,4 +1,4 @@
-OmiChat = {
+return {
     EnableCustomShouts = true,
     EnableEmotes = true,
     EnableSetNameColor = false,

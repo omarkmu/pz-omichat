@@ -11,6 +11,48 @@ local ISServerSandboxOptionsUI = ISServerSandboxOptionsUI
 
 local _createPanel = ISServerSandboxOptionsUI.createPanel
 
+
+---Callback for applying a sandbox options preset.
+---@param panel ISPanel
+---@param button ISButton
+---@param preset table
+local function applyPreset(panel, button, preset)
+    local parent = panel.parent
+    local options = parent and parent.options
+    if not options or button.internal ~= 'YES' then
+        return
+    end
+
+    local values = preset.options
+    for i = 0, options:getNumOptions() - 1 do
+        local option = options:getOptionByIndex(i) ---@type unknown
+        if option:getTableName() == 'OmiChat' then
+            local optName = option:getShortName()
+            option:setValue(values[optName])
+        end
+    end
+
+    parent:settingsToUI(parent.options)
+end
+
+---Callback for opening a modal to confirm sandbox option preset application.
+---@param panel ISPanel
+---@param button ISButton
+local function confirmApplyPreset(panel, button)
+    local control = button.ocPresetControl
+    if not control then
+        return
+    end
+
+    local idx = control.selected
+    local preset = control.ocPresets[idx]
+    if not preset then
+        return
+    end
+
+    utils.createModal(getText('Sandbox_OCPreset_Confirm', preset.name), panel, applyPreset, preset)
+end
+
 ---Transforms the sandbox option panel.
 ---@param panel ISPanel Panel containing controls.
 ---@param page table Settings table.
@@ -107,6 +149,40 @@ local function transformPanel(panel, page, parent)
                     end
                 end
             end
+        elseif el.type == 'presets' then
+            local presets = el.presets
+
+            local labelText = getText('Sandbox_OCPreset_Title')
+            local buttonText = getText('UI_ServerSettings_ButtonApplyPreset')
+            local label = ISLabel:new(0, 0, controlPadY, labelText, 1, 1, 1, 1, controlFont)
+
+            local control = ISComboBox:new(0, 0, 200, controlPadY, panel)
+            control.font = controlFont
+            control:initialise()
+
+            local button = ISButton:new(0, 0, 100, controlPadY + 4, buttonText, panel, confirmApplyPreset)
+            button.borderColor.a = 0.2
+            button:initialise()
+
+            label:setY(nextY)
+            label:setX(settingX)
+            control:setX(settingX)
+            control:setY(nextY + label:getHeight())
+            button:setY(control:getY() - 2)
+            button:setX(control:getX() + control:getWidth() + 8)
+
+            for j = 1, #presets do
+                local preset = presets[j]
+                control:addOption(preset.name)
+            end
+
+            control.ocPresets = presets
+            button.ocPresetControl = control
+
+            panel:addChild(label)
+            panel:addChild(control)
+            panel:addChild(button)
+            padY = label:getHeight() + control:getHeight() + 8
         elseif el.type == 'heading' then
             local text = el.text
             if i > 1 then
@@ -132,6 +208,7 @@ local function transformPanel(panel, page, parent)
     panel:setScrollHeight(nextY + 8)
     return panel
 end
+
 
 ---Override to improve the admin sandbox options menu.
 ---@param page table

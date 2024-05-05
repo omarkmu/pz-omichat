@@ -956,15 +956,7 @@ function ISChat.onAddLanguage(target, language)
     local languages = OmiChat.getRoleplayLanguages()
     local languageTranslated = utils.getTranslatedLanguageName(language)
     local text = getText('UI_OmiChat_ContextConfirmAddLanguage', languageTranslated, #languages + 1)
-    local width, height = ISModalDialog.CalcSize(0, 0, text)
-    local x = getPlayerScreenLeft(0) + (getPlayerScreenWidth(0) - width) / 2
-    local y = getPlayerScreenTop(0) + (getPlayerScreenHeight(0) - height) / 2
-
-    local modal = ISModalDialog:new(x, y, width, height, text, true, target, ISChat.onConfirmAddLanguage, 0, language)
-
-    modal:initialise()
-    modal:addToUIManager()
-    target.activeLanguageModal = modal
+    target.activeLanguageModal = utils.createModal(text, target, ISChat.onConfirmAddLanguage, language)
 end
 
 ---Event handler for confirming adding a roleplay language.
