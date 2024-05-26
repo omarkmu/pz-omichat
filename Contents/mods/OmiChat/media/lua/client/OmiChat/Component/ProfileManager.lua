@@ -5,6 +5,7 @@ local ISPanelJoypad = ISPanelJoypad
 local OmiChat = require 'OmiChat/API/Client'
 
 local ContentPanel = require 'OmiChat/Component/ProfileManager/ContentPanel'
+local config = OmiChat.config
 local utils = OmiChat.utils
 local Option = OmiChat.Option
 
@@ -16,6 +17,8 @@ local Option = OmiChat.Option
 ---@field nicknameControl omichat.ValidatedTextEntry?
 ---@field colorControls table<string, omichat.ValidatedColorEntry>
 ---@field calloutControls table<string, omichat.ValidatedTextEntry>
+---@field deleteButton ISButton?
+---@field duplicateButton ISButton?
 local ProfileManager = ISPanelJoypad:derive('ProfileManager')
 
 local textManager = getTextManager()
@@ -185,7 +188,7 @@ end
 ---Adds a new profile to the manager.
 function ProfileManager:addProfile()
     local idx = #self.profiles + 1
-    if idx > 20 then
+    if idx > config:maxProfiles() then
         return
     end
 
@@ -217,6 +220,37 @@ function ProfileManager:deleteProfile()
 
     table.remove(self.profiles, idx)
     self:updateUIState(true, idx)
+end
+
+---Duplicates the currently selected profile.
+function ProfileManager:duplicateProfile()
+    local newIdx = #self.profiles + 1
+    if newIdx > config:maxProfiles() then
+        return
+    end
+
+    local idx = self.listbox.selected
+    local item = self.listbox.items[idx]
+    item = item and item.item
+    if not item then
+        return
+    end
+
+    local profile = {
+        name = getText('UI_OmiChat_ProfileManager_DefaultProfileName', newIdx),
+        colors = {},
+        callouts = utils.copy(item.callouts or {}),
+        sneakcallouts = utils.copy(item.sneakcallouts or {}),
+    }
+
+    local colors = item.colors or {}
+    for k, v in pairs(colors) do
+        profile.colors[k] = utils.copy(v)
+    end
+
+    self.profiles[newIdx] = profile
+    self:addListboxItem(profile)
+    self:updateUIState(true, newIdx)
 end
 
 ---Callback for callout update.
@@ -378,6 +412,7 @@ function ProfileManager:updateUIState(resetItems, selectIdx)
     local listbox = self.listbox
     local emptyLabel = self.emptyLabel
     local createButton = self.createButton
+    local dupButton = self.duplicateButton
 
     if resetItems then
         listbox:clear()
@@ -388,6 +423,16 @@ function ProfileManager:updateUIState(resetItems, selectIdx)
 
     if selectIdx and #self.listbox.items > 0 then
         self.listbox.selected = math.min(selectIdx, #self.listbox.items)
+    end
+
+    local addEnabled = #self.profiles < config:maxProfiles()
+    local addTooltip = not addEnabled and getText('UI_OmiChat_ProfileManager_MaxProfiles') or nil
+    createButton:setEnable(addEnabled)
+    createButton:setTooltip(addTooltip)
+
+    if dupButton then
+        dupButton:setEnable(addEnabled)
+        dupButton:setTooltip(addTooltip)
     end
 
     if #self.profiles == 0 then

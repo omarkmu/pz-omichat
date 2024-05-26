@@ -309,6 +309,12 @@ function Configuration:maxLanguageSlots()
     return 50
 end
 
+---Returns the maximum number of profiles a player can have.
+---@return integer
+function Configuration:maxProfiles()
+    return 20
+end
+
 ---Returns an iterator over custom stream information.
 ---@return fun(): omichat.CustomStreamInfo?
 function Configuration:streams()
