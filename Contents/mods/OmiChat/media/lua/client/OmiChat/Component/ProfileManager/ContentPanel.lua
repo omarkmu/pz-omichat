@@ -111,8 +111,19 @@ function ContentPanel:createButtons(manager)
     deleteBtn:initialise()
     deleteBtn:instantiate()
 
+    local dupText = getText('UI_OmiChat_ProfileManager_DuplicateButton')
+    local dupX = btnX + btnWidth + PAD_X
+    local dupBtn = ISButton:new(dupX, btnY, btnWidth, btnHgt, dupText, manager, manager.duplicateProfile)
+    dupBtn.borderColor.a = 0.5
+    dupBtn.internal = 'DUPLICATE'
+    dupBtn:initialise()
+    dupBtn:instantiate()
+
     manager.deleteButton = deleteBtn
+    manager.duplicateButton = dupBtn
+
     self:addChild(deleteBtn)
+    self:addChild(dupBtn)
 end
 
 ---Creates the labels and controls for callout text.

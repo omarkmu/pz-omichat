@@ -194,9 +194,11 @@ UI_FR = {
     --[[ Profile Manager ]]--
     UI_OmiChat_ProfileManager_Title = "Profile Manager",
     UI_OmiChat_ProfileManager_Empty = "You have no profiles.",
+    UI_OmiChat_ProfileManager_MaxProfiles = "You already have the maximum number of profiles.",
     UI_OmiChat_ProfileManager_AddButton = "Add",
     UI_OmiChat_ProfileManager_CreateButton = "Create New Profile",
     UI_OmiChat_ProfileManager_DeleteButton = "Delete Profile",
+    UI_OmiChat_ProfileManager_DuplicateButton = "Duplicate Profile",
     UI_OmiChat_ProfileManager_DefaultProfileName = "Profile %1",
     UI_OmiChat_ProfileManager_Label_Nickname = "Chat nickname",
     UI_OmiChat_ProfileManager_Label_ProfileName = "Profile name",
