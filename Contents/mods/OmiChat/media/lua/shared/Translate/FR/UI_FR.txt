@@ -224,8 +224,7 @@ UI_FR = {
 
     --[[ Context Menus ]]--
     UI_OmiChat_ContextChatSettings = "Paramètres de discussion",
-    UI_OmiChat_ContextChatCustomization = "Personnalisation de la discussion",
-    UI_OmiChat_ContextCharacterCustomization = "Personnalisation du personnage",
+    UI_OmiChat_ContextCustomization = "Personnalisation",
     UI_OmiChat_ContextLanguages = "Langue",
     UI_OmiChat_ContextClean = "Nettoyer le sang et la saleté",
     UI_OmiChat_ContextHairColor = "Changer la couleur des cheveux",

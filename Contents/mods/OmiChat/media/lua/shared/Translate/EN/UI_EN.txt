@@ -224,8 +224,7 @@ UI_EN = {
 
     --[[ Context Menus ]]--
     UI_OmiChat_ContextChatSettings = "Chat settings",
-    UI_OmiChat_ContextChatCustomization = "Chat customization",
-    UI_OmiChat_ContextCharacterCustomization = "Character customization",
+    UI_OmiChat_ContextCustomization = "Customization",
     UI_OmiChat_ContextLanguages = "Language",
     UI_OmiChat_ContextClean = "Clean blood & dirt",
     UI_OmiChat_ContextHairColor = "Change hair color",

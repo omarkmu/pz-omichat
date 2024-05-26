@@ -209,7 +209,7 @@ UI_KO = {
     UI_OmiChat_ProfileManager_Tooltip_Color = "Enter a color in RGB or hex format to set the color used for %1 messages.",
     UI_OmiChat_ProfileManager_Tooltip_Color_name = "Enter a color in RGB or hex format to set the color of your name in chat.",
     UI_OmiChat_ProfileManager_Tooltip_Color_speech = "Enter a color in RGB or hex format to set the color of your overhead speech bubbles.",
-    
+
     --[[ Mod Data Manager ]]--
     UI_OmiChat_ModDataManager_Title = "OmiChat Mod Data Viewer",
     UI_OmiChat_ModDataManager_EditorTitle = "Edit Mod Data",
@@ -224,8 +224,7 @@ UI_KO = {
 
     --[[ Context Menus ]]--
     UI_OmiChat_ContextChatSettings = "채팅 설정",
-    UI_OmiChat_ContextChatCustomization = "채팅 커스터마이징",
-    UI_OmiChat_ContextCharacterCustomization = "모습 커스터마이징",
+    UI_OmiChat_ContextCustomization = "커스터마이징",
     UI_OmiChat_ContextLanguages = "롤플레이 언어",
     UI_OmiChat_ContextClean = "피와 먼지를 청소하기",
     UI_OmiChat_ContextHairColor = "염색하기",
