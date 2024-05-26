@@ -27,8 +27,7 @@ return OmiChat
 
 ---@alias omichat.SettingCategory
 ---| 'basic'
----| 'chat_customization'
----| 'character_customization'
+---| 'customization'
 ---| 'language'
 ---| 'admin'
 ---| 'suggestions'

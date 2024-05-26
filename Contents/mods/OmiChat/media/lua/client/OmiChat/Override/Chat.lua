@@ -374,17 +374,25 @@ local function addChatSettings(context)
     end
 end
 
----Adds the chat customization submenu to the context menu.
+---Adds the customization submenu to the context menu.
 ---@param context ISContextMenu
-local function addChatCustomizationSettings(context)
+local function addCustomizationSettings(context)
     local instance = ISChat.instance
     if not instance then
         return
     end
 
-    local option = context:addOption(getText('UI_OmiChat_ContextChatCustomization'), instance)
+    local player = getSpecificPlayer(0)
+    if not player then
+        return
+    end
+
+    local option = context:addOption(getText('UI_OmiChat_ContextCustomization'), instance)
     local submenu = context:getNew(context)
     context:addSubMenu(option, submenu)
+
+    -- chat customization
+    addSignEmoteOption(submenu)
 
     if Option.EnableSetNameColor or Option.EnableSpeechColorAsDefaultNameColor then
         local nameColorOptName = OmiChat.getNameColorsEnabled()
@@ -394,55 +402,29 @@ local function addChatCustomizationSettings(context)
         submenu:addOption(nameColorOptName, instance, ISChat.onToggleShowNameColor)
     end
 
-    if not Option.EnableCharacterCustomization then
-        addSignEmoteOption(submenu)
-    end
-
     local manageOptName = getText('UI_OmiChat_ContextManageProfiles')
     submenu:addOption(manageOptName, instance, ISChat.onManageProfiles)
 
-    local handlers = OmiChat.getSettingHandlers('chat_customization')
-    for i = 1, #handlers do
-        handlers[i](submenu)
-    end
-end
+    -- character customization
+    if Option.EnableCharacterCustomization then
+        if Option:isCleanCustomizationEnabled() then
+            local cleanOptName = getText('UI_OmiChat_ContextClean')
+            submenu:addOption(cleanOptName, instance, ISChat.onCleanCharacter)
+        end
 
----Adds the character customization submenu to the context menu.
----@param context ISContextMenu
-local function addCharacterCustomizationSettings(context)
-    local instance = ISChat.instance
-    if not instance or not Option.EnableCharacterCustomization then
-        return
-    end
+        local hairColorOptName = getText('UI_OmiChat_ContextHairColor')
+        submenu:addOption(hairColorOptName, instance, ISChat.onHairColorMenu)
 
-    local player = getSpecificPlayer(0)
-    if not player then
-        return
-    end
+        local growHairOptName = getText('UI_OmiChat_ContextGrowHair')
+        submenu:addOption(growHairOptName, instance, ISChat.onGrowHair)
 
-    local option = context:addOption(getText('UI_OmiChat_ContextCharacterCustomization'), instance)
-    local submenu = context:getNew(context)
-    context:addSubMenu(option, submenu)
-
-    addSignEmoteOption(submenu)
-
-    if Option:isCleanCustomizationEnabled() then
-        local cleanOptName = getText('UI_OmiChat_ContextClean')
-        submenu:addOption(cleanOptName, instance, ISChat.onCleanCharacter)
+        if not player:isFemale() then
+            local growBeardOptName = getText('UI_OmiChat_ContextGrowBeard')
+            submenu:addOption(growBeardOptName, instance, ISChat.onGrowBeard)
+        end
     end
 
-    local hairColorOptName = getText('UI_OmiChat_ContextHairColor')
-    submenu:addOption(hairColorOptName, instance, ISChat.onHairColorMenu)
-
-    local growHairOptName = getText('UI_OmiChat_ContextGrowHair')
-    submenu:addOption(growHairOptName, instance, ISChat.onGrowHair)
-
-    if not player:isFemale() then
-        local growBeardOptName = getText('UI_OmiChat_ContextGrowBeard')
-        submenu:addOption(growBeardOptName, instance, ISChat.onGrowBeard)
-    end
-
-    local handlers = OmiChat.getSettingHandlers('character_customization')
+    local handlers = OmiChat.getSettingHandlers('customization')
     for i = 1, #handlers do
         handlers[i](submenu)
     end
@@ -1224,8 +1206,7 @@ function ISChat:onGearButtonClick()
 
     addAdminOptions(context)
     addChatSettings(context)
-    addChatCustomizationSettings(context)
-    addCharacterCustomizationSettings(context)
+    addCustomizationSettings(context)
     addProfileSwitchSubmenu(context)
     addLanguageOptions(context)
 
