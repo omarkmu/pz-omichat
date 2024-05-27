@@ -7,7 +7,3 @@ do
     outfile="$BASE/docs/sandbox-presets/${fname%.*}.txt"
     echo -e "OmiChat = {\n$(sed -e '1d' $file)" > $outfile
 done
-
-# generate typestub
-lua-language-server --doc "./Contents/mods/OmiChat/media/lua"
-python $BASE/scripts/stubgen.py ./lls/log/doc.json -o $BASE/docs/api/typestub.lua -n "omi(?:chat)?\."
