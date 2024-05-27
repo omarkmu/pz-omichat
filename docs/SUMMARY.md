@@ -32,5 +32,4 @@
 
 # API
 
-- [Type Stub](api/typestub.md)
 - [Extending Format Strings](api/extending-format-strings.md)
