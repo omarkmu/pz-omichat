@@ -236,17 +236,8 @@ function ProfileManager:duplicateProfile()
         return
     end
 
-    local profile = {
-        name = getText('UI_OmiChat_ProfileManager_DefaultProfileName', newIdx),
-        colors = {},
-        callouts = utils.copy(item.callouts or {}),
-        sneakcallouts = utils.copy(item.sneakcallouts or {}),
-    }
-
-    local colors = item.colors or {}
-    for k, v in pairs(colors) do
-        profile.colors[k] = utils.copy(v)
-    end
+    local profile = cloneProfile(item)
+    profile.name = getText('UI_OmiChat_ProfileManager_DefaultProfileName', newIdx)
 
     self.profiles[newIdx] = profile
     self:addListboxItem(profile)
