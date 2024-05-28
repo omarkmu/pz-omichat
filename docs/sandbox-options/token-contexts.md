@@ -5,11 +5,14 @@ This document serves as a reference for the tokens available to different types 
 
 ## Chat
 
-The tokens within this context can be used by all [chat format strings](../sandbox-options/chat-formats.md).
+The tokens within this context can be used by all [chat format strings](../sandbox-options/chat-formats.md), other than [processed chats](#processed-chat).
 
 - [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$buffyCrit`](../format-strings/tokens.md#buffycrit)
+- [`$buffyCritRaw`](../format-strings/tokens.md#buffycritraw)
+- [`$buffyRoll`](../format-strings/tokens.md#buffyroll)
 - [`$callout`](../format-strings/tokens.md#callout)
 - [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$echo`](../format-strings/tokens.md#echo)
@@ -48,6 +51,9 @@ This context contains the tokens that can be used in [`ChatFormatFull`](../sandb
 - [`$admin`](../format-strings/tokens.md#admin)
 - [`$author`](../format-strings/tokens.md#author)
 - [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$buffyCrit`](../format-strings/tokens.md#buffycrit)
+- [`$buffyCritRaw`](../format-strings/tokens.md#buffycritraw)
+- [`$buffyRoll`](../format-strings/tokens.md#buffyroll)
 - `$content`: The full chat message content, after other formatting has occurred.
 - [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$echo`](../format-strings/tokens.md#echo)

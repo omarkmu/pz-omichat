@@ -264,7 +264,7 @@ The format used for `/safehouse` messages in chat.
 **See also:** [`ColorSafehouse`](./colors.md#colorsafehouse).
 
 ### ChatFormatSay
-**Default:** `$name: <SPACE> $message`  
+**Default:** `$name$unless($buffyRoll :) <SPACE> $message`  
 **Token Context:** [Chat](../sandbox-options/token-contexts.md#chat)
 
 The format used for `/say` messages in chat.
