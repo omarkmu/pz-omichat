@@ -370,22 +370,28 @@ Wraps quoted text within `s` in the color category specified, or the `say` color
 Checks and sets a cooldown associated with `key`.
 `n` is the number of seconds in the cooldown.
 
+If the cooldown period has ended, returns `true`.
+Otherwise, returns the empty string.
+
+Unless `suppressError` is passed, this also sets the [error token](./tokens.md#error-tokens) to a message informing the player of the cooldown.
+
 ### `$cooldownset(key n)` {#other-cooldownset}
 Sets the value of the cooldown associated with `key` to `n` seconds from now.
 
 ### `$cooldownif(condition n key suppressError)` {#other-cooldownif}
-The same as `$cooldown()`, but only if `condition` is truthy.
+The same as `$cooldown(...)`, but only if `condition` is truthy.
 
 ### `$cooldownunless(condition n key suppressError)` {#other-cooldownunless}
-The same as `$cooldown()`, but only if `condition` is falsy.
+The same as `$cooldown(...)`, but only if `condition` is falsy.
 
-### `$cooldownremaining(condition key)` {#other-cooldownremaining}
+### `$cooldownremaining(key)` {#other-cooldownremaining}
 Returns the number of seconds remaining on a cooldown, or the empty string if there's no such cooldown.
 
 ### `$disallowsignedoverradio(condition suppressError)` {#other-disallowsignedoverradio}
-Sets the `errorID` token if `condition` is true and the message language is signed.
-An error message will inform the player that they cannot use a signed language over the radio, unless `suppressError` is passed.
-Returns true if the check passed.
+Returns the empty string if `condition` is truthy and the message language is signed.
+Otherwise, returns `true`.
+
+Unless `suppressError` is passed, this also sets the [error token](./tokens.md#error-tokens) to a message that will inform the player that they cannot use a signed language over the radio.
 
 ### `$fragmented(text)` {#other-fragmented}
 Gets random fragments of the words in a string, replacing other words with ellipses.

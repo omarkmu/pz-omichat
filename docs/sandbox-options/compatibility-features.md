@@ -9,6 +9,14 @@ All of these features have three possible values:
 
 The third option will check for the mod ID before applying the patch.
 
+### EnableCompatBuffyRPGSystem
+**Default:** `2 - Disable`
+
+Enables the compatibility patch for [buffy's tabletop RPG system](https://steamcommunity.com/sharedfiles/filedetails/?id=2728250841).
+
+This reads messages that look like rolls from the mod and populates tokens accordingly.
+If this option is enabled, the [`$buffyRoll`](../format-strings/tokens.md#buffyroll), [`$buffyCrit`](../format-strings/tokens.md#buffycrit), and [`$buffyCritRaw`](../format-strings/tokens.md#buffycritraw) tokens will be populated where appropriate.
+
 ### EnableCompatChatBubble
 **Default:** `3 - Enable if mod is enabled`
 

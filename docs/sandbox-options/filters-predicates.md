@@ -44,13 +44,9 @@ Filters messages sent on a stream with [narrative style](#predicateusenarratives
 **Default:** `$sub($input 1 50)`
 
 Filters names set by players with `/name` or `/nickname`.
-
 The default option will limit names to 50 characters.
 
-This format can [set](../format-strings/functions.md#set) `error` or `errorID` to provide feedback to the player.
-If `errorID` is used, it will be interpreted as a string ID, whereas `error` will be displayed as given.
-
-If the empty string is returned, or either error token is set, the command will fail.
+If the empty string is returned, or either [error token](../format-strings/tokens.md#error-tokens) is set, the command will fail.
 
 **Tokens:**
 - [`$input`](../format-strings/tokens.md#input)
@@ -63,9 +59,7 @@ If the empty string is returned, or either error token is set, the command will 
 
 Determines whether chat input is allowed.
 
-This format can [set](../format-strings/functions.md#set) `error` or `errorID` to provide feedback to the player.
-If `errorID` is used, it will be interpreted as a string ID, whereas `error` will be displayed as given.
-If either token is set, the predicate will be considered a failure.
+If either [error token](../format-strings/tokens.md#error-tokens) is set, the predicate will be considered a failure.
 
 **Tokens:**
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -134,6 +128,10 @@ Determines whether a stream is enabled.
 
 Determines whether input will trigger the typing indicator.
 
+For example, to enable typing indicators for ranged streams only, set `PredicateShowTypingIndicator` to `$isRanged`.
+
+If [`FormatMenuName`](./component-formats.md#formatmenuname) does not resolve for the `typing` menu type, typing indicators will not display.
+
 **Tokens:**
 - [`$chatType`](../format-strings/tokens.md#chattype)
 - [`$input`](../format-strings/tokens.md#input)
@@ -192,7 +190,7 @@ Determines whether name colors are used for a message.
 Determines whether the narrative style is used for a message.
 If narrative style is used, messages will be enclosed in quotes and prefixed with a dialogue tag depending on the stream.
 
-For example, with the default settings and a modified predicate, a message sent with `/yell Hey` will be transformed to `shouts, "Hey!"`.
+For example, with the default settings and a modified predicate, a message sent with `/yell Hey` will be transformed to `shouts, “Hey!”`.
 Note that the player name is not included; overhead and chat formats should include it as needed.
 See the [buffy preset](../sandbox-presets/index.md#buffy) for examples.
 

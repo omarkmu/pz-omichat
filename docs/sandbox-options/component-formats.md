@@ -31,7 +31,7 @@ The format used for local [`/card`](./chat-formats.md#chatformatcard) overhead m
 - `$suit`: The suit  of the card, from 1 to 4. 1 is clubs, 2 is diamonds, 3 is hearts, and 4 is spades.
 
 ### FormatChatPrefix
-**Default:** `$if($icon $icon <SPACE>)$if($neq($stream server) $timestamp)$tag$language`  
+**Default:** `$if($icon $icon <SPACE>)$if($neq($stream server) $timestamp)$tag$language$if($buffyCrit $buffyCrit ( <SPACE>))`  
 **Token Context:** [Processed Chat](../sandbox-options/token-contexts.md#processed-chat)
 
 The format used to determine the value of the `$prefix` token in [`ChatFormatFull`](./chat-formats.md#chatformatfull).
@@ -45,13 +45,14 @@ The format used for local [`/roll`](./chat-formats.md#chatformatflip) overhead m
 - `$heads`: Populated if the result of the coin flip was heads.
 
 ### FormatIcon
-**Default:** `@($eq($stream card):Item_CardDeck;$eq($stream roll):Item_Dice;$has(@(say;shout;whisper;faction;safehouse;ooc;general) $stream):@($adminIcon;$icon))`
+**Default:** `@($eq($stream card):Item_CardDeck;$any($buffyRoll $eq($stream roll)):Item_Dice;$has(@(say;shout;whisper;faction;safehouse;ooc;general) $stream):@($adminIcon;$icon))`
 
 The format used to determine the value of `$icon` in other formats.
 
 **Tokens:**
 - `$adminIcon`: The icon determined by [`FormatAdminIcon`](#formatadminicon).
 This is only populated when the player is an admin with the relevant [option](../user-guide/admins.md#admin-menu) enabled.
+- [`$buffyRoll`](../format-strings/tokens.md#buffyroll)
 - [`$chatType`](../format-strings/tokens.md#chattype)
 - `$icon`: The icon associated with the message, or set with [`/seticon`](../user-guide/admins.md#commands).
 - [`$stream`](../format-strings/tokens.md#stream)

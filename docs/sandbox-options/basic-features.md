@@ -160,7 +160,7 @@ The minimum access level needed to execute [admin commands](../user-guide/admins
 The option used to determine a pattern for custom dialogue tags in [narrative style](./filters-predicates.md#predicateusenarrativestyle).
 If blank, custom tag prefixes will be turned off.
 
-For example, if this option is set to `^~(%l+)%s+(.+)` and the other narrative style options are configured, players can input `~inquires What's your name?` to get `Jane inquires, "What's your name?"`.
+For example, if this option is set to `^~(%l+)%s+(.+)` and the other narrative style options are configured, players can input `~inquires What's your name?` to get `Jane inquires, “What's your name?”`.
 
 This option should be a Lua [string pattern](https://www.lua.org/pil/20.2.html) with two [capture groups](https://www.lua.org/pil/20.3.html).
 If you're unsure about configuring this, start a [discussion](https://github.com/omarkmu/pz-omichat/discussions/new?category=q-a)!
