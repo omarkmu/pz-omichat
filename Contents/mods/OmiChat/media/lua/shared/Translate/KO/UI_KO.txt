@@ -107,7 +107,7 @@ UI_KO = {
     UI_OmiChat_UnknownLanguageNarrative_whisper_shouts = "%1이/가 %2(으)로 무슨 말을 크게 속삭였습니다.",
 
     --[[ Dialogue Tags ]]--
-    UI_OmiChat_NarrativeTag = "%1, %2",
+    UI_OmiChat_NarrativeTag = "%1, %2", ---@ignore identical
     UI_OmiChat_NarrativeTag_asks = "%1냐고 물었습니다.",
     UI_OmiChat_NarrativeTag_says = "%1라고 말했습니다.",
     UI_OmiChat_NarrativeTag_states = "%1라고 말했습니다.",
@@ -256,7 +256,7 @@ UI_KO = {
     UI_OmiChat_ContextColor_name = "이름 색",
     UI_OmiChat_ContextColor_speech = "말풍선 색",
     UI_OmiChat_ContextMessageType_radio = "라디오",
-    UI_OmiChat_ContextMessageType_discord = "Discord",
+    UI_OmiChat_ContextMessageType_discord = "Discord", ---@ignore identical
     UI_OmiChat_ContextMessageType_server = "서버",
     UI_OmiChat_ContextProfiles = "프로필 전환",
     UI_OmiChat_ContextProfileDefault = "기본 프로필",
