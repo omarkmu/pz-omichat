@@ -132,6 +132,7 @@ return check {
     'FormatInfo',
 
     category('Compatibility'),
+    'EnableCompatBuffyRPGSystem',
     'EnableCompatChatBubble',
     'EnableCompatSearchPlayers',
     'EnableCompatTAD',
@@ -172,6 +173,7 @@ return check {
     'LanguageSlots',
     'InterpretationRolls',
     'InterpretationChance',
+    'FormatLanguage',
     'ChatFormatUnknownLanguage',
     'ChatFormatUnknownLanguageRadio',
 
@@ -304,6 +306,5 @@ return check {
     'FormatMenuName',
     'FormatTag',
     'FormatTimestamp',
-    'FormatLanguage',
     'FormatIcon',
 }

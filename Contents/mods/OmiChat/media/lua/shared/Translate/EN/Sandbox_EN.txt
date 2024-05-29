@@ -63,6 +63,7 @@ Sandbox_EN = {
     Sandbox_OCPatternNarrativeCustomTag_tooltip = "Lua string pattern for custom dialogue tags when using narrative style. If blank, custom dialogue tags will be disabled.",
 
     --[[ Compatibility Features ]]--
+    Sandbox_OCEnableCompatBuffyRPGSystem = "Buffy's Tabletop RPG System Compatibility",
     Sandbox_OCEnableCompatChatBubble = "Chat Bubble Compatibility",
     Sandbox_OCEnableCompatSearchPlayers = "Search Players For Weapons Compatibility",
     Sandbox_OCEnableCompatTAD = "True Actions Act 3 - Dancing Compatibility",
@@ -72,6 +73,8 @@ Sandbox_EN = {
     Sandbox_OCCompatOptionValue_option3 = "Enable if mod is enabled",
 
     /* Tooltips */
+    Sandbox_OCEnableCompatBuffyRPGSystem_tooltip = "Controls compatibility with the <SPACE> <RGB:0,0.5,1> Buffy's Tabletop RPG System <RGB:1,1,1> <SPACE> mod. <LINE>" ..
+        "The compatibility patch provides tokens for roll messages to control their formatting and uses <SPACE> <GREEN> /me <RGB:1,1,1> <SPACE> formatting for these messages if the stream is enabled."
     Sandbox_OCEnableCompatChatBubble_tooltip = "Controls compatibility with the <SPACE> <RGB:0,0.5,1> Chat Bubble v0.6 <RGB:1,1,1> <SPACE> mod. <LINE> The compatibility patch prevents image messages from that mod from showing up in chat.",
     Sandbox_OCEnableCompatSearchPlayers_tooltip = "Controls compatibility with the <SPACE> <RGB:0,0.5,1> Search Players For Weapons <RGB:1,1,1> <SPACE> mod. <LINE> The compatibility patch modifies options added by the mod to respect the menu name format.",
     Sandbox_OCEnableCompatTAD_tooltip = "Controls compatibility with the <SPACE> <RGB:0,0.5,1> True Actions Act 3 - Dancing <RGB:1,1,1> <SPACE> mod. <LINE> The compatibility patch adds a <SPACE> <GREEN> /dance <RGB:1,1,1> <SPACE> command.",
