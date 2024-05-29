@@ -183,6 +183,7 @@ function OmiChat.applyFormatOptions(info)
     local icon = utils.interpolate(Option.FormatIcon, {
         chatType = info.chatType,
         stream = info.tokens.stream,
+        buffyRoll = info.tokens.buffyRoll,
         icon = meta.icon,
         adminIcon = meta.adminIcon,
     }, seed)
@@ -388,6 +389,9 @@ function OmiChat.buildMessageTextFromInfo(info)
         language = info.language,
         timestamp = info.timestamp,
         tag = info.tag,
+        buffyRoll = info.tokens.buffyRoll,
+        buffyCrit = info.tokens.buffyCrit,
+        buffyCritRaw = info.tokens.buffyCritRaw,
         content = utils.interpolate(info.format, info.tokens, seed),
     }
 

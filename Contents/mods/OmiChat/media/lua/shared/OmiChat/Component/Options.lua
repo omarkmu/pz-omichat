@@ -14,6 +14,7 @@ local floor = math.floor
 ---@field EnableSetNameColor boolean
 ---@field EnableSpeechColorAsDefaultNameColor boolean
 ---@field EnableSetSpeechColor boolean
+---@field EnableCompatBuffyRPGSystem integer
 ---@field EnableCompatChatBubble integer
 ---@field EnableCompatSearchPlayers integer
 ---@field EnableCompatTAD integer
@@ -238,6 +239,11 @@ end
 ---@return boolean
 function Option:canPlayersSetNickname()
     return self:isNicknameCommandEnabled() or self.EnableSetName == 2
+end
+
+---Returns whether the Buffy's Tabletop RPG System compatibility patch is enabled.
+function Option:compatBuffyRPGSystemEnabled()
+    return isCompatEnabled(Option.EnableCompatBuffyRPGSystem, 'roleplaydnd_update15')
 end
 
 ---Returns whether the Chat Bubble compatibility patch is enabled.

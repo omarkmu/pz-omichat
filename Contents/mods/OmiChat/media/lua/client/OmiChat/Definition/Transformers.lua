@@ -314,6 +314,10 @@ return {
         name = 'handle-language',
         priority = 30,
         transform = function(_, info)
+            if info.context.ocSkipLanguage then
+                return
+            end
+
             local isRadio = info.context.ocIsRadio
             local formatter = OmiChat.getFormatter('language')
             local text = info.content or info.rawText
@@ -328,6 +332,7 @@ return {
             local language = info.meta.language
             if not language and isRadio and encodedLanguage then
                 language = encodedLanguage
+                info.meta.language = language
                 utils.addMessageTagValue(info.message, 'ocLanguage', language)
             end
 
