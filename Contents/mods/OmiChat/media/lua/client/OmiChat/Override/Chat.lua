@@ -217,6 +217,10 @@ local function addLanguageOptions(context)
         end
     end
 
+    if #knownLanguages == 0 and #addLanguages == 0 then
+        return
+    end
+
     local languageOptionName = getText('UI_OmiChat_ContextLanguages')
     local languageOption = context:addOption(languageOptionName, ISChat.instance)
     local languageSubMenu = context:getNew(context)
