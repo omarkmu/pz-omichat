@@ -1,5 +1,61 @@
 # Changelog
 
+## 1.2.0
+
+### Added
+- Player preference profiles
+    - These allow for switching between sets of player preferences.
+    Profiles include the chat nickname, shout text, and chat colors.
+    This may be useful for playing multiple characters with different speech colors, or for switching between chat “themes.”
+- Player preferences to control how suggestions are entered
+    - Tab and Enter can be toggled individually.
+    If both are disabled, suggestions will only be entered on click.
+- Typing indicator controlled by the new options `PredicateShowTypingIndicator` and `FormatTyping`
+	- This defaults to **off**; to use this feature, the predicate option must be set.
+    To enable typing indicators for ranged streams only (recommended), set `PredicateShowTypingIndicator` to `$isRanged`.
+- API functionality for adding emote handler functions
+    - This enables emote shortcuts that use something other than `playEmote`.
+- Mod data management menu for admins
+	- This allows setting mod data for both online and offline players.
+    It includes chat nickname, name color, languages, and language slots.
+- Compatibility patch for buffy's tabletop roleplay system
+    - This populates the tokens `$buffyRoll`, `$buffyCrit`, and `$buffyCritRaw`.
+    See the documentation for details.
+    - Unlike other compatibility patches, this defaults to **off**.
+    This is because there is recommended setup to perform before enabling the patch.
+    - To enable the patch for existing settings:
+        1. If you're using a preset without any changes, re-apply the preset from the in-game sandbox options menu and skip to the last step.
+        2. Modify the `FormatIcon` option to use the dice icon when the message is a roll.
+        If you're using a value from one of the presets, you can replace `$eq($stream roll)` with `$any($buffyRoll $eq($stream roll))`.
+        3. Modify the `FormatChatPrefix` option to include the critical roll indicator with `$buffyCrit`.
+        This can be placed anywhere; if your settings are based on the buffy preset, you can add `$buffyCrit` to the end.
+        Otherwise, see the presets for examples.
+        4. Set the `EnableCompatBuffyRPGSystem` option to `Enable` or `Enable if mod is enabled`.
+- Conversion for strings deprecated in this release and the previous release
+    - This should handle automatically updating the outdated values, but relevant options should still be updated.
+	The conversion will be removed in a future version.
+
+### Changed
+- Chat streams are now case-insensitive by default
+	- This can be reverted by disabling the new `EnableCaseInsensitiveChatStreams` option.
+- Improved the in-game admin sandbox options menu
+	- All options now have tooltips.
+	- Options have been organized into sections.
+	- Color options include a color selector.
+	- Presets can now be applied from this menu.
+- Merged the chat customization and character customization setting menus
+- The `FormatNarrativePunctuation` option now includes the `$dialogueTag` token
+- Faction/safehouse echo messages will no longer display if the player would have seen the original message
+- Normalized string names
+
+### Deprecated
+- Deprecated two more strings that were in use by presets
+	- `UI_OmiChat_error_signed_faction_radio`: use `$disallowsignedoverradio(...)`
+	- `UI_OmiChat_error_signed_safehouse_radio`: use `$disallowsignedoverradio(...)`
+
+### Fixed
+- Fixed the string key for `UI_OmiChat_Error_CommandCooldown1` in English
+
 ## 1.1.1
 
 ### Fixed

@@ -4,6 +4,9 @@ This page contains [sandbox options](../sandbox-options/index.md) presets to hel
 The presets can be copied by clicking the button that appears the top right of the block on hover.
 You can paste them directly into your server's `SandboxVars` file, or use a preset as a base and tweak it.
 
+These presets can also be applied from the in-game admin sandbox options menu.
+
+
 ## Default
 
 This preset contains the default settings of the mod.

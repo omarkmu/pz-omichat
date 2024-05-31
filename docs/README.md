@@ -27,8 +27,8 @@ The vast majority of the features in the mod can be configured or completely dis
 - Speech bubble color [customization](https://omarkmu.github.io/pz-omichat/sandbox-options/basic-features.html#enablesetspeechcolor)
 - Callout [customization](https://omarkmu.github.io/pz-omichat/user-guide/chat-settings.html#callout-customization)
 - Character naming with [`/name`](https://omarkmu.github.io/pz-omichat/sandbox-options/basic-features.html#enablesetname)
-- Character [customization](https://omarkmu.github.io/pz-omichat/sandbox-options/basic-features.html#enablecharactercustomization) (off-by-default)
-- Chat [buffs](https://omarkmu.github.io/pz-omichat/sandbox-options/filters-predicates.html#predicateapplybuff) (off-by-default)
+- Character [customization](https://omarkmu.github.io/pz-omichat/sandbox-options/basic-features.html#enablecharactercustomization) (off by default)
+- Chat [buffs](https://omarkmu.github.io/pz-omichat/sandbox-options/filters-predicates.html#predicateapplybuff) (off by default)
 - Display of chat names in [menus](https://omarkmu.github.io/pz-omichat/sandbox-options/component-formats.html#formatmenuname) (Trading, Medical Check)
 - Local [`/whisper`](https://omarkmu.github.io/pz-omichat/sandbox-options/chat-formats.html#chatformatwhisper) chat
 - Local [`/card`](https://omarkmu.github.io/pz-omichat/sandbox-options/chat-formats.html#chatformatcard) and [`/roll`](https://omarkmu.github.io/pz-omichat/sandbox-options/chat-formats.html#chatformatroll)
@@ -40,6 +40,7 @@ The vast majority of the features in the mod can be configured or completely dis
 - Compatibility with [True Actions Act 3 - Dancing](https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556) with [`/dance`](https://omarkmu.github.io/pz-omichat/sandbox-options/compatibility-features.html#enablecompattad)
 - Chat range [options](https://omarkmu.github.io/pz-omichat/sandbox-options/ranges.html)
 - Info text [option](https://omarkmu.github.io/pz-omichat/sandbox-options/component-formats.html#formatinfo)
+- Typing [indicator](https://omarkmu.github.io/pz-omichat/sandbox-options/filters-predicates.html#predicateshowtypingindicator) (off by default)
 - Various other options for chat customization
 - API for extension by other mods
 
@@ -49,7 +50,7 @@ Thank you to the translators!
 - French: [Inkredibehl](https://github.com/Inkredibehl)
 - Korean: 우로
 
-If you'd like to see the mod translated into your language, please [contribute](https://github.com/omarkmu/pz-omichat/blob/main/.github/CONTRIBUTING.md)!  
+If you'd like to see the mod translated into your language, please [contribute](https://github.com/omarkmu/pz-omichat/blob/main/.github/CONTRIBUTING.md#contributing-translations)!  
 Some features were inspired by [buffy's roleplay chat](https://steamcommunity.com/sharedfiles/filedetails/?id=2688851521).  
 
 <!-- ANCHOR_END: content -->

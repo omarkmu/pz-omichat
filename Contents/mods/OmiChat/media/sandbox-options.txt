@@ -50,6 +50,14 @@ option OmiChat.EnableFactionColorAsDefault
     translation = OCEnableFactionColorAsDefault,
 }
 
+option OmiChat.EnableCaseInsensitiveChatStreams
+{
+    type = boolean,
+    default = true,
+    page = OmiChat,
+    translation = OCEnableCaseInsensitiveChatStreams,
+}
+
 option OmiChat.EnableCharacterCustomization
 {
     type = boolean,
@@ -122,6 +130,16 @@ option OmiChat.PatternNarrativeCustomTag
 
 
 /* Compatibility Feature Flags */
+option OmiChat.EnableCompatBuffyRPGSystem
+{
+    type = enum,
+    numValues = 3,
+    default = 2,
+    page = OmiChat,
+    translation = OCEnableCompatBuffyRPGSystem,
+    valueTranslation = OCCompatOptionValue,
+}
+
 option OmiChat.EnableCompatChatBubble
 {
     type = enum,
@@ -584,6 +602,14 @@ option OmiChat.PredicateAttractZombies
     translation = OCPredicateAttractZombies,
 }
 
+option OmiChat.PredicateShowTypingIndicator
+{
+    type = string,
+    default =,
+    page = OmiChat,
+    translation = OCPredicateShowTypingIndicator,
+}
+
 option OmiChat.PredicateTransmitOverRadio
 {
     type = string,
@@ -722,6 +748,14 @@ option OmiChat.FormatMenuName
     translation = OCFormatMenuName,
 }
 
+option OmiChat.FormatTyping
+{
+    type = string,
+    default = $fmttyping($names $alt),
+    page = OmiChat,
+    translation = OCFormatTyping,
+}
+
 option OmiChat.FormatCard
 {
     type = string,
@@ -757,7 +791,7 @@ option OmiChat.FormatAdminIcon
 option OmiChat.FormatIcon
 {
     type = string,
-    default = @($eq($stream card):Item_CardDeck;$eq($stream roll):Item_Dice;$has(@(say;shout;whisper;faction;safehouse;ooc;general) $stream):@($adminIcon;$icon)),
+    default = @($eq($stream card):Item_CardDeck;$any($buffyRoll $eq($stream roll)):Item_Dice;$has(@(say;shout;whisper;faction;safehouse;ooc;general) $stream):@($adminIcon;$icon)),
     page = OmiChat,
     translation = OCFormatIcon,
 }
@@ -781,7 +815,7 @@ option OmiChat.FormatOverheadPrefix
 option OmiChat.FormatChatPrefix
 {
     type = string,
-    default = $if($icon $icon <SPACE>)$if($neq($stream server) $timestamp)$tag$language,
+    default = $if($icon $icon <SPACE>)$if($neq($stream server) $timestamp)$tag$language$if($buffyCrit $buffyCrit ( <SPACE>)),
     page = OmiChat,
     translation = OCFormatChatPrefix,
 }
@@ -1081,7 +1115,7 @@ option OmiChat.ChatFormatSafehouse
 option OmiChat.ChatFormatSay
 {
     type = string,
-    default = $name: <SPACE> $message,
+    default = $name$unless($buffyRoll :) <SPACE> $message,
     page = OmiChat,
     translation = OCChatFormatSay,
 }

@@ -31,7 +31,7 @@ The format used for local [`/card`](./chat-formats.md#chatformatcard) overhead m
 - `$suit`: The suit  of the card, from 1 to 4. 1 is clubs, 2 is diamonds, 3 is hearts, and 4 is spades.
 
 ### FormatChatPrefix
-**Default:** `$if($icon $icon <SPACE>)$if($neq($stream server) $timestamp)$tag$language`  
+**Default:** `$if($icon $icon <SPACE>)$if($neq($stream server) $timestamp)$tag$language$if($buffyCrit $buffyCrit ( <SPACE>))`  
 **Token Context:** [Processed Chat](../sandbox-options/token-contexts.md#processed-chat)
 
 The format used to determine the value of the `$prefix` token in [`ChatFormatFull`](./chat-formats.md#chatformatfull).
@@ -45,13 +45,14 @@ The format used for local [`/roll`](./chat-formats.md#chatformatflip) overhead m
 - `$heads`: Populated if the result of the coin flip was heads.
 
 ### FormatIcon
-**Default:** `@($eq($stream card):Item_CardDeck;$eq($stream roll):Item_Dice;$has(@(say;shout;whisper;faction;safehouse;ooc;general) $stream):@($adminIcon;$icon))`
+**Default:** `@($eq($stream card):Item_CardDeck;$any($buffyRoll $eq($stream roll)):Item_Dice;$has(@(say;shout;whisper;faction;safehouse;ooc;general) $stream):@($adminIcon;$icon))`
 
 The format used to determine the value of `$icon` in other formats.
 
 **Tokens:**
 - `$adminIcon`: The icon determined by [`FormatAdminIcon`](#formatadminicon).
 This is only populated when the player is an admin with the relevant [option](../user-guide/admins.md#admin-menu) enabled.
+- [`$buffyRoll`](../format-strings/tokens.md#buffyroll)
 - [`$chatType`](../format-strings/tokens.md#chattype)
 - `$icon`: The icon associated with the message, or set with [`/seticon`](../user-guide/admins.md#commands).
 - [`$stream`](../format-strings/tokens.md#stream)
@@ -99,6 +100,7 @@ If blank, menus will not be affected.
     - `mini_scoreboard`
     - `search_player` (see [`EnableCompatSearchPlayers`](../sandbox-options/compatibility-features.md#enablecompatsearchplayers))
     - `trade`
+    - `typing` (see [`PredicateShowTypingIndicator`](../sandbox-options/filters-predicates.md#predicateshowtypingindicator))
 
 ### FormatName
 **Default:** `$ifelse($has(@(general;admin;whisper) $chatType) $username @($name;$forename))`
@@ -134,11 +136,23 @@ The format used to determine the punctuation used in [narrative style](./filters
 **Tokens:**
 - [`$callout`](../format-strings/tokens.md#callout)
 - [`$chatType`](../format-strings/tokens.md#chattype)
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
 - [`$input`](../format-strings/tokens.md#input)
 - [`$name`](../format-strings/tokens.md#name)
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 - [`$stream`](../format-strings/tokens.md#stream)
 - [`$username`](../format-strings/tokens.md#username)
+
+### FormatTyping
+**Default:** `$fmttyping($names $alt)`
+
+The format used to determine the text used for [typing indicators](./filters-predicates.md#predicateshowtypingindicator).
+
+**Tokens:**
+- `$alt`: Populated when requesting an alternative, shorter string.
+This is used when the content of the regular string was too long to fit the chat box.
+- `$names`: An [at-map](../format-strings/at-maps.md) containing the names of the people typing.
+Not populated when requesting an alternative string.
 
 ### FormatOverheadPrefix
 **Default:** `$concats(( ) $index(@(low:[Low];whisper:[Whisper]) $stream) $if($languageRaw [$languageRaw]))&#32;`

@@ -28,8 +28,8 @@
     - [Functions](format-strings/functions.md)
     - [At-Maps](format-strings/at-maps.md)
     - [Escapes & References](format-strings/escapes-references.md)
+- [String Customization](customization/strings.md)
 
 # API
 
-- [Type Stub](api/typestub.md)
 - [Extending Format Strings](api/extending-format-strings.md)

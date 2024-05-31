@@ -5,7 +5,7 @@ require 'Chat/ISChat'
 
 ---@class omichat.api.client : omichat.api.shared
 ---@field private _commandStreams omichat.CommandStream[]
----@field private _emotes table<string, string>
+---@field private _emotes table<string, string | omichat.EmoteHandler>
 ---@field private _formatters table<string, omichat.MetaFormatter>
 ---@field private _iconsToExclude table<string, true>
 ---@field private _transformers omichat.MessageTransformer[]
@@ -17,26 +17,36 @@ require 'Chat/ISChat'
 ---@field private _customButtons ISButton[]
 ---@field private _customSuggesterArgTypes table<string, omichat.SuggestSearchCallback>
 ---@field private _settingHandlers table<omichat.SettingCategory, omichat.SettingHandlerCallback[]>
+---@field private _isTyping boolean
+---@field private _typingDisplay string?
+---@field private _typingInfo table<string, omichat.TypingInformation>
+---@field private _leftmostBtn ISButton?
 local OmiChat = require 'OmiChatShared'
 
 OmiChat.ColorModal = require 'OmiChat/Component/ColorModal'
+OmiChat.ValidatedColorEntry = require 'OmiChat/Component/ValidatedColorEntry'
+OmiChat.ValidatedTextEntry = require 'OmiChat/Component/ValidatedTextEntry'
 OmiChat.IconPicker = require 'OmiChat/Component/IconPicker'
 OmiChat.SuggesterBox = require 'OmiChat/Component/SuggesterBox'
 OmiChat.StreamInfo = require 'OmiChat/Component/StreamInfo'
+OmiChat.TextPanel = require 'OmiChat/Component/TextPanel'
 
-OmiChat._prefsVersion = 1
+OmiChat._prefsVersion = 2
 OmiChat._prefsFileName = 'omichat.json'
 
 OmiChat._formatters = {}
 OmiChat._customButtons = {}
 OmiChat._customSuggesterArgTypes = {}
+OmiChat._typingDisplay = nil
+OmiChat._typingInfo = {}
+OmiChat._isTyping = false
 
 OmiChat._settingHandlers = {
     admin = {},
     basic = {},
-    chat_customization = {},
-    character_customization = {},
+    customization = {},
     language = {},
+    suggestions = {},
     main = {},
 }
 OmiChat._iconsToExclude = {

@@ -11,6 +11,7 @@ local utils = OmiChat.utils
 local Option = OmiChat.Option
 local unpack = unpack
 local concat = table.concat
+local getTimestampMs = getTimestampMs
 
 local englishSuits = {
     'Clubs',
@@ -75,6 +76,16 @@ end
 ---Executes the /clearnames command.
 function OmiChat.requestClearNames()
     return OmiChat.dispatch('requestClearNames')
+end
+
+---Requests clearing mod data for a given username.
+---@param username string
+---@return boolean success
+function OmiChat.requestClearModData(username)
+    ---@type omichat.request.ClearModData
+    local req = { username = username }
+
+    return OmiChat.dispatch('requestClearModData', req)
 end
 
 ---Requests an update to global mod data.
@@ -215,6 +226,19 @@ function OmiChat.requestSetName(command)
     return OmiChat.dispatch('requestSetName', req)
 end
 
+---Sends the current typing status to the server.
+---@param range integer?
+---@return boolean
+function OmiChat.sendTypingStatus(range)
+    ---@type omichat.request.Typing
+    local req = {
+        range = range,
+        typing = OmiChat.getTyping(),
+    }
+
+    return OmiChat.dispatch('requestTyping', req)
+end
+
 --#endregion
 
 --#region handlers
@@ -235,7 +259,7 @@ function OmiChat.Commands.reportDrawCard(args)
     -- global message
     if args.name then
         local cardName = utils.getTranslatedCardName(card, suit)
-        OmiChat.addInfoMessage(getText('UI_OmiChat_card', args.name, cardName))
+        OmiChat.addInfoMessage(getText('UI_OmiChat_Card', args.name, cardName))
         return
     end
 
@@ -315,6 +339,24 @@ end
 ---Updates chat state.
 function OmiChat.Commands.updateState()
     OmiChat.updateState(true)
+end
+
+---Updates typing state for another player.
+---@param args omichat.request.UpdateTyping
+function OmiChat.Commands.updateTyping(args)
+    local typingInfo ---@type omichat.TypingInformation?
+
+    local player = args.typing and utils.getPlayerByUsername(args.username)
+    local display = player and OmiChat.getPlayerMenuName(player, 'typing')
+    if display then
+        typingInfo = {
+            display = display,
+            lastUpdate = getTimestampMs(),
+        }
+    end
+
+    OmiChat._typingInfo[args.username] = typingInfo
+    OmiChat.updateTypingDisplay()
 end
 
 --#endregion

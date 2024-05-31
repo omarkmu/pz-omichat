@@ -13,5 +13,8 @@
         "codestyle": "Information",
         "conventions": "Warning",
         "redefined": "Warning"
-    }
+    },
+    "workspace.ignoreDir": [
+        "SandboxPreset"
+    ]
 }

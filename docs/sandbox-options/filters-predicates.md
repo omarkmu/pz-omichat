@@ -44,13 +44,9 @@ Filters messages sent on a stream with [narrative style](#predicateusenarratives
 **Default:** `$sub($input 1 50)`
 
 Filters names set by players with `/name` or `/nickname`.
-
 The default option will limit names to 50 characters.
 
-This format can [set](../format-strings/functions.md#set) `error` or `errorID` to provide feedback to the player.
-If `errorID` is used, it will be interpreted as a string ID, whereas `error` will be displayed as given.
-
-If the empty string is returned, or either error token is set, the command will fail.
+If the empty string is returned, or either [error token](../format-strings/tokens.md#error-tokens) is set, the command will fail.
 
 **Tokens:**
 - [`$input`](../format-strings/tokens.md#input)
@@ -63,9 +59,7 @@ If the empty string is returned, or either error token is set, the command will 
 
 Determines whether chat input is allowed.
 
-This format can [set](../format-strings/functions.md#set) `error` or `errorID` to provide feedback to the player.
-If `errorID` is used, it will be interpreted as a string ID, whereas `error` will be displayed as given.
-If either token is set, the predicate will be considered a failure.
+If either [error token](../format-strings/tokens.md#error-tokens) is set, the predicate will be considered a failure.
 
 **Tokens:**
 - [`$callout`](../format-strings/tokens.md#callout)
@@ -93,32 +87,6 @@ Determines whether [roleplay languages](./languages.md) can be used for a messag
 - [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
 - [`$stream`](../format-strings/tokens.md#stream)
 - [`$username`](../format-strings/tokens.md#username)
-
-### PredicateTransmitOverRadio
-**Default:** `$any($has(@(whisper;low) $customStream) $not($customStream))`
-
-Determines whether a message should be transmitted over the radio.
-
-This only controls whether messages that have already been transmitted will be visible.
-For faction/safehouse echo messages, use [`ChatFormatEcho`](./chat-formats.md#chatformatecho).
-
-**Tokens:**
-- [`$admin`](../format-strings/tokens.md#admin)
-- [`$author`](../format-strings/tokens.md#author)
-- [`$authorRaw`](../format-strings/tokens.md#authorraw)
-- [`$callout`](../format-strings/tokens.md#callout)
-- `$customStream`: The name of the custom stream the original message was sent over, if any.
-This has the same values as `$stream`, but will only be populated with custom streams.
-- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
-- [`$echo`](../format-strings/tokens.md#echo)
-- [`$language`](../format-strings/tokens.md#language)
-- [`$languageRaw`](../format-strings/tokens.md#languageraw)
-- [`$icon`](../format-strings/tokens.md#icon)
-- [`$iconRaw`](../format-strings/tokens.md#iconraw)
-- [`$name`](../format-strings/tokens.md#name)
-- [`$nameRaw`](../format-strings/tokens.md#nameraw)
-- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
-- [`$stream`](../format-strings/tokens.md#stream)
 
 ### PredicateApplyBuff
 `(blank by default)`
@@ -155,6 +123,50 @@ Determines whether a stream is enabled.
 **Tokens:**
 - [`$stream`](../format-strings/tokens.md#stream)
 
+### PredicateShowTypingIndicator
+`(blank by default)`
+
+Determines whether input will trigger the typing indicator.
+
+For example, to enable typing indicators for ranged streams only, set `PredicateShowTypingIndicator` to `$isRanged`.
+
+If [`FormatMenuName`](./component-formats.md#formatmenuname) does not resolve for the `typing` menu type, typing indicators will not display.
+
+**Tokens:**
+- [`$chatType`](../format-strings/tokens.md#chattype)
+- [`$input`](../format-strings/tokens.md#input)
+- `$isRanged`: Populated if the stream is a ranged stream.
+- `$range`: The range of the chat stream. Not included if it's not a ranged stream.
+- [`$stream`](../format-strings/tokens.md#stream)
+
+**See also:** [`FormatTyping`](./component-formats.md#formattyping).
+
+### PredicateTransmitOverRadio
+**Default:** `$any($has(@(whisper;low) $customStream) $not($customStream))`
+
+Determines whether a message should be transmitted over the radio.
+
+This only controls whether messages that have already been transmitted will be visible.
+For faction/safehouse echo messages, use [`ChatFormatEcho`](./chat-formats.md#chatformatecho).
+
+**Tokens:**
+- [`$admin`](../format-strings/tokens.md#admin)
+- [`$author`](../format-strings/tokens.md#author)
+- [`$authorRaw`](../format-strings/tokens.md#authorraw)
+- [`$callout`](../format-strings/tokens.md#callout)
+- `$customStream`: The name of the custom stream the original message was sent over, if any.
+This has the same values as `$stream`, but will only be populated with custom streams.
+- [`$dialogueTag`](../format-strings/tokens.md#dialoguetag)
+- [`$echo`](../format-strings/tokens.md#echo)
+- [`$language`](../format-strings/tokens.md#language)
+- [`$languageRaw`](../format-strings/tokens.md#languageraw)
+- [`$icon`](../format-strings/tokens.md#icon)
+- [`$iconRaw`](../format-strings/tokens.md#iconraw)
+- [`$name`](../format-strings/tokens.md#name)
+- [`$nameRaw`](../format-strings/tokens.md#nameraw)
+- [`$sneakCallout`](../format-strings/tokens.md#sneakcallout)
+- [`$stream`](../format-strings/tokens.md#stream)
+
 ### PredicateUseNameColor
 **Default:** `$eq($stream say)`
 
@@ -178,7 +190,7 @@ Determines whether name colors are used for a message.
 Determines whether the narrative style is used for a message.
 If narrative style is used, messages will be enclosed in quotes and prefixed with a dialogue tag depending on the stream.
 
-For example, with the default settings and a modified predicate, a message sent with `/yell Hey` will be transformed to `shouts, "Hey!"`.
+For example, with the default settings and a modified predicate, a message sent with `/yell Hey` will be transformed to `shouts, “Hey!”`.
 Note that the player name is not included; overhead and chat formats should include it as needed.
 See the [buffy preset](../sandbox-presets/index.md#buffy) for examples.
 

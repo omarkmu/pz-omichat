@@ -114,7 +114,28 @@ return {
 
             local player = getSpecificPlayer(0)
             local username = player and player:getUsername()
-            if info.message:getAuthor() == username then
+            local author = info.message:getAuthor()
+            if author == username then
+                info.message:setShowInChat(false)
+                info.message:setOverHeadSpeech(false)
+                return
+            end
+
+            if not author or not username then
+                return
+            end
+
+            local shouldSuppress = false
+            local echoType = utils.decodeInvisibleCharacter(matched)
+            if echoType == 1 then -- faction
+                local playerFaction = Faction.getPlayerFaction(username)
+                shouldSuppress = playerFaction and (playerFaction:isOwner(author) or playerFaction:isMember(author))
+            elseif echoType == 2 then -- safehouse
+                local playerSafehouse = SafeHouse.hasSafehouse(username)
+                shouldSuppress = playerSafehouse and playerSafehouse:playerAllowed(author)
+            end
+
+            if shouldSuppress then
                 info.message:setShowInChat(false)
                 info.message:setOverHeadSpeech(false)
             end
@@ -293,6 +314,10 @@ return {
         name = 'handle-language',
         priority = 30,
         transform = function(_, info)
+            if info.context.ocSkipLanguage then
+                return
+            end
+
             local isRadio = info.context.ocIsRadio
             local formatter = OmiChat.getFormatter('language')
             local text = info.content or info.rawText
@@ -307,6 +332,7 @@ return {
             local language = info.meta.language
             if not language and isRadio and encodedLanguage then
                 language = encodedLanguage
+                info.meta.language = language
                 utils.addMessageTagValue(info.message, 'ocLanguage', language)
             end
 
@@ -327,7 +353,7 @@ return {
                 info.message:setOverHeadSpeech(false)
             end
 
-            if isAdmin() and OmiChat.getAdminOption('know_all_languages') then
+            if isAdmin() and OmiChat.getUnderstandAllLanguages() then
                 return
             end
 
@@ -449,7 +475,7 @@ return {
                 end
             end
 
-            if isAdmin() and OmiChat.getAdminOption('ignore_message_range') then
+            if isAdmin() and OmiChat.getIgnoreMessageRange() then
                 return
             end
 

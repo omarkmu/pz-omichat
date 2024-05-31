@@ -49,6 +49,7 @@ description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=26487
 description=[*]Input suggestion box
 description=[*]Emote animation shortcuts (.clap, .salute, .surrender, etc.) + /emotes command to display a list of emotes
 description=[*]Roleplay languages
+description=[*]Typing indicators (off by default)
 description=[*]...and more!
 description=[/list]
 description=
@@ -69,6 +70,7 @@ description=The mod is confirmed to be compatible with the following mods, for w
 description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2688676019]Chat Bubble v0.6[/url]
 description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2873010748]Search Players For Weapons[/url]
 description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556]True Actions. Act 3 - Dancing[/url]
+description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2728250841]buffy's tabletop RPG system[/url]
 description=[/list]
 description=
 description=[h2]Permissions & Credits[/h2]

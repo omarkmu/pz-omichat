@@ -14,6 +14,7 @@ local floor = math.floor
 ---@field EnableSetNameColor boolean
 ---@field EnableSpeechColorAsDefaultNameColor boolean
 ---@field EnableSetSpeechColor boolean
+---@field EnableCompatBuffyRPGSystem integer
 ---@field EnableCompatChatBubble integer
 ---@field EnableCompatSearchPlayers integer
 ---@field EnableCompatTAD integer
@@ -22,6 +23,7 @@ local floor = math.floor
 ---@field EnableCleanCharacter integer
 ---@field EnableDiscordColorOption integer
 ---@field EnableSetName integer
+---@field EnableCaseInsensitiveChatStreams boolean
 ---@field CardItems string
 ---@field CoinItems string
 ---@field DiceItems string
@@ -76,6 +78,7 @@ local floor = math.floor
 ---@field PredicateAllowLanguage string
 ---@field PredicateTransmitOverRadio string
 ---@field PredicateEnableStream string
+---@field PredicateShowTypingIndicator string
 ---@field AvailableLanguages string
 ---@field AddLanguageAllowlist string
 ---@field AddLanguageBlocklist string
@@ -99,6 +102,7 @@ local floor = math.floor
 ---@field FormatAdminIcon string
 ---@field FormatNarrativeDialogueTag string
 ---@field FormatNarrativePunctuation string
+---@field FormatTyping string
 ---@field PatternNarrativeCustomTag string
 ---@field OverheadFormatFull string
 ---@field OverheadFormatCard string
@@ -237,6 +241,11 @@ function Option:canPlayersSetNickname()
     return self:isNicknameCommandEnabled() or self.EnableSetName == 2
 end
 
+---Returns whether the Buffy's Tabletop RPG System compatibility patch is enabled.
+function Option:compatBuffyRPGSystemEnabled()
+    return isCompatEnabled(Option.EnableCompatBuffyRPGSystem, 'roleplaydnd_update15')
+end
+
 ---Returns whether the Chat Bubble compatibility patch is enabled.
 ---@return boolean
 function Option:compatChatBubbleEnabled()
@@ -273,7 +282,7 @@ function Option:getDiceItems()
     return diceItemsList:list()
 end
 
----Returns the default color associated with a category.
+---Returns the configured default color associated with a category.
 ---@param category omichat.ColorCategory
 ---@param username string? The username of the user to use for getting defaults, if applicable.
 ---@return omichat.ColorTable
@@ -316,6 +325,16 @@ function Option:getDefaultColor(category, username)
     return getColorOrDefault(self, custom and custom.colorOpt)
         or getColorOrDefault(self, colorOpts[category])
         or { r = 255, g = 255, b = 255 }
+end
+
+---Returns the default value for a color option.
+---@param option string
+---@return omichat.ColorTable
+function Option:getOptionDefaultColor(option)
+    local defaultStr = Option:getDefault(option)
+    local defaultColor = defaultStr and utils.stringToColor(defaultStr) or { r = 255, g = 255, b = 255 }
+
+    return defaultColor
 end
 
 ---Returns whether the clean character option is set to clean clothing.
@@ -362,6 +381,12 @@ end
 ---@return boolean
 function Option:isNicknameCommandEnabled()
     return self.EnableSetName > 4
+end
+
+---Returns whether the /nickname command is enabled, or /name sets nicknames.
+---@return boolean
+function Option:isNicknameEnabled()
+    return self.EnableSetName > 4 or self.EnableSetName == 2
 end
 
 ---Checks whether an item is required for /card.

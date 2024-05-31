@@ -50,6 +50,39 @@ local function isOnlinePlayer(username)
     return player ~= nil
 end
 
+---Checks whether the typing indicator should be sent for a pair of players.
+---@param player IsoPlayer
+---@param otherPlayer IsoPlayer
+---@param range integer?
+---@return boolean
+local function shouldSendTyping(player, otherPlayer, range)
+    if range then
+        local xDiff = otherPlayer:getX() - player:getX()
+        local yDiff = otherPlayer:getY() - player:getY()
+        if math.sqrt(xDiff * xDiff + yDiff * yDiff) > range then
+            return false
+        end
+    end
+
+    if player:isInvisible() ~= otherPlayer:isInvisible() then
+        return false
+    end
+
+    return true
+end
+
+
+---@param args omichat.request.ModDataUpdate
+---@return boolean
+function updateModData.all(args)
+    if not args.value then
+        return false
+    end
+
+    OmiChat.setUserModData(args.target, args.value)
+    return true
+end
+
 ---@param args omichat.request.ModDataUpdate
 ---@return boolean
 function updateModData.currentLanguage(args)
@@ -173,6 +206,17 @@ function OmiChat.reportRoll(player, roll, sides)
     OmiChat.dispatch('reportRoll', player, req)
 end
 
+---Notifies the client about another typing player.
+---@param player IsoPlayer
+---@param target IsoPlayer
+---@param isTyping boolean
+function OmiChat.sendTyping(player, target, isTyping)
+    ---@type omichat.request.UpdateTyping
+    local req = { username = target:getUsername(), typing = isTyping }
+
+    OmiChat.dispatch('updateTyping', player, req)
+end
+
 ---Sends an info message that will show only for the specified player.
 ---@param player IsoPlayer
 ---@param text string
@@ -260,21 +304,21 @@ function OmiChat.Commands.requestAddLanguage(player, args)
     username = utils.escapeRichText(username)
     if not success then
         if err == 'FULL' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_add_language_full', { username })
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_AddLanguageFull', { username })
         elseif err == 'ALREADY_KNOW' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_add_language_known', { username, language })
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_AddLanguageKnown', { username, language })
         elseif err == 'UNKNOWN' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_add_language_unknown_language', { language })
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_AddLanguageNotConfigured', { language })
         elseif err == 'UNKNOWN_PLAYER' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_error_unknown_player', { username })
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
         else
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_addlanguage')
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_AddLanguage')
         end
 
         return
     end
 
-    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_add_language_success', { username, language })
+    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_AddLanguageOther', { username, language })
 end
 
 ---Handles the /clearnames command.
@@ -287,7 +331,19 @@ function OmiChat.Commands.requestClearNames(player)
 
     OmiChat.clearNicknames()
     OmiChat.transmitModData()
-    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_clear_names_success')
+    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ClearNames')
+end
+
+---Handles a request to clear mod data for a given username.
+---@param player IsoPlayer
+---@param req omichat.request.ClearModData
+function OmiChat.Commands.requestClearModData(player, req)
+    if player:getAccessLevel() ~= 'Admin' then
+        return
+    end
+
+    OmiChat.clearModData(req.username)
+    OmiChat.transmitModData()
 end
 
 ---Updates global mod data.
@@ -298,7 +354,7 @@ end
 function OmiChat.Commands.requestDataUpdate(player, args)
     local err
     local success = false
-    if not isOnlinePlayer(args.target) then
+    if args.field ~= 'all' and not isOnlinePlayer(args.target) then
         return false, 'UNKNOWN_PLAYER'
     end
 
@@ -334,7 +390,7 @@ function OmiChat.Commands.requestFlipCoin(player)
         OmiChat.reportFlipCoin(player, heads)
     else
         local name = OmiChat.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
-        OmiChat.sendTranslatedServerMessage('UI_OmiChat_flip_' .. (heads and 'heads' or 'tails'), { name })
+        OmiChat.sendTranslatedServerMessage('UI_OmiChat_Flip' .. (heads and 'Heads' or 'Tails'), { name })
     end
 end
 
@@ -358,15 +414,15 @@ function OmiChat.Commands.requestResetIcon(player, args)
     username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_error_unknown_player', { username })
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
         else
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_reseticon')
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_ResetIcon')
         end
 
         return
     end
 
-    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_reset_other_icon_success', { username })
+    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ResetIconOther', { username })
 end
 
 ---Handles the /resetlanguages command.
@@ -389,15 +445,15 @@ function OmiChat.Commands.requestResetLanguages(player, args)
     username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_error_unknown_player', { username })
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
         else
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_resetlanguages')
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_ResetLanguages')
         end
 
         return
     end
 
-    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_reset_other_languages_success', { username })
+    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ResetLanguagesOther', { username })
 end
 
 ---Handles the /resetname command.
@@ -420,15 +476,15 @@ function OmiChat.Commands.requestResetName(player, args)
     username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_error_unknown_player', { username })
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
         else
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_resetname')
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_ResetName')
         end
 
         return
     end
 
-    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_reset_other_name_success', { username })
+    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ResetNameOther', { username })
 end
 
 ---Handles the /roll command.
@@ -446,7 +502,7 @@ function OmiChat.Commands.requestRollDice(player, args)
         OmiChat.reportRoll(player, roll, sides)
     else
         local name = OmiChat.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
-        OmiChat.sendTranslatedServerMessage('UI_OmiChat_roll', { name, tostring(roll), tostring(sides) })
+        OmiChat.sendTranslatedServerMessage('UI_OmiChat_Roll', { name, tostring(roll), tostring(sides) })
     end
 end
 
@@ -477,15 +533,15 @@ function OmiChat.Commands.requestSetIcon(player, args)
     username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_error_unknown_player', { username })
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
         else
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_seticon')
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_SetIcon')
         end
 
         return
     end
 
-    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_set_other_icon_success', { username })
+    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_SetIconOther', { username })
 end
 
 ---Handles the /setlanguageslots command.
@@ -510,15 +566,15 @@ function OmiChat.Commands.requestSetLanguageSlots(player, args)
     username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_error_unknown_player', { username })
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
         else
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_setlanguageslots')
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_SetLanguageSlots')
         end
 
         return
     end
 
-    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_set_language_slots_success', { username, slots })
+    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_SetLanguageSlotsOther', { username, slots })
 end
 
 ---Handles the /setname command.
@@ -543,16 +599,31 @@ function OmiChat.Commands.requestSetName(player, args)
     username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_error_unknown_player', { username })
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
         else
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_helptext_setname')
+            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_SetName')
         end
 
         return
     end
 
     name = utils.escapeRichText(name)
-    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_set_other_name_success', { username, name })
+    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_SetNameOther', { username, name })
+end
+
+---Handles a request to notify other players of typing status.
+---@param player IsoPlayer
+---@param args omichat.request.Typing
+function OmiChat.Commands.requestTyping(player, args)
+    local onlinePlayers = getOnlinePlayers()
+    for i = 0, onlinePlayers:size() - 1 do
+        local otherPlayer = onlinePlayers:get(i)
+
+        if player ~= otherPlayer or isDebugEnabled() then
+            local typing = args.typing and shouldSendTyping(player, otherPlayer, args.range)
+            OmiChat.sendTyping(otherPlayer, player, typing)
+        end
+    end
 end
 
 --#endregion

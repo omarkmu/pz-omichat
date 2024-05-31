@@ -2,8 +2,8 @@
 
 These [options](./index.md) are used to configure roleplay languages.
 
-With the default settings, languages must be manually added to players by admins with [`/addlanguage`](../user-guide/admins.md#commands).
-To allow players to set additional languages, the [`LanguageSlots`](#languageslots) option can be used.
+With the default settings, admins must add languages to players manually with the [`/addlanguage`](../user-guide/admins.md#commands) command.
+To allow players to set additional languages themselves, the [`LanguageSlots`](#languageslots) option can be used.
 
 ### AddLanguageAllowlist
 `(blank by default)`
@@ -11,9 +11,8 @@ To allow players to set additional languages, the [`LanguageSlots`](#languageslo
 Semicolon-separated list of languages that should display in the “Add” menu for players whose language [slots](#languageslots) exceed their current number of known languages.
 If blank, all available languages will be available for adding.
 
-This is recommended for servers that have a large amount of roleplay languages and allow players to add them.
-Showing only a subset of languages that can be manually added improves player experience with the add menu.
-Languages not in this list can still be added to plyers using the `/addlanguage` [command](../user-guide/admins.md#commands).
+This is recommended for servers that have a large amount of roleplay languages and allow players to add them, since showing only a subset of languages that can be manually added improves player experience.
+Admins can still add languages not in this list to players using the [`/addlanguage`](../user-guide/admins.md#commands).
 
 ### AddLanguageBlocklist
 `(blank by default)`
@@ -28,33 +27,8 @@ The roleplay languages that players can use, separated by semicolons.
 Up to 1000 languages can be specified.
 The first language in the list will be treated as the default language player characters speak.
 
-Translations for each language's name can be specified by defining a `UI_OmiChat_Language_[Language]` string (e.g., `UI_OmiChat_Language_English`).
-If the translation is absent, the language name will be used as-is regardless of the in-game language.
-
-The default languages have translations provided by the mod, in all languages for which the mod has translations.
-In addition to the default languages, translations are included for the following languages:
-
-- Arabic
-- Bengali
-- Catalan
-- Cantonese
-- Gujarati
-- Hausa
-- Hawaiian
-- Hindi
-- Javanese
-- Latvian
-- Malay
-- Marathi
-- Persian
-- Punjabi
-- Romanian
-- Shanghainese
-- Tagalog
-- Tamil
-- Telugu
-- Urdu
-- Vietnamese
+Server operators are encouraged to define translations for custom languages.
+See the [language string customization](../customization/strings.md#roleplay-languages) guide for details and a list of languages for which the mod includes translations.
 
 If there's a language that you believe would make sense to include in the base mod, please create a [feature request](https://github.com/omarkmu/pz-omichat/discussions/new?category=ideas)!
 

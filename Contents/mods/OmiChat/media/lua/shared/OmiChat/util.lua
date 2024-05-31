@@ -3,6 +3,7 @@ local Interpolator = require 'OmiChat/Component/Interpolator'
 
 local pow = math.pow
 local floor = math.floor
+local max = math.max
 local min = math.min
 local char = string.char
 local format = string.format
@@ -34,25 +35,25 @@ local accessLevels = {
     observer = 2,
 }
 local suits = {
-    'clubs',
-    'diamonds',
-    'hearts',
-    'spades',
+    'Clubs',
+    'Diamonds',
+    'Hearts',
+    'Spades',
 }
 local cards = {
-    'ace',
-    'two',
-    'three',
-    'four',
-    'five',
-    'six',
-    'seven',
-    'eight',
-    'nine',
-    'ten',
-    'jack',
-    'queen',
-    'king',
+    'Ace',
+    'Two',
+    'Three',
+    'Four',
+    'Five',
+    'Six',
+    'Seven',
+    'Eight',
+    'Nine',
+    'Ten',
+    'Jack',
+    'Queen',
+    'King',
 }
 
 ---@type table<string, string>
@@ -144,6 +145,19 @@ function utils.addMessageTagValue(message, key, value)
     message:setCustomTag(encodedTag)
 end
 
+---Clamps the RGB color values in `color` to within the provided range.
+---@param color omichat.DecimalColorTable An RGB color table with values in [0, 1].
+---@param minVal number A value in [0, 1].
+---@param maxVal number A value in [0, 1].
+---@return omichat.DecimalColorTable
+function utils.clampDecimalColor(color, minVal, maxVal)
+    return {
+        r = min(max(color.r, minVal), maxVal),
+        g = min(max(color.g, minVal), maxVal),
+        b = min(max(color.b, minVal), maxVal),
+    }
+end
+
 ---Cleans up unused cache items.
 ---@param clear boolean If true, the cache will be cleared entirely.
 function utils.cleanupCache(clear)
@@ -177,6 +191,51 @@ end
 ---@return string
 function utils.colorToRGBString(color)
     return format('%d,%d,%d', color.r, color.g, color.b)
+end
+
+---Builds a callback info object.
+---@param target unknown? The first argument to pass to the callback function.
+---@param callback function? The callback function.
+---@param ... unknown Callback arguments.
+---@return omichat.CallbackInfo?
+function utils.createCallback(target, callback, ...)
+    if not callback then
+        return
+    end
+
+    local n = select('#', ...)
+    local args = { n = n }
+    for i = 1, n do
+        args[i] = select(i, ...)
+    end
+
+    ---@type omichat.CallbackInfo
+    local info = {
+        target = target,
+        callback = callback,
+        args = args,
+    }
+
+    return info
+end
+
+---Creates a yes/no modal dialog.
+---@param text string
+---@param target unknown?
+---@param onclick function?
+---@param param1 unknown?
+---@param param2 unknown?
+---@return ISModalDialog
+function utils.createModal(text, target, onclick, param1, param2)
+    local w, h = ISModalDialog.CalcSize(0, 0, text) ---@cast h number
+    local x, y = utils.getScreenCenter(w, h)
+
+    local modal = ISModalDialog:new(x, y, w, h, text, true, target, onclick, nil, param1, param2)
+    modal.moveWithMouse = true
+    modal:initialise()
+    modal:addToUIManager()
+
+    return modal
 end
 
 ---Decodes an encoded character.
@@ -412,6 +471,33 @@ function utils.getInternalText(text)
     return text:sub(start, finish), prefix, suffix
 end
 
+---Returns the non-empty lines of a string.
+---If there are no non-empty lines, returns `nil`.
+---@param text string
+---@param maxLen integer?
+---@return string[]?
+function utils.getLines(text, maxLen)
+    if not text then
+        return
+    end
+
+    local lines = {}
+    for line in text:gmatch('[^\n]+\n?') do
+        line = utils.trim(line)
+        if maxLen and #line > maxLen then
+            lines[#lines + 1] = line:sub(1, maxLen)
+        elseif #line > 0 then
+            lines[#lines + 1] = line
+        end
+    end
+
+    if #lines == 0 then
+        return
+    end
+
+    return lines
+end
+
 ---Gets a numeric access level given an access level string.
 ---@param access string
 ---@return integer
@@ -450,6 +536,20 @@ function utils.getPlayerUsername()
     end
 end
 
+---Gets the position for the center of the screen given a UI width and height.
+---@param width number
+---@param height number
+---@param playerIndex number?
+---@return number
+---@return number
+function utils.getScreenCenter(width, height, playerIndex)
+    playerIndex = playerIndex or 0
+    local x = (getPlayerScreenWidth(playerIndex) - width) * 0.5
+    local y = (getPlayerScreenHeight(playerIndex) - height) * 0.5
+
+    return x, y
+end
+
 ---Retrieves a texture name given a chat icon name.
 ---@param icon string
 ---@return string?
@@ -470,9 +570,9 @@ function utils.getTranslatedCardName(card, suit)
         return ''
     end
 
-    local cardTranslated = getText('UI_OmiChat_card_' .. cards[card])
-    local suitTranslated = getText('UI_OmiChat_suit_' .. suits[suit])
-    return getText('UI_OmiChat_card_name', cardTranslated, suitTranslated)
+    local cardTranslated = getText('UI_OmiChat_Card_' .. cards[card])
+    local suitTranslated = getText('UI_OmiChat_CardSuit_' .. suits[suit])
+    return getText('UI_OmiChat_CardName', cardTranslated, suitTranslated)
 end
 
 ---Returns the translation of the given language.
@@ -778,6 +878,30 @@ function utils.toOverheadColor(color, bbCodeFormat)
     }
 end
 
+---Triggers a callback.
+---@param info omichat.CallbackInfo? The callback info object.
+---@param ... unknown Prefix arguments to include before the callback arguments.
+---@return unknown?
+function utils.triggerCallback(info, ...)
+    if not info or not info.callback then
+        return
+    end
+
+    local args = {}
+    for i = 1, select('#', ...) do
+        args[i] = select(i, ...)
+    end
+
+    local count = #args
+    local cbArgs = info.args or {}
+    for i = 1, cbArgs.n do
+        count = count + 1
+        args[count] = cbArgs[i]
+    end
+
+    return info.callback(info.target, unpack(args, 1, count or 1))
+end
+
 ---Attempts to convert a color string to a color. Returns false and an error message on failure.
 ---@param text string A color string, in RGB or hex.
 ---@param minColor integer? Minimum color value [0, 255].
@@ -785,22 +909,22 @@ end
 ---@return omi.Result<omichat.ColorTable>
 function utils.tryStringToColor(text, minColor, maxColor)
     if not text then
-        return { success = false, error = getText('UI_OmiChat_error_invalid_color') }
+        return { success = false, error = getText('UI_OmiChat_Error_InvalidColor') }
     end
 
     local r, g, b = readColor(text)
     if not r then
-        return { success = false, error = getText('UI_OmiChat_error_invalid_color') }
+        return { success = false, error = getText('UI_OmiChat_Error_InvalidColor') }
     end
 
     maxColor = maxColor or 255
     if r > maxColor or g > maxColor or b > maxColor then
-        return { success = false, error = getText('UI_OmiChat_error_color_max', tostring(maxColor)) }
+        return { success = false, error = getText('UI_OmiChat_Error_ValuesMax', tostring(maxColor)) }
     end
 
     minColor = minColor or 0
     if r < minColor or g < minColor or b < minColor then
-        return { success = false, error = getText('UI_OmiChat_error_color_min', tostring(minColor)) }
+        return { success = false, error = getText('UI_OmiChat_Error_ValuesMin', tostring(minColor)) }
     end
 
     return { success = true, value = { r = r, g = g, b = b } }

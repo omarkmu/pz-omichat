@@ -22,6 +22,35 @@ OmiChat._modDataVersion = 1
 OmiChat._playerModDataVersion = 1
 
 
+local modDataFields = {
+    { key = 'nicknames', name = 'nickname' },
+    { key = 'nameColors', name = 'nameColor' },
+    { key = 'icons', name = 'icon' },
+    { key = 'currentLanguage', name = 'currentLanguage' },
+    { key = 'languageSlots', name = 'languageSlots' },
+    { key = 'languages', name = 'languages' },
+}
+
+local modDataKeys = { 'username' }
+for i = 1, #modDataFields do
+    modDataKeys[#modDataKeys + 1] = modDataFields[i].name
+end
+
+
+---Clears mod data for a given username.
+---@param username string
+---@protected
+function OmiChat._clearModData(username)
+    local modData = OmiChat.getModData()
+
+    modData.currentLanguage[username] = nil
+    modData.icons[username] = nil
+    modData.languageSlots[username] = nil
+    modData.languages[username] = nil
+    modData.nameColors[username] = nil
+    modData.nicknames[username] = nil
+end
+
 ---Returns the admin chat icon for a given username.
 ---@param username string
 ---@return string?
@@ -61,7 +90,53 @@ function OmiChat.getModData()
     return modData
 end
 
----Returns the color table for a user's name color, or `nil` if unset.
+---Gets the global mod data as a list associated with usernames.
+---@return omichat.UserModData[] data
+---@return string[] fieldList
+function OmiChat.getModDataList()
+    local list = {}
+    local map = {}
+    local modData = OmiChat.getModData()
+
+    for _, field in pairs(modDataFields) do
+        local key, fieldName
+        if type(field) == 'string' then
+            key = field
+            fieldName = field
+        else
+            key = field.key
+            fieldName = field.name
+        end
+
+        for username, v in pairs(modData[key]) do
+            if not map[username] then
+                local userData = { username = username }
+                list[#list + 1] = userData
+                map[username] = userData
+            end
+
+            map[username][fieldName] = v
+        end
+    end
+
+    return list, utils.copy(modDataKeys)
+end
+
+---Retrieves mod data for a given user.
+---@param username string
+---@return omichat.UserModData
+function OmiChat.getUserModData(username)
+    local data = { username = username }
+    local modData = OmiChat.getModData()
+
+    for _, field in pairs(modDataFields) do
+        data[field.name] = modData[field.key][username]
+    end
+
+    return data
+end
+
+---Returns the color table for a player's name color, or `nil` if unset.
 ---@param username string
 ---@return omichat.ColorTable?
 function OmiChat.getNameColor(username)
@@ -72,7 +147,7 @@ function OmiChat.getNameColor(username)
     return utils.stringToColor(OmiChat.getModData().nameColors[username])
 end
 
----Returns the color table used for a user's name color in chat, or `nil` if unset.
+---Returns the color table used for a player's name color in chat, or `nil` if unset.
 ---This respects the `EnableSpeechColorAsDefaultNameColor` option.
 ---@param username string
 ---@return omichat.ColorTable?
@@ -87,31 +162,10 @@ function OmiChat.getNameColorInChat(username)
     end
 end
 
----Retrieves the name that should be used in chat for a given player.
----@param player IsoPlayer
----@param chatType omichat.ChatTypeString The chat type to use in format string interpolation.
----@return string? name The name to use in chat, or `nil` if unable to retrieve information about the user.
-function OmiChat.getPlayerNameInChat(player, chatType)
-    local tokens = player and OmiChat.getPlayerSubstitutions(player)
-    if not tokens then
-        return
-    end
-
-    local username = player:getUsername()
-    local modData = OmiChat.getModData()
-    if modData.nicknames[username] then
-        tokens.name = modData.nicknames[username]
-    end
-
-    tokens.username = username
-    tokens.chatType = chatType
-    return utils.interpolate(Option.FormatName, tokens, username)
-end
-
 ---Retrieves the name that should be used in chat for a given username.
 ---@param username string?
 ---@param chatType omichat.ChatTypeString The chat type to use in format string interpolation.
----@return string? name The name to use in chat, or `nil` if unable to retrieve information about the user.
+---@return string? name The name to use in chat, or `nil` if unable to retrieve information about the player.
 function OmiChat.getNameInChat(username, chatType)
     if not username then
         return
@@ -128,7 +182,7 @@ end
 ---Retrieves the name that should be used in chat for a given username, escaped for rich text.
 ---@param username string?
 ---@param chatType omichat.ChatTypeString The chat type to use in format string interpolation.
----@return string? name The name to use in chat, or `nil` if unable to retrieve information about the user.
+---@return string? name The name to use in chat, or `nil` if unable to retrieve information about the player.
 function OmiChat.getNameInChatRichText(username, chatType)
     local name = OmiChat.getNameInChat(username, chatType)
     if name then
@@ -163,6 +217,27 @@ function OmiChat.getPlayerMenuName(player, menuType)
     end
 
     return result
+end
+
+---Retrieves the name that should be used in chat for a given player.
+---@param player IsoPlayer
+---@param chatType omichat.ChatTypeString The chat type to use in format string interpolation.
+---@return string? name The name to use in chat, or `nil` if unable to retrieve information about the player.
+function OmiChat.getPlayerNameInChat(player, chatType)
+    local tokens = player and OmiChat.getPlayerSubstitutions(player)
+    if not tokens then
+        return
+    end
+
+    local username = player:getUsername()
+    local modData = OmiChat.getModData()
+    if modData.nicknames[username] then
+        tokens.name = modData.nicknames[username]
+    end
+
+    tokens.username = username
+    tokens.chatType = chatType
+    return utils.interpolate(Option.FormatName, tokens, username)
 end
 
 ---Gets substitution tokens to use in interpolation for a given player.
