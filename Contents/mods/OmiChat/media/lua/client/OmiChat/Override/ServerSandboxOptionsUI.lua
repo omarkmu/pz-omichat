@@ -140,6 +140,7 @@ local function transformPanel(panel, page, parent)
                     -- special case
                     if el == 'FormatInfo' then
                         control:setMultipleLine(true)
+                        control:setMaxLines(50)
                         control:addScrollBars()
                         control:setHeight(fontH * 10 + 8)
                     end
