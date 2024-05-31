@@ -15,6 +15,7 @@ local StreamInfo = OmiChat.StreamInfo
 ---@field startsWith omichat.search.InternalSearchResult[]
 ---@field contains omichat.search.InternalSearchResult[]
 ---@field mapValue (fun(value: unknown, str: string): unknown)?
+---@field caseInsensitive boolean?
 ---@field args table
 
 ---@class omichat.search.InternalSearchResult : omichat.SearchResult
@@ -167,6 +168,10 @@ function OmiChat.searchInternal(ctx, primary, value, ...)
     local mapValue = ctx.mapValue
     local strings = { primary, ... }
     local compare = {}
+
+    if ctx.caseInsensitive then
+        search = search:lower()
+    end
 
     ---@type omichat.search.InternalSearchResult?
     local result
@@ -339,6 +344,7 @@ function OmiChat.searchStreams(ctxOrSearch, options)
         local stream = streamList[i]
         if utils.isinstance(stream, StreamInfo) then
             ---@cast stream omichat.StreamInfo
+            ctx.caseInsensitive = stream:isCaseInsensitive()
             result = OmiChat.searchInternal(ctx, stream:getCommand(), stream, stream:getShortCommand())
 
             if not result then
@@ -351,6 +357,7 @@ function OmiChat.searchStreams(ctxOrSearch, options)
             end
         else
             ---@cast stream omichat.VanillaCommand
+            ctx.caseInsensitive = true
             result = OmiChat.searchInternal(ctx, '/' .. stream.name .. ' ', stream)
         end
 

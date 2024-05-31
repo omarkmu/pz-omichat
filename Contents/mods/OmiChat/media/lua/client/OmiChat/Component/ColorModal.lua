@@ -1,6 +1,5 @@
 local utils = require 'OmiChat/util'
-local min = math.min
-local max = math.max
+local ColorEntry = require 'OmiChat/Component/ValidatedColorEntry'
 local floor = math.floor
 
 ---Modal for color selection.
@@ -9,27 +8,12 @@ local floor = math.floor
 ---@field currentColor ColorInfo
 ---@field defaultColor omichat.ColorTable The default color to set on the modal during initialization.
 ---@field emptyColor omichat.ColorTable The color that will be used if the entry is blank.
----@field minimumValue integer The minimum RGB value of each color component.
----@field maximumValue integer The maximum RGB value of each color component.
+---@field entry ISTextEntryBox
+---@field minValue integer The minimum RGB value of each color component.
+---@field maxValue integer The maximum RGB value of each color component.
 ---@field requireValue boolean If true, the text entry will not be valid if empty.
+---@field font UIFont The font of the entry.
 local ColorModal = ISTextBox:derive('ColorModal')
-
-
----Clamps the RGB color values in `color` to within the provided range.
----@param color omichat.ColorTable
----@param minVal integer
----@param maxVal integer
----@return omichat.ColorTable
-local function clamp(color, minVal, maxVal)
-    minVal = minVal / 255
-    maxVal = maxVal / 255
-
-    return {
-        r = min(max(color.r, minVal), maxVal),
-        g = min(max(color.g, minVal), maxVal),
-        b = min(max(color.b, minVal), maxVal),
-    }
-end
 
 
 ---Removes the color modal and the associated color picker.
@@ -42,7 +26,7 @@ end
 ---Gets a color table for the current text, or `nil` if the color is not valid.
 ---@return omichat.ColorTable?
 function ColorModal:getColorTable()
-    local result = utils.tryStringToColor(self.entry:getText(), self.minimumValue, self.maximumValue)
+    local result = utils.tryStringToColor(self.entry:getInternalText(), self.minValue, self.maxValue)
     return result.value
 end
 
@@ -50,7 +34,10 @@ end
 function ColorModal:initialise()
     ISTextBox.initialise(self)
 
-    self:setValidateFunction(self, self.validate)
+    if not self.validateFunc then
+        self:setValidateFunction(self, ColorModal.validate)
+    end
+
     self.colorBtn.onclick = self.onColorPicker
     self.colorPicker.onMouseDownOutside = ColorModal.onColorPickerMouseDownOutside
     self:enableColorPicker()
@@ -63,7 +50,7 @@ function ColorModal:initialise()
         b = self.defaultColor.b / 255,
     })
 
-    if self.minimumValue ~= 0 or self.maximumValue ~= 255 then
+    if self.minValue ~= 0 or self.maxValue ~= 255 then
         self:updateColorPickerColors()
     end
 end
@@ -92,7 +79,7 @@ function ColorModal:onTextChange(entry)
     if not self.requireValue and #utils.trim(text) == 0 then
         color = self.emptyColor
     else
-        local result = utils.tryStringToColor(text, self.minimumValue, self.maximumValue)
+        local result = utils.tryStringToColor(text, self.minValue, self.maxValue)
         color = result.value
         if not color then
             return
@@ -116,19 +103,19 @@ end
 ---Sets the maximum value of color components.
 ---@param val integer A number in the range [0, 255].
 function ColorModal:setMaxValue(val)
-    self.maximumValue = val
+    self.maxValue = val
 end
 
 ---Sets the minimum value of color components.
 ---@param val integer A number in the range [0, 255].
 function ColorModal:setMinValue(val)
-    self.minimumValue = val
+    self.minValue = val
 end
 
 ---Handler for when a color option in the color picker is clicked.
----@param color omichat.ColorTable
+---@param color omichat.DecimalColorTable
 function ColorModal:selectColor(color)
-    color = clamp(color, self.minimumValue, self.maximumValue)
+    color = utils.clampDecimalColor(color, self.minValue / 255, self.maxValue / 255)
 
     self.currentColor = ColorInfo.new(color.r, color.g, color.b, 1)
     self.colorBtn.backgroundColor = { r = color.r, g = color.g, b = color.b, a = 1 }
@@ -141,45 +128,10 @@ function ColorModal:selectColor(color)
     }))
 end
 
----Updates the color picker's colors based on the set minimum
----and maximum values.
+---Updates the color picker's colors based on the set minimum and maximum values.
 function ColorModal:updateColorPickerColors()
-    local columns = 18
-    local rows = 12
-
-    local minVal = self.minimumValue
-    local maxVal = self.maximumValue
-
-    local colors = {}
-    local delta = floor((maxVal - minVal) / 5)
-
-    --#region modified code from ISColorPicker
-
-    local i = 0
-    local newColor = Color.new(1, 1, 1, 1)
-    for red = minVal, maxVal, delta do
-        for green = minVal, maxVal, delta do
-            for blue = minVal, maxVal, delta do
-                local col = i % columns
-                local row = floor(i / columns)
-                if row % 2 == 0 then row = row / 2 else row = floor(row / 2) + 6 end
-
-                ---@diagnostic disable-next-line: redundant-parameter
-                newColor:set(red / 255, green / 255, blue / 255, 1.0)
-                colors[col + row * columns + 1] = {
-                    r = newColor:getRedFloat(),
-                    g = newColor:getGreenFloat(),
-                    b = newColor:getBlueFloat(),
-                }
-
-                i = i + 1
-            end
-        end
-    end
-
-    --#endregion
-
-    self.colorPicker:setColors(colors, columns, rows)
+    ---@diagnostic disable-next-line: param-type-mismatch
+    ColorEntry.updateColorPickerColors(self)
 end
 
 ---Validates text input.
@@ -191,7 +143,7 @@ function ColorModal:validate(text)
         return true
     end
 
-    local result = utils.tryStringToColor(text, self.minimumValue, self.maximumValue)
+    local result = utils.tryStringToColor(text, self.minValue, self.maxValue)
     if result.error then
         self:setValidateTooltipText(result.error)
     end
@@ -205,9 +157,9 @@ end
 ---@param width number
 ---@param height number
 ---@param text string
----@param defaultColor omichat.ColorTable
+---@param defaultColor omichat.ColorTable?
 ---@param target table?
----@param onclick function
+---@param onclick function?
 ---@param player integer?
 ---@param ... any
 ---@return omichat.ColorModal
@@ -224,16 +176,17 @@ function ColorModal:new(x, y, width, height, text, defaultColor, target, onclick
 
     local o = ISTextBox:new(x, y, width, height, text, '', target, onclick, player, ...)
 
+    ---@cast o omichat.ColorModal
     o.defaultColor = defaultColor or { r = 255, g = 255, b = 255 }
     o.emptyColor = o.defaultColor
-    o.minimumValue = 0
-    o.maximumValue = 255
+    o.font = UIFont.Medium
+    o.minValue = 0
+    o.maxValue = 255
     o.requireValue = false
 
     setmetatable(o, self)
     self.__index = self
 
-    ---@cast o omichat.ColorModal
     return o
 end
 

@@ -32,8 +32,8 @@ function StreamInfo:checkMatch(command)
     local commandCompare = command
     local fullCompare = fullCommand
     local shortCompare = shortCommand
-    if isCmdStream then
-        -- command streams are case-insensitive
+    if self:isCaseInsensitive() then
+        -- case-insensitive matching
         commandCompare = command:lower()
         fullCompare = fullCommand:lower()
         shortCompare = shortCommand and shortCommand:lower()
@@ -122,6 +122,24 @@ function StreamInfo:getName()
     return self:getStream().name
 end
 
+---Returns the range of the stream if it's a ranged stream.
+---@return integer?
+function StreamInfo:getRange()
+    local chatType = self:getChatType()
+    if chatType ~= 'say' and chatType ~= 'shout' then
+        return
+    end
+
+    local data = config:getCustomStreamInfo(self:getIdentifier())
+    if data then
+        return Option[data.rangeOpt]
+    elseif chatType == 'shout' then
+        return Option.RangeYell
+    end
+
+    return Option.RangeSay
+end
+
 ---Gets the stream's short command.
 ---@return string?
 function StreamInfo:getShortCommand()
@@ -179,6 +197,12 @@ end
 ---@return boolean
 function StreamInfo:isAllowIconPicker()
     return self:config().allowIconPicker or false
+end
+
+---Returns whether the stream should be treated as case-insensitive.
+---@return boolean
+function StreamInfo:isCaseInsensitive()
+    return self:isCommand() or Option.EnableCaseInsensitiveChatStreams
 end
 
 ---Returns whether this object represents a command stream.

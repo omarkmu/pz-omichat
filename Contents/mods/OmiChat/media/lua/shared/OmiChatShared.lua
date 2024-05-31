@@ -5,6 +5,105 @@ local OmiChat = require 'OmiChat/API/Shared'
 require 'OmiChat/API/SharedLanguages'
 require 'OmiChat/Component/InterpolatorLibrary'
 
+--#region deprecated string conversion
+-- this will be removed in the next major version
+
+local radioReplacement = { 'UI_OmiChat_radio', 'UI_OmiChat_Radio' }
+local rpReplacement = { 'UI_OmiChat_rp_emote', 'UI_OmiChat_RPEmote' }
+local replacementMap = {
+    ChatFormatCard = { { 'UI_OmiChat_card_local', 'UI_OmiChat_CardLocal' }, rpReplacement },
+    ChatFormatRoll = { { 'UI_OmiChat_roll_local', 'UI_OmiChat_RollLocal' }, rpReplacement },
+    ChatFormatRadio = { radioReplacement },
+    ChatFormatFlip = { rpReplacement },
+    ChatFormatDo = { rpReplacement },
+    ChatFormatDoLoud = { rpReplacement },
+    ChatFormatDoQuiet = { rpReplacement },
+    ChatFormatMe = { rpReplacement },
+    ChatFormatMeLoud = { rpReplacement },
+    ChatFormatMeQuiet = { rpReplacement },
+    ChatFormatUnknownLanguage = { rpReplacement },
+    ChatFormatUnknownLanguageRadio = { radioReplacement, rpReplacement },
+    ChatFormatIncomingPrivate = { { 'UI_OmiChat_private_chat_from', 'UI_OmiChat_PrivateChatFrom' } },
+    ChatFormatOutgoingPrivate = { { 'UI_OmiChat_private_chat_to', 'UI_OmiChat_PrivateChatTo' } },
+    PredicateAllowChatInput = {
+        { 'UI_OmiChat_error_signed_faction_radio', 'UI_OmiChat_Error_SignedFactionRadio' },
+        { 'UI_OmiChat_error_signed_safehouse_radio', 'UI_OmiChat_Error_SignedSafehouseRadio' },
+    },
+}
+
+---Attempts to apply replacements to a sandbox option.
+---@param opt StringSandboxOption
+---@return string?
+local function tryApplyReplacements(opt)
+    if opt:getTableName() ~= 'OmiChat' then
+        return
+    end
+
+    local name = opt:getShortName()
+    local replacements = replacementMap[name]
+    if not replacements then
+        return
+    end
+
+    local value = opt:getValue()
+    if not value then
+        return
+    end
+
+    local originalValue = value
+    for i = 1, #replacements do
+        local replace = replacements[i]
+        value = value:gsub(replace[1], replace[2])
+    end
+
+    if value ~= originalValue then
+        return value
+    end
+end
+
+---Updates sandbox options containing deprecated strings.
+local function updateDeprecatedStrings()
+    local hasChanges = false
+    local options = getSandboxOptions()
+
+    -- old strings are deprecated, but removing them entirely would be a breaking change for presets
+    -- to prevent broken options, replace them with the corresponding new string. this logic will be removed in 2.0
+    for i = 0, options:getNumOptions() - 1 do
+        local opt = options:getOptionByIndex(i) ---@type unknown
+        local value = tryApplyReplacements(opt)
+        if value then
+            hasChanges = true
+            opt:setValue(value)
+        end
+    end
+
+    if hasChanges then
+        options:toLua()
+        options:sendToServer()
+    end
+end
+
+Events.OnGameBoot.Add(function()
+    -- fired after sandbox options load server-side
+    -- this should be before clients connect
+    if not isServer() then
+        return
+    end
+
+    updateDeprecatedStrings()
+end)
+
+Events.OnGameStart.Add(function()
+    -- sandbox options have loaded by this point in Host mode
+    if not isCoopHost() then
+        return
+    end
+
+    updateDeprecatedStrings()
+end)
+
+--#endregion
+
 Events.EveryDays.Add(OmiChat.utils.cleanupCache)
 
 
@@ -27,6 +126,7 @@ return OmiChat
 ---| 'medical'
 ---| 'mini_scoreboard'
 ---| 'search_player'
+---| 'typing'
 
 ---@alias omichat.CalloutCategory
 ---| 'callouts'
@@ -48,6 +148,7 @@ return OmiChat
 ---| 'speech'
 
 ---@alias omichat.ModDataField
+---| 'all'
 ---| 'nicknames'
 ---| 'nameColors'
 ---| 'languages'
@@ -56,9 +157,9 @@ return OmiChat
 ---| 'icons'
 
 ---@alias omichat.AdminOption
----| 'show_icon'
----| 'know_all_languages'
----| 'ignore_message_range'
+---| 'ShowIcon'
+---| 'KnowAllLanguages'
+---| 'IgnoreMessageRange'
 
 ---@class omichat.StreamSearchOptions
 ---@field excludeChatStreams boolean? Whether to exclude chat streams from the search.
@@ -83,6 +184,10 @@ return OmiChat
 ---@field results omichat.SearchResult[]
 ---@field exact omichat.SearchResult?
 
+---@class omichat.CallbackInfo
+---@field target unknown
+---@field callback function
+---@field args table
 
 ---@class omichat.LanguageInfoStore
 ---@field languageCount integer
@@ -121,13 +226,13 @@ return OmiChat
 ---@field b integer The blue value.
 
 ---A table containing color values in [0.0, 1.0].
----@class omichat.DecimalRGBColorTable
+---@class omichat.DecimalColorTable
 ---@field r number The red value.
 ---@field g number The green value.
 ---@field b number The blue value.
 
 ---A table containing color values in [0.0, 1.0].
----@class omichat.DecimalRGBAColorTable : omichat.DecimalRGBColorTable
+---@class omichat.DecimalColorTableRGBA : omichat.DecimalColorTable
 ---@field a number The alpha value.
 
 ---Global mod data.
@@ -140,9 +245,19 @@ return OmiChat
 ---@field languageSlots table<string, integer> Map of usernames to roleplay language slots.
 ---@field currentLanguage table<string, string> Map of usernames to currently selected roleplay languages.
 
----Player mod data.
----@class omichat.PlayerModData
+---Global mod data associated with a username.
+---@class omichat.UserModData
+---@field username string
+---@field nickname string?
+---@field nameColor string?
+---@field icon string?
+---@field languages string[]?
+---@field languageSlots integer?
 ---@field currentLanguage string?
+
+---Request to clear mod data for a username.
+---@class omichat.request.ClearModData
+---@field username string
 
 ---Request to update global mod data fields on the server.
 ---@class omichat.request.ModDataUpdate
@@ -176,6 +291,16 @@ return OmiChat
 ---Request to roll dice on the server.
 ---@class omichat.request.RollDice
 ---@field sides integer The number of sides on the dice to roll.
+
+---Request to notify other players about typing status.
+---@class omichat.request.Typing
+---@field typing boolean Whether the source player is typing.
+---@field range integer? Optional range to limit notifications to.
+
+---Request to update client information about typing.
+---@class omichat.request.UpdateTyping
+---@field username string Whether the target player is typing.
+---@field typing boolean Whether the target player is typing.
 
 ---Request to handle a command on the server.
 ---@class omichat.request.Command

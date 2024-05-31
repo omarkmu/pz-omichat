@@ -113,9 +113,13 @@ end
 
 ---Adds an emote that is playable from chat with the .emote syntax.
 ---@param name string The name of the emote, as it can be used from chat.
----@param emote string The string to associate with the emote.
+---@param emote (string | omichat.EmoteHandler) The string or handler to associate with the emote.
 function OmiChat.addEmote(name, emote)
-    OmiChat._emotes[name] = tostring(emote)
+    if type(emote) ~= 'function' then
+        emote = tostring(emote)
+    end
+
+    OmiChat._emotes[name] = emote
 end
 
 ---Adds a message transformer which can act on message information to modify display or behavior.

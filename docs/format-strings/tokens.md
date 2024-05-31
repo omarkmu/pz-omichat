@@ -8,6 +8,12 @@ Unlike [functions](./functions.md), tokens are case-sensitive; `$author` is not 
 Tokens that are used by multiple sandbox options are documented below.
 **Some tokens may take on different meanings in certain options; the documentation of an option will indicate if that is the case.**
 
+## Error Tokens
+
+The tokens `$error` and `$errorID` can be [set](../format-strings/functions.md#set) in some format strings to display feedback to players.
+When set, the operation associated with the filter or predicate will be considered a failure.
+If `errorID` is used, it will be interpreted as a string ID, whereas `error` will be displayed as given.
+
 ## `$1`
 
 The `$1` token is frequently used for the content wrapped in invisible special characters.
@@ -30,6 +36,18 @@ This may include the name color, if one is included.
 ## `$authorRaw`
 
 The same as `$author`, but does not include name colors.
+
+## `$buffyCrit`
+
+If the [`EnableCompatBuffyRPGSystem`](../sandbox-options/compatibility-features.md#enablecompatbuffyrpgsystem) option is enabled and the message is a critical roll, this will be formatted text to display the `[CRITICAL SUCCESS/FAILURE!]` text in green or red.
+
+## `$buffyCritRaw`
+
+If the [`EnableCompatBuffyRPGSystem`](../sandbox-options/compatibility-features.md#enablecompatbuffyrpgsystem) option is enabled, this will be populated with either `success` or `failure` for critical rolls.
+
+## `$buffyRoll`
+
+If the [`EnableCompatBuffyRPGSystem`](../sandbox-options/compatibility-features.md#enablecompatbuffyrpgsystem) option is enabled, this will be populated with the roll text (e.g., “rolled X: 5+1=6”) for roll messages.
 
 ## `$callout`
 

@@ -94,6 +94,7 @@ local function applyNarrativeStyle(input, stream, tokens)
     local prefix, suffix
     input, prefix, suffix = utils.getInternalText(input) -- get the actual end, not an invisible character
     if not input:match('%p$') then
+        tokens.dialogueTag = dialogueTag
         local punctuation = utils.interpolate(Option.FormatNarrativePunctuation, tokens, seed)
         if punctuation then
             input = input .. punctuation
@@ -182,6 +183,7 @@ function OmiChat.applyFormatOptions(info)
     local icon = utils.interpolate(Option.FormatIcon, {
         chatType = info.chatType,
         stream = info.tokens.stream,
+        buffyRoll = info.tokens.buffyRoll,
         icon = meta.icon,
         adminIcon = meta.adminIcon,
     }, seed)
@@ -387,6 +389,9 @@ function OmiChat.buildMessageTextFromInfo(info)
         language = info.language,
         timestamp = info.timestamp,
         tag = info.tag,
+        buffyRoll = info.tokens.buffyRoll,
+        buffyCrit = info.tokens.buffyCrit,
+        buffyCritRaw = info.tokens.buffyCritRaw,
         content = utils.interpolate(info.format, info.tokens, seed),
     }
 
@@ -562,7 +567,7 @@ function OmiChat.formatForChat(args)
     tokens.input = formatter and formatter:format(tokens.input, tokens) or tokens.input
 
     -- add indicator for admin icon
-    if isAdmin() and OmiChat.getAdminOption('show_icon') then
+    if isAdmin() and OmiChat.getShowAdminIcon() then
         local adminIconFormatter = OmiChat.getFormatter('adminIcon')
         tokens.input = adminIconFormatter:wrap(tokens.input)
     end
@@ -570,7 +575,12 @@ function OmiChat.formatForChat(args)
     -- mark as echo message
     if args.isEcho then
         local echoFormatter = OmiChat.getFormatter('echo')
-        tokens.input = echoFormatter:format(tokens.input, tokens)
+        local input = tokens.input
+        if args.echoType then
+            input = utils.encodeInvisibleCharacter(args.echoType) .. input
+        end
+
+        tokens.input = echoFormatter:format(input, tokens)
     end
 
     -- apply full overhead format
@@ -625,4 +635,36 @@ function OmiChat.getMessageChatType(message)
 
     ---@cast message ChatMessage
     return tostring(_getChatType(message:getChat()))
+end
+
+---Text entry validator that validates against the nickname filter.
+---@param entry omichat.ValidatedTextEntry
+---@param text string?
+---@return boolean
+---@return string? nickname
+function OmiChat.validateNicknameText(entry, text)
+    if not text then
+        text = entry:getInternalText()
+    end
+
+    text = utils.trim(text)
+    if #text == 0 then
+        return true
+    end
+
+    local tokens = {
+        target = 'nickname',
+        input = text,
+        error = '',
+        errorID = '',
+    }
+
+    local nickname = utils.interpolate(Option.FilterNickname, tokens)
+    local err = utils.extractError(tokens)
+    if nickname ~= '' and not err then
+        return true, nickname
+    end
+
+    entry:setValidateTooltipText(err or getText('UI_OmiChat_Error_InvalidName', utils.escapeRichText(text)))
+    return false
 end

@@ -11,6 +11,7 @@ require 'OmiChat/API/ClientCommands'
 require 'OmiChat/API/ClientExtension'
 require 'OmiChat/API/ClientFormat'
 require 'OmiChat/API/ClientSearch'
+require 'OmiChat/API/ClientPreferences'
 
 Events.OnGameStart.Add(OmiChat._onGameStart)
 Events.OnCreatePlayer.Add(OmiChat._onCreatePlayer)
@@ -23,7 +24,15 @@ return OmiChat
 
 ---@alias omichat.ChatCommandType 'chat' | 'rp' | 'other'
 ---@alias omichat.ChatFont 'small' | 'medium' | 'large'
----@alias omichat.SettingCategory 'basic' | 'chat_customization' | 'character_customization' | 'language' | 'admin' | 'main'
+
+---@alias omichat.SettingCategory
+---| 'basic'
+---| 'customization'
+---| 'language'
+---| 'admin'
+---| 'suggestions'
+---| 'main'
+
 ---@alias omichat.SettingHandlerCallback fun(submenu: ISContextMenu)
 ---@alias omichat.Message ChatMessage | omichat.MimicMessage
 
@@ -39,6 +48,7 @@ return OmiChat
 ---@alias omichat.SuggestArgSpec omichat.SuggestArgSpecTable | omichat.SuggestionType | string
 ---@alias omichat.SuggestSpec omichat.SuggestArgSpec[]
 ---@alias omichat.SuggestSearchCallback fun(ctx: omichat.SearchContext | string, spec: omichat.SuggestArgSpec): omichat.SearchResults?
+---@alias omichat.EmoteHandler fun(player: IsoPlayer, emote: string)
 
 ---@class omichat.SuggestArgSpecTable
 ---@field type omichat.SuggestionType | string The type of the argument.
@@ -118,7 +128,8 @@ return OmiChat
 ---@field streamName string?
 ---@field stream omichat.StreamInfo?
 ---@field playSignedEmote boolean?
----@field isEcho boolean?
+---@field isEcho boolean? Deprecated. This will be removed in a future version in favor of `echoType`.
+---@field echoType integer?
 ---@field formatterName omichat.FormatterName?
 ---@field tokens table?
 
@@ -128,7 +139,8 @@ return OmiChat
 ---@field text string
 ---@field icon string?
 ---@field language string?
----@field isEcho boolean?
+---@field isEcho boolean? Deprecated. This will be removed in a future version in favor of `echoType`.
+---@field echoType integer?
 ---@field formatterName omichat.FormatterName?
 ---@field stream string?
 ---@field chatType omichat.ChatTypeString
@@ -182,9 +194,22 @@ return OmiChat
 ---@class omichat.CommandStream : omichat.BaseStream
 ---@field omichat omichat.CommandStreamConfig Additional configuration options.
 
+---Typing information record.
+---@class omichat.TypingInformation
+---@field display string
+---@field lastUpdate integer
+
 ---@alias omichat.Stream
 ---| omichat.ChatStream
 ---| omichat.CommandStream
+
+---Player preference profile.
+---@class omichat.PlayerProfile
+---@field name string
+---@field chatNickname string? Nickname to use in chat alongside a profile.
+---@field callouts string[] Custom callouts.
+---@field sneakcallouts string[] Custom sneak callouts.
+---@field colors table<omichat.ColorCategory, omichat.ColorTable> Custom chat colors.
 
 ---Player preferences.
 ---@class omichat.PlayerPreferences
@@ -192,15 +217,17 @@ return OmiChat
 ---@field showNameColors boolean Whether name colors are enabled.
 ---@field useSuggester boolean Whether suggestions are enabled.
 ---@field useSignEmotes boolean Whether signed roleplay languages should play a random emote.
----@field callouts string[] Custom callouts.
----@field sneakcallouts string[] Custom sneak callouts.
----@field colors table<omichat.ColorCategory, omichat.ColorTable> Custom chat colors.
+---@field showTyping boolean Whether typing indicators should be shown and sent.
+---@field suggestOnEnter boolean Whether suggestions should be entered when pressing Enter.
+---@field suggestOnTab boolean Whether suggestions should be entered when pressing Tab.
 ---@field retainChatInput boolean Whether to retain chat input for chat streams.
 ---@field retainRPInput boolean Whether to retain chat input for roleplay streams (/me).
 ---@field retainOtherInput boolean Whether to retain other chat input.
 ---@field adminShowIcon boolean Whether the admin icon should display in chat.
 ---@field adminKnowLanguages boolean Whether all languages should be treated as known.
 ---@field adminIgnoreRange boolean Whether message range should be ignored.
+---@field profileIndex integer The index of the current profile.
+---@field profiles omichat.PlayerProfile[] List of chat profiles.
 
 ---Description of a chat tab object.
 ---@class omichat.ChatTab : ISRichTextPanel
