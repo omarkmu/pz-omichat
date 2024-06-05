@@ -108,7 +108,7 @@ Determines the behavior of the `/name` and `/nickname` chat commands.
 
 - `1`: Disallow setting name
 - `2`: `/name` sets chat nickname
-- `3`: `/name` sets character forename
+- `3`: `/name` sets character's forename
 - `4`: `/name` sets character's full name
 - `5`: `/name` sets character's forename, `/nickname` sets chat nickname
 - `6`: `/name` sets character's full name, `/nickname` sets chat nickname

@@ -19,6 +19,65 @@ local stringFunctions = baseLibraries.functions.string
 local cooldowns = {}
 
 
+---Colors actions in a string.
+---@param s string
+---@param color string
+---@param autoQuote boolean
+---@param excludeAsterisk boolean
+---@return string, boolean
+local function colorActions(s, color, autoQuote, excludeAsterisk)
+    local result = {}
+
+    local pos = 1
+    local patt = autoQuote and '%*' or '"%s*%*'
+    local next, nextEnd = s:find(patt)
+
+    local endsWithAction = false
+    while next and nextEnd and next <= #s do
+        local sub = s:sub(pos, next - 1)
+        result[#result + 1] = sub
+
+        if not autoQuote or (autoQuote and not utils.endsWith(utils.trim(sub), '"')) then
+            result[#result + 1] = '"'
+        end
+
+        result[#result + 1] = color
+        result[#result + 1] = ' <SPACE> '
+
+        if not excludeAsterisk then
+            result[#result + 1] = '*'
+        end
+
+        pos = nextEnd + 1
+
+        -- maintain action color until next quote character
+        local nextQuote = s:find('"', pos)
+        if not nextQuote then
+            result[#result + 1] = s:sub(pos)
+            result[#result + 1] = ' <SPACE> <POPRGB> '
+            pos = #s + 1
+            endsWithAction = true
+            break
+        end
+
+        result[#result + 1] = s:sub(pos, nextQuote - 1)
+        result[#result + 1] = ' <SPACE> <POPRGB> '
+
+        pos = nextQuote
+        next, nextEnd = s:find(patt, pos)
+    end
+
+    if #result == 0 then
+        return s, false
+    end
+
+    if pos <= #s then
+        result[#result + 1] = s:sub(pos)
+    end
+
+    return concat(result), endsWithAction
+end
+
 ---Wraps a function so that it gets the internal value before being applied, and then reapplies the invisible characters.
 ---@param f function
 ---@return function
@@ -182,7 +241,7 @@ library = {
     end,
     ---@param _ omichat.Interpolator
     ---@param s string?
-    ---@param category omichat.ColorCategory
+    ---@param category omichat.ColorCategory?
     ---@return string?
     colorquotes = function(_, s, category)
         ---@cast OmiChat omichat.api.client
@@ -193,6 +252,10 @@ library = {
         s = tostring(s or '')
         if s == '' then
             return
+        end
+
+        if category == '' then
+            category = nil
         end
 
         category = tostring(category or 'say')
@@ -211,6 +274,57 @@ library = {
         end)
 
         return s
+    end,
+    ---@param interpolator omichat.Interpolator
+    ---@param s string
+    ---@param category omichat.ColorCategory?
+    ---@param includeAsterisk string?
+    ---@param autoQuote string?
+    ---@return string?
+    coloractions = function(interpolator, s, category, includeAsterisk, autoQuote)
+        ---@cast OmiChat omichat.api.client
+        if not OmiChat.getColorOrDefault then
+            return
+        end
+
+        s = tostring(s or '')
+        if s == '' then
+            return
+        end
+
+        if category == '' then
+            category = nil
+        end
+
+        local color = utils.toChatColor(OmiChat.getColorOrDefault(tostring(category or 'me')), true)
+
+        -- narrative style handling
+        local prefix = ''
+        local suffix = ''
+        if interpolator:token('dialogueTag') then
+            local startQ = s:find('"')
+            local endQ = s:sub(#s, #s)
+
+            if startQ and endQ == '"' and startQ ~= endQ then
+                prefix = s:sub(1, startQ)
+                suffix = '"'
+                s = s:sub(startQ + 1, #s - 1)
+            end
+        end
+
+        local doAutoQuote = interpolator:toBoolean(autoQuote)
+        local doExcludeAsterisk = not interpolator:toBoolean(includeAsterisk)
+        local delimited, endsWithAction = colorActions(s, color, doAutoQuote, doExcludeAsterisk)
+        if not delimited then
+            return
+        end
+
+        -- if we end with an action or a quote, get rid of the trailing quote
+        if endsWithAction or utils.endsWith(delimited, '"') then
+            suffix = ''
+        end
+
+        return prefix .. delimited .. suffix
     end,
     ---@param _ omichat.Interpolator
     ---@param s string
