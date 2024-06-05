@@ -136,27 +136,42 @@ function ModDataManager:drawItem(listbox, y, item, alt)
 
     listbox:drawRectBorder(0, y, width, listbox.itemheight, 0.9, borderColor.r, borderColor.g, borderColor.b)
 
+    -- determine stencil for listbox stencil redrawing
+    local borderDelta = listbox.drawBorder and 1 or 0
+    local stencilX = borderDelta
+    local stencilX2 = listbox.width - borderDelta
+    local stencilY = borderDelta
+    local stencilY2 = listbox.height - borderDelta
+    if listbox:isVScrollBarVisible() then
+        stencilX2 = listbox.vscroll.x + 3
+    end
+
+    if listbox.parent and listbox.parent:getScrollChildren() then
+        stencilX = listbox.javaObject:clampToParentX(listbox:getAbsoluteX() + stencilX) - listbox:getAbsoluteX()
+        stencilX2 = listbox.javaObject:clampToParentX(listbox:getAbsoluteX() + stencilX2) - listbox:getAbsoluteX()
+        stencilY = listbox.javaObject:clampToParentY(listbox:getAbsoluteY() + stencilY) - listbox:getAbsoluteY()
+        stencilY2 = listbox.javaObject:clampToParentY(listbox:getAbsoluteY() + stencilY2) - listbox:getAbsoluteY()
+    end
+
+    local stencilW = stencilX2 - stencilX
+    local stencilH = stencilY2 - stencilY
+    listbox:clearStencilRect()
+
     local x = 10
     for i = 1, #self.columnList do
         local colName = self.columnList[i]
         local colW = self.columnWidth[colName] or 200
         local textAlpha = item.item.empty[colName] and 0.4 or 0.9
 
-        local doRect = i ~= #self.columnList -- rect is handled by listbox for last column
-        if doRect then
-            listbox:setStencilRect(x - 10, y, colW - 10, listbox.itemheight)
-        end
-
+        listbox:setStencilRect(x - 10, stencilY, colW - 10, stencilY2 - stencilY)
         listbox:drawText(item.item.display[colName], x, y + 2, 1, 1, 1, textAlpha, listbox.font)
         listbox:drawRect(x - 10, y - 1, 1, listbox.itemheight, 1, borderColor.r, borderColor.g, borderColor.b)
-
-        if doRect then
-            listbox:clearStencilRect()
-        end
+        listbox:clearStencilRect()
 
         x = x + colW
     end
 
+    listbox:setStencilRect(stencilX, stencilY, stencilW, stencilH)
     return y + listbox.itemheight
 end
 
