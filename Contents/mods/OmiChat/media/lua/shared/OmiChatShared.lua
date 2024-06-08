@@ -296,6 +296,7 @@ return OmiChat
 ---@class omichat.request.Typing
 ---@field typing boolean Whether the source player is typing.
 ---@field range integer? Optional range to limit notifications to.
+---@field chatType omichat.ChatTypeString? The chat type of the stream on which the player is typing.
 
 ---Request to update client information about typing.
 ---@class omichat.request.UpdateTyping

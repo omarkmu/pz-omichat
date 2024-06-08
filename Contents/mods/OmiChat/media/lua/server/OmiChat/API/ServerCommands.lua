@@ -54,8 +54,13 @@ end
 ---@param player IsoPlayer
 ---@param otherPlayer IsoPlayer
 ---@param range integer?
+---@param chatType omichat.ChatTypeString?
 ---@return boolean
-local function shouldSendTyping(player, otherPlayer, range)
+local function shouldSendTyping(player, otherPlayer, range, chatType)
+    if player:isInvisible() and not otherPlayer:isInvisible() then
+        return false
+    end
+
     if range then
         local xDiff = otherPlayer:getX() - player:getX()
         local yDiff = otherPlayer:getY() - player:getY()
@@ -64,8 +69,14 @@ local function shouldSendTyping(player, otherPlayer, range)
         end
     end
 
-    if player:isInvisible() ~= otherPlayer:isInvisible() then
-        return false
+    if chatType == 'faction' then
+        local faction = Faction.getPlayerFaction(player:getUsername())
+        local other = otherPlayer:getUsername()
+
+        return faction and (faction:isOwner(other) or faction:isMember(other))
+    elseif chatType == 'safehouse' then
+        local safehouse = SafeHouse.hasSafehouse(player:getUsername())
+        return safehouse and safehouse:playerAllowed(otherPlayer:getUsername())
     end
 
     return true
@@ -620,7 +631,7 @@ function OmiChat.Commands.requestTyping(player, args)
         local otherPlayer = onlinePlayers:get(i)
 
         if player ~= otherPlayer or isDebugEnabled() then
-            local typing = args.typing and shouldSendTyping(player, otherPlayer, args.range)
+            local typing = args.typing and shouldSendTyping(player, otherPlayer, args.range, args.chatType)
             OmiChat.sendTyping(otherPlayer, player, typing)
         end
     end

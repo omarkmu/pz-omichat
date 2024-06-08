@@ -65,6 +65,7 @@ function StreamInfo:config()
 end
 
 ---Returns the chat type associated with the stream.
+---@return omichat.ChatTypeString
 function StreamInfo:getChatType()
     return self:config().chatType or 'say'
 end
