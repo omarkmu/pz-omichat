@@ -1232,6 +1232,7 @@ function OmiChat.updateTypingStatus(skipTimer)
     end
 
     local range
+    local chatType
     local isTyping = entry:isFocused() and instance.currentTabID == 1
     if isTyping then
         local text = entry:getInternalText()
@@ -1245,12 +1246,13 @@ function OmiChat.updateTypingStatus(skipTimer)
 
         local tokens
         if stream and #command:trim() > 0 and stream:isTabID(instance.currentTabID) then
+            chatType = stream:getChatType()
             range = stream:getRange()
             tokens = {
                 input = command,
                 range = range,
                 isRanged = range ~= nil,
-                chatType = stream:getChatType(),
+                chatType = chatType,
                 stream = stream:getIdentifier(),
             }
         end
@@ -1265,6 +1267,6 @@ function OmiChat.updateTypingStatus(skipTimer)
     if isTyping or wasTyping then
         wasTyping = isTyping
 
-        OmiChat.sendTypingStatus(range)
+        OmiChat.sendTypingStatus(range, chatType)
     end
 end
