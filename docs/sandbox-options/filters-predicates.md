@@ -115,6 +115,17 @@ Determines whether a message on a stream will attract zombies.
 
 **See also:** [`RangeMultiplierZombies`](./ranges.md#rangemultiplierzombies).
 
+### PredicateClearOnDeath
+**Default:** `true`
+
+Determines what information is cleared when a player dies.
+
+For example, if this is set to `$neq($field languages)`, then [roleplay languages](./languages.md) will not be cleared when a player character dies.
+
+**Tokens:**
+- `$field`: The field to check. This will be one of `icon`, `languages`, or `nickname`.
+- `$username`: The username of the player being checked.
+
 ### PredicateEnableStream
 **Default:** `true`
 

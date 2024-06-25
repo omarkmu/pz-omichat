@@ -50,6 +50,17 @@ local function isOnlinePlayer(username)
     return player ~= nil
 end
 
+---Checks whether a field should be reset on player death.
+---@param field string
+---@param username string
+---@return boolean
+local function shouldResetFieldOnDeath(field, username)
+    return utils.testPredicate(Option.PredicateClearOnDeath, {
+        field = field,
+        username = username,
+    })
+end
+
 ---Checks whether the typing indicator should be sent for a pair of players.
 ---@param player IsoPlayer
 ---@param otherPlayer IsoPlayer
@@ -285,12 +296,25 @@ function OmiChat.Commands.reportPlayerDeath(player)
         return
     end
 
-    -- clear nickname, icon, and languages
-    updateModData.nicknames({ target = username })
-    updateModData.icons({ target = username })
-    updateModData.languages({ target = username })
+    local doTransmit = false
+    if shouldResetFieldOnDeath('nickname', username) then
+        updateModData.nicknames({ target = username })
+        doTransmit = true
+    end
 
-    OmiChat.transmitModData()
+    if shouldResetFieldOnDeath('icon', username) then
+        updateModData.icons({ target = username })
+        doTransmit = true
+    end
+
+    if shouldResetFieldOnDeath('languages', username) then
+        updateModData.languages({ target = username })
+        doTransmit = true
+    end
+
+    if doTransmit then
+        OmiChat.transmitModData()
+    end
 end
 
 ---Handles the /addlanguage command.
