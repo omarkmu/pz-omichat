@@ -129,6 +129,9 @@ return check {
     'MinimumCommandAccessLevel',
 
     padding(),
+    'PredicateClearOnDeath',
+
+    padding(),
     'FormatInfo',
 
     category('Compatibility'),
