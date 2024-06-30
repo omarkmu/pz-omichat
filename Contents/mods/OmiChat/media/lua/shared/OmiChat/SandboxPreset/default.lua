@@ -66,6 +66,7 @@ return {
     PredicateAllowLanguage = "$has(@(say;shout;whisper;low;faction;safehouse) $stream)",
     PredicateApplyBuff = "",
     PredicateAttractZombies = "$has(@(say;shout;meloud;doloud) $stream)",
+    PredicateClearOnDeath = "true",
     PredicateShowTypingIndicator = "",
     PredicateTransmitOverRadio = "$any($has(@(whisper;low) $customStream) $not($customStream))",
     PredicateUseNarrativeStyle = "",

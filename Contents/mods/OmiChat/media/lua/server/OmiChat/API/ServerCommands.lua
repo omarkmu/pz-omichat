@@ -50,12 +50,28 @@ local function isOnlinePlayer(username)
     return player ~= nil
 end
 
+---Checks whether a field should be reset on player death.
+---@param field string
+---@param username string
+---@return boolean
+local function shouldResetFieldOnDeath(field, username)
+    return utils.testPredicate(Option.PredicateClearOnDeath, {
+        field = field,
+        username = username,
+    })
+end
+
 ---Checks whether the typing indicator should be sent for a pair of players.
 ---@param player IsoPlayer
 ---@param otherPlayer IsoPlayer
 ---@param range integer?
+---@param chatType omichat.ChatTypeString?
 ---@return boolean
-local function shouldSendTyping(player, otherPlayer, range)
+local function shouldSendTyping(player, otherPlayer, range, chatType)
+    if player:isInvisible() and not otherPlayer:isInvisible() then
+        return false
+    end
+
     if range then
         local xDiff = otherPlayer:getX() - player:getX()
         local yDiff = otherPlayer:getY() - player:getY()
@@ -64,8 +80,14 @@ local function shouldSendTyping(player, otherPlayer, range)
         end
     end
 
-    if player:isInvisible() ~= otherPlayer:isInvisible() then
-        return false
+    if chatType == 'faction' then
+        local faction = Faction.getPlayerFaction(player:getUsername())
+        local other = otherPlayer:getUsername()
+
+        return faction and (faction:isOwner(other) or faction:isMember(other))
+    elseif chatType == 'safehouse' then
+        local safehouse = SafeHouse.hasSafehouse(player:getUsername())
+        return safehouse and safehouse:playerAllowed(otherPlayer:getUsername())
     end
 
     return true
@@ -274,12 +296,25 @@ function OmiChat.Commands.reportPlayerDeath(player)
         return
     end
 
-    -- clear nickname, icon, and languages
-    updateModData.nicknames({ target = username })
-    updateModData.icons({ target = username })
-    updateModData.languages({ target = username })
+    local doTransmit = false
+    if shouldResetFieldOnDeath('nickname', username) then
+        updateModData.nicknames({ target = username })
+        doTransmit = true
+    end
 
-    OmiChat.transmitModData()
+    if shouldResetFieldOnDeath('icon', username) then
+        updateModData.icons({ target = username })
+        doTransmit = true
+    end
+
+    if shouldResetFieldOnDeath('languages', username) then
+        updateModData.languages({ target = username })
+        doTransmit = true
+    end
+
+    if doTransmit then
+        OmiChat.transmitModData()
+    end
 end
 
 ---Handles the /addlanguage command.
@@ -620,7 +655,7 @@ function OmiChat.Commands.requestTyping(player, args)
         local otherPlayer = onlinePlayers:get(i)
 
         if player ~= otherPlayer or isDebugEnabled() then
-            local typing = args.typing and shouldSendTyping(player, otherPlayer, args.range)
+            local typing = args.typing and shouldSendTyping(player, otherPlayer, args.range, args.chatType)
             OmiChat.sendTyping(otherPlayer, player, typing)
         end
     end

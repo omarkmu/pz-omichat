@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.3.0
+
+### Added
+- `$coloractions()` interpolator function to apply `/me` formatting to actions within a message
+    - This has been added to the buffy preset; see that preset for an example.
+- `PredicateClearOnDeath` sandbox option to control which mod data fields are cleared on player death
+
+### Fixed
+- Admins can now see typing indicators for visible players while invisible
+- Typing indicators for faction and safehouse chats (if enabled for those streams) will now only show for members of the faction or safehouse
+- Fixed a visual issue with the admin mod data viewer
+
 ## 1.2.0
 
 ### Added
