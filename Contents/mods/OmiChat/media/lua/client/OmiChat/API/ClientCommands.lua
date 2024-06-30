@@ -228,11 +228,13 @@ end
 
 ---Sends the current typing status to the server.
 ---@param range integer?
+---@param chatType omichat.ChatTypeString?
 ---@return boolean
-function OmiChat.sendTypingStatus(range)
+function OmiChat.sendTypingStatus(range, chatType)
     ---@type omichat.request.Typing
     local req = {
         range = range,
+        chatType = chatType,
         typing = OmiChat.getTyping(),
     }
 

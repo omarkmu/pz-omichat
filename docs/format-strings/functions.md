@@ -363,6 +363,11 @@ Seeds the randomizer with the given value.
 ### `$accesslevel()` {#other-accesslevel}
 Returns the access level of player 1, as a string.
 
+### `$coloractions(s category includeAsterisk)` {#other-colorquotes}
+Wraps actions within `s` in the color category specified, or the `me` color if none is given.
+Actions are delimited by quote followed by an asterisk.
+If `includeAsterisk` is specified, the asterisk will be visible in the final string.
+
 ### `$colorquotes(s category)` {#other-colorquotes}
 Wraps quoted text within `s` in the color category specified, or the `say` color if none is given.
 

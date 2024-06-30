@@ -66,6 +66,7 @@ return {
     PredicateAllowLanguage = "",
     PredicateApplyBuff = "",
     PredicateAttractZombies = "$has(@(say;shout;meloud;doloud) $stream)",
+    PredicateClearOnDeath = "true",
     PredicateShowTypingIndicator = "",
     PredicateTransmitOverRadio = "true",
     PredicateUseNarrativeStyle = "",

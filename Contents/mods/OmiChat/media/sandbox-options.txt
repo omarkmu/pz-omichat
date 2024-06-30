@@ -602,6 +602,14 @@ option OmiChat.PredicateAttractZombies
     translation = OCPredicateAttractZombies,
 }
 
+option OmiChat.PredicateClearOnDeath
+{
+    type = string,
+    default = true,
+    page = OmiChat,
+    translation = OCPredicateClearOnDeath,
+}
+
 option OmiChat.PredicateShowTypingIndicator
 {
     type = string,
