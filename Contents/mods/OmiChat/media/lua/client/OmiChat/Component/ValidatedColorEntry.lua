@@ -1,6 +1,7 @@
 local TextEntry = require 'OmiChat/Component/ValidatedTextEntry'
 local utils = require 'OmiChat/util'
 local floor = math.floor
+local ISColorPicker = utils.getBaseColorPicker(ISColorPicker)
 
 ---@class omichat.ValidatedColorEntry : omichat.ValidatedTextEntry
 ---@field defaultColor omichat.ColorTable The default color to set on the modal during initialization.

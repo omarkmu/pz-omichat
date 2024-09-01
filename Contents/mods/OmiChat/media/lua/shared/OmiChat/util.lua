@@ -413,6 +413,19 @@ function utils.extractError(tokens)
     return err
 end
 
+---Gets the base color picker class given a class object.
+---For compatibility with More Everything Colors.
+---@param cls ISColorPicker
+---@return ISColorPicker
+function utils.getBaseColorPicker(cls)
+    local mt = getmetatable(cls)
+    if mt and mt.Type == 'ISColorPicker' then
+        return mt
+    end
+
+    return cls
+end
+
 ---Returns the player's current access level.
 ---If the connection is a coop host, returns `admin`.
 ---@return string
