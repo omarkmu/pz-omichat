@@ -66,6 +66,14 @@ option OmiChat.EnableCharacterCustomization
     translation = OCEnableCharacterCustomization,
 }
 
+option OmiChat.EnableAlwaysShowChat
+{
+    type = boolean,
+    default = false,
+    page = OmiChat,
+    translation = OCEnableAlwaysShowChat,
+}
+
 option OmiChat.EnableCleanCharacter
 {
     type = enum,
