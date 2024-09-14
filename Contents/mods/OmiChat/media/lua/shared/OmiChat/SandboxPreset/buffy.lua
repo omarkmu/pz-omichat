@@ -7,6 +7,7 @@ return {
     EnableFactionColorAsDefault = false,
     EnableCaseInsensitiveChatStreams = true,
     EnableCharacterCustomization = true,
+    EnableAlwaysShowChat = false,
     EnableCleanCharacter = 2,
     EnableSetName = 2,
     EnableDiscordColorOption = 3,

@@ -44,6 +44,11 @@ If blank, the command won't require an item.
 
 The maximum length for individual [custom shouts](#enablecustomshouts).
 
+### EnableAlwaysShowChat
+**Default:** `false`
+
+If enabled, players will be unable to close the chat.
+
 ### EnableCaseInsensitiveChatStreams
 **Default:** `true`
 

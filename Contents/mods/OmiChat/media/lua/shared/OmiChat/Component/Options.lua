@@ -20,6 +20,7 @@ local floor = math.floor
 ---@field EnableCompatTAD integer
 ---@field EnableFactionColorAsDefault boolean
 ---@field EnableCharacterCustomization boolean
+---@field EnableAlwaysShowChat boolean
 ---@field EnableCleanCharacter integer
 ---@field EnableDiscordColorOption integer
 ---@field EnableSetName integer
