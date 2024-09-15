@@ -29,7 +29,6 @@ OmiChat.ValidatedTextEntry = require 'OmiChat/Component/ValidatedTextEntry'
 OmiChat.IconPicker = require 'OmiChat/Component/IconPicker'
 OmiChat.SuggesterBox = require 'OmiChat/Component/SuggesterBox'
 OmiChat.StreamInfo = require 'OmiChat/Component/StreamInfo'
-OmiChat.TextPanel = require 'OmiChat/Component/TextPanel'
 
 OmiChat._prefsVersion = 2
 OmiChat._prefsFileName = 'omichat.json'
