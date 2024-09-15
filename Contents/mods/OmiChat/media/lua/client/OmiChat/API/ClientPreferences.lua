@@ -32,7 +32,16 @@ end
 local function readPrefsJson()
     local line
     local content = {}
-    local prefsFile = getFileReader(OmiChat._prefsFileName, true)
+
+    local prefsFile
+    pcall(function()
+        prefsFile = getFileReader(OmiChat._prefsFileName, true)
+    end)
+
+    if not prefsFile then
+        return
+    end
+
     while true do
         line = prefsFile:readLine()
         if line == nil then
@@ -54,7 +63,7 @@ local function readPrefsJson()
             decoded = 'invalid file content'
         end
 
-        utils.logError('failed to read preferences (%s)', decoded)
+        utils.logError('failed to read preferences: %s', decoded)
 
         -- reset to default on failed read
         return
@@ -386,13 +395,15 @@ function OmiChat.savePlayerPreferences()
     }
 
     if not success or type(encoded) ~= 'string' then
-        utils.logError('failed to write preferences (%s)', tostring(encoded))
+        utils.logError('failed to write preferences: %s', tostring(encoded))
         return false
     end
 
-    local outFile = getFileWriter(OmiChat._prefsFileName, true, false)
-    outFile:write(encoded)
-    outFile:close()
+    pcall(function()
+        local outFile = getFileWriter(OmiChat._prefsFileName, true, false)
+        outFile:write(encoded)
+        outFile:close()
+    end)
 
     return true
 end
