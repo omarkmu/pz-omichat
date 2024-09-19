@@ -226,7 +226,7 @@ function OmiChat.getDefaultPlayerPreferences()
         suggestOnTab = true,
         useSignEmotes = true,
         retainChatInput = true,
-        retainRPInput = true,
+        retainRPInput = false,
         retainOtherInput = false,
         adminShowIcon = true,
         adminKnowLanguages = true,
