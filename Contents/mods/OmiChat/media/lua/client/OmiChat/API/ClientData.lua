@@ -358,6 +358,11 @@ function OmiChat.updateCharacterName(name, updateSurname)
     end
 
     desc:setForename(forename)
+    if ISChat.instance then
+        -- fix incompatibility with buffy's character bios
+        ISChat.instance.rpName = forename
+    end
+
     if surname then
         desc:setSurname(surname)
     end
