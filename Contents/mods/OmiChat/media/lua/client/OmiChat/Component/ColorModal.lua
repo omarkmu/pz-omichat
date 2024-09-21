@@ -1,6 +1,7 @@
 local utils = require 'OmiChat/util'
 local ColorEntry = require 'OmiChat/Component/ValidatedColorEntry'
 local floor = math.floor
+local ISColorPicker = utils.getBaseColorPicker(ISColorPicker)
 
 ---Modal for color selection.
 ---Includes a text field for RGB input and a color picker.
@@ -33,6 +34,19 @@ end
 ---Sets up the color modal.
 function ColorModal:initialise()
     ISTextBox.initialise(self)
+
+    -- fix for integration bug with More Everything Colors
+    self:removeChild(self.colorPicker)
+    self.colorPicker = ISColorPicker:new(0, 0)
+    self.colorPicker:initialise()
+    self.colorPicker.pickedTarget = self
+    self.colorPicker.resetFocusTo = self
+    self.currentColor = ColorInfo.new(1, 1, 1, 1)
+    self.colorPicker:setInitialColor(self.currentColor)
+    self.colorPicker:addToUIManager()
+    self.colorPicker:setVisible(false)
+    self.colorPicker.otherFct = true
+    self.colorPicker.parent = self
 
     if not self.validateFunc then
         self:setValidateFunction(self, ColorModal.validate)

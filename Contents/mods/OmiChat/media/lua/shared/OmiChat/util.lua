@@ -413,6 +413,28 @@ function utils.extractError(tokens)
     return err
 end
 
+---Gets the end position of an author in a raw chat message, if present.
+---@param text string
+---@param author string
+---@return integer?
+function utils.getAuthorEndPos(text, author)
+    local _, authorEnd = text:find('%[' .. utils.escape(author) .. '%]:')
+    return authorEnd
+end
+
+---Gets the base color picker class given a class object.
+---For compatibility with More Everything Colors.
+---@param cls ISColorPicker
+---@return ISColorPicker
+function utils.getBaseColorPicker(cls)
+    local mt = getmetatable(cls)
+    if mt and mt.Type == 'ISColorPicker' then
+        return mt
+    end
+
+    return cls
+end
+
 ---Returns the player's current access level.
 ---If the connection is a coop host, returns `admin`.
 ---@return string

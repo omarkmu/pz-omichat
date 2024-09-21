@@ -306,6 +306,7 @@ return {
 
             local matched = formatter:read(text)
             if matched then
+                info.context.ocIsOtherOverhead = true
                 info.content = matched
             end
         end,
@@ -603,9 +604,7 @@ return {
 
             if not info.content then
                 -- grab text after the author
-                local authorPattern = concat { '%[', utils.escape(info.author), '%]:' }
-                local _, authorEnd = info.rawText:find(authorPattern)
-
+                local authorEnd = utils.getAuthorEndPos(info.rawText, info.author)
                 if authorEnd then
                     info.content = info.rawText:sub(authorEnd + 1)
                 end

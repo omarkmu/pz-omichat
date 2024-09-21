@@ -251,8 +251,8 @@ function OmiChat.getPlayerSubstitutions(player)
     end
 
     return {
-        forename = desc:getForename(),
-        surname = desc:getSurname(),
+        forename = utils.trim(desc:getForename()),
+        surname = utils.trim(desc:getSurname()),
         username = player:getUsername(),
     }
 end

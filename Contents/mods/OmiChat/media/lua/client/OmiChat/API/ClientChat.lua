@@ -1052,6 +1052,24 @@ function OmiChat.updateChatPanelSize()
     end
 end
 
+---Updates the visibility of the chat and close button based on the `Always Show Chat` option.
+---@protected
+function OmiChat.updateChatVisibility()
+    local instance = ISChat.instance
+    if not instance or not instance.closeButton then
+        return
+    end
+
+    local closeBtn = ISChat.instance.closeButton
+    if closeBtn and closeBtn:isVisible() == Option.EnableAlwaysShowChat then
+        closeBtn:setVisible(not Option.EnableAlwaysShowChat)
+    end
+
+    if Option.EnableAlwaysShowChat then
+        ISChat.instance:setVisible(true)
+    end
+end
+
 ---Updates the icon picker and suggester box based on the current input text.
 ---@param text string? The current text entry text. If omitted, the current text will be retrieved.
 function OmiChat.updateCustomComponents(text)
@@ -1110,6 +1128,7 @@ function OmiChat.updateState(redraw)
     addOrRemoveIconComponents()
     OmiChat.updateChatPanelSize()
     OmiChat.updateInfoText()
+    OmiChat.updateChatVisibility()
     OmiChat.updateButtons()
 
     local player = getSpecificPlayer(0)
