@@ -136,6 +136,7 @@ return check {
     'FormatInfo',
 
     category('Compatibility'),
+    'EnableCompatBuffyCharacterBios',
     'EnableCompatBuffyRPGSystem',
     'EnableCompatChatBubble',
     'EnableCompatSearchPlayers',

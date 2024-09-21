@@ -65,6 +65,7 @@ Sandbox_EN = {
     Sandbox_OCPatternNarrativeCustomTag_tooltip = "Lua string pattern for custom dialogue tags when using narrative style. If blank, custom dialogue tags will be disabled.",
 
     --[[ Compatibility Features ]]--
+    Sandbox_OCEnableCompatBuffyCharacterBios = "Buffy's Character Bios Compatibility",
     Sandbox_OCEnableCompatBuffyRPGSystem = "Buffy's Tabletop RPG System Compatibility",
     Sandbox_OCEnableCompatChatBubble = "Chat Bubble Compatibility",
     Sandbox_OCEnableCompatSearchPlayers = "Search Players For Weapons Compatibility",
@@ -75,6 +76,8 @@ Sandbox_EN = {
     Sandbox_OCCompatOptionValue_option3 = "Enable if mod is enabled",
 
     /* Tooltips */
+    Sandbox_OCEnableCompatBuffyCharacterBios_tooltip = "Controls compatibility with the <SPACE> <RGB:0,0.5,1> Buffy's Character Bios <RGB:1,1,1> <SPACE> mod. <LINE>" ..
+        "The compatibility patch fixes an incompatibility with forename-setting commands and uses server message formatting for bio update notifications."
     Sandbox_OCEnableCompatBuffyRPGSystem_tooltip = "Controls compatibility with the <SPACE> <RGB:0,0.5,1> Buffy's Tabletop RPG System <RGB:1,1,1> <SPACE> mod. <LINE>" ..
         "The compatibility patch provides tokens for roll messages to control their formatting and uses <SPACE> <GREEN> /me <RGB:1,1,1> <SPACE> formatting for these messages if the stream is enabled."
     Sandbox_OCEnableCompatChatBubble_tooltip = "Controls compatibility with the <SPACE> <RGB:0,0.5,1> Chat Bubble v0.6 <RGB:1,1,1> <SPACE> mod. <LINE> The compatibility patch prevents image messages from that mod from showing up in chat.",
