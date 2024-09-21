@@ -901,6 +901,7 @@ local _onTabAdded = ISChat.onTabAdded
 local _onTabRemoved = ISChat.onTabRemoved
 local _update = ISChat.update
 local _render = ISChat.render
+local _setDrawFrame = ISChat.setDrawFrame
 
 local _ChatMessage = __classmetatables[ChatMessage.class].__index
 local _ServerChatMessage = __classmetatables[ServerChatMessage.class].__index
@@ -971,6 +972,10 @@ end
 
 ---Override to unfocus on close.
 function ISChat:close()
+    if Option.EnableAlwaysShowChat then
+        return
+    end
+
     _close(self)
 
     if not self.locked then
@@ -1421,6 +1426,18 @@ function ISChat:render()
     self:setStencilRect(0, 0, w, self:getHeight())
     self:drawText(text, x, y, 1, 1, 1, 1, self.typingFont)
     self:clearStencilRect()
+end
+
+---Override to keep the close button hidden if the always show chat option is enabled.
+---@param visible boolean
+function ISChat:setDrawFrame(visible)
+    if not Option.EnableAlwaysShowChat then
+        _setDrawFrame(self, visible)
+        return
+    end
+
+    self.background = visible
+    self.drawFrame = visible
 end
 
 ---Override to hide icon picker and disable button on unfocus.

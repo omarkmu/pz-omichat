@@ -2,6 +2,7 @@
 ---@diagnostic disable: duplicate-set-field
 
 local OmiChat = require 'OmiChatClient'
+local utils = OmiChat.utils
 
 
 --#region Medical
@@ -315,8 +316,8 @@ function ISMiniScoreboardUI:populateList()
         if name then
             item.text = name
             local desc = player:getDescriptor()
-            local forename = desc and desc:getForename() or ''
-            local surname = desc and desc:getSurname() or ''
+            local forename = utils.trim(desc and desc:getForename() or '')
+            local surname = utils.trim(desc and desc:getSurname() or '')
             local chatName = OmiChat.getNameInChat(username, 'say') or ''
 
             local details = {

@@ -15,11 +15,13 @@ local floor = math.floor
 ---@field EnableSpeechColorAsDefaultNameColor boolean
 ---@field EnableSetSpeechColor boolean
 ---@field EnableCompatBuffyRPGSystem integer
+---@field EnableCompatBuffyCharacterBios integer
 ---@field EnableCompatChatBubble integer
 ---@field EnableCompatSearchPlayers integer
 ---@field EnableCompatTAD integer
 ---@field EnableFactionColorAsDefault boolean
 ---@field EnableCharacterCustomization boolean
+---@field EnableAlwaysShowChat boolean
 ---@field EnableCleanCharacter integer
 ---@field EnableDiscordColorOption integer
 ---@field EnableSetName integer
@@ -240,6 +242,11 @@ end
 ---@return boolean
 function Option:canPlayersSetNickname()
     return self:isNicknameCommandEnabled() or self.EnableSetName == 2
+end
+
+---Returns whether the Buffy's Character Bios compatibility patch is enabled.
+function Option:compatBuffyCharacterBiosEnabled()
+    return isCompatEnabled(Option.EnableCompatBuffyCharacterBios, 'CharacterBio')
 end
 
 ---Returns whether the Buffy's Tabletop RPG System compatibility patch is enabled.

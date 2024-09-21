@@ -338,7 +338,7 @@ function OmiChat.updateCharacterName(name, updateSurname)
         errorID = '',
     }
 
-    name = utils.interpolate(Option.FilterNickname, tokens)
+    name = utils.trim(utils.interpolate(Option.FilterNickname, tokens))
 
     local err = utils.extractError(tokens)
     if name == '' then
@@ -352,12 +352,17 @@ function OmiChat.updateCharacterName(name, updateSurname)
 
         local parts = name:split(' ')
         if #parts > 1 then
-            forename = concat(parts, ' ', 1, #parts - 1)
-            surname = parts[#parts]
+            forename = utils.trim(concat(parts, ' ', 1, #parts - 1))
+            surname = utils.trim(parts[#parts])
         end
     end
 
     desc:setForename(forename)
+    if ISChat.instance and Option:compatBuffyCharacterBiosEnabled() then
+        -- fix incompatibility with buffy's character bios
+        ISChat.instance.rpName = forename
+    end
+
     if surname then
         desc:setSurname(surname)
     end

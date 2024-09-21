@@ -98,6 +98,7 @@ return check {
     'EnableSpeechColorAsDefaultNameColor',
     'EnableFactionColorAsDefault',
     'EnableCaseInsensitiveChatStreams',
+    'EnableAlwaysShowChat',
 
     padding(),
     'EnableCustomShouts',
@@ -135,6 +136,7 @@ return check {
     'FormatInfo',
 
     category('Compatibility'),
+    'EnableCompatBuffyCharacterBios',
     'EnableCompatBuffyRPGSystem',
     'EnableCompatChatBubble',
     'EnableCompatSearchPlayers',
