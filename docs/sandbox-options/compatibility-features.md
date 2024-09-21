@@ -9,6 +9,14 @@ All of these features have three possible values:
 
 The third option will check for the mod ID before applying the patch.
 
+### EnableCompatBuffyCharacterBios
+**Default:** `3 - Enable if mod is enabled`
+
+Enables the compatibility patch for [buffy's character bios](https://steamcommunity.com/sharedfiles/filedetails/?id=2755000912).
+
+This fixes an incompatibility that otherwise causes [commands that update forenames](./basic-features.md#enablesetname) to fail.
+It will also make bio update messages appear as server messages rather than `/say` messages.
+
 ### EnableCompatBuffyRPGSystem
 **Default:** `2 - Disable`
 

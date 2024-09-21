@@ -11,6 +11,7 @@ return {
     EnableCleanCharacter = 3,
     EnableSetName = 1,
     EnableDiscordColorOption = 3,
+    EnableCompatBuffyCharacterBios = 2,
     EnableCompatBuffyRPGSystem = 2,
     EnableCompatChatBubble = 2,
     EnableCompatSearchPlayers = 2,
