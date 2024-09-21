@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.4.0
+
+### Added
+- `EnableAlwaysShowChat` sandbox option to force the chat to always be open
+- Compatibility patch for buffy's character bios
+
+### Changed
+- RP commands will no longer be retained by default
+- Improved safety of saving and loading player preferences
+
+### Fixed
+- Fixed a compatibility issue with More Everything Colors
+
 ## 1.3.0
 
 ### Added
