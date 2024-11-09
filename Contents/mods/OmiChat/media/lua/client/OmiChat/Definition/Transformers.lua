@@ -480,7 +480,7 @@ return {
                 return
             end
 
-            local authorPlayer = getPlayerFromUsername(info.author)
+            local authorPlayer = utils.getPlayerByUsername(info.author)
             local localPlayer = getSpecificPlayer(0)
             if not authorPlayer or not localPlayer or authorPlayer == localPlayer then
                 -- players can hear themselves

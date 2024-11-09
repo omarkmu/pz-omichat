@@ -123,6 +123,26 @@ local function mapPerkToId(perk)
     return perk:getId()
 end
 
+---Checks whether a player should be included in the username search.
+---@param player IsoPlayer | omichat.utils.PlayerCacheItem
+---@param ctx omichat.search.InternalSearchContext
+---@param ownUsername string
+---@param includeSelf boolean?
+---@return omichat.search.InternalSearchResult?
+local function searchPlayer(player, ctx, ownUsername, includeSelf)
+    local username
+    if player.getUsername then
+        ---@cast player IsoPlayer
+        username = player:getUsername()
+    else
+        username = player.username
+    end
+
+    if username and (includeSelf or username ~= ownUsername) then
+        return OmiChat.searchInternal(ctx, username)
+    end
+end
+
 
 ---Creates internal context given search context.
 ---@param ctx omichat.SearchContext | string
@@ -269,22 +289,31 @@ function OmiChat.searchInternal(ctx, primary, value, ...)
 end
 
 ---Collects online usernames based on a search string.
----If there's an exact match, no results are returned.
 ---@param ctxOrSearch omichat.SearchContext | string Context for the search.
 ---@param includeSelf boolean? If true, player 1's username will be included in the search.
+---@param useCache boolean? If true, cached player information will be used.
 ---@return omichat.SearchResults
-function OmiChat.searchOnlineUsernames(ctxOrSearch, includeSelf)
+function OmiChat.searchOnlineUsernames(ctxOrSearch, includeSelf, useCache)
     local ctx = OmiChat.buildInternalSearchContext(ctxOrSearch)
     local onlinePlayers = getOnlinePlayers()
     local player = getSpecificPlayer(0)
     local ownUsername = player and player:getUsername()
 
     local exact
-    for i = 0, onlinePlayers:size() - 1 do
-        local onlinePlayer = onlinePlayers:get(i)
-        local user = onlinePlayer and onlinePlayer:getUsername()
-        if user and (includeSelf or user ~= ownUsername) then
-            local result = OmiChat.searchInternal(ctx, user)
+    if useCache then
+        for _, item in utils.iteratePlayerCache() do
+            local result = searchPlayer(item, ctx, ownUsername, includeSelf)
+            if result and result.exact then
+                exact = result
+                if ctx.terminateOnExact then
+                    break
+                end
+            end
+        end
+    else
+        for i = 0, onlinePlayers:size() - 1 do
+            local onlinePlayer = onlinePlayers:get(i)
+            local result = searchPlayer(onlinePlayer, ctx, ownUsername, includeSelf)
             if result and result.exact then
                 exact = result
                 if ctx.terminateOnExact then
@@ -396,7 +425,6 @@ function OmiChat.searchStreams(ctxOrSearch, options)
 end
 
 ---Collects results from a list of strings based on a search string.
----If there's an exact match, no results are returned.
 ---@param ctxOrSearch omichat.SearchContext | string Context for the search.
 ---@param list string[] The list of strings to search.
 ---@return omichat.SearchResults

@@ -10,5 +10,6 @@ require 'OmiChat/API/ServerCommands'
 
 Events.OnClientCommand.Add(OmiChat._onClientCommand)
 Events.SendCustomModData.Add(OmiChat.transmitModData)
+Events.EveryTenMinutes.Add(OmiChat._refreshCache)
 
 return OmiChat

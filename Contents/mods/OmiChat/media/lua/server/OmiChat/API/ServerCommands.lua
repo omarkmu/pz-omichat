@@ -317,6 +317,11 @@ function OmiChat.Commands.reportPlayerDeath(player)
     end
 end
 
+---Handles player join.
+function OmiChat.Commands.reportPlayerJoined()
+    OmiChat.Commands.requestPlayerCacheUpdate()
+end
+
 ---Handles the /addlanguage command.
 ---@param player IsoPlayer
 ---@param args omichat.request.Command
@@ -427,6 +432,11 @@ function OmiChat.Commands.requestFlipCoin(player)
         local name = OmiChat.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
         OmiChat.sendTranslatedServerMessage('UI_OmiChat_Flip' .. (heads and 'Heads' or 'Tails'), { name })
     end
+end
+
+---Updates player cache information.
+function OmiChat.Commands.requestPlayerCacheUpdate()
+    OmiChat._refreshCache()
 end
 
 ---Handles the /reseticon command.
@@ -678,4 +688,12 @@ function OmiChat._onClientCommand(module, command, player, args)
     if OmiChat.Commands[command] then
         OmiChat.Commands[command](player, args)
     end
+end
+
+---Event handler for a scheduled update of the player cache.
+---@protected
+function OmiChat._refreshCache()
+    local items = utils.refreshPlayerCache()
+    local req = { items = items } ---@type omichat.request.UpdatePlayerCache
+    OmiChat.dispatchAll('updatePlayerCache', req)
 end

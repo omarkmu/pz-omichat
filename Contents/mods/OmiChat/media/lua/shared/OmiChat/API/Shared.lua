@@ -36,6 +36,19 @@ for i = 1, #modDataFields do
     modDataKeys[#modDataKeys + 1] = modDataFields[i].name
 end
 
+---Gets the username for a player or player cache item.
+---@param player IsoPlayer | omichat.utils.PlayerCacheItem
+---@return string?
+local function getPlayerUsername(player)
+    if player.getUsername then
+        ---@cast player IsoPlayer
+        return player:getUsername()
+    else
+        ---@cast player omichat.utils.PlayerCacheItem
+        return player.username
+    end
+end
+
 
 ---Clears mod data for a given username.
 ---@param username string
@@ -171,7 +184,7 @@ function OmiChat.getNameInChat(username, chatType)
         return
     end
 
-    local player = utils.getPlayerByUsername(username)
+    local player = utils.getPlayerInfoByUsername(username)
     if not player then
         return
     end
@@ -192,7 +205,7 @@ end
 
 ---Retrieves the name that should be used in chat for the given menu type.
 ---If the menu name should not be affected or retrieving the name fails, this returns `nil`.
----@param player IsoPlayer
+---@param player IsoPlayer | omichat.utils.PlayerCacheItem
 ---@param menuType omichat.MenuTypeString
 ---@return string?
 function OmiChat.getPlayerMenuName(player, menuType)
@@ -201,8 +214,7 @@ function OmiChat.getPlayerMenuName(player, menuType)
         return
     end
 
-    local username = player:getUsername()
-    local chatName = OmiChat.getNameInChat(username, 'say')
+    local chatName = OmiChat.getPlayerNameInChat(player, 'say')
     local tokens = chatName and OmiChat.getPlayerSubstitutions(player)
     if not chatName or not tokens then
         return
@@ -210,7 +222,7 @@ function OmiChat.getPlayerMenuName(player, menuType)
 
     tokens.name = OmiChat.utils.unescapeRichText(chatName)
     tokens.menuType = menuType
-    local result = OmiChat.utils.interpolate(nameFormat, tokens, username)
+    local result = OmiChat.utils.interpolate(nameFormat, tokens, getPlayerUsername(player))
 
     if result == '' then
         return
@@ -220,7 +232,7 @@ function OmiChat.getPlayerMenuName(player, menuType)
 end
 
 ---Retrieves the name that should be used in chat for a given player.
----@param player IsoPlayer
+---@param player IsoPlayer | omichat.utils.PlayerCacheItem
 ---@param chatType omichat.ChatTypeString The chat type to use in format string interpolation.
 ---@return string? name The name to use in chat, or `nil` if unable to retrieve information about the player.
 function OmiChat.getPlayerNameInChat(player, chatType)
@@ -229,7 +241,8 @@ function OmiChat.getPlayerNameInChat(player, chatType)
         return
     end
 
-    local username = player:getUsername()
+    local username = getPlayerUsername(player)
+
     local modData = OmiChat.getModData()
     if modData.nicknames[username] then
         tokens.name = modData.nicknames[username]
@@ -242,9 +255,19 @@ end
 
 ---Gets substitution tokens to use in interpolation for a given player.
 ---If the player descriptor could not be obtained, returns `nil`.
----@param player IsoPlayer?
+---@param player (IsoPlayer | omichat.utils.PlayerCacheItem)?
 ---@return table?
 function OmiChat.getPlayerSubstitutions(player)
+    if player and not player.getUsername then
+        ---@cast player omichat.utils.PlayerCacheItem
+        return {
+            forename = utils.trim(player.forename),
+            surname = utils.trim(player.surname),
+            username = player.username,
+        }
+    end
+
+    ---@cast player IsoPlayer
     local desc = player and player:getDescriptor()
     if not player or not desc then
         return

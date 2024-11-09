@@ -18,6 +18,7 @@ Events.OnCreatePlayer.Add(OmiChat._onCreatePlayer)
 Events.OnPlayerDeath.Add(OmiChat._onPlayerDeath)
 Events.OnServerCommand.Add(OmiChat._onServerCommand)
 Events.OnReceiveGlobalModData.Add(OmiChat._onReceiveGlobalModData)
+Events.OnTick.Add(OmiChat._onTickTemporary)
 
 return OmiChat
 

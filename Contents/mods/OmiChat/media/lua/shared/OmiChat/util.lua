@@ -14,13 +14,25 @@ local getTimestampMs = getTimestampMs
 ---Utility functions.
 ---@class omichat.utils : omi.utils
 ---@field private _interpolatorCache table<string, omichat.utils.InterpolatorCacheItem>
+---@field private _playerCacheByUsername table<string, omichat.utils.PlayerCacheItem>
+---@field private _playerCacheByOnlineID table<string, omichat.utils.PlayerCacheItem>
 local utils = lib.utils.copy(lib.utils)
 utils.Interpolator = Interpolator
 utils._interpolatorCache = {}
+utils._playerCacheByUsername = {}
+utils._playerCacheByOnlineID = {}
 
 ---@class omichat.utils.InterpolatorCacheItem
 ---@field interpolator omichat.Interpolator
 ---@field lastAccess number
+
+---@class omichat.utils.PlayerCacheItem
+---@field username string
+---@field forename string
+---@field surname string
+---@field onlineID number
+---@field speechColor omichat.ColorTable
+
 
 local CACHE_EXPIRY_MS = 600000 -- ten minutes
 local shortHexPattern = '^%s*#?(%x)(%x)(%x)%s*$'
@@ -118,6 +130,47 @@ local function readColor(text)
     return tonumber(r, 16), tonumber(g, 16), tonumber(b, 16)
 end
 
+---Creates a cache item for the given player.
+---@param player IsoPlayer
+---@return omichat.utils.PlayerCacheItem
+local function buildPlayerCacheItem(player)
+    local desc = player:getDescriptor()
+
+    local speechColor
+    local color = player:getSpeakColour()
+    if color then
+        speechColor = {
+            r = color:getRed(),
+            g = color:getGreen(),
+            b = color:getBlue(),
+        }
+    else
+        speechColor = { r = 255, g = 255, b = 255 }
+    end
+
+    ---@type omichat.utils.PlayerCacheItem
+    local item = {
+        username = player:getUsername(),
+        forename = desc:getForename(),
+        surname = desc:getSurname(),
+        onlineID = player:getOnlineID(),
+        speechColor = speechColor,
+    }
+
+    return item
+end
+
+---Updates the cache with the player's information.
+---@param player IsoPlayer
+---@return omichat.utils.PlayerCacheItem
+local function updateCacheWithPlayer(player)
+    local item = buildPlayerCacheItem(player)
+
+    utils._playerCacheByUsername[item.username] = item
+    utils._playerCacheByOnlineID[item.onlineID] = item
+    return item
+end
+
 
 ---Encodes additional information in a message tag.
 ---@param message omichat.Message
@@ -143,6 +196,20 @@ function utils.addMessageTagValue(message, key, value)
     end
 
     message:setCustomTag(encodedTag)
+end
+
+---Adds a player to the cache.
+---@param player IsoPlayer
+---@return omichat.utils.PlayerCacheItem
+function utils.cachePlayer(player)
+    return updateCacheWithPlayer(player)
+end
+
+---Adds an item to the player cache.
+---@param item omichat.utils.PlayerCacheItem
+function utils.cachePlayerInfo(item)
+    utils._playerCacheByUsername[item.username] = item
+    utils._playerCacheByOnlineID[item.onlineID] = item
 end
 
 ---Clamps the RGB color values in `color` to within the provided range.
@@ -531,6 +598,43 @@ function utils.getNumericAccessLevel(access)
     return accessLevels[access:lower()] or 1
 end
 
+---Retrieves player information given an online ID.
+---@param onlineID number
+---@return omichat.utils.PlayerCacheItem?
+function utils.getPlayerInfoByOnlineID(onlineID)
+    local found = getPlayerByOnlineID(onlineID)
+    if found then
+        return updateCacheWithPlayer(found)
+    end
+
+    return utils._playerCacheByOnlineID[onlineID]
+end
+
+---Retrieves player information given a username.
+---@param username string
+---@return omichat.utils.PlayerCacheItem?
+function utils.getPlayerInfoByUsername(username)
+    local found
+    if isClient() then
+        found = getPlayerFromUsername(username)
+    else
+        local onlinePlayers = getOnlinePlayers()
+        for i = 0, onlinePlayers:size() - 1 do
+            local player = onlinePlayers:get(i)
+            if player:getUsername() == username then
+                found = player
+                break
+            end
+        end
+    end
+
+    if found then
+        return updateCacheWithPlayer(found)
+    end
+
+    return utils._playerCacheByUsername[username]
+end
+
 ---Gets a player given their username.
 ---@param username string
 ---@return IsoPlayer?
@@ -772,6 +876,13 @@ function utils.iterateIcons()
     return pairs(iconToTextureNameMap)
 end
 
+---Returns an iterator over the player cache.
+---@return function
+---@return table<string, omichat.utils.PlayerCacheItem>
+function utils.iteratePlayerCache()
+    return pairs(utils._playerCacheByUsername)
+end
+
 ---Logs a non-fatal mod error.
 ---@param err string
 ---@param ... unknown
@@ -825,6 +936,19 @@ function utils.parseCommandArgs(text)
     return args, inQuote
 end
 
+---Refreshes the cache with information from the currently online players.
+---@return omichat.utils.PlayerCacheItem[]
+function utils.refreshPlayerCache()
+    local onlinePlayers = getOnlinePlayers()
+    local items = {}
+    for i = 0, onlinePlayers:size() - 1 do
+        items[#items + 1] = buildPlayerCacheItem(onlinePlayers:get(i))
+    end
+
+    utils.resetPlayerCache(items)
+    return items
+end
+
 ---Replaces character entities with the characters that they represent.
 ---Numeric entities and named entities in ISO-8859-1 are supported.
 ---@param text string
@@ -835,6 +959,23 @@ function utils.replaceEntities(text)
     end)
 
     return text
+end
+
+---Resets the player cache.
+---@param items omichat.utils.PlayerCacheItem[]
+function utils.resetPlayerCache(items)
+    items = items or {}
+
+    local byUsername = {}
+    local byOnlineID = {}
+    for i = 1, #items do
+        local item = items[i]
+        byUsername[item.username] = item
+        byOnlineID[item.onlineID] = item
+    end
+
+    utils._playerCacheByUsername = byUsername
+    utils._playerCacheByOnlineID = byOnlineID
 end
 
 ---Converts a color string to a color. Returns `nil` on failure.
