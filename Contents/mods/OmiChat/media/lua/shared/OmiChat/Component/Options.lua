@@ -4,7 +4,6 @@ local config = require 'OmiChat/config'
 local DelimitedList = utils.DelimitedList
 
 local getActivatedMods = getActivatedMods
-local floor = math.floor
 
 
 ---Helper for retrieving sandbox variables and their defaults.
@@ -208,7 +207,7 @@ local function isCompatEnabled(value, modId)
 end
 
 
----Checks whether the language against the add language allow/block list.
+---Checks the language against the add language allow/block list.
 ---This does not check whether the language is a valid roleplay language.
 ---@param language string
 ---@return boolean
@@ -296,25 +295,21 @@ end
 ---@return omichat.ColorTable
 function Option:getDefaultColor(category, username)
     if category == 'speech' or (category == 'name' and self.EnableSpeechColorAsDefaultNameColor) then
-        local player = username and utils.getPlayerByUsername(username)
-        local speechColor = player and player:getSpeakColour()
+        local player = username and utils.getPlayerInfoByUsername(username)
+        local speechColor = player and player.speechColor
 
         if not speechColor then
             return { r = 255, g = 255, b = 255 }
         end
 
         return {
-            r = floor(speechColor:getR() * 255),
-            g = floor(speechColor:getG() * 255),
-            b = floor(speechColor:getB() * 255),
+            r = speechColor.r,
+            g = speechColor.g,
+            b = speechColor.b,
         }
     elseif category == 'faction' and Option.EnableFactionColorAsDefault then
-        local player
-        if username then
-            player = utils.getPlayerByUsername(username)
-        else
-            player = getSpecificPlayer(0)
-        end
+        -- faction messages should share the player's faction
+        local player = getSpecificPlayer(0)
 
         local playerFaction = player and Faction.getPlayerFaction(player)
         local tagColor = playerFaction and playerFaction:getTagColor()

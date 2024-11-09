@@ -82,6 +82,7 @@ function OmiChat.changeSpeechColor(color)
     core:saveOptions()
     player:setSpeakColourInfo(core:getMpTextColor())
     sendPersonalColor(player)
+    OmiChat.requestPlayerCacheUpdate()
 end
 
 ---Checks whether the current player knows a given roleplay language.
@@ -341,7 +342,7 @@ function OmiChat.updateCharacterName(name, updateSurname)
     name = utils.trim(utils.interpolate(Option.FilterNickname, tokens))
 
     local err = utils.extractError(tokens)
-    if name == '' then
+    if name == '' or err then
         return false, err or getText('UI_OmiChat_Error_InvalidName', utils.escapeRichText(name))
     end
 
@@ -368,6 +369,7 @@ function OmiChat.updateCharacterName(name, updateSurname)
     end
 
     sendPlayerStatsChange(player)
+    OmiChat.requestPlayerCacheUpdate()
 
     -- update name in inventory
     local data = getPlayerData(player:getPlayerNum())

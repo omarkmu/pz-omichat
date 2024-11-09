@@ -306,3 +306,7 @@ return OmiChat
 ---Request to handle a command on the server.
 ---@class omichat.request.Command
 ---@field command string The command text, excluding the command itself.
+
+---Request to update the player cache.
+---@class omichat.request.UpdatePlayerCache
+---@field items omichat.utils.PlayerCacheItem[]

@@ -204,5 +204,16 @@ function OmiChat._onReceiveGlobalModData(key, newData)
     end
 end
 
+---Event handler that runs on tick until the player has loaded.
+---@protected
+function OmiChat._onTickTemporary()
+    if not getSpecificPlayer(0) then
+        return
+    end
+
+    Events.OnTick.Remove(OmiChat._onTickTemporary)
+    OmiChat.reportPlayerJoined()
+end
+
 
 return OmiChat
