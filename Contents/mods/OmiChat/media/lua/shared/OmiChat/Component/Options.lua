@@ -29,6 +29,12 @@ local getActivatedMods = getActivatedMods
 ---@field CoinItems string
 ---@field DiceItems string
 ---@field BuffCooldown integer
+---@field BuffReduceBoredom number
+---@field BuffReduceCigaretteStress number
+---@field BuffReduceFatigue number
+---@field BuffReduceHunger number
+---@field BuffReduceThirst number
+---@field BuffReduceUnhappiness number
 ---@field CustomShoutMaxLength integer
 ---@field MinimumCommandAccessLevel integer
 ---@field MaximumCustomShouts integer

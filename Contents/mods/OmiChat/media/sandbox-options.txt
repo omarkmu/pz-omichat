@@ -200,6 +200,66 @@ option OmiChat.BuffCooldown
     translation = OCBuffCooldown,
 }
 
+option OmiChat.BuffReduceBoredom
+{
+    type = double,
+    default = 0.2,
+    min = 0,
+    max = 1,
+    page = OmiChat,
+    translation = OCBuffReduceBoredom,
+}
+
+option OmiChat.BuffReduceUnhappiness
+{
+    type = double,
+    default = 0.2,
+    min = 0,
+    max = 1,
+    page = OmiChat,
+    translation = OCBuffReduceUnhappiness,
+}
+
+option OmiChat.BuffReduceHunger
+{
+    type = double,
+    default = 0.1,
+    min = 0,
+    max = 1,
+    page = OmiChat,
+    translation = OCBuffReduceHunger,
+}
+
+option OmiChat.BuffReduceThirst
+{
+    type = double,
+    default = 0.1,
+    min = 0,
+    max = 1,
+    page = OmiChat,
+    translation = OCBuffReduceThirst,
+}
+
+option OmiChat.BuffReduceFatigue
+{
+    type = double,
+    default = 0.1,
+    min = 0,
+    max = 1,
+    page = OmiChat,
+    translation = OCBuffReduceFatigue,
+}
+
+option OmiChat.BuffReduceCigaretteStress
+{
+    type = double,
+    default = 0.2,
+    min = 0,
+    max = 1,
+    page = OmiChat,
+    translation = OCBuffReduceCigaretteStress,
+}
+
 option OmiChat.MaximumCustomShouts
 {
     type = integer,

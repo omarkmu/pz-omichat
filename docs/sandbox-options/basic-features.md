@@ -10,6 +10,48 @@ These [options](./index.md) are used to control basic features of the mod.
 
 The cooldown for applying [buffs](./filters-predicates.md#predicateapplybuff), in real-time minutes.
 
+### BuffReduceBoredom
+**Default:** `0.2`  
+**Minimum:** `0.0`  
+**Maximum:** `1.0`
+
+The amount that boredom will be reduced by when a [buff](./filters-predicates.md#predicateapplybuff) is applied.
+
+### BuffReduceCigaretteStress
+**Default:** `0.2`  
+**Minimum:** `0.0`  
+**Maximum:** `1.0`
+
+The amount that stress from lack of smoking will be reduced by when a [buff](./filters-predicates.md#predicateapplybuff) is applied.
+
+### BuffReduceFatigue
+**Default:** `0.1`  
+**Minimum:** `0.0`  
+**Maximum:** `1.0`
+
+The amount that fatigue will be reduced by when a [buff](./filters-predicates.md#predicateapplybuff) is applied.
+
+### BuffReduceHunger
+**Default:** `0.1`  
+**Minimum:** `0.0`  
+**Maximum:** `1.0`
+
+The amount that hunger will be reduced by when a [buff](./filters-predicates.md#predicateapplybuff) is applied.
+
+### BuffReduceThirst
+**Default:** `0.1`  
+**Minimum:** `0.0`  
+**Maximum:** `1.0`
+
+The amount that thirst will be reduced by when a [buff](./filters-predicates.md#predicateapplybuff) is applied.
+
+### BuffReduceUnhappiness
+**Default:** `0.2`  
+**Minimum:** `0.0`  
+**Maximum:** `1.0`
+
+The amount that unhappiness will be reduced by when a [buff](./filters-predicates.md#predicateapplybuff) is applied.
+
 ### CardItems
 **Default:** `CardDeck`
 

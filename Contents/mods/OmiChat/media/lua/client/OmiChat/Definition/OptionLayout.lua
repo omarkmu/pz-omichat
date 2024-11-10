@@ -124,6 +124,12 @@ return check {
     padding(),
     'PredicateApplyBuff',
     'BuffCooldown',
+    'BuffReduceBoredom',
+    'BuffReduceUnhappiness',
+    'BuffReduceHunger',
+    'BuffReduceThirst',
+    'BuffReduceFatigue',
+    'BuffReduceCigaretteStress',
 
     padding(),
     'FormatAdminIcon',

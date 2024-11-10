@@ -89,12 +89,24 @@ Sandbox_EN = {
     Sandbox_OCMinimumCommandAccessLevel = "Admin Command Access Level",
     Sandbox_OCMaximumCustomShouts = "(Deprecated) Maximum Custom Shouts",
     Sandbox_OCBuffCooldown = "Buff Cooldown",
+    Sandbox_OCBuffReduceBoredom = "Buff Boredom Reduction",
+    Sandbox_OCBuffReduceUnhappiness = "Buff Unhappiness Reduction",
+    Sandbox_OCBuffReduceHunger = "Buff Hunger Reduction",
+    Sandbox_OCBuffReduceThirst = "Buff Thirst Reduction",
+    Sandbox_OCBuffReduceFatigue = "Buff Fatigue Reduction",
+    Sandbox_OCBuffReduceCigaretteStress = "Buff Cigarette Stress Reduction",
 
     /* Tooltips */
     Sandbox_OCCustomShoutMaxLength_tooltip = "<RED> This option is deprecated and will be removed in a future version. <LINE> To apply length limits, use the chat input filter option instead. <RGB:1,1,1> <LINE> The maximum length of a single custom shout.",
     Sandbox_OCMinimumCommandAccessLevel_tooltip = "The minimum access level required to execute admin commands added by the mod.",
     Sandbox_OCMaximumCustomShouts_tooltip = "<RED> This option is deprecated and will be removed in a future version. <RGB:1,1,1> <LINE> Controls the maximum number of custom shouts players are allowed to define.",
     Sandbox_OCBuffCooldown_tooltip = "The cooldown for applying buffs, in real-time minutes.",
+    Sandbox_OCBuffReduceBoredom_tooltip = "The amount that boredom is reduced by when a buff is applied.",
+    Sandbox_OCBuffReduceUnhappiness_tooltip = "The amount that unhappiness is reduced by when a buff is applied.",
+    Sandbox_OCBuffReduceHunger_tooltip = "The amount that hunger is reduced by when a buff is applied.",
+    Sandbox_OCBuffReduceThirst_tooltip = "The amount that thirst is reduced by when a buff is applied.",
+    Sandbox_OCBuffReduceFatigue_tooltip = "The amount that fatigue is reduced by when a buff is applied.",
+    Sandbox_OCBuffReduceCigaretteStress_tooltip = "The amount that stress from lack of smoking is reduced by when a buff is applied.",
 
     --[[ Ranges ]]--
     Sandbox_OCRangeCallout = "Callout Range",
