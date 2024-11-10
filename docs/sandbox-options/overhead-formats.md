@@ -86,6 +86,13 @@ If blank, `/meloud` messages will not display overhead.
 Defines the format used for overhead speech bubbles of [`/mequiet`](./chat-formats.md#chatformatmequiet) messages.
 If blank, `/mequiet` messages will not display overhead.
 
+### OverheadFormatMeWhisper
+**Default:** `<< $1 >>`  
+**Token Context:** [Overhead](../sandbox-options/token-contexts.md#overhead)
+
+Defines the format used for overhead speech bubbles of [`/mewhisper`](./chat-formats.md#chatformatmequiet) messages.
+If blank, `/mewhisper` messages will not display overhead.
+
 ### OverheadFormatOoc
 **Default:** `(( $1 ))`  
 **Token Context:** [Overhead](../sandbox-options/token-contexts.md#overhead)

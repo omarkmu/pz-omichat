@@ -65,6 +65,13 @@ The maximum distance between players for [`/meloud`](./chat-formats.md#chatforma
 
 The maximum distance between players for [`/mequiet`](./chat-formats.md#chatformatmequiet) messages to be visible.
 
+### RangeMeWhisper
+**Default:** `2`  
+**Minimum:** `1`  
+**Maximum:** `30`
+
+The maximum distance between players for [`/mewhisper`](./chat-formats.md#chatformatmewhisper) messages to be visible.
+
 ### RangeMultiplierZombies
 **Default:** `0.0`  
 **Minimum:** `0.0`  
@@ -102,7 +109,7 @@ The maximum distance for a 'Q' callout performed while sneaking to be heard by p
 The maximum distance for a 'Q' callout performed while sneaking to attract zombies.
 
 ### RangeVertical
-**Default:** `@($sneakCallout:1;$index(@(@(shout;meloud;doloud):3;@(whisper;low;mequiet;doquiet):1) $stream 2))`  
+**Default:** `@($sneakCallout:1;$index(@(@(shout;meloud;doloud):3;@(whisper;low;mequiet;doquiet;mewhisper):1) $stream 2))`  
 **Minimum:** `1`  
 **Maximum:** `32`
 
