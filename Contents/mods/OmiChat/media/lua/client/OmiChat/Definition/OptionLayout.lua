@@ -283,6 +283,12 @@ return check {
     'ColorMeQuiet',
 
     padding(),
+    'ChatFormatMeWhisper',
+    'OverheadFormatMeWhisper',
+    'RangeMeWhisper',
+    'ColorMeWhisper',
+
+    padding(),
     'ChatFormatMeLoud',
     'OverheadFormatMeLoud',
     'RangeMeLoud',

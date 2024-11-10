@@ -13,6 +13,7 @@ Configuration._streamTable = {}
 ---| 'whisper'
 ---| 'me'
 ---| 'mequiet'
+---| 'mewhisper'
 ---| 'meloud'
 ---| 'do'
 ---| 'doquiet'
@@ -115,8 +116,17 @@ Configuration._chatStreams = {
         chatTypes = { say = true },
     },
     {
-        name = 'mequiet',
+        name = 'mewhisper',
         formatID = 54,
+        colorOpt = 'ColorMeWhisper',
+        rangeOpt = 'RangeMeWhisper',
+        chatFormatOpt = 'ChatFormatMeWhisper',
+        overheadFormatOpt = 'OverheadFormatMeWhisper',
+        chatTypes = { say = true },
+    },
+    {
+        name = 'mequiet',
+        formatID = 55,
         colorOpt = 'ColorMeQuiet',
         rangeOpt = 'RangeMeQuiet',
         chatFormatOpt = 'ChatFormatMeQuiet',
@@ -125,7 +135,7 @@ Configuration._chatStreams = {
     },
     {
         name = 'meloud',
-        formatID = 55,
+        formatID = 56,
         colorOpt = 'ColorMeLoud',
         rangeOpt = 'RangeMeLoud',
         defaultRangeOpt = 'RangeYell',
@@ -135,7 +145,7 @@ Configuration._chatStreams = {
     },
     {
         name = 'do',
-        formatID = 56,
+        formatID = 57,
         colorOpt = 'ColorDo',
         rangeOpt = 'RangeDo',
         chatFormatOpt = 'ChatFormatDo',
@@ -144,7 +154,7 @@ Configuration._chatStreams = {
     },
     {
         name = 'doquiet',
-        formatID = 57,
+        formatID = 58,
         colorOpt = 'ColorDoQuiet',
         rangeOpt = 'RangeDoQuiet',
         chatFormatOpt = 'ChatFormatDoQuiet',
@@ -153,7 +163,7 @@ Configuration._chatStreams = {
     },
     {
         name = 'doloud',
-        formatID = 58,
+        formatID = 59,
         colorOpt = 'ColorDoLoud',
         rangeOpt = 'RangeDoLoud',
         chatFormatOpt = 'ChatFormatDoLoud',
@@ -163,7 +173,7 @@ Configuration._chatStreams = {
     },
     {
         name = 'ooc',
-        formatID = 59,
+        formatID = 60,
         colorOpt = 'ColorOoc',
         rangeOpt = 'RangeOoc',
         chatFormatOpt = 'ChatFormatOoc',

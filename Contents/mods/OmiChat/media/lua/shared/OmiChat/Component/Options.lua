@@ -42,6 +42,7 @@ local getActivatedMods = getActivatedMods
 ---@field RangeMe integer
 ---@field RangeMeLoud integer
 ---@field RangeMeQuiet integer
+---@field RangeMeWhisper integer
 ---@field RangeMultiplierZombies number
 ---@field RangeOoc integer
 ---@field RangeLow integer
@@ -56,6 +57,7 @@ local getActivatedMods = getActivatedMods
 ---@field ColorDoLoud string
 ---@field ColorMe string
 ---@field ColorMeQuiet string
+---@field ColorMeWhisper string
 ---@field ColorMeLoud string
 ---@field ColorSay string
 ---@field ColorWhisper string
@@ -117,6 +119,7 @@ local getActivatedMods = getActivatedMods
 ---@field OverheadFormatMe string
 ---@field OverheadFormatWhisper string
 ---@field OverheadFormatMeQuiet string
+---@field OverheadFormatMeWhisper string
 ---@field OverheadFormatMeLoud string
 ---@field OverheadFormatOoc string
 ---@field OverheadFormatLow string
@@ -131,6 +134,7 @@ local getActivatedMods = getActivatedMods
 ---@field ChatFormatEcho string
 ---@field ChatFormatMe string
 ---@field ChatFormatMeQuiet string
+---@field ChatFormatMeWhisper string
 ---@field ChatFormatMeLoud string
 ---@field ChatFormatSay string
 ---@field ChatFormatOoc string
