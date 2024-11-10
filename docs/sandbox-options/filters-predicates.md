@@ -91,7 +91,7 @@ Determines whether [roleplay languages](./languages.md) can be used for a messag
 ### PredicateApplyBuff
 `(blank by default)`
 
-Determines whether messages sent on a stream will apply a buff to a player.
+Determines whether messages sent on a stream will apply buffs to a player.
 This is a QoL feature intended for roleplay servers.
 
 **Tokens:**
@@ -103,7 +103,14 @@ This is a QoL feature intended for roleplay servers.
 - [`$stream`](../format-strings/tokens.md#stream)
 - [`$username`](../format-strings/tokens.md#username)
 
-**See also:** [`BuffCooldown`](./basic-features.md#buffcooldown)
+**See also:**
+- [`BuffCooldown`](./basic-features.md#buffcooldown)
+- [`BuffReduceBoredom`](./basic-features.md#buffreduceboredom)
+- [`BuffReduceCigaretteStress`](./basic-features.md#buffreducecigarettestress)
+- [`BuffReduceFatigue`](./basic-features.md#buffreducefatigue)
+- [`BuffReduceHunger`](./basic-features.md#buffreducehunger)
+- [`BuffReduceThirst`](./basic-features.md#buffreducethirst)
+- [`BuffReduceUnhappiness`](./basic-features.md#buffreduceunhappiness)
 
 ### PredicateAttractZombies
 **Default:** `$has(@(say;shout;meloud;doloud) $stream)`

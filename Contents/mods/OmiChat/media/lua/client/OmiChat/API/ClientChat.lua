@@ -199,13 +199,14 @@ local function tryApplyBuff()
 
     local stats = player:getStats()
     local bodyDamage = player:getBodyDamage()
+    local cigaretteStressReduction = Option.BuffReduceCigaretteStress * stats:getMaxStressFromCigarettes()
 
-    stats:setHunger(stats:getHunger() - 0.04)
-    stats:setThirst(stats:getThirst() - 0.04)
-    stats:setFatigue(stats:getFatigue() - 0.1)
-    stats:setStressFromCigarettes(stats:getStressFromCigarettes() - 0.25)
-    bodyDamage:setBoredomLevel(bodyDamage:getBoredomLevel() - 50)
-    bodyDamage:setUnhappynessLevel(bodyDamage:getUnhappynessLevel() - 50)
+    stats:setHunger(stats:getHunger() - Option.BuffReduceHunger)
+    stats:setThirst(stats:getThirst() - Option.BuffReduceThirst)
+    stats:setFatigue(stats:getFatigue() - Option.BuffReduceFatigue)
+    stats:setStressFromCigarettes(stats:getStressFromCigarettes() - cigaretteStressReduction)
+    bodyDamage:setBoredomLevel(bodyDamage:getBoredomLevel() - Option.BuffReduceBoredom * 100)
+    bodyDamage:setUnhappynessLevel(bodyDamage:getUnhappynessLevel() - Option.BuffReduceUnhappiness * 100)
     modData.ocLastBuff = now
 end
 
