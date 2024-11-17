@@ -2,12 +2,12 @@ local ISLabel = ISLabel
 local ISPanelJoypad = ISPanelJoypad
 
 ---@class omichat.api.client
-local OmiChat = require 'OmiChat/API/Client'
+local API = require 'OmiChat/API/Client/Core'
 
 local ContentPanel = require 'OmiChat/Component/ProfileManager/ContentPanel'
-local config = OmiChat.config
-local utils = OmiChat.utils
-local Option = OmiChat.Option
+local config = API.config
+local utils = API.utils
+local Option = API.Option
 
 ---UI element for managing player preference profiles.
 ---@class omichat.ProfileManager : ISPanelJoypad
@@ -215,7 +215,7 @@ function ProfileManager:deleteProfile()
 
     item = item.item
     if not self.deletedCurrentProfile and item._originalIndex then
-        self.deletedCurrentProfile = item._originalIndex == OmiChat.getCurrentProfileIndex()
+        self.deletedCurrentProfile = item._originalIndex == API.getCurrentProfileIndex()
     end
 
     table.remove(self.profiles, idx)
@@ -291,7 +291,7 @@ function ProfileManager:onNicknameChange(entry)
     if #text == 0 then
         valid = false
     else
-        valid, filtered = OmiChat.validateNicknameText(entry, text)
+        valid, filtered = API.validateNicknameText(entry, text)
         if filtered and text ~= filtered then
             entry:setText(filtered)
         end
@@ -325,10 +325,10 @@ end
 
 ---Callback for apply changes button.
 function ProfileManager:onSave()
-    OmiChat.setProfiles(cloneProfiles(self.profiles))
+    API.setProfiles(cloneProfiles(self.profiles))
     if self.deletedCurrentProfile then
-        OmiChat.switchToDefaultProfile()
-        OmiChat.redrawMessages()
+        API.switchToDefaultProfile()
+        API.redrawMessages()
     end
 
     self:removeFromUIManager()
@@ -474,5 +474,5 @@ function ProfileManager:new(x, y, width, height, profiles)
 end
 
 
-OmiChat.ProfileManager = ProfileManager
+API.ProfileManager = ProfileManager
 return ProfileManager

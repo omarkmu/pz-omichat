@@ -7,8 +7,8 @@ local min = math.min
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
 ---@class omichat.api.client
-local OmiChat = require 'OmiChat/API/Client'
-local utils = OmiChat.utils
+local API = require 'OmiChat/API/Client/Core'
+local utils = API.utils
 local MAX_RESULTS = 50
 
 
@@ -33,7 +33,7 @@ end
 ---@param input string
 ---@return omichat.SuggestSpec?
 local function getSuggestSpec(input)
-    local stream = OmiChat.chatCommandToStream(input, true, true)
+    local stream = API.chatCommandToStream(input, true, true)
     if stream then
         return stream:suggestSpec()
     end
@@ -67,7 +67,7 @@ return {
                 return
             end
 
-            if OmiChat.chatCommandToStream(info.input) then
+            if API.chatCommandToStream(info.input) then
                 -- already have a stream
                 return
             end
@@ -77,7 +77,7 @@ return {
                 return
             end
 
-            local search = OmiChat.searchStreams({
+            local search = API.searchStreams({
                 search = command,
                 terminateOnExact = true,
                 max = MAX_RESULTS,
@@ -148,24 +148,24 @@ return {
             }
 
             if argType == 'online-username' then
-                search = OmiChat.searchOnlineUsernames(ctx, false, true)
+                search = API.searchOnlineUsernames(ctx, false, true)
             elseif argType == 'online-username-with-self' then
-                search = OmiChat.searchOnlineUsernames(ctx, true, true)
+                search = API.searchOnlineUsernames(ctx, true, true)
             elseif argType == 'language' then
                 ctx.display = ctx.display or utils.getTranslatedLanguageName
                 ctx.searchDisplay = utils.default(ctx.searchDisplay, true)
-                search = OmiChat.searchStrings(ctx, OmiChat.getConfiguredRoleplayLanguages())
+                search = API.searchStrings(ctx, API.getConfiguredRoleplayLanguages())
             elseif argType == 'known-language' then
                 ctx.display = ctx.display or utils.getTranslatedLanguageName
                 ctx.searchDisplay = utils.default(ctx.searchDisplay, true)
-                search = OmiChat.searchStrings(ctx, OmiChat.getRoleplayLanguages())
+                search = API.searchStrings(ctx, API.getRoleplayLanguages())
             elseif argType == 'perk' then
-                search = OmiChat.searchPerks(ctx)
+                search = API.searchPerks(ctx)
                 applyQuotes = false
             elseif argType == 'option' and argSpec.options then
-                search = OmiChat.searchStrings(ctx, argSpec.options)
+                search = API.searchStrings(ctx, argSpec.options)
             else
-                local callback = OmiChat.getSuggesterArgTypeCallback(argType)
+                local callback = API.getSuggesterArgTypeCallback(argType)
                 local cbResult = callback and callback(ctx, argSpec)
                 if not cbResult then
                     return
@@ -207,14 +207,14 @@ return {
             end
 
             local currentTabID = instance.currentTabID
-            local stream = OmiChat.chatCommandToStream(info.input)
+            local stream = API.chatCommandToStream(info.input)
             if not stream then
                 if utils.startsWith(info.input, '/') then
                     -- disallow for unknown commands
                     return
                 end
 
-                local default = OmiChat.getDefaultTabStream(currentTabID)
+                local default = API.getDefaultTabStream(currentTabID)
                 if not default then
                     return
                 end
@@ -230,7 +230,7 @@ return {
                 return
             end
 
-            local existingEmote = OmiChat.getEmoteFromCommand(info.input)
+            local existingEmote = API.getEmoteFromCommand(info.input)
             if existingEmote then
                 return
             end
@@ -242,11 +242,11 @@ return {
             end
 
             local keys = {}
-            for k in pairs(OmiChat._emotes) do
+            for k in pairs(API._emotes) do
                 keys[#keys + 1] = k
             end
 
-            local search = OmiChat.searchStrings(text, keys)
+            local search = API.searchStrings(text, keys)
             if search.exact then
                 return
             end

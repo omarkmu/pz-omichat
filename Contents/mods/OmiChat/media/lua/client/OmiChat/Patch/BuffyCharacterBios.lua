@@ -1,10 +1,10 @@
 ---Compatibility patch for Buffy's Character Bios.
 
-local OmiChat = require 'OmiChatClient'
-local Option = OmiChat.Option
-local utils = OmiChat.utils
+local API = require 'OmiChat/Client'
+local Option = API.Option
+local utils = API.utils
 
-OmiChat.addMessageTransformer({
+API.addMessageTransformer({
     name = 'handle-buffy-character-bios',
     priority = 34,
     transform = function(_, info)
@@ -31,7 +31,7 @@ OmiChat.addMessageTransformer({
         info.tokens.stream = 'server'
         info.titleID = 'UI_chat_server_chat_title_id'
         info.format = Option.ChatFormatServer
-        info.formatOptions.color = OmiChat.getColorOrDefault('server')
+        info.formatOptions.color = API.getColorOrDefault('server')
         info.formatOptions.useDefaultChatColor = false
         info.context.ocSkipLanguage = true
 

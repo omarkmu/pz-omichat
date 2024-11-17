@@ -1,4 +1,4 @@
-local OmiChat = require 'OmiChat/API/Client'
+local API = require 'OmiChat/API/Client/Core'
 
 ---@type table<string, omichat.ChatStreamConfig>
 return {
@@ -26,7 +26,7 @@ return {
                 return true
             end
 
-            OmiChat.addInfoMessage(getText('IGUI_Commands_Whisper'))
+            API.addInfoMessage(getText('IGUI_Commands_Whisper'))
             return false
         end,
     },

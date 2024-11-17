@@ -1,19 +1,17 @@
-local lib = require 'OmiLibrary'
-local MultiMap = lib.interpolate.MultiMap
-
 ---@class omichat.Interpolator
 local Interpolator = require 'OmiChat/Component/Interpolator'
 
 ---Format string function library.
 local InterpolatorLibrary
 
-local OmiChat = require 'OmiChat/API/Shared'
-local utils = OmiChat.utils
-local Option = OmiChat.Option
+local API = require 'OmiChat/API/Shared/Core'
+local utils = API.utils
+local Option = API.Option
+local MultiMap = utils.lib.interpolate.MultiMap
 
 local rep = string.rep
 local concat = table.concat
-local baseLibraries = lib.interpolate.Interpolator.Libraries
+local baseLibraries = utils.lib.interpolate.Interpolator.Libraries
 local stringFunctions = baseLibraries.functions.string
 
 local cooldowns = {}
@@ -175,7 +173,7 @@ local function getBaseUnknownLanguageString(language, stream, author, dialogueTa
         return getText('UI_OmiChat_UnknownLanguageRadioNoAuthor', language)
     end
 
-    local isSigned = OmiChat.isRoleplayLanguageSigned(language)
+    local isSigned = API.isRoleplayLanguageSigned(language)
     language = utils.getTranslatedLanguageName(language)
 
     -- narrative style
@@ -243,8 +241,8 @@ InterpolatorLibrary = {
     ---@param category omichat.ColorCategory?
     ---@return string?
     colorquotes = function(_, s, category)
-        ---@cast OmiChat omichat.api.client
-        if not OmiChat.getColorOrDefault then
+        ---@cast API omichat.api.client
+        if not API.getColorOrDefault then
             return
         end
 
@@ -258,7 +256,7 @@ InterpolatorLibrary = {
         end
 
         category = tostring(category or 'say')
-        local color = utils.color.toRichText(OmiChat.getColorOrDefault(category), true)
+        local color = utils.color.toRichText(API.getColorOrDefault(category), true)
         if color == '' then
             return s
         end
@@ -281,8 +279,8 @@ InterpolatorLibrary = {
     ---@param autoQuote string?
     ---@return string?
     coloractions = function(interpolator, s, category, includeAsterisk, autoQuote)
-        ---@cast OmiChat omichat.api.client
-        if not OmiChat.getColorOrDefault then
+        ---@cast API omichat.api.client
+        if not API.getColorOrDefault then
             return
         end
 
@@ -295,7 +293,7 @@ InterpolatorLibrary = {
             category = nil
         end
 
-        local color = utils.color.toRichText(OmiChat.getColorOrDefault(tostring(category or 'me')), true)
+        local color = utils.color.toRichText(API.getColorOrDefault(tostring(category or 'me')), true)
 
         -- narrative style handling
         local prefix = ''
@@ -336,7 +334,7 @@ InterpolatorLibrary = {
     ---@param language string
     ---@return boolean
     issigned = function(_, language)
-        return OmiChat.isRoleplayLanguageSigned(tostring(language or ''))
+        return API.isRoleplayLanguageSigned(tostring(language or ''))
     end,
     accesslevel = function()
         local player = getSpecificPlayer(0)
@@ -384,10 +382,10 @@ InterpolatorLibrary = {
         local pop
         local parts = { base, ' <SPACE> ' }
 
-        ---@cast OmiChat unknown
-        if not interpolator:toBoolean(noQuoteColor) and OmiChat.getColorOrDefault then
-            ---@cast OmiChat omichat.api.client
-            local color = utils.color.toRichText(OmiChat.getColorOrDefault('say'), true) or ''
+        ---@cast API unknown
+        if not interpolator:toBoolean(noQuoteColor) and API.getColorOrDefault then
+            ---@cast API omichat.api.client
+            local color = utils.color.toRichText(API.getColorOrDefault('say'), true) or ''
             if color ~= '' then
                 pop = true
                 parts[#parts + 1] = color
@@ -402,12 +400,12 @@ InterpolatorLibrary = {
     ---@param name string
     ---@return omichat.ChatCommandType?
     streamtype = function(_, name)
-        ---@cast OmiChat omichat.api.client
-        if not OmiChat.getChatStreamByIdentifier then
+        ---@cast API omichat.api.client
+        if not API.getChatStreamByIdentifier then
             return
         end
 
-        local stream = OmiChat.getChatStreamByIdentifier(name)
+        local stream = API.getChatStreamByIdentifier(name)
         if not stream then
             return
         end
@@ -501,7 +499,7 @@ InterpolatorLibrary = {
         end
 
         local language = interpolator:token('languageRaw')
-        if not language or not OmiChat.isRoleplayLanguageSigned(language) then
+        if not language or not API.isRoleplayLanguageSigned(language) then
             return true
         end
 

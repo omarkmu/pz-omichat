@@ -8,13 +8,12 @@ local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
 
 ---@class omichat.api.client
-local OmiChat = require 'OmiChat/API/Client'
-require 'OmiChat/Component/MimicMessage'
+local API = require 'OmiChat/API/Client/Core'
 
-local utils = OmiChat.utils
-local config = OmiChat.config
-local Option = OmiChat.Option
-local MimicMessage = OmiChat.MimicMessage
+local utils = API.utils
+local config = API.config
+local Option = API.Option
+local MimicMessage = API.MimicMessage
 
 local _ChatMessage = __classmetatables[ChatMessage.class].__index
 local _ChatBase = __classmetatables[ChatBase.class].__index
@@ -34,7 +33,7 @@ local overheadChatTypes = {
 ---@param info omichat.MessageInfo
 ---@return boolean
 local function shouldUseNameColor(info)
-    if not OmiChat.getNameColorsEnabled() then
+    if not API.getNameColorsEnabled() then
         return false
     end
 
@@ -105,7 +104,7 @@ local function applyNarrativeStyle(input, stream, tokens)
     input = utils.wrapStringArgument(prefix .. input .. suffix, config.NARRATIVE_TEXT)
     local combined = format('%s, "%s"', dialogueTag, input)
 
-    local formatter = OmiChat.getFormatter('narrative')
+    local formatter = API.getFormatter('narrative')
     return formatter:format(combined)
 end
 
@@ -114,7 +113,7 @@ end
 ---This mutates `info`.
 ---@param info omichat.MessageInfo
 ---@return boolean success If false, the information table is invalid.
-function OmiChat.applyFormatOptions(info)
+function API.applyFormatOptions(info)
     local msg = info.content
     if not msg or not info.format then
         return false
@@ -248,9 +247,9 @@ function OmiChat.applyFormatOptions(info)
         local color
         if options.useDefaultChatColor then
             if message:isFromDiscord() then
-                color = OmiChat.getColorOrDefault('discord')
+                color = API.getColorOrDefault('discord')
             else
-                color = OmiChat.getColorOrDefault(info.chatType)
+                color = API.getColorOrDefault(info.chatType)
             end
         end
 
@@ -270,15 +269,15 @@ end
 ---@param stream omichat.StreamInfo
 ---@param tokens table?
 ---@return string
-function OmiChat.applyStyles(input, stream, tokens)
+function API.applyStyles(input, stream, tokens)
     return applyNarrativeStyle(input, stream, tokens)
 end
 
 ---Applies message transforms.
 ---@param info omichat.MessageInfo
-function OmiChat.applyTransforms(info)
-    for i = 1, #OmiChat._transformers do
-        local transformer = OmiChat._transformers[i]
+function API.applyTransforms(info)
+    for i = 1, #API._transformers do
+        local transformer = API._transformers[i]
         if transformer.transform and transformer:transform(info) == true then
             break
         end
@@ -295,7 +294,7 @@ end
 ---@param skipFormatting boolean?
 ---@return omichat.MessageInfo?
 ---@return string
-function OmiChat.buildMessageInfo(message, skipFormatting)
+function API.buildMessageInfo(message, skipFormatting)
     local instance = ISChat.instance or {}
 
     local text
@@ -313,11 +312,11 @@ function OmiChat.buildMessageInfo(message, skipFormatting)
         titleID = _getChatTitleID(chat)
     end
 
-    local chatType = OmiChat.getMessageChatType(message)
+    local chatType = API.getMessageChatType(message)
     local author = message:getAuthor() or ''
     local textColor = message:getTextColor()
-    local meta = OmiChat.decodeMessageTag(message:getCustomTag())
-    local displayAsAdmin = OmiChat.getFormatter('adminIcon'):isMatch(message:getText())
+    local meta = API.decodeMessageTag(message:getCustomTag())
+    local displayAsAdmin = API.getFormatter('adminIcon'):isMatch(message:getText())
 
     local streamName = chatType
     if chatType == 'whisper' then
@@ -353,8 +352,8 @@ function OmiChat.buildMessageInfo(message, skipFormatting)
         },
     }
 
-    OmiChat.applyTransforms(info)
-    if not skipFormatting and not OmiChat.applyFormatOptions(info) then
+    API.applyTransforms(info)
+    if not skipFormatting and not API.applyFormatOptions(info) then
         return nil, text
     end
 
@@ -364,16 +363,16 @@ end
 ---Builds the prefixed text for a message.
 ---@param message omichat.Message
 ---@return string
-function OmiChat.buildMessageText(message)
-    local info, original = OmiChat.buildMessageInfo(message)
-    local result = info and OmiChat.buildMessageTextFromInfo(info)
+function API.buildMessageText(message)
+    local info, original = API.buildMessageInfo(message)
+    local result = info and API.buildMessageTextFromInfo(info)
     return result or original
 end
 
 ---Builds the prefixed text for a message from message information.
 ---@param info omichat.MessageInfo
 ---@return string?
-function OmiChat.buildMessageTextFromInfo(info)
+function API.buildMessageTextFromInfo(info)
     if not info or not info.format then
         return
     end
@@ -407,29 +406,29 @@ end
 ---Returns the roleplay language encoded in message content.
 ---@param message omichat.Message | string A message object or string to read.
 ---@return string?
-function OmiChat.decodeLanguage(message)
+function API.decodeLanguage(message)
     if type(message) ~= 'string' then
         message = message:getText()
     end
 
-    local formatter = OmiChat.getFormatter('language')
+    local formatter = API.getFormatter('language')
     message = formatter:read(message)
     if not message then
         return
     end
 
     local languageId = utils.decodeInvisibleInt(message)
-    if not languageId or languageId < 1 or languageId > OmiChat.config:maxDefinedLanguages() then
+    if not languageId or languageId < 1 or languageId > API.config:maxDefinedLanguages() then
         return
     end
 
-    return OmiChat.getRoleplayLanguageFromID(languageId)
+    return API.getRoleplayLanguageFromID(languageId)
 end
 
 ---Decodes message metadata from an encoded tag.
 ---@param tag string
 ---@return omichat.MessageMetadata
-function OmiChat.decodeMessageTag(tag)
+function API.decodeMessageTag(tag)
     if not tag or tag == '' then
         return {}
     end
@@ -455,29 +454,29 @@ end
 ---@param language string The language to encode.
 ---@return string text
 ---@return string? language
-function OmiChat.encodeLanguage(text, language)
-    local langId = OmiChat.getRoleplayLanguageID(language)
+function API.encodeLanguage(text, language)
+    local langId = API.getRoleplayLanguageID(language)
     if not langId or #utils.trim(text) == 0 then
         return text
     end
 
     local encoded = utils.encodeInvisibleInt(langId) .. text
-    return OmiChat.getFormatter('language'):format(encoded)
+    return API.getFormatter('language'):format(encoded)
 end
 
 ---Encodes message information including chat name and colors into a string.
 ---@param message omichat.Message
 ---@return string
-function OmiChat.encodeMessageTag(message)
+function API.encodeMessageTag(message)
     local author = message:getAuthor() ---@type string?
     if author == '' then
         author = nil
     end
 
     local text = message:getText()
-    local useAdminIcon = OmiChat.getFormatter('adminIcon'):isMatch(text)
+    local useAdminIcon = API.getFormatter('adminIcon'):isMatch(text)
 
-    local iconFormatter = OmiChat.getFormatter('messageIcon')
+    local iconFormatter = API.getFormatter('messageIcon')
     local encodedIcon = iconFormatter:read(text)
     local icon = encodedIcon and utils.decodeInvisibleString(encodedIcon)
 
@@ -488,14 +487,14 @@ function OmiChat.encodeMessageTag(message)
         useAdminIcon = false
     end
 
-    local color = author and OmiChat.getNameColorInChat(author)
+    local color = author and API.getNameColorInChat(author)
     local encoded = utils.json.tryEncode {
         ocSuppressed = false,
-        ocLanguage = OmiChat.decodeLanguage(message),
-        ocName = OmiChat.getNameInChatRichText(author, OmiChat.getMessageChatType(message)),
+        ocLanguage = API.decodeLanguage(message),
+        ocName = API.getNameInChatRichText(author, API.getMessageChatType(message)),
         ocNameColor = color and utils.color.toHexString(color) or nil,
-        ocIcon = icon or (author and OmiChat.getChatIcon(author)) or nil,
-        ocAdminIcon = (author and useAdminIcon) and OmiChat.getAdminChatIcon(author) or nil,
+        ocIcon = icon or (author and API.getChatIcon(author)) or nil,
+        ocAdminIcon = (author and useAdminIcon) and API.getAdminChatIcon(author) or nil,
     }
 
     return encoded or ''
@@ -504,10 +503,10 @@ end
 ---Prepares text for sending to chat.
 ---@param args omichat.FormatArgs
 ---@return omichat.FormatResult
-function OmiChat.formatForChat(args)
+function API.formatForChat(args)
     local stream = args.stream or args.formatterName or args.chatType
     local username = args.username or utils.getPlayerUsername()
-    local name = args.name or OmiChat.getNameInChat(username, args.chatType)
+    local name = args.name or API.getNameInChat(username, args.chatType)
     local text, before, after = utils.getInternalText(args.text)
 
     local tokens = args.tokens and utils.copy(args.tokens) or {}
@@ -545,12 +544,12 @@ function OmiChat.formatForChat(args)
     tokens.input = before .. tokens.input .. after
 
     -- apply styles
-    local streamInfo = OmiChat.getChatStreamByIdentifier(stream)
-    tokens.input = streamInfo and OmiChat.applyStyles(tokens.input, streamInfo, tokens) or tokens.input
+    local streamInfo = API.getChatStreamByIdentifier(stream)
+    tokens.input = streamInfo and API.applyStyles(tokens.input, streamInfo, tokens) or tokens.input
 
     -- encode language
     if language then
-        tokens.input = OmiChat.encodeLanguage(tokens.input, language)
+        tokens.input = API.encodeLanguage(tokens.input, language)
     end
 
     -- apply format
@@ -559,18 +558,18 @@ function OmiChat.formatForChat(args)
         formatterName = 'overheadOther'
     end
 
-    local formatter = formatterName and OmiChat.getFormatter(formatterName)
+    local formatter = formatterName and API.getFormatter(formatterName)
     tokens.input = formatter and formatter:format(tokens.input, tokens) or tokens.input
 
     -- add indicator for admin icon
-    if isAdmin() and OmiChat.getShowAdminIcon() then
-        local adminIconFormatter = OmiChat.getFormatter('adminIcon')
+    if isAdmin() and API.getShowAdminIcon() then
+        local adminIconFormatter = API.getFormatter('adminIcon')
         tokens.input = adminIconFormatter:wrap(tokens.input)
     end
 
     -- mark as echo message
     if args.echoType then
-        local echoFormatter = OmiChat.getFormatter('echo')
+        local echoFormatter = API.getFormatter('echo')
         local input = tokens.input
         input = utils.encodeInvisibleCharacter(args.echoType) .. input
 
@@ -578,7 +577,7 @@ function OmiChat.formatForChat(args)
     end
 
     -- apply full overhead format
-    local overheadFormatter = OmiChat.getFormatter('overheadFull')
+    local overheadFormatter = API.getFormatter('overheadFull')
     tokens.prefix = utils.trimleft(utils.interpolate(Option.FormatOverheadPrefix, tokens))
     tokens.input = overheadFormatter:format(tokens.input, tokens)
 
@@ -592,7 +591,7 @@ function OmiChat.formatForChat(args)
         end
 
         if textureName then
-            local iconFormatter = OmiChat.getFormatter('messageIcon')
+            local iconFormatter = API.getFormatter('messageIcon')
             local encodedIcon = iconFormatter:wrap(utils.encodeInvisibleString(textureName))
             tokens.input = tokens.input .. encodedIcon
         end
@@ -602,7 +601,7 @@ function OmiChat.formatForChat(args)
     local player = getSpecificPlayer(0)
     if player then
         local id = utils.encodeInvisibleInt(player:getOnlineID())
-        tokens.input = OmiChat.getFormatter('onlineID'):format(id) .. tokens.input
+        tokens.input = API.getFormatter('onlineID'):format(id) .. tokens.input
     end
 
     return {
@@ -614,14 +613,14 @@ end
 ---Gets a named formatter.
 ---@param name omichat.FormatterName
 ---@return omichat.MetaFormatter
-function OmiChat.getFormatter(name)
-    return OmiChat._formatters[name]
+function API.getFormatter(name)
+    return API._formatters[name]
 end
 
 ---Returns the chat type of a chat message.
 ---@param message omichat.Message
 ---@return string
-function OmiChat.getMessageChatType(message)
+function API.getMessageChatType(message)
     if utils.isinstance(message, MimicMessage) then
         ---@cast message omi.chat.MimicMessage
         return message:getChatType()
@@ -636,7 +635,7 @@ end
 ---@param text string?
 ---@return boolean
 ---@return string? nickname
-function OmiChat.validateNicknameText(entry, text)
+function API.validateNicknameText(entry, text)
     if not text then
         text = entry:getInternalText()
     end

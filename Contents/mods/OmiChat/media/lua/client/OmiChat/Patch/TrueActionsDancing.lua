@@ -1,8 +1,8 @@
 ---Compatibility patch for True Actions Act 3 - Dancing.
 
-local OmiChat = require 'OmiChatClient'
-local utils = OmiChat.utils
-local Option = OmiChat.Option
+local API = require 'OmiChat/Client'
+local utils = API.utils
+local Option = API.Option
 
 local getText = getText
 local pairs = pairs
@@ -485,7 +485,7 @@ local function searchKnownDances(ctxOrSearch)
     end
 
     ---@diagnostic disable-next-line: invisible
-    local ctx = OmiChat.buildInternalSearchContext(ctxOrSearch)
+    local ctx = API.buildInternalSearchContext(ctxOrSearch)
     ctx.display = ctx.display or danceDisplay
     ctx.mapValue = mapDanceValue
 
@@ -496,7 +496,7 @@ local function searchKnownDances(ctxOrSearch)
         local display = dance.display:gsub(' ', '_')
 
         ---@diagnostic disable-next-line: invisible
-        local result = OmiChat.searchInternal(ctx, dance.name, dance, display)
+        local result = API.searchInternal(ctx, dance.name, dance, display)
         if result and result.exact and ctx.terminateOnExact then
             exact = result
             break
@@ -541,7 +541,7 @@ local danceStream = {
             end
 
             if feedback then
-                OmiChat.addInfoMessage(feedback)
+                API.addInfoMessage(feedback)
             end
         end,
     },
@@ -560,8 +560,8 @@ local function applyPatch()
         v.display = v.recipe:gsub('^BobTA%s*', '')
     end
 
-    OmiChat.addCommand(danceStream)
-    OmiChat.addSuggesterArgType('known-dance', searchKnownDances)
+    API.addCommand(danceStream)
+    API.addSuggesterArgType('known-dance', searchKnownDances)
 end
 
 Events.OnGameStart.Add(applyPatch)

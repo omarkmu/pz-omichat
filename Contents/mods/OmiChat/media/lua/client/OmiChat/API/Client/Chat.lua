@@ -1,6 +1,5 @@
 ---Client API functionality related to manipulating the chat.
 
-local lib = require 'OmiLibrary/Client'
 local getTexture = getTexture
 local min = math.min
 local max = math.max
@@ -8,15 +7,13 @@ local sort = table.sort
 local concat = table.concat
 local getTimestampMs = getTimestampMs
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
-local MultiMap = lib.interpolate.MultiMap
 
 
 ---@class omichat.api.client
-local OmiChat = require 'OmiChat/API/Client'
-require 'OmiChat/Component/MimicMessage'
+local API = require 'OmiChat/API/Client/Core'
 
 ---Contains raw chat functions, to send without formatting.
-OmiChat.raw = {
+API.raw = {
     say = processSayMessage,
     shout = processShoutMessage,
     whisper = proceedPM,
@@ -29,11 +26,12 @@ OmiChat.raw = {
 local vanillaStreamConfigs = require 'OmiChat/Definition/VanillaStreams'
 local customChatStreams = require 'OmiChat/Definition/CustomStreams'
 
-local utils = OmiChat.utils
-local config = OmiChat.config
-local Option = OmiChat.Option
-local IconPicker = OmiChat.IconPicker
-local StreamInfo = OmiChat.StreamInfo
+local utils = API.utils
+local config = API.config
+local Option = API.Option
+local IconPicker = API.IconPicker
+local StreamInfo = API.StreamInfo
+local MultiMap = utils.lib.interpolate.MultiMap
 
 
 local signLanguageEmotes = {
@@ -125,7 +123,7 @@ local function addOrRemoveIconComponents()
         iconButton:bringToTop()
 
         iconPicker = IconPicker:new(0, 0, instance, ISChat.onIconClick)
-        iconPicker.exclude = OmiChat._iconsToExclude
+        iconPicker.exclude = API._iconsToExclude
         iconPicker.includeUnknownAsMiscellaneous = false
 
         iconPicker:initialise()
@@ -160,7 +158,7 @@ end
 ---@param streamIdentifier string
 ---@return omichat.SendArgs?
 local function transformSendArgs(args, streamIdentifier)
-    local stream = OmiChat.getChatStreamByIdentifier(streamIdentifier)
+    local stream = API.getChatStreamByIdentifier(streamIdentifier)
     if not stream then
         return
     end
@@ -214,13 +212,13 @@ local function updateAliases()
     -- clear all aliases
     local i = 1
     local numStreams = #ISChat.allChatStreams
-    local numCommands = #OmiChat._commandStreams
+    local numCommands = #API._commandStreams
     while i <= numStreams + numCommands do
         local stream
         if i <= numStreams then
             stream = ISChat.allChatStreams[i]
         else
-            stream = OmiChat._commandStreams[i - numStreams]
+            stream = API._commandStreams[i - numStreams]
         end
 
         if stream and stream.omichat and stream.omichat.aliases then
@@ -251,7 +249,7 @@ local function updateAliases()
     end
 
     for ident, tab in pairs(allAliases) do
-        local info = OmiChat.getChatStreamByIdentifier(ident)
+        local info = API.getChatStreamByIdentifier(ident)
         local stream = info and info:getStream()
         if stream then
             if not stream.omichat then
@@ -276,10 +274,10 @@ local function updateFormatters()
         local name = info.name
         local optName = config:getOverheadFormatOption(name) or info.overheadFormatOpt
         local fmt = optName and Option[optName] or '$1'
-        if OmiChat._formatters[name] then
-            OmiChat._formatters[name]:setFormatString(fmt)
+        if API._formatters[name] then
+            API._formatters[name]:setFormatString(fmt)
         else
-            OmiChat._formatters[name] = OmiChat.MetaFormatter:new(info.formatID, { format = fmt })
+            API._formatters[name] = API.MetaFormatter:new(info.formatID, { format = fmt })
         end
     end
 end
@@ -316,7 +314,7 @@ local function updateStreams()
     for data in config:chatStreams() do
         local stream = customChatStreams[data.name]
         if not exists[data.name] and stream then
-            OmiChat.addStreamBefore(stream, vanillaWhisper)
+            API.addStreamBefore(stream, vanillaWhisper)
         end
     end
 
@@ -324,7 +322,7 @@ local function updateStreams()
         return
     end
 
-    local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
+    local useLocalWhisper = API.isCustomStreamEnabled('whisper')
     if useLocalWhisper and vanillaWhisper.name == 'whisper' then
         -- modify /whisper to be /pm
         vanillaWhisper.name = 'private'
@@ -343,8 +341,8 @@ end
 ---@param text string
 ---@param serverAlert boolean?
 ---@param tabID integer? The 1-indexed ID of the chat tab to send the message on. Defaults to the current chat tab.
-function OmiChat.addInfoMessage(text, serverAlert, tabID)
-    lib.chat.addInfoMessage(text, serverAlert, tabID)
+function API.addInfoMessage(text, serverAlert, tabID)
+    utils.lib.chat.addInfoMessage(text, serverAlert, tabID)
 end
 
 ---Determines stream information given a chat command.
@@ -355,7 +353,7 @@ end
 ---@return string #The text following the command in the input.
 ---@return string? #The command or short command that was used.
 ---@return omichat.StreamInfo? #Information about the disabled stream.
-function OmiChat.chatCommandToStream(command, includeCommands, enabledOnly)
+function API.chatCommandToStream(command, includeCommands, enabledOnly)
     if not command or command == '' then
         return nil, ''
     end
@@ -370,7 +368,7 @@ function OmiChat.chatCommandToStream(command, includeCommands, enabledOnly)
 
     local i = 1
     local numStreams = #ISChat.allChatStreams
-    local numCommands = #OmiChat._commandStreams
+    local numCommands = #API._commandStreams
     while i <= numStreams + numCommands do
         local stream, checkCommand
         if i <= numStreams then
@@ -380,7 +378,7 @@ function OmiChat.chatCommandToStream(command, includeCommands, enabledOnly)
                 break
             end
 
-            stream = OmiChat._commandStreams[i - numStreams]
+            stream = API._commandStreams[i - numStreams]
         end
 
         local info = StreamInfo:new(stream)
@@ -405,15 +403,15 @@ end
 ---@param includeCommands boolean? If true, commands should be included.
 ---@param enabledOnly boolean? If true, only enabled streams will be returned. Defaults to false.
 ---@return string? #The name of the chat stream, or `nil` if not found.
-function OmiChat.chatCommandToStreamName(command, includeCommands, enabledOnly)
-    local stream = OmiChat.chatCommandToStream(command, includeCommands, enabledOnly)
+function API.chatCommandToStreamName(command, includeCommands, enabledOnly)
+    local stream = API.chatCommandToStream(command, includeCommands, enabledOnly)
     if stream then
         return stream:getName()
     end
 end
 
 ---Clears all of the current chat messages.
-function OmiChat.clearMessages()
+function API.clearMessages()
     local tabs = ISChat.instance and ISChat.instance.tabs
     if not tabs then
         return
@@ -432,7 +430,7 @@ end
 ---This is used with onSwitchStream.
 ---@param target string? The name of a target stream to switch to instead of the next stream.
 ---@return string #The command of the new current stream.
-function OmiChat.cycleStream(target)
+function API.cycleStream(target)
     local curChatText = ISChat.instance.chatText
     local chatStreams = curChatText.chatStreams
 
@@ -467,7 +465,7 @@ end
 ---Retrieves a stream given its identifier.
 ---@param identifier string
 ---@return omichat.StreamInfo?
-function OmiChat.getChatStreamByIdentifier(identifier)
+function API.getChatStreamByIdentifier(identifier)
     for i = 1, #ISChat.allChatStreams do
         local stream = ISChat.allChatStreams[i]
         local id = stream.omichat and stream.omichat.streamIdentifier
@@ -484,9 +482,9 @@ end
 ---Gets the command associated with a color category.
 ---@param cat omichat.ColorCategory
 ---@return string
-function OmiChat.getColorCategoryCommand(cat)
+function API.getColorCategoryCommand(cat)
     if cat == 'private' then
-        return OmiChat.isCustomStreamEnabled('whisper') and '/pm' or '/whisper'
+        return API.isCustomStreamEnabled('whisper') and '/pm' or '/whisper'
     end
 
     if cat == 'general' then
@@ -503,10 +501,10 @@ end
 ---Determines the color options that should be enabled based on the server configuration.
 ---@param all boolean? If given, all possible color options will be returned instead.
 ---@return omichat.ColorCategory[]
-function OmiChat.getColorOptions(all)
+function API.getColorOptions(all)
     local colorOpts = {}
     local canUsePM = checkPlayerCanUseChat('/w')
-    local useLocalWhisper = OmiChat.isCustomStreamEnabled('whisper')
+    local useLocalWhisper = API.isCustomStreamEnabled('whisper')
 
     if all or Option.EnableSetNameColor then
         colorOpts[#colorOpts + 1] = 'name'
@@ -569,7 +567,7 @@ function OmiChat.getColorOptions(all)
 
     for info in config:chatStreams() do
         local name = info.name
-        if info.autoColorOption ~= false and (all or OmiChat.isCustomStreamEnabled(name)) then
+        if info.autoColorOption ~= false and (all or API.isCustomStreamEnabled(name)) then
             colorOpts[#colorOpts + 1] = name
         end
     end
@@ -580,7 +578,7 @@ end
 ---Returns information about the default stream for a given tab ID.
 ---@param tabID integer
 ---@return omichat.StreamInfo?
-function OmiChat.getDefaultTabStream(tabID)
+function API.getDefaultTabStream(tabID)
     local default = ISChat.defaultTabStream[tabID]
     if default then
         return StreamInfo:new(default)
@@ -591,8 +589,8 @@ end
 ---Returns `nil` if there is not an emote associated with the emote name.
 ---@param emote string
 ---@return (string | omichat.EmoteHandler)?
-function OmiChat.getEmote(emote)
-    return OmiChat._emotes[emote]
+function API.getEmote(emote)
+    return API._emotes[emote]
 end
 
 ---Returns the first emote found from an emote shortcut in the provided text.
@@ -601,7 +599,7 @@ end
 ---@return integer? start
 ---@return integer? finish
 ---@return string? inputEmote
-function OmiChat.getEmoteFromCommand(text)
+function API.getEmoteFromCommand(text)
     local startPos = 1
     while startPos < #text do
         local start, finish, whitespace, emote = text:find('(%s*)%.([%w_]+)', startPos)
@@ -614,7 +612,7 @@ function OmiChat.getEmoteFromCommand(text)
             emote = nil
         end
 
-        local emoteToPlay = emote and OmiChat.getEmote(emote:lower())
+        local emoteToPlay = emote and API.getEmote(emote:lower())
         if emoteToPlay then
             return emoteToPlay, start, finish, emote:lower()
         end
@@ -626,27 +624,27 @@ end
 ---Gets the text that should display when clicking the info button.
 ---@param player IsoPlayer? The player to use to populate token values. If `nil`, this will be player 1.
 ---@return string
-function OmiChat.getInfoRichText(player)
+function API.getInfoRichText(player)
     player = player or getSpecificPlayer(0)
     if not player then
         return ''
     end
 
-    local tokens = OmiChat.getPlayerSubstitutions(player)
+    local tokens = API.getPlayerSubstitutions(player)
     if not tokens then
         return ''
     end
 
-    local name = OmiChat.getPlayerNameInChat(player, 'say')
+    local name = API.getPlayerNameInChat(player, 'say')
     tokens.name = name and utils.escapeRichText(name) or ''
     return utils.interpolate(Option.FormatInfo, tokens, player:getUsername())
 end
 
 ---Returns the current leftmost button.
 ---@return ISButton?
-function OmiChat.getLeftmostButton()
-    if OmiChat._leftmostBtn then
-        return OmiChat._leftmostBtn
+function API.getLeftmostButton()
+    if API._leftmostBtn then
+        return API._leftmostBtn
     end
 
     local instance = ISChat.instance
@@ -658,14 +656,14 @@ end
 ---Returns the list of custom setting handlers for a given category.
 ---@param category omichat.SettingCategory
 ---@return omichat.SettingHandlerCallback[]
-function OmiChat.getSettingHandlers(category)
-    return OmiChat._settingHandlers[category]
+function API.getSettingHandlers(category)
+    return API._settingHandlers[category]
 end
 
 ---Gets an emote meant to simulate sign language based on the given text.
 ---@param text string
 ---@return string
-function OmiChat.getSignLanguageEmote(text)
+function API.getSignLanguageEmote(text)
     -- same text should map to same 'sign'
     local rand = newrandom()
     rand:seed(utils.trim(text:lower()))
@@ -676,14 +674,14 @@ end
 ---Retrieves the search callback for an argument type.
 ---@param argType string
 ---@return omichat.SuggestSearchCallback?
-function OmiChat.getSuggesterArgTypeCallback(argType)
-    return OmiChat._customSuggesterArgTypes[argType]
+function API.getSuggesterArgTypeCallback(argType)
+    return API._customSuggesterArgTypes[argType]
 end
 
 ---Suggests text based on the provided input text.
 ---@param text string
 ---@return omichat.Suggestion[]
-function OmiChat.getSuggestions(text)
+function API.getSuggestions(text)
     if not text or text == '' then
         return {}
     end
@@ -695,8 +693,8 @@ function OmiChat.getSuggestions(text)
         suggestions = {},
     }
 
-    for i = 1, #OmiChat._suggesters do
-        local suggester = OmiChat._suggesters[i]
+    for i = 1, #API._suggesters do
+        local suggester = API._suggesters[i]
         if suggester.suggest then
             suggester:suggest(info)
         end
@@ -707,15 +705,15 @@ end
 
 ---Returns whether the player is currently typing.
 ---@return boolean
-function OmiChat.getTyping()
-    return OmiChat._isTyping
+function API.getTyping()
+    return API._isTyping
 end
 
 ---Returns the current display string for the typing indicator.
 ---@param maxWidth integer?
 ---@return string?
-function OmiChat.getTypingDisplay(maxWidth)
-    local display = OmiChat._typingDisplay
+function API.getTypingDisplay(maxWidth)
+    local display = API._typingDisplay
     local txtMgr = getTextManager()
 
     if display and maxWidth and txtMgr:MeasureStringX(UIFont.Small, display) > maxWidth then
@@ -726,7 +724,7 @@ function OmiChat.getTypingDisplay(maxWidth)
 end
 
 ---Hides the suggester box if it's currently visible.
-function OmiChat.hideSuggesterBox()
+function API.hideSuggesterBox()
     local instance = ISChat.instance
     local suggesterBox = instance and instance.suggesterBox
     if suggesterBox then
@@ -736,7 +734,7 @@ end
 
 ---Redraws the current chat messages.
 ---@param doScroll boolean? Whether the chat should also be scrolled to the bottom. Defaults to true.
-function OmiChat.redrawMessages(doScroll)
+function API.redrawMessages(doScroll)
     if not ISChat.instance then
         return
     end
@@ -765,12 +763,12 @@ function OmiChat.redrawMessages(doScroll)
 
     if doScroll ~= false then
         -- fix scroll position
-        OmiChat.scrollToBottom()
+        API.scrollToBottom()
     end
 end
 
 ---Sets the scroll position of all chat tabs to the bottom.
-function OmiChat.scrollToBottom()
+function API.scrollToBottom()
     if not ISChat.instance or not ISChat.instance.tabs then
         return
     end
@@ -782,7 +780,7 @@ function OmiChat.scrollToBottom()
 end
 
 ---Sets the scroll position of all chat tabs to the top.
-function OmiChat.scrollToTop()
+function API.scrollToTop()
     if not ISChat.instance or not ISChat.instance.tabs then
         return
     end
@@ -796,7 +794,7 @@ end
 ---Sends a message on the given stream.
 ---@param args omichat.SendArgs?
 ---@return string?
-function OmiChat.send(args)
+function API.send(args)
     if not args then
         return
     end
@@ -808,7 +806,7 @@ function OmiChat.send(args)
 
     local stream = args.stream
     if not stream then
-        stream = OmiChat.getChatStreamByIdentifier('say')
+        stream = API.getChatStreamByIdentifier('say')
         if not stream then
             return
         end
@@ -833,13 +831,13 @@ function OmiChat.send(args)
     end
 
     local language
-    local currentLanguage = OmiChat.getCurrentRoleplayLanguage()
-    if currentLanguage and currentLanguage ~= OmiChat.getDefaultRoleplayLanguage() then
+    local currentLanguage = API.getCurrentRoleplayLanguage()
+    if currentLanguage and currentLanguage ~= API.getDefaultRoleplayLanguage() then
         language = currentLanguage
     end
 
     local initialText = text
-    local formatResult = OmiChat.formatForChat {
+    local formatResult = API.formatForChat {
         text = text,
         language = language,
         chatType = chatType,
@@ -854,27 +852,27 @@ function OmiChat.send(args)
     text = formatResult.text
     if text == '' then
         if formatResult.error then
-            OmiChat.addInfoMessage(formatResult.error)
+            API.addInfoMessage(formatResult.error)
         end
 
         return
     end
 
     local processResult
-    local process = OmiChat.raw[chatType] or OmiChat.raw.say
+    local process = API.raw[chatType] or API.raw.say
     if process then
         processResult = process(prefix .. text)
-        if processResult and chatType == 'whisper' and OmiChat.getRetainCommand(stream:getCommandType()) then
+        if processResult and chatType == 'whisper' and API.getRetainCommand(stream:getCommandType()) then
             local chatText = ISChat.instance.chatText
             chatText.lastChatCommand = concat { chatText.lastChatCommand, tostring(processResult), ' ' }
         end
     end
 
-    local isSigned = formatResult.allowLanguage and language and OmiChat.isRoleplayLanguageSigned(language)
-    if isSigned and args.playSignedEmote and OmiChat.getSignEmotesEnabled() then
+    local isSigned = formatResult.allowLanguage and language and API.isRoleplayLanguageSigned(language)
+    if isSigned and args.playSignedEmote and API.getSignEmotesEnabled() then
         local player = getSpecificPlayer(0)
         if player then
-            player:playEmote(OmiChat.getSignLanguageEmote(initialText))
+            player:playEmote(API.getSignLanguageEmote(initialText))
         end
     end
 
@@ -883,7 +881,7 @@ function OmiChat.send(args)
     tokens.chatType = chatType
     tokens.input = initialText
     tokens.username = username
-    tokens.name = OmiChat.getNameInChat(username, chatType)
+    tokens.name = API.getNameInChat(username, chatType)
     tokens.stream = stream:getIdentifier()
 
     if utils.testPredicate(Option.PredicateApplyBuff, tokens) then
@@ -892,16 +890,16 @@ function OmiChat.send(args)
 
     local echoType = echoTypes[chatType]
     if Option.ChatFormatEcho ~= '' and echoType then
-        local echoStream = OmiChat.getChatStreamByIdentifier('low')
+        local echoStream = API.getChatStreamByIdentifier('low')
         if not echoStream or not echoStream:isEnabled() then
-            echoStream = OmiChat.getChatStreamByIdentifier('say')
+            echoStream = API.getChatStreamByIdentifier('say')
 
             if not echoStream or not echoStream:isEnabled() then
                 return processResult
             end
         end
 
-        local useCallback = echoStream:getUseCallback() or OmiChat.send
+        local useCallback = echoStream:getUseCallback() or API.send
         useCallback {
             echoType = echoType,
             stream = echoStream,
@@ -915,51 +913,51 @@ end
 
 ---Sends an /admin message, formatted according to configuration.
 ---@param args string | omichat.SendArgs
-function OmiChat.sendAdmin(args)
-    OmiChat.send(transformSendArgs(args, 'admin'))
+function API.sendAdmin(args)
+    API.send(transformSendArgs(args, 'admin'))
 end
 
 ---Sends a /faction message, formatted according to configuration.
 ---@param args string | omichat.SendArgs
-function OmiChat.sendFaction(args)
-    OmiChat.send(transformSendArgs(args, 'faction'))
+function API.sendFaction(args)
+    API.send(transformSendArgs(args, 'faction'))
 end
 
 ---Sends an /all message, formatted according to configuration.
 ---@param args string | omichat.SendArgs
-function OmiChat.sendGeneral(args)
-    OmiChat.send(transformSendArgs(args, 'general'))
+function API.sendGeneral(args)
+    API.send(transformSendArgs(args, 'general'))
 end
 
 ---Sends a /pm message, formatted according to configuration.
 ---@param args string | omichat.SendArgs
 ---@return string
-function OmiChat.sendPM(args)
-    return OmiChat.send(transformSendArgs(args, 'private')) or ''
+function API.sendPM(args)
+    return API.send(transformSendArgs(args, 'private')) or ''
 end
 
 ---Sends a /safehouse message, formatted according to configuration.
 ---@param args string | omichat.SendArgs
-function OmiChat.sendSafehouse(args)
-    OmiChat.send(transformSendArgs(args, 'safehouse'))
+function API.sendSafehouse(args)
+    API.send(transformSendArgs(args, 'safehouse'))
 end
 
 ---Sends a /say message, formatted according to configuration.
 ---@param args string | omichat.SendArgs
-function OmiChat.sendSay(args)
-    OmiChat.send(transformSendArgs(args, 'say'))
+function API.sendSay(args)
+    API.send(transformSendArgs(args, 'say'))
 end
 
 ---Sends a /yell message, formatted according to configuration.
 ---@param args string | omichat.SendArgs
-function OmiChat.sendShout(args)
-    OmiChat.send(transformSendArgs(args, 'shout'))
+function API.sendShout(args)
+    API.send(transformSendArgs(args, 'shout'))
 end
 
 ---Sets whether the icon picker button is enabled.
 ---If the button is disabled, the icon picker component will also be hidden.
 ---@param enable boolean?
-function OmiChat.setIconButtonEnabled(enable)
+function API.setIconButtonEnabled(enable)
     local instance = ISChat.instance
     local iconButton = instance and instance.iconButton
     if not instance or not iconButton then
@@ -980,18 +978,18 @@ end
 ---This does not update the icon picker icons.
 ---@see omichat.IconPicker.updateIcons
 ---@param icons table<string, true>?
-function OmiChat.setIconsToExclude(icons)
-    OmiChat._iconsToExclude = icons or {}
+function API.setIconsToExclude(icons)
+    API._iconsToExclude = icons or {}
 end
 
 ---Sets whether the player is currently typing.
 ---@param isTyping boolean
-function OmiChat.setTyping(isTyping)
-    OmiChat._isTyping = isTyping
+function API.setTyping(isTyping)
+    API._isTyping = isTyping
 end
 
 ---Updates the positions of custom buttons.
-function OmiChat.updateButtons()
+function API.updateButtons()
     local instance = ISChat.instance
     if not instance or not instance.gearButton then
         return
@@ -999,8 +997,8 @@ function OmiChat.updateButtons()
 
     local th = instance:titleBarHeight()
     local lastBtn = instance.gearButton
-    for i = 1, #OmiChat._customButtons do
-        local btn = OmiChat._customButtons[i]
+    for i = 1, #API._customButtons do
+        local btn = API._customButtons[i]
         if btn:getParent() ~= instance then
             instance:addChild(btn)
         end
@@ -1012,11 +1010,11 @@ function OmiChat.updateButtons()
         end
     end
 
-    OmiChat._leftmostBtn = lastBtn
+    API._leftmostBtn = lastBtn
 end
 
 ---Updates the chat panel size based on the configured options.
-function OmiChat.updateChatPanelSize()
+function API.updateChatPanelSize()
     local instance = ISChat.instance
     if not instance then
         return
@@ -1032,7 +1030,7 @@ function OmiChat.updateChatPanelSize()
     instance.tabCnt = oldTabCnt
 
     local height = size.height
-    if Option.PredicateShowTypingIndicator ~= '' and OmiChat.getShowTyping() then
+    if Option.PredicateShowTypingIndicator ~= '' and API.getShowTyping() then
         height = height - instance.typingFontHgt - 4
     end
 
@@ -1046,7 +1044,7 @@ end
 
 ---Updates the visibility of the chat and close button based on the `Always Show Chat` option.
 ---@protected
-function OmiChat.updateChatVisibility()
+function API.updateChatVisibility()
     local instance = ISChat.instance
     if not instance or not instance.closeButton then
         return
@@ -1064,7 +1062,7 @@ end
 
 ---Updates the icon picker and suggester box based on the current input text.
 ---@param text string? The current text entry text. If omitted, the current text will be retrieved.
-function OmiChat.updateCustomComponents(text)
+function API.updateCustomComponents(text)
     local instance = ISChat.instance
     if not instance then
         return
@@ -1072,85 +1070,85 @@ function OmiChat.updateCustomComponents(text)
 
     text = text or instance.textEntry:getInternalText()
 
-    OmiChat.updateIconComponents(text)
-    OmiChat.updateSuggesterComponent(text)
+    API.updateIconComponents(text)
+    API.updateSuggesterComponent(text)
 end
 
 ---Enables or disables the icon picker based on the current input.
 ---@param text string? The current text entry text.
-function OmiChat.updateIconComponents(text)
+function API.updateIconComponents(text)
     local instance = ISChat.instance
     if not instance or not instance.iconButton then
         return
     end
 
     text = text or instance.textEntry:getInternalText()
-    local stream = OmiChat.chatCommandToStream(text)
+    local stream = API.chatCommandToStream(text)
 
     if not stream then
-        stream = OmiChat.getDefaultTabStream(instance.currentTabID)
+        stream = API.getDefaultTabStream(instance.currentTabID)
     end
 
     local enable = stream and stream:isAllowIconPicker() or false
-    OmiChat.setIconButtonEnabled(enable)
+    API.setIconButtonEnabled(enable)
 end
 
 ---Updates the info text to the configured value.
 ---@param player IsoPlayer?
-function OmiChat.updateInfoText(player)
+function API.updateInfoText(player)
     local instance = ISChat.instance
     if not instance then
         return
     end
 
-    instance:setInfo(OmiChat.getInfoRichText(player))
+    instance:setInfo(API.getInfoRichText(player))
 end
 
 ---Updates state to match sandbox variables.
 ---@param redraw boolean? If true, chat messages will be redrawn.
-function OmiChat.updateState(redraw)
+function API.updateState(redraw)
     if not ISChat.instance then
         return
     end
 
-    OmiChat.getPlayerPreferences()
+    API.getPlayerPreferences()
     updateStreams()
     updateFormatters()
     updateAliases()
     addOrRemoveIconComponents()
-    OmiChat.updateChatPanelSize()
-    OmiChat.updateInfoText()
-    OmiChat.updateChatVisibility()
-    OmiChat.updateButtons()
+    API.updateChatPanelSize()
+    API.updateInfoText()
+    API.updateChatVisibility()
+    API.updateButtons()
 
     local player = getSpecificPlayer(0)
     local username = player and player:getUsername()
     if username then
-        OmiChat.refreshLanguageInfo(username)
+        API.refreshLanguageInfo(username)
     end
 
     if redraw then
         -- some sandbox vars affect how messages are drawn
-        OmiChat.redrawMessages(false)
+        API.redrawMessages(false)
     end
 end
 
 ---Shows or hides the suggester based on the current input.
 ---@param text string? The current text entry text. If omitted, the current text will be retrieved.
-function OmiChat.updateSuggesterComponent(text)
+function API.updateSuggesterComponent(text)
     local instance = ISChat.instance
     local suggesterBox = instance and instance.suggesterBox
     if not instance or not suggesterBox then
         return
     end
 
-    if not OmiChat.getUseSuggester() then
+    if not API.getUseSuggester() then
         suggesterBox:setVisible(false)
         return
     end
 
     text = text or instance.textEntry:getInternalText()
-    local suggestions = OmiChat.getSuggestions(text)
+    local suggestions = API.getSuggestions(text)
     if #suggestions == 0 then
         suggesterBox:setVisible(false)
         return
@@ -1170,9 +1168,9 @@ function OmiChat.updateSuggesterComponent(text)
 end
 
 ---Updates the display string for typing players based on the current typing information.
-function OmiChat.updateTypingDisplay()
-    if not OmiChat.getShowTyping() then
-        OmiChat._typingDisplay = nil
+function API.updateTypingDisplay()
+    if not API.getShowTyping() then
+        API._typingDisplay = nil
         return
     end
 
@@ -1180,7 +1178,7 @@ function OmiChat.updateTypingDisplay()
     local inactive = {}
 
     local now = getTimestampMs()
-    for username, info in pairs(OmiChat._typingInfo) do
+    for username, info in pairs(API._typingInfo) do
         if now - info.lastUpdate >= 5000 then
             inactive[#inactive + 1] = username
         else
@@ -1189,11 +1187,11 @@ function OmiChat.updateTypingDisplay()
     end
 
     for _, username in pairs(inactive) do
-        OmiChat._typingInfo[username] = nil
+        API._typingInfo[username] = nil
     end
 
     if #list == 0 then
-        OmiChat._typingDisplay = nil
+        API._typingDisplay = nil
         return
     end
 
@@ -1215,17 +1213,17 @@ function OmiChat.updateTypingDisplay()
         text = nil
     end
 
-    OmiChat._typingDisplay = text
+    API._typingDisplay = text
 end
 
 ---Updates the typing status based on the current input.
 ---@param skipTimer boolean?
-function OmiChat.updateTypingStatus(skipTimer)
-    if not OmiChat.getShowTyping() then
+function API.updateTypingStatus(skipTimer)
+    if not API.getShowTyping() then
         if wasTyping then
             wasTyping = false
-            OmiChat.setTyping(false)
-            OmiChat.sendTypingStatus()
+            API.setTyping(false)
+            API.sendTypingStatus()
         end
 
         return
@@ -1248,10 +1246,10 @@ function OmiChat.updateTypingStatus(skipTimer)
     if isTyping then
         local text = entry:getInternalText()
         local trimmed = text:trim()
-        local stream, command = OmiChat.chatCommandToStream(text, false, true)
+        local stream, command = API.chatCommandToStream(text, false, true)
 
         if not stream and not utils.startsWith(trimmed, '/') then
-            stream = OmiChat.getDefaultTabStream(1)
+            stream = API.getDefaultTabStream(1)
             command = trimmed
         end
 
@@ -1274,10 +1272,10 @@ function OmiChat.updateTypingStatus(skipTimer)
     end
 
     lastTypingUpdate = now
-    OmiChat.setTyping(isTyping)
+    API.setTyping(isTyping)
     if isTyping or wasTyping then
         wasTyping = isTyping
 
-        OmiChat.sendTypingStatus(range, chatType)
+        API.sendTypingStatus(range, chatType)
     end
 end

@@ -4,13 +4,13 @@ if not isServer() then return end
 
 
 ---@class omichat.api.server
-local OmiChat = require 'OmiChat/API/Server'
+local API = require 'OmiChat/API/Server/Core'
 
 ---@class omichat.api.server.commands
-OmiChat.Commands = {}
+API.Commands = {}
 
-local Option = OmiChat.Option
-local utils = OmiChat.utils
+local Option = API.Option
+local utils = API.utils
 
 ---@type table<omichat.ModDataField, function>
 local updateModData = {}
@@ -101,7 +101,7 @@ function updateModData.all(args)
         return false
     end
 
-    OmiChat.setUserModData(args.target, args.value)
+    API.setUserModData(args.target, args.value)
     return true
 end
 
@@ -112,13 +112,13 @@ function updateModData.currentLanguage(args)
         return false
     end
 
-    return OmiChat.setCurrentRoleplayLanguage(args.target, args.value)
+    return API.setCurrentRoleplayLanguage(args.target, args.value)
 end
 
 ---@param args omichat.request.ModDataUpdate
 ---@return boolean
 function updateModData.icons(args)
-    OmiChat.setChatIcon(args.target, args.value and tostring(args.value) or nil)
+    API.setChatIcon(args.target, args.value and tostring(args.value) or nil)
     return true
 end
 
@@ -127,11 +127,11 @@ end
 ---@return string?
 function updateModData.languages(args)
     if not args.value then
-        OmiChat.resetRoleplayLanguages(args.target)
+        API.resetRoleplayLanguages(args.target)
         return true
     end
 
-    return OmiChat.addRoleplayLanguage(args.target, args.value)
+    return API.addRoleplayLanguage(args.target, args.value)
 end
 
 ---@param args omichat.request.ModDataUpdate
@@ -142,7 +142,7 @@ function updateModData.languageSlots(args)
         return false
     end
 
-    return OmiChat.setRoleplayLanguageSlots(args.target, slots)
+    return API.setRoleplayLanguageSlots(args.target, slots)
 end
 
 ---@param args omichat.request.ModDataUpdate
@@ -152,7 +152,7 @@ function updateModData.nameColors(args)
         return false
     end
 
-    OmiChat.setNameColorString(args.target, args.value and tostring(args.value) or nil)
+    API.setNameColorString(args.target, args.value and tostring(args.value) or nil)
     return true
 end
 
@@ -163,7 +163,7 @@ function updateModData.nicknames(args)
         return false
     end
 
-    OmiChat.setNickname(args.target, args.value and tostring(args.value) or nil)
+    API.setNickname(args.target, args.value and tostring(args.value) or nil)
     return true
 end
 
@@ -174,90 +174,90 @@ end
 ---@param player IsoPlayer
 ---@param command string
 ---@param args table?
-function OmiChat.dispatch(command, player, args)
-    sendServerCommand(player, OmiChat._modDataKey, command, args or {})
+function API.dispatch(command, player, args)
+    sendServerCommand(player, API._modDataKey, command, args or {})
 end
 
 ---Dispatches a server command to all players.
 ---@param command string
 ---@param args table?
-function OmiChat.dispatchAll(command, args)
-    sendServerCommand(OmiChat._modDataKey, command, args or {})
+function API.dispatchAll(command, args)
+    sendServerCommand(API._modDataKey, command, args or {})
 end
 
 ---Instructs the client to report the result of drawing a card.
 ---@param player IsoPlayer
 ---@param card integer
 ---@param suit integer
-function OmiChat.reportDrawCard(player, card, suit)
+function API.reportDrawCard(player, card, suit)
     ---@type omichat.request.ReportDrawCard
     local req = { card = card, suit = suit }
 
-    OmiChat.dispatch('reportDrawCard', player, req)
+    API.dispatch('reportDrawCard', player, req)
 end
 
 ---Instructs all clients to report the result of drawing a card.
 ---@param name string
 ---@param card integer
 ---@param suit integer
-function OmiChat.reportDrawCardGlobal(name, card, suit)
+function API.reportDrawCardGlobal(name, card, suit)
     ---@type omichat.request.ReportDrawCard
     local req = { name = name, card = card, suit = suit }
 
-    OmiChat.dispatchAll('reportDrawCard', req)
+    API.dispatchAll('reportDrawCard', req)
 end
 
 ---Instructs the client to report the result of a coin flip.
 ---@param player IsoPlayer
 ---@param heads boolean
-function OmiChat.reportFlipCoin(player, heads)
+function API.reportFlipCoin(player, heads)
     ---@type omichat.request.ReportFlipCoin
     local req = { heads = heads }
 
-    OmiChat.dispatch('reportFlipCoin', player, req)
+    API.dispatch('reportFlipCoin', player, req)
 end
 
 ---Instructs the client to report the result of a dice roll.
 ---@param player IsoPlayer
 ---@param roll integer
 ---@param sides integer
-function OmiChat.reportRoll(player, roll, sides)
+function API.reportRoll(player, roll, sides)
     ---@type omichat.request.ReportRoll
     local req = { roll = roll, sides = sides }
 
-    OmiChat.dispatch('reportRoll', player, req)
+    API.dispatch('reportRoll', player, req)
 end
 
 ---Notifies the client about another typing player.
 ---@param player IsoPlayer
 ---@param target IsoPlayer
 ---@param isTyping boolean
-function OmiChat.sendTyping(player, target, isTyping)
+function API.sendTyping(player, target, isTyping)
     ---@type omichat.request.UpdateTyping
     local req = { username = target:getUsername(), typing = isTyping }
 
-    OmiChat.dispatch('updateTyping', player, req)
+    API.dispatch('updateTyping', player, req)
 end
 
 ---Sends an info message that will show only for the specified player.
 ---@param player IsoPlayer
 ---@param text string
 ---@param serverAlert boolean?
-function OmiChat.sendInfoMessage(player, text, serverAlert)
+function API.sendInfoMessage(player, text, serverAlert)
     ---@type omichat.request.ShowMessage
     local req = { text = text, serverAlert = serverAlert }
 
-    OmiChat.dispatch('showInfoMessage', player, req)
+    API.dispatch('showInfoMessage', player, req)
 end
 
 ---Sends an info message that will show for all players.
 ---@param text string
 ---@param serverAlert boolean?
-function OmiChat.sendServerMessage(text, serverAlert)
+function API.sendServerMessage(text, serverAlert)
     ---@type omichat.request.ShowMessage
     local req = { text = text, serverAlert = serverAlert }
 
-    OmiChat.dispatchAll('showInfoMessage', req)
+    API.dispatchAll('showInfoMessage', req)
 end
 
 ---Sends an info message that will show only for the specified player.
@@ -265,22 +265,22 @@ end
 ---@param stringID string
 ---@param args string[]?
 ---@param serverAlert boolean?
-function OmiChat.sendTranslatedInfoMessage(player, stringID, args, serverAlert)
+function API.sendTranslatedInfoMessage(player, stringID, args, serverAlert)
     ---@type omichat.request.ShowMessage
     local req = { stringID = stringID, args = args, serverAlert = serverAlert }
 
-    OmiChat.dispatch('showInfoMessage', player, req)
+    API.dispatch('showInfoMessage', player, req)
 end
 
 ---Sends an info message that will show for all players.
 ---@param stringID string
 ---@param args string[]?
 ---@param serverAlert boolean?
-function OmiChat.sendTranslatedServerMessage(stringID, args, serverAlert)
+function API.sendTranslatedServerMessage(stringID, args, serverAlert)
     ---@type omichat.request.ShowMessage
     local req = { stringID = stringID, args = args, serverAlert = serverAlert }
 
-    OmiChat.dispatchAll('showInfoMessage', req)
+    API.dispatchAll('showInfoMessage', req)
 end
 
 
@@ -290,7 +290,7 @@ end
 
 ---Handles player death.
 ---@param player IsoPlayer
-function OmiChat.Commands.reportPlayerDeath(player)
+function API.Commands.reportPlayerDeath(player)
     local username = player:getUsername()
     if not canAccessTarget(player, username) then
         return
@@ -313,19 +313,19 @@ function OmiChat.Commands.reportPlayerDeath(player)
     end
 
     if doTransmit then
-        OmiChat.transmitModData()
+        API.transmitModData()
     end
 end
 
 ---Handles player join.
-function OmiChat.Commands.reportPlayerJoined()
-    OmiChat.Commands.requestPlayerCacheUpdate()
+function API.Commands.reportPlayerJoined()
+    API.Commands.requestPlayerCacheUpdate()
 end
 
 ---Handles the /addlanguage command.
 ---@param player IsoPlayer
 ---@param args omichat.request.Command
-function OmiChat.Commands.requestAddLanguage(player, args)
+function API.Commands.requestAddLanguage(player, args)
     args = utils.parseCommandArgs(args.command)
     local username = args[1]
     local language = args[2]
@@ -333,7 +333,7 @@ function OmiChat.Commands.requestAddLanguage(player, args)
     local err
     local success = false
     if username and language then
-        success, err = OmiChat.Commands.requestDataUpdate(player, {
+        success, err = API.Commands.requestDataUpdate(player, {
             target = username,
             field = 'languages',
             fromCommand = true,
@@ -344,46 +344,46 @@ function OmiChat.Commands.requestAddLanguage(player, args)
     username = utils.escapeRichText(username)
     if not success then
         if err == 'FULL' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_AddLanguageFull', { username })
+            API.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_AddLanguageFull', { username })
         elseif err == 'ALREADY_KNOW' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_AddLanguageKnown', { username, language })
+            API.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_AddLanguageKnown', { username, language })
         elseif err == 'UNKNOWN' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_AddLanguageNotConfigured', { language })
+            API.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_AddLanguageNotConfigured', { language })
         elseif err == 'UNKNOWN_PLAYER' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
+            API.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
         else
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_AddLanguage')
+            API.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_AddLanguage')
         end
 
         return
     end
 
-    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_AddLanguageOther', { username, language })
+    API.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_AddLanguageOther', { username, language })
 end
 
 ---Handles the /clearnames command.
 ---@param player IsoPlayer
-function OmiChat.Commands.requestClearNames(player)
+function API.Commands.requestClearNames(player)
     local access = utils.getNumericAccessLevel(player:getAccessLevel())
     if access < Option.MinimumCommandAccessLevel then
         return
     end
 
-    OmiChat.clearNicknames()
-    OmiChat.transmitModData()
-    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ClearNames')
+    API.clearNicknames()
+    API.transmitModData()
+    API.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ClearNames')
 end
 
 ---Handles a request to clear mod data for a given username.
 ---@param player IsoPlayer
 ---@param req omichat.request.ClearModData
-function OmiChat.Commands.requestClearModData(player, req)
+function API.Commands.requestClearModData(player, req)
     if player:getAccessLevel() ~= 'Admin' then
         return
     end
 
-    OmiChat.clearModData(req.username)
-    OmiChat.transmitModData()
+    API.clearModData(req.username)
+    API.transmitModData()
 end
 
 ---Updates global mod data.
@@ -391,7 +391,7 @@ end
 ---@param args omichat.request.ModDataUpdate
 ---@return boolean
 ---@return string?
-function OmiChat.Commands.requestDataUpdate(player, args)
+function API.Commands.requestDataUpdate(player, args)
     local err
     local success = false
     if args.field ~= 'all' and not isOnlinePlayer(args.target) then
@@ -405,51 +405,51 @@ function OmiChat.Commands.requestDataUpdate(player, args)
         end
     end
 
-    OmiChat.transmitModData()
+    API.transmitModData()
     return success, err
 end
 
 ---Handles the /card command.
 ---@param player IsoPlayer
-function OmiChat.Commands.requestDrawCard(player)
+function API.Commands.requestDrawCard(player)
     local suit = 1 + ZombRand(4)
     local card = 1 + ZombRand(13)
-    if OmiChat.isCustomStreamEnabled('card') then
-        OmiChat.reportDrawCard(player, card, suit)
+    if API.isCustomStreamEnabled('card') then
+        API.reportDrawCard(player, card, suit)
     else
-        local name = OmiChat.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
-        OmiChat.reportDrawCardGlobal(name, card, suit)
+        local name = API.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
+        API.reportDrawCardGlobal(name, card, suit)
     end
 end
 
 ---Handles the /flip command.
 ---@param player IsoPlayer
-function OmiChat.Commands.requestFlipCoin(player)
+function API.Commands.requestFlipCoin(player)
     local heads = ZombRand(2) == 0
-    if OmiChat.isCustomStreamEnabled('flip') then
-        OmiChat.reportFlipCoin(player, heads)
+    if API.isCustomStreamEnabled('flip') then
+        API.reportFlipCoin(player, heads)
     else
-        local name = OmiChat.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
-        OmiChat.sendTranslatedServerMessage('UI_OmiChat_Flip' .. (heads and 'Heads' or 'Tails'), { name })
+        local name = API.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
+        API.sendTranslatedServerMessage('UI_OmiChat_Flip' .. (heads and 'Heads' or 'Tails'), { name })
     end
 end
 
 ---Updates player cache information.
-function OmiChat.Commands.requestPlayerCacheUpdate()
-    OmiChat._refreshCache()
+function API.Commands.requestPlayerCacheUpdate()
+    API._refreshCache()
 end
 
 ---Handles the /reseticon command.
 ---@param player IsoPlayer
 ---@param args omichat.request.Command
-function OmiChat.Commands.requestResetIcon(player, args)
+function API.Commands.requestResetIcon(player, args)
     args = utils.parseCommandArgs(args.command)
     local username = args[1]
 
     local err
     local success = false
     if username then
-        success, err = OmiChat.Commands.requestDataUpdate(player, {
+        success, err = API.Commands.requestDataUpdate(player, {
             target = username,
             field = 'icons',
             fromCommand = true,
@@ -459,28 +459,28 @@ function OmiChat.Commands.requestResetIcon(player, args)
     username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
+            API.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
         else
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_ResetIcon')
+            API.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_ResetIcon')
         end
 
         return
     end
 
-    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ResetIconOther', { username })
+    API.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ResetIconOther', { username })
 end
 
 ---Handles the /resetlanguages command.
 ---@param player IsoPlayer
 ---@param args omichat.request.Command
-function OmiChat.Commands.requestResetLanguages(player, args)
+function API.Commands.requestResetLanguages(player, args)
     args = utils.parseCommandArgs(args.command)
     local username = args[1]
 
     local err
     local success = false
     if username then
-        success, err = OmiChat.Commands.requestDataUpdate(player, {
+        success, err = API.Commands.requestDataUpdate(player, {
             target = username,
             field = 'languages',
             fromCommand = true,
@@ -490,28 +490,28 @@ function OmiChat.Commands.requestResetLanguages(player, args)
     username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
+            API.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
         else
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_ResetLanguages')
+            API.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_ResetLanguages')
         end
 
         return
     end
 
-    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ResetLanguagesOther', { username })
+    API.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ResetLanguagesOther', { username })
 end
 
 ---Handles the /resetname command.
 ---@param player IsoPlayer
 ---@param args omichat.request.Command
-function OmiChat.Commands.requestResetName(player, args)
+function API.Commands.requestResetName(player, args)
     args = utils.parseCommandArgs(args.command)
     local username = args[1]
 
     local err
     local success = false
     if username then
-        success, err = OmiChat.Commands.requestDataUpdate(player, {
+        success, err = API.Commands.requestDataUpdate(player, {
             target = username,
             field = 'nicknames',
             fromCommand = true,
@@ -521,45 +521,45 @@ function OmiChat.Commands.requestResetName(player, args)
     username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
+            API.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
         else
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_ResetName')
+            API.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_ResetName')
         end
 
         return
     end
 
-    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ResetNameOther', { username })
+    API.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ResetNameOther', { username })
 end
 
 ---Handles the /roll command.
 ---@param player IsoPlayer
 ---@param args omichat.request.RollDice
-function OmiChat.Commands.requestRollDice(player, args)
+function API.Commands.requestRollDice(player, args)
     local sides = tonumber(args.sides)
     if type(sides) ~= 'number' or sides < 1 or sides > 100 then
-        OmiChat.sendTranslatedInfoMessage(player, 'UI_ServerOptionDesc_Roll')
+        API.sendTranslatedInfoMessage(player, 'UI_ServerOptionDesc_Roll')
         return
     end
 
     local roll = 1 + ZombRand(sides)
-    if OmiChat.isCustomStreamEnabled('roll') then
-        OmiChat.reportRoll(player, roll, sides)
+    if API.isCustomStreamEnabled('roll') then
+        API.reportRoll(player, roll, sides)
     else
-        local name = OmiChat.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
-        OmiChat.sendTranslatedServerMessage('UI_OmiChat_Roll', { name, tostring(roll), tostring(sides) })
+        local name = API.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
+        API.sendTranslatedServerMessage('UI_OmiChat_Roll', { name, tostring(roll), tostring(sides) })
     end
 end
 
 ---Handles sandbox options being updated by an admin.
-function OmiChat.Commands.requestSandboxUpdate()
-    OmiChat.dispatchAll('updateState')
+function API.Commands.requestSandboxUpdate()
+    API.dispatchAll('updateState')
 end
 
 ---Handles the /seticon command.
 ---@param player IsoPlayer
 ---@param args omichat.request.Command
-function OmiChat.Commands.requestSetIcon(player, args)
+function API.Commands.requestSetIcon(player, args)
     args = utils.parseCommandArgs(args.command)
     local username = args[1]
     local icon = args[2]
@@ -567,7 +567,7 @@ function OmiChat.Commands.requestSetIcon(player, args)
     local err
     local success = false
     if username and icon then
-        success, err = OmiChat.Commands.requestDataUpdate(player, {
+        success, err = API.Commands.requestDataUpdate(player, {
             target = username,
             field = 'icons',
             value = icon,
@@ -578,21 +578,21 @@ function OmiChat.Commands.requestSetIcon(player, args)
     username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
+            API.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
         else
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_SetIcon')
+            API.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_SetIcon')
         end
 
         return
     end
 
-    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_SetIconOther', { username })
+    API.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_SetIconOther', { username })
 end
 
 ---Handles the /setlanguageslots command.
 ---@param player IsoPlayer
 ---@param args omichat.request.Command
-function OmiChat.Commands.requestSetLanguageSlots(player, args)
+function API.Commands.requestSetLanguageSlots(player, args)
     args = utils.parseCommandArgs(args.command)
     local username = args[1]
     local slots = args[2]
@@ -600,7 +600,7 @@ function OmiChat.Commands.requestSetLanguageSlots(player, args)
     local err
     local success = false
     if username and slots then
-        success, err = OmiChat.Commands.requestDataUpdate(player, {
+        success, err = API.Commands.requestDataUpdate(player, {
             target = username,
             field = 'languageSlots',
             fromCommand = true,
@@ -611,21 +611,21 @@ function OmiChat.Commands.requestSetLanguageSlots(player, args)
     username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
+            API.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
         else
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_SetLanguageSlots')
+            API.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_SetLanguageSlots')
         end
 
         return
     end
 
-    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_SetLanguageSlotsOther', { username, slots })
+    API.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_SetLanguageSlotsOther', { username, slots })
 end
 
 ---Handles the /setname command.
 ---@param player IsoPlayer
 ---@param args omichat.request.Command
-function OmiChat.Commands.requestSetName(player, args)
+function API.Commands.requestSetName(player, args)
     args = utils.parseCommandArgs(args.command)
     local username = args[1]
     local name = args[2]
@@ -633,7 +633,7 @@ function OmiChat.Commands.requestSetName(player, args)
     local err
     local success = false
     if username and name then
-        success, err = OmiChat.Commands.requestDataUpdate(player, {
+        success, err = API.Commands.requestDataUpdate(player, {
             target = username,
             field = 'nicknames',
             value = name,
@@ -644,29 +644,29 @@ function OmiChat.Commands.requestSetName(player, args)
     username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
+            API.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
         else
-            OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_SetName')
+            API.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_SetName')
         end
 
         return
     end
 
     name = utils.escapeRichText(name)
-    OmiChat.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_SetNameOther', { username, name })
+    API.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_SetNameOther', { username, name })
 end
 
 ---Handles a request to notify other players of typing status.
 ---@param player IsoPlayer
 ---@param args omichat.request.Typing
-function OmiChat.Commands.requestTyping(player, args)
+function API.Commands.requestTyping(player, args)
     local onlinePlayers = getOnlinePlayers()
     for i = 0, onlinePlayers:size() - 1 do
         local otherPlayer = onlinePlayers:get(i)
 
         if player ~= otherPlayer or isDebugEnabled() then
             local typing = args.typing and shouldSendTyping(player, otherPlayer, args.range, args.chatType)
-            OmiChat.sendTyping(otherPlayer, player, typing)
+            API.sendTyping(otherPlayer, player, typing)
         end
     end
 end
@@ -680,20 +680,20 @@ end
 ---@param player IsoPlayer
 ---@param args table
 ---@protected
-function OmiChat._onClientCommand(module, command, player, args)
-    if module ~= OmiChat._modDataKey then
+function API._onClientCommand(module, command, player, args)
+    if module ~= API._modDataKey then
         return
     end
 
-    if OmiChat.Commands[command] then
-        OmiChat.Commands[command](player, args)
+    if API.Commands[command] then
+        API.Commands[command](player, args)
     end
 end
 
 ---Event handler for a scheduled update of the player cache.
 ---@protected
-function OmiChat._refreshCache()
+function API._refreshCache()
     local items = utils.refreshPlayerCache()
     local req = { items = items } ---@type omichat.request.UpdatePlayerCache
-    OmiChat.dispatchAll('updatePlayerCache', req)
+    API.dispatchAll('updatePlayerCache', req)
 end

@@ -1,10 +1,10 @@
 ---Client API functionality related to handling player preferences.
 
 ---@class omichat.api.client
-local OmiChat = require 'OmiChat/API/Client'
+local API = require 'OmiChat/API/Client/Core'
 
-local utils = OmiChat.utils
-local Option = OmiChat.Option
+local utils = API.utils
+local Option = API.Option
 local concat = table.concat
 
 
@@ -30,7 +30,7 @@ local function readPrefsJson()
 
     local prefsFile
     pcall(function()
-        prefsFile = getFileReader(OmiChat._prefsFileName, true)
+        prefsFile = getFileReader(API._prefsFileName, true)
     end)
 
     if not prefsFile then
@@ -168,8 +168,8 @@ end
 ---Gets the value of a given admin option preference.
 ---@param option omichat.AdminOption
 ---@return boolean
-function OmiChat.getAdminOption(option)
-    local prefs = OmiChat.getPlayerPreferences()
+function API.getAdminOption(option)
+    local prefs = API.getPlayerPreferences()
     local mappedPref = adminOptionMap[option]
     return prefs[mappedPref] or false
 end
@@ -177,12 +177,12 @@ end
 ---Retrieves the player's custom shouts for the current profile.
 ---@param shoutType omichat.CalloutCategory The type of shouts to retrieve.
 ---@return string[]?
-function OmiChat.getCustomShouts(shoutType)
+function API.getCustomShouts(shoutType)
     if not Option.EnableCustomShouts then
         return
     end
 
-    local profile = OmiChat.getCurrentProfile()
+    local profile = API.getCurrentProfile()
     if not profile then
         return
     end
@@ -192,8 +192,8 @@ end
 
 ---Returns the current player profile.
 ---@return omichat.PlayerProfile?
-function OmiChat.getCurrentProfile()
-    local prefs = OmiChat.getPlayerPreferences()
+function API.getCurrentProfile()
+    local prefs = API.getPlayerPreferences()
     local idx = prefs.profileIndex
     local profile = prefs.profiles[idx]
     return profile
@@ -201,8 +201,8 @@ end
 
 ---Returns the index of the current player profile.
 ---@return integer?
-function OmiChat.getCurrentProfileIndex()
-    local prefs = OmiChat.getPlayerPreferences()
+function API.getCurrentProfileIndex()
+    local prefs = API.getPlayerPreferences()
     if prefs.profileIndex < 1 then
         return
     end
@@ -212,7 +212,7 @@ end
 
 ---Gets a table with the default player preferences.
 ---@return omichat.PlayerPreferences
-function OmiChat.getDefaultPlayerPreferences()
+function API.getDefaultPlayerPreferences()
     return {
         HIGHER_VERSION = false,
         showNameColors = true,
@@ -238,26 +238,26 @@ end
 ---Retrieves whether the player has the admin option to ignore message range enabled.
 ---This does not check for admin permissions.
 ---@return boolean
-function OmiChat.getIgnoreMessageRange()
-    return OmiChat.getAdminOption('IgnoreMessageRange')
+function API.getIgnoreMessageRange()
+    return API.getAdminOption('IgnoreMessageRange')
 end
 
 ---Retrieves a boolean for whether the current player has name colors enabled.
 ---@return boolean
-function OmiChat.getNameColorsEnabled()
-    local prefs = OmiChat.getPlayerPreferences()
+function API.getNameColorsEnabled()
+    local prefs = API.getPlayerPreferences()
     return prefs.showNameColors
 end
 
 ---Gets or creates the player preferences table.
 ---@return omichat.PlayerPreferences
-function OmiChat.getPlayerPreferences()
-    if OmiChat._playerPrefs then
-        return OmiChat._playerPrefs
+function API.getPlayerPreferences()
+    if API._playerPrefs then
+        return API._playerPrefs
     end
 
-    local prefs = OmiChat.getDefaultPlayerPreferences()
-    OmiChat._playerPrefs = prefs
+    local prefs = API.getDefaultPlayerPreferences()
+    API._playerPrefs = prefs
 
     local decoded = readPrefsJson()
     if not decoded then
@@ -265,9 +265,9 @@ function OmiChat.getPlayerPreferences()
     end
 
     local version = decoded.VERSION
-    if version > OmiChat._prefsVersion then
+    if version > API._prefsVersion then
         -- use default settings & add flag to avoid overwrite
-        utils.log.info('preferences file has a higher version (%d > %d)', version, OmiChat._prefsVersion)
+        utils.log.info('preferences file has a higher version (%d > %d)', version, API._prefsVersion)
         prefs.HIGHER_VERSION = true
         return prefs
     elseif version == 1 then
@@ -282,8 +282,8 @@ end
 ---Gets a color table for the current player's preference for a category, or `nil` if unset.
 ---@param category omichat.ColorCategory
 ---@return omi.ColorTable?
-function OmiChat.getPreferredColor(category)
-    local profile = OmiChat.getCurrentProfile()
+function API.getPreferredColor(category)
+    local profile = API.getCurrentProfile()
     if not profile then
         return
     end
@@ -293,16 +293,16 @@ end
 
 ---Returns the configured player profiles.
 ---@return omichat.PlayerProfile[]
-function OmiChat.getProfiles()
-    local prefs = OmiChat.getPlayerPreferences()
+function API.getProfiles()
+    local prefs = API.getPlayerPreferences()
     return prefs.profiles
 end
 
 ---Gets whether a command category is set to retain commands.
 ---@param category omichat.ChatCommandType
 ---@return boolean
-function OmiChat.getRetainCommand(category)
-    local prefs = OmiChat.getPlayerPreferences()
+function API.getRetainCommand(category)
+    local prefs = API.getPlayerPreferences()
     if category == 'chat' then
         return prefs.retainChatInput
     elseif category == 'rp' then
@@ -316,61 +316,61 @@ end
 
 ---Retrieves a boolean for whether the current player has sign language emotes enabled.
 ---@return boolean
-function OmiChat.getSignEmotesEnabled()
-    return OmiChat.getPlayerPreferences().useSignEmotes
+function API.getSignEmotesEnabled()
+    return API.getPlayerPreferences().useSignEmotes
 end
 
 ---Retrieves whether the player has the admin option to display a chat icon enabled.
 ---This does not check for admin permissions.
 ---@return boolean
-function OmiChat.getShowAdminIcon()
-    return OmiChat.getAdminOption('ShowIcon')
+function API.getShowAdminIcon()
+    return API.getAdminOption('ShowIcon')
 end
 
 ---Retrieves whether the player has the option to show typing indicators enabled.
-function OmiChat.getShowTyping()
-    local prefs = OmiChat.getPlayerPreferences()
+function API.getShowTyping()
+    local prefs = API.getPlayerPreferences()
     return prefs.showTyping
 end
 
 ---Retrieves whether suggestions should be applied on Enter.
 ---@return boolean
-function OmiChat.getSuggestOnEnter()
-    local prefs = OmiChat.getPlayerPreferences()
+function API.getSuggestOnEnter()
+    local prefs = API.getPlayerPreferences()
     return prefs.suggestOnEnter
 end
 
 ---Retrieves whether suggestions should be applied on Tab.
 ---@return boolean
-function OmiChat.getSuggestOnTab()
-    local prefs = OmiChat.getPlayerPreferences()
+function API.getSuggestOnTab()
+    local prefs = API.getPlayerPreferences()
     return prefs.suggestOnTab
 end
 
 ---Retrieves whether the player has the admin option to understand all roleplay languages enabled.
 ---This does not check for admin permissions.
 ---@return boolean
-function OmiChat.getUnderstandAllLanguages()
-    return OmiChat.getAdminOption('KnowAllLanguages')
+function API.getUnderstandAllLanguages()
+    return API.getAdminOption('KnowAllLanguages')
 end
 
 ---Gets whether the current player wants to use chat suggestions.
 ---@return boolean
-function OmiChat.getUseSuggester()
-    local prefs = OmiChat.getPlayerPreferences()
+function API.getUseSuggester()
+    local prefs = API.getPlayerPreferences()
     return prefs.useSuggester
 end
 
 ---Saves the current player preferences to a file.
 ---@return boolean success
-function OmiChat.savePlayerPreferences()
-    if not OmiChat._playerPrefs or OmiChat._playerPrefs.HIGHER_VERSION then
+function API.savePlayerPreferences()
+    if not API._playerPrefs or API._playerPrefs.HIGHER_VERSION then
         return false
     end
 
-    local prefs = OmiChat._playerPrefs
+    local prefs = API._playerPrefs
     local encoded, err = utils.json.tryEncode {
-        VERSION = OmiChat._prefsVersion,
+        VERSION = API._prefsVersion,
         profileIndex = prefs.profileIndex,
         profiles = prefs.profiles,
         settings = {
@@ -395,7 +395,7 @@ function OmiChat.savePlayerPreferences()
     end
 
     pcall(function()
-        local outFile = getFileWriter(OmiChat._prefsFileName, true, false)
+        local outFile = getFileWriter(API._prefsFileName, true, false)
         outFile:write(encoded)
         outFile:close()
     end)
@@ -406,18 +406,18 @@ end
 ---Sets the value of a given admin option preference.
 ---@param option omichat.AdminOption
 ---@param value boolean
-function OmiChat.setAdminOption(option, value)
-    local prefs = OmiChat.getPlayerPreferences()
+function API.setAdminOption(option, value)
+    local prefs = API.getPlayerPreferences()
     local mappedPref = adminOptionMap[option]
     if prefs[mappedPref] == nil then
         return
     end
 
     prefs[mappedPref] = not not value
-    OmiChat.savePlayerPreferences()
+    API.savePlayerPreferences()
 
     if mappedPref == 'adminKnowLanguages' then
-        OmiChat.redrawMessages()
+        API.redrawMessages()
     end
 end
 
@@ -425,35 +425,35 @@ end
 ---@param shouts string[]?
 ---@param shoutType omichat.CalloutCategory The type of shouts to set.
 ---@return boolean success
-function OmiChat.setCustomShouts(shouts, shoutType)
+function API.setCustomShouts(shouts, shoutType)
     if not Option.EnableCustomShouts then
         return false
     end
 
-    local profile = OmiChat.getCurrentProfile()
+    local profile = API.getCurrentProfile()
     if not profile then
         return false
     end
 
     profile[shoutType] = shouts and shouts or {}
-    OmiChat.savePlayerPreferences()
+    API.savePlayerPreferences()
     return true
 end
 
 ---Sets whether the current player has name colors enabled.
 ---@param enabled boolean True to enable, false to disable.
-function OmiChat.setNameColorEnabled(enabled)
-    local prefs = OmiChat.getPlayerPreferences()
+function API.setNameColorEnabled(enabled)
+    local prefs = API.getPlayerPreferences()
     prefs.showNameColors = not not enabled
-    OmiChat.savePlayerPreferences()
+    API.savePlayerPreferences()
 end
 
 ---Sets a color table for the current player's preference for a category, on the current profile.
 ---This sets the value in the current profile.
 ---@param category omichat.ColorCategory
 ---@param color omi.ColorTable?
-function OmiChat.setPreferredColor(category, color)
-    local profile = OmiChat.getCurrentProfile()
+function API.setPreferredColor(category, color)
+    local profile = API.getCurrentProfile()
     if not profile then
         return
     end
@@ -464,18 +464,18 @@ end
 ---Sets the list of player profiles.
 ---This assumes the input is a valid list of PlayerProfile tables.
 ---@param profiles omichat.PlayerProfile[]
-function OmiChat.setProfiles(profiles)
-    local prefs = OmiChat.getPlayerPreferences()
+function API.setProfiles(profiles)
+    local prefs = API.getPlayerPreferences()
     prefs.profiles = profiles
     prefs.profileIndex = math.max(0, math.min(prefs.profileIndex, #profiles))
-    OmiChat.savePlayerPreferences()
+    API.savePlayerPreferences()
 end
 
 ---Sets whether a retain command category will retain commands.
 ---@param category omichat.ChatCommandType
 ---@param value boolean
-function OmiChat.setRetainCommand(category, value)
-    local prefs = OmiChat.getPlayerPreferences()
+function API.setRetainCommand(category, value)
+    local prefs = API.getPlayerPreferences()
     if category == 'chat' then
         prefs.retainChatInput = value
     elseif category == 'rp' then
@@ -484,54 +484,54 @@ function OmiChat.setRetainCommand(category, value)
         prefs.retainOtherInput = value
     end
 
-    OmiChat.savePlayerPreferences()
+    API.savePlayerPreferences()
 end
 
 ---Sets whether typing indicators should be shown for the current player.
 ---@param enable boolean
-function OmiChat.setShowTyping(enable)
-    local prefs = OmiChat.getPlayerPreferences()
+function API.setShowTyping(enable)
+    local prefs = API.getPlayerPreferences()
     prefs.showTyping = not not enable
-    OmiChat.savePlayerPreferences()
+    API.savePlayerPreferences()
 end
 
 ---Sets whether sign language emotes are enabled for the current player.
 ---@param enable boolean
-function OmiChat.setSignEmotesEnabled(enable)
-    local prefs = OmiChat.getPlayerPreferences()
+function API.setSignEmotesEnabled(enable)
+    local prefs = API.getPlayerPreferences()
     prefs.useSignEmotes = not not enable
-    OmiChat.savePlayerPreferences()
+    API.savePlayerPreferences()
 end
 
 ---Sets whether suggestions should be applied on Enter.
 ---@param enable boolean
-function OmiChat.setSuggestOnEnter(enable)
-    local prefs = OmiChat.getPlayerPreferences()
+function API.setSuggestOnEnter(enable)
+    local prefs = API.getPlayerPreferences()
     prefs.suggestOnEnter = enable
-    OmiChat.savePlayerPreferences()
+    API.savePlayerPreferences()
 end
 
 ---Sets whether suggestions should be applied on Tab.
 ---@param enable boolean
-function OmiChat.setSuggestOnTab(enable)
-    local prefs = OmiChat.getPlayerPreferences()
+function API.setSuggestOnTab(enable)
+    local prefs = API.getPlayerPreferences()
     prefs.suggestOnTab = enable
-    OmiChat.savePlayerPreferences()
+    API.savePlayerPreferences()
 end
 
 ---Sets whether the current player wants to use chat suggestions.
 ---@param useSuggester boolean
-function OmiChat.setUseSuggester(useSuggester)
-    local prefs = OmiChat.getPlayerPreferences()
+function API.setUseSuggester(useSuggester)
+    local prefs = API.getPlayerPreferences()
     prefs.useSuggester = not not useSuggester
-    OmiChat.savePlayerPreferences()
+    API.savePlayerPreferences()
 end
 
 ---Switches to a player preference profile.
 ---@param idx integer
 ---@return boolean success
-function OmiChat.switchProfile(idx)
-    local prefs = OmiChat.getPlayerPreferences()
+function API.switchProfile(idx)
+    local prefs = API.getPlayerPreferences()
     local profile = prefs.profiles[idx] ---@type omichat.PlayerProfile?
     if not profile and idx >= 1 then
         return false
@@ -540,18 +540,18 @@ function OmiChat.switchProfile(idx)
     prefs.profileIndex = math.max(0, math.min(idx, #prefs.profiles))
 
     local colors = profile and profile.colors or {}
-    OmiChat.changeColor('name', colors.name)
-    OmiChat.changeSpeechColor(colors.speech)
+    API.changeColor('name', colors.name)
+    API.changeSpeechColor(colors.speech)
 
     if profile and profile.chatNickname and Option:isNicknameEnabled() then
-        OmiChat.setNickname(profile.chatNickname)
+        API.setNickname(profile.chatNickname)
     end
 
-    OmiChat.savePlayerPreferences()
+    API.savePlayerPreferences()
     return true
 end
 
 ---Switches to the default player preference profile.
-function OmiChat.switchToDefaultProfile()
-    OmiChat.switchProfile(0)
+function API.switchToDefaultProfile()
+    API.switchProfile(0)
 end

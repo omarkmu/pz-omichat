@@ -1,7 +1,7 @@
 ---Base shared API.
 
 local config = require 'OmiChat/config'
-local utils = require 'OmiChat/util'
+local utils = require 'OmiChat/utils'
 local Option = require 'OmiChat/Component/Options'
 local MetaFormatter = require 'OmiChat/Component/MetaFormatter'
 
@@ -11,15 +11,15 @@ local MetaFormatter = require 'OmiChat/Component/MetaFormatter'
 ---@field protected _modDataVersion integer
 ---@field protected _playerModDataVersion integer
 ---@field protected _languageInfo omichat.LanguageInfoStore
-local OmiChat = {}
+local API = {}
 
-OmiChat.Option = Option
-OmiChat.MetaFormatter = MetaFormatter
-OmiChat.config = config
-OmiChat.utils = utils
-OmiChat._modDataKey = 'omichat'
-OmiChat._modDataVersion = 1
-OmiChat._playerModDataVersion = 1
+API.Option = Option
+API.MetaFormatter = MetaFormatter
+API.config = config
+API.utils = utils
+API._modDataKey = 'omichat'
+API._modDataVersion = 1
+API._playerModDataVersion = 1
 
 
 local modDataFields = {
@@ -53,8 +53,8 @@ end
 ---Clears mod data for a given username.
 ---@param username string
 ---@protected
-function OmiChat._clearModData(username)
-    local modData = OmiChat.getModData()
+function API._clearModData(username)
+    local modData = API.getModData()
 
     modData.currentLanguage[username] = nil
     modData.icons[username] = nil
@@ -67,7 +67,7 @@ end
 ---Returns the admin chat icon for a given username.
 ---@param username string
 ---@return string?
-function OmiChat.getAdminChatIcon(username)
+function API.getAdminChatIcon(username)
     if not username then
         return
     end
@@ -82,17 +82,17 @@ end
 ---Returns the chat icon for a given username.
 ---@param username string
 ---@return string?
-function OmiChat.getChatIcon(username)
-    return OmiChat.getModData().icons[username]
+function API.getChatIcon(username)
+    return API.getModData().icons[username]
 end
 
 ---Gets or creates the global mod data table.
 ---@return omichat.ModData
-function OmiChat.getModData()
+function API.getModData()
     ---@type omichat.ModData
-    local modData = ModData.getOrCreate(OmiChat._modDataKey)
+    local modData = ModData.getOrCreate(API._modDataKey)
 
-    modData.version = OmiChat._modDataVersion
+    modData.version = API._modDataVersion
     modData.nicknames = modData.nicknames or {}
     modData.nameColors = modData.nameColors or {}
     modData.languages = modData.languages or {}
@@ -106,10 +106,10 @@ end
 ---Gets the global mod data as a list associated with usernames.
 ---@return omichat.UserModData[] data
 ---@return string[] fieldList
-function OmiChat.getModDataList()
+function API.getModDataList()
     local list = {}
     local map = {}
-    local modData = OmiChat.getModData()
+    local modData = API.getModData()
 
     for _, field in pairs(modDataFields) do
         local key, fieldName
@@ -138,9 +138,9 @@ end
 ---Retrieves mod data for a given user.
 ---@param username string
 ---@return omichat.UserModData
-function OmiChat.getUserModData(username)
+function API.getUserModData(username)
     local data = { username = username }
-    local modData = OmiChat.getModData()
+    local modData = API.getModData()
 
     for _, field in pairs(modDataFields) do
         data[field.name] = modData[field.key][username]
@@ -152,20 +152,20 @@ end
 ---Returns the color table for a player's name color, or `nil` if unset.
 ---@param username string
 ---@return omi.ColorTable?
-function OmiChat.getNameColor(username)
+function API.getNameColor(username)
     if not Option.EnableSetNameColor or not username then
         return
     end
 
-    return utils.color.fromString(OmiChat.getModData().nameColors[username])
+    return utils.color.fromString(API.getModData().nameColors[username])
 end
 
 ---Returns the color table used for a player's name color in chat, or `nil` if unset.
 ---This respects the `EnableSpeechColorAsDefaultNameColor` option.
 ---@param username string
 ---@return omi.ColorTable?
-function OmiChat.getNameColorInChat(username)
-    local nameColor = OmiChat.getNameColor(username)
+function API.getNameColorInChat(username)
+    local nameColor = API.getNameColor(username)
     if nameColor then
         return nameColor
     end
@@ -179,7 +179,7 @@ end
 ---@param username string?
 ---@param chatType omichat.ChatTypeString The chat type to use in format string interpolation.
 ---@return string? name The name to use in chat, or `nil` if unable to retrieve information about the player.
-function OmiChat.getNameInChat(username, chatType)
+function API.getNameInChat(username, chatType)
     if not username then
         return
     end
@@ -189,15 +189,15 @@ function OmiChat.getNameInChat(username, chatType)
         return
     end
 
-    return OmiChat.getPlayerNameInChat(player, chatType)
+    return API.getPlayerNameInChat(player, chatType)
 end
 
 ---Retrieves the name that should be used in chat for a given username, escaped for rich text.
 ---@param username string?
 ---@param chatType omichat.ChatTypeString The chat type to use in format string interpolation.
 ---@return string? name The name to use in chat, or `nil` if unable to retrieve information about the player.
-function OmiChat.getNameInChatRichText(username, chatType)
-    local name = OmiChat.getNameInChat(username, chatType)
+function API.getNameInChatRichText(username, chatType)
+    local name = API.getNameInChat(username, chatType)
     if name then
         return utils.escapeRichText(name)
     end
@@ -208,21 +208,21 @@ end
 ---@param player IsoPlayer | omichat.utils.PlayerCacheItem
 ---@param menuType omichat.MenuTypeString
 ---@return string?
-function OmiChat.getPlayerMenuName(player, menuType)
+function API.getPlayerMenuName(player, menuType)
     local nameFormat = Option.FormatMenuName
     if not player or not nameFormat or nameFormat == '' then
         return
     end
 
-    local chatName = OmiChat.getPlayerNameInChat(player, 'say')
-    local tokens = chatName and OmiChat.getPlayerSubstitutions(player)
+    local chatName = API.getPlayerNameInChat(player, 'say')
+    local tokens = chatName and API.getPlayerSubstitutions(player)
     if not chatName or not tokens then
         return
     end
 
-    tokens.name = OmiChat.utils.unescapeRichText(chatName)
+    tokens.name = API.utils.unescapeRichText(chatName)
     tokens.menuType = menuType
-    local result = OmiChat.utils.interpolate(nameFormat, tokens, getPlayerUsername(player))
+    local result = API.utils.interpolate(nameFormat, tokens, getPlayerUsername(player))
 
     if result == '' then
         return
@@ -235,15 +235,15 @@ end
 ---@param player IsoPlayer | omichat.utils.PlayerCacheItem
 ---@param chatType omichat.ChatTypeString The chat type to use in format string interpolation.
 ---@return string? name The name to use in chat, or `nil` if unable to retrieve information about the player.
-function OmiChat.getPlayerNameInChat(player, chatType)
-    local tokens = player and OmiChat.getPlayerSubstitutions(player)
+function API.getPlayerNameInChat(player, chatType)
+    local tokens = player and API.getPlayerSubstitutions(player)
     if not tokens then
         return
     end
 
     local username = getPlayerUsername(player)
 
-    local modData = OmiChat.getModData()
+    local modData = API.getModData()
     if modData.nicknames[username] then
         tokens.name = modData.nicknames[username]
     end
@@ -257,7 +257,7 @@ end
 ---If the player descriptor could not be obtained, returns `nil`.
 ---@param player (IsoPlayer | omichat.utils.PlayerCacheItem)?
 ---@return table?
-function OmiChat.getPlayerSubstitutions(player)
+function API.getPlayerSubstitutions(player)
     if player and not player.getUsername then
         ---@cast player omichat.utils.PlayerCacheItem
         return {
@@ -283,7 +283,7 @@ end
 ---Returns true if the custom chat stream specified is enabled.
 ---@param name omichat.CustomStreamName
 ---@return boolean
-function OmiChat.isCustomStreamEnabled(name)
+function API.isCustomStreamEnabled(name)
     local info = config:getCustomStreamInfo(name)
     if not info then
         return false
@@ -296,10 +296,10 @@ end
 ---Adds a function that should be available to all interpolator patterns.
 ---@param name string
 ---@param func function
-function OmiChat.registerInterpolatorFunction(name, func)
+function API.registerInterpolatorFunction(name, func)
     ---@diagnostic disable-next-line: invisible
     utils.Interpolator._registeredFunctions[name:lower()] = func
 end
 
 
-return OmiChat
+return API

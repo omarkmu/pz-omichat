@@ -9,27 +9,13 @@ local concat = table.concat
 local getTimestampMs = getTimestampMs
 
 
----Utility functions.
 ---@class omichat.utils : omi.proxy
----@field private _interpolatorCache table<string, omichat.utils.InterpolatorCacheItem>
----@field private _playerCacheByUsername table<string, omichat.utils.PlayerCacheItem>
----@field private _playerCacheByOnlineID table<string, omichat.utils.PlayerCacheItem>
 local utils = lib.proxy({ name = 'OmiChat' })
+utils.lib = lib
 utils.Interpolator = Interpolator
 utils._interpolatorCache = {}
 utils._playerCacheByUsername = {}
 utils._playerCacheByOnlineID = {}
-
----@class omichat.utils.InterpolatorCacheItem
----@field interpolator omichat.Interpolator
----@field lastAccess number
-
----@class omichat.utils.PlayerCacheItem
----@field username string
----@field forename string
----@field surname string
----@field onlineID number
----@field speechColor omi.ColorTable
 
 
 local CACHE_EXPIRY_MS = 600000 -- ten minutes
@@ -63,8 +49,7 @@ local cards = {
     'King',
 }
 
----@type table<string, string>
-local iconToTextureNameMap = {}
+local iconToTextureNameMap = {} ---@type table<string, string>
 local loadedIcons = false
 
 

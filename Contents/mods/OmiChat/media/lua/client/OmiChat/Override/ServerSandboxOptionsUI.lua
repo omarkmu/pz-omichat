@@ -1,10 +1,10 @@
 ---Handles overriding the server settings screen to customize the sandbox settings page.
 
-local UI = require 'OmiLibrary/UI'
-local OmiChat = require 'OmiChatClient'
+local API = require 'OmiChat/Client'
 local layout = require 'OmiChat/Definition/OptionLayout'
-local utils = OmiChat.utils
-local Option = OmiChat.Option
+local utils = API.utils
+local UI = utils.ui
+local Option = API.Option
 local ColorEntry = UI.ColorEntry
 
 ---@class omichat.ISServerSandboxOptionsUI : ISServerSandboxOptionsUI

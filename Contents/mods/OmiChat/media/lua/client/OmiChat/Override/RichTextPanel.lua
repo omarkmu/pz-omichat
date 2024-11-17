@@ -6,7 +6,7 @@ local concat = table.concat
 local trim = string.trim
 local getTextManager = getTextManager
 local getTexture = getTexture
-local utils = require 'OmiChat/util'
+local utils = require 'OmiChat/utils'
 
 
 ---@class omichat.ISRichTextPanel : ISRichTextPanel

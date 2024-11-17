@@ -1,6 +1,6 @@
 ---Override to notify all clients after sandbox options have been updated via the admin menu.
 
-local OmiChat = require 'OmiChat/API/Client'
+local API = require 'OmiChat/API/Client/Core'
 
 local getTimestampMs = getTimestampMs
 local _SandboxOptions = __classmetatables[SandboxOptions.class].__index
@@ -18,7 +18,7 @@ sendUpdate = function()
     end
 
     scheduled = nil
-    OmiChat.dispatch('requestSandboxUpdate')
+    API.dispatch('requestSandboxUpdate')
     Events.OnTick.Remove(sendUpdate)
 end
 

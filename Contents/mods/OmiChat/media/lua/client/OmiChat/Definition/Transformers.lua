@@ -1,20 +1,20 @@
 ---@class omichat.api.client
-local OmiChat = require 'OmiChat/API/Client'
+local API = require 'OmiChat/API/Client/Core'
 
 local concat = table.concat
 local getText = getText
 local instanceof = instanceof
 
-local utils = OmiChat.utils
-local Option = OmiChat.Option
-local config = OmiChat.config
+local utils = API.utils
+local Option = API.Option
+local config = API.config
 
 ---Checks whether input matches a command stream.
 ---@param name omichat.CustomStreamName
 ---@param info omichat.MessageInfo
 ---@return string?
 local function matchCommand(name, info)
-    if not OmiChat.isCustomStreamEnabled(name) then
+    if not API.isCustomStreamEnabled(name) then
         return
     end
 
@@ -24,7 +24,7 @@ local function matchCommand(name, info)
     end
 
     local text = info.content or info.rawText
-    local formatter = OmiChat.getFormatter(name)
+    local formatter = API.getFormatter(name)
     local matched = formatter:read(text)
     if not matched then
         return
@@ -71,7 +71,7 @@ return {
         priority = 70,
         transform = function(_, info)
             local text = info.content or info.rawText
-            local formatter = OmiChat.getFormatter('onlineID')
+            local formatter = API.getFormatter('onlineID')
             local id = formatter:read(text)
 
             -- cleanup
@@ -87,7 +87,7 @@ return {
         name = 'decode-full-overhead',
         priority = 65,
         transform = function(_, info)
-            local formatter = OmiChat.getFormatter('overheadFull')
+            local formatter = API.getFormatter('overheadFull')
             local text = info.content or info.rawText
             local match = formatter:read(text)
             if match then
@@ -100,7 +100,7 @@ return {
         priority = 60,
         transform = function(_, info)
             local text = info.rawText
-            local formatter = OmiChat.getFormatter('echo')
+            local formatter = API.getFormatter('echo')
 
             local matched = formatter:read(text)
             if not matched then
@@ -162,7 +162,7 @@ return {
             info.tokens.card = utils.getTranslatedCardName(card, suit)
 
             info.format = Option.ChatFormatCard
-            info.formatOptions.color = OmiChat.getColorOrDefault('me')
+            info.formatOptions.color = API.getColorOrDefault('me')
             info.formatOptions.useDefaultChatColor = false
 
             info.context.ocCustomStream = 'me'
@@ -189,7 +189,7 @@ return {
             info.tokens.heads = result == 1
 
             info.format = Option.ChatFormatFlip
-            info.formatOptions.color = OmiChat.getColorOrDefault('me')
+            info.formatOptions.color = API.getColorOrDefault('me')
             info.formatOptions.useDefaultChatColor = false
 
             info.context.ocCustomStream = 'me'
@@ -217,7 +217,7 @@ return {
             info.tokens.sides = seq[2]
 
             info.format = Option.ChatFormatRoll
-            info.formatOptions.color = OmiChat.getColorOrDefault('me')
+            info.formatOptions.color = API.getColorOrDefault('me')
             info.formatOptions.useDefaultChatColor = false
 
             info.context.ocCustomStream = 'me'
@@ -233,8 +233,8 @@ return {
             end
 
             local text = info.content or info.rawText
-            local calloutFormatter = OmiChat.getFormatter('callout')
-            local sneakCalloutFormatter = OmiChat.getFormatter('sneakCallout')
+            local calloutFormatter = API.getFormatter('callout')
+            local sneakCalloutFormatter = API.getFormatter('sneakCallout')
 
             if calloutFormatter:isMatch(text) then
                 info.content = calloutFormatter:read(text)
@@ -243,10 +243,10 @@ return {
                 info.content = sneakCalloutFormatter:read(text)
                 info.context.ocIsSneakCallout = true
 
-                if OmiChat.isCustomStreamEnabled('whisper') then
+                if API.isCustomStreamEnabled('whisper') then
                     -- format sneak callouts like whispers, if enabled
                     info.format = info.format or Option.ChatFormatWhisper
-                    info.formatOptions.color = OmiChat.getColorOrDefault('whisper')
+                    info.formatOptions.color = API.getColorOrDefault('whisper')
                 end
             else
                 return
@@ -268,8 +268,8 @@ return {
             for data in config:chatStreams() do
                 local name = data.name
 
-                local formatter = OmiChat.getFormatter(name)
-                local isValidStream = data.chatTypes[info.chatType] and OmiChat.isCustomStreamEnabled(name)
+                local formatter = API.getFormatter(name)
+                local isValidStream = data.chatTypes[info.chatType] and API.isCustomStreamEnabled(name)
 
                 local isMatch = formatter:isMatch(text)
                 if isMatch and isRadio then
@@ -281,7 +281,7 @@ return {
                     info.context.ocCustomStream = data.streamAlias or name
                     info.tokens.stream = name
 
-                    info.formatOptions.color = OmiChat.getColorOrDefault(info.context.ocCustomStream)
+                    info.formatOptions.color = API.getColorOrDefault(info.context.ocCustomStream)
                     info.formatOptions.useDefaultChatColor = false
 
                     if data.titleID then
@@ -302,7 +302,7 @@ return {
         priority = 35,
         transform = function(_, info)
             local text = info.content or info.rawText
-            local formatter = OmiChat.getFormatter('overheadOther')
+            local formatter = API.getFormatter('overheadOther')
 
             local matched = formatter:read(text)
             if matched then
@@ -320,14 +320,14 @@ return {
             end
 
             local isRadio = info.context.ocIsRadio
-            local formatter = OmiChat.getFormatter('language')
+            local formatter = API.getFormatter('language')
             local text = info.content or info.rawText
 
             -- radio messages don't have language metadata, so we need to read the language from the text
             local encodedLanguage
             if formatter:isMatch(text) then
                 text = formatter:read(text)
-                encodedLanguage = OmiChat.decodeLanguage(text)
+                encodedLanguage = API.decodeLanguage(text)
             end
 
             local language = info.meta.language
@@ -342,8 +342,8 @@ return {
             end
 
             -- add language information for format strings
-            local isSigned = OmiChat.isRoleplayLanguageSigned(language)
-            if language ~= OmiChat.getDefaultRoleplayLanguage() then
+            local isSigned = API.isRoleplayLanguageSigned(language)
+            if language ~= API.getDefaultRoleplayLanguage() then
                 info.tokens.language = utils.getTranslatedLanguageName(language)
                 info.tokens.languageRaw = language
             end
@@ -354,7 +354,7 @@ return {
                 info.message:setOverHeadSpeech(false)
             end
 
-            if isAdmin() and OmiChat.getUnderstandAllLanguages() then
+            if isAdmin() and API.getUnderstandAllLanguages() then
                 return
             end
 
@@ -363,7 +363,7 @@ return {
             if not isRadio and username and info.author == username then
                 -- everyone understands themselves
                 return
-            elseif OmiChat.checkKnowsLanguage(language) then
+            elseif API.checkKnowsLanguage(language) then
                 -- if they understand the language, we're done here
                 return
             end
@@ -380,16 +380,16 @@ return {
                 local isQuietStream = info.context.ocIsSneakCallout
                     or info.context.ocCustomStream == 'whisper'
                     or info.context.ocCustomStream == 'low'
-                if isQuietStream and OmiChat.isCustomStreamEnabled('mequiet') then
+                if isQuietStream and API.isCustomStreamEnabled('mequiet') then
                     info.context.ocStreamForRange = 'whisper'
-                    info.formatOptions.color = OmiChat.getColorOrDefault('mequiet')
+                    info.formatOptions.color = API.getColorOrDefault('mequiet')
                     info.tokens.stream = 'mequiet'
-                elseif info.chatType == 'shout' and OmiChat.isCustomStreamEnabled('meloud') then
+                elseif info.chatType == 'shout' and API.isCustomStreamEnabled('meloud') then
                     info.context.ocStreamForRange = 'shout'
-                    info.formatOptions.color = OmiChat.getColorOrDefault('meloud')
+                    info.formatOptions.color = API.getColorOrDefault('meloud')
                     info.tokens.stream = 'meloud'
-                elseif OmiChat.isCustomStreamEnabled('me') then
-                    info.formatOptions.color = OmiChat.getColorOrDefault('me')
+                elseif API.isCustomStreamEnabled('me') then
+                    info.formatOptions.color = API.getColorOrDefault('me')
                     info.tokens.stream = 'me'
                 end
             end
@@ -400,7 +400,7 @@ return {
         priority = 25,
         transform = function(_, info)
             local text = info.content or info.rawText
-            local formatter = OmiChat.getFormatter('narrative')
+            local formatter = API.getFormatter('narrative')
 
             local matched = formatter:read(text)
             if not matched then
@@ -476,7 +476,7 @@ return {
                 end
             end
 
-            if isAdmin() and OmiChat.getIgnoreMessageRange() then
+            if isAdmin() and API.getIgnoreMessageRange() then
                 return
             end
 
@@ -529,18 +529,18 @@ return {
                 info.format = Option.ChatFormatOutgoingPrivate
                 info.tokens.recipient = other
                 info.tokens.recipientRaw = other
-                info.tokens.recipientName = utils.escapeRichText(OmiChat.getNameInChat(other, 'whisper') or other)
+                info.tokens.recipientName = utils.escapeRichText(API.getNameInChat(other, 'whisper') or other)
                 info.tokens.recipientNameRaw = info.tokens.recipientName
 
                 if not info.meta.recipientNameColor then
-                    info.meta.recipientNameColor = OmiChat.getNameColorInChat(other)
+                    info.meta.recipientNameColor = API.getNameColorInChat(other)
                 end
             else
                 -- defer to basic chat format handler
                 info.context.ocIsIncomingPM = true
             end
 
-            info.formatOptions.color = OmiChat.getColorOrDefault('private')
+            info.formatOptions.color = API.getColorOrDefault('private')
             info.formatOptions.useDefaultChatColor = false
         end,
     },
@@ -688,7 +688,7 @@ return {
 
             -- make sure we haven't done this already
             local tag = info.message:getCustomTag()
-            local decoded = OmiChat.decodeMessageTag(tag)
+            local decoded = API.decodeMessageTag(tag)
             if decoded.suppressed then
                 return
             end

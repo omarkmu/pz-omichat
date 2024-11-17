@@ -1,10 +1,10 @@
 ---Handles IsoPlayer overrides.
 
-local OmiChat = require 'OmiChat/API/Client'
-local config = OmiChat.config
+local API = require 'OmiChat/API/Client/Core'
+local config = API.config
 
 local min = math.min
-local Option = OmiChat.Option
+local Option = API.Option
 local _IsoPlayer = __classmetatables[IsoPlayer.class].__index
 local _Callout = _IsoPlayer.Callout
 
@@ -36,7 +36,7 @@ function _IsoPlayer:Callout(playEmote)
 
     local shouts
     if Option.EnableCustomShouts then
-        shouts = OmiChat.getCustomShouts(isSneaking and 'sneakcallouts' or 'callouts')
+        shouts = API.getCustomShouts(isSneaking and 'sneakcallouts' or 'callouts')
     end
 
     -- this can't set .callOut, so minor boredom reduction will occur from shouting
@@ -61,7 +61,7 @@ function _IsoPlayer:Callout(playEmote)
         shout = shout:upper()
     end
 
-    OmiChat.sendShout {
+    API.sendShout {
         text = shout,
         formatterName = formatterName,
         playSignedEmote = not playEmote,

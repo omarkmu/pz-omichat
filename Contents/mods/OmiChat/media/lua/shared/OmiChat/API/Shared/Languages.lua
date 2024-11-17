@@ -1,8 +1,8 @@
 ---Shared API functionality related to roleplay languages.
 
 ---@class omichat.api.shared
-local OmiChat = require 'OmiChat/API/Shared'
-OmiChat._languageInfo = {
+local API = require 'OmiChat/API/Shared/Core'
+API._languageInfo = {
     languageCount = 0,
     availableLanguages = '',
     signedLanguages = '',
@@ -11,15 +11,15 @@ OmiChat._languageInfo = {
     languageIsSignedMap = {},
 }
 
-local utils = OmiChat.utils
-local Option = OmiChat.Option
+local utils = API.utils
+local Option = API.Option
 
 
 ---Retrieves information about configured roleplay language options.
 ---Performs a refresh of cached language info if necessary.
 ---@return omichat.LanguageInfoStore
 local function getLanguageInfo()
-    local langInfo = OmiChat._languageInfo
+    local langInfo = API._languageInfo
 
     local noChanges = langInfo.availableLanguages == Option.AvailableLanguages
         and langInfo.signedLanguages == Option.SignedLanguages
@@ -42,7 +42,7 @@ local function getLanguageInfo()
             langInfo.idToLanguage[nextId] = lang
 
             nextId = nextId + 1
-            if nextId > OmiChat.config:maxDefinedLanguages() then
+            if nextId > API.config:maxDefinedLanguages() then
                 -- skip languages after the maximum
                 break
             end
@@ -66,14 +66,14 @@ end
 ---@param username string
 ---@param language string
 ---@return boolean
-function OmiChat.checkPlayerKnowsLanguage(username, language)
+function API.checkPlayerKnowsLanguage(username, language)
     local langInfo = getLanguageInfo()
     if langInfo.languageCount == 0 then
         -- no configured languages → understand everything
         return true
     end
 
-    local modData = OmiChat.getModData()
+    local modData = API.getModData()
     local knownLanguages = modData.languages[username]
     if type(knownLanguages) ~= 'table' or #knownLanguages == 0 then
         -- no languages chosen → understand only default language
@@ -91,21 +91,21 @@ end
 
 ---Returns a list of configured roleplay languages.
 ---@return string[]
-function OmiChat.getConfiguredRoleplayLanguages()
+function API.getConfiguredRoleplayLanguages()
     return utils.copy(getLanguageInfo().idToLanguage)
 end
 
 ---Gets the default roleplay language, which is the first one listed in the configuration.
 ---@return string?
-function OmiChat.getDefaultRoleplayLanguage()
-    return OmiChat.getRoleplayLanguageFromID(1)
+function API.getDefaultRoleplayLanguage()
+    return API.getRoleplayLanguageFromID(1)
 end
 
 ---Gets a roleplay language given a language ID.
 ---@param id integer
 ---@return string?
-function OmiChat.getRoleplayLanguageFromID(id)
-    if id < 1 or id > OmiChat.config:maxDefinedLanguages() then
+function API.getRoleplayLanguageFromID(id)
+    if id < 1 or id > API.config:maxDefinedLanguages() then
         return
     end
 
@@ -115,30 +115,30 @@ end
 ---Returns the ID used for a configured roleplay language.
 ---@param language string
 ---@return integer?
-function OmiChat.getRoleplayLanguageID(language)
+function API.getRoleplayLanguageID(language)
     return getLanguageInfo().languageToID[language]
 end
 
 ---Checks whether the language is a configured roleplay language.
 ---@param language string
 ---@return boolean
-function OmiChat.isConfiguredRoleplayLanguage(language)
+function API.isConfiguredRoleplayLanguage(language)
     return getLanguageInfo().languageToID[language] ~= nil
 end
 
 ---Returns whether a configured roleplay language is signed.
 ---@param language string
 ---@return boolean
-function OmiChat.isRoleplayLanguageSigned(language)
+function API.isRoleplayLanguageSigned(language)
     return getLanguageInfo().languageIsSignedMap[language] or false
 end
 
 ---Refreshes roleplay language information for the given username.
 ---@param username string
-function OmiChat.refreshLanguageInfo(username)
+function API.refreshLanguageInfo(username)
     getLanguageInfo()
 
-    local modData = OmiChat.getModData()
+    local modData = API.getModData()
     local currentLang = modData.currentLanguage[username]
     local languages = modData.languages[username]
     if not languages then
@@ -150,7 +150,7 @@ function OmiChat.refreshLanguageInfo(username)
     local validLanguages = {}
     for i = 1, #languages do
         local lang = languages[i]
-        if OmiChat.isConfiguredRoleplayLanguage(lang) then
+        if API.isConfiguredRoleplayLanguage(lang) then
             validLanguages[#validLanguages + 1] = lang
             if lang == currentLang then
                 hasCurrentLang = true

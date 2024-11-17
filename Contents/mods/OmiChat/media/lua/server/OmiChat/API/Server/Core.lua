@@ -4,7 +4,7 @@ if not isServer() then return end
 
 
 ---@class omichat.api.server : omichat.api.shared
-local OmiChat = require 'OmiChatShared'
+local API = require 'OmiChat/Shared'
 
 
-return OmiChat
+return API

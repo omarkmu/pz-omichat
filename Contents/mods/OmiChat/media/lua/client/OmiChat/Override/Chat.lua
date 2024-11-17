@@ -1,7 +1,7 @@
 ---Handles chat overrides and extensions.
 
-local OmiChat = require 'OmiChatClient'
-local UI = require 'OmiLibrary/UI'
+local API = require 'OmiChat/API/Client/Core'
+local UI = API.utils.ui
 
 
 ---Extended fields for ISChat.
@@ -27,10 +27,10 @@ local UI = require 'OmiLibrary/UI'
 ---@field typingFontHgt integer The height of the font used for the typing indicator.
 local ISChat = ISChat
 
-local utils = OmiChat.utils
-local config = OmiChat.config
-local Option = OmiChat.Option
-local SuggesterBox = OmiChat.SuggesterBox
+local utils = API.utils
+local config = API.config
+local Option = API.Option
+local SuggesterBox = API.SuggesterBox
 local getText = getText
 local max = math.max
 local concat = table.concat
@@ -68,10 +68,10 @@ local function addAdminOptions(context)
         local option = options[i]
         local name = getText('UI_OmiChat_ContextAdmin_' .. option)
         local opt = subMenu:addOption(name, ISChat.instance, ISChat.onAdminOptionToggle, option)
-        subMenu:setOptionChecked(opt, OmiChat.getAdminOption(option))
+        subMenu:setOptionChecked(opt, API.getAdminOption(option))
     end
 
-    local handlers = OmiChat.getSettingHandlers('admin')
+    local handlers = API.getSettingHandlers('admin')
     for i = 1, #handlers do
         handlers[i](subMenu)
     end
@@ -161,7 +161,7 @@ end
 ---@param context ISContextMenu
 local function addProfileSwitchSubmenu(context)
     local instance = ISChat.instance
-    local profiles = OmiChat.getProfiles()
+    local profiles = API.getProfiles()
     if #profiles == 0 then
         return
     end
@@ -171,7 +171,7 @@ local function addProfileSwitchSubmenu(context)
     local submenu = context:getNew(context)
     context:addSubMenu(submenuOption, submenu)
 
-    local currentIndex = OmiChat.getCurrentProfileIndex()
+    local currentIndex = API.getCurrentProfileIndex()
     local option = submenu:addOption(getText('UI_OmiChat_ContextProfileDefault'), instance, ISChat.onSwitchProfile, 0)
     submenu:setOptionChecked(option, currentIndex == nil)
 
@@ -185,14 +185,14 @@ end
 ---Adds the context menu options for roleplay languages.
 ---@param context ISContextMenu
 local function addLanguageOptions(context)
-    local languages = OmiChat.getRoleplayLanguages()
-    local languageSlots = math.min(OmiChat.getRoleplayLanguageSlots(), config:maxLanguageSlots())
+    local languages = API.getRoleplayLanguages()
+    local languageSlots = math.min(API.getRoleplayLanguageSlots(), config:maxLanguageSlots())
 
     local isKnown = {}
     local knownLanguages = {}
     for i = 1, #languages do
         local lang = languages[i]
-        if OmiChat.isConfiguredRoleplayLanguage(lang) then
+        if API.isConfiguredRoleplayLanguage(lang) then
             knownLanguages[#knownLanguages + 1] = lang
             isKnown[lang] = true
         end
@@ -200,7 +200,7 @@ local function addLanguageOptions(context)
 
     local addLanguages = {}
     if languageSlots - #knownLanguages >= 1 then
-        local allLanguages = OmiChat.getConfiguredRoleplayLanguages()
+        local allLanguages = API.getConfiguredRoleplayLanguages()
         for i = 1, #allLanguages do
             local lang = allLanguages[i]
             if not isKnown[lang] and Option:canAddLanguage(lang) then
@@ -226,7 +226,7 @@ local function addLanguageOptions(context)
     local languageSubMenu = context:getNew(context)
     context:addSubMenu(languageOption, languageSubMenu)
 
-    local currentLang = OmiChat.getCurrentRoleplayLanguage() or OmiChat.getDefaultRoleplayLanguage()
+    local currentLang = API.getCurrentRoleplayLanguage() or API.getDefaultRoleplayLanguage()
     for i = 1, #knownLanguages do
         local lang = knownLanguages[i]
         local name = utils.getTranslatedLanguageName(lang)
@@ -247,7 +247,7 @@ local function addLanguageOptions(context)
         end
     end
 
-    local handlers = OmiChat.getSettingHandlers('language')
+    local handlers = API.getSettingHandlers('language')
     for i = 1, #handlers do
         handlers[i](languageSubMenu)
     end
@@ -275,7 +275,7 @@ local function addRetainOptions(context)
         local cat = categories[i]
         local name = getText('UI_OmiChat_ContextRetainCommands_' .. cat)
         local opt = retainSubMenu:addOption(name, ISChat.instance, ISChat.onToggleRetainCommand, cat)
-        retainSubMenu:setOptionChecked(opt, OmiChat.getRetainCommand(cat))
+        retainSubMenu:setOptionChecked(opt, API.getRetainCommand(cat))
     end
 end
 
@@ -283,24 +283,24 @@ end
 ---@param context ISContextMenu
 local function addSignEmoteOption(context)
     local foundSigned = false
-    local languages = OmiChat.getRoleplayLanguages()
+    local languages = API.getRoleplayLanguages()
     for i = 1, #languages do
-        if OmiChat.isRoleplayLanguageSigned(languages[i]) then
+        if API.isRoleplayLanguageSigned(languages[i]) then
             foundSigned = true
             break
         end
     end
 
-    local defaultLang = not foundSigned and OmiChat.getDefaultRoleplayLanguage()
+    local defaultLang = not foundSigned and API.getDefaultRoleplayLanguage()
     if defaultLang then
-        foundSigned = OmiChat.isRoleplayLanguageSigned(defaultLang)
+        foundSigned = API.isRoleplayLanguageSigned(defaultLang)
     end
 
     if not foundSigned then
         return
     end
 
-    local infix = OmiChat.getSignEmotesEnabled() and 'Disable' or 'Enable'
+    local infix = API.getSignEmotesEnabled() and 'Disable' or 'Enable'
     local optName = getText('UI_OmiChat_Context' .. infix .. 'SignEmotes')
     local option = context:addOption(optName, ISChat.instance, ISChat.onToggleUseSignEmotes)
     option.toolTip = ISToolTip:new()
@@ -311,7 +311,7 @@ end
 ---@param context ISContextMenu
 local function addSuggestionOptions(context)
     local instance = ISChat.instance
-    local isUseSuggester = OmiChat.getUseSuggester()
+    local isUseSuggester = API.getUseSuggester()
     if not isUseSuggester then
         local optName = getText('UI_OmiChat_ContextSuggestions_Enable')
         context:addOption(optName, instance, ISChat.onToggleUseSuggester)
@@ -330,10 +330,10 @@ local function addSuggestionOptions(context)
 
     local onEnterOpt = submenu:addOption(onEnterOptName, instance, ISChat.onToggleSuggestOnEnter)
     local onTabOpt = submenu:addOption(onTabOptName, instance, ISChat.onToggleSuggestOnTab)
-    submenu:setOptionChecked(onEnterOpt, OmiChat.getSuggestOnEnter())
-    submenu:setOptionChecked(onTabOpt, OmiChat.getSuggestOnTab())
+    submenu:setOptionChecked(onEnterOpt, API.getSuggestOnEnter())
+    submenu:setOptionChecked(onTabOpt, API.getSuggestOnTab())
 
-    local handlers = OmiChat.getSettingHandlers('suggestions')
+    local handlers = API.getSettingHandlers('suggestions')
     for i = 1, #handlers do
         handlers[i](submenu)
     end
@@ -362,7 +362,7 @@ local function addChatSettings(context)
     submenu:addOption(tagOptName, instance, ISChat.onToggleTagPrefix)
 
     if Option.PredicateShowTypingIndicator ~= '' then
-        local typingOptName = OmiChat.getShowTyping()
+        local typingOptName = API.getShowTyping()
             and getText('UI_OmiChat_ContextDisableTypingIndicator')
             or getText('UI_OmiChat_ContextEnableTypingIndicator')
         submenu:addOption(typingOptName, instance, ISChat.onToggleShowTyping)
@@ -372,7 +372,7 @@ local function addChatSettings(context)
     addRetainOptions(submenu)
     addVanillaSubmenuOptions(submenu)
 
-    local handlers = OmiChat.getSettingHandlers('basic')
+    local handlers = API.getSettingHandlers('basic')
     for i = 1, #handlers do
         handlers[i](submenu)
     end
@@ -399,7 +399,7 @@ local function addCustomizationSettings(context)
     addSignEmoteOption(submenu)
 
     if Option.EnableSetNameColor or Option.EnableSpeechColorAsDefaultNameColor then
-        local nameColorOptName = OmiChat.getNameColorsEnabled()
+        local nameColorOptName = API.getNameColorsEnabled()
             and getText('UI_OmiChat_ContextDisableNameColors')
             or getText('UI_OmiChat_ContextEnableNameColors')
 
@@ -428,7 +428,7 @@ local function addCustomizationSettings(context)
         end
     end
 
-    local handlers = OmiChat.getSettingHandlers('customization')
+    local handlers = API.getSettingHandlers('customization')
     for i = 1, #handlers do
         handlers[i](submenu)
     end
@@ -449,9 +449,9 @@ local function refreshLastCommand(tab)
         return
     end
 
-    local stream = OmiChat.chatCommandToStream(lastChatCommand, true)
+    local stream = API.chatCommandToStream(lastChatCommand, true)
     local commandType = stream and stream:getCommandType() or 'other'
-    if not OmiChat.getRetainCommand(commandType) then
+    if not API.getRetainCommand(commandType) then
         tab.lastChatCommand = ''
     end
 end
@@ -499,8 +499,8 @@ end
 ---@param option omichat.AdminOption
 ---@diagnostic disable-next-line: unused-local
 function ISChat.onAdminOptionToggle(target, option)
-    local value = OmiChat.getAdminOption(option)
-    OmiChat.setAdminOption(option, not value)
+    local value = API.getAdminOption(option)
+    API.setAdminOption(option, not value)
 end
 
 ---Event handler for the clean character customization option.
@@ -656,8 +656,8 @@ function ISChat.onToggleRetainCommand(target, type)
         return
     end
 
-    local value = not OmiChat.getRetainCommand(type)
-    OmiChat.setRetainCommand(type, value)
+    local value = not API.getRetainCommand(type)
+    API.setRetainCommand(type, value)
 
     if value then
         -- don't need to clear the last command for enable
@@ -673,46 +673,46 @@ end
 ---@param target omichat.ISChat
 ---@diagnostic disable-next-line: unused-local
 function ISChat.onToggleShowNameColor(target)
-    OmiChat.setNameColorEnabled(not OmiChat.getNameColorsEnabled())
-    OmiChat.redrawMessages()
+    API.setNameColorEnabled(not API.getNameColorsEnabled())
+    API.redrawMessages()
 end
 
 ---Event handler for toggling using the suggester.
 ---@param target omichat.ISChat
 ---@diagnostic disable-next-line: unused-local
 function ISChat.onToggleShowTyping(target)
-    OmiChat.setShowTyping(not OmiChat.getShowTyping())
-    OmiChat.updateTypingDisplay()
-    OmiChat.updateChatPanelSize()
+    API.setShowTyping(not API.getShowTyping())
+    API.updateTypingDisplay()
+    API.updateChatPanelSize()
 end
 
 ---Event handler for toggling applying suggestions on Enter.
 ---@param target omichat.ISChat
 ---@diagnostic disable-next-line: unused-local
 function ISChat.onToggleSuggestOnEnter(target)
-    OmiChat.setSuggestOnEnter(not OmiChat.getSuggestOnEnter())
+    API.setSuggestOnEnter(not API.getSuggestOnEnter())
 end
 
 ---Event handler for toggling applying suggestions on Tab.
 ---@param target omichat.ISChat
 ---@diagnostic disable-next-line: unused-local
 function ISChat.onToggleSuggestOnTab(target)
-    OmiChat.setSuggestOnTab(not OmiChat.getSuggestOnTab())
+    API.setSuggestOnTab(not API.getSuggestOnTab())
 end
 
 ---Event handler for toggling sign language emotes.
 ---@param target omichat.ISChat
 ---@diagnostic disable-next-line: unused-local
 function ISChat.onToggleUseSignEmotes(target)
-    OmiChat.setSignEmotesEnabled(not OmiChat.getSignEmotesEnabled())
+    API.setSignEmotesEnabled(not API.getSignEmotesEnabled())
 end
 
 ---Event handler for toggling using the suggester.
 ---@param target omichat.ISChat
 ---@diagnostic disable-next-line: unused-local
 function ISChat.onToggleUseSuggester(target)
-    OmiChat.setUseSuggester(not OmiChat.getUseSuggester())
-    OmiChat.updateSuggesterComponent()
+    API.setUseSuggester(not API.getUseSuggester())
+    API.updateSuggesterComponent()
 end
 
 ---Event handler for icon button click.
@@ -745,7 +745,7 @@ function ISChat.onIconButtonClick(target)
     iconPicker:setY(y)
     iconPicker:bringToTop()
     iconPicker:setVisible(not iconPicker:isVisible())
-    OmiChat.hideSuggesterBox()
+    API.hideSuggesterBox()
 
     return true
 end
@@ -768,7 +768,7 @@ function ISChat.onIconClick(target, icon)
 
     local addSpace = #text > 0 and text:sub(-1) ~= ' '
     target.textEntry:setText(concat { text, addSpace and ' *' or '*', icon, '*' })
-    OmiChat.updateSuggesterComponent()
+    API.updateSuggesterComponent()
 end
 
 ---Event handler for selecting a suggestion.
@@ -778,9 +778,9 @@ end
 function ISChat.onSuggesterSelect(target, suggestion)
     local entry = ISChat.instance.textEntry
 
-    OmiChat.hideSuggesterBox()
+    API.hideSuggesterBox()
     entry:setText(suggestion.suggestion)
-    OmiChat.updateSuggesterComponent()
+    API.updateSuggesterComponent()
 end
 
 ---Event handler for adding a roleplay language.
@@ -810,7 +810,7 @@ function ISChat.onConfirmAddLanguage(target, button, language)
         return
     end
 
-    OmiChat.addRoleplayLanguage(language)
+    API.addRoleplayLanguage(language)
 end
 
 ---Event handler for selecting the current roleplay language.
@@ -818,7 +818,7 @@ end
 ---@param language string
 ---@diagnostic disable-next-line: unused-local
 function ISChat.onLanguageSelect(target, language)
-    OmiChat.setCurrentRoleplayLanguage(language)
+    API.setCurrentRoleplayLanguage(language)
 end
 
 ---Event handler for clicking the manage profiles context option.
@@ -829,7 +829,7 @@ function ISChat.onManageProfiles(target)
     end
 
     local x, y = UI.getScreenCenter(800, 600)
-    local panel = OmiChat.ProfileManager:new(x, y, 800, 600, OmiChat.getProfiles())
+    local panel = API.ProfileManager:new(x, y, 800, 600, API.getProfiles())
     panel:initialise()
     panel:addToUIManager()
     target.activeProfilesPanel = panel
@@ -843,7 +843,7 @@ function ISChat.onManageModData(target)
     end
 
     local x, y = UI.getScreenCenter(1200, 650)
-    local panel = OmiChat.ModDataManager:new(x, y, 1200, 650)
+    local panel = API.ModDataManager:new(x, y, 1200, 650)
     panel:initialise()
     panel:addToUIManager()
 
@@ -855,8 +855,8 @@ end
 ---@param idx integer
 ---@diagnostic disable-next-line: unused-local
 function ISChat.onSwitchProfile(target, idx)
-    OmiChat.switchProfile(idx)
-    OmiChat.redrawMessages()
+    API.switchProfile(idx)
+    API.redrawMessages()
 end
 
 ---Validation function for custom callout menu.
@@ -913,8 +913,8 @@ local _ChatMessage = __classmetatables[ChatMessage.class].__index
 local _ServerChatMessage = __classmetatables[ServerChatMessage.class].__index
 
 ---Override to enable custom formatting.
-_ChatMessage.getTextWithPrefix = OmiChat.buildMessageText
-_ServerChatMessage.getTextWithPrefix = OmiChat.buildMessageText
+_ChatMessage.getTextWithPrefix = API.buildMessageText
+_ServerChatMessage.getTextWithPrefix = API.buildMessageText
 
 
 ---Override to add information to chat messages and remove blank lines.
@@ -929,12 +929,12 @@ function ISChat.addLineInChat(message, tabID)
     local player = getSpecificPlayer(0)
 
     local mtIndex = (getmetatable(message) or {}).__index
-    if mtIndex == _ChatMessage or mtIndex == _ServerChatMessage or utils.isinstance(message, OmiChat.MimicMessage) then
+    if mtIndex == _ChatMessage or mtIndex == _ServerChatMessage or utils.isinstance(message, API.MimicMessage) then
         local username = player and player:getUsername()
-        local chatType = OmiChat.getMessageChatType(message)
+        local chatType = API.getMessageChatType(message)
 
         if chatType == 'radio' then
-            local formatter = OmiChat.getFormatter('onlineID')
+            local formatter = API.getFormatter('onlineID')
             local value = formatter:read(message:getText())
             local onlineID = value and utils.decodeInvisibleInt(value)
             local authorPlayer = onlineID and utils.getPlayerInfoByOnlineID(onlineID)
@@ -951,10 +951,10 @@ function ISChat.addLineInChat(message, tabID)
             return
         end
 
-        message:setCustomTag(OmiChat.encodeMessageTag(message))
+        message:setCustomTag(API.encodeMessageTag(message))
 
         -- necessary to process transforms so we know whether this message should be added to chat
-        local info = OmiChat.buildMessageInfo(message, true)
+        local info = API.buildMessageInfo(message, true)
         if info then
             if not message:isShowInChat() then
                 return
@@ -987,7 +987,7 @@ function ISChat:close()
 
     if not self.locked then
         self:unfocus()
-        OmiChat.updateTypingStatus(true)
+        API.updateTypingStatus(true)
     end
 end
 
@@ -1017,8 +1017,8 @@ function ISChat:createChildren()
     self.suggesterBox:addToUIManager()
     self.suggesterBox:setVisible(false)
 
-    OmiChat.addCustomButton(self.infoButton)
-    OmiChat.updateState()
+    API.addCustomButton(self.infoButton)
+    API.updateState()
 end
 
 ---Override to mark chat tabs for rich text processing changes.
@@ -1038,12 +1038,12 @@ function ISChat:focus()
     _focus(self)
 
     local text = ISChat.instance.textEntry:getInternalText()
-    OmiChat.updateCustomComponents(text)
+    API.updateCustomComponents(text)
 
     -- correct the stream ID to the current stream
-    local currentStreamName = OmiChat.chatCommandToStreamName(text)
+    local currentStreamName = API.chatCommandToStreamName(text)
     if currentStreamName then
-        OmiChat.cycleStream(currentStreamName)
+        API.cycleStream(currentStreamName)
     end
 end
 
@@ -1064,14 +1064,14 @@ function ISChat:onCommandEntered()
         return
     end
 
-    if OmiChat.getSuggestOnEnter() and tryInputSuggestedItem() then
-        OmiChat.updateCustomComponents()
+    if API.getSuggestOnEnter() and tryInputSuggestedItem() then
+        API.updateCustomComponents()
         return
     end
 
     local instance = ISChat.instance ---@cast instance omichat.ISChat
     local input = instance.textEntry:getText()
-    local stream, command, chatCommand, disabledStream = OmiChat.chatCommandToStream(input, true, true)
+    local stream, command, chatCommand, disabledStream = API.chatCommandToStream(input, true, true)
 
     local useCallback
     local callbackStream
@@ -1087,7 +1087,7 @@ function ISChat:onCommandEntered()
         allowEmotes = not isCommand
         command = input
 
-        local default = OmiChat.getDefaultTabStream(instance.currentTabID)
+        local default = API.getDefaultTabStream(instance.currentTabID)
         if not isCommand and default then
             stream = default
             allowEmotes = not isCommand and default:isAllowEmotes()
@@ -1106,7 +1106,7 @@ function ISChat:onCommandEntered()
             shouldHandle = true
             callbackStream = stream
             allowEmotes = not isDefault and stream:isAllowEmotes() or allowEmotes
-            useCallback = stream:getUseCallback() or OmiChat.send
+            useCallback = stream:getUseCallback() or API.send
             commandType = stream:getCommandType()
         end
 
@@ -1118,7 +1118,7 @@ function ISChat:onCommandEntered()
     -- handle emotes specified with .emote
     local playedEmote
     if allowEmotes and Option.EnableEmotes then
-        local emoteToPlay, start, finish, emote = OmiChat.getEmoteFromCommand(command)
+        local emoteToPlay, start, finish, emote = API.getEmoteFromCommand(command)
         if emoteToPlay then
             -- remove the emote text
             shouldHandle = true
@@ -1137,10 +1137,10 @@ function ISChat:onCommandEntered()
         end
     end
 
-    local shouldRetain = OmiChat.getRetainCommand(commandType)
+    local shouldRetain = API.getRetainCommand(commandType)
     if shouldRetain and stream then
         -- fix the switching functionality by updating to the used stream
-        OmiChat.cycleStream(stream:getName())
+        API.cycleStream(stream:getName())
     end
 
     if callbackStream and not callbackStream:validate(command) then
@@ -1153,11 +1153,11 @@ function ISChat:onCommandEntered()
         if onUseDisabled then
             onUseDisabled(disabledStream)
         elseif disabledStream:getCommandType() ~= 'chat' then
-            OmiChat.addInfoMessage('Unknown command ' .. command:sub(2))
+            API.addInfoMessage('Unknown command ' .. command:sub(2))
         else
             local msg = { getText('UI_chat_chat_disabled_msg', utils.trim(disabledStream:getCommand())) }
             for i = 1, #ISChat.allChatStreams do
-                local info = OmiChat.StreamInfo:new(ISChat.allChatStreams[i])
+                local info = API.StreamInfo:new(ISChat.allChatStreams[i])
                 if info:isEnabled() then
                     msg[#msg + 1] = '* '
                     msg[#msg + 1] = utils.trim(info:getCommand())
@@ -1167,7 +1167,7 @@ function ISChat:onCommandEntered()
 
             if #msg > 1 then
                 msg[#msg] = nil
-                OmiChat.addInfoMessage(concat(msg))
+                API.addInfoMessage(concat(msg))
             end
         end
     elseif not shouldHandle then
@@ -1183,15 +1183,15 @@ function ISChat:onCommandEntered()
 
     instance:unfocus()
     instance:logChatCommand(input)
-    OmiChat.scrollToBottom()
+    API.scrollToBottom()
 
     if shouldRetain and stream then
         instance.chatText.lastChatCommand = chatCommand
     elseif stream then
         -- if the used stream shouldn't be set as the last, cycle to the previous command
-        local lastChatStream = OmiChat.chatCommandToStreamName(instance.chatText.lastChatCommand)
+        local lastChatStream = API.chatCommandToStreamName(instance.chatText.lastChatCommand)
         if lastChatStream then
-            OmiChat.cycleStream(lastChatStream)
+            API.cycleStream(lastChatStream)
         end
     end
 
@@ -1214,7 +1214,7 @@ function ISChat:onGearButtonClick()
         return
     end
 
-    OmiChat.hideSuggesterBox()
+    API.hideSuggesterBox()
 
     local x = getMouseX()
     local y = getMouseY()
@@ -1226,7 +1226,7 @@ function ISChat:onGearButtonClick()
     addProfileSwitchSubmenu(context)
     addLanguageOptions(context)
 
-    local handlers = OmiChat.getSettingHandlers('main')
+    local handlers = API.getSettingHandlers('main')
     for i = 1, #handlers do
         handlers[i](context)
     end
@@ -1234,9 +1234,9 @@ end
 
 ---Override to handle custom info text.
 function ISChat:onInfo()
-    OmiChat.hideSuggesterBox()
+    API.hideSuggesterBox()
 
-    local text = OmiChat.getInfoRichText()
+    local text = API.getInfoRichText()
     self:setInfo(text)
 
     if text == '' and self.infoRichText then
@@ -1260,7 +1260,7 @@ function ISChat.onMouseDown(target, x, y)
     end
 
     local iconPicker = instance.iconPicker
-    OmiChat.hideSuggesterBox()
+    API.hideSuggesterBox()
 
     if not handled or not iconPicker or not iconPicker:isVisible() then
         return handled
@@ -1279,7 +1279,7 @@ function ISChat:onOtherKey(key)
     local instance = ISChat.instance
     local suggesterBox = instance and instance.suggesterBox
     if suggesterBox and suggesterBox:isVisible() and key == Keyboard.KEY_ESCAPE then
-        OmiChat.hideSuggesterBox()
+        API.hideSuggesterBox()
     else
         _onOtherKey(self, key)
     end
@@ -1295,7 +1295,7 @@ function ISChat.onPressDown()
     end
 
     _onPressDown()
-    OmiChat.updateCustomComponents()
+    API.updateCustomComponents()
 end
 
 ---Override to update custom components.
@@ -1308,7 +1308,7 @@ function ISChat.onPressUp()
     end
 
     _onPressUp()
-    OmiChat.updateCustomComponents()
+    API.updateCustomComponents()
 end
 
 ---Override to control custom components and allow switching to custom streams.
@@ -1318,13 +1318,13 @@ function ISChat.onSwitchStream()
     end
 
     local text
-    if not (OmiChat.getSuggestOnTab() and tryInputSuggestedItem()) then
-        text = OmiChat.cycleStream()
+    if not (API.getSuggestOnTab() and tryInputSuggestedItem()) then
+        text = API.cycleStream()
         local entry = ISChat.instance.textEntry
         entry:setText(text)
     end
 
-    OmiChat.updateCustomComponents(text)
+    API.updateCustomComponents(text)
 end
 
 ---Override to respect retain options when creating chat tabs.
@@ -1349,7 +1349,7 @@ function ISChat.onTabAdded(tabTitle, tabID)
         refreshLastCommand(target)
     end
 
-    OmiChat.updateChatPanelSize()
+    API.updateChatPanelSize()
 end
 
 ---Override to correct the chat panel sizes after removing a tab.
@@ -1357,7 +1357,7 @@ end
 ---@param tabID integer
 function ISChat.onTabRemoved(tabTitle, tabID)
     _onTabRemoved(tabTitle, tabID)
-    OmiChat.updateChatPanelSize()
+    API.updateChatPanelSize()
 end
 
 ---Override to update custom components and include aliases in determination for resetting input.
@@ -1365,21 +1365,21 @@ function ISChat.onTextChange()
     local instance = ISChat.instance
     local chatText = instance and instance.chatText
     if not instance or not chatText or not chatText.lastChatCommand then
-        OmiChat.updateCustomComponents()
+        API.updateCustomComponents()
         return
     end
 
     local entry = ISChat.instance.textEntry
     local internalText = entry:getInternalText()
     if not utils.endsWith(internalText, '/') then
-        OmiChat.updateCustomComponents()
+        API.updateCustomComponents()
         return
     end
 
     local text = entry:getText()
     if #text <= 6 then
         entry:setText('/')
-        OmiChat.updateCustomComponents()
+        API.updateCustomComponents()
         return
     end
 
@@ -1406,12 +1406,12 @@ function ISChat.onTextChange()
 
         if prefix and #text:sub(#prefix + 1, #text) <= 5 then
             entry:setText('/')
-            OmiChat.updateCustomComponents()
+            API.updateCustomComponents()
             return
         end
     end
 
-    OmiChat.updateCustomComponents()
+    API.updateCustomComponents()
 end
 
 ---Override to render the typing indicator.
@@ -1423,7 +1423,7 @@ function ISChat:render()
     end
 
     local w = self:getWidth()
-    local text = OmiChat.getTypingDisplay(w)
+    local text = API.getTypingDisplay(w)
     if not text then
         return
     end
@@ -1450,21 +1450,21 @@ end
 ---Override to hide icon picker and disable button on unfocus.
 function ISChat:unfocus()
     _unfocus(self)
-    OmiChat.hideSuggesterBox()
-    OmiChat.setIconButtonEnabled(false)
+    API.hideSuggesterBox()
+    API.setIconButtonEnabled(false)
 end
 
 ---Override to process typing indicators.
 function ISChat:update()
     _update(self)
-    OmiChat.updateTypingDisplay()
-    OmiChat.updateTypingStatus()
+    API.updateTypingDisplay()
+    API.updateTypingStatus()
 end
 
 ---Override to improve performance of text refresh.
 function ISChat:updateChatPrefixSettings()
     updateChatSettings(self.chatFont, self.showTimestamp, self.showTitle)
-    OmiChat.redrawMessages()
+    API.redrawMessages()
 end
 
 --#endregion

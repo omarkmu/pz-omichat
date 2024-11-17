@@ -40,8 +40,8 @@ There is no linting process, but contributions should be readable.
 The repository includes `.editorconfig` and `.luarc.json` files, which formatters such as the one included in [Lua Language Server](https://github.com/luals/lua-language-server) can use to maintain code style.
 2. One of the primary aims of this mod is to be configurable.
 If you're adding a new feature, consider whether you need to add sandbox options to control it.
-3. Make sure the correct functionality is in the right place
- The `OmiChatShared` API should contain functionality that should work on both client and server, whereas the `OmiChatClient` and `OmiChatServer` APIs are specific to client and server, respectively.
+3. Make sure the correct functionality is in the right place.
+The `OmiChat/Shared` API should contain functionality that should work on both client and server, whereas the `OmiChat/Client` and `OmiChat/Server` APIs are specific to client and server, respectively.
 4. Use type [annotations](https://luals.github.io/wiki/annotations).
 Variables and functions should be strongly typed wherever possible, to help catch easily-avoidable problems.
 You should document your functions and classes, as well.

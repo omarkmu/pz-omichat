@@ -1,16 +1,3 @@
----Provides API access to OmiChat.
----@class omichat.api.shared
-local OmiChat = require 'OmiChat/API/Shared'
-
-require 'OmiChat/API/SharedLanguages'
-require 'OmiChat/Component/InterpolatorLibrary'
-
-Events.EveryDays.Add(OmiChat.utils.cleanupCache)
-
-
-return OmiChat
-
-
 ---@alias omichat.ChatTypeString
 ---| 'general'
 ---| 'whisper'
@@ -139,6 +126,22 @@ return OmiChat
 ---@field languages string[]?
 ---@field languageSlots integer?
 ---@field currentLanguage string?
+
+---@class omichat.utils.InterpolatorCacheItem
+---@field interpolator omichat.Interpolator
+---@field lastAccess number
+
+---@class omichat.utils.PlayerCacheItem
+---@field username string
+---@field forename string
+---@field surname string
+---@field onlineID number
+---@field speechColor omi.ColorTable
+
+---@class omichat.utils
+---@field private _interpolatorCache table<string, omichat.utils.InterpolatorCacheItem>
+---@field private _playerCacheByUsername table<string, omichat.utils.PlayerCacheItem>
+---@field private _playerCacheByOnlineID table<string, omichat.utils.PlayerCacheItem>
 
 ---Request to clear mod data for a username.
 ---@class omichat.request.ClearModData

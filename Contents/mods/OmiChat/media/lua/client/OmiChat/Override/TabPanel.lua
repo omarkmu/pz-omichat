@@ -1,7 +1,7 @@
 ---Override to correct info text on tab panel activation.
 
 require 'ISUI/ISTabPanel'
-local OmiChat = require 'OmiChatClient'
+local API = require 'OmiChat/Client'
 
 ---@class omichat.ISTabPanel : ISTabPanel
 local ISTabPanel = ISTabPanel
@@ -16,6 +16,6 @@ function ISTabPanel:activateView(viewName)
 
     local instance = ISChat.instance
     if instance and self:getParent() == instance then
-        OmiChat.updateInfoText()
+        API.updateInfoText()
     end
 end

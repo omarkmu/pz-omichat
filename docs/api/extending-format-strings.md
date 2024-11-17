@@ -14,7 +14,7 @@ If you think your extension should instead be included in the mod, feel free to 
 A simple example which appends the length of the input:
 ```lua
 -- $example(hello) → hello5
-local OmiChat = require 'OmiChat'
+local OmiChat = require 'OmiChat/Client'
 OmiChat.registerInterpolatorFunction('example', function(interpolator, s)
     if not s then
         return

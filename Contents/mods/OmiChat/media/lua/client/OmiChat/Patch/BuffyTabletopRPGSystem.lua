@@ -1,9 +1,9 @@
 ---Compatibility patch for Buffy's Tabletop RPG System.
 
-local OmiChat = require 'OmiChatClient'
-local Option = OmiChat.Option
+local API = require 'OmiChat/Client'
+local Option = API.Option
 
-OmiChat.addMessageTransformer({
+API.addMessageTransformer({
     name = 'handle-buffy-rpg',
     priority = 49,
     transform = function(_, info)
@@ -31,11 +31,11 @@ OmiChat.addMessageTransformer({
             info.tokens.buffyCritRaw = crit:lower()
         end
 
-        if OmiChat.isCustomStreamEnabled('me') then
+        if API.isCustomStreamEnabled('me') then
             info.tokens.stream = 'me'
             info.context.ocCustomStream = 'me'
             info.format = Option.ChatFormatMe
-            info.formatOptions.color = OmiChat.getColorOrDefault('me')
+            info.formatOptions.color = API.getColorOrDefault('me')
         end
 
         info.context.ocSkipLanguage = true

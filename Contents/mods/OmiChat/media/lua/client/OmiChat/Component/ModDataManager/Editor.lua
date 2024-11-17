@@ -1,15 +1,14 @@
 local ISPanelJoypad = ISPanelJoypad
 local Keyboard = Keyboard
 
-local UI = require 'OmiLibrary/UI'
-
 ---@class omichat.api.client
-local OmiChat = require 'OmiChat/API/Client'
-local utils = OmiChat.utils
-local config = OmiChat.config
+local API = require 'OmiChat/API/Client/Core'
+local utils = API.utils
+local config = API.config
+local UI = utils.ui
 local TextEntry = UI.TextEntry
 local ColorEntry = UI.ColorEntry
-local SuggesterBox = OmiChat.SuggesterBox
+local SuggesterBox = API.SuggesterBox
 
 ---UI element for displaying the mod data editor for the mod data manager.
 ---@class omichat.ModDataEditor : ISPanelJoypad
@@ -24,6 +23,7 @@ local SuggesterBox = OmiChat.SuggesterBox
 ---@field languageSlotsEntry omi.ui.TextEntry
 ---@field languageListbox ISScrollingListBox
 ---@field langSuggester omichat.SuggesterBox
+---@field buttonBorderColor omi.ColorTableRGBA
 ---@field addLangBtn ISButton
 ---@field deleteLangBtn ISButton
 ---@field saveBtn ISButton
@@ -96,8 +96,8 @@ end
 ---Called when the add language button is clicked.
 ---Adds the current input language to the language list.
 function ModDataEditor:addLanguage()
-    local language = utils.trim(self.languageEntry:getInternalText())
-    if not self:isLanguageValidForAdd(language) then
+    local lang = utils.trim(self.languageEntry:getInternalText())
+    if not self:isLanguageValidForAdd(lang) then
         return
     end
 
@@ -107,7 +107,7 @@ function ModDataEditor:addLanguage()
         self.item.languages = list
     end
 
-    list[#list + 1] = language
+    list[#list + 1] = lang
     self:updateLanguageList()
 end
 
@@ -183,7 +183,7 @@ function ModDataEditor:createChildren()
 
     text = getText('UI_OmiChat_ModDataManager_Column_nickname')
     y, self.nicknameEntry = createField(self, TextEntry, y + PAD_Y, text, item.nickname)
-    self.nicknameEntry:setValidateFunction(self.nicknameEntry, OmiChat.validateNicknameText)
+    self.nicknameEntry:setValidateFunction(self.nicknameEntry, API.validateNicknameText)
 
     text = getText('UI_OmiChat_ModDataManager_Column_nameColor')
     y, self.nameColorEntry = createField(self, ColorEntry, y + PAD_Y, text, utils.color.fromString(item.nameColor))
@@ -333,7 +333,8 @@ function ModDataEditor:isLanguageValidForAdd(language)
         return false, getText('UI_OmiChat_Error_AddLanguageFull', self.item.username)
     end
 
-    if not self:validateLanguageText(self.languageEntry, false) then
+    local lang = utils.trim(self.languageEntry:getInternalText())
+    if not self:validateLanguageText(lang, self.languageEntry, false) then
         local tooltip = self.languageEntry:getValidateTooltipText()
         self.languageEntry:setValidateTooltipText()
         return false, tooltip
@@ -352,7 +353,7 @@ function ModDataEditor:isLanguageValidForRemove(language)
     end
 
     if not self:hasLanguage(language) then
-        if not OmiChat.isConfiguredRoleplayLanguage(language) then
+        if not API.isConfiguredRoleplayLanguage(language) then
             return false, getText('UI_OmiChat_Error_AddLanguageNotConfigured', language)
         end
 
@@ -417,7 +418,7 @@ function ModDataEditor:onSave()
     item.nickname = self:getEntryValue(self.nicknameEntry)
     item.languages = self.item.languages
 
-    OmiChat.setModData(username, item)
+    API.setModData(username, item)
 
     if self.onsave then
         self.onsave(self.target)
@@ -429,8 +430,8 @@ end
 ---Called when the removes language button is clicked.
 ---Removes the current input language from the language list.
 function ModDataEditor:removeLanguage()
-    local language = utils.trim(self.languageEntry:getInternalText())
-    if not self:isLanguageValidForRemove(language) then
+    local lang = utils.trim(self.languageEntry:getInternalText())
+    if not self:isLanguageValidForRemove(lang) then
         return
     end
 
@@ -441,7 +442,7 @@ function ModDataEditor:removeLanguage()
 
     local idx
     for i = 1, #list do
-        if list[i] == language then
+        if list[i] == lang then
             idx = i
             break
         end
@@ -527,8 +528,8 @@ function ModDataEditor:updateSuggester()
         max = 50,
     }
 
-    local search = OmiChat.searchStrings(ctx, OmiChat.getConfiguredRoleplayLanguages())
-    if #search.results == 1 and OmiChat.isConfiguredRoleplayLanguage(input) then
+    local search = API.searchStrings(ctx, API.getConfiguredRoleplayLanguages())
+    if #search.results == 1 and API.isConfiguredRoleplayLanguage(input) then
         suggester:setVisible(false)
         return
     end
@@ -562,10 +563,10 @@ function ModDataEditor:updateSuggester()
 end
 
 ---Text entry validator for icons.
+---@param text string
 ---@param entry omi.ui.TextEntry
 ---@return boolean
-function ModDataEditor:validateIconText(entry)
-    local text = utils.trim(entry:getInternalText())
+function ModDataEditor:validateIconText(text, entry)
     if #text == 0 then
         return true
     end
@@ -585,16 +586,16 @@ function ModDataEditor:validateIconText(entry)
 end
 
 ---Text entry validator for roleplay language names.
+---@param text string
 ---@param entry omi.ui.TextEntry
 ---@param expectKnown boolean?
 ---@return boolean
-function ModDataEditor:validateLanguageText(entry, expectKnown)
-    local text = utils.trim(entry:getInternalText())
+function ModDataEditor:validateLanguageText(text, entry, expectKnown)
     if #text == 0 then
         return true
     end
 
-    if not OmiChat.isConfiguredRoleplayLanguage(text) then
+    if not API.isConfiguredRoleplayLanguage(text) then
         entry:setValidateTooltipText(getText('UI_OmiChat_Error_AddLanguageNotConfigured', text))
         return false
     end
@@ -640,5 +641,5 @@ function ModDataEditor:new(x, y, width, height, item, target, onsave, isAdd)
 end
 
 
-OmiChat.ModDataEditor = ModDataEditor
+API.ModDataEditor = ModDataEditor
 return ModDataEditor

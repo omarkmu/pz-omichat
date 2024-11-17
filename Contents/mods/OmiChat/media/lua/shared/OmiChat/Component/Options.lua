@@ -1,7 +1,6 @@
-local lib = require 'OmiLibrary'
-local utils = require 'OmiChat/util'
+local utils = require 'OmiChat/utils'
 local config = require 'OmiChat/config'
-local DelimitedList = lib.DelimitedList
+local DelimitedList = utils.lib.DelimitedList
 
 local getActivatedMods = getActivatedMods
 
@@ -156,7 +155,7 @@ local getActivatedMods = getActivatedMods
 ---@field ChatFormatServer string
 ---@field ChatFormatUnknownLanguage string
 ---@field ChatFormatUnknownLanguageRadio string
-local Option = lib.sandbox('OmiChat')
+local Option = utils.lib.sandbox('OmiChat')
 
 
 ---@type table<omichat.ColorCategory, string>

@@ -1,9 +1,11 @@
 ---Base client API.
 
 require 'Chat/ISChat'
+local lib = require 'OmiLibrary/Client'
 
 
 ---@class omichat.api.client : omichat.api.shared
+---@field utils omichat.utils.client
 ---@field private _commandStreams omichat.CommandStream[]
 ---@field private _emotes table<string, string | omichat.EmoteHandler>
 ---@field private _formatters table<string, omichat.MetaFormatter>
@@ -21,24 +23,31 @@ require 'Chat/ISChat'
 ---@field private _typingDisplay string?
 ---@field private _typingInfo table<string, omichat.TypingInformation>
 ---@field private _leftmostBtn ISButton?
-local OmiChat = require 'OmiChatShared'
+local API = require 'OmiChat/Shared'
 
-OmiChat.IconPicker = require 'OmiChat/Component/IconPicker'
-OmiChat.SuggesterBox = require 'OmiChat/Component/SuggesterBox'
-OmiChat.StreamInfo = require 'OmiChat/Component/StreamInfo'
-OmiChat.MimicMessage = (require 'OmiLibrary/Chat').MimicMessage
+---@class omichat.utils.client : omichat.utils
+---@field ui omi.ui
+---@field lib omi.client
 
-OmiChat._prefsVersion = 2
-OmiChat._prefsFileName = 'omichat.json'
+API.utils.ui = lib.ui
+API.utils.lib = lib
 
-OmiChat._formatters = {}
-OmiChat._customButtons = {}
-OmiChat._customSuggesterArgTypes = {}
-OmiChat._typingDisplay = nil
-OmiChat._typingInfo = {}
-OmiChat._isTyping = false
+API.IconPicker = require 'OmiChat/Component/IconPicker'
+API.SuggesterBox = require 'OmiChat/Component/SuggesterBox'
+API.StreamInfo = require 'OmiChat/Component/StreamInfo'
+API.MimicMessage = (require 'OmiLibrary/Chat').MimicMessage
 
-OmiChat._settingHandlers = {
+API._prefsVersion = 2
+API._prefsFileName = 'omichat.json'
+
+API._formatters = {}
+API._customButtons = {}
+API._customSuggesterArgTypes = {}
+API._typingDisplay = nil
+API._typingInfo = {}
+API._isTyping = false
+
+API._settingHandlers = {
     admin = {},
     basic = {},
     customization = {},
@@ -46,7 +55,7 @@ OmiChat._settingHandlers = {
     suggestions = {},
     main = {},
 }
-OmiChat._iconsToExclude = {
+API._iconsToExclude = {
     -- shadowed by colors
     thistle = true,
     salmon = true,
@@ -118,7 +127,7 @@ OmiChat._iconsToExclude = {
     mannequin = true,
     toolcabinet = true,
 }
-OmiChat._emotes = {
+API._emotes = {
     yes = 'yes',
     no = 'no',
     ok = 'signalok',
@@ -156,29 +165,29 @@ OmiChat._emotes = {
 ---@param playerNum integer
 ---@param player IsoPlayer
 ---@protected
-function OmiChat._onCreatePlayer(playerNum, player)
+function API._onCreatePlayer(playerNum, player)
     if playerNum == 0 then
-        OmiChat.updateInfoText(player)
-        OmiChat.refreshLanguageInfo(player:getUsername())
+        API.updateInfoText(player)
+        API.refreshLanguageInfo(player:getUsername())
     end
 end
 
 ---Event handler that runs on game start.
 ---@protected
-function OmiChat._onGameStart()
-    OmiChat.updateState(true)
+function API._onGameStart()
+    API.updateState(true)
 end
 
 ---Event handler that runs on player death.
 ---@param player IsoPlayer
 ---@protected
-function OmiChat._onPlayerDeath(player)
+function API._onPlayerDeath(player)
     if player ~= getSpecificPlayer(0) then
         return
     end
 
     -- reset nickname, icon, and languages
-    OmiChat.reportPlayerDeath()
+    API.reportPlayerDeath()
 
     local instance = ISChat.instance
     if instance then
@@ -191,12 +200,12 @@ end
 ---@param key string
 ---@param newData omichat.ModData
 ---@protected
-function OmiChat._onReceiveGlobalModData(key, newData)
-    if key ~= OmiChat._modDataKey or type(newData) ~= 'table' then
+function API._onReceiveGlobalModData(key, newData)
+    if key ~= API._modDataKey or type(newData) ~= 'table' then
         return
     end
 
-    local modData = OmiChat.getModData()
+    local modData = API.getModData()
     for k in pairs(newData) do
         modData[k] = newData[k]
     end
@@ -204,14 +213,14 @@ end
 
 ---Event handler that runs on tick until the player has loaded.
 ---@protected
-function OmiChat._onTickTemporary()
+function API._onTickTemporary()
     if not getSpecificPlayer(0) then
         return
     end
 
-    Events.OnTick.Remove(OmiChat._onTickTemporary)
-    OmiChat.reportPlayerJoined()
+    Events.OnTick.Remove(API._onTickTemporary)
+    API.reportPlayerJoined()
 end
 
 
-return OmiChat
+return API

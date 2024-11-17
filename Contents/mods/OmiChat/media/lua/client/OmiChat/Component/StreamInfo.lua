@@ -1,5 +1,4 @@
-local lib = require 'OmiLibrary'
-local utils = require 'OmiChat/util'
+local utils = require 'OmiChat/utils'
 local config = require 'OmiChat/config'
 local Option = require 'OmiChat/Component/Options'
 
@@ -7,7 +6,7 @@ local Option = require 'OmiChat/Component/Options'
 ---Stream wrapper for easier retrieval of stream info and mod configuration data.
 ---@class omichat.StreamInfo : omi.Class
 ---@field protected _stream omichat.Stream
-local StreamInfo = lib.class()
+local StreamInfo = utils.lib.class()
 
 
 ---Returns an iterator over the stream's aliases.

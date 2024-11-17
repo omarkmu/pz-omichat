@@ -1,5 +1,4 @@
-local lib = require 'OmiLibrary'
-local utils = require 'OmiChat/util'
+local utils = require 'OmiChat/utils'
 
 local char = string.char
 local concat = table.concat
@@ -14,7 +13,7 @@ local metaChar = char(65535)
 ---@field protected _formatString string
 ---@field protected _idPrefix string
 ---@field protected _idSuffix string
-local MetaFormatter = lib.class()
+local MetaFormatter = utils.lib.class()
 
 
 ---@type omichat.MetaFormatter[]

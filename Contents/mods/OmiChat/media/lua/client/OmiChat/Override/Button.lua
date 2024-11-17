@@ -1,7 +1,7 @@
 ---Overrides for custom buttons.
 
 require 'ISUI/ISButton'
-local OmiChat = require 'OmiChatClient'
+local API = require 'OmiChat/Client'
 
 ---@class omichat.ISButton : ISButton
 local ISButton = ISButton
@@ -16,6 +16,6 @@ function ISButton:setVisible(bVisible)
 
     local instance = ISChat.instance
     if instance and self:getParent() == instance then
-        OmiChat.updateButtons()
+        API.updateButtons()
     end
 end

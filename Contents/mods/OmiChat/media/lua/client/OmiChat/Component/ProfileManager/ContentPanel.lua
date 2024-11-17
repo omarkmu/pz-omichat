@@ -1,9 +1,9 @@
-local UI = require 'OmiLibrary/UI'
+local API = require 'OmiChat/Client'
+local UI = API.utils.ui
 local TextEntry = UI.TextEntry
 local ColorEntry = UI.ColorEntry
-local OmiChat = require 'OmiChatClient'
-local Option = OmiChat.Option
-local config = OmiChat.config
+local Option = API.Option
+local config = API.config
 
 local ISLabel = ISLabel
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
@@ -69,7 +69,7 @@ function ContentPanel:addControls(manager)
             tooltip = getText('UI_OmiChat_ProfileManager_Tooltip_Nickname'),
         }
 
-        nicknameControl:setValidateFunction(nicknameControl, OmiChat.validateNicknameText)
+        nicknameControl:setValidateFunction(nicknameControl, API.validateNicknameText)
         nicknameControl:setOnChange(manager, manager.onNicknameChange, nicknameControl)
         nicknameControl:initialise()
 
@@ -194,7 +194,7 @@ function ContentPanel:createColorControls(manager, startY)
     local nextY = startY
     local maxY = nextY
     local columnTopY = nextY
-    local availableColorOpts = OmiChat.getColorOptions()
+    local availableColorOpts = API.getColorOptions()
     local splitIdx = math.ceil(#availableColorOpts / 2)
     local controlW = self.width / 2 - PAD_X * 2
 
@@ -202,7 +202,7 @@ function ContentPanel:createColorControls(manager, startY)
         local opt = availableColorOpts[i]
         local labelText = getTextOrNull('UI_OmiChat_ContextColor_' .. opt)
         if not labelText then
-            labelText = getText('UI_OmiChat_ContextColor', OmiChat.getColorCategoryCommand(opt))
+            labelText = getText('UI_OmiChat_ContextColor', API.getColorCategoryCommand(opt))
         end
 
         local leftCol = i <= splitIdx
@@ -211,7 +211,7 @@ function ContentPanel:createColorControls(manager, startY)
         local tooltip = getTextOrNull('UI_OmiChat_ProfileManager_Tooltip_Color_' .. opt)
         if not tooltip then
             local optName = getTextOrNull('UI_OmiChat_ContextMessageType_' .. opt)
-                or OmiChat.getColorCategoryCommand(opt)
+                or API.getColorCategoryCommand(opt)
             tooltip = getText('UI_OmiChat_ProfileManager_Tooltip_Color', optName)
         end
 

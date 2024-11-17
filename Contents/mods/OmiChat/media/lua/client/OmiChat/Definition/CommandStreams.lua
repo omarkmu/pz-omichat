@@ -1,14 +1,14 @@
 ---@class omichat.api.client
-local OmiChat = require 'OmiChat/API/Client'
+local API = require 'OmiChat/API/Client/Core'
 
 local concat = table.concat
 local pairs = pairs
 local getText = getText
 local vanillaCommands = require 'OmiChat/Definition/VanillaCommandList'
 
-local utils = OmiChat.utils
-local Option = OmiChat.Option
-local StreamInfo = OmiChat.StreamInfo
+local utils = API.utils
+local Option = API.Option
+local StreamInfo = API.StreamInfo
 
 ---Checks whether the current player can use custom admin commands.
 ---@return boolean
@@ -30,7 +30,7 @@ local function matchKnownLanguage(input)
         display = utils.getTranslatedLanguageName,
     }
 
-    local searchResult = OmiChat.searchStrings(ctx, OmiChat.getRoleplayLanguages())
+    local searchResult = API.searchStrings(ctx, API.getRoleplayLanguages())
     if searchResult.exact then
         return searchResult.exact.value
     end
@@ -44,7 +44,7 @@ end
 ---Callback function to display help text for a stream.
 ---@param info omichat.StreamInfo
 local function showHelpText(info)
-    OmiChat.addInfoMessage(info:getHelpText())
+    API.addInfoMessage(info:getHelpText())
 end
 
 ---@type omichat.CommandStream[]
@@ -58,9 +58,9 @@ return {
             isEnabled = function() return Option:isNameCommandEnabled() end,
             onUse = function(ctx)
                 if Option:isNameCommandSetNickname() then
-                    local _, feedback = OmiChat.setNickname(ctx.text)
+                    local _, feedback = API.setNickname(ctx.text)
                     if feedback then
-                        OmiChat.addInfoMessage(feedback)
+                        API.addInfoMessage(feedback)
                     end
 
                     return
@@ -68,13 +68,13 @@ return {
 
                 local input = utils.trim(ctx.text or '')
                 if #input == 0 then
-                    OmiChat.addInfoMessage(getText('UI_OmiChat_Info_SetNameEmpty'))
+                    API.addInfoMessage(getText('UI_OmiChat_Info_SetNameEmpty'))
                     return
                 end
 
-                local _, feedback = OmiChat.updateCharacterName(input, Option:isNameCommandSetFullName())
+                local _, feedback = API.updateCharacterName(input, Option:isNameCommandSetFullName())
                 if feedback then
-                    OmiChat.addInfoMessage(feedback)
+                    API.addInfoMessage(feedback)
                 end
             end,
             onHelp = function()
@@ -83,7 +83,7 @@ return {
                     msg = 'UI_OmiChat_HelpText_NameFull'
                 end
 
-                OmiChat.addInfoMessage(getText(msg))
+                API.addInfoMessage(getText(msg))
             end,
         },
     },
@@ -95,9 +95,9 @@ return {
             helpText = 'UI_OmiChat_HelpText_Nickname',
             isEnabled = function() return Option:isNicknameCommandEnabled() end,
             onUse = function(ctx)
-                local _, feedback = OmiChat.setNickname(ctx.text)
+                local _, feedback = API.setNickname(ctx.text)
                 if feedback then
-                    OmiChat.addInfoMessage(feedback)
+                    API.addInfoMessage(feedback)
                 end
             end,
         },
@@ -110,7 +110,7 @@ return {
             helpText = 'UI_OmiChat_HelpText_ClearNames',
             isEnabled = canUseAdminCommands,
             onUse = function()
-                OmiChat.requestClearNames()
+                API.requestClearNames()
             end,
         },
     },
@@ -123,7 +123,7 @@ return {
             suggestSpec = { 'online-username' },
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                OmiChat.requestSetName(ctx.text)
+                API.requestSetName(ctx.text)
             end,
         },
     },
@@ -137,24 +137,24 @@ return {
             onUse = function(ctx)
                 local command = utils.trim(ctx.text)
                 if #command == '' then
-                    OmiChat.addInfoMessage(ctx.stream:getHelpText())
+                    API.addInfoMessage(ctx.stream:getHelpText())
                     return
                 end
 
                 if getTexture(command) then
                     local image = table.concat { ' <SPACE> <IMAGE:', command, ',15,14> ' }
-                    OmiChat.addInfoMessage(getText('UI_OmiChat_Info_Icon', command, image))
+                    API.addInfoMessage(getText('UI_OmiChat_Info_Icon', command, image))
                     return
                 end
 
                 local textureName = utils.getTextureNameFromIcon(command)
                 if not textureName or not getTexture(textureName) then
-                    OmiChat.addInfoMessage(getText('UI_OmiChat_Info_IconUnknown', command))
+                    API.addInfoMessage(getText('UI_OmiChat_Info_IconUnknown', command))
                     return
                 end
 
                 local image = table.concat { ' <SPACE> <IMAGE:', textureName, ',15,14> ' }
-                OmiChat.addInfoMessage(getText('UI_OmiChat_Info_IconAlias', textureName, image, command))
+                API.addInfoMessage(getText('UI_OmiChat_Info_IconAlias', textureName, image, command))
             end,
         },
     },
@@ -167,13 +167,13 @@ return {
             suggestSpec = { 'online-username-with-self' },
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                if not OmiChat.requestSetIcon(ctx.text) then
+                if not API.requestSetIcon(ctx.text) then
                     local args = utils.parseCommandArgs(ctx.text)
                     local icon = args[2]
                     if not args[1] or not icon then
-                        OmiChat.addInfoMessage(ctx.stream:getHelpText())
+                        API.addInfoMessage(ctx.stream:getHelpText())
                     else
-                        OmiChat.addInfoMessage(getText('UI_OmiChat_Info_IconUnknown', icon))
+                        API.addInfoMessage(getText('UI_OmiChat_Info_IconUnknown', icon))
                     end
                 end
             end,
@@ -188,7 +188,7 @@ return {
             suggestSpec = { 'online-username' },
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                OmiChat.requestResetName(ctx.text)
+                API.requestResetName(ctx.text)
             end,
         },
     },
@@ -201,7 +201,7 @@ return {
             suggestSpec = { 'online-username-with-self' },
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                OmiChat.requestResetIcon(ctx.text)
+                API.requestResetIcon(ctx.text)
             end,
         },
     },
@@ -225,13 +225,13 @@ return {
                         end
 
                         -- don't suggest adding already known languages
-                        return not OmiChat.checkPlayerKnowsLanguage(username, result)
+                        return not API.checkPlayerKnowsLanguage(username, result)
                     end,
                 },
             },
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                OmiChat.requestAddLanguage(ctx.text)
+                API.requestAddLanguage(ctx.text)
             end,
         },
     },
@@ -244,7 +244,7 @@ return {
             suggestSpec = { 'online-username-with-self' },
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                OmiChat.requestResetLanguages(ctx.text)
+                API.requestResetLanguages(ctx.text)
             end,
         },
     },
@@ -257,7 +257,7 @@ return {
             suggestSpec = { 'online-username-with-self' },
             isEnabled = canUseAdminCommands,
             onUse = function(ctx)
-                OmiChat.requestSetLanguageSlots(ctx.text)
+                API.requestSetLanguageSlots(ctx.text)
             end,
         },
     },
@@ -269,8 +269,8 @@ return {
             helpText = 'UI_ServerOptionDesc_Card',
             onUseDisabled = showHelpText,
             onUse = function(ctx)
-                if not OmiChat.requestDrawCard() then
-                    OmiChat.addInfoMessage(ctx.stream:getHelpText())
+                if not API.requestDrawCard() then
+                    API.addInfoMessage(ctx.stream:getHelpText())
                 end
             end,
             isEnabled = function()
@@ -291,8 +291,8 @@ return {
             helpText = 'UI_OmiChat_HelpText_Flip',
             onUseDisabled = showHelpText,
             onUse = function(ctx)
-                if not OmiChat.requestFlipCoin() then
-                    OmiChat.addInfoMessage(ctx.stream:getHelpText())
+                if not API.requestFlipCoin() then
+                    API.addInfoMessage(ctx.stream:getHelpText())
                 end
             end,
             isEnabled = function()
@@ -319,12 +319,12 @@ return {
                 if not sides and #command == 0 then
                     sides = 6
                 elseif not sides then
-                    OmiChat.addInfoMessage(ctx.stream:getHelpText())
+                    API.addInfoMessage(ctx.stream:getHelpText())
                     return
                 end
 
-                if not OmiChat.requestRollDice(sides) then
-                    OmiChat.addInfoMessage(ctx.stream:getHelpText())
+                if not API.requestRollDice(sides) then
+                    API.addInfoMessage(ctx.stream:getHelpText())
                 end
             end,
             isEnabled = function()
@@ -348,7 +348,7 @@ return {
             onHelp = function()
                 -- collect currently available emotes
                 local emotes = {}
-                for k in pairs(OmiChat._emotes) do
+                for k in pairs(API._emotes) do
                     emotes[#emotes + 1] = k
                 end
 
@@ -368,7 +368,7 @@ return {
                     parts[#parts + 1] = emotes[i]
                 end
 
-                OmiChat.addInfoMessage(concat(parts))
+                API.addInfoMessage(concat(parts))
             end,
         },
     },
@@ -380,23 +380,23 @@ return {
             isCommand = true,
             helpText = 'UI_OmiChat_HelpText_SwitchLanguage',
             suggestSpec = { 'known-language' },
-            isEnabled = function() return #OmiChat.getRoleplayLanguages() > 1 end,
+            isEnabled = function() return #API.getRoleplayLanguages() > 1 end,
             onUse = function(ctx)
                 local args = utils.parseCommandArgs(ctx.text)
                 local command = args[1]
                 if not command then
-                    OmiChat.addInfoMessage(getText('UI_OmiChat_HelpText_SwitchLanguage'))
+                    API.addInfoMessage(getText('UI_OmiChat_HelpText_SwitchLanguage'))
                     return
                 end
 
                 local lang = matchKnownLanguage(command)
-                if not lang or not OmiChat.setCurrentRoleplayLanguage(lang) then
-                    OmiChat.addInfoMessage(getText('UI_OmiChat_Error_SwitchUnknownLanguage', command))
+                if not lang or not API.setCurrentRoleplayLanguage(lang) then
+                    API.addInfoMessage(getText('UI_OmiChat_Error_SwitchUnknownLanguage', command))
                     return
                 end
 
                 lang = utils.getTranslatedLanguageName(lang)
-                OmiChat.addInfoMessage(getText('UI_OmiChat_Success_SwitchLanguage', lang))
+                API.addInfoMessage(getText('UI_OmiChat_Success_SwitchLanguage', lang))
             end,
         },
     },
@@ -408,8 +408,8 @@ return {
             isCommand = true,
             isEnabled = function() return isAdmin() or isCoopHost() end,
             onUse = function()
-                OmiChat.clearMessages()
-                OmiChat.addInfoMessage(getText('UI_OmiChat_Info_Clear'))
+                API.clearMessages()
+                API.addInfoMessage(getText('UI_OmiChat_Info_Clear'))
             end,
         },
     },
@@ -434,8 +434,8 @@ return {
                     ---@type omichat.StreamInfo?, function?, string?
                     local helpStream, helpCallback, helpText
 
-                    for i = 1, #OmiChat._commandStreams do
-                        local stream = StreamInfo:new(OmiChat._commandStreams[i])
+                    for i = 1, #API._commandStreams do
+                        local stream = StreamInfo:new(API._commandStreams[i])
                         if stream:getName() == command and stream:isEnabled() then
                             helpCallback = stream:getHelpCallback()
                             helpText = stream:getHelpTextStringID() and stream:getHelpText()
@@ -449,7 +449,7 @@ return {
                     if helpCallback then
                         helpCallback(helpStream)
                     elseif helpText then
-                        OmiChat.addInfoMessage(helpText)
+                        API.addInfoMessage(helpText)
                     else
                         -- defer to default help command
                         SendCommandToServer('/help ' .. command)
@@ -462,8 +462,8 @@ return {
                 local seen = {}
                 local commands = {} ---@type omichat.VanillaCommand[]
 
-                for i = 1, #OmiChat._commandStreams do
-                    local stream = StreamInfo:new(OmiChat._commandStreams[i])
+                for i = 1, #API._commandStreams do
+                    local stream = StreamInfo:new(API._commandStreams[i])
                     if stream:config() then
                         local name = stream:getName()
                         local helpText = stream:getHelpTextStringID()
@@ -499,7 +499,7 @@ return {
                     end
                 end
 
-                OmiChat.addInfoMessage(concat(result))
+                API.addInfoMessage(concat(result))
             end,
         },
     },

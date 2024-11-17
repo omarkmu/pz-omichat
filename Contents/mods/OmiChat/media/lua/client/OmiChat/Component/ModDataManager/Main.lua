@@ -1,9 +1,9 @@
 local ISPanelJoypad = ISPanelJoypad
-local UI = require 'OmiLibrary/UI'
 
 ---@class omichat.api.client
-local OmiChat = require 'OmiChat/API/Client'
-local utils = OmiChat.utils
+local API = require 'OmiChat/API/Client/Core'
+local utils = API.utils
+local UI = utils.ui
 
 ---UI element for displaying the admin mod data manager.
 ---@class omichat.ModDataManager : ISPanelJoypad
@@ -14,6 +14,11 @@ local utils = OmiChat.utils
 ---@field columnWidth table<string, integer>
 ---@field headerH integer
 ---@field titleW integer
+---@field buttonBorderColor omi.ColorTableRGBA
+---@field listHeaderColor omi.ColorTableRGBA
+---@field headerFont UIFont
+---@field listFont UIFont
+---@field titleText string
 ---@field activeModifyPanel omichat.ModDataEditor?
 ---@field closeBtn ISButton
 ---@field refreshBtn ISButton
@@ -209,7 +214,7 @@ function ModDataManager:onConfirmDelete(button, item, idx)
         return
     end
 
-    OmiChat.clearModData(item.username)
+    API.clearModData(item.username)
 
     self.listbox:removeItemByIndex(idx)
     if #self.listbox.items > 0 then
@@ -237,14 +242,14 @@ function ModDataManager:openEditPanel(item, isAdd)
 
     local x = self.x + (self.width - 500) * 0.5
     local y = self.y + (self.height - 600) * 0.5
-    self.activeModifyPanel = OmiChat.ModDataEditor:new(x, y, 500, 100, item, self, self.refresh, isAdd)
+    self.activeModifyPanel = API.ModDataEditor:new(x, y, 500, 100, item, self, self.refresh, isAdd)
     self.activeModifyPanel:initialise()
     self.activeModifyPanel:addToUIManager()
 end
 
 ---Refreshes the mod data information.
 function ModDataManager:refresh()
-    local elements, fields = OmiChat.getModDataList()
+    local elements, fields = API.getModDataList()
     self.elements = elements
     self.columnList = fields
 
@@ -368,5 +373,5 @@ function ModDataManager:new(x, y, width, height)
 end
 
 
-OmiChat.ModDataManager = ModDataManager
+API.ModDataManager = ModDataManager
 return ModDataManager

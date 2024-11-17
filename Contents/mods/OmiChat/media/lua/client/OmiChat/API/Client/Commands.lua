@@ -1,14 +1,14 @@
 ---Client API functionality related to dispatching and handling commands.
 
 ---@class omichat.api.client
-local OmiChat = require 'OmiChat/API/Client'
+local API = require 'OmiChat/API/Client/Core'
 
 ---@class omichat.api.client.commands
-OmiChat.Commands = {}
+API.Commands = {}
 
 
-local utils = OmiChat.utils
-local Option = OmiChat.Option
+local utils = API.utils
+local Option = API.Option
 local unpack = unpack
 local concat = table.concat
 local getTimestampMs = getTimestampMs
@@ -42,7 +42,7 @@ local englishCards = {
 ---@param command string
 ---@param args table?
 ---@return boolean success Whether the command was successfully sent.
-function OmiChat.dispatch(command, args)
+function API.dispatch(command, args)
     local player = getSpecificPlayer(0)
     if not player then
         return false
@@ -53,57 +53,57 @@ function OmiChat.dispatch(command, args)
         return false
     end
 
-    sendClientCommand(player, OmiChat._modDataKey, command, args or {})
+    sendClientCommand(player, API._modDataKey, command, args or {})
     return true
 end
 
 ---Reports to the server that the player died, for clearing relevant data.
 ---@return boolean
-function OmiChat.reportPlayerDeath()
-    return OmiChat.dispatch('reportPlayerDeath')
+function API.reportPlayerDeath()
+    return API.dispatch('reportPlayerDeath')
 end
 
 ---Reports to the server that the player joined.
 ---@return boolean
-function OmiChat.reportPlayerJoined()
-    return OmiChat.dispatch('reportPlayerJoined')
+function API.reportPlayerJoined()
+    return API.dispatch('reportPlayerJoined')
 end
 
 ---Executes the /addlanguage command.
 ---@param command string
 ---@return boolean
-function OmiChat.requestAddLanguage(command)
+function API.requestAddLanguage(command)
     ---@type omichat.request.Command
     local req = { command = command }
 
-    return OmiChat.dispatch('requestAddLanguage', req)
+    return API.dispatch('requestAddLanguage', req)
 end
 
 ---Executes the /clearnames command.
-function OmiChat.requestClearNames()
-    return OmiChat.dispatch('requestClearNames')
+function API.requestClearNames()
+    return API.dispatch('requestClearNames')
 end
 
 ---Requests clearing mod data for a given username.
 ---@param username string
 ---@return boolean success
-function OmiChat.requestClearModData(username)
+function API.requestClearModData(username)
     ---@type omichat.request.ClearModData
     local req = { username = username }
 
-    return OmiChat.dispatch('requestClearModData', req)
+    return API.dispatch('requestClearModData', req)
 end
 
 ---Requests an update to global mod data.
 ---@param updates omichat.request.ModDataUpdate
 ---@return boolean
-function OmiChat.requestDataUpdate(updates)
-    return OmiChat.dispatch('requestDataUpdate', updates)
+function API.requestDataUpdate(updates)
+    return API.dispatch('requestDataUpdate', updates)
 end
 
 ---Requests drawing a card from a card deck in the player's inventory.
 ---@return boolean
-function OmiChat.requestDrawCard()
+function API.requestDrawCard()
     local player = getSpecificPlayer(0)
     if not player then
         return false
@@ -113,12 +113,12 @@ function OmiChat.requestDrawCard()
         return false
     end
 
-    return OmiChat.dispatch('requestDrawCard')
+    return API.dispatch('requestDrawCard')
 end
 
 ---Requests flipping a coin.
 ---@return boolean
-function OmiChat.requestFlipCoin()
+function API.requestFlipCoin()
     local player = getSpecificPlayer(0)
     if not player then
         return false
@@ -128,49 +128,49 @@ function OmiChat.requestFlipCoin()
         return false
     end
 
-    return OmiChat.dispatch('requestFlipCoin')
+    return API.dispatch('requestFlipCoin')
 end
 
 ---Requests that the server updates the player cache.
 ---@return boolean
-function OmiChat.requestPlayerCacheUpdate()
-    return OmiChat.dispatch('requestPlayerCacheUpdate')
+function API.requestPlayerCacheUpdate()
+    return API.dispatch('requestPlayerCacheUpdate')
 end
 
 ---Executes the /reseticon command.
 ---@param command string
 ---@return boolean
-function OmiChat.requestResetIcon(command)
+function API.requestResetIcon(command)
     ---@type omichat.request.Command
     local req = { command = command }
 
-    return OmiChat.dispatch('requestResetIcon', req)
+    return API.dispatch('requestResetIcon', req)
 end
 
 ---Executes the /resetlanguages command.
 ---@param command string
 ---@return boolean
-function OmiChat.requestResetLanguages(command)
+function API.requestResetLanguages(command)
     ---@type omichat.request.Command
     local req = { command = command }
 
-    return OmiChat.dispatch('requestResetLanguages', req)
+    return API.dispatch('requestResetLanguages', req)
 end
 
 ---Executes the /resetname command.
 ---@param command string
 ---@return boolean
-function OmiChat.requestResetName(command)
+function API.requestResetName(command)
     ---@type omichat.request.Command
     local req = { command = command }
 
-    return OmiChat.dispatch('requestResetName', req)
+    return API.dispatch('requestResetName', req)
 end
 
 ---Requests rolling dice.
 ---@param sides integer
 ---@return boolean
-function OmiChat.requestRollDice(sides)
+function API.requestRollDice(sides)
     local player = getSpecificPlayer(0)
     if not player then
         return false
@@ -187,13 +187,13 @@ function OmiChat.requestRollDice(sides)
     ---@type omichat.request.RollDice
     local req = { sides = sides }
 
-    return OmiChat.dispatch('requestRollDice', req)
+    return API.dispatch('requestRollDice', req)
 end
 
 ---Executes the /seticon command.
 ---@param command string
 ---@return boolean
-function OmiChat.requestSetIcon(command)
+function API.requestSetIcon(command)
     -- need to process client-side for texture information
     local args = utils.parseCommandArgs(command)
     local username = args[1]
@@ -215,42 +215,42 @@ function OmiChat.requestSetIcon(command)
     ---@type omichat.request.Command
     local req = { command = command }
 
-    return OmiChat.dispatch('requestSetIcon', req)
+    return API.dispatch('requestSetIcon', req)
 end
 
 ---Executes the /setlanguageslots command.
 ---@param command string
 ---@return boolean
-function OmiChat.requestSetLanguageSlots(command)
+function API.requestSetLanguageSlots(command)
     ---@type omichat.request.Command
     local req = { command = command }
 
-    return OmiChat.dispatch('requestSetLanguageSlots', req)
+    return API.dispatch('requestSetLanguageSlots', req)
 end
 
 ---Executes the /setname command.
 ---@param command string
 ---@return boolean
-function OmiChat.requestSetName(command)
+function API.requestSetName(command)
     ---@type omichat.request.Command
     local req = { command = command }
 
-    return OmiChat.dispatch('requestSetName', req)
+    return API.dispatch('requestSetName', req)
 end
 
 ---Sends the current typing status to the server.
 ---@param range integer?
 ---@param chatType omichat.ChatTypeString?
 ---@return boolean
-function OmiChat.sendTypingStatus(range, chatType)
+function API.sendTypingStatus(range, chatType)
     ---@type omichat.request.Typing
     local req = {
         range = range,
         chatType = chatType,
-        typing = OmiChat.getTyping(),
+        typing = API.getTyping(),
     }
 
-    return OmiChat.dispatch('requestTyping', req)
+    return API.dispatch('requestTyping', req)
 end
 
 --#endregion
@@ -259,7 +259,7 @@ end
 
 ---Reports the results of drawing a card.
 ---@param args omichat.request.ReportDrawCard
-function OmiChat.Commands.reportDrawCard(args)
+function API.Commands.reportDrawCard(args)
     local card = tonumber(args.card)
     if not card or card < 1 or card > 13 then
         return
@@ -273,7 +273,7 @@ function OmiChat.Commands.reportDrawCard(args)
     -- global message
     if args.name then
         local cardName = utils.getTranslatedCardName(card, suit)
-        OmiChat.addInfoMessage(getText('UI_OmiChat_Card', args.name, cardName))
+        API.addInfoMessage(getText('UI_OmiChat_Card', args.name, cardName))
         return
     end
 
@@ -286,7 +286,7 @@ function OmiChat.Commands.reportDrawCard(args)
         card = cardName,
     })
 
-    OmiChat.send {
+    API.send {
         streamName = 'card',
         formatterName = 'card',
         text = concat {
@@ -299,13 +299,13 @@ end
 
 ---Reports the results of flipping a coin.
 ---@param args omichat.request.ReportFlipCoin
-function OmiChat.Commands.reportFlipCoin(args)
+function API.Commands.reportFlipCoin(args)
     local heads = args.heads
     local content = utils.interpolate(Option.FormatFlip, {
         heads = args.heads and '1' or nil,
     })
 
-    OmiChat.send {
+    API.send {
         streamName = 'flip',
         formatterName = 'flip',
         text = concat {
@@ -317,11 +317,11 @@ end
 
 ---Reports the results of a dice roll.
 ---@param args omichat.request.ReportRoll
-function OmiChat.Commands.reportRoll(args)
+function API.Commands.reportRoll(args)
     local tokens = { roll = tostring(args.roll), sides = tostring(args.sides) }
     local content = utils.interpolate(Option.FormatRoll, tokens)
 
-    OmiChat.send {
+    API.send {
         streamName = 'roll',
         formatterName = 'roll',
         text = concat {
@@ -334,7 +334,7 @@ end
 
 ---Adds an info message for the local player.
 ---@param args omichat.request.ShowMessage
-function OmiChat.Commands.showInfoMessage(args)
+function API.Commands.showInfoMessage(args)
     local text
     if args.text then
         text = args.text
@@ -347,27 +347,27 @@ function OmiChat.Commands.showInfoMessage(args)
         return
     end
 
-    OmiChat.addInfoMessage(text, args.serverAlert)
+    API.addInfoMessage(text, args.serverAlert)
 end
 
 ---Updates player cache state.
 ---@param info omichat.request.UpdatePlayerCache
-function OmiChat.Commands.updatePlayerCache(info)
+function API.Commands.updatePlayerCache(info)
     utils.resetPlayerCache(info.items)
 end
 
 ---Updates chat state.
-function OmiChat.Commands.updateState()
-    OmiChat.updateState(true)
+function API.Commands.updateState()
+    API.updateState(true)
 end
 
 ---Updates typing state for another player.
 ---@param args omichat.request.UpdateTyping
-function OmiChat.Commands.updateTyping(args)
+function API.Commands.updateTyping(args)
     local typingInfo ---@type omichat.TypingInformation?
 
     local player = args.typing and utils.getPlayerInfoByUsername(args.username)
-    local display = player and OmiChat.getPlayerMenuName(player, 'typing')
+    local display = player and API.getPlayerMenuName(player, 'typing')
     if display then
         typingInfo = {
             display = display,
@@ -375,8 +375,8 @@ function OmiChat.Commands.updateTyping(args)
         }
     end
 
-    OmiChat._typingInfo[args.username] = typingInfo
-    OmiChat.updateTypingDisplay()
+    API._typingInfo[args.username] = typingInfo
+    API.updateTypingDisplay()
 end
 
 --#endregion
@@ -387,12 +387,12 @@ end
 ---@param command string
 ---@param args table
 ---@protected
-function OmiChat._onServerCommand(module, command, args)
-    if module ~= OmiChat._modDataKey then
+function API._onServerCommand(module, command, args)
+    if module ~= API._modDataKey then
         return
     end
 
-    if OmiChat.Commands[command] then
-        OmiChat.Commands[command](args)
+    if API.Commands[command] then
+        API.Commands[command](args)
     end
 end

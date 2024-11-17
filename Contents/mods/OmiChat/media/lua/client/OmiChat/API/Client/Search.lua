@@ -3,10 +3,10 @@
 local vanillaCommands = require 'OmiChat/Definition/VanillaCommandList'
 
 ---@class omichat.api.client
-local OmiChat = require 'OmiChat/API/Client'
+local API = require 'OmiChat/API/Client/Core'
 
-local utils = OmiChat.utils
-local StreamInfo = OmiChat.StreamInfo
+local utils = API.utils
+local StreamInfo = API.StreamInfo
 
 ---@class omichat.search.InternalSearchContext : omichat.SearchContext
 ---@field search string
@@ -48,8 +48,8 @@ local function buildStreamList(options)
     end
 
     if not options.excludeCommandStreams then
-        for i = 1, #OmiChat._commandStreams do
-            list[#list + 1] = StreamInfo:new(OmiChat._commandStreams[i])
+        for i = 1, #API._commandStreams do
+            list[#list + 1] = StreamInfo:new(API._commandStreams[i])
         end
     end
 
@@ -139,7 +139,7 @@ local function searchPlayer(player, ctx, ownUsername, includeSelf)
     end
 
     if username and (includeSelf or username ~= ownUsername) then
-        return OmiChat.searchInternal(ctx, username)
+        return API.searchInternal(ctx, username)
     end
 end
 
@@ -148,7 +148,7 @@ end
 ---@param ctx omichat.SearchContext | string
 ---@return omichat.search.InternalSearchContext
 ---@private
-function OmiChat.buildInternalSearchContext(ctx)
+function API.buildInternalSearchContext(ctx)
     if type(ctx) == 'string' then
         ctx = { search = ctx }
     end
@@ -164,7 +164,6 @@ function OmiChat.buildInternalSearchContext(ctx)
         terminateOnExact = ctx.terminateOnExact,
         startsWith = {},
         contains = {},
-        collectResults = true,
     }
 end
 
@@ -175,7 +174,7 @@ end
 ---@param ... string Secondary strings to search.
 ---@return omichat.search.InternalSearchResult?
 ---@private
-function OmiChat.searchInternal(ctx, primary, value, ...)
+function API.searchInternal(ctx, primary, value, ...)
     if value == nil then
         value = primary
     end
@@ -293,8 +292,8 @@ end
 ---@param includeSelf boolean? If true, player 1's username will be included in the search.
 ---@param useCache boolean? If true, cached player information will be used.
 ---@return omichat.SearchResults
-function OmiChat.searchOnlineUsernames(ctxOrSearch, includeSelf, useCache)
-    local ctx = OmiChat.buildInternalSearchContext(ctxOrSearch)
+function API.searchOnlineUsernames(ctxOrSearch, includeSelf, useCache)
+    local ctx = API.buildInternalSearchContext(ctxOrSearch)
     local onlinePlayers = getOnlinePlayers()
     local player = getSpecificPlayer(0)
     local ownUsername = player and player:getUsername()
@@ -332,8 +331,8 @@ end
 ---Collects perk IDs based on a search string.
 ---@param ctxOrSearch omichat.SearchContext | string
 ---@return omichat.SearchResults
-function OmiChat.searchPerks(ctxOrSearch)
-    local ctx = OmiChat.buildInternalSearchContext(ctxOrSearch)
+function API.searchPerks(ctxOrSearch)
+    local ctx = API.buildInternalSearchContext(ctxOrSearch)
     ctx.display = ctx.display or getPerkDisplay
     ctx.mapValue = mapPerkToId
 
@@ -342,7 +341,7 @@ function OmiChat.searchPerks(ctxOrSearch)
         local perk = perkList[i]
         local name = perk:getName():lower()
         local id = perk:getId():lower()
-        local result = OmiChat.searchInternal(ctx, id, perk, name)
+        local result = API.searchInternal(ctx, id, perk, name)
         if result and result.exact and ctx.terminateOnExact then
             exact = result
             break
@@ -359,8 +358,8 @@ end
 ---@param ctxOrSearch omichat.SearchContext | string
 ---@param options omichat.StreamSearchOptions
 ---@return omichat.SearchResults
-function OmiChat.searchStreams(ctxOrSearch, options)
-    local ctx = OmiChat.buildInternalSearchContext(ctxOrSearch)
+function API.searchStreams(ctxOrSearch, options)
+    local ctx = API.buildInternalSearchContext(ctxOrSearch)
 
     ctx.searchForStartsWith = '/' .. ctx.search
     ctx.display = ctx.display or mapToCommand
@@ -374,11 +373,11 @@ function OmiChat.searchStreams(ctxOrSearch, options)
         if utils.isinstance(stream, StreamInfo) then
             ---@cast stream omichat.StreamInfo
             ctx.caseInsensitive = stream:isCaseInsensitive()
-            result = OmiChat.searchInternal(ctx, stream:getCommand(), stream, stream:getShortCommand())
+            result = API.searchInternal(ctx, stream:getCommand(), stream, stream:getShortCommand())
 
             if not result then
                 for alias in stream:aliases() do
-                    result = OmiChat.searchInternal(ctx, alias, stream)
+                    result = API.searchInternal(ctx, alias, stream)
                     if result then
                         break
                     end
@@ -387,7 +386,7 @@ function OmiChat.searchStreams(ctxOrSearch, options)
         else
             ---@cast stream omichat.VanillaCommand
             ctx.caseInsensitive = true
-            result = OmiChat.searchInternal(ctx, '/' .. stream.name .. ' ', stream)
+            result = API.searchInternal(ctx, '/' .. stream.name .. ' ', stream)
         end
 
         if result and result.exact and ctx.terminateOnExact then
@@ -428,12 +427,12 @@ end
 ---@param ctxOrSearch omichat.SearchContext | string Context for the search.
 ---@param list string[] The list of strings to search.
 ---@return omichat.SearchResults
-function OmiChat.searchStrings(ctxOrSearch, list)
-    local ctx = OmiChat.buildInternalSearchContext(ctxOrSearch)
+function API.searchStrings(ctxOrSearch, list)
+    local ctx = API.buildInternalSearchContext(ctxOrSearch)
 
     local exact
     for i = 1, #list do
-        local result = OmiChat.searchInternal(ctx, list[i])
+        local result = API.searchInternal(ctx, list[i])
         if result and result.exact then
             exact = result
             if ctx.terminateOnExact then
