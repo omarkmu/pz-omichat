@@ -307,6 +307,18 @@ function Configuration:init()
     return self
 end
 
+---Gets the maximum length of an individual custom shout.
+---@return 200
+function Configuration:maxCustomShoutLength()
+    return 200
+end
+
+---Gets the maximum number of custom shouts.
+---@return 20
+function Configuration:maxCustomShouts()
+    return 20
+end
+
 ---Gets the maximum number of roleplay languages that can be configured.
 ---@return 1000
 function Configuration:maxDefinedLanguages()

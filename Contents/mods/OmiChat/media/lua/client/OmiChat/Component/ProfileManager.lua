@@ -253,8 +253,7 @@ function ProfileManager:onCalloutsChange(entry, category)
         return
     end
 
-    local maxLen = Option.CustomShoutMaxLength > 0 and Option.CustomShoutMaxLength or nil
-    local lines = utils.getLines(entry:getInternalText(), maxLen)
+    local lines = utils.getLines(entry:getInternalText(), config:maxCustomShoutLength())
     if lines and category == 'sneakcallouts' then
         for i = 1, #lines do
             lines[i] = lines[i]:lower()

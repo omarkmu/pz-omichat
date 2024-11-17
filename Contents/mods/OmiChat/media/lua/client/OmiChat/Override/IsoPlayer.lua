@@ -1,6 +1,7 @@
 ---Handles IsoPlayer overrides.
 
 local OmiChat = require 'OmiChat/API/Client'
+local config = OmiChat.config
 
 local min = math.min
 local Option = OmiChat.Option
@@ -47,7 +48,7 @@ function _IsoPlayer:Callout(playEmote)
         shouts = getDefaultShouts(isSneaking)
         shoutMax = #shouts
     else
-        shoutMax = Option.MaximumCustomShouts > 0 and min(#shouts, Option.MaximumCustomShouts) or #shouts
+        shoutMax = min(#shouts, config:maxCustomShouts())
     end
 
     local formatterName

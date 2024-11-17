@@ -13,11 +13,6 @@ local adminOptionMap = {
     ShowIcon = 'adminShowIcon',
     KnowAllLanguages = 'adminKnowLanguages',
     IgnoreMessageRange = 'adminIgnoreRange',
-
-    -- deprecated
-    show_icon = 'adminShowIcon',
-    know_all_languages = 'adminKnowLanguages',
-    ignore_message_range = 'adminIgnoreRange',
 }
 
 ---Converts all elements of a list to strings.

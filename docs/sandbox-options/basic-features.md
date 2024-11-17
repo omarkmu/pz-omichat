@@ -76,16 +76,6 @@ A semicolon-separated list of items players can use for the `/roll` command.
 The `/roll` command will only be available if the player has one of the items in this list in their inventory.
 If blank, the command won't require an item.
 
-### CustomShoutMaxLength
-**Default:** `50`  
-**Minimum:** `1`  
-**Maximum:** `200`
-
-**This option is deprecated and will be removed in a future version in favor of a hardcoded value.**
-**To apply length limits, use [`FilterChatInput`](./filters-predicates.md#filterchatinput).**
-
-The maximum length for individual [custom shouts](#enablecustomshouts).
-
 ### EnableAlwaysShowChat
 **Default:** `false`
 
@@ -177,17 +167,6 @@ This affects the existing in-game option within the Multiplayer tab of the setti
 
 If enabled, players' overhead speech color will be used as their default name color.
 This can be used alongside with or independently of [`EnableSetNameColor`](#enablesetnamecolor).
-
-### MaximumCustomShouts
-**Default:** `10`  
-**Minimum:** `1`  
-**Maximum:** `20`
-
-The maximum number of [custom shouts](#enablecustomshouts) that players are allowed to define.
-
-The maximums apply to regular and sneak shouts separately; a value of `10` means a player can specify 10 shouts and 10 sneak shouts.
-
-**This option is deprecated and will be removed in a future version in favor of a hardcoded value.**
 
 ### MinimumCommandAccessLevel
 **Default:** `16`

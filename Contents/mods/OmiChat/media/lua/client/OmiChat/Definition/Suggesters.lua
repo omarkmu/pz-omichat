@@ -88,7 +88,6 @@ return {
                 local value = result.value
 
                 info.suggestions[#info.suggestions + 1] = {
-                    type = '',
                     display = result.display or value,
                     suggestion = value,
                 }
@@ -192,7 +191,6 @@ return {
                 end
 
                 info.suggestions[#info.suggestions + 1] = {
-                    type = '',
                     display = display,
                     suggestion = prefix .. value .. suffix,
                 }
@@ -258,7 +256,6 @@ return {
             for i = 1, #results do
                 local emote = results[i].value
                 info.suggestions[#info.suggestions + 1] = {
-                    type = '',
                     display = '.' .. emote,
                     suggestion = prefix .. emote,
                 }

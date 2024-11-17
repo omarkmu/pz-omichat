@@ -35,9 +35,7 @@ local getActivatedMods = getActivatedMods
 ---@field BuffReduceHunger number
 ---@field BuffReduceThirst number
 ---@field BuffReduceUnhappiness number
----@field CustomShoutMaxLength integer
 ---@field MinimumCommandAccessLevel integer
----@field MaximumCustomShouts integer
 ---@field RangeCallout integer
 ---@field RangeSneakCallout integer
 ---@field RangeCalloutZombies integer

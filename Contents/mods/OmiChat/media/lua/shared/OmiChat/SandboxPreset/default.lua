@@ -27,8 +27,6 @@ return {
     BuffReduceThirst = 0.1,
     BuffReduceFatigue = 0.1,
     BuffReduceCigaretteStress = 0.2,
-    MaximumCustomShouts = 10,
-    CustomShoutMaxLength = 50,
     MinimumCommandAccessLevel = 16,
     RangeCallout = 60,
     RangeSneakCallout = 6,

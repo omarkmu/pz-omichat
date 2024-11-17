@@ -3,6 +3,7 @@ local TextEntry = UI.TextEntry
 local ColorEntry = UI.ColorEntry
 local OmiChat = require 'OmiChatClient'
 local Option = OmiChat.Option
+local config = OmiChat.config
 
 local ISLabel = ISLabel
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
@@ -133,12 +134,7 @@ end
 ---@return table<string, omi.ui.TextEntry>
 ---@return number
 function ContentPanel:createCalloutControls(manager, startY)
-    local numLines = Option.MaximumCustomShouts
-    if numLines <= 0 then
-        numLines = Option:getDefault('MaximumCustomShouts') or 1
-    elseif numLines > 20 then
-        numLines = 20
-    end
+    local numLines = config:maxCustomShouts() * 0.5
 
     local controls = {}
     local nextY = startY

@@ -99,7 +99,6 @@ return OmiChat
 
 ---A suggestion that can display to the player.
 ---@class omichat.Suggestion
----@field type string Deprecated (unused); will be removed in version 2.0. Suggestion category.
 ---@field display string The text that will display in the menu.
 ---@field suggestion string Text that will replace the input text if the suggestion is selected.
 
@@ -125,11 +124,9 @@ return OmiChat
 ---@class omichat.SendArgs
 ---@field text string
 ---@field icon string?
----@field command string? Deprecated. Contains the same information as `text`.
 ---@field streamName string?
 ---@field stream omichat.StreamInfo?
 ---@field playSignedEmote boolean?
----@field isEcho boolean? Deprecated. This will be removed in a future version in favor of `echoType`.
 ---@field echoType integer?
 ---@field formatterName omichat.FormatterName?
 ---@field tokens table?
@@ -140,7 +137,6 @@ return OmiChat
 ---@field text string
 ---@field icon string?
 ---@field language string?
----@field isEcho boolean? Deprecated. This will be removed in a future version in favor of `echoType`.
 ---@field echoType integer?
 ---@field formatterName omichat.FormatterName?
 ---@field stream string?
@@ -161,8 +157,6 @@ return OmiChat
 ---@field commandType omichat.ChatCommandType? The command type used to determine whether input should be retained.
 ---@field chatType string? The chat type associated with the stream.
 ---@field isCommand boolean? Indicates that the stream is a command.
----@field suggestUsernames boolean? Deprecated; will be removed in version 2.0. Use `suggestSpec` instead.
----@field suggestOwnUsername boolean? Deprecated; will be removed in version 2.0. Use `suggestSpec` instead.
 ---@field suggestSpec omichat.SuggestSpec? The spec for suggestions to the stream.
 ---@field isEnabled (fun(self: omichat.StreamInfo): boolean)? Returns a boolean representing whether the stream is enabled.
 ---@field onUse fun(ctx: omichat.SendArgs)? Callback triggered when the stream is used.

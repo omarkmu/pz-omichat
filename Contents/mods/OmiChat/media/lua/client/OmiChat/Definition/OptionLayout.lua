@@ -102,8 +102,6 @@ return check {
 
     padding(),
     'EnableCustomShouts',
-    'CustomShoutMaxLength',
-    'MaximumCustomShouts',
 
     padding(),
     'EnableCharacterCustomization',

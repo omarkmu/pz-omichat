@@ -869,15 +869,16 @@ function ISChat.validateCustomCalloutText(target, text)
         return true
     end
 
-    if #lines > Option.MaximumCustomShouts then
-        target:setValidateTooltipText(getText('UI_OmiChat_Error_TooManyShouts', tostring(Option.MaximumCustomShouts)))
+    local maxShouts = config:maxCustomShouts()
+    if #lines > maxShouts then
+        target:setValidateTooltipText(getText('UI_OmiChat_Error_TooManyShouts', tostring(maxShouts)))
         return false
     end
 
     for i = 1, #lines do
-        if #lines[i] > Option.CustomShoutMaxLength then
-            local maxLen = tostring(Option.CustomShoutMaxLength)
-            target:setValidateTooltipText(getText('UI_OmiChat_Error_TooLongShout', maxLen))
+        local maxLen = config:maxCustomShoutLength()
+        if #lines[i] > maxLen then
+            target:setValidateTooltipText(getText('UI_OmiChat_Error_TooLongShout', tostring(maxLen)))
             return false
         end
     end

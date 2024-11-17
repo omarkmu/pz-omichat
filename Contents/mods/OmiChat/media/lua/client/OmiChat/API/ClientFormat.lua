@@ -516,7 +516,7 @@ function OmiChat.formatForChat(args)
     tokens.username = username
     tokens.name = name
     tokens.stream = stream
-    tokens.echo = args.isEcho and '1' or nil
+    tokens.echo = args.echoType ~= nil and '1' or nil
 
     -- check language
     local language
@@ -569,12 +569,10 @@ function OmiChat.formatForChat(args)
     end
 
     -- mark as echo message
-    if args.isEcho then
+    if args.echoType then
         local echoFormatter = OmiChat.getFormatter('echo')
         local input = tokens.input
-        if args.echoType then
-            input = utils.encodeInvisibleCharacter(args.echoType) .. input
-        end
+        input = utils.encodeInvisibleCharacter(args.echoType) .. input
 
         tokens.input = echoFormatter:format(input, tokens)
     end
