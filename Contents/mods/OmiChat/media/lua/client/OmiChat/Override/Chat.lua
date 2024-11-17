@@ -1,6 +1,7 @@
 ---Handles chat overrides and extensions.
 
 local OmiChat = require 'OmiChatClient'
+local UI = require 'OmiLibrary/UI'
 
 
 ---Extended fields for ISChat.
@@ -29,7 +30,6 @@ local ISChat = ISChat
 local utils = OmiChat.utils
 local config = OmiChat.config
 local Option = OmiChat.Option
-local ColorModal = OmiChat.ColorModal
 local SuggesterBox = OmiChat.SuggesterBox
 local getText = getText
 local max = math.max
@@ -605,22 +605,23 @@ function ISChat.onHairColorMenu(target)
     }
 
     local text = getText('UI_OmiChat_ContextHairColorDesc')
-    local width = max(450, getTextManager():MeasureStringX(UIFont.Small, text) + 60)
-    local modal = ColorModal:new(0, 0, width, 250, text, color, target, ISChat.onCustomHairColorMenuClick, 0)
-
-    modal:setEmptyColor(emptyColor)
-    modal:initialise()
-    modal:addToUIManager()
-
-    target.activeColorModal = modal
+    target.activeColorModal = UI.colorDialog {
+        w = max(450, getTextManager():MeasureStringX(UIFont.Small, text) + 60),
+        h = 250,
+        text = text,
+        defaultColor = color,
+        emptyColor = emptyColor,
+        target = target,
+        onClick = ISChat.onCustomHairColorMenuClick,
+    }
 end
 
 ---Event handler for hair color picker selection.
 ---@param target omichat.ISChat
----@param button table
+---@param args omi.ui.Args.ColorDialog.Click
 ---@diagnostic disable-next-line: unused-local
-function ISChat.onCustomHairColorMenuClick(target, button)
-    if button.internal ~= 'OK' then
+function ISChat.onCustomHairColorMenuClick(target, args)
+    if args.internal ~= 'OK' then
         return
     end
 
@@ -631,7 +632,7 @@ function ISChat.onCustomHairColorMenuClick(target, button)
     end
 
     local hairColor
-    local color = button.parent:getColorTable()
+    local color = args.button.parent:getColor()
     if color then
         hairColor = ImmutableColor.new(color.r / 255, color.g / 255, color.b / 255, 1)
     else
@@ -791,8 +792,12 @@ function ISChat.onAddLanguage(target, language)
         target.activeLanguageModal:destroy()
     end
 
-    local text = getText('UI_OmiChat_ContextConfirmAddLanguage', utils.getTranslatedLanguageName(language))
-    target.activeLanguageModal = utils.createModal(text, target, ISChat.onConfirmAddLanguage, language)
+    target.activeLanguageModal = UI.yesNoDialog {
+        text = getText('UI_OmiChat_ContextConfirmAddLanguage', utils.getTranslatedLanguageName(language)),
+        target = target,
+        onClick = ISChat.onConfirmAddLanguage,
+        onClickArgs = { language },
+    }
 end
 
 ---Event handler for confirming adding a roleplay language.
@@ -823,7 +828,7 @@ function ISChat.onManageProfiles(target)
         target.activeProfilesPanel:destroy()
     end
 
-    local x, y = utils.getScreenCenter(800, 600)
+    local x, y = UI.getScreenCenter(800, 600)
     local panel = OmiChat.ProfileManager:new(x, y, 800, 600, OmiChat.getProfiles())
     panel:initialise()
     panel:addToUIManager()
@@ -837,7 +842,7 @@ function ISChat.onManageModData(target)
         target.activeModDataPanel:destroy()
     end
 
-    local x, y = utils.getScreenCenter(1200, 650)
+    local x, y = UI.getScreenCenter(1200, 650)
     local panel = OmiChat.ModDataManager:new(x, y, 1200, 650)
     panel:initialise()
     panel:addToUIManager()
@@ -855,7 +860,7 @@ function ISChat.onSwitchProfile(target, idx)
 end
 
 ---Validation function for custom callout menu.
----@param target ISTextBox | omichat.ValidatedTextEntry
+---@param target ISTextBox | omi.ui.TextEntry
 ---@param text string
 ---@return boolean
 function ISChat.validateCustomCalloutText(target, text)
@@ -962,7 +967,7 @@ function ISChat.addLineInChat(message, tabID)
 
     local s, e = pcall(_addLineInChat, message, tabID)
     if not s then
-        utils.logError('error while adding message %s: %s', tostring(message), e)
+        utils.log.error('error while adding message %s: %s', tostring(message), e)
         return
     end
 

@@ -24,7 +24,7 @@ local adminOptionMap = {
 ---@param tab table
 ---@return string[]
 local function readStringList(tab)
-    return utils.pack(utils.mapList(tostring, tab))
+    return utils.mapList(tostring, tab)
 end
 
 ---Reads the JSON preferences file and converts it to an equivalent Lua table.
@@ -63,7 +63,7 @@ local function readPrefsJson()
             decoded = 'invalid file content'
         end
 
-        utils.logError('failed to read preferences: %s', decoded)
+        utils.log.error('failed to read preferences: %s', decoded)
 
         -- reset to default on failed read
         return
@@ -124,7 +124,7 @@ local function readPrefsV1(decoded, prefs, ignoreObsolete)
 
         local hasColor
         for k, v in pairs(decoded.colors) do
-            local color = utils.stringToColor(v)
+            local color = utils.color.fromString(v)
             if color then
                 hasColor = true
                 colors[k] = color
@@ -272,7 +272,7 @@ function OmiChat.getPlayerPreferences()
     local version = decoded.VERSION
     if version > OmiChat._prefsVersion then
         -- use default settings & add flag to avoid overwrite
-        utils.logError('preferences file has a higher version (%d > %d)', version, OmiChat._prefsVersion)
+        utils.log.info('preferences file has a higher version (%d > %d)', version, OmiChat._prefsVersion)
         prefs.HIGHER_VERSION = true
         return prefs
     elseif version == 1 then
@@ -286,7 +286,7 @@ end
 
 ---Gets a color table for the current player's preference for a category, or `nil` if unset.
 ---@param category omichat.ColorCategory
----@return omichat.ColorTable?
+---@return omi.ColorTable?
 function OmiChat.getPreferredColor(category)
     local profile = OmiChat.getCurrentProfile()
     if not profile then
@@ -374,7 +374,7 @@ function OmiChat.savePlayerPreferences()
     end
 
     local prefs = OmiChat._playerPrefs
-    local success, encoded = utils.json.tryEncode {
+    local encoded, err = utils.json.tryEncode {
         VERSION = OmiChat._prefsVersion,
         profileIndex = prefs.profileIndex,
         profiles = prefs.profiles,
@@ -394,8 +394,8 @@ function OmiChat.savePlayerPreferences()
         },
     }
 
-    if not success or type(encoded) ~= 'string' then
-        utils.logError('failed to write preferences: %s', tostring(encoded))
+    if not encoded then
+        utils.log.error('failed to write preferences: %s', err)
         return false
     end
 
@@ -456,7 +456,7 @@ end
 ---Sets a color table for the current player's preference for a category, on the current profile.
 ---This sets the value in the current profile.
 ---@param category omichat.ColorCategory
----@param color omichat.ColorTable?
+---@param color omi.ColorTable?
 function OmiChat.setPreferredColor(category, color)
     local profile = OmiChat.getCurrentProfile()
     if not profile then

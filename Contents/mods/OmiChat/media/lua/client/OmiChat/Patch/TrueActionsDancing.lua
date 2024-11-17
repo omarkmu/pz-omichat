@@ -505,7 +505,7 @@ local function searchKnownDances(ctxOrSearch)
 
     return {
         exact = exact,
-        results = utils.extend(ctx.startsWith, ctx.contains),
+        results = utils.append(ctx.startsWith, ctx.contains),
     }
 end
 

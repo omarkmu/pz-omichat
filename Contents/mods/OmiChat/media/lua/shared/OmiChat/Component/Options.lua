@@ -1,7 +1,7 @@
-local lib = require 'OmiChat/lib'
+local lib = require 'OmiLibrary'
 local utils = require 'OmiChat/util'
 local config = require 'OmiChat/config'
-local DelimitedList = utils.DelimitedList
+local DelimitedList = lib.DelimitedList
 
 local getActivatedMods = getActivatedMods
 
@@ -184,20 +184,20 @@ local diceItemsList = DelimitedList:new({ table = Option, source = 'DiceItems' }
 
 ---@param options omichat.Options
 ---@param colorOpt string?
----@return omichat.ColorTable?
+---@return omi.ColorTable?
 local function getColorOrDefault(options, colorOpt)
     if not colorOpt then
         return
     end
 
     local value = options[colorOpt]
-    local settingColor = value and utils.stringToColor(value)
+    local settingColor = value and utils.color.fromString(value)
     if settingColor then
         return settingColor
     end
 
     local defaultStr = options:getDefault(colorOpt)
-    local defaultColor = defaultStr and utils.stringToColor(defaultStr)
+    local defaultColor = defaultStr and utils.color.fromString(defaultStr)
 
     if defaultColor then
         return defaultColor
@@ -302,7 +302,7 @@ end
 ---Returns the configured default color associated with a category.
 ---@param category omichat.ColorCategory
 ---@param username string? The username of the user to use for getting defaults, if applicable.
----@return omichat.ColorTable
+---@return omi.ColorTable
 function Option:getDefaultColor(category, username)
     if category == 'speech' or (category == 'name' and self.EnableSpeechColorAsDefaultNameColor) then
         local player = username and utils.getPlayerInfoByUsername(username)
@@ -342,10 +342,10 @@ end
 
 ---Returns the default value for a color option.
 ---@param option string
----@return omichat.ColorTable
+---@return omi.ColorTable
 function Option:getOptionDefaultColor(option)
     local defaultStr = Option:getDefault(option)
-    local defaultColor = defaultStr and utils.stringToColor(defaultStr) or { r = 255, g = 255, b = 255 }
+    local defaultColor = defaultStr and utils.color.fromString(defaultStr) or { r = 255, g = 255, b = 255 }
 
     return defaultColor
 end

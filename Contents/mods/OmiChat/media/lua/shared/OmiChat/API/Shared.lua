@@ -151,19 +151,19 @@ end
 
 ---Returns the color table for a player's name color, or `nil` if unset.
 ---@param username string
----@return omichat.ColorTable?
+---@return omi.ColorTable?
 function OmiChat.getNameColor(username)
     if not Option.EnableSetNameColor or not username then
         return
     end
 
-    return utils.stringToColor(OmiChat.getModData().nameColors[username])
+    return utils.color.fromString(OmiChat.getModData().nameColors[username])
 end
 
 ---Returns the color table used for a player's name color in chat, or `nil` if unset.
 ---This respects the `EnableSpeechColorAsDefaultNameColor` option.
 ---@param username string
----@return omichat.ColorTable?
+---@return omi.ColorTable?
 function OmiChat.getNameColorInChat(username)
     local nameColor = OmiChat.getNameColor(username)
     if nameColor then

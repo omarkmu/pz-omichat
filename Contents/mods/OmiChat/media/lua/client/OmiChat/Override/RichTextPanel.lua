@@ -339,7 +339,7 @@ function ISRichTextPanel:processCommand(command, x, y, lineImageHeight, lineHeig
     if success then
         return x, y, lineImageHeight
     elseif success == false then
-        utils.logError('unknown texture used in image command: `%s`', image)
+        utils.log.error('unknown texture used in image command: `%s`', image)
         return x, y, lineImageHeight
     end
 

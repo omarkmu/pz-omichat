@@ -1,10 +1,11 @@
 ---Handles overriding the server settings screen to customize the sandbox settings page.
 
+local UI = require 'OmiLibrary/UI'
 local OmiChat = require 'OmiChatClient'
 local layout = require 'OmiChat/Definition/OptionLayout'
 local utils = OmiChat.utils
 local Option = OmiChat.Option
-local ColorEntry = OmiChat.ValidatedColorEntry
+local ColorEntry = UI.ColorEntry
 
 ---@class omichat.ISServerSandboxOptionsUI : ISServerSandboxOptionsUI
 local ISServerSandboxOptionsUI = ISServerSandboxOptionsUI
@@ -52,7 +53,12 @@ local function confirmApplyPreset(panel, button)
         return
     end
 
-    utils.createModal(getText('Sandbox_OCPreset_Confirm', preset.name), panel, applyPreset, preset)
+    UI.yesNoDialog {
+        text = getText('Sandbox_OCPreset_Confirm', preset.name),
+        target = panel,
+        onClick = applyPreset,
+        onClickArgs = { preset },
+    }
 end
 
 ---Transforms the sandbox option panel.
@@ -118,7 +124,7 @@ local function transformPanel(panel, page, parent)
                         h = control.height,
                         font = controlFont,
                         emptyColor = Option:getOptionDefaultColor(el),
-                        tooltipText = oldControl.tooltip,
+                        tooltip = oldControl.tooltip,
                         anchorRight = false,
                         anchorBottom = false,
                     }

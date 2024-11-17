@@ -30,7 +30,7 @@ end
 ---Sets the color associated with a given color category for the current player,
 ---if the related option is enabled.
 ---@param category omichat.ColorCategory
----@param color omichat.ColorTable?
+---@param color omi.ColorTable?
 function OmiChat.changeColor(category, color)
     if category == 'speech' then
         OmiChat.changeSpeechColor(color)
@@ -49,7 +49,7 @@ function OmiChat.changeColor(category, color)
     end
 
     local modData = OmiChat.getModData()
-    local value = color and utils.colorToHexString(color) or nil
+    local value = color and utils.color.toHexString(color) or nil
 
     modData.nameColors[username] = value
     OmiChat.requestDataUpdate({
@@ -61,9 +61,9 @@ end
 
 ---Sets the color used for overhead chat bubbles.
 ---This will set the speech color in-game option.
----@param color omichat.ColorTable?
+---@param color omi.ColorTable?
 function OmiChat.changeSpeechColor(color)
-    if not utils.isValidColor(color) then
+    if not utils.color.isValid(color) then
         return
     end
 
@@ -72,7 +72,7 @@ function OmiChat.changeSpeechColor(color)
         return
     end
 
-    ---@cast color omichat.ColorTable
+    ---@cast color omi.ColorTable
     local r = color.r / 255
     local g = color.g / 255
     local b = color.b / 255
@@ -106,7 +106,7 @@ end
 
 ---Gets a color table for the current player, or `nil` if unset.
 ---@param category omichat.ColorCategory
----@return omichat.ColorTable?
+---@return omi.ColorTable?
 function OmiChat.getColor(category)
     if category == 'name' then
         local player = getSpecificPlayer(0)
@@ -123,7 +123,7 @@ end
 ---Returns a color table associated with the current player,
 ---or the default color table if there isn't one.
 ---@param category omichat.ColorCategory
----@return omichat.ColorTable
+---@return omi.ColorTable
 function OmiChat.getColorOrDefault(category)
     return OmiChat.getColor(category) or Option:getDefaultColor(category)
 end
@@ -181,7 +181,7 @@ function OmiChat.getRoleplayLanguageSlots()
 end
 
 ---Returns a color table for the current player's speech color.
----@return omichat.ColorTable?
+---@return omi.ColorTable?
 function OmiChat.getSpeechColor()
     local player = getSpecificPlayer(0)
     if not player then

@@ -1,4 +1,5 @@
 local ISPanelJoypad = ISPanelJoypad
+local UI = require 'OmiLibrary/UI'
 
 ---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Client'
@@ -32,7 +33,12 @@ function ModDataManager:confirmDeleteItem()
         return
     end
 
-    utils.createModal(getText('IGUI_DbViewer_DeleteConfirm'), self, self.onConfirmDelete, item, idx)
+    UI.yesNoDialog {
+        text = getText('IGUI_DbViewer_DeleteConfirm'),
+        target = self,
+        onClick = self.onConfirmDelete,
+        onclickArgs = { item, idx },
+    }
 end
 
 ---Creates the children of the mod data manager.
@@ -101,7 +107,6 @@ function ModDataManager:createChildren()
     self.listbox.doDrawItem = utils.bind(self.drawItem, self)
     self.listbox.drawBorder = true
     self.listbox.joypadParent = self
-    self.listbox.parent = self
     self:addChild(self.listbox)
 
     self:refresh()
@@ -196,7 +201,7 @@ end
 
 ---Performs deletion of a mod data row.
 ---Called after clicking yes on the deletion confirmation prompt.
----@param button ISButton
+---@param button omi.ui.Args.Dialog.Click
 ---@param item omichat.UserModData
 ---@param idx integer
 function ModDataManager:onConfirmDelete(button, item, idx)

@@ -1,4 +1,4 @@
-local lib = require 'OmiChat/lib'
+local lib = require 'OmiLibrary'
 local utils = require 'OmiChat/util'
 
 local char = string.char
@@ -105,7 +105,7 @@ function MetaFormatter:setID(id)
             error(string.format('cannot overwrite reserved formatter ID %d', id))
         end
 
-        utils.logError('created formatter with duplicate ID %d', id)
+        utils.log.info('created formatter with duplicate ID %d', id)
     end
 
     self._id = id

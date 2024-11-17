@@ -1,22 +1,20 @@
-local lib = require 'OmiChat/lib'
+local lib = require 'OmiLibrary'
 local Interpolator = require 'OmiChat/Component/Interpolator'
 
 local pow = math.pow
 local floor = math.floor
-local max = math.max
 local min = math.min
 local char = string.char
-local format = string.format
 local concat = table.concat
 local getTimestampMs = getTimestampMs
 
 
 ---Utility functions.
----@class omichat.utils : omi.utils
+---@class omichat.utils : omi.proxy
 ---@field private _interpolatorCache table<string, omichat.utils.InterpolatorCacheItem>
 ---@field private _playerCacheByUsername table<string, omichat.utils.PlayerCacheItem>
 ---@field private _playerCacheByOnlineID table<string, omichat.utils.PlayerCacheItem>
-local utils = lib.utils.copy(lib.utils)
+local utils = lib.proxy({ name = 'OmiChat' })
 utils.Interpolator = Interpolator
 utils._interpolatorCache = {}
 utils._playerCacheByUsername = {}
@@ -31,13 +29,10 @@ utils._playerCacheByOnlineID = {}
 ---@field forename string
 ---@field surname string
 ---@field onlineID number
----@field speechColor omichat.ColorTable
+---@field speechColor omi.ColorTable
 
 
 local CACHE_EXPIRY_MS = 600000 -- ten minutes
-local shortHexPattern = '^%s*#?(%x)(%x)(%x)%s*$'
-local fullHexPattern = '^%s*#?(%x%x)%s*(%x%x)%s*(%x%x)%s*$'
-local rgbPattern = '^%s*(%d%d?%d?)[,%s]+(%d%d?%d?)[,%s]+(%d%d?%d?)%s*$'
 
 local accessLevels = {
     admin = 32,
@@ -103,33 +98,6 @@ local function setCachedInterpolator(text, interpolator)
     }
 end
 
----Attempts to read an RGB or hex color from a string.
----@param text string
----@return number?
----@return number?
----@return number?
-local function readColor(text)
-    local r, g, b = text:match(rgbPattern)
-    if r then
-        return tonumber(r), tonumber(g), tonumber(b)
-    end
-
-    r, g, b = text:match(shortHexPattern)
-    if r then
-        r = r .. r
-        g = g .. g
-        b = b .. b
-    else
-        r, g, b = text:match(fullHexPattern)
-    end
-
-    if not r then
-        return
-    end
-
-    return tonumber(r, 16), tonumber(g, 16), tonumber(b, 16)
-end
-
 ---Creates a cache item for the given player.
 ---@param player IsoPlayer
 ---@return omichat.utils.PlayerCacheItem
@@ -185,8 +153,8 @@ function utils.addMessageTagValue(message, key, value)
     end
 
     newTag[key] = value
-    success, encodedTag = utils.json.tryEncode(newTag)
-    if not success then
+    encodedTag = utils.json.tryEncode(newTag)
+    if not encodedTag then
         -- other data is bad, so just throw it out
         if type(value) == 'string' then
             value = string.format('%q', value)
@@ -212,19 +180,6 @@ function utils.cachePlayerInfo(item)
     utils._playerCacheByOnlineID[item.onlineID] = item
 end
 
----Clamps the RGB color values in `color` to within the provided range.
----@param color omichat.DecimalColorTable An RGB color table with values in [0, 1].
----@param minVal number A value in [0, 1].
----@param maxVal number A value in [0, 1].
----@return omichat.DecimalColorTable
-function utils.clampDecimalColor(color, minVal, maxVal)
-    return {
-        r = min(max(color.r, minVal), maxVal),
-        g = min(max(color.g, minVal), maxVal),
-        b = min(max(color.b, minVal), maxVal),
-    }
-end
-
 ---Cleans up unused cache items.
 ---@param clear boolean If true, the cache will be cleared entirely.
 function utils.cleanupCache(clear)
@@ -244,65 +199,6 @@ function utils.cleanupCache(clear)
     for i = 1, #toRemove do
         utils._interpolatorCache[toRemove[i]] = nil
     end
-end
-
----Converts a color table to a hex string.
----@param color omichat.ColorTable
----@return string
-function utils.colorToHexString(color)
-    return format('%02x%02x%02x', color.r, color.g, color.b)
-end
-
----Converts a color table to an RGB string.
----@param color omichat.ColorTable
----@return string
-function utils.colorToRGBString(color)
-    return format('%d,%d,%d', color.r, color.g, color.b)
-end
-
----Builds a callback info object.
----@param target unknown? The first argument to pass to the callback function.
----@param callback function? The callback function.
----@param ... unknown Callback arguments.
----@return omichat.CallbackInfo?
-function utils.createCallback(target, callback, ...)
-    if not callback then
-        return
-    end
-
-    local n = select('#', ...)
-    local args = { n = n }
-    for i = 1, n do
-        args[i] = select(i, ...)
-    end
-
-    ---@type omichat.CallbackInfo
-    local info = {
-        target = target,
-        callback = callback,
-        args = args,
-    }
-
-    return info
-end
-
----Creates a yes/no modal dialog.
----@param text string
----@param target unknown?
----@param onclick function?
----@param param1 unknown?
----@param param2 unknown?
----@return ISModalDialog
-function utils.createModal(text, target, onclick, param1, param2)
-    local w, h = ISModalDialog.CalcSize(0, 0, text) ---@cast h number
-    local x, y = utils.getScreenCenter(w, h)
-
-    local modal = ISModalDialog:new(x, y, w, h, text, true, target, onclick, nil, param1, param2)
-    modal.moveWithMouse = true
-    modal:initialise()
-    modal:addToUIManager()
-
-    return modal
 end
 
 ---Decodes an encoded character.
@@ -404,7 +300,7 @@ end
 function utils.encodeInvisibleInt(value)
     value = floor(value)
     if value < 0 then
-        utils.logError('attempted to encode negative value: ' .. value)
+        utils.log.error('attempted to encode negative value: ' .. value)
         return ''
     end
 
@@ -412,7 +308,7 @@ function utils.encodeInvisibleInt(value)
     local result = {}
     while value > 0 do
         if #result == 32 then
-            utils.logError('value is too large to encode: ' .. originalValue)
+            utils.log.error('value is too large to encode: ' .. originalValue)
             return ''
         end
 
@@ -438,26 +334,6 @@ function utils.encodeInvisibleString(text)
     end
 
     return utils.encodeInvisibleInt(#chars) .. concat(chars)
-end
-
----Escapes a string for use in a rich text panel.
----@see ISRichTextPanel
----@param text string
----@return string
-function utils.escapeRichText(text)
-    return (text:gsub('<', '&lt;'):gsub('>', '&gt;'))
-end
-
----Appends members of `t1` to `t2`.
----@param t1 unknown[]
----@param t2 unknown[]
----@return unknown[]
-function utils.extend(t1, t2)
-    for i = 1, #t2 do
-        t1[#t1 + 1] = t2[i]
-    end
-
-    return t1
 end
 
 ---Gets an error from the error tokens, if one is set, and unsets the tokens.
@@ -662,20 +538,6 @@ function utils.getPlayerUsername()
     end
 end
 
----Gets the position for the center of the screen given a UI width and height.
----@param width number
----@param height number
----@param playerIndex number?
----@return number
----@return number
-function utils.getScreenCenter(width, height, playerIndex)
-    playerIndex = playerIndex or 0
-    local x = (getPlayerScreenWidth(playerIndex) - width) * 0.5
-    local y = (getPlayerScreenHeight(playerIndex) - height) * 0.5
-
-    return x, y
-end
-
 ---Retrieves a texture name given a chat icon name.
 ---@param icon string
 ---@return string?
@@ -820,7 +682,7 @@ function utils.interpolateRaw(text, tokens, seed)
 
     local interpolator = getCachedInterpolator(text)
     if not interpolator then
-        interpolator = Interpolator:new({})
+        interpolator = Interpolator:new()
         interpolator:setPattern(text)
 
         setCachedInterpolator(text, interpolator)
@@ -836,33 +698,6 @@ end
 ---@return boolean
 function utils.isInvisibleByte(byte)
     return (byte >= 128 and byte <= 159) or byte == 65535
-end
-
----Checks a color table for validity.
----@param color omichat.ColorTable?
----@return boolean
-function utils.isValidColor(color)
-    if type(color) ~= 'table' then
-        return false
-    end
-
-    local r = color.r
-    local g = color.g
-    local b = color.b
-
-    if type(r) ~= 'number' or r < 0 or r > 255 then
-        return false
-    end
-
-    if type(g) ~= 'number' or g < 0 or g > 255 then
-        return false
-    end
-
-    if type(b) ~= 'number' or b < 0 or b > 255 then
-        return false
-    end
-
-    return true
 end
 
 ---Returns an iterator over an icon-to-texture name map.
@@ -881,13 +716,6 @@ end
 ---@return table<string, omichat.utils.PlayerCacheItem>
 function utils.iteratePlayerCache()
     return pairs(utils._playerCacheByUsername)
-end
-
----Logs a non-fatal mod error.
----@param err string
----@param ... unknown
-function utils.logError(err, ...)
-    print('[OmiChat] ' .. string.format(err, ...))
 end
 
 ---Parses arguments for a chat command.
@@ -949,18 +777,6 @@ function utils.refreshPlayerCache()
     return items
 end
 
----Replaces character entities with the characters that they represent.
----Numeric entities and named entities in ISO-8859-1 are supported.
----@param text string
----@return string
-function utils.replaceEntities(text)
-    text = text:gsub('(&#?x?[%a%d]+;)', function(entity)
-        return utils.getEntityValue(entity) or entity
-    end)
-
-    return text
-end
-
 ---Resets the player cache.
 ---@param items omichat.utils.PlayerCacheItem[]
 function utils.resetPlayerCache(items)
@@ -978,13 +794,6 @@ function utils.resetPlayerCache(items)
     utils._playerCacheByOnlineID = byOnlineID
 end
 
----Converts a color string to a color. Returns `nil` on failure.
----@param text string A color string, in RGB or hex.
----@return omichat.ColorTable?
-function utils.stringToColor(text)
-    return utils.tryStringToColor(text).value
-end
-
 ---Tests a predicate.
 ---@param pred string
 ---@param tokens table?
@@ -999,34 +808,12 @@ function utils.testPredicate(pred, tokens, seed, default)
     return utils.interpolate(pred, tokens or {}, seed) ~= ''
 end
 
----Converts a color table to a color string for chat messages.
----@param color omichat.ColorTable
----@param pushFormat boolean? If true, PUSHRGB format will be used.
----@return string
-function utils.toChatColor(color, pushFormat)
-    if not utils.isValidColor(color) then
-        return ''
-    end
-
-    return concat {
-        ' <',
-        pushFormat and 'PUSH' or '',
-        'RGB:',
-        format('%.7f', color.r / 255):gsub('00+$', '0'),
-        ',',
-        format('%.7f', color.g / 255):gsub('00+$', '0'),
-        ',',
-        format('%.7f', color.b / 255):gsub('00+$', '0'),
-        '> ',
-    }
-end
-
 ---Converts a color table to a color string for overhead messages.
----@param color omichat.ColorTable
+---@param color omi.ColorTable
 ---@param bbCodeFormat boolean? If true, BBCode format will be used.
 ---@return string
 function utils.toOverheadColor(color, bbCodeFormat)
-    if not utils.isValidColor(color) then
+    if not utils.color.isValid(color) then
         return ''
     end
 
@@ -1039,67 +826,6 @@ function utils.toOverheadColor(color, bbCodeFormat)
         color.b,
         bbCodeFormat and ']' or '*',
     }
-end
-
----Triggers a callback.
----@param info omichat.CallbackInfo? The callback info object.
----@param ... unknown Prefix arguments to include before the callback arguments.
----@return unknown?
-function utils.triggerCallback(info, ...)
-    if not info or not info.callback then
-        return
-    end
-
-    local args = {}
-    for i = 1, select('#', ...) do
-        args[i] = select(i, ...)
-    end
-
-    local count = #args
-    local cbArgs = info.args or {}
-    for i = 1, cbArgs.n do
-        count = count + 1
-        args[count] = cbArgs[i]
-    end
-
-    return info.callback(info.target, unpack(args, 1, count or 1))
-end
-
----Attempts to convert a color string to a color. Returns false and an error message on failure.
----@param text string A color string, in RGB or hex.
----@param minColor integer? Minimum color value [0, 255].
----@param maxColor integer? Maximum color value [0, 255].
----@return omi.Result<omichat.ColorTable>
-function utils.tryStringToColor(text, minColor, maxColor)
-    if not text then
-        return { success = false, error = getText('UI_OmiChat_Error_InvalidColor') }
-    end
-
-    local r, g, b = readColor(text)
-    if not r then
-        return { success = false, error = getText('UI_OmiChat_Error_InvalidColor') }
-    end
-
-    maxColor = maxColor or 255
-    if r > maxColor or g > maxColor or b > maxColor then
-        return { success = false, error = getText('UI_OmiChat_Error_ValuesMax', tostring(maxColor)) }
-    end
-
-    minColor = minColor or 0
-    if r < minColor or g < minColor or b < minColor then
-        return { success = false, error = getText('UI_OmiChat_Error_ValuesMin', tostring(minColor)) }
-    end
-
-    return { success = true, value = { r = r, g = g, b = b } }
-end
-
----Reverses the operation of escaping text for use in a rich text panel.
----@see ISRichTextPanel
----@see omichat.utils.escapeRichText
----@param text string
----@return string
-function utils.unescapeRichText(text)
-    return (text:gsub('&lt;', '<'):gsub('&gt;', '>'))
 end
 
 ---Matches on text wrapped in invisible characters.

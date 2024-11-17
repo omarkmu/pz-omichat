@@ -35,7 +35,7 @@ return OmiChat
 ---| 'main'
 
 ---@alias omichat.SettingHandlerCallback fun(submenu: ISContextMenu)
----@alias omichat.Message ChatMessage | omichat.MimicMessage
+---@alias omichat.Message ChatMessage | omi.MimicMessage
 
 ---@alias omichat.SuggestionType
 ---| 'online-username'
@@ -66,8 +66,8 @@ return OmiChat
 ---@field name string? The name of the author when this message was sent.
 ---@field icon string? The user's icon when this message was sent.
 ---@field adminIcon string? The admin icon when this message was sent, if it was enabled.
----@field nameColor omichat.ColorTable? The name color of the author when this message was sent.
----@field recipientNameColor omichat.ColorTable? The name color of the recipient when this message was sent.
+---@field nameColor omi.ColorTable? The name color of the author when this message was sent.
+---@field recipientNameColor omi.ColorTable? The name color of the recipient when this message was sent.
 ---@field suppressed boolean? Whether the overhead text for this message has already been suppressed.
 
 ---Options for how to format a message in chat.
@@ -76,7 +76,7 @@ return OmiChat
 ---@field showTimestamp boolean Whether the message will include a timestamp.
 ---@field useDefaultChatColor boolean Whether the default color associated with the chat type will be used if no color is specified.
 ---@field font omichat.ChatFont The font size of the message.
----@field color omichat.ColorTable? The message color.
+---@field color omi.ColorTable? The message color.
 
 ---Information used during message transformation and formatting.
 ---@class omichat.MessageInfo
@@ -210,7 +210,7 @@ return OmiChat
 ---@field chatNickname string? Nickname to use in chat alongside a profile.
 ---@field callouts string[] Custom callouts.
 ---@field sneakcallouts string[] Custom sneak callouts.
----@field colors table<omichat.ColorCategory, omichat.ColorTable> Custom chat colors.
+---@field colors table<omichat.ColorCategory, omi.ColorTable> Custom chat colors.
 
 ---Player preferences.
 ---@class omichat.PlayerPreferences

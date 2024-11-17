@@ -1,4 +1,4 @@
-local lib = require 'OmiChat/lib'
+local lib = require 'OmiLibrary'
 local utils = require 'OmiChat/util'
 local config = require 'OmiChat/config'
 local Option = require 'OmiChat/Component/Options'

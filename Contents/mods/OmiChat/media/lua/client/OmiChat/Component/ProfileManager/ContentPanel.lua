@@ -1,5 +1,6 @@
-local TextEntry = require 'OmiChat/Component/ValidatedTextEntry'
-local ColorEntry = require 'OmiChat/Component/ValidatedColorEntry'
+local UI = require 'OmiLibrary/UI'
+local TextEntry = UI.TextEntry
+local ColorEntry = UI.ColorEntry
 local OmiChat = require 'OmiChatClient'
 local Option = OmiChat.Option
 
@@ -64,7 +65,7 @@ function ContentPanel:addControls(manager)
             w = controlW,
             h = LABEL_H,
             font = FONT,
-            tooltipText = getText('UI_OmiChat_ProfileManager_Tooltip_Nickname'),
+            tooltip = getText('UI_OmiChat_ProfileManager_Tooltip_Nickname'),
         }
 
         nicknameControl:setValidateFunction(nicknameControl, OmiChat.validateNicknameText)
@@ -129,7 +130,7 @@ end
 ---Creates the labels and controls for callout text.
 ---@param manager omichat.ProfileManager
 ---@param startY number
----@return table<string, omichat.ValidatedTextEntry>
+---@return table<string, omi.ui.TextEntry>
 ---@return number
 function ContentPanel:createCalloutControls(manager, startY)
     local numLines = Option.MaximumCustomShouts
@@ -165,7 +166,7 @@ function ContentPanel:createCalloutControls(manager, startY)
             w = self.width - PAD_X * 2,
             h = controlH,
             font = FONT,
-            tooltipText = getText('UI_OmiChat_ProfileManager_Tooltip_Callouts'),
+            tooltip = getText('UI_OmiChat_ProfileManager_Tooltip_Callouts'),
             maxLines = numLines,
         }
 
@@ -189,7 +190,7 @@ end
 ---Creates the labels and controls for chat colors.
 ---@param manager omichat.ProfileManager
 ---@param startY number
----@return table<string, omichat.ValidatedColorEntry> controls
+---@return table<string, omi.ui.ColorEntry> controls
 ---@return number maxY
 function ContentPanel:createColorControls(manager, startY)
     local controls = {}
@@ -227,7 +228,7 @@ function ContentPanel:createColorControls(manager, startY)
             h = LABEL_H,
             font = FONT,
             minValue = opt == 'speech' and 48 or 0,
-            tooltipText = tooltip,
+            tooltip = tooltip,
         }
 
         control:setOnChange(manager, manager.onColorChange, control, opt)

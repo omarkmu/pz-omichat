@@ -1,8 +1,8 @@
-local lib = require 'OmiChat/lib'
+local lib = require 'OmiLibrary'
 local BaseInterpolator = lib.interpolate.Interpolator
 
 
----@class omichat.Interpolator : omi.interpolate.Interpolator
+---@class omichat.Interpolator : omi.Interpolator
 ---@field private _registeredFunctions table<string, function>
 local Interpolator = BaseInterpolator:derive()
 Interpolator._registeredFunctions = {}
@@ -36,12 +36,12 @@ function Interpolator:token(token)
 end
 
 ---Creates a new interpolator.
----@param options omi.interpolate.Options
+---@param options omi.Args.Interpolator?
 ---@return omichat.Interpolator
 function Interpolator:new(options)
     local this = BaseInterpolator.new(self, options)
 
-    Interpolator.CustomLibrary:load(this._library)
+    lib.extend(this._library, Interpolator.Library)
 
     ---@cast this omichat.Interpolator
     return this

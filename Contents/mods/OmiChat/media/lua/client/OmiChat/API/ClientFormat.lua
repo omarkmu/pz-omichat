@@ -76,7 +76,7 @@ local function applyNarrativeStyle(input, stream, tokens)
             dialogueTag = tostring(tag)
             tokens.input = prefix .. tostring(remainder) .. suffix
         elseif not success then
-            utils.logError('invalid string pattern set for PatternNarrativeCustomTag')
+            utils.log.info('invalid string pattern set for PatternNarrativeCustomTag')
         end
     end
 
@@ -205,10 +205,10 @@ function OmiChat.applyFormatOptions(info)
         local hasRecipientNameColor = meta.recipientNameColor or Option.EnableSpeechColorAsDefaultNameColor
         if hasNameColor then
             local colorToUse = meta.nameColor or Option:getDefaultColor('name', message:getAuthor())
-            local nameColor = utils.toChatColor(colorToUse, true)
+            local nameColor = utils.color.toRichText(colorToUse, true)
 
             if nameColor ~= '' then
-                utils.addMessageTagValue(message, 'ocNameColor', utils.colorToHexString(colorToUse))
+                utils.addMessageTagValue(message, 'ocNameColor', utils.color.toHexString(colorToUse))
                 info.tokens.name = concat {
                     nameColor,
                     info.tokens.name,
@@ -225,10 +225,10 @@ function OmiChat.applyFormatOptions(info)
         if hasRecipientNameColor and info.tokens.recipient then
             local colorToUse = meta.recipientNameColor or Option:getDefaultColor('name', info.tokens.recipient)
             meta.recipientNameColor = colorToUse
-            local nameColor = utils.toChatColor(colorToUse, true)
+            local nameColor = utils.color.toRichText(colorToUse, true)
 
             if nameColor ~= '' then
-                utils.addMessageTagValue(message, 'ocRecipientNameColor', utils.colorToHexString(colorToUse))
+                utils.addMessageTagValue(message, 'ocRecipientNameColor', utils.color.toHexString(colorToUse))
                 info.tokens.recipientName = concat {
                     nameColor,
                     info.tokens.recipientName,
@@ -301,7 +301,7 @@ function OmiChat.buildMessageInfo(message, skipFormatting)
     local text
     local titleID
     if utils.isinstance(message, MimicMessage) then
-        ---@cast message omichat.MimicMessage
+        ---@cast message omi.chat.MimicMessage
         text = message:getTextWithPrefixBase()
         titleID = message:getTitleID()
     else
@@ -398,7 +398,7 @@ function OmiChat.buildMessageTextFromInfo(info)
     tokens.prefix = utils.trim(utils.interpolate(Option.FormatChatPrefix, tokens, seed))
 
     return concat {
-        utils.toChatColor(info.formatOptions.color),
+        utils.color.toRichText(info.formatOptions.color),
         '<SIZE:', info.formatOptions.font or 'medium', '> ',
         utils.interpolate(Option.ChatFormatFull, tokens, seed),
     }
@@ -443,8 +443,8 @@ function OmiChat.decodeMessageTag(tag)
         suppressed = decoded.ocSuppressed,
         language = decoded.ocLanguage,
         name = decoded.ocName,
-        nameColor = utils.stringToColor(decoded.ocNameColor),
-        recipientNameColor = utils.stringToColor(decoded.ocRecipientNameColor),
+        nameColor = utils.color.fromString(decoded.ocNameColor),
+        recipientNameColor = utils.color.fromString(decoded.ocRecipientNameColor),
         icon = decoded.ocIcon,
         adminIcon = decoded.ocAdminIcon,
     }
@@ -489,20 +489,16 @@ function OmiChat.encodeMessageTag(message)
     end
 
     local color = author and OmiChat.getNameColorInChat(author)
-    local success, encoded = utils.json.tryEncode {
+    local encoded = utils.json.tryEncode {
         ocSuppressed = false,
         ocLanguage = OmiChat.decodeLanguage(message),
         ocName = OmiChat.getNameInChatRichText(author, OmiChat.getMessageChatType(message)),
-        ocNameColor = color and utils.colorToHexString(color) or nil,
+        ocNameColor = color and utils.color.toHexString(color) or nil,
         ocIcon = icon or (author and OmiChat.getChatIcon(author)) or nil,
         ocAdminIcon = (author and useAdminIcon) and OmiChat.getAdminChatIcon(author) or nil,
     }
 
-    if not success then
-        return ''
-    end
-
-    return encoded
+    return encoded or ''
 end
 
 ---Prepares text for sending to chat.
@@ -629,7 +625,7 @@ end
 ---@return string
 function OmiChat.getMessageChatType(message)
     if utils.isinstance(message, MimicMessage) then
-        ---@cast message omichat.MimicMessage
+        ---@cast message omi.chat.MimicMessage
         return message:getChatType()
     end
 
@@ -638,7 +634,7 @@ function OmiChat.getMessageChatType(message)
 end
 
 ---Text entry validator that validates against the nickname filter.
----@param entry omichat.ValidatedTextEntry
+---@param entry omi.ui.TextEntry
 ---@param text string?
 ---@return boolean
 ---@return string? nickname

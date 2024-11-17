@@ -13,10 +13,10 @@ local Option = OmiChat.Option
 ---@class omichat.ProfileManager : ISPanelJoypad
 ---@field current omichat.PlayerProfile?
 ---@field profiles omichat.PlayerProfile[]
----@field profileNameControl omichat.ValidatedTextEntry
----@field nicknameControl omichat.ValidatedTextEntry?
----@field colorControls table<string, omichat.ValidatedColorEntry>
----@field calloutControls table<string, omichat.ValidatedTextEntry>
+---@field profileNameControl omi.ui.TextEntry
+---@field nicknameControl omi.ui.TextEntry?
+---@field colorControls table<string, omi.ui.ColorEntry>
+---@field calloutControls table<string, omi.ui.TextEntry>
 ---@field deleteButton ISButton?
 ---@field duplicateButton ISButton?
 local ProfileManager = ISPanelJoypad:derive('ProfileManager')
@@ -245,7 +245,7 @@ function ProfileManager:duplicateProfile()
 end
 
 ---Callback for callout update.
----@param entry omichat.ValidatedTextEntry
+---@param entry omi.ui.TextEntry
 ---@param category omichat.CalloutCategory
 function ProfileManager:onCalloutsChange(entry, category)
     local profile = self.current
@@ -265,11 +265,11 @@ function ProfileManager:onCalloutsChange(entry, category)
 end
 
 ---Callback for color update.
----@param entry omichat.ValidatedColorEntry
+---@param entry omi.ui.ColorEntry
 ---@param category omichat.ColorCategory
 function ProfileManager:onColorChange(entry, category)
     local profile = self.current
-    local color = entry:getColorTable()
+    local color = entry:getColor()
     if profile and color then
         profile.colors[category] = utils.copy(color)
     elseif profile then
@@ -283,7 +283,7 @@ function ProfileManager:onColorChange(entry, category)
 end
 
 ---Callback for nickname update.
----@param entry omichat.ValidatedTextEntry
+---@param entry omi.ui.TextEntry
 function ProfileManager:onNicknameChange(entry)
     local text = entry:getInternalText()
     text = utils.trim(text)
@@ -305,7 +305,7 @@ function ProfileManager:onNicknameChange(entry)
 end
 
 ---Callback for profile name update.
----@param entry omichat.ValidatedTextEntry
+---@param entry omi.ui.TextEntry
 function ProfileManager:onProfileNameChange(entry)
     local text = entry:getInternalText()
     text = utils.trim(text)

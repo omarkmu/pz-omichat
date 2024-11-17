@@ -325,7 +325,7 @@ function OmiChat.searchOnlineUsernames(ctxOrSearch, includeSelf, useCache)
 
     return {
         exact = exact,
-        results = utils.extend(ctx.startsWith, ctx.contains),
+        results = utils.append(ctx.startsWith, ctx.contains),
     }
 end
 
@@ -351,7 +351,7 @@ function OmiChat.searchPerks(ctxOrSearch)
 
     return {
         exact = exact,
-        results = utils.extend(ctx.startsWith, ctx.contains),
+        results = utils.append(ctx.startsWith, ctx.contains),
     }
 end
 
@@ -402,7 +402,7 @@ function OmiChat.searchStreams(ctxOrSearch, options)
     end
 
     local results = {}
-    local streamResults = utils.extend(ctx.startsWith, ctx.contains)
+    local streamResults = utils.append(ctx.startsWith, ctx.contains)
     for i = 1, #streamResults do
         local result = streamResults[i]
         local stream = result.value
@@ -445,6 +445,6 @@ function OmiChat.searchStrings(ctxOrSearch, list)
     ---@type omichat.SearchResults
     return {
         exact = exact,
-        results = utils.extend(ctx.startsWith, ctx.contains),
+        results = utils.append(ctx.startsWith, ctx.contains),
     }
 end

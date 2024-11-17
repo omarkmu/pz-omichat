@@ -1,11 +1,11 @@
-local lib = require 'OmiChat/lib'
+local lib = require 'OmiLibrary'
 local MultiMap = lib.interpolate.MultiMap
 
 ---@class omichat.Interpolator
 local Interpolator = require 'OmiChat/Component/Interpolator'
 
 ---Format string function library.
-local InterpolatorLibrary = {}
+local InterpolatorLibrary
 
 local OmiChat = require 'OmiChat/API/Shared'
 local utils = OmiChat.utils
@@ -13,7 +13,7 @@ local Option = OmiChat.Option
 
 local rep = string.rep
 local concat = table.concat
-local baseLibraries = (require 'OmiChat/lib').interpolate.Interpolator.Libraries
+local baseLibraries = lib.interpolate.Interpolator.Libraries
 local stringFunctions = baseLibraries.functions.string
 
 local cooldowns = {}
@@ -229,8 +229,7 @@ local function stringify(...)
 end
 
 
-local library
-library = {
+InterpolatorLibrary = {
     capitalize = internalWrap(stringFunctions.capitalize),
     punctuate = internalWrap(stringFunctions.punctuate),
     ---@param _ omichat.Interpolator
@@ -259,7 +258,7 @@ library = {
         end
 
         category = tostring(category or 'say')
-        local color = utils.toChatColor(OmiChat.getColorOrDefault(category), true)
+        local color = utils.color.toRichText(OmiChat.getColorOrDefault(category), true)
         if color == '' then
             return s
         end
@@ -296,7 +295,7 @@ library = {
             category = nil
         end
 
-        local color = utils.toChatColor(OmiChat.getColorOrDefault(tostring(category or 'me')), true)
+        local color = utils.color.toRichText(OmiChat.getColorOrDefault(tostring(category or 'me')), true)
 
         -- narrative style handling
         local prefix = ''
@@ -382,12 +381,13 @@ library = {
             return base
         end
 
+        local pop
         local parts = { base, ' <SPACE> ' }
 
-        local pop
-        if not interpolator:toBoolean(noQuoteColor) then
+        ---@cast OmiChat unknown
+        if not interpolator:toBoolean(noQuoteColor) and OmiChat.getColorOrDefault then
             ---@cast OmiChat omichat.api.client
-            local color = OmiChat.getColorOrDefault and utils.toChatColor(OmiChat.getColorOrDefault('say'), true) or ''
+            local color = utils.color.toRichText(OmiChat.getColorOrDefault('say'), true) or ''
             if color ~= '' then
                 pop = true
                 parts[#parts + 1] = color
@@ -588,7 +588,7 @@ library = {
             return true
         end
 
-        return library.cooldown(interpolator, n, key, suppressError)
+        return InterpolatorLibrary.cooldown(interpolator, n, key, suppressError)
     end,
     ---@param interpolator omichat.Interpolator
     ---@param condition string?
@@ -601,7 +601,7 @@ library = {
             return true
         end
 
-        return library.cooldown(interpolator, n, key, suppressError)
+        return InterpolatorLibrary.cooldown(interpolator, n, key, suppressError)
     end,
     ---@param interpolator omichat.Interpolator
     ---@param key string?
@@ -623,15 +623,5 @@ library = {
 }
 
 
----Loads the library into the destination table.
----@param dest table
-function InterpolatorLibrary:load(dest)
-    for k, v in pairs(library) do
-        dest[k] = v
-    end
-end
-
-
-Interpolator.CustomLibrary = InterpolatorLibrary
-InterpolatorLibrary.library = library
+Interpolator.Library = InterpolatorLibrary
 return InterpolatorLibrary

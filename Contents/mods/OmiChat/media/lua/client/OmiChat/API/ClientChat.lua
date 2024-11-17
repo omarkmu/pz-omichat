@@ -1,6 +1,6 @@
 ---Client API functionality related to manipulating the chat.
 
-local lib = require 'OmiChat/lib'
+local lib = require 'OmiLibrary/Client'
 local getTexture = getTexture
 local min = math.min
 local max = math.max
@@ -34,7 +34,6 @@ local config = OmiChat.config
 local Option = OmiChat.Option
 local IconPicker = OmiChat.IconPicker
 local StreamInfo = OmiChat.StreamInfo
-local MimicMessage = OmiChat.MimicMessage
 
 
 local signLanguageEmotes = {
@@ -343,14 +342,9 @@ end
 ---Adds an info message to chat that displays only for the local user.
 ---@param text string
 ---@param serverAlert boolean?
-function OmiChat.addInfoMessage(text, serverAlert)
-    local message = MimicMessage:new(text)
-    message:setChatType('server')
-    message:setTitleID('UI_chat_server_chat_title_id')
-    message:setServerAlert(serverAlert or false)
-    message:setIsRichText(true)
-
-    ISChat.addLineInChat(message, ISChat.instance.currentTabID - 1)
+---@param tabID integer? The 1-indexed ID of the chat tab to send the message on. Defaults to the current chat tab.
+function OmiChat.addInfoMessage(text, serverAlert, tabID)
+    lib.chat.addInfoMessage(text, serverAlert, tabID)
 end
 
 ---Determines stream information given a chat command.

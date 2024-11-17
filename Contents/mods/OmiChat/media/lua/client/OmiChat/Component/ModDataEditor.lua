@@ -1,25 +1,27 @@
 local ISPanelJoypad = ISPanelJoypad
 local Keyboard = Keyboard
 
+local UI = require 'OmiLibrary/UI'
+
 ---@class omichat.api.client
 local OmiChat = require 'OmiChat/API/Client'
 local utils = OmiChat.utils
 local config = OmiChat.config
-local TextEntry = OmiChat.ValidatedTextEntry
-local ColorEntry = OmiChat.ValidatedColorEntry
+local TextEntry = UI.TextEntry
+local ColorEntry = UI.ColorEntry
 local SuggesterBox = OmiChat.SuggesterBox
 
 ---UI element for displaying the mod data editor for the mod data manager.
 ---@class omichat.ModDataEditor : ISPanelJoypad
 ---@field item omichat.UserModData
 ---@field saveItem omichat.UserModData
----@field nicknameEntry omichat.ValidatedTextEntry
----@field usernameEntry omichat.ValidatedTextEntry
----@field nameColorEntry omichat.ValidatedColorEntry
----@field iconEntry omichat.ValidatedTextEntry
----@field currentLangEntry omichat.ValidatedTextEntry
----@field languageEntry omichat.ValidatedTextEntry
----@field languageSlotsEntry omichat.ValidatedTextEntry
+---@field nicknameEntry omi.ui.TextEntry
+---@field usernameEntry omi.ui.TextEntry
+---@field nameColorEntry omi.ui.ColorEntry
+---@field iconEntry omi.ui.TextEntry
+---@field currentLangEntry omi.ui.TextEntry
+---@field languageEntry omi.ui.TextEntry
+---@field languageSlotsEntry omi.ui.TextEntry
 ---@field languageListbox ISScrollingListBox
 ---@field langSuggester omichat.SuggesterBox
 ---@field addLangBtn ISButton
@@ -184,7 +186,7 @@ function ModDataEditor:createChildren()
     self.nicknameEntry:setValidateFunction(self.nicknameEntry, OmiChat.validateNicknameText)
 
     text = getText('UI_OmiChat_ModDataManager_Column_nameColor')
-    y, self.nameColorEntry = createField(self, ColorEntry, y + PAD_Y, text, utils.stringToColor(item.nameColor))
+    y, self.nameColorEntry = createField(self, ColorEntry, y + PAD_Y, text, utils.color.fromString(item.nameColor))
 
     text = getText('UI_OmiChat_ModDataManager_Column_icon')
     y, self.iconEntry = createField(self, TextEntry, y + PAD_Y, text, item.icon)
@@ -215,8 +217,8 @@ function ModDataEditor:createChildren()
 
     self.languageEntry:initialise()
     self.languageEntry:setOnChange(self, self.updateSuggester)
-    self.languageEntry:setOnFocusGained(self, self.updateSuggester)
-    self.languageEntry:setOnFocusLost(self, self.onLanguageEntryFocusLost)
+    self.languageEntry:setOnFocus(self, self.updateSuggester)
+    self.languageEntry:setOnBlur(self, self.onLanguageEntryFocusLost)
     self.languageEntry:setOnKey(self, self.handleLangEntryKey)
     self:addChild(self.languageEntry)
 
@@ -260,7 +262,7 @@ function ModDataEditor:destroy()
 end
 
 ---Gets the computed value of an entry.
----@param entry omichat.ValidatedTextEntry
+---@param entry omi.ui.TextEntry
 ---@return string?
 function ModDataEditor:getEntryValue(entry)
     local value = utils.trim(entry:getInternalText())
@@ -560,7 +562,7 @@ function ModDataEditor:updateSuggester()
 end
 
 ---Text entry validator for icons.
----@param entry omichat.ValidatedTextEntry
+---@param entry omi.ui.TextEntry
 ---@return boolean
 function ModDataEditor:validateIconText(entry)
     local text = utils.trim(entry:getInternalText())
@@ -583,7 +585,7 @@ function ModDataEditor:validateIconText(entry)
 end
 
 ---Text entry validator for roleplay language names.
----@param entry omichat.ValidatedTextEntry
+---@param entry omi.ui.TextEntry
 ---@param expectKnown boolean?
 ---@return boolean
 function ModDataEditor:validateLanguageText(entry, expectKnown)
