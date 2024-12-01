@@ -63,6 +63,12 @@ function OmiChat.reportPlayerDeath()
     return OmiChat.dispatch('reportPlayerDeath')
 end
 
+---Reports to the server that the player joined.
+---@return boolean
+function OmiChat.reportPlayerJoined()
+    return OmiChat.dispatch('reportPlayerJoined')
+end
+
 ---Executes the /addlanguage command.
 ---@param command string
 ---@return boolean
@@ -123,6 +129,12 @@ function OmiChat.requestFlipCoin()
     end
 
     return OmiChat.dispatch('requestFlipCoin')
+end
+
+---Requests that the server updates the player cache.
+---@return boolean
+function OmiChat.requestPlayerCacheUpdate()
+    return OmiChat.dispatch('requestPlayerCacheUpdate')
 end
 
 ---Executes the /reseticon command.
@@ -338,6 +350,12 @@ function OmiChat.Commands.showInfoMessage(args)
     OmiChat.addInfoMessage(text, args.serverAlert)
 end
 
+---Updates player cache state.
+---@param info omichat.request.UpdatePlayerCache
+function OmiChat.Commands.updatePlayerCache(info)
+    utils.resetPlayerCache(info.items)
+end
+
 ---Updates chat state.
 function OmiChat.Commands.updateState()
     OmiChat.updateState(true)
@@ -348,7 +366,7 @@ end
 function OmiChat.Commands.updateTyping(args)
     local typingInfo ---@type omichat.TypingInformation?
 
-    local player = args.typing and utils.getPlayerByUsername(args.username)
+    local player = args.typing and utils.getPlayerInfoByUsername(args.username)
     local display = player and OmiChat.getPlayerMenuName(player, 'typing')
     if display then
         typingInfo = {

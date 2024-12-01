@@ -4,7 +4,6 @@ local config = require 'OmiChat/config'
 local DelimitedList = utils.DelimitedList
 
 local getActivatedMods = getActivatedMods
-local floor = math.floor
 
 
 ---Helper for retrieving sandbox variables and their defaults.
@@ -30,6 +29,12 @@ local floor = math.floor
 ---@field CoinItems string
 ---@field DiceItems string
 ---@field BuffCooldown integer
+---@field BuffReduceBoredom number
+---@field BuffReduceCigaretteStress number
+---@field BuffReduceFatigue number
+---@field BuffReduceHunger number
+---@field BuffReduceThirst number
+---@field BuffReduceUnhappiness number
 ---@field CustomShoutMaxLength integer
 ---@field MinimumCommandAccessLevel integer
 ---@field MaximumCustomShouts integer
@@ -43,6 +48,7 @@ local floor = math.floor
 ---@field RangeMe integer
 ---@field RangeMeLoud integer
 ---@field RangeMeQuiet integer
+---@field RangeMeWhisper integer
 ---@field RangeMultiplierZombies number
 ---@field RangeOoc integer
 ---@field RangeLow integer
@@ -57,6 +63,7 @@ local floor = math.floor
 ---@field ColorDoLoud string
 ---@field ColorMe string
 ---@field ColorMeQuiet string
+---@field ColorMeWhisper string
 ---@field ColorMeLoud string
 ---@field ColorSay string
 ---@field ColorWhisper string
@@ -118,6 +125,7 @@ local floor = math.floor
 ---@field OverheadFormatMe string
 ---@field OverheadFormatWhisper string
 ---@field OverheadFormatMeQuiet string
+---@field OverheadFormatMeWhisper string
 ---@field OverheadFormatMeLoud string
 ---@field OverheadFormatOoc string
 ---@field OverheadFormatLow string
@@ -132,6 +140,7 @@ local floor = math.floor
 ---@field ChatFormatEcho string
 ---@field ChatFormatMe string
 ---@field ChatFormatMeQuiet string
+---@field ChatFormatMeWhisper string
 ---@field ChatFormatMeLoud string
 ---@field ChatFormatSay string
 ---@field ChatFormatOoc string
@@ -208,7 +217,7 @@ local function isCompatEnabled(value, modId)
 end
 
 
----Checks whether the language against the add language allow/block list.
+---Checks the language against the add language allow/block list.
 ---This does not check whether the language is a valid roleplay language.
 ---@param language string
 ---@return boolean
@@ -296,25 +305,21 @@ end
 ---@return omichat.ColorTable
 function Option:getDefaultColor(category, username)
     if category == 'speech' or (category == 'name' and self.EnableSpeechColorAsDefaultNameColor) then
-        local player = username and utils.getPlayerByUsername(username)
-        local speechColor = player and player:getSpeakColour()
+        local player = username and utils.getPlayerInfoByUsername(username)
+        local speechColor = player and player.speechColor
 
         if not speechColor then
             return { r = 255, g = 255, b = 255 }
         end
 
         return {
-            r = floor(speechColor:getR() * 255),
-            g = floor(speechColor:getG() * 255),
-            b = floor(speechColor:getB() * 255),
+            r = speechColor.r,
+            g = speechColor.g,
+            b = speechColor.b,
         }
     elseif category == 'faction' and Option.EnableFactionColorAsDefault then
-        local player
-        if username then
-            player = utils.getPlayerByUsername(username)
-        else
-            player = getSpecificPlayer(0)
-        end
+        -- faction messages should share the player's faction
+        local player = getSpecificPlayer(0)
 
         local playerFaction = player and Faction.getPlayerFaction(player)
         local tagColor = playerFaction and playerFaction:getTagColor()

@@ -921,19 +921,20 @@ function ISChat.addLineInChat(message, tabID)
 
     local soundRange
     local player = getSpecificPlayer(0)
-    local username = player and player:getUsername()
 
     local mtIndex = (getmetatable(message) or {}).__index
     if mtIndex == _ChatMessage or mtIndex == _ServerChatMessage or utils.isinstance(message, OmiChat.MimicMessage) then
+        local username = player and player:getUsername()
         local chatType = OmiChat.getMessageChatType(message)
+
         if chatType == 'radio' then
             local formatter = OmiChat.getFormatter('onlineID')
             local value = formatter:read(message:getText())
             local onlineID = value and utils.decodeInvisibleInt(value)
-            local authorPlayer = onlineID and getPlayerByOnlineID(onlineID)
+            local authorPlayer = onlineID and utils.getPlayerInfoByOnlineID(onlineID)
 
             if authorPlayer then
-                message:setAuthor(authorPlayer:getUsername())
+                message:setAuthor(authorPlayer.username)
             elseif username and message:getAuthor() == username then
                 -- if we can't find the author, clear instead of attributing to this player
                 message:setAuthor('')

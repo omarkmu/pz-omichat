@@ -74,12 +74,12 @@ description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=27282
 description=[/list]
 description=
 description=[h2]Permissions & Credits[/h2]
-description=This mod uses the [url=https://theindiestone.com/forums/index.php?/topic/2530-mod-permissions/#comment-36478]“Ask for permission” policy.[/url]
+description=This mod uses the [url=https://theindiestone.com/forums/index.php?/topic/2530-mod-permissions/#comment-36478]"Ask for permission" policy.[/url]
 description=You may [b]not[/b] reupload this mod or include it directly in modpacks. If there's something missing from the mod, [url=https://github.com/omarkmu/pz-omichat/blob/main/.github/CONTRIBUTING.md]contribute![/url]
 description=Permission is not required to list the mod as a requirement or extend it via the API. If you'd like to request permission to use it in another way (modpack requests will likely be denied), please start a [url=https://github.com/omarkmu/pz-omichat/discussions/new?category=general]discussion.[/url]
 description=The code and associated documentation is licensed under the [url=https://github.com/omarkmu/pz-omichat/blob/main/LICENSE]MIT License.[/url]
 description=
-description=Thank you to 우로 and Inkredibehl for providing translations!
+description=Thank you to Wuro and Inkredibehl for providing translations!
 description=Some features were inspired by [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2688851521]buffy's roleplay chat.[/url]
 description=[hr][/hr]Questions? Use the [url=https://github.com/omarkmu/pz-omichat/discussions]GitHub discussions.[/url]
 description=Suggestions? Create a [url=https://github.com/omarkmu/pz-omichat/discussions/new?category=ideas]feature request.[/url]

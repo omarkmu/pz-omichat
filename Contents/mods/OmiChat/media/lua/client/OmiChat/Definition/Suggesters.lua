@@ -149,9 +149,9 @@ return {
             }
 
             if argType == 'online-username' then
-                search = OmiChat.searchOnlineUsernames(ctx)
+                search = OmiChat.searchOnlineUsernames(ctx, false, true)
             elseif argType == 'online-username-with-self' then
-                search = OmiChat.searchOnlineUsernames(ctx, true)
+                search = OmiChat.searchOnlineUsernames(ctx, true, true)
             elseif argType == 'language' then
                 ctx.display = ctx.display or utils.getTranslatedLanguageName
                 ctx.searchDisplay = utils.default(ctx.searchDisplay, true)

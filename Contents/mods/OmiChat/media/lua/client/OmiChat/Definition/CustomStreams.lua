@@ -98,6 +98,18 @@ return {
             formatter = 'mequiet',
         },
     },
+    mewhisper = {
+        name = 'mewhisper',
+        command = '/mewhisper ',
+        shortCommand = '/mw ',
+        tabID = 1,
+        omichat = {
+            allowEmotes = true,
+            allowIconPicker = true,
+            commandType = 'rp',
+            formatter = 'mewhisper',
+        },
+    },
     meloud = {
         name = 'meloud',
         command = '/meloud ',

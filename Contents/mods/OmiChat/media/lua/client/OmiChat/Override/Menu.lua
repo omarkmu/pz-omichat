@@ -309,16 +309,15 @@ function ISMiniScoreboardUI:populateList()
 
     for i = 1, #self.playerList.items do
         local item = self.playerList.items[i]
-        local username = item.item and item.item.username
+        local username = item.item and item.item.username ---@type string?
 
-        local player = getPlayerFromUsername(username)
+        local player = username and utils.getPlayerInfoByUsername(username)
         local name = player and OmiChat.getPlayerMenuName(player, 'mini_scoreboard')
-        if name then
+        if player and name then
             item.text = name
-            local desc = player:getDescriptor()
-            local forename = utils.trim(desc and desc:getForename() or '')
-            local surname = utils.trim(desc and desc:getSurname() or '')
-            local chatName = OmiChat.getNameInChat(username, 'say') or ''
+            local forename = utils.trim(player.forename or '')
+            local surname = utils.trim(player.surname or '')
+            local chatName = OmiChat.getPlayerNameInChat(player, 'say') or ''
 
             local details = {
                 'Username: ',
