@@ -124,6 +124,12 @@ return check {
     padding(),
     'PredicateApplyBuff',
     'BuffCooldown',
+    'BuffReduceBoredom',
+    'BuffReduceUnhappiness',
+    'BuffReduceHunger',
+    'BuffReduceThirst',
+    'BuffReduceFatigue',
+    'BuffReduceCigaretteStress',
 
     padding(),
     'FormatAdminIcon',
@@ -281,6 +287,12 @@ return check {
     'OverheadFormatMeQuiet',
     'RangeMeQuiet',
     'ColorMeQuiet',
+
+    padding(),
+    'ChatFormatMeWhisper',
+    'OverheadFormatMeWhisper',
+    'RangeMeWhisper',
+    'ColorMeWhisper',
 
     padding(),
     'ChatFormatMeLoud',

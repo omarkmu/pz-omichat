@@ -200,6 +200,66 @@ option OmiChat.BuffCooldown
     translation = OCBuffCooldown,
 }
 
+option OmiChat.BuffReduceBoredom
+{
+    type = double,
+    default = 0.2,
+    min = 0,
+    max = 1,
+    page = OmiChat,
+    translation = OCBuffReduceBoredom,
+}
+
+option OmiChat.BuffReduceUnhappiness
+{
+    type = double,
+    default = 0.2,
+    min = 0,
+    max = 1,
+    page = OmiChat,
+    translation = OCBuffReduceUnhappiness,
+}
+
+option OmiChat.BuffReduceHunger
+{
+    type = double,
+    default = 0.1,
+    min = 0,
+    max = 1,
+    page = OmiChat,
+    translation = OCBuffReduceHunger,
+}
+
+option OmiChat.BuffReduceThirst
+{
+    type = double,
+    default = 0.1,
+    min = 0,
+    max = 1,
+    page = OmiChat,
+    translation = OCBuffReduceThirst,
+}
+
+option OmiChat.BuffReduceFatigue
+{
+    type = double,
+    default = 0.1,
+    min = 0,
+    max = 1,
+    page = OmiChat,
+    translation = OCBuffReduceFatigue,
+}
+
+option OmiChat.BuffReduceCigaretteStress
+{
+    type = double,
+    default = 0.2,
+    min = 0,
+    max = 1,
+    page = OmiChat,
+    translation = OCBuffReduceCigaretteStress,
+}
+
 option OmiChat.MaximumCustomShouts
 {
     type = integer,
@@ -352,6 +412,16 @@ option OmiChat.RangeMeQuiet
     translation = OCRangeMeQuiet,
 }
 
+option OmiChat.RangeMeWhisper
+{
+    type = integer,
+    default = 2,
+    min = 1,
+    max = 30,
+    page = OmiChat,
+    translation = OCRangeMeWhisper,
+}
+
 option OmiChat.RangeSay
 {
     type = integer,
@@ -395,7 +465,7 @@ option OmiChat.RangeYell
 option OmiChat.RangeVertical
 {
     type = string,
-    default = @($sneakCallout:1;$index(@(@(shout;meloud;doloud):3;@(whisper;low;mequiet;doquiet):1) $stream 2)),
+    default = @($sneakCallout:1;$index(@(@(shout;meloud;doloud):3;@(whisper;low;mequiet;doquiet;mewhisper):1) $stream 2)),
     page = OmiChat,
     translation = OCRangeVertical,
 }
@@ -504,6 +574,14 @@ option OmiChat.ColorMeQuiet
     default = 85 48 139,
     page = OmiChat,
     translation = OCColorMeQuiet,
+}
+
+option OmiChat.ColorMeWhisper
+{
+    type = string,
+    default = 85 48 139,
+    page = OmiChat,
+    translation = OCColorMeWhisper,
 }
 
 option OmiChat.ColorPrivate
@@ -936,6 +1014,14 @@ option OmiChat.OverheadFormatMeQuiet
     translation = OCOverheadFormatMeQuiet,
 }
 
+option OmiChat.OverheadFormatMeWhisper
+{
+    type = string,
+    default = << $1 >>,
+    page = OmiChat,
+    translation = OCOverheadFormatMeWhisper,
+}
+
 option OmiChat.OverheadFormatLow
 {
     type = string,
@@ -1128,6 +1214,14 @@ option OmiChat.ChatFormatMeQuiet
     default = $fmtrp(<SPACE> $name <SPACE> $punctuate($trimright($message)) <SPACE>),
     page = OmiChat,
     translation = OCChatFormatMeQuiet,
+}
+
+option OmiChat.ChatFormatMeWhisper
+{
+    type = string,
+    default =,
+    page = OmiChat,
+    translation = OCChatFormatMeWhisper,
 }
 
 option OmiChat.ChatFormatSafehouse

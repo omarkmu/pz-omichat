@@ -194,6 +194,15 @@ If blank, `/mequiet` messages will be disabled.
 - [`RangeMeQuiet`](./ranges.md#rangemequiet)
 - [`OverheadFormatMeQuiet`](./overhead-formats.md#overheadformatmequiet)
 
+### ChatFormatMeWhisper
+`(blank by default)`  
+**Token Context:** [Chat](../sandbox-options/token-contexts.md#chat)
+
+The format used for `/mewhisper` (`/mw`) messages in chat.
+If blank, `/mewhisper` messages will be disabled.
+
+`/mewhisper` behaves similarly to [`/me`](#chatformatme), but has a smaller range.
+
 ### ChatFormatOoc
 **Default:** `$name: <SPACE> (( $message ))`  
 **Token Context:** [Chat](../sandbox-options/token-contexts.md#chat)

@@ -63,6 +63,11 @@ The default color used for [`/me`](./chat-formats.md#chatformatme) messages.
 
 The default color used for [`/meloud`](./chat-formats.md#chatformatmeloud) messages.
 
+### ColorMeWhisper
+**Default:** `85 48 139`
+
+The default color used for [`/mewhisper`](./chat-formats.md#chatformatmewhisper) messages.
+
 ### ColorMeQuiet
 **Default:** `85 48 139`
 

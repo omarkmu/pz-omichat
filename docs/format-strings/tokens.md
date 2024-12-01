@@ -153,6 +153,7 @@ This can be extended by other mods. In the base mod, however, this will be one o
 - `me`
 - `meloud`
 - `mequiet`
+- `mewhisper`
 - `card`
 - `roll`
 
