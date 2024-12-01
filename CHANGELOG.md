@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.5.0
+
+### Added
+- `/mewhisper` stream and associated (off by default)
+    - To enable this stream, populate the `ChatFormatMeWhisper` option. See the buffy preset for an example.
+- Options for configuration of buff amounts
+    - `BuffReduceBoredom`
+    - `BuffReduceUnhappiness`
+    - `BuffReduceHunger`
+    - `BuffReduceThirst`
+    - `BuffReduceFatigue`
+    - `BuffReduceCigaretteStress`
+
+### Fixed
+- Unmet players' names will no longer fail to show up over radio
+
 ## 1.4.0
 
 ### Added
