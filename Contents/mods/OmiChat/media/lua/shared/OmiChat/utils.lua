@@ -475,20 +475,7 @@ end
 ---@param username string
 ---@return omichat.utils.PlayerCacheItem?
 function utils.getPlayerInfoByUsername(username)
-    local found
-    if isClient() then
-        found = getPlayerFromUsername(username)
-    else
-        local onlinePlayers = getOnlinePlayers()
-        for i = 0, onlinePlayers:size() - 1 do
-            local player = onlinePlayers:get(i)
-            if player:getUsername() == username then
-                found = player
-                break
-            end
-        end
-    end
-
+    local found = utils.getPlayerByUsername(username)
     if found then
         return updateCacheWithPlayer(found)
     end
@@ -500,7 +487,7 @@ end
 ---@param username string
 ---@return IsoPlayer?
 function utils.getPlayerByUsername(username)
-    if isClient() then
+    if not isServer() then
         return getPlayerFromUsername(username)
     end
 

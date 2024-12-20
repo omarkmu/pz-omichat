@@ -23,6 +23,7 @@ local lib = require 'OmiLibrary/Client'
 ---@field private _typingDisplay string?
 ---@field private _typingInfo table<string, omichat.TypingInformation>
 ---@field private _leftmostBtn ISButton?
+---@field private _mock omi.chat.Mock?
 local API = require 'OmiChat/Shared'
 
 ---@class omichat.utils.client : omichat.utils
@@ -35,7 +36,7 @@ API.utils.lib = lib
 API.IconPicker = require 'OmiChat/Component/IconPicker'
 API.SuggesterBox = require 'OmiChat/Component/SuggesterBox'
 API.StreamInfo = require 'OmiChat/Component/StreamInfo'
-API.MimicMessage = (require 'OmiLibrary/Chat').MimicMessage
+API.MimicMessage = lib.chat.MimicMessage
 
 API._prefsVersion = 2
 API._prefsFileName = 'omichat.json'
@@ -175,6 +176,24 @@ end
 ---Event handler that runs on game start.
 ---@protected
 function API._onGameStart()
+    if getDebug() and not isClient() then
+        -- if we're running in singleplayer & debug, mock the chat
+        local mock = lib.chat.Mock:new()
+        mock:start()
+
+        API._mock = mock
+
+        API.raw = {
+            say = processSayMessage,
+            shout = processShoutMessage,
+            whisper = proceedPM,
+            general = processGeneralMessage,
+            safehouse = processSafehouseMessage,
+            faction = proceedFactionMessage,
+            admin = processAdminChatMessage,
+        }
+    end
+
     API.updateState(true)
 end
 
