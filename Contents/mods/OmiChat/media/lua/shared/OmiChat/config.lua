@@ -1,5 +1,5 @@
 ---Mod configuration values.
----@class omichat.Configuration
+---@class omichat.DeprecatedConfiguration
 ---@field private _streamTable table<omichat.CustomStreamName, omichat.CustomStreamInfo>
 ---@field private _streamList omichat.CustomStreamInfo[]
 ---@field private _chatStreams omichat.CustomStreamInfo[]

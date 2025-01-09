@@ -228,6 +228,20 @@ function API.reportRoll(player, roll, sides)
     API.dispatch('reportRoll', player, req)
 end
 
+---Sends the configuration to the given player.
+---If no player is given, configuration is sent to all players.
+---@param player IsoPlayer?
+function API.sendConfiguration(player)
+    ---@type omichat.request.UpdateConfiguration
+    local req = { value = API.Configuration:getValues() }
+
+    if player then
+        API.dispatch('updateConfiguration', player, req)
+    else
+        API.dispatchAll('updateConfiguration', req)
+    end
+end
+
 ---Notifies the client about another typing player.
 ---@param player IsoPlayer
 ---@param target IsoPlayer
@@ -318,8 +332,10 @@ function API.Commands.reportPlayerDeath(player)
 end
 
 ---Handles player join.
-function API.Commands.reportPlayerJoined()
+---@param player IsoPlayer
+function API.Commands.reportPlayerJoined(player)
     API.Commands.requestPlayerCacheUpdate()
+    API.sendConfiguration(player)
 end
 
 ---Handles the /addlanguage command.
@@ -669,6 +685,19 @@ function API.Commands.requestTyping(player, args)
             API.sendTyping(otherPlayer, player, typing)
         end
     end
+end
+
+---Updates the configuration with data from the client.
+---@param player IsoPlayer
+---@param args omichat.request.UpdateConfiguration
+function API.Commands.updateConfiguration(player, args)
+    if not player:isAccessLevel('Admin') then
+        return
+    end
+
+    API.Configuration:load(args.value)
+    API.Configuration:saveFile()
+    API.sendConfiguration()
 end
 
 --#endregion

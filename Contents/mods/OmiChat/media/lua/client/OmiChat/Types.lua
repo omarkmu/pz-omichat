@@ -10,7 +10,7 @@
 ---| 'main'
 
 ---@alias omichat.SettingHandlerCallback fun(submenu: ISContextMenu)
----@alias omichat.Message ChatMessage | omi.MimicMessage
+---@alias omichat.Message ChatMessage | omi.chat.MimicMessage
 
 ---@alias omichat.SuggestionType
 ---| 'online-username'

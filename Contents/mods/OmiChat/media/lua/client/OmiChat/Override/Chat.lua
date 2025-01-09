@@ -1,7 +1,6 @@
 ---Handles chat overrides and extensions.
 
 local API = require 'OmiChat/API/Client/Core'
-local UI = API.utils.ui
 
 
 ---Extended fields for ISChat.
@@ -30,6 +29,7 @@ local ISChat = ISChat
 local utils = API.utils
 local config = API.config
 local Option = API.Option
+local UI = API.utils.ui
 local SuggesterBox = API.SuggesterBox
 local getText = getText
 local max = math.max
@@ -63,6 +63,9 @@ local function addAdminOptions(context)
 
     local manageName = getText('UI_OmiChat_ContextAdminManageModData')
     subMenu:addOption(manageName, ISChat.instance, ISChat.onManageModData)
+
+    local optionsName = getText('UI_OmiChat_ContextAdminUpdateConfiguration')
+    subMenu:addOption(optionsName, ISChat.instance, ISChat.onUpdateConfiguration)
 
     for i = 1, #options do
         local option = options[i]
@@ -857,6 +860,30 @@ end
 function ISChat.onSwitchProfile(target, idx)
     API.switchProfile(idx)
     API.redrawMessages()
+end
+
+---Event handler for clicking the update configuration admin context option.
+---@param target omichat.ISChat
+---@diagnostic disable-next-line: unused-local
+function ISChat.onUpdateConfiguration(target)
+    if target.activeConfigurationPanel then
+        target.activeConfigurationPanel:destroy()
+    end
+
+    local x, y = UI.getScreenCenter(800, 600)
+    local generator = API.Configuration:getSchema():getFormGenerator()
+    local panel = generator:generate {
+        x = x,
+        y = y,
+        w = 800,
+        h = 600,
+        values = API.Configuration:getValuesForSave(),
+        onSave = API._onSaveConfiguration, ---@diagnostic disable-line: invisible
+    }
+
+    panel:initialise()
+    panel:addToUIManager()
+    target.activeConfigurationPanel = panel
 end
 
 ---Validation function for custom callout menu.

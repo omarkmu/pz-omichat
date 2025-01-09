@@ -1,3 +1,5 @@
+--#region Common
+
 ---@alias omichat.ChatTypeString
 ---| 'general'
 ---| 'whisper'
@@ -143,6 +145,10 @@
 ---@field private _playerCacheByUsername table<string, omichat.utils.PlayerCacheItem>
 ---@field private _playerCacheByOnlineID table<string, omichat.utils.PlayerCacheItem>
 
+--#endregion
+
+--#region Requests
+
 ---Request to clear mod data for a username.
 ---@class omichat.request.ClearModData
 ---@field username string
@@ -198,3 +204,236 @@
 ---Request to update the player cache.
 ---@class omichat.request.UpdatePlayerCache
 ---@field items omichat.utils.PlayerCacheItem[]
+
+---Request to update the configuration.
+---@class omichat.request.UpdateConfiguration
+---@field value omichat.Configuration The new configuration values.
+
+--#endregion
+
+--#region Configuration
+
+---@class omichat.Configuration
+---@field General omichat.Configuration.General
+---@field Buffs omichat.Configuration.Buffs
+---@field Callouts omichat.Configuration.Callouts
+---@field Commands omichat.Configuration.Commands
+---@field Compatibility omichat.Configuration.Compatibility
+---@field Customization omichat.Configuration.Customization
+---@field Discord omichat.Configuration.Discord
+---@field Format omichat.Configuration.Format
+---@field EchoMessages omichat.Configuration.EchoMessages
+---@field Language omichat.Configuration.Language
+---@field Macros omichat.Configuration.Macros
+---@field NarrativeStyle omichat.Configuration.NarrativeStyle
+---@field Radio omichat.Configuration.Radio
+---@field ServerMessages omichat.Configuration.ServerMessages
+---@field Streams omichat.Configuration.Streams
+---@field TypingIndicator omichat.Configuration.TypingIndicator
+---@field ZombieAttraction omichat.Configuration.ZombieAttraction
+
+---@class omichat.Configuration.General
+---@field Preset omichat.PresetString
+---@field AlwaysShowChat boolean
+---@field CaseInsensitiveChatStreams boolean
+---@field MinimumCommandAccessLevel integer
+---@field AdminIcon string
+---@field ClearOnDeath omichat.Configuration.General.ClearOnDeath
+---@field InfoText string
+
+---@class omichat.Configuration.General.ClearOnDeath
+---@field Icon boolean?
+---@field Languages boolean?
+---@field Nickname boolean?
+
+---@class omichat.Configuration.Buffs
+---@field Enable boolean
+---@field Cooldown integer
+---@field Boredom number
+---@field Unhappiness number
+---@field Hunger number
+---@field Thirst number
+---@field Fatigue number
+---@field CigaretteStress number
+
+---@class omichat.Configuration.Callouts
+---@field Range integer
+---@field SneakRange integer
+---@field Format string
+---@field SneakFormat string
+
+---@class omichat.Configuration.Commands
+---@field SetName omichat.Configuration.Commands.SetName
+---@field Card omichat.Configuration.Commands.ItemCommand
+---@field Roll omichat.Configuration.Commands.ItemCommand
+---@field Flip omichat.Configuration.Commands.ItemCommand
+
+---@alias omichat.Configuration.Commands.SetName
+---| 'Disable'
+---| 'Nickname'
+---| 'Forename'
+---| 'Fullname'
+---| 'Forename_Plus_Nickname'
+---| 'Fullname_Plus_Nickname'
+
+---@class omichat.Configuration.Commands.ItemCommand
+---@field Global boolean
+---@field Format string
+---@field OverheadFormat string
+---@field ChatFormat string
+---@field Items string[]
+---@field Tags string[]
+
+---@class omichat.Configuration.Compatibility
+---@field BuffyCharacterBios omi.schema.CompatibilityValue
+---@field BuffyRPGSystem omi.schema.CompatibilityValue
+---@field ChatBubble omi.schema.CompatibilityValue
+---@field SearchPlayers omi.schema.CompatibilityValue
+---@field TrueActionsDancing omi.schema.CompatibilityValue
+
+---@class omichat.Configuration.Customization
+---@field AllowCustomShouts boolean
+---@field EnableNameColors boolean
+---@field EnableCharacterCustomization boolean
+---@field CleanEffects omi.SimpleSet
+
+---@class omichat.Configuration.Discord
+---@field ShowColorOption 'Yes' | 'No' | 'Respect_Server_Setting'
+---@field ChatFormat string
+---@field DefaultColor omi.ColorTable
+---@field Tags string[]
+
+---@class omichat.Configuration.EchoMessages
+---@field Enable boolean
+---@field ChatFormat string
+---@field OverheadFormat string
+---@field Tags string[]
+
+---@class omichat.Configuration.Format
+---@field Chat omichat.Configuration.Format.Chat
+---@field Component omichat.Configuration.Format.Component
+---@field Filter omichat.Configuration.Format.Filter
+---@field MenuName omichat.Configuration.Format.MenuName
+---@field Overhead omichat.Configuration.Format.Overhead
+
+---@class omichat.Configuration.Format.Chat
+---@field Final string
+---@field Prefix string
+
+---@class omichat.Configuration.Format.Component
+---@field Name string
+---@field Tag string
+---@field Timestamp string
+---@field Icon string
+---@field Language string
+
+---@class omichat.Configuration.Format.Filter
+---@field Name string
+---@field ChatInput string
+
+---@class omichat.Configuration.Format.MenuName
+---@field Default string?
+---@field Trade string?
+---@field Medical string?
+---@field SearchPlayer string?
+---@field Typing string?
+---@field MiniScoreboard string?
+
+---@class omichat.Configuration.Format.Overhead
+---@field Final string
+---@field Prefix string
+
+---@class omichat.Configuration.Language
+---@field DefaultSlots integer
+---@field InterpretationRolls integer
+---@field InterpretationChance integer
+---@field SelfAddAllowlist string[]
+---@field SelfAddBlocklist string[]
+---@field UnknownLanguage string
+---@field UnknownLanguageRadio string
+---@field UseDefaultList boolean
+---@field List omichat.Configuration.LanguageDefinition[]
+
+---@class omichat.Configuration.LanguageDefinition
+---@field Name string
+---@field Signed boolean?
+
+---@class omichat.Configuration.Macros
+---@field AllowEmotes boolean
+
+---@class omichat.Configuration.NarrativeStyle
+---@field Enable boolean
+---@field OverheadContentFormat string
+---@field ChatContentFormat string
+---@field DialogueTagFormat string
+---@field InputFilter string
+
+---@class omichat.Configuration.Radio
+---@field ChatFormat string
+---@field DefaultColor omi.ColorTable
+---@field Tags string[]
+
+---@class omichat.Configuration.ServerMessages
+---@field ChatFormat string
+---@field DefaultColor omi.ColorTable
+---@field Tags string[]
+
+---@class omichat.Configuration.Streams
+---@field UseDefaultList boolean
+---@field GlobalTags string[]
+---@field List omichat.Configuration.StreamDefinition[]
+
+---@class omichat.Configuration.StreamDefinition
+---@field Enable boolean?
+---@field Stream string?
+---@field ChatType string?
+---@field CommandType string?
+---@field Name string?
+---@field Command string?
+---@field ShortCommand string?
+---@field DefaultColor omi.ColorTable?
+---@field Aliases string[]?
+---@field Tags string[]?
+---@field OverheadFormat string?
+---@field ChatFormat string?
+---@field Range integer?
+---@field VerticalRange integer?
+---@field AllowBuffs boolean?
+---@field AllowEmotes boolean?
+---@field AllowLanguages boolean?
+---@field AllowTypingIndicator boolean?
+---@field AttractZombies boolean?
+---@field UseNarrativeStyle boolean?
+
+---@class omichat.Configuration.TypingIndicator
+---@field Enable boolean
+---@field Format string
+
+---@class omichat.Configuration.ZombieAttraction
+---@field ChatRangeMultiplier number
+---@field CalloutRange integer
+---@field SneakCalloutRange integer
+
+---@class omichat.ConfigurationPreset
+---@field protected _name string
+---@field protected _values omichat.Configuration
+---@field protected _getLanguages omichat.Callback.ConfigurationPreset.GetLanguages?
+---@field protected _getStreams omichat.Callback.ConfigurationPreset.GetStreams?
+---@field protected _getValues omichat.Callback.ConfigurationPreset.GetValues?
+
+---@class omichat.Args.ConfigurationPreset
+---@field name string
+---@field values omichat.Configuration?
+---@field getLanguages omichat.Callback.ConfigurationPreset.GetLanguages?
+---@field getStreams omichat.Callback.ConfigurationPreset.GetStreams?
+---@field getValues omichat.Callback.ConfigurationPreset.GetValues?
+
+---@alias omichat.PresetString 'Default' | 'Buffy' | 'Vanilla'
+
+---@alias omichat.Callback.ConfigurationPreset.GetStreams fun(self: omichat.ConfigurationPreset, schema: omichat.ConfigurationSchema): omichat.Configuration.StreamDefinition[]
+
+---@alias omichat.Callback.ConfigurationPreset.GetLanguages fun(self: omichat.ConfigurationPreset, schema: omichat.ConfigurationSchema): omichat.Configuration.LanguageDefinition[]
+
+---@alias omichat.Callback.ConfigurationPreset.GetValues fun(self: omichat.ConfigurationPreset, schema: omichat.ConfigurationSchema): omichat.Configuration
+
+--#endregion

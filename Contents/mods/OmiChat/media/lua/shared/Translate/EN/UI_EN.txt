@@ -252,6 +252,7 @@ UI_EN = {
     UI_OmiChat_ContextManageProfiles = "Manage profiles",
     UI_OmiChat_ContextAdmin = "Admin options",
     UI_OmiChat_ContextAdminManageModData = "View mod data",
+    UI_OmiChat_ContextAdminUpdateConfiguration = "Open mod configuration",
     UI_OmiChat_ContextAdmin_ShowIcon = "Display chat icon",
     UI_OmiChat_ContextAdmin_KnowAllLanguages = "Understand all languages",
     UI_OmiChat_ContextAdmin_IgnoreMessageRange = "Ignore message range",

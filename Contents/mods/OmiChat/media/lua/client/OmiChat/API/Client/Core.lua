@@ -230,6 +230,19 @@ function API._onReceiveGlobalModData(key, newData)
     end
 end
 
+---Called when configuration is saved from the editor form.
+---@param args omi.forms.Args.Callback.Save
+---@protected
+function API._onSaveConfiguration(args)
+    API.Configuration:load(args.values)
+    API.updateConfiguration()
+
+    -- save to file if testing in singleplayer
+    if getDebug() and not isClient() then
+        API.Configuration:saveFile()
+    end
+end
+
 ---Event handler that runs on tick until the player has loaded.
 ---@protected
 function API._onTickTemporary()

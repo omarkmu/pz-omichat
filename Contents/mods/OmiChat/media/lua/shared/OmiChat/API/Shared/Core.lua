@@ -1,6 +1,7 @@
 ---Base shared API.
 
 local config = require 'OmiChat/config'
+local Configuration = require 'OmiChat/Component/Configuration'
 local utils = require 'OmiChat/utils'
 local Option = require 'OmiChat/Component/Options'
 local MetaFormatter = require 'OmiChat/Component/MetaFormatter'
@@ -13,6 +14,7 @@ local MetaFormatter = require 'OmiChat/Component/MetaFormatter'
 ---@field protected _languageInfo omichat.LanguageInfoStore
 local API = {}
 
+API.Configuration = Configuration
 API.Option = Option
 API.MetaFormatter = MetaFormatter
 API.config = config

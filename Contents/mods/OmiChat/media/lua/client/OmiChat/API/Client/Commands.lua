@@ -238,6 +238,19 @@ function API.requestSetName(command)
     return API.dispatch('requestSetName', req)
 end
 
+---Sends updated configuration values to the server.
+---@return boolean
+function API.updateConfiguration()
+    if not isAdmin() then
+        return false
+    end
+
+    ---@type omichat.request.UpdateConfiguration
+    local req = { value = API.Configuration:getValues() }
+
+    return API.dispatch('updateConfiguration', req)
+end
+
 ---Sends the current typing status to the server.
 ---@param range integer?
 ---@param chatType omichat.ChatTypeString?
@@ -348,6 +361,12 @@ function API.Commands.showInfoMessage(args)
     end
 
     API.addInfoMessage(text, args.serverAlert)
+end
+
+---Updates the configuration with new data from the server.
+---@param req omichat.request.UpdateConfiguration
+function API.Commands.updateConfiguration(req)
+    API.Configuration:load(req.value)
 end
 
 ---Updates player cache state.

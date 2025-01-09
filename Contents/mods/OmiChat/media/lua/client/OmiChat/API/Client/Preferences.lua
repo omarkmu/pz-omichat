@@ -5,7 +5,6 @@ local API = require 'OmiChat/API/Client/Core'
 
 local utils = API.utils
 local Option = API.Option
-local concat = table.concat
 
 
 ---@type table<omichat.AdminOption, string>
@@ -25,42 +24,12 @@ end
 ---Reads the JSON preferences file and converts it to an equivalent Lua table.
 ---@return table?
 local function readPrefsJson()
-    local line
-    local content = {}
-
-    local prefsFile
-    pcall(function()
-        prefsFile = getFileReader(API._prefsFileName, true)
-    end)
-
-    if not prefsFile then
-        return
+    local decoded, err = utils.schema.read(API._prefsFileName)
+    if err then
+        utils.log.error('failed to read preferences: %s', err)
     end
 
-    while true do
-        line = prefsFile:readLine()
-        if line == nil then
-            prefsFile:close()
-            break
-        end
-
-        content[#content + 1] = line
-    end
-
-    local encoded = utils.trim(concat(content))
-    if #encoded == 0 then
-        return
-    end
-
-    local success, decoded = utils.json.tryDecode(encoded)
-    if type(decoded) ~= 'table' then
-        if success then
-            decoded = 'invalid file content'
-        end
-
-        utils.log.error('failed to read preferences: %s', decoded)
-
-        -- reset to default on failed read
+    if not decoded then
         return
     end
 
