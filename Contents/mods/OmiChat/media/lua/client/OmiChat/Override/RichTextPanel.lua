@@ -12,7 +12,7 @@ local utils = require 'OmiChat/utils'
 ---@class omichat.ISRichTextPanel : ISRichTextPanel
 ---@field font UIFont
 ---@field indent number
----@field rgbCurrent { r: integer, g: integer, b: integer }
+---@field rgbCurrent omi.ColorTable
 ---@field currentLine number
 ---@field fonts table
 ---@field ocLastChar string | nil
@@ -43,7 +43,7 @@ local function addText(self, text, x, y, lineImageHeight, curLine, maxLineWidth)
     if chunkText == '' then
         chunkText = text
     elseif text ~= '' then
-        chunkText = concat { chunkText, ' ', text }
+        chunkText = chunkText .. ' ' .. text
     end
 
     local font = textManager:getFontFromEnum(self.font)
@@ -339,7 +339,7 @@ function ISRichTextPanel:processCommand(command, x, y, lineImageHeight, lineHeig
     if success then
         return x, y, lineImageHeight
     elseif success == false then
-        utils.log.error('unknown texture used in image command: `%s`', image)
+        utils.log.error('Unknown texture used in image command: `%s`', image)
         return x, y, lineImageHeight
     end
 

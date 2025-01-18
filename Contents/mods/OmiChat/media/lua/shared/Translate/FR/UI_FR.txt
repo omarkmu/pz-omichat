@@ -16,6 +16,10 @@ UI_FR = {
     UI_OmiChat_Typing2 = "%1 et %2 sont en train d'écrire...",
     UI_OmiChat_Typing3 = "%1, %2, et %3 sont en train d'écrire...",
     UI_OmiChat_TypingMany = "Plusieurs personnes sont en train d'écrire...",
+    UI_OmiChat_FactionRadio = "(Radio de Faction)",
+    UI_OmiChat_SafehouseRadio = "(Radio de Refuge)",
+    UI_OmiChat_OverRadio = "(À la Radio)",
+    UI_OmiChat_AdminIndicator = "(Administrateur)",
 
     --[[ Info Messages ]]--
     UI_OmiChat_Info_SetNameEmpty = "Aucun nom spécifié. Utilisez /name Nom",
@@ -252,6 +256,7 @@ UI_FR = {
     UI_OmiChat_ContextManageProfiles = "Gérer les profils",
     UI_OmiChat_ContextAdmin = "Options administrateur",
     UI_OmiChat_ContextAdminManageModData = "Voir les données de mod",
+    UI_OmiChat_ContextAdminUpdateConfiguration = "Paramètres",
     UI_OmiChat_ContextAdmin_ShowIcon = "Afficher l'icône de discussion",
     UI_OmiChat_ContextAdmin_KnowAllLanguages = "Comprendre toutes les langues",
     UI_OmiChat_ContextAdmin_IgnoreMessageRange = "Ignorer la plage de message",

@@ -2,7 +2,7 @@
 ---Compatibility patch for Search Players For Weapons.
 
 local API = require 'OmiChat/Client'
-local Option = API.Option
+local config = API.Configuration
 
 local _getContextOptionText
 local _reportBeingSearched
@@ -11,7 +11,7 @@ local _reportBeingSearched
 ---@param otherPlayer IsoPlayer
 ---@return string
 local function getContextOptionText(otherPlayer)
-    if Option:compatSearchPlayersEnabled() then
+    if config:compatSearchPlayersEnabled() then
         local name = API.getPlayerMenuName(otherPlayer, 'search_player')
         if name then
             return getText('UI_SearchStub', name)
@@ -29,7 +29,7 @@ end
 ---@param player IsoPlayer
 ---@param otherPlayer IsoPlayer
 local function reportBeingSearched(player, otherPlayer)
-    if Option:compatSearchPlayersEnabled() then
+    if config:compatSearchPlayersEnabled() then
         local name = API.getNameInChat(otherPlayer:getUsername(), 'say')
         if name then
             player:Say(getText('UI_SearchedBy', name))

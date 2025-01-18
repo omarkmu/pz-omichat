@@ -7,15 +7,16 @@ local getText = getText
 local vanillaCommands = require 'OmiChat/Definition/VanillaCommandList'
 
 local utils = API.utils
-local Option = API.Option
-local StreamInfo = API.StreamInfo
+local config = API.Configuration
+local CommandStream = API.CommandStream
+
 
 ---Checks whether the current player can use custom admin commands.
 ---@return boolean
 local function canUseAdminCommands()
     local player = getSpecificPlayer(0)
     local access = player and player:getAccessLevel()
-    return utils.getNumericAccessLevel(access) >= Option.MinimumCommandAccessLevel
+    return utils.getNumericAccessLevel(access) >= config.General.MinimumCommandAccessLevel
 end
 
 ---Searches for a known language with loose matching.
@@ -41,466 +42,350 @@ local function matchKnownLanguage(input)
     end
 end
 
----Callback function to display help text for a stream.
----@param info omichat.StreamInfo
-local function showHelpText(info)
-    API.addInfoMessage(info:getHelpText())
-end
 
 ---@type omichat.CommandStream[]
 return {
-    {
+    API._cardCommand,
+    API._flipCommand,
+    API._rollCommand,
+    CommandStream:new {
         name = 'name',
         command = '/name ',
-        omichat = {
-            isCommand = true,
-            helpText = 'UI_OmiChat_HelpText_Name',
-            isEnabled = function() return Option:isNameCommandEnabled() end,
-            onUse = function(ctx)
-                if Option:isNameCommandSetNickname() then
-                    local _, feedback = API.setNickname(ctx.text)
-                    if feedback then
-                        API.addInfoMessage(feedback)
-                    end
-
-                    return
-                end
-
-                local input = utils.trim(ctx.text or '')
-                if #input == 0 then
-                    API.addInfoMessage(getText('UI_OmiChat_Info_SetNameEmpty'))
-                    return
-                end
-
-                local _, feedback = API.updateCharacterName(input, Option:isNameCommandSetFullName())
-                if feedback then
-                    API.addInfoMessage(feedback)
-                end
-            end,
-            onHelp = function()
-                local msg = 'UI_OmiChat_HelpText_Name'
-                if Option:isNameCommandSetFullName() then
-                    msg = 'UI_OmiChat_HelpText_NameFull'
-                end
-
-                API.addInfoMessage(getText(msg))
-            end,
-        },
-    },
-    {
-        name = 'nickname',
-        command = '/nickname ',
-        omichat = {
-            isCommand = true,
-            helpText = 'UI_OmiChat_HelpText_Nickname',
-            isEnabled = function() return Option:isNicknameCommandEnabled() end,
-            onUse = function(ctx)
+        helpTextID = 'UI_OmiChat_HelpText_Name',
+        isEnabled = function() return config:isNameCommandEnabled() end,
+        onUse = function(ctx)
+            if config:isNameCommandSetNickname() then
                 local _, feedback = API.setNickname(ctx.text)
                 if feedback then
                     API.addInfoMessage(feedback)
                 end
-            end,
-        },
+
+                return
+            end
+
+            local input = utils.trim(ctx.text or '')
+            if #input == 0 then
+                API.addInfoMessage(getText('UI_OmiChat_Info_SetNameEmpty'))
+                return
+            end
+
+            local _, feedback = API.updateCharacterName(input, config:isNameCommandSetFullName())
+            if feedback then
+                API.addInfoMessage(feedback)
+            end
+        end,
+        onHelp = function()
+            local msg = 'UI_OmiChat_HelpText_Name'
+            if config:isNameCommandSetFullName() then
+                msg = 'UI_OmiChat_HelpText_NameFull'
+            end
+
+            API.addInfoMessage(getText(msg))
+        end,
     },
-    {
+    CommandStream:new {
+        name = 'nickname',
+        command = '/nickname ',
+        helpTextID = 'UI_OmiChat_HelpText_Nickname',
+        isEnabled = function() return config:isNicknameCommandEnabled() end,
+        onUse = function(ctx)
+            local _, feedback = API.setNickname(ctx.text)
+            if feedback then
+                API.addInfoMessage(feedback)
+            end
+        end,
+    },
+    CommandStream:new {
         name = 'clearnames',
         command = '/clearnames ',
-        omichat = {
-            isCommand = true,
-            helpText = 'UI_OmiChat_HelpText_ClearNames',
-            isEnabled = canUseAdminCommands,
-            onUse = function()
-                API.requestClearNames()
-            end,
-        },
+        helpTextID = 'UI_OmiChat_HelpText_ClearNames',
+        isEnabled = canUseAdminCommands,
+        onUse = function() API.requestClearNames() end,
     },
-    {
+    CommandStream:new {
         name = 'setname',
         command = '/setname ',
-        omichat = {
-            isCommand = true,
-            helpText = 'UI_OmiChat_HelpText_SetName',
-            suggestSpec = { 'online-username' },
-            isEnabled = canUseAdminCommands,
-            onUse = function(ctx)
-                API.requestSetName(ctx.text)
-            end,
-        },
+        helpTextID = 'UI_OmiChat_HelpText_SetName',
+        suggestSpec = { 'online-username' },
+        isEnabled = canUseAdminCommands,
+        onUse = function(ctx) API.requestSetName(ctx.text) end,
     },
-    {
+    CommandStream:new {
         name = 'iconinfo',
         command = '/iconinfo ',
-        omichat = {
-            isCommand = true,
-            helpText = 'UI_OmiChat_HelpText_IconInfo',
-            isEnabled = canUseAdminCommands,
-            onUse = function(ctx)
-                local command = utils.trim(ctx.text)
-                if #command == '' then
-                    API.addInfoMessage(ctx.stream:getHelpText())
-                    return
-                end
+        helpTextID = 'UI_OmiChat_HelpText_IconInfo',
+        isEnabled = canUseAdminCommands,
+        onUse = function(ctx)
+            local command = utils.trim(ctx.text)
+            if #command == 0 then
+                ctx.stream:showHelpText()
+                return
+            end
 
-                if getTexture(command) then
-                    local image = table.concat { ' <SPACE> <IMAGE:', command, ',15,14> ' }
-                    API.addInfoMessage(getText('UI_OmiChat_Info_Icon', command, image))
-                    return
-                end
+            if getTexture(command) then
+                local image = ' <SPACE> <IMAGE:' .. command .. ',15,14> '
+                API.addInfoMessage(getText('UI_OmiChat_Info_Icon', command, image))
+                return
+            end
 
-                local textureName = utils.getTextureNameFromIcon(command)
-                if not textureName or not getTexture(textureName) then
-                    API.addInfoMessage(getText('UI_OmiChat_Info_IconUnknown', command))
-                    return
-                end
+            local textureName = utils.getTextureNameFromIcon(command)
+            if not textureName or not getTexture(textureName) then
+                API.addInfoMessage(getText('UI_OmiChat_Info_IconUnknown', command))
+                return
+            end
 
-                local image = table.concat { ' <SPACE> <IMAGE:', textureName, ',15,14> ' }
-                API.addInfoMessage(getText('UI_OmiChat_Info_IconAlias', textureName, image, command))
-            end,
-        },
+            local image = ' <SPACE> <IMAGE:' .. textureName .. ',15,14> '
+            API.addInfoMessage(getText('UI_OmiChat_Info_IconAlias', textureName, image, command))
+        end,
     },
-    {
+    CommandStream:new {
         name = 'seticon',
         command = '/seticon ',
-        omichat = {
-            isCommand = true,
-            helpText = 'UI_OmiChat_HelpText_SetIcon',
-            suggestSpec = { 'online-username-with-self' },
-            isEnabled = canUseAdminCommands,
-            onUse = function(ctx)
-                if not API.requestSetIcon(ctx.text) then
-                    local args = utils.parseCommandArgs(ctx.text)
-                    local icon = args[2]
-                    if not args[1] or not icon then
-                        API.addInfoMessage(ctx.stream:getHelpText())
-                    else
-                        API.addInfoMessage(getText('UI_OmiChat_Info_IconUnknown', icon))
-                    end
+        helpTextID = 'UI_OmiChat_HelpText_SetIcon',
+        suggestSpec = { 'online-username-with-self' },
+        isEnabled = canUseAdminCommands,
+        onUse = function(ctx)
+            if not API.requestSetIcon(ctx.text) then
+                local args = utils.parseCommandArgs(ctx.text)
+                local icon = args[2]
+                if not args[1] or not icon then
+                    ctx.stream:showHelpText()
+                else
+                    API.addInfoMessage(getText('UI_OmiChat_Info_IconUnknown', icon))
                 end
-            end,
-        },
+            end
+        end,
     },
-    {
+    CommandStream:new {
         name = 'resetname',
         command = '/resetname ',
-        omichat = {
-            isCommand = true,
-            helpText = 'UI_OmiChat_HelpText_ResetName',
-            suggestSpec = { 'online-username' },
-            isEnabled = canUseAdminCommands,
-            onUse = function(ctx)
-                API.requestResetName(ctx.text)
-            end,
-        },
+        helpTextID = 'UI_OmiChat_HelpText_ResetName',
+        suggestSpec = { 'online-username' },
+        isEnabled = canUseAdminCommands,
+        onUse = function(ctx)
+            API.requestResetName(ctx.text)
+        end,
     },
-    {
+    CommandStream:new {
         name = 'reseticon',
         command = '/reseticon ',
-        omichat = {
-            isCommand = true,
-            helpText = 'UI_OmiChat_HelpText_ResetIcon',
-            suggestSpec = { 'online-username-with-self' },
-            isEnabled = canUseAdminCommands,
-            onUse = function(ctx)
-                API.requestResetIcon(ctx.text)
-            end,
-        },
+        helpTextID = 'UI_OmiChat_HelpText_ResetIcon',
+        suggestSpec = { 'online-username-with-self' },
+        isEnabled = canUseAdminCommands,
+        onUse = function(ctx)
+            API.requestResetIcon(ctx.text)
+        end,
     },
-    {
+    CommandStream:new {
         name = 'addlanguage',
         command = '/addlanguage ',
-        omichat = {
-            isCommand = true,
-            helpText = 'UI_OmiChat_HelpText_AddLanguage',
-            suggestSpec = {
-                'online-username-with-self',
-                {
-                    type = 'language',
-                    ---@param result string
-                    ---@param args string[]
-                    ---@return boolean
-                    filter = function(result, args)
-                        local username = args[1]
-                        if not username then
-                            return true
-                        end
+        helpTextID = 'UI_OmiChat_HelpText_AddLanguage',
+        suggestSpec = {
+            'online-username-with-self',
+            {
+                type = 'language',
+                ---@param result string
+                ---@param args string[]
+                ---@return boolean
+                filter = function(result, args)
+                    local username = args[1]
+                    if not username then
+                        return true
+                    end
 
-                        -- don't suggest adding already known languages
-                        return not API.checkPlayerKnowsLanguage(username, result)
-                    end,
-                },
+                    -- don't suggest adding already known languages
+                    return not API.checkPlayerKnowsLanguage(username, result)
+                end,
             },
-            isEnabled = canUseAdminCommands,
-            onUse = function(ctx)
-                API.requestAddLanguage(ctx.text)
-            end,
         },
+        isEnabled = canUseAdminCommands,
+        onUse = function(ctx)
+            API.requestAddLanguage(ctx.text)
+        end,
     },
-    {
+    CommandStream:new {
         name = 'resetlanguages',
         command = '/resetlanguages ',
-        omichat = {
-            isCommand = true,
-            helpText = 'UI_OmiChat_HelpText_ResetLanguages',
-            suggestSpec = { 'online-username-with-self' },
-            isEnabled = canUseAdminCommands,
-            onUse = function(ctx)
-                API.requestResetLanguages(ctx.text)
-            end,
-        },
+        helpTextID = 'UI_OmiChat_HelpText_ResetLanguages',
+        suggestSpec = { 'online-username-with-self' },
+        isEnabled = canUseAdminCommands,
+        onUse = function(ctx)
+            API.requestResetLanguages(ctx.text)
+        end,
     },
-    {
+    CommandStream:new {
         name = 'setlanguageslots',
         command = '/setlanguageslots ',
-        omichat = {
-            isCommand = true,
-            helpText = 'UI_OmiChat_HelpText_SetLanguageSlots',
-            suggestSpec = { 'online-username-with-self' },
-            isEnabled = canUseAdminCommands,
-            onUse = function(ctx)
-                API.requestSetLanguageSlots(ctx.text)
-            end,
-        },
+        helpTextID = 'UI_OmiChat_HelpText_SetLanguageSlots',
+        suggestSpec = { 'online-username-with-self' },
+        isEnabled = canUseAdminCommands,
+        onUse = function(ctx)
+            API.requestSetLanguageSlots(ctx.text)
+        end,
     },
-    {
-        name = 'card',
-        command = '/card ',
-        omichat = {
-            isCommand = true,
-            helpText = 'UI_ServerOptionDesc_Card',
-            onUseDisabled = showHelpText,
-            onUse = function(ctx)
-                if not API.requestDrawCard() then
-                    API.addInfoMessage(ctx.stream:getHelpText())
-                end
-            end,
-            isEnabled = function()
-                local player = getSpecificPlayer(0)
-                if not player then
-                    return false
-                end
-
-                return player:getAccessLevel() ~= 'None' or utils.hasAnyItemType(player, Option:getCardItems())
-            end,
-        },
-    },
-    {
-        name = 'flip',
-        command = '/flip ',
-        omichat = {
-            isCommand = true,
-            helpText = 'UI_OmiChat_HelpText_Flip',
-            onUseDisabled = showHelpText,
-            onUse = function(ctx)
-                if not API.requestFlipCoin() then
-                    API.addInfoMessage(ctx.stream:getHelpText())
-                end
-            end,
-            isEnabled = function()
-                local player = getSpecificPlayer(0)
-                if not player then
-                    return false
-                end
-
-                return player:getAccessLevel() ~= 'None' or utils.hasAnyItemType(player, Option:getCoinItems())
-            end,
-        },
-    },
-    {
-        name = 'roll',
-        command = '/roll ',
-        omichat = {
-            isCommand = true,
-            helpText = 'UI_ServerOptionDesc_Roll',
-            onUseDisabled = showHelpText,
-            onUse = function(ctx)
-                local command = utils.trim(ctx.text)
-                local first = command:split(' ')[1]
-                local sides = first and tonumber(first)
-                if not sides and #command == 0 then
-                    sides = 6
-                elseif not sides then
-                    API.addInfoMessage(ctx.stream:getHelpText())
-                    return
-                end
-
-                if not API.requestRollDice(sides) then
-                    API.addInfoMessage(ctx.stream:getHelpText())
-                end
-            end,
-            isEnabled = function()
-                local player = getSpecificPlayer(0)
-                if not player then
-                    return false
-                end
-
-                return player:getAccessLevel() ~= 'None' or utils.hasAnyItemType(player, Option:getDiceItems())
-            end,
-        },
-    },
-    {
+    CommandStream:new {
         name = 'emotes',
         command = '/emotes ',
-        omichat = {
-            isCommand = true,
-            helpText = 'UI_OmiChat_HelpText_Emotes',
-            isEnabled = function() return Option.EnableEmotes end,
-            onUse = function(ctx) ctx.stream:onHelp() end,
-            onHelp = function()
-                -- collect currently available emotes
-                local emotes = {}
-                for k in pairs(API._emotes) do
-                    emotes[#emotes + 1] = k
-                end
+        helpTextID = 'UI_OmiChat_HelpText_Emotes',
+        isEnabled = function() return config:isEmoteMacroEnabled() end,
+        onUse = function(ctx) ctx.stream:onHelp() end,
+        onHelp = function()
+            -- collect currently available emotes
+            local emotes = {}
+            for k in pairs(API._emotes) do
+                emotes[#emotes + 1] = k
+            end
 
-                if #emotes == 0 then
-                    -- no emotes; ignore
-                    return
-                end
+            if #emotes == 0 then
+                -- no emotes; ignore
+                return
+            end
 
-                table.sort(emotes)
+            table.sort(emotes)
 
-                local parts = {
-                    getText('UI_OmiChat_Info_AvailableEmotes'),
-                }
+            local parts = {
+                getText('UI_OmiChat_Info_AvailableEmotes'),
+            }
 
-                for i = 1, #emotes do
-                    parts[#parts + 1] = ' <LINE> * .'
-                    parts[#parts + 1] = emotes[i]
-                end
+            for i = 1, #emotes do
+                parts[#parts + 1] = ' <LINE> * .'
+                parts[#parts + 1] = emotes[i]
+            end
 
-                API.addInfoMessage(concat(parts))
-            end,
-        },
+            API.addInfoMessage(concat(parts))
+        end,
     },
-    {
+    CommandStream:new {
         name = 'language',
         command = '/language ',
         shortCommand = '/lang ',
-        omichat = {
-            isCommand = true,
-            helpText = 'UI_OmiChat_HelpText_SwitchLanguage',
-            suggestSpec = { 'known-language' },
-            isEnabled = function() return #API.getRoleplayLanguages() > 1 end,
-            onUse = function(ctx)
-                local args = utils.parseCommandArgs(ctx.text)
-                local command = args[1]
-                if not command then
-                    API.addInfoMessage(getText('UI_OmiChat_HelpText_SwitchLanguage'))
-                    return
-                end
+        helpTextID = 'UI_OmiChat_HelpText_SwitchLanguage',
+        suggestSpec = { 'known-language' },
+        isEnabled = function() return #API.getRoleplayLanguages() > 1 end,
+        onUse = function(ctx)
+            local args = utils.parseCommandArgs(ctx.text)
+            local command = args[1]
+            if not command then
+                API.addInfoMessage(getText('UI_OmiChat_HelpText_SwitchLanguage'))
+                return
+            end
 
-                local lang = matchKnownLanguage(command)
-                if not lang or not API.setCurrentRoleplayLanguage(lang) then
-                    API.addInfoMessage(getText('UI_OmiChat_Error_SwitchUnknownLanguage', command))
-                    return
-                end
+            local lang = matchKnownLanguage(command)
+            if not lang or not API.setCurrentRoleplayLanguage(lang) then
+                API.addInfoMessage(getText('UI_OmiChat_Error_SwitchUnknownLanguage', command))
+                return
+            end
 
-                lang = utils.getTranslatedLanguageName(lang)
-                API.addInfoMessage(getText('UI_OmiChat_Success_SwitchLanguage', lang))
-            end,
-        },
+            lang = utils.getTranslatedLanguageName(lang)
+            API.addInfoMessage(getText('UI_OmiChat_Success_SwitchLanguage', lang))
+        end,
     },
-    {
+    CommandStream:new {
         -- reimplementing this because the vanilla clear doesn't actually clear the chatbox
         name = 'clear',
         command = '/clear ',
-        omichat = {
-            isCommand = true,
-            isEnabled = function() return isAdmin() or isCoopHost() end,
-            onUse = function()
-                API.clearMessages()
+        isEnabled = function() return isAdmin() or isCoopHost() end,
+        onUse = function()
+            API.clearMessages()
+
+            if not getDebug() then
                 API.addInfoMessage(getText('UI_OmiChat_Info_Clear'))
-            end,
-        },
+            end
+        end,
     },
-    {
+    CommandStream:new {
         name = 'help',
         command = '/help ',
-        omichat = {
-            isCommand = true,
-            onUse = function(ctx)
-                local accessLevel = utils.getEffectiveAccessLevel()
-                local command = ctx.text
-                if not accessLevel then
-                    -- something went wrong, defer to default help command
-                    SendCommandToServer('/help ' .. command)
-                    return
-                end
+        onUse = function(ctx)
+            local accessLevel = utils.getEffectiveAccessLevel()
+            local command = ctx.text
+            if not accessLevel then
+                -- something went wrong, defer to default help command
+                SendCommandToServer('/help ' .. command)
+                return
+            end
 
-                command = utils.trim(command)
+            command = utils.trim(command)
 
-                -- specific command help
-                if #command > 0 then
-                    ---@type omichat.StreamInfo?, function?, string?
-                    local helpStream, helpCallback, helpText
-
-                    for i = 1, #API._commandStreams do
-                        local stream = StreamInfo:new(API._commandStreams[i])
-                        if stream:getName() == command and stream:isEnabled() then
-                            helpCallback = stream:getHelpCallback()
-                            helpText = stream:getHelpTextStringID() and stream:getHelpText()
-                            if helpCallback or helpText then
-                                helpStream = stream
-                                break
-                            end
-                        end
-                    end
-
-                    if helpCallback then
-                        helpCallback(helpStream)
-                    elseif helpText then
-                        API.addInfoMessage(helpText)
-                    else
-                        -- defer to default help command
-                        SendCommandToServer('/help ' .. command)
-                    end
-
-                    return
-                end
-
-                -- overall help
-                local seen = {}
-                local commands = {} ---@type omichat.VanillaCommand[]
+            -- specific command help
+            if #command > 0 then
+                local helpStream ---@type omichat.CommandStream?
+                local helpCallback ---@type omichat.Stream.Callback.OnHelp?
+                local helpText ---@type string?
 
                 for i = 1, #API._commandStreams do
-                    local stream = StreamInfo:new(API._commandStreams[i])
-                    if stream:config() then
-                        local name = stream:getName()
-                        local helpText = stream:getHelpTextStringID()
-                        if not seen[name] and helpText and stream:isEnabled() then
-                            seen[name] = true
-                            commands[#commands + 1] = { name = name, helpText = helpText, access = 0 }
+                    local stream = API._commandStreams[i]
+                    if stream:getName() == command and stream:isEnabled() then
+                        helpCallback = stream:getHelpCallback()
+                        helpText = stream:getHelpText()
+                        if helpCallback or helpText then
+                            helpStream = stream
+                            break
                         end
                     end
+                end
+
+                if helpStream and helpCallback then
+                    helpCallback(helpStream)
+                    return
+                elseif helpText then
+                    API.addInfoMessage(helpText)
+                    return
                 end
 
                 for i = 1, #vanillaCommands do
                     local info = vanillaCommands[i]
-                    if info.name and info.helpText and not seen[info.name] then
-                        if utils.hasAccess(info.access, accessLevel) then
-                            commands[#commands + 1] = info
-                        end
+                    if info.helpText and info.helpTextArgs then
+                        API.addInfoMessage(getText(info.helpText, unpack(info.helpTextArgs)))
+                        return
                     end
                 end
 
-                table.sort(commands, function(a, b) return a.name < b.name end)
+                -- defer to default help command
+                SendCommandToServer('/help ' .. command)
+                return
+            end
 
-                local result = { getText('UI_OmiChat_Info_CommandList') }
-                for i = 1, #commands do
-                    local cmd = commands[i]
-                    result[#result + 1] = ' <LINE> * '
-                    result[#result + 1] = cmd.name
-                    result[#result + 1] = ' : '
+            -- overall help
+            local seen = {}
+            local commands = {} ---@type omichat.VanillaCommand[]
 
-                    if cmd.helpTextArgs then
-                        result[#result + 1] = getText(cmd.helpText, unpack(cmd.helpTextArgs))
-                    else
-                        result[#result + 1] = getText(cmd.helpText)
+            for i = 1, #API._commandStreams do
+                local stream = API._commandStreams[i]
+                local name = stream:getName()
+                local helpText = stream:getHelpTextStringID()
+                if not seen[name] and helpText and stream:isEnabled() then
+                    seen[name] = true
+                    commands[#commands + 1] = { name = name, helpText = helpText, access = 0 }
+                end
+            end
+
+            for i = 1, #vanillaCommands do
+                local info = vanillaCommands[i]
+                if info.name and info.helpText and not seen[info.name] then
+                    if utils.hasAccess(info.access, accessLevel) then
+                        commands[#commands + 1] = info
                     end
                 end
+            end
 
-                API.addInfoMessage(concat(result))
-            end,
-        },
+            table.sort(commands, function(a, b) return a.name < b.name end)
+
+            local result = { getText('UI_OmiChat_Info_CommandList') }
+            for i = 1, #commands do
+                local cmd = commands[i]
+                result[#result + 1] = ' <LINE> * '
+                result[#result + 1] = cmd.name
+                result[#result + 1] = ' : '
+
+                if cmd.helpTextArgs then
+                    result[#result + 1] = getText(cmd.helpText, unpack(cmd.helpTextArgs))
+                else
+                    result[#result + 1] = getText(cmd.helpText)
+                end
+            end
+
+            API.addInfoMessage(concat(result))
+        end,
     },
 }

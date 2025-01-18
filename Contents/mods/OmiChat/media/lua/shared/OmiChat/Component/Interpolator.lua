@@ -8,40 +8,20 @@ local Interpolator = BaseInterpolator:derive()
 Interpolator._registeredFunctions = {}
 
 
----Resolves a function given its name.
----@param name string
----@return function?
-function Interpolator:getFunction(name)
-    if Interpolator._registeredFunctions[name] and not self._functions[name] then
-        return Interpolator._registeredFunctions[name]
-    end
+local FUNCTION_MT = { __index = Interpolator._registeredFunctions }
 
-    return BaseInterpolator.getFunction(self, name)
-end
-
----Gets the value of an interpolation token.
----@param token unknown
----@return unknown
-function Interpolator:token(token)
-    if self._tokens[token] then
-        return self._tokens[token]
-    end
-
-    local num = tonumber(token)
-    if num and self._tokens[num] then
-        return self._tokens[num]
-    end
-
-    return BaseInterpolator.token(self, token)
-end
 
 ---Creates a new interpolator.
 ---@param options omi.Args.Interpolator?
 ---@return omichat.Interpolator
 function Interpolator:new(options)
+    options = lib.copy(options)
+    options.libraryExtra = lib.extend(lib.copy(options.libraryExtra or {}), Interpolator.Library)
+
     local this = BaseInterpolator.new(self, options)
 
-    lib.extend(this._library, Interpolator.Library)
+    this._checkNumericTokens = true
+    setmetatable(this._functions, FUNCTION_MT)
 
     ---@cast this omichat.Interpolator
     return this

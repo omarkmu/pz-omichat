@@ -22,25 +22,20 @@
 ---| 'callouts'
 ---| 'sneakcallouts'
 
----@alias omichat.ColorCategory
----| omichat.CustomStreamName
----| 'general'
----| 'say'
----| 'shout'
----| 'faction'
----| 'safehouse'
----| 'radio'
----| 'admin'
----| 'server'
----| 'private'
----| 'discord'
----| 'name'
----| 'speech'
+---@see omichat.api.client.getFormatter
+---@alias omichat.FormatterName
+---| 'callout'
+---| 'sneakCallout'
+---| 'language'
+---| 'overheadFinal'
+---| 'adminIcon'
+---| 'narrative'
+---| 'onlineID'
+---| 'echo'
 
 ---@alias omichat.ModDataField
 ---| 'all'
 ---| 'nicknames'
----| 'nameColors'
 ---| 'languages'
 ---| 'languageSlots'
 ---| 'currentLanguage'
@@ -79,41 +74,19 @@
 ---@field callback function
 ---@field args table
 
----@class omichat.LanguageInfoStore
----@field languageCount integer
----@field availableLanguages string
----@field signedLanguages string
----@field idToLanguage table<integer, string>
----@field languageToID table<string, integer>
----@field languageIsSignedMap table<string, boolean>
-
----@class omichat.CustomStreamInfo
----@field name string The name of the custom stream.
----@field formatID integer The constant ID to use for message formatting.
----@field colorOpt string The name of the option used to determine message color.
----@field rangeOpt string The name of the option used to determine message range.
----@field chatFormatOpt string The name of the option used for the chat format.
----@field overheadFormatOpt string The name of the option used for the overhead format.
----@field chatTypes table<omichat.ChatTypeString, true?> Chat types for which this stream is enabled.
----@field streamAlias string? An alias to use for determining color and range.
----@field autoColorOption false? Whether to automatically add a color option for this stream.
----@field defaultRangeOpt string? The option used for the default message range. Defaults to `RangeSay`.
----@field titleID string? The string ID to use for chat tags associated with this stream.
-
 ---@class omichat.FormatterInfo
 ---@field name string The name of the formatter.
----@field formatID integer The formatter's ID.
----@field overheadFormatOpt string? The name of the option used for the overhead format.
+---@field id integer The formatter's ID.
+---@field formatter omichat.MetaFormatter The formatter.
 
 ---Options for initializing formatters.
 ---@class omichat.MetaFormatterOptions
----@field format string The format string to use.
+---@field format string? The format string to use.
 
 ---Global mod data.
 ---@class omichat.ModData
 ---@field version integer The current mod data version.
 ---@field nicknames table<string, string> Map of usernames to chat nicknames.
----@field nameColors table<string, string> Map of usernames to chat color strings.
 ---@field icons table<string, string> Map of usernames to chat icons.
 ---@field languages table<string, string[]> Map of usernames to roleplay languages.
 ---@field languageSlots table<string, integer> Map of usernames to roleplay language slots.
@@ -123,7 +96,6 @@
 ---@class omichat.UserModData
 ---@field username string
 ---@field nickname string?
----@field nameColor string?
 ---@field icon string?
 ---@field languages string[]?
 ---@field languageSlots integer?
@@ -212,6 +184,19 @@
 --#endregion
 
 --#region Configuration
+
+---@class omichat.ConfigurationHelper
+---@field protected _enabledMods table<string, boolean>
+---@field protected _idToLanguage omichat.LanguageRecord[]
+---@field protected _nameToLanguage table<string, omichat.LanguageRecord>
+---@field protected _languageNameList string[]
+---@field protected _languageAllowSet omi.SimpleSet
+---@field protected _languageBlockSet omi.SimpleSet
+---@field protected _formatterInfo table<integer, omichat.FormatterInfo>
+---@field protected _onSaveCallback function
+
+---@class omichat.LanguageRecord : omichat.Configuration.LanguageDefinition
+---@field ID integer
 
 ---@class omichat.Configuration
 ---@field General omichat.Configuration.General

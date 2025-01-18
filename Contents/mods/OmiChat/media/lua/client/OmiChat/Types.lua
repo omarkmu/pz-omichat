@@ -32,11 +32,39 @@
 ---@field suffix string? A suffix to apply to the suggestion result.
 ---@field options string[]? String options for the `string` suggestion type.
 ---@field searchDisplay boolean? If true, the display string will be used for determining suggestions.
----@field filter (fun(result: unknown, args: string[]): boolean)|nil Filter function for results.
----@field display (fun(value: unknown, str: string): string?)|nil Function to retrieve display strings for results.
+---@field filter (fun(result: unknown, args: string[]): boolean)? Filter function for results.
+---@field display (fun(value: unknown, str: string): string?)? Function to retrieve display strings for results.
 
----Metadata that can be attached to a message.
----@class omichat.MessageMetadata
+---@class omichat.MessageInfo
+---@field message omichat.Message The message object.
+---@field tokens table<string, unknown> Token substitution values.
+---@field context table Table for arbitrary context data.
+---@field content string? The message content to display in chat. Set by transformers.
+---@field rawText string The raw text of the message. This should not be modified.
+---@field chatType omichat.ChatTypeString The chat type of the message's chat.
+---@field format string? The format string to use for the message. Set by transformers.
+---@field stream omichat.Stream? The source stream of the message.
+---@field originalStream omichat.Stream? The original stream of a radio message.
+---@field author string The username of the message author.
+---@field zombieAttractRange integer? The range at which the message will be heard by zombies.
+---@field protected callout boolean? Whether the stream is a callout.
+---@field protected sneakCallout boolean? Whether the stream is a sneak callout.
+---@field protected datetime string A string representing the date and time the message was sent.
+---@field protected options omichat.MessageInfo.FormatOptions Formatting options to apply to the message.
+---@field protected skipLanguage boolean If `true`, language processing will skipped.
+---@field protected tag string? The result of the `FormatTag` option.
+---@field protected timestamp string? The result of the `FormatTimestamp` option.
+---@field protected language string? The result of the `FormatLanguage` option.
+---@field protected titleID string The string ID of the chat type's tag.
+---@field protected meta omichat.MessageInfo.Metadata Metadata attached to the message.
+
+---@class omichat.MessageInfo.FormatOptions
+---@field showTitle boolean Whether the message will include the chat type tag.
+---@field showTimestamp boolean Whether the message will include a timestamp.
+---@field font omichat.ChatFont The font size of the message.
+---@field color omi.ColorTable? The message color.
+
+---@class omichat.MessageInfo.Metadata
 ---@field language string? The roleplay language in which the message was sent.
 ---@field name string? The name of the author when this message was sent.
 ---@field icon string? The user's icon when this message was sent.
@@ -44,33 +72,8 @@
 ---@field nameColor omi.ColorTable? The name color of the author when this message was sent.
 ---@field recipientNameColor omi.ColorTable? The name color of the recipient when this message was sent.
 ---@field suppressed boolean? Whether the overhead text for this message has already been suppressed.
-
----Options for how to format a message in chat.
----@class omichat.MessageFormatOptions
----@field showTitle boolean Whether the message will include the chat type tag.
----@field showTimestamp boolean Whether the message will include a timestamp.
----@field useDefaultChatColor boolean Whether the default color associated with the chat type will be used if no color is specified.
----@field font omichat.ChatFont The font size of the message.
----@field color omi.ColorTable? The message color.
-
----Information used during message transformation and formatting.
----@class omichat.MessageInfo
----@field message omichat.Message The message object.
----@field attractRange integer? The range at which the message will be heard by zombies.
----@field content string? The message content to display in chat. Set by transformers.
----@field format string? The string format to use for the message. Set by transformers.
----@field tag string? The result of the `FormatTag` option.
----@field timestamp string? The result of the `FormatTimestamp` option.
----@field language string? The result of the `FormatLanguage` option.
----@field textColor Color The message's default text color.
----@field meta omichat.MessageMetadata Metadata attached to the message.
----@field rawText string The raw text of the message. This should not be modified.
----@field author string The username of the message author.
----@field titleID string The string ID of the chat type's tag.
----@field chatType omichat.ChatTypeString The chat type of the message's chat.
----@field context table Table for arbitrary context data.
----@field tokens table<string, unknown> Token substitution values.
----@field formatOptions omichat.MessageFormatOptions Formatting options to apply to the message.
+---@field stream string? The name of the stream the message was sent over.
+---@field originalStream string? The name of the original stream a radio message was sent over.
 
 ---A suggestion that can display to the player.
 ---@class omichat.Suggestion
@@ -96,29 +99,31 @@
 ---@field priority integer? The priority of the suggester. Higher numbers will run first.
 
 ---Context for sending chat messages.
----@class omichat.SendArgs
+---@class omichat.SendArgs : omichat.SendArgsPartial
+---@field stream omichat.Stream
+
+---@class omichat.SendArgsPartial
 ---@field text string
----@field icon string?
----@field streamName string?
----@field stream omichat.StreamInfo?
+---@field formatStream omichat.Stream?
 ---@field playSignedEmote boolean?
 ---@field echoType integer?
----@field formatterName omichat.FormatterName?
+---@field formatter omichat.MetaFormatter?
 ---@field tokens table?
+---@field extraTags string[]?
 
 ---Argument table passed to `formatForChat`.
----@see omichat.api.client.formatForChat
 ---@class omichat.FormatArgs
 ---@field text string
----@field icon string?
+---@field stream omichat.ChatStream
+---@field formatStream omichat.Stream?
+---@field chatType omichat.ChatTypeString
 ---@field language string?
 ---@field echoType integer?
----@field formatterName omichat.FormatterName?
----@field stream string?
----@field chatType omichat.ChatTypeString
+---@field formatter omichat.MetaFormatter?
 ---@field name string?
 ---@field username string?
 ---@field tokens table?
+---@field extraTags string[]?
 
 ---Result of `formatForChat`.
 ---@see omichat.api.client.formatForChat
@@ -127,51 +132,10 @@
 ---@field error string?
 ---@field allowLanguage boolean?
 
----@class omichat.BaseStreamConfig
----@field aliases string[]? Additional aliases for the command.
----@field commandType omichat.ChatCommandType? The command type used to determine whether input should be retained.
----@field chatType string? The chat type associated with the stream.
----@field isCommand boolean? Indicates that the stream is a command.
----@field suggestSpec omichat.SuggestSpec? The spec for suggestions to the stream.
----@field isEnabled (fun(self: omichat.StreamInfo): boolean)? Returns a boolean representing whether the stream is enabled.
----@field onUse fun(ctx: omichat.SendArgs)? Callback triggered when the stream is used.
----@field onUseDisabled fun(self: omichat.StreamInfo)? Callback triggered when attempting to use a disabled stream.
----@field allowEmotes boolean? Whether to allow emotes on this stream. Defaults to true for non-commands and false for commands.
----@field allowIconPicker boolean? Whether to enable the icon button for this stream. Defaults to false.
----@field streamIdentifier string? The stream identifier tied to this stream. Used for format strings and determining roleplay language. Defaults to stream name.
----@field validator (fun(self: omichat.StreamInfo, input: string): boolean)?
-
----@class omichat.ChatStreamConfig : omichat.BaseStreamConfig
----@field isLocalWhisper boolean?
----@field isEnabledCommand string? The command to pass to checkPlayerCanUseChat to determine whether the stream is enabled.
----@field formatter string?
-
----@class omichat.CommandStreamConfig : omichat.BaseStreamConfig
----@field helpText string? String ID of a summary of the command's purpose. Displays when the /help command is used.
----@field onHelp fun(self: omichat.StreamInfo)? Callback triggered when /help is used with this command.
-
----@class omichat.BaseStream
----@field name string The name of the stream.
----@field command string The stream command, with a trailing space.
----@field shortCommand string? An optional short stream command, with a trailing space.
-
----A stream used for communicating in chat.
----@class omichat.ChatStream : omichat.BaseStream
----@field omichat omichat.ChatStreamConfig? Additional configuration options.
----@field tabID integer The tab ID of the tab in which this stream is available (1-indexed).
-
----A stream used to invoke a command in chat.
----@class omichat.CommandStream : omichat.BaseStream
----@field omichat omichat.CommandStreamConfig Additional configuration options.
-
 ---Typing information record.
 ---@class omichat.TypingInformation
 ---@field display string
 ---@field lastUpdate integer
-
----@alias omichat.Stream
----| omichat.ChatStream
----| omichat.CommandStream
 
 ---Player preference profile.
 ---@class omichat.PlayerProfile
@@ -179,7 +143,7 @@
 ---@field chatNickname string? Nickname to use in chat alongside a profile.
 ---@field callouts string[] Custom callouts.
 ---@field sneakcallouts string[] Custom sneak callouts.
----@field colors table<omichat.ColorCategory, omi.ColorTable> Custom chat colors.
+---@field colors table<string, omi.ColorTable> Custom chat colors.
 
 ---Player preferences.
 ---@class omichat.PlayerPreferences
@@ -205,9 +169,125 @@
 ---@field logIndex integer The current index in the tab's input history.
 ---@field tabID integer The tab ID of this tab (0-indexed).
 ---@field text string The current rich text of the chat tab.
----@field chatStreams omichat.ChatStream[] Chat streams available in this tab.
+---@field chatStreams (omichat.ChatStream | omichat.StreamTable)[] Chat streams available in this tab.
 ---@field chatTextLines string[] An array of rich text strings of the current messages.
 ---@field chatMessages omichat.Message[] Current chat messages.
 ---@field log string[] The input history of this tab.
 ---@field tabTitle string The title of this tab.
 ---@field streamID integer The stream ID of the current stream.
+
+---@class omichat.Args.StreamRetrieval
+---@field enabledOnly boolean? If `true`, only enabled streams will be returned.
+
+---@class omichat.Args.ChatCommandToStream : omichat.Args.StreamRetrieval
+---@field commandsOnly boolean? If `true`, only command streams will be checked.
+---@field chatsOnly boolean? If `true`, only chat streams will be checked.
+
+---@class omichat.Args.MessageInfo.SetStream
+---@field chatType omichat.ChatTypeString? The chat type to set alongside the stream. Defaults to the stream's chat type.
+---@field forceFormat boolean? If `true`, the format will be set to the chat's format regardless of whether it's already set.
+---@field noTagUpdate boolean? If `true`, the tags won't be updated to include the target stream's tags.
+---@field overwriteTags boolean? If `true`, the previous tags will be overwritten with the tags from the target stream, instead of merging.
+
+
+--#region Streams
+
+---@class omichat.Stream
+---@field private __api omichat.api.client (static) Reference to the API.
+---@field protected callbacks omichat.Stream.Callbacks Container for callbacks.
+---@field protected name string The name of the stream.
+---@field protected command string The stream command, with a trailing space.
+---@field protected shortCommand string? An optional short stream command, with a trailing space.
+---@field protected disabled boolean? If `true`, the stream will always be treated as not enabled.
+---@field protected aliasesList string[] Additional aliases for the stream.
+---@field protected commandType omichat.ChatCommandType The command type used to determine whether input should be retained.
+---@field protected chatFormat string? The format to use for chat messages sent from this stream.
+---@field protected overheadFormat string? The format to use for overhead messages sent from this stream.
+---@field protected formatter omichat.MetaFormatter? The formatter to use for this stream.
+---@field protected allowEmotes boolean Whether to allow emotes on this stream.
+---@field protected suggestSpec omichat.SuggestSpec? Spec to use for suggestions.
+---@field protected tags omi.SimpleSet A set of tags for the stream.
+---@field protected autoTags omi.SimpleSet A set of tags to always include on the stream.
+---@field protected isChat boolean Whether this is a chat stream.
+---@field protected isCommand boolean Whether this is a command stream.
+---@field protected noTags boolean True if the stream has an empty tags table.
+
+---@class omichat.Stream.Callbacks
+---@field isEnabled omichat.Stream.Callback.IsEnabled? Invoked to check whether the stream should be treated as enabled.
+---@field onUse omichat.Stream.Callback.OnUse? Invoked when the stream is used.
+---@field onUseDisabled omichat.Stream.Callback.OnUseDisabled? Invoked when the stream is used while disabled.
+
+---@class omichat.Args.Stream
+---@field name string The name of the stream.
+---@field command string? The stream command, with a trailing space. Defaults to `/` + `name`.
+---@field shortCommand string? An optional short stream command, with a trailing space.
+---@field aliases string[]? Additional aliases for the stream.
+---@field disabled boolean? If `true`, the stream will always be treated as not enabled.
+---@field commandType omichat.ChatCommandType? The command type used to determine whether input should be retained.
+---@field isEnabled omichat.Stream.Callback.IsEnabled? Invoked to check whether the stream should be treated as enabled.
+---@field overheadFormat string? The overhead format to use for the stream.
+---@field chatFormat string? The format to use for the stream in chat.
+---@field onUse omichat.Stream.Callback.OnUse? Invoked when the stream is used.
+---@field onUseDisabled omichat.Stream.Callback.OnUseDisabled? Invoked when the stream is used while disabled.
+---@field allowEmotes boolean? Whether to allow emotes on this stream.
+---@field suggestSpec omichat.SuggestSpec? Spec to use for suggestions.
+---@field formatter omichat.MetaFormatter? The formatter to use for this stream.
+---@field tags string[]? Tags for the stream.
+---@field autoTags string[]? Tags which should always be included on the stream.
+
+
+---@class omichat.ChatStream
+---@field protected allowBuffs boolean Whether the stream can apply buffs when it's used.
+---@field protected allowLanguages boolean Whether the stream allows messages to be sent using roleplay languages.
+---@field protected allowTypingIndicator boolean Whether typing on the stream triggers a typing indicator.
+---@field protected attractZombies boolean Whether the stream can attract zombies.
+---@field protected chatFormat string? The format to use for chat messages.
+---@field protected chatType omichat.ChatTypeString The chat type that stream messages are sent over.
+---@field protected defaultColor omi.ColorTable The default color for messages on the stream.
+---@field protected range integer The range of the chat stream.
+---@field protected tabID integer The tab ID of the tab in which this stream is available (1-indexed).
+---@field protected useNarrativeStyle boolean Whether the stream should apply narrative style if it's enabled.
+---@field protected verticalRange integer The vertical range of the chat stream.
+
+---@class omichat.Args.ChatStream : omichat.Args.Stream
+---@field defaultColor omi.ColorTable? The default color for messages on the stream.
+---@field allowBuffs boolean? Whether the stream can apply buffs when it's used.
+---@field allowLanguages boolean? Whether the stream allows messages to be sent using roleplay languages.
+---@field allowTypingIndicator boolean? Whether typing on the stream triggers a typing indicator.
+---@field attractZombies boolean? Whether the stream can attract zombies.
+---@field chatFormat string? The format to use for chat messages.
+---@field useNarrativeStyle boolean? Whether the stream should apply narrative style if it's enabled.
+---@field chatType omichat.ChatTypeString? The chat type that stream messages are sent over.
+---@field range integer? The range of the chat stream.
+---@field verticalRange integer? The vertical range of the chat stream.
+---@field tabID integer? The tab ID of the tab in which this stream is available (1-indexed).
+
+
+---@class omichat.CommandStream
+---@field protected callbacks omichat.CommandStream.Callbacks Container for callbacks.
+---@field protected helpTextID string? String ID for a help message for the stream.
+
+---@class omichat.CommandStream.Callbacks : omichat.Stream.Callbacks
+---@field onHelp omichat.Stream.Callback.OnHelp? Invoked when the `/help` command is used.
+
+---@class omichat.Args.CommandStream : omichat.Args.Stream
+---@field helpTextID string? String ID for a help message for the stream.
+---@field onHelp omichat.Stream.Callback.OnHelp? Invoked when the `/help` command is used.
+
+
+---@class omichat.StreamTable
+---@field name string The name of the stream.
+---@field command string The stream command, with a trailing space.
+---@field tabID integer The tab ID of the tab in which this stream is available (1-indexed).
+---@field shortCommand string? An optional short stream command, with a trailing space.
+
+
+---@alias omichat.Stream.Callback.IsEnabled fun(self: omichat.Stream): boolean
+
+---@alias omichat.Stream.Callback.OnUse fun(ctx: omichat.SendArgs) Callback triggered when the stream is used.
+
+---@alias omichat.Stream.Callback.OnUseDisabled fun(self: omichat.Stream) Callback triggered when attempting to use a disabled stream.
+
+---@alias omichat.Stream.Callback.OnHelp fun(self: omichat.Stream) Callback triggered when /help is used.
+
+--#endregion

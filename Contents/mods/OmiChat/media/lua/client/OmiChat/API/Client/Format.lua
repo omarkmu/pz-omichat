@@ -1,359 +1,96 @@
 ---Client API functionality related to formatting, encoding, and decoding chat messages.
 
-local getTexture = getTexture
-local format = string.format
-local concat = table.concat
-local match = string.match
-local ISChat = ISChat ---@cast ISChat omichat.ISChat
+local MessageInfo = require 'OmiChat/Component/MessageInfo'
 
 
 ---@class omichat.api.client
 local API = require 'OmiChat/API/Client/Core'
 
 local utils = API.utils
-local config = API.config
-local Option = API.Option
-local MimicMessage = API.MimicMessage
+local config = API.Configuration
+local MultiMap = utils.MultiMap
 
-local _ChatMessage = __classmetatables[ChatMessage.class].__index
-local _ChatBase = __classmetatables[ChatBase.class].__index
-
-local _getTextWithPrefix = _ChatMessage.getTextWithPrefix
-local _getChatTitleID = _ChatBase.getTitleID
-local _getChatType = _ChatBase.getType
-
-local overheadChatTypes = {
-    say = true,
-    shout = true,
-    radio = true,
-}
-
-
----Returns whether name colors should be used given message info.
----@param info omichat.MessageInfo
----@return boolean
-local function shouldUseNameColor(info)
-    if not API.getNameColorsEnabled() then
-        return false
-    end
-
-    local tokens = {
-        author = info.tokens.author,
-        authorRaw = info.tokens.authorRaw,
-        chatType = info.chatType,
-        name = info.tokens.name,
-        nameRaw = info.tokens.nameRaw,
-        stream = info.tokens.stream,
-    }
-
-    return utils.testPredicate(Option.PredicateUseNameColor, tokens, tostring(info.message:getDatetime()))
-end
 
 ---Applies the narrative style given an input and stream.
 ---@param input string
----@param stream omichat.StreamInfo
----@param tokens table?
----@return string
+---@param stream omichat.ChatStream
+---@param tokens table
+---@return string result
+---@return boolean? appliedStyle
+---@return string? error
 local function applyNarrativeStyle(input, stream, tokens)
-    tokens = tokens and utils.copy(tokens) or {}
-    tokens.input = tokens.input or input
-    tokens.chatType = tokens.chatType or stream:getChatType()
-    tokens.stream = tokens.stream or stream:getIdentifier()
-
-    local original = input
-    if not utils.testPredicate(Option.PredicateUseNarrativeStyle, tokens) then
+    if not config.NarrativeStyle.Enable or not stream:canUseNarrativeStyle() then
         return input
     end
 
-    local dialogueTag
-    local patt = utils.trim(Option.PatternNarrativeCustomTag)
-    if patt ~= '' then
-        local internal, prefix, suffix = utils.getInternalText(input)
-
-        local success, tag, remainder = pcall(match, internal, patt)
-        if success and tag and remainder then
-            dialogueTag = tostring(tag)
-            tokens.input = prefix .. tostring(remainder) .. suffix
-        elseif not success then
-            utils.log.info('invalid string pattern set for PatternNarrativeCustomTag')
-        end
+    local formatter = API._metadataFormatters.narrative
+    if not formatter then
+        return input
     end
 
-    input = utils.interpolate(Option.FilterNarrativeStyle, tokens)
-    if input == '' then
-        return original
+    local original = input
+    local inputTokens = tokens
+    tokens = tokens and utils.copy(tokens) or {}
+    tokens.input = tokens.input or input
+    tokens.chatType = tokens.chatType or stream:getChatType()
+    tokens.stream = tokens.stream or stream:getName()
+
+    -- filter input
+    tokens.error = ''
+    tokens.errorID = ''
+    input = utils.interpolate(config.NarrativeStyle.InputFilter, tokens)
+
+    local err = utils.extractError(tokens)
+    if err or input == '' then
+        return original, nil, err
     end
 
+    -- get dialogue tag
     local seed = input
-    dialogueTag = dialogueTag or utils.interpolate(Option.FormatNarrativeDialogueTag, tokens, seed)
+    local dialogueTag = utils.interpolate(config.NarrativeStyle.DialogueTagFormat, tokens, seed)
     if dialogueTag == '' then
         return original
     end
 
-    local prefix, suffix
-    input, prefix, suffix = utils.getInternalText(input) -- get the actual end, not an invisible character
-    if not input:match('%p$') then
-        tokens.dialogueTag = dialogueTag
-        local punctuation = utils.interpolate(Option.FormatNarrativePunctuation, tokens, seed)
-        if punctuation then
-            input = input .. punctuation
-        end
+    input = utils.wrapStringArgument(input, config.ID_NARRATIVE_TEXT)
+    dialogueTag = utils.wrapStringArgument(dialogueTag, config.ID_NARRATIVE_TAG)
+
+    tokens.input = input
+    tokens.dialogueTag = dialogueTag
+
+    local content = utils.interpolate(config.NarrativeStyle.OverheadContentFormat, tokens, seed)
+    if content == '' then
+        return original
     end
 
-    dialogueTag = utils.wrapStringArgument(dialogueTag, config.NARRATIVE_TAG)
-    input = utils.wrapStringArgument(prefix .. input .. suffix, config.NARRATIVE_TEXT)
-    local combined = format('%s, "%s"', dialogueTag, input)
+    inputTokens.narrativeStyle = '1'
+    inputTokens.dialogueTag = dialogueTag
 
-    local formatter = API.getFormatter('narrative')
-    return formatter:format(combined)
+    return formatter:format(content), true
 end
 
 
----Applies format options from a message information table.
----This mutates `info`.
----@param info omichat.MessageInfo
----@return boolean success If false, the information table is invalid.
-function API.applyFormatOptions(info)
-    local msg = info.content
-    if not msg or not info.format then
-        return false
-    end
+---Applies message transforms and format options to a message.
+---@see omichat.api.client.buildMessageText
+---@param message omichat.Message
+---@param skipFormatting boolean?
+---@return omichat.MessageInfo? info The processed message information. If building fails, this is `nil`.
+---@return string original The original message text.
+function API.buildMessageInfo(message, skipFormatting)
+    ---@type omichat.MessageInfo
+    local info = MessageInfo:new(message)
+    local text = info:getRawText()
 
-    local meta = info.meta
-    local options = info.formatOptions
-    local message = info.message
-    local dt = tostring(info.message:getDatetime())
-    local seed = dt
-
-    if options.showTimestamp then
-        local hour, minute, second = dt:match('(%d%d):(%d%d):(%d%d)')
-
-        hour = tonumber(hour)
-        minute = tonumber(minute)
-        second = tonumber(second)
-
-        if hour and minute and second then
-            local hour12 = hour % 12
-            if hour12 == 0 then
-                hour12 = 12
-            end
-
-            local prefer24 = getCore():getOptionClock24Hour()
-            local prefHour = format('%d', prefer24 and hour or hour12)
-            local prefHourPadded = format('%02d', prefer24 and hour or hour12)
-
-            local ampm = hour < 12 and 'am' or 'pm'
-            info.timestamp = utils.interpolate(Option.FormatTimestamp, {
-                chatType = info.chatType,
-                stream = info.tokens.stream,
-                P = prefHour,
-                PP = prefHourPadded,
-                H = format('%d', hour),
-                HH = format('%02d', hour),
-                h = format('%d', hour12),
-                hh = format('%02d', hour12),
-                m = format('%d', minute),
-                mm = format('%02d', minute),
-                s = format('%d', second),
-                ss = format('%02d', second),
-                ampm = ampm,
-                AMPM = ampm:upper(),
-                hourFormat = prefer24 and 24 or 12,
-            }, seed)
-        end
-    end
-
-    info.language = utils.interpolate(Option.FormatLanguage, {
-        chatType = info.chatType,
-        stream = info.tokens.stream,
-        languageRaw = info.tokens.languageRaw,
-        language = info.tokens.language,
-        unknownLanguage = info.tokens.unknownLanguage,
-    })
-
-    if options.showTitle then
-        info.tag = utils.interpolate(Option.FormatTag, {
-            chatType = info.chatType,
-            stream = info.tokens.stream,
-            tag = getText(info.titleID),
-        }, seed)
-    end
-
-    local icon = utils.interpolate(Option.FormatIcon, {
-        chatType = info.chatType,
-        stream = info.tokens.stream,
-        buffyRoll = info.tokens.buffyRoll,
-        icon = meta.icon,
-        adminIcon = meta.adminIcon,
-    }, seed)
-
-    if icon and getTexture(icon) then
-        local size = 14
-        if options.font == 'small' then
-            size = 12
-        elseif options.font == 'large' then
-            size = 16
-        end
-
-        info.tokens.iconRaw = icon
-        info.tokens.icon = string.format(' <IMAGE:%s,%d,%d> ', icon, size + 1, size)
-    end
-
-    if shouldUseNameColor(info) then
-        local hasNameColor = meta.nameColor or Option.EnableSpeechColorAsDefaultNameColor
-        local hasRecipientNameColor = meta.recipientNameColor or Option.EnableSpeechColorAsDefaultNameColor
-        if hasNameColor then
-            local colorToUse = meta.nameColor or Option:getDefaultColor('name', message:getAuthor())
-            local nameColor = utils.color.toRichText(colorToUse, true)
-
-            if nameColor ~= '' then
-                utils.addMessageTagValue(message, 'ocNameColor', utils.color.toHexString(colorToUse))
-                info.tokens.name = concat {
-                    nameColor,
-                    info.tokens.name,
-                    ' <POPRGB> ',
-                }
-                info.tokens.author = concat {
-                    nameColor,
-                    info.tokens.author,
-                    ' <POPRGB> ',
-                }
-            end
-        end
-
-        if hasRecipientNameColor and info.tokens.recipient then
-            local colorToUse = meta.recipientNameColor or Option:getDefaultColor('name', info.tokens.recipient)
-            meta.recipientNameColor = colorToUse
-            local nameColor = utils.color.toRichText(colorToUse, true)
-
-            if nameColor ~= '' then
-                utils.addMessageTagValue(message, 'ocRecipientNameColor', utils.color.toHexString(colorToUse))
-                info.tokens.recipientName = concat {
-                    nameColor,
-                    info.tokens.recipientName,
-                    ' <POPRGB> ',
-                }
-                info.tokens.recipient = concat {
-                    nameColor,
-                    info.tokens.recipient,
-                    ' <POPRGB> ',
-                }
-            end
-        end
-    end
-
-    msg = utils.trim(msg)
-    if not options.color then
-        local color
-        if options.useDefaultChatColor then
-            if message:isFromDiscord() then
-                color = API.getColorOrDefault('discord')
-            else
-                color = API.getColorOrDefault(info.chatType)
-            end
-        end
-
-        options.color = color or {
-            r = info.textColor:getRed(),
-            g = info.textColor:getGreen(),
-            b = info.textColor:getBlue(),
-        }
-    end
-
-    info.tokens.message = msg
-    return true
-end
-
----Applies chat styles to a stream's input.
----@param input string
----@param stream omichat.StreamInfo
----@param tokens table?
----@return string
-function API.applyStyles(input, stream, tokens)
-    return applyNarrativeStyle(input, stream, tokens)
-end
-
----Applies message transforms.
----@param info omichat.MessageInfo
-function API.applyTransforms(info)
+    -- apply transforms
     for i = 1, #API._transformers do
         local transformer = API._transformers[i]
         if transformer.transform and transformer:transform(info) == true then
             break
         end
     end
-end
 
----Applies message transforms and format options to a message.
----Returns information about the parsed message.
----If building the message fails, `nil` is returned and the original
----text is returned instead.
----@see omichat.api.client.buildMessageText
----@see omichat.api.client.buildMessageTextFromInfo
----@param message omichat.Message
----@param skipFormatting boolean?
----@return omichat.MessageInfo?
----@return string
-function API.buildMessageInfo(message, skipFormatting)
-    local instance = ISChat.instance or {}
-
-    local text
-    local titleID
-    if utils.isinstance(message, MimicMessage) then
-        ---@cast message omi.chat.MimicMessage
-        text = message:getTextWithPrefixBase()
-        titleID = message:getTitleID()
-    else
-        -- `getText` doesn't handle color & image formatting.
-        -- would just use that otherwise
-        ---@cast message ChatMessage
-        local chat = message:getChat()
-        text = _getTextWithPrefix(message)
-        titleID = _getChatTitleID(chat)
-    end
-
-    local chatType = API.getMessageChatType(message)
-    local author = message:getAuthor() or ''
-    local textColor = message:getTextColor()
-    local meta = API.decodeMessageTag(message:getCustomTag())
-    local displayAsAdmin = API.getFormatter('adminIcon'):isMatch(message:getText())
-
-    local streamName = chatType
-    if chatType == 'whisper' then
-        streamName = 'private'
-    elseif message:isFromDiscord() then
-        streamName = 'discord'
-    end
-
-    ---@type omichat.MessageInfo
-    local info = {
-        message = message,
-        meta = meta,
-        rawText = text,
-        author = author,
-        titleID = titleID,
-        chatType = chatType,
-        textColor = textColor,
-
-        context = {},
-        tokens = {
-            admin = displayAsAdmin and '1' or nil,
-            stream = streamName,
-            author = utils.escapeRichText(author),
-            authorRaw = author,
-            name = meta.name or utils.escapeRichText(author),
-            nameRaw = meta.name or utils.escapeRichText(author),
-        },
-        formatOptions = {
-            font = instance.chatFont,
-            showTitle = instance.showTitle,
-            showTimestamp = instance.showTimestamp,
-            useDefaultChatColor = true,
-        },
-    }
-
-    API.applyTransforms(info)
-    if not skipFormatting and not API.applyFormatOptions(info) then
+    -- apply formatting
+    if not skipFormatting and not info:applyFormatting() then
         return nil, text
     end
 
@@ -365,88 +102,34 @@ end
 ---@return string
 function API.buildMessageText(message)
     local info, original = API.buildMessageInfo(message)
-    local result = info and API.buildMessageTextFromInfo(info)
+    local result = info and info:buildMessageText()
     return result or original
 end
 
----Builds the prefixed text for a message from message information.
----@param info omichat.MessageInfo
+---Returns the roleplay language encoded in message content.
+---@param message omichat.Message | string? A message object or string to read.
 ---@return string?
-function API.buildMessageTextFromInfo(info)
-    if not info or not info.format then
+function API.decodeLanguage(message)
+    if not message then
         return
     end
 
-    local seed = tostring(info.message:getDatetime())
-    local tokens = {
-        admin = info.tokens.admin,
-        chatType = info.chatType,
-        echo = info.tokens.echo,
-        stream = info.tokens.stream,
-        icon = info.tokens.icon,
-        iconRaw = info.tokens.iconRaw,
-        language = info.language,
-        timestamp = info.timestamp,
-        tag = info.tag,
-        buffyRoll = info.tokens.buffyRoll,
-        buffyCrit = info.tokens.buffyCrit,
-        buffyCritRaw = info.tokens.buffyCritRaw,
-        content = utils.interpolate(info.format, info.tokens, seed),
-    }
-
-    tokens.prefix = utils.trim(utils.interpolate(Option.FormatChatPrefix, tokens, seed))
-
-    return concat {
-        utils.color.toRichText(info.formatOptions.color),
-        '<SIZE:', info.formatOptions.font or 'medium', '> ',
-        utils.interpolate(Option.ChatFormatFull, tokens, seed),
-    }
-end
-
----Returns the roleplay language encoded in message content.
----@param message omichat.Message | string A message object or string to read.
----@return string?
-function API.decodeLanguage(message)
     if type(message) ~= 'string' then
         message = message:getText()
     end
 
-    local formatter = API.getFormatter('language')
-    message = formatter:read(message)
+    local formatter = API._metadataFormatters.language
+    message = formatter and formatter:read(message)
     if not message then
         return
     end
 
     local languageId = utils.decodeInvisibleInt(message)
-    if not languageId or languageId < 1 or languageId > API.config:maxDefinedLanguages() then
+    if not languageId or languageId < 1 or languageId > config.MAX_LANGUAGES then
         return
     end
 
     return API.getRoleplayLanguageFromID(languageId)
-end
-
----Decodes message metadata from an encoded tag.
----@param tag string
----@return omichat.MessageMetadata
-function API.decodeMessageTag(tag)
-    if not tag or tag == '' then
-        return {}
-    end
-
-    local _, decoded = utils.json.tryDecode(tag)
-    if type(decoded) ~= 'table' then
-        return {}
-    end
-
-    return {
-        suppressed = decoded.ocSuppressed,
-        language = decoded.ocLanguage,
-        name = decoded.ocName,
-        nameColor = utils.color.fromString(decoded.ocNameColor),
-        recipientNameColor = utils.color.fromString(decoded.ocRecipientNameColor),
-        icon = decoded.ocIcon,
-        adminIcon = decoded.ocAdminIcon,
-    }
 end
 
 ---Encodes the provided text with information about the given roleplay language.
@@ -455,153 +138,133 @@ end
 ---@return string text
 ---@return string? language
 function API.encodeLanguage(text, language)
+    local formatter = API._metadataFormatters.language
     local langId = API.getRoleplayLanguageID(language)
-    if not langId or #utils.trim(text) == 0 then
+    if not formatter or not langId or #utils.trim(text) == 0 then
         return text
     end
 
     local encoded = utils.encodeInvisibleInt(langId) .. text
-    return API.getFormatter('language'):format(encoded)
-end
-
----Encodes message information including chat name and colors into a string.
----@param message omichat.Message
----@return string
-function API.encodeMessageTag(message)
-    local author = message:getAuthor() ---@type string?
-    if author == '' then
-        author = nil
-    end
-
-    local text = message:getText()
-    local useAdminIcon = API.getFormatter('adminIcon'):isMatch(text)
-
-    local iconFormatter = API.getFormatter('messageIcon')
-    local encodedIcon = iconFormatter:read(text)
-    local icon = encodedIcon and utils.decodeInvisibleString(encodedIcon)
-
-    if icon and not getTexture(icon) then
-        icon = nil
-    elseif icon then
-        -- message-level icons suppress admin icon
-        useAdminIcon = false
-    end
-
-    local color = author and API.getNameColorInChat(author)
-    local encoded = utils.json.tryEncode {
-        ocSuppressed = false,
-        ocLanguage = API.decodeLanguage(message),
-        ocName = API.getNameInChatRichText(author, API.getMessageChatType(message)),
-        ocNameColor = color and utils.color.toHexString(color) or nil,
-        ocIcon = icon or (author and API.getChatIcon(author)) or nil,
-        ocAdminIcon = (author and useAdminIcon) and API.getAdminChatIcon(author) or nil,
-    }
-
-    return encoded or ''
+    return formatter:format(encoded)
 end
 
 ---Prepares text for sending to chat.
 ---@param args omichat.FormatArgs
 ---@return omichat.FormatResult
 function API.formatForChat(args)
-    local stream = args.stream or args.formatterName or args.chatType
     local username = args.username or utils.getPlayerUsername()
     local name = args.name or API.getNameInChat(username, args.chatType)
     local text, before, after = utils.getInternalText(args.text)
+    local stream = args.stream
+    local formatStream = args.formatStream
+    local echoType = args.echoType
+
+    -- set up tokens
+    local tagSet = stream and stream:getTags() or {}
+    if formatStream then
+        utils.extend(tagSet, formatStream:getTags())
+    end
+
+    if args.extraTags then
+        for i = 1, #args.extraTags do
+            tagSet[args.extraTags[i]] = true
+        end
+    end
+
+    if echoType then
+        tagSet.IsEchoMessage = true
+    end
 
     local tokens = args.tokens and utils.copy(args.tokens) or {}
     tokens.chatType = args.chatType
     tokens.input = text
     tokens.username = username
     tokens.name = name
-    tokens.stream = stream
-    tokens.echo = args.echoType ~= nil and '1' or nil
+    tokens.stream = stream:getName()
+    tokens.echo = echoType ~= nil and '1' or nil
+    tokens.tags = MultiMap.fromSet(tagSet)
+    tokens.error = ''
+    tokens.errorID = ''
 
-    -- check language
+    -- check for roleplay language
     local language
-    local allowLanguage = args.language and utils.testPredicate(Option.PredicateAllowLanguage, tokens)
+    local allowLanguage = args.language and stream and stream:isAllowLanguages()
     if allowLanguage then
         language = args.language
         tokens.languageRaw = language
         tokens.language = language and utils.getTranslatedLanguageName(language)
     end
 
-    -- filter and check input
-    tokens.input = utils.interpolate(Option.FilterChatInput, tokens)
+    -- filter input
+    tokens.input = utils.interpolate(config.Format.Filter.ChatInput, tokens)
 
-    tokens.error = ''
-    tokens.errorID = ''
-    local allowInput = #tokens.input > 0 and utils.testPredicate(Option.PredicateAllowChatInput, tokens)
     local err = utils.extractError(tokens)
-
-    if not allowInput or err then
-        return {
-            text = '',
-            error = err,
-        }
+    if err or tokens.input == '' then
+        return { text = '', error = err }
     end
 
+    -- reapply invisible wrapping characters
     tokens.input = before .. tokens.input .. after
 
-    -- apply styles
-    local streamInfo = API.getChatStreamByIdentifier(stream)
-    tokens.input = streamInfo and API.applyStyles(tokens.input, streamInfo, tokens) or tokens.input
+    -- apply narrative style
+    local appliedStyle
+    if stream then
+        tokens.input, appliedStyle, err = applyNarrativeStyle(tokens.input, stream, tokens)
 
-    -- encode language
-    if language then
-        tokens.input = API.encodeLanguage(tokens.input, language)
+        if err or tokens.input == '' then
+            return { text = '', error = err }
+        end
     end
 
-    -- apply format
-    local formatterName = args.formatterName
-    if not formatterName and overheadChatTypes[args.chatType] then
-        formatterName = 'overheadOther'
+    if appliedStyle then
+        -- add IsNarrativeStyle tag
+        if utils.isinstance(tokens.tags, MultiMap) then
+            tokens.tags = tokens.tags:withSetValue('IsNarrativeStyle')
+        else
+            tokens.tags = MultiMap.fromSet({ IsNarrativeStyle = true })
+        end
     end
 
-    local formatter = formatterName and API.getFormatter(formatterName)
-    tokens.input = formatter and formatter:format(tokens.input, tokens) or tokens.input
+    -- encode language metadata
+    tokens.input = language and API.encodeLanguage(tokens.input, language) or tokens.input
+
+    -- mark as echo message
+    if echoType then
+        tokens.input = utils.wrapStringArgument(utils.encodeInvisibleInt(echoType), config.ID_ECHO_TYPE) .. tokens.input
+    end
+
+    -- apply formatter
+    local formatter = args.formatter
+        or (formatStream and formatStream:getFormatter())
+        or stream:getFormatter()
+
+    if formatter then
+        tokens.input = formatter:format(tokens.input, tokens)
+    end
 
     -- add indicator for admin icon
     if isAdmin() and API.getShowAdminIcon() then
-        local adminIconFormatter = API.getFormatter('adminIcon')
-        tokens.input = adminIconFormatter:wrap(tokens.input)
+        local adminIconFormatter = API._metadataFormatters.adminIcon
+        if adminIconFormatter then
+            tokens.input = adminIconFormatter:wrap(tokens.input)
+        end
     end
 
-    -- mark as echo message
-    if args.echoType then
-        local echoFormatter = API.getFormatter('echo')
-        local input = tokens.input
-        input = utils.encodeInvisibleCharacter(args.echoType) .. input
-
-        tokens.input = echoFormatter:format(input, tokens)
-    end
-
-    -- apply full overhead format
-    local overheadFormatter = API.getFormatter('overheadFull')
-    tokens.prefix = utils.trimleft(utils.interpolate(Option.FormatOverheadPrefix, tokens))
-    tokens.input = overheadFormatter:format(tokens.input, tokens)
-
-    -- encode message icon
-    if args.icon then
-        local textureName
-        if getTexture(args.icon) then
-            textureName = args.icon
-        else
-            textureName = utils.getTextureNameFromIcon(args.icon)
-        end
-
-        if textureName then
-            local iconFormatter = API.getFormatter('messageIcon')
-            local encodedIcon = iconFormatter:wrap(utils.encodeInvisibleString(textureName))
-            tokens.input = tokens.input .. encodedIcon
-        end
+    -- apply final overhead format
+    local overheadFormatter = API._metadataFormatters.overheadFinal
+    if overheadFormatter then
+        tokens.prefix = utils.trimleft(utils.interpolate(config.Format.Overhead.Prefix, tokens))
+        tokens.input = overheadFormatter:format(tokens.input, tokens)
     end
 
     -- encode online ID for radio
     local player = getSpecificPlayer(0)
     if player then
-        local id = utils.encodeInvisibleInt(player:getOnlineID())
-        tokens.input = API.getFormatter('onlineID'):format(id) .. tokens.input
+        local onlineIDFormatter = API._metadataFormatters.onlineID
+        if onlineIDFormatter then
+            local id = utils.encodeInvisibleInt(player:getOnlineID())
+            tokens.input = onlineIDFormatter:format(id) .. tokens.input
+        end
     end
 
     return {
@@ -612,22 +275,9 @@ end
 
 ---Gets a named formatter.
 ---@param name omichat.FormatterName
----@return omichat.MetaFormatter
+---@return omichat.MetaFormatter?
 function API.getFormatter(name)
-    return API._formatters[name]
-end
-
----Returns the chat type of a chat message.
----@param message omichat.Message
----@return string
-function API.getMessageChatType(message)
-    if utils.isinstance(message, MimicMessage) then
-        ---@cast message omi.chat.MimicMessage
-        return message:getChatType()
-    end
-
-    ---@cast message ChatMessage
-    return tostring(_getChatType(message:getChat()))
+    return API._metadataFormatters[name]
 end
 
 ---Text entry validator that validates against the nickname filter.
@@ -652,9 +302,9 @@ function API.validateNicknameText(entry, text)
         errorID = '',
     }
 
-    local nickname = utils.interpolate(Option.FilterNickname, tokens)
+    local nickname = utils.interpolate(config.Format.Filter.Name, tokens)
     local err = utils.extractError(tokens)
-    if nickname ~= '' and not err then
+    if not err and not utils.isNilOrWhitespace(nickname) then
         return true, nickname
     end
 

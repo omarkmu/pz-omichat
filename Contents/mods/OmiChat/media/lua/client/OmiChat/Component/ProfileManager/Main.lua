@@ -5,9 +5,8 @@ local ISPanelJoypad = ISPanelJoypad
 local API = require 'OmiChat/API/Client/Core'
 
 local ContentPanel = require 'OmiChat/Component/ProfileManager/ContentPanel'
-local config = API.config
+local config = API.Configuration
 local utils = API.utils
-local Option = API.Option
 
 ---UI element for managing player preference profiles.
 ---@class omichat.ProfileManager : ISPanelJoypad
@@ -188,7 +187,7 @@ end
 ---Adds a new profile to the manager.
 function ProfileManager:addProfile()
     local idx = #self.profiles + 1
-    if idx > config:maxProfiles() then
+    if idx > config.MAX_PROFILES then
         return
     end
 
@@ -225,7 +224,7 @@ end
 ---Duplicates the currently selected profile.
 function ProfileManager:duplicateProfile()
     local newIdx = #self.profiles + 1
-    if newIdx > config:maxProfiles() then
+    if newIdx > config.MAX_PROFILES then
         return
     end
 
@@ -253,7 +252,7 @@ function ProfileManager:onCalloutsChange(entry, category)
         return
     end
 
-    local lines = utils.getLines(entry:getInternalText(), config:maxCustomShoutLength())
+    local lines = utils.getLines(entry:getInternalText(), config.MAX_CUSTOM_SHOUT_LEN)
     if lines and category == 'sneakcallouts' then
         for i = 1, #lines do
             lines[i] = lines[i]:lower()
@@ -265,7 +264,7 @@ end
 
 ---Callback for color update.
 ---@param entry omi.ui.ColorEntry
----@param category omichat.ColorCategory
+---@param category string
 function ProfileManager:onColorChange(entry, category)
     local profile = self.current
     local color = entry:getColor()
@@ -273,11 +272,6 @@ function ProfileManager:onColorChange(entry, category)
         profile.colors[category] = utils.copy(color)
     elseif profile then
         profile.colors[category] = nil
-    end
-
-    local nameControl = self.colorControls.name
-    if nameControl and Option.EnableSpeechColorAsDefaultNameColor and category == 'speech' then
-        nameControl:setEmptyColor(color or entry:getEmptyColor())
     end
 end
 
@@ -337,9 +331,6 @@ end
 ---Updates the state of controls.
 ---@param force boolean?
 function ProfileManager:updateControlState(force)
-    local player = getSpecificPlayer(0)
-    local username = player and player:getUsername()
-
     local selectedProfile = self.profiles[self.listbox.selected]
     if not selectedProfile then
         return
@@ -357,8 +348,7 @@ function ProfileManager:updateControlState(force)
     end
 
     for k, control in pairs(self.colorControls) do
-        local defaultColor = Option:getDefaultColor(k, username)
-        control:setEmptyColor(defaultColor)
+        control:setEmptyColor(API.getDefaultColor(k))
 
         local color = self.current.colors[k]
         if color then
@@ -415,7 +405,7 @@ function ProfileManager:updateUIState(resetItems, selectIdx)
         self.listbox.selected = math.min(selectIdx, #self.listbox.items)
     end
 
-    local addEnabled = #self.profiles < config:maxProfiles()
+    local addEnabled = #self.profiles < config.MAX_PROFILES
     local addTooltip = not addEnabled and getText('UI_OmiChat_ProfileManager_MaxProfiles') or nil
     createButton:setEnable(addEnabled)
     createButton:setTooltip(addTooltip)

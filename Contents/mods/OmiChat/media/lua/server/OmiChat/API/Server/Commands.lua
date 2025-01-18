@@ -9,7 +9,7 @@ local API = require 'OmiChat/API/Server/Core'
 ---@class omichat.api.server.commands
 API.Commands = {}
 
-local Option = API.Option
+local config = API.Configuration
 local utils = API.utils
 
 ---@type table<omichat.ModDataField, function>
@@ -27,7 +27,7 @@ local function canAccessTarget(player, target, fromCommand)
     end
 
     local access = utils.getNumericAccessLevel(player:getAccessLevel())
-    if fromCommand and access < Option.MinimumCommandAccessLevel then
+    if fromCommand and access < config.General.MinimumCommandAccessLevel then
         return false
     end
 
@@ -48,17 +48,6 @@ local function isOnlinePlayer(username)
 
     local player = utils.getPlayerByUsername(username)
     return player ~= nil
-end
-
----Checks whether a field should be reset on player death.
----@param field string
----@param username string
----@return boolean
-local function shouldResetFieldOnDeath(field, username)
-    return utils.testPredicate(Option.PredicateClearOnDeath, {
-        field = field,
-        username = username,
-    })
 end
 
 ---Checks whether the typing indicator should be sent for a pair of players.
@@ -147,19 +136,8 @@ end
 
 ---@param args omichat.request.ModDataUpdate
 ---@return boolean
-function updateModData.nameColors(args)
-    if not Option.EnableSetNameColor and not args.fromCommand then
-        return false
-    end
-
-    API.setNameColorString(args.target, args.value and tostring(args.value) or nil)
-    return true
-end
-
----@param args omichat.request.ModDataUpdate
----@return boolean
 function updateModData.nicknames(args)
-    if not Option:canPlayersSetNickname() and not args.fromCommand then
+    if not config:isNicknameEnabled() and not args.fromCommand then
         return false
     end
 
@@ -311,17 +289,18 @@ function API.Commands.reportPlayerDeath(player)
     end
 
     local doTransmit = false
-    if shouldResetFieldOnDeath('nickname', username) then
+    local clearConfig = config.General.ClearOnDeath
+    if clearConfig.Nickname then
         updateModData.nicknames({ target = username })
         doTransmit = true
     end
 
-    if shouldResetFieldOnDeath('icon', username) then
+    if clearConfig.Icon then
         updateModData.icons({ target = username })
         doTransmit = true
     end
 
-    if shouldResetFieldOnDeath('languages', username) then
+    if clearConfig.Languages then
         updateModData.languages({ target = username })
         doTransmit = true
     end
@@ -381,7 +360,7 @@ end
 ---@param player IsoPlayer
 function API.Commands.requestClearNames(player)
     local access = utils.getNumericAccessLevel(player:getAccessLevel())
-    if access < Option.MinimumCommandAccessLevel then
+    if access < config.General.MinimumCommandAccessLevel then
         return
     end
 
@@ -430,11 +409,12 @@ end
 function API.Commands.requestDrawCard(player)
     local suit = 1 + ZombRand(4)
     local card = 1 + ZombRand(13)
-    if API.isCustomStreamEnabled('card') then
-        API.reportDrawCard(player, card, suit)
-    else
+
+    if config.Commands.Card.Global then
         local name = API.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
         API.reportDrawCardGlobal(name, card, suit)
+    else
+        API.reportDrawCard(player, card, suit)
     end
 end
 
@@ -442,11 +422,11 @@ end
 ---@param player IsoPlayer
 function API.Commands.requestFlipCoin(player)
     local heads = ZombRand(2) == 0
-    if API.isCustomStreamEnabled('flip') then
-        API.reportFlipCoin(player, heads)
-    else
+    if config.Commands.Flip.Global then
         local name = API.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
         API.sendTranslatedServerMessage('UI_OmiChat_Flip' .. (heads and 'Heads' or 'Tails'), { name })
+    else
+        API.reportFlipCoin(player, heads)
     end
 end
 
@@ -559,17 +539,12 @@ function API.Commands.requestRollDice(player, args)
     end
 
     local roll = 1 + ZombRand(sides)
-    if API.isCustomStreamEnabled('roll') then
-        API.reportRoll(player, roll, sides)
-    else
+    if config.Commands.Roll.Global then
         local name = API.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
         API.sendTranslatedServerMessage('UI_OmiChat_Roll', { name, tostring(roll), tostring(sides) })
+    else
+        API.reportRoll(player, roll, sides)
     end
-end
-
----Handles sandbox options being updated by an admin.
-function API.Commands.requestSandboxUpdate()
-    API.dispatchAll('updateState')
 end
 
 ---Handles the /seticon command.

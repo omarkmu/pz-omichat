@@ -8,10 +8,12 @@ API.Commands = {}
 
 
 local utils = API.utils
-local Option = API.Option
+local config = API.Configuration
 local unpack = unpack
-local concat = table.concat
 local getTimestampMs = getTimestampMs
+
+local COMMAND_ARGS_START = utils.encodeInvisibleCharacter(config.ID_COMMAND_ARGS)
+
 
 local englishSuits = {
     'Clubs',
@@ -109,7 +111,7 @@ function API.requestDrawCard()
         return false
     end
 
-    if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, Option:getCardItems()) then
+    if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, config.Commands.Card.Items) then
         return false
     end
 
@@ -124,7 +126,7 @@ function API.requestFlipCoin()
         return false
     end
 
-    if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, Option:getCoinItems()) then
+    if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, config.Commands.Flip.Items) then
         return false
     end
 
@@ -176,7 +178,7 @@ function API.requestRollDice(sides)
         return false
     end
 
-    if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, Option:getDiceItems()) then
+    if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, config.Commands.Roll.Items) then
         return false
     end
 
@@ -206,7 +208,7 @@ function API.requestSetIcon(command)
     if not getTexture(icon) then
         local textureName = utils.getTextureNameFromIcon(icon)
         if textureName and getTexture(textureName) then
-            command = table.concat { string.format('%q', username), textureName }
+            command = string.format('%q', username) .. ' ' .. textureName
         else
             return false
         end
@@ -285,63 +287,81 @@ function API.Commands.reportDrawCard(args)
 
     -- global message
     if args.name then
+        -- "global" on the client because the card name needs to be translated locally
         local cardName = utils.getTranslatedCardName(card, suit)
         API.addInfoMessage(getText('UI_OmiChat_Card', args.name, cardName))
         return
     end
 
     -- local message
-    -- display english overhead & encode card values for future translation
-    local cardName = concat { englishCards[card], ' of ', englishSuits[suit] }
-    local content = utils.interpolate(Option.FormatCard, {
+    local commandStream = API._cardCommand
+    local targetStream = API.getFirstChatStreamWithTag('CardCommandTarget')
+    if not targetStream then
+        return
+    end
+
+    -- display English text overhead, encode card values for per-client translation
+    local cardName = englishCards[card] .. ' of ' .. englishSuits[suit]
+    local content = utils.interpolate(config.Commands.Card.Format, {
         suit = suit,
         number = card,
         card = cardName,
     })
 
+    local result = utils.encodeInvisibleCharacter(suit) .. utils.encodeInvisibleCharacter(card)
+    local encoded = COMMAND_ARGS_START .. result
+
     API.send {
-        streamName = 'card',
-        formatterName = 'card',
-        text = concat {
-            utils.encodeInvisibleCharacter(suit),
-            utils.encodeInvisibleCharacter(card),
-            content,
-        },
+        stream = targetStream,
+        formatStream = commandStream,
+        text = encoded .. content,
     }
 end
 
 ---Reports the results of flipping a coin.
 ---@param args omichat.request.ReportFlipCoin
 function API.Commands.reportFlipCoin(args)
+    local commandStream = API._flipCommand
+    local targetStream = API.getFirstChatStreamWithTag('FlipCommandTarget')
+    if not targetStream then
+        return
+    end
+
     local heads = args.heads
-    local content = utils.interpolate(Option.FormatFlip, {
+    local content = utils.interpolate(config.Commands.Flip.Format, {
         heads = args.heads and '1' or nil,
     })
 
+    local result = utils.encodeInvisibleCharacter(heads and 1 or 2)
+    local encoded = COMMAND_ARGS_START .. result
+
     API.send {
-        streamName = 'flip',
-        formatterName = 'flip',
-        text = concat {
-            utils.encodeInvisibleCharacter(heads and 1 or 2),
-            content,
-        },
+        stream = targetStream,
+        formatStream = commandStream,
+        text = encoded .. content,
     }
 end
 
 ---Reports the results of a dice roll.
 ---@param args omichat.request.ReportRoll
 function API.Commands.reportRoll(args)
+    local commandStream = API._rollCommand
+    local targetStream = API.getFirstChatStreamWithTag('RollCommandTarget')
+    if not targetStream then
+        return
+    end
+
     local tokens = { roll = tostring(args.roll), sides = tostring(args.sides) }
-    local content = utils.interpolate(Option.FormatRoll, tokens)
+    local content = utils.interpolate(config.Commands.Roll.Format, tokens)
+
+
+    local result = utils.encodeInvisibleInt(args.roll) .. utils.encodeInvisibleInt(args.sides)
+    local encoded = COMMAND_ARGS_START .. result
 
     API.send {
-        streamName = 'roll',
-        formatterName = 'roll',
-        text = concat {
-            utils.encodeInvisibleInt(args.roll),
-            utils.encodeInvisibleInt(args.sides),
-            content,
-        },
+        stream = targetStream,
+        formatStream = commandStream,
+        text = encoded .. content,
     }
 end
 
@@ -367,6 +387,7 @@ end
 ---@param req omichat.request.UpdateConfiguration
 function API.Commands.updateConfiguration(req)
     API.Configuration:load(req.value)
+    API.updateState(true)
 end
 
 ---Updates player cache state.

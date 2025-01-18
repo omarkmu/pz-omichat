@@ -4,7 +4,7 @@
 local API = require 'OmiChat/API/Client/Core'
 
 local utils = API.utils
-local Option = API.Option
+local config = API.Configuration
 local concat = table.concat
 local getText = getText
 
@@ -27,9 +27,9 @@ function API.addRoleplayLanguage(language)
     return true
 end
 
----Sets the color associated with a given color category for the current player,
+---Sets the color associated with a given stream for the current player,
 ---if the related option is enabled.
----@param category omichat.ColorCategory
+---@param category string
 ---@param color omi.ColorTable?
 function API.changeColor(category, color)
     if category == 'speech' then
@@ -37,26 +37,7 @@ function API.changeColor(category, color)
         return
     end
 
-    if category ~= 'name' then
-        -- no syncing necessary for chat colors; just set in player preferences
-        API.setPreferredColor(category, color)
-        return
-    end
-
-    local username = utils.getPlayerUsername()
-    if not username then
-        return
-    end
-
-    local modData = API.getModData()
-    local value = color and utils.color.toHexString(color) or nil
-
-    modData.nameColors[username] = value
-    API.requestDataUpdate({
-        target = username,
-        field = 'nameColors',
-        value = value,
-    })
+    API.setPreferredColor(category, color)
 end
 
 ---Sets the color used for overhead chat bubbles.
@@ -105,27 +86,22 @@ function API.clearModData(username)
 end
 
 ---Gets a color table for the current player, or `nil` if unset.
----@param category omichat.ColorCategory
+---@param id string
 ---@return omi.ColorTable?
-function API.getColor(category)
-    if category == 'name' then
-        local player = getSpecificPlayer(0)
-        return API.getNameColor(player and player:getUsername())
+function API.getColor(id)
+    if id == 'speech' then
+        return API.getLocalSpeechColor()
     end
 
-    if category == 'speech' then
-        return API.getSpeechColor()
-    end
-
-    return API.getPreferredColor(category)
+    return API.getPreferredColor(id)
 end
 
----Returns a color table associated with the current player,
+---Returns a color table preferred by the current player,
 ---or the default color table if there isn't one.
----@param category omichat.ColorCategory
+---@param id string
 ---@return omi.ColorTable
-function API.getColorOrDefault(category)
-    return API.getColor(category) or Option:getDefaultColor(category)
+function API.getColorOrDefault(id)
+    return API.getColor(id) or API.getDefaultColor(id)
 end
 
 ---Gets the player's current roleplay language.
@@ -143,6 +119,19 @@ function API.getCurrentRoleplayLanguage()
     end
 
     return language
+end
+
+---Gets the default color associated with a stream or speech color.
+---If the default could not be retrieved or there is no default, this returns white.
+---@param category string
+---@return omi.ColorTable
+function API.getDefaultColor(category)
+    if category == 'speech' then
+        return API.getLocalSpeechColor() or { r = 255, g = 255, b = 255 }
+    end
+
+    local stream = API.getChatStreamByName(category)
+    return stream and stream:getDefaultColor() or { r = 255, g = 255, b = 255 }
 end
 
 ---Gets the nickname for the current player, if one is set.
@@ -177,12 +166,12 @@ end
 ---@return integer
 function API.getRoleplayLanguageSlots()
     local username = utils.getPlayerUsername()
-    return username and API.getModData().languageSlots[username] or Option.LanguageSlots
+    return username and API.getModData().languageSlots[username] or config.Language.DefaultSlots
 end
 
 ---Returns a color table for the current player's speech color.
 ---@return omi.ColorTable?
-function API.getSpeechColor()
+function API.getLocalSpeechColor()
     local player = getSpecificPlayer(0)
     if not player then
         return
@@ -232,7 +221,6 @@ function API.setModData(username, data)
     data = data or {}
     modData.nicknames[username] = data.nickname
     modData.icons[username] = data.icon
-    modData.nameColors[username] = data.nameColor
     modData.languageSlots[username] = data.languageSlots
     modData.languages[username] = data.languages
     modData.currentLanguage[username] = data.currentLanguage
@@ -275,7 +263,7 @@ function API.setNickname(nickname)
         errorID = '',
     }
 
-    nickname = utils.interpolate(Option.FilterNickname, tokens)
+    nickname = utils.interpolate(config.Format.Filter.Name, tokens)
     local err = utils.extractError(tokens)
     if nickname == '' or err then
         return false, err or getText('UI_OmiChat_Error_InvalidName', utils.escapeRichText(original))
@@ -300,7 +288,7 @@ function API.setRoleplayLanguageSlots(slots)
         return false
     end
 
-    if slots < 1 or slots > API.config:maxLanguageSlots() then
+    if slots < 1 or slots > config.MAX_LANGUAGE_SLOTS then
         return false
     end
 
@@ -339,7 +327,7 @@ function API.updateCharacterName(name, updateSurname)
         errorID = '',
     }
 
-    name = utils.trim(utils.interpolate(Option.FilterNickname, tokens))
+    name = utils.trim(utils.interpolate(config.Format.Filter.Name, tokens))
 
     local err = utils.extractError(tokens)
     if name == '' or err then
@@ -359,7 +347,7 @@ function API.updateCharacterName(name, updateSurname)
     end
 
     desc:setForename(forename)
-    if ISChat.instance and Option:compatBuffyCharacterBiosEnabled() then
+    if ISChat.instance and config:compatBuffyCharacterBiosEnabled() then
         -- fix incompatibility with buffy's character bios
         ISChat.instance.rpName = forename
     end

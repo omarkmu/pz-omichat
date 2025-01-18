@@ -161,12 +161,19 @@ return Preset:new {
                 {
                     Stream = 'say',
                     Enable = true,
-                    Tags = { 'EchoTarget' },
+                    Tags = {
+                        'EchoTarget',
+                    },
                 },
                 {
                     Stream = 'yell',
                     Enable = true,
-                    Tags = { 'Loud', 'Callout', 'SneakCallout', 'NoVolumeIndicator' },
+                    Tags = {
+                        'Loud',
+                        'Callout',
+                        'SneakCallout',
+                        'NoVolumeIndicator',
+                    },
                 },
                 {
                     Stream = 'low',
@@ -179,6 +186,18 @@ return Preset:new {
                 {
                     Stream = 'me',
                     Enable = false,
+                    Tags = {
+                        'AutoPunctuateChat',
+                        'AutoColorQuotes',
+                        'Action',
+                        'IncludeName',
+                        'ActionColorTarget',
+                        'CardCommandTarget',
+                        'FlipCommandTarget',
+                        'RollCommandTarget',
+                        'BuffyRPGTarget',
+                        'UseNameColor',
+                    },
                 },
                 {
                     Stream = 'meloud',
@@ -217,7 +236,9 @@ return Preset:new {
                     Command = '/whisper',
                     ShortCommand = '/w',
                     Enable = true,
-                    Tags = { 'UseVanillaPM' },
+                    Tags = {
+                        'UseVanillaPM',
+                    },
                 },
                 {
                     Stream = 'faction',

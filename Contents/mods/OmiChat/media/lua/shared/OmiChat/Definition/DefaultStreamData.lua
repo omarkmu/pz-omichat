@@ -123,6 +123,7 @@ return {
             'CardCommandTarget',
             'FlipCommandTarget',
             'RollCommandTarget',
+            'BuffyRPGTarget',
             'UseNameColor',
         },
     },
@@ -335,7 +336,7 @@ return {
         ChatFormat = '$DefaultChatFormat()',
         Tags = {
             'AutoCapitalizeNarrative',
-            'AutoPunctuateNarrative'
+            'AutoPunctuateNarrative',
         },
     },
     general = {

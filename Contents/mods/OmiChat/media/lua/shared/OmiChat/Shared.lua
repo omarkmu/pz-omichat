@@ -3,7 +3,7 @@
 local API = require 'OmiChat/API/Shared/Core'
 
 require 'OmiChat/API/Shared/Languages'
-require 'OmiChat/Component/InterpolatorLibrary'
+require 'OmiChat/Component/InterpolationLibrary'
 
 Events.EveryDays.Add(API.utils.cleanupCache)
 

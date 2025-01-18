@@ -16,8 +16,20 @@ local metaChar = char(65535)
 local MetaFormatter = utils.lib.class()
 
 
----@type omichat.MetaFormatter[]
+---@type table<integer, omichat.MetaFormatter>
 local formatters = {}
+
+
+---Returns the next free ID for a formatter.
+---@static
+---@return integer?
+function MetaFormatter.getNextFreeID()
+    for i = 101, 1024 do
+        if not formatters[i] then
+            return i
+        end
+    end
+end
 
 
 ---Formats the text according to the formatter's format string.
@@ -46,11 +58,17 @@ function MetaFormatter:format(text, tokens)
     return formatted
 end
 
+---Returns the ID of the formatter.
+---@return integer
+function MetaFormatter:getID()
+    return self._id
+end
+
 ---Wraps the provided text in the formatter's invisible characters.
 ---@param text string
 ---@return string
 function MetaFormatter:wrap(text)
-    return concat { self._idPrefix, text, self._idSuffix }
+    return self._idPrefix .. text .. self._idSuffix
 end
 
 ---Retrieves the text that was formatted using this formatter.
@@ -93,18 +111,18 @@ end
 ---@private
 function MetaFormatter:setID(id)
     if type(id) ~= 'number' or id < 1 then
-        error('id must be a positive integer')
+        error('ID must be a positive integer')
     elseif id > 1024 then
-        error('id is too large')
+        error('ID is too large')
     end
 
     id = floor(id)
     if formatters[id] then
         if id <= 100 then
-            error(string.format('cannot overwrite reserved formatter ID %d', id))
+            error(string.format('Cannot overwrite reserved formatter ID %d', id))
         end
 
-        utils.log.info('created formatter with duplicate ID %d', id)
+        utils.log.info('Created formatter with duplicate ID %d', id)
     end
 
     self._id = id
@@ -122,9 +140,9 @@ function MetaFormatter:setID(id)
 end
 
 ---Sets the format string to the given string.
----@param format string
+---@param format string?
 function MetaFormatter:setFormatString(format)
-    self._formatString = format
+    self._formatString = format or '$1'
 end
 
 ---Creates a new meta formatter.
@@ -136,7 +154,7 @@ function MetaFormatter:new(id, options)
     local this = setmetatable({}, MetaFormatter)
 
     options = options or {}
-    this:setFormatString(tostring(options.format or '$1'))
+    this:setFormatString(options.format)
     this:setID(id)
 
     return this

@@ -1,123 +1,220 @@
----@class omichat.api.client
 local API = require 'OmiChat/API/Client/Core'
+local utils = API.utils
+local config = API.Configuration
 
-local concat = table.concat
 local getText = getText
 local instanceof = instanceof
 
-local utils = API.utils
-local Option = API.Option
-local config = API.config
 
----Checks whether input matches a command stream.
----@param name omichat.CustomStreamName
----@param info omichat.MessageInfo
----@return string?
-local function matchCommand(name, info)
-    if not API.isCustomStreamEnabled(name) then
-        return
-    end
+local COMMAND_ARGS_START = utils.encodeInvisibleCharacter(config.ID_COMMAND_ARGS)
 
-    local streamConfig = config:getCustomStreamInfo(name)
-    if not streamConfig then
-        return
-    end
 
-    local text = info.content or info.rawText
-    local formatter = API.getFormatter(name)
-    local matched = formatter:read(text)
-    if not matched then
-        return
-    end
+local rangedChatTypes = {
+    say = true,
+    shout = true,
+}
 
-    if info.context.ocIsRadio then
-        info.message:setShowInChat(false)
-        info.message:setOverHeadSpeech(false)
-        return
-    end
-
-    if streamConfig.overheadFormatOpt and Option[streamConfig.overheadFormatOpt] == '' then
-        info.message:setOverHeadSpeech(false)
-    end
-
-    return matched
-end
+-- accessing fields directly where possible to avoid function call overhead
+---@diagnostic disable: invisible
 
 
 ---@type omichat.MessageTransformer[]
 return {
     {
-        name = 'radio-chat',
-        priority = 75,
+        name = 'setup-chat-info',
+        priority = 100,
         transform = function(_, info)
-            local text = info.content or info.rawText
-            if info.chatType ~= 'radio' then
-                return
-            end
+            -- more performant than separate transformers to set up multiple types in one
+            local chatType = info.chatType
+            if chatType == 'radio' then
+                local text = info.content or info.rawText
+                local _, msgStart, freq = text:find('Radio%s*%((%d+%.%d+)[^%)]+%)%s*:')
+                if msgStart then
+                    info.tokens.frequency = freq
+                    info.content = text:sub(msgStart + 1)
 
-            local _, msgStart, freq = text:find('Radio%s*%((%d+%.%d+)[^%)]+%)%s*:')
-            if not msgStart then
-                return
-            end
-
-            info.context.ocIsRadio = true
-            info.content = text:sub(msgStart + 1)
-            info.format = info.format or Option.ChatFormatRadio
-            info.tokens.frequency = freq
-        end,
-    },
-    {
-        name = 'cleanup-author-metadata',
-        priority = 70,
-        transform = function(_, info)
-            local text = info.content or info.rawText
-            local formatter = API.getFormatter('onlineID')
-            local id = formatter:read(text)
-
-            -- cleanup
-            if id then
-                local start, finish = text:find(formatter:getPattern())
-                if start then
-                    info.content = concat { text:sub(1, start - 1), text:sub(start, finish), text:sub(finish + 1) }
+                    if not info.format then
+                        info.format = config.Radio.ChatFormat
+                    end
                 end
+
+                local originalStream = info.originalStream
+                if originalStream then
+                    info.tokens.originalStream = originalStream.name
+
+                    local formatter = originalStream.formatter
+                    if formatter then
+                        info.content = formatter:read(text)
+                    end
+                end
+            elseif chatType == 'faction' then
+                local player = getSpecificPlayer(0)
+                local faction = player and Faction.getPlayerFaction(player)
+                info.tokens.faction = faction and faction:getName() or nil
+
+                return
+            elseif chatType == 'server' then
+                local text = info.content or info.rawText
+
+                -- not great, but can't access the isShowTitle chat setting to do this in a safer way
+                local _, serverMsgStart = text:find('%[' .. getText('UI_chat_server_chat_title_id') .. '%]:')
+
+                if serverMsgStart then
+                    info.content = text:sub(serverMsgStart + 1)
+                else
+                    -- server messages can be only their text, if not set to show title
+                    -- still have to extract text due to the existing rich text
+
+                    local _, sizeEnd = text:find('<SIZE:')
+                    local start = sizeEnd ~= -1 and text:find('>', sizeEnd)
+                    if start then
+                        info.content = text:sub(start + 1)
+                    end
+                end
+
+                return
+            elseif chatType == 'whisper' then
+                local text = info.rawText
+                local _, msgStart, other = text:find('%[to ([^%]]+)%]:')
+
+                if not other then
+                    info.tokens.incomingPM = '1'
+                    info:addTags({ 'IsIncomingPM' })
+                    return
+                end
+
+                info.tokens.recipient = other
+                info.tokens.recipientRaw = other
+                info.tokens.recipientName = utils.escapeRichText(API.getNameInChat(other, 'whisper') or other)
+                info.tokens.recipientNameRaw = info.tokens.recipientName
+                info.tokens.outgoingPM = '1'
+                info:addTags({ 'IsOutgoingPM' })
+
+                info.content = text:sub(msgStart + 1)
+
+                return
             end
-        end,
-    },
-    {
-        name = 'decode-full-overhead',
-        priority = 65,
-        transform = function(_, info)
-            local formatter = API.getFormatter('overheadFull')
+
             local text = info.content or info.rawText
-            local match = formatter:read(text)
+            local formatter = API._metadataFormatters.overheadFinal
+            local match = formatter and formatter:read(text)
             if match then
                 info.content = match
             end
         end,
     },
     {
-        name = 'handle-echo',
-        priority = 60,
+        name = 'handle-commands',
+        priority = 90,
         transform = function(_, info)
-            local text = info.rawText
-            local formatter = API.getFormatter('echo')
+            local stream = info:getStream()
+            if not stream or not stream:isCommandStream() then
+                return
+            end
 
-            local matched = formatter:read(text)
+            local formatter = stream.formatter
+            local matched = formatter and formatter:read(info.content or info.rawText)
             if not matched then
                 return
             end
 
-            if Option.ChatFormatEcho ~= '' then
-                info.tokens.echo = '1'
-                info.format = info.format or Option.ChatFormatEcho
+            local start = matched:find(COMMAND_ARGS_START)
+            if not start then
+                return
+            end
+
+            matched = matched:sub(start + 1)
+
+            local targetStream
+            local name = stream.name
+            if name == 'card' then
+                local suit = utils.decodeInvisibleCharacter(matched)
+                local card = utils.decodeInvisibleCharacter(matched, 2)
+                if suit < 1 or suit > 4 or card < 1 or card > 13 then
+                    info:hide()
+                    return
+                end
+
+                info.content = matched:sub(3)
+                info.tokens.card = utils.getTranslatedCardName(card, suit)
+
+                targetStream = API.getFirstChatStreamWithTag('CardCommandTarget')
+            elseif name == 'flip' then
+                local result = utils.decodeInvisibleCharacter(matched)
+                if result ~= 1 and result ~= 2 then
+                    info:hide()
+                    return
+                end
+
+                info.content = matched:sub(2)
+                info.tokens.heads = result == 1
+
+                targetStream = API.getFirstChatStreamWithTag('FlipCommandTarget')
+            elseif name == 'roll' then
+                local seq = utils.decodeInvisibleIntSequence(matched, 2)
+                if not seq or #seq ~= 2 then
+                    info:hide()
+                    return
+                end
+
+                info.content = matched:sub(3)
+                info.tokens.roll = seq[1]
+                info.tokens.sides = seq[2]
+
+                targetStream = API.getFirstChatStreamWithTag('RollCommandTarget')
+            else
+                return
+            end
+
+            if not targetStream or info:isChatType('radio') then
+                info:hide()
+                return
+            end
+
+            local targetFormat = stream:getChatFormat()
+            if targetFormat and targetFormat ~= '' then
+                info.format = targetFormat
+            end
+
+            info:setStream(targetStream)
+
+            if targetStream:hasTag('HideOverhead') or stream:hasTag('HideOverhead') then
+                info:hideOverhead()
+            end
+        end,
+    },
+    {
+        name = 'echo-chat',
+        priority = 80,
+        transform = function(_, info)
+            local formatter = API._metadataFormatters.echo
+            local matched = formatter and formatter:read(info:getRawText())
+            if not matched then
+                return
+            end
+
+            info.tokens.echo = '1'
+            info:addTags({ 'IsEchoMessage' })
+            info:addTags(config.EchoMessages.Tags)
+
+            if not info.format then
+                info.format = config.EchoMessages.ChatFormat
+            end
+
+            local targetStream = API.getFirstChatStreamWithTag('EchoTarget')
+            if targetStream then
+                info:setStream(targetStream)
+
+                if targetStream:hasTag('HideOverhead') then
+                    info:hideOverhead()
+                end
             end
 
             local player = getSpecificPlayer(0)
             local username = player and player:getUsername()
-            local author = info.message:getAuthor()
+            local author = info:getAuthor()
             if author == username then
-                info.message:setShowInChat(false)
-                info.message:setOverHeadSpeech(false)
+                info:hide()
                 return
             end
 
@@ -125,8 +222,9 @@ return {
                 return
             end
 
+            -- suppress echo messages if the player would have seen the original
             local shouldSuppress = false
-            local echoType = utils.decodeInvisibleCharacter(matched)
+            local echoType = utils.decodeInvisibleInt(utils.unwrapStringArgument(matched, config.ID_ECHO_TYPE))
             if echoType == 1 then -- faction
                 local playerFaction = Faction.getPlayerFaction(username)
                 shouldSuppress = playerFaction and (playerFaction:isOwner(author) or playerFaction:isMember(author))
@@ -136,205 +234,102 @@ return {
             end
 
             if shouldSuppress then
-                info.message:setShowInChat(false)
-                info.message:setOverHeadSpeech(false)
+                info:hide()
             end
         end,
     },
     {
-        name = 'decode-card',
-        priority = 55,
+        name = 'callouts',
+        priority = 80,
         transform = function(_, info)
-            local matched = matchCommand('card', info)
-            if not matched then
-                return
-            end
-
-            local suit = utils.decodeInvisibleCharacter(matched)
-            local card = utils.decodeInvisibleCharacter(matched:sub(2, 2))
-
-            if suit < 1 or suit > 4 or card < 1 or card > 13 then
-                info.message:setShowInChat(false)
-                return
-            end
-
-            info.content = matched:sub(3)
-            info.tokens.card = utils.getTranslatedCardName(card, suit)
-
-            info.format = Option.ChatFormatCard
-            info.formatOptions.color = API.getColorOrDefault('me')
-            info.formatOptions.useDefaultChatColor = false
-
-            info.context.ocCustomStream = 'me'
-            info.tokens.stream = 'card'
-        end,
-    },
-    {
-        name = 'decode-flip',
-        priority = 54,
-        transform = function(_, info)
-            local matched = matchCommand('flip', info)
-            if not matched then
-                return
-            end
-
-            local result = utils.decodeInvisibleCharacter(matched)
-
-            if result ~= 1 and result ~= 2 then
-                info.message:setShowInChat(false)
-                return
-            end
-
-            info.content = matched:sub(3)
-            info.tokens.heads = result == 1
-
-            info.format = Option.ChatFormatFlip
-            info.formatOptions.color = API.getColorOrDefault('me')
-            info.formatOptions.useDefaultChatColor = false
-
-            info.context.ocCustomStream = 'me'
-            info.tokens.stream = 'flip'
-        end,
-    },
-    {
-        name = 'decode-roll',
-        priority = 50,
-        transform = function(_, info)
-            local matched = matchCommand('roll', info)
-            if not matched then
-                return
-            end
-
-            local seq
-            seq, matched = utils.decodeInvisibleIntSequence(matched, 2)
-            if not matched or not seq then
-                info.message:setShowInChat(false)
-                return
-            end
-
-            info.content = matched
-            info.tokens.roll = seq[1]
-            info.tokens.sides = seq[2]
-
-            info.format = Option.ChatFormatRoll
-            info.formatOptions.color = API.getColorOrDefault('me')
-            info.formatOptions.useDefaultChatColor = false
-
-            info.context.ocCustomStream = 'me'
-            info.tokens.stream = 'roll'
-        end,
-    },
-    {
-        name = 'decode-callout',
-        priority = 45,
-        transform = function(_, info)
-            if info.chatType ~= 'shout' then
+            if not info:isChatType('shout') then
                 return
             end
 
             local text = info.content or info.rawText
-            local calloutFormatter = API.getFormatter('callout')
-            local sneakCalloutFormatter = API.getFormatter('sneakCallout')
+            local calloutFormatter = API._metadataFormatters.callout
+            local sneakCalloutFormatter = API._metadataFormatters.sneakCallout
 
-            if calloutFormatter:isMatch(text) then
+            local targetStream
+            if calloutFormatter and calloutFormatter:isMatch(text) then
+                info:setIsCallout(true)
                 info.content = calloutFormatter:read(text)
-                info.context.ocIsCallout = true
-            elseif sneakCalloutFormatter:isMatch(text) then
+                targetStream = API.getFirstChatStreamWithTag('Callout')
+            elseif sneakCalloutFormatter and sneakCalloutFormatter:isMatch(text) then
+                info:setIsSneakCallout(true)
                 info.content = sneakCalloutFormatter:read(text)
-                info.context.ocIsSneakCallout = true
 
-                if API.isCustomStreamEnabled('whisper') then
-                    -- format sneak callouts like whispers, if enabled
-                    info.format = info.format or Option.ChatFormatWhisper
-                    info.formatOptions.color = API.getColorOrDefault('whisper')
-                end
+                targetStream = API.getFirstChatStreamWithTag('SneakCallout') or API.getFirstChatStreamWithTag('Callout')
             else
                 return
             end
 
-            info.tokens.callout = '1'
-            info.tokens.sneakCallout = info.context.ocIsSneakCallout and '1' or nil
+            if targetStream then
+                info:setStream(targetStream)
+            end
 
             -- already created a sound for the callout
             info.message:setShouldAttractZombies(false)
         end,
     },
     {
-        name = 'decode-stream',
-        priority = 40,
+        name = 'read-stream',
+        priority = 70,
         transform = function(_, info)
-            local isRadio = info.context.ocIsRadio
-            local text = info.content or info.rawText
-            for data in config:chatStreams() do
-                local name = data.name
-
-                local formatter = API.getFormatter(name)
-                local isValidStream = data.chatTypes[info.chatType] and API.isCustomStreamEnabled(name)
-
-                local isMatch = formatter:isMatch(text)
-                if isMatch and isRadio then
-                    info.tokens.customStream = data.streamAlias or name
-                    info.content = formatter:read(text)
-                elseif isValidStream and isMatch then
-                    info.content = formatter:read(text)
-                    info.format = info.format or Option[data.chatFormatOpt]
-                    info.context.ocCustomStream = data.streamAlias or name
-                    info.tokens.stream = name
-
-                    info.formatOptions.color = API.getColorOrDefault(info.context.ocCustomStream)
-                    info.formatOptions.useDefaultChatColor = false
-
-                    if data.titleID then
-                        info.titleID = data.titleID
-                    end
-
-                    if Option[data.overheadFormatOpt] == '' then
-                        info.message:setOverHeadSpeech(false)
-                    end
-
-                    break
-                end
+            if info:isChatType('radio') then
+                return
             end
-        end,
-    },
-    {
-        name = 'decode-other',
-        priority = 35,
-        transform = function(_, info)
-            local text = info.content or info.rawText
-            local formatter = API.getFormatter('overheadOther')
 
-            local matched = formatter:read(text)
+            local stream = info:getStream()
+            if not stream then
+                return
+            end
+
+            local text = info.content or info.rawText
+            local formatter = stream:getFormatter()
+            local matched = formatter and formatter:read(text)
             if matched then
-                info.context.ocIsOtherOverhead = true
                 info.content = matched
+            elseif info:checkMismatch() then
+                info:hide()
+            end
+
+            if not info.format then
+                info.format = stream:getChatFormat()
+            end
+
+            if stream:hasTag('HideOverhead') then
+                info:hideOverhead()
             end
         end,
     },
     {
         name = 'handle-language',
-        priority = 30,
+        priority = 60,
         transform = function(_, info)
-            if info.context.ocSkipLanguage then
+            if info.skipLanguage then
                 return
             end
 
-            local isRadio = info.context.ocIsRadio
-            local formatter = API.getFormatter('language')
-            local text = info.content or info.rawText
-
-            -- radio messages don't have language metadata, so we need to read the language from the text
-            local encodedLanguage
-            if formatter:isMatch(text) then
-                text = formatter:read(text)
-                encodedLanguage = API.decodeLanguage(text)
+            local formatter = API._metadataFormatters.language
+            if not formatter then
+                return
             end
 
+            local isRadio = info.chatType == 'radio'
+            local text = info.content or info.rawText
+
             local language = info.meta.language
-            if not language and isRadio and encodedLanguage then
-                language = encodedLanguage
-                info.meta.language = language
-                utils.addMessageTagValue(info.message, 'ocLanguage', language)
+            if not language and isRadio then
+                -- radio messages don't have language metadata, so we need to read the language from the text
+                if formatter:isMatch(text) then
+                    text = formatter:read(text)
+                    language = API.decodeLanguage(text)
+
+                    if language then
+                        info:setMetadataLanguage(language)
+                    end
+                end
             end
 
             if not language then
@@ -350,8 +345,7 @@ return {
 
             -- hide signed messages sent over the radio
             if isSigned and isRadio then
-                info.message:setShowInChat(false)
-                info.message:setOverHeadSpeech(false)
+                info:hide()
             end
 
             if isAdmin() and API.getUnderstandAllLanguages() then
@@ -360,7 +354,7 @@ return {
 
             local player = getSpecificPlayer(0)
             local username = player and player:getUsername()
-            if not isRadio and username and info.author == username then
+            if not isRadio and username and info:getAuthor() == username then
                 -- everyone understands themselves
                 return
             elseif API.checkKnowsLanguage(language) then
@@ -369,111 +363,111 @@ return {
             end
 
             -- they didn't understand it
-            info.message:setOverHeadSpeech(false)
-            info.formatOptions.useDefaultChatColor = false
+            info:hideOverhead()
             info.tokens.unknownLanguage = language
+            info:addTags({ 'IsUnknownLanguage' })
 
             if isRadio then
-                info.format = Option.ChatFormatUnknownLanguageRadio
+                info.format = config.Language.UnknownLanguageRadio
             else
-                info.format = Option.ChatFormatUnknownLanguage
-                local isQuietStream = info.context.ocIsSneakCallout
-                    or info.context.ocCustomStream == 'whisper'
-                    or info.context.ocCustomStream == 'low'
-                if isQuietStream and API.isCustomStreamEnabled('mequiet') then
-                    info.context.ocStreamForRange = 'whisper'
-                    info.formatOptions.color = API.getColorOrDefault('mequiet')
-                    info.tokens.stream = 'mequiet'
-                elseif info.chatType == 'shout' and API.isCustomStreamEnabled('meloud') then
-                    info.context.ocStreamForRange = 'shout'
-                    info.formatOptions.color = API.getColorOrDefault('meloud')
-                    info.tokens.stream = 'meloud'
-                elseif API.isCustomStreamEnabled('me') then
-                    info.formatOptions.color = API.getColorOrDefault('me')
-                    info.tokens.stream = 'me'
+                info.format = config.Language.UnknownLanguage
+
+                local targetTags
+                if info.sneakCallout or info:hasTag('Quiet') then
+                    targetTags = { 'Quiet', 'Whisper' }
+                elseif info.callout or info:hasTag('Loud') then
+                    targetTags = { 'Loud' }
+                end
+
+                local streams = API.getChatStreamsWithTag('Action', { 'NoName' })
+                local targetStream
+                if targetTags then
+                    for i = 1, #streams do
+                        local stream = streams[i]
+                        if stream:hasAnyTags(targetTags) then
+                            targetStream = stream
+                            break
+                        end
+                    end
+                end
+
+                -- if there's not a stream that matches the volume, use any action stream that displays names
+                targetStream = targetStream or streams[1]
+                if targetStream then
+                    local stream = info:getStream()
+                    if stream and stream.tags.Action then
+                        info:addTags({ 'IsActionUnknownLanguage' })
+                    end
+
+                    info:setStream(targetStream)
                 end
             end
         end,
     },
     {
-        name = 'decode-narrative',
-        priority = 25,
+        name = 'handle-narrative',
+        priority = 50,
         transform = function(_, info)
-            local text = info.content or info.rawText
-            local formatter = API.getFormatter('narrative')
+            local formatter = API._metadataFormatters.narrative
+            if not formatter then
+                return
+            end
 
+            local text = info.content or info.rawText
             local matched = formatter:read(text)
             if not matched then
                 return
             end
 
-            local dialogueTag = utils.unwrapStringArgument(matched, config.NARRATIVE_TAG)
-            local content = utils.unwrapStringArgument(matched, config.NARRATIVE_TEXT)
-            if not dialogueTag or not content then
+            local dialogueTag = utils.unwrapStringArgument(matched, config.ID_NARRATIVE_TAG)
+            local unstyled = utils.unwrapStringArgument(matched, config.ID_NARRATIVE_TEXT)
+            if not dialogueTag or not unstyled then
                 return
             end
 
-            info.context.ocNarrativeTag = dialogueTag
-            info.context.ocNarrativeContent = content
-        end,
-    },
-    {
-        name = 'apply-narrative',
-        priority = 20,
-        transform = function(_, info)
-            local dialogueTag = info.context.ocNarrativeTag
-            local content = info.context.ocNarrativeContent
-            if not dialogueTag or not content then
-                return
-            end
+            local tokens = utils.copy(info.tokens)
+            tokens.input = unstyled
+            tokens.dialogueTag = dialogueTag
 
-            content = string.format('"%s"', content)
-            local dialogueTagIdent = dialogueTag:gsub('%s', '_')
-
-            local translated = getTextOrNull('UI_OmiChat_NarrativeTag_' .. dialogueTagIdent, content)
-            if not translated then
-                translated = getText('UI_OmiChat_NarrativeTag', dialogueTag, content)
-            end
-
+            info.content = utils.interpolate(config.NarrativeStyle.ChatContentFormat, tokens)
+            info.tokens.narrativeStyle = '1'
             info.tokens.dialogueTag = dialogueTag
-            info.tokens.unstyled = info.context.ocNarrativeContent
-            info.content = translated
+            info.tokens.unstyled = unstyled
+            info:addTags({ 'IsNarrativeStyle' })
         end,
     },
     {
         name = 'check-range',
-        priority = 15,
+        priority = 20,
         transform = function(_, info)
-            if info.chatType ~= 'say' and info.chatType ~= 'shout' then
+            local stream = info.stream
+            if not stream or not stream.isChat then
                 return
             end
 
-            local range
-            local defaultRange
-            local streamData = config:getCustomStreamInfo(info.context.ocCustomStream)
-            if streamData then
-                range = Option[streamData.rangeOpt]
-                defaultRange = Option:getDefault(streamData.defaultRangeOpt or 'RangeSay')
-            elseif info.context.ocIsCallout then
-                range = Option.RangeCallout
-                defaultRange = Option:getDefault('RangeYell')
-            elseif info.context.ocIsSneakCallout then
-                range = Option.RangeSneakCallout
-                defaultRange = Option:getDefault('RangeYell')
-            elseif info.chatType == 'say' then
-                range = Option.RangeSay
-                defaultRange = Option:getDefault('RangeSay')
-            elseif info.chatType == 'shout' then
-                range = Option.RangeYell
-                defaultRange = Option:getDefault('RangeYell')
+            ---@cast stream omichat.ChatStream
+            if not rangedChatTypes[stream.chatType] then
+                return
             end
 
-            local tokens = { stream = info.context.ocStreamForRange or info.tokens.stream }
-            if range then
-                info.attractRange = range * Option.RangeMultiplierZombies
-                if not info.context.ocIsCallout and not info.context.ocIsSneakCallout then
-                    info.message:setShouldAttractZombies(utils.testPredicate(Option.PredicateAttractZombies, tokens))
-                end
+            local defaultRange
+            local range = stream.range
+            if info.callout then
+                range = config.Callouts.Range
+                defaultRange = 60
+            elseif info.sneakCallout then
+                range = config.Callouts.SneakRange
+                defaultRange = 60
+            else
+                defaultRange = info.chatType == 'shout' and 60 or 30
+            end
+
+            if not range then
+                return
+            end
+
+            if stream.attractZombies then
+                info.zombieAttractRange = range * config.ZombieAttraction.ChatRangeMultiplier
             end
 
             if isAdmin() and API.getIgnoreMessageRange() then
@@ -488,13 +482,10 @@ return {
             end
 
             local outOfRange = false
-            tokens.callout = (info.context.ocIsCallout or info.context.ocIsSneakCallout) and '1' or nil
-            tokens.sneakCallout = info.context.ocIsSneakCallout and '1' or nil
-
-            local zMax = tonumber(utils.interpolate(Option.RangeVertical, tokens))
-            if range and zMax and math.abs(authorPlayer:getZ() - localPlayer:getZ()) >= zMax then
+            local zMax = stream.verticalRange or 2
+            if zMax and math.abs(authorPlayer:getZ() - localPlayer:getZ()) >= zMax then
                 outOfRange = true
-            elseif range and range ~= defaultRange then
+            elseif range ~= defaultRange then
                 -- calculating distance using the distance formula like ChatUtility
                 -- assuming players are synced it works equivalently
                 local xDiff = authorPlayer:getX() - localPlayer:getX()
@@ -506,126 +497,33 @@ return {
             if outOfRange then
                 -- show in chat value is only used on the initial message add,
                 -- so it's okay that this runs on refresh
-                info.message:setOverHeadSpeech(false)
-                info.message:setShowInChat(false)
+                info:hide()
             end
         end,
     },
     {
-        name = 'private-chat',
-        priority = 10,
-        transform = function(_, info)
-            if info.chatType ~= 'whisper' then
-                return
-            end
-
-            local text = info.rawText
-            local _, msgStart, other = text:find('%[to ([^%]]+)%]:')
-            if other then
-                if not info.content then
-                    info.content = text:sub(msgStart + 1)
-                end
-
-                info.format = Option.ChatFormatOutgoingPrivate
-                info.tokens.recipient = other
-                info.tokens.recipientRaw = other
-                info.tokens.recipientName = utils.escapeRichText(API.getNameInChat(other, 'whisper') or other)
-                info.tokens.recipientNameRaw = info.tokens.recipientName
-
-                if not info.meta.recipientNameColor then
-                    info.meta.recipientNameColor = API.getNameColorInChat(other)
-                end
-            else
-                -- defer to basic chat format handler
-                info.context.ocIsIncomingPM = true
-            end
-
-            info.formatOptions.color = API.getColorOrDefault('private')
-            info.formatOptions.useDefaultChatColor = false
-        end,
-    },
-    {
-        name = 'check-hide-radio',
+        name = 'check-transmit-radio',
         priority = 5,
         transform = function(_, info)
-            if info.chatType ~= 'radio' or utils.testPredicate(Option.PredicateTransmitOverRadio, info.tokens) then
+            if info.chatType ~= 'radio' then
                 return
             end
 
-            info.message:setShowInChat(false)
-            info.message:setOverHeadSpeech(false)
-        end,
-    },
-    {
-        name = 'server-chat',
-        priority = 5,
-        transform = function(_, info)
-            if info.chatType ~= 'server' then
+            local originalStream = info.originalStream
+            local tags = originalStream and originalStream.tags
+            if not tags then
                 return
             end
 
-            local text = info.content or info.rawText
-            -- not great, but can't access the isShowTitle chat setting to do this in a safer way
-            local patt = concat { '%[', getText('UI_chat_server_chat_title_id'), '%]:' }
-            local _, serverMsgStart = text:find(patt)
-
-            if serverMsgStart then
-                info.content = text:sub(serverMsgStart + 1)
+            local canTransmit = true
+            if tags.IsEchoMessage or tags.NoTransmitOverRadio then
+                canTransmit = false
             else
-                -- server messages can be only their text, if not set to show title
-                -- still have to extract text due to the existing rich text
-
-                local _, sizeEnd = text:find('<SIZE:')
-                local start = sizeEnd ~= -1 and text:find('>', sizeEnd)
-                if start then
-                    info.content = info.rawText:sub(start + 1)
-                end
+                canTransmit = tags.TransmitOverRadio or (not tags.OOC and not tags.Action)
             end
 
-            info.format = Option.ChatFormatServer
-        end,
-    },
-    {
-        name = 'basic-chats',
-        priority = 5,
-        basicChatFormats = {
-            say = 'ChatFormatSay',
-            shout = 'ChatFormatYell',
-            general = 'ChatFormatGeneral',
-            admin = 'ChatFormatAdmin',
-            faction = 'ChatFormatFaction',
-            safehouse = 'ChatFormatSafehouse',
-        },
-        transform = function(self, info)
-            local chatFormat = self.basicChatFormats[info.chatType]
-            if not chatFormat and not info.context.ocIsIncomingPM then
-                return
-            end
-
-            if not info.content then
-                -- grab text after the author
-                local authorEnd = utils.getAuthorEndPos(info.rawText, info.author)
-                if authorEnd then
-                    info.content = info.rawText:sub(authorEnd + 1)
-                end
-            end
-
-            if info.chatType == 'faction' then
-                local player = getSpecificPlayer(0)
-                local faction = player and Faction.getPlayerFaction(player)
-                info.tokens.faction = faction and faction:getName() or nil
-            end
-
-            if info.format then
-                return
-            end
-
-            if info.message:isFromDiscord() then
-                info.format = Option.ChatFormatDiscord
-            elseif info.context.ocIsIncomingPM then
-                info.format = Option.ChatFormatIncomingPrivate
-            else
-                info.format = Option[chatFormat]
+            if not canTransmit then
+                info:hide()
             end
         end,
     },
@@ -633,18 +531,18 @@ return {
         name = 'radio-storm-fix',
         priority = 0,
         transform = function(_, info)
-            if info.chatType ~= 'radio' or Option.PredicateUseNarrativeStyle == '' then
+            if not config.NarrativeStyle.Enable or info.chatType ~= 'radio' then
                 return
             end
 
-            local text = info.content
+            local text = info.content or info.rawText
             -- avoid duplicate name when radios scramble narrative style messages
             if not text or not text:match('&lt;[bfws]zzt&gt;') then
                 return
             end
 
             -- this is not ideal, but for now it will have to do
-            local author = info.message:getAuthor()
+            local author = info.author
             if author and author ~= '' then
                 text = text:gsub(utils.escape(author), '')
             end
@@ -670,9 +568,9 @@ return {
                 end
             end
 
-            text = utils.trim(concat(chars))
+            text = utils.trim(table.concat(chars))
             if #text == 0 then
-                info.message:setShowInChat(false)
+                info:hide()
             end
         end,
     },
@@ -681,20 +579,18 @@ return {
         priority = 0,
         transform = function(_, info)
             -- the message showing overhead is hardcoded for radio messages,
-            -- so we have to suppress it by overwriting it with empty messages
-            if not info.context.ocIsRadio or info.message:isOverHeadSpeech() then
+            -- so, if it shouldn't show overhead, we have to suppress it by overwriting with empty messages
+            if info.chatType ~= 'radio' or info.message:isOverHeadSpeech() then
                 return
             end
 
             -- make sure we haven't done this already
-            local tag = info.message:getCustomTag()
-            local decoded = API.decodeMessageTag(tag)
-            if decoded.suppressed then
+            if info.meta.suppressed then
                 return
             end
 
             -- avoid doing this again
-            utils.addMessageTagValue(info.message, 'ocSuppressed', true)
+            info:setMetadataOverheadSuppressed(true)
 
             -- push the message up with blank text
             local player = getSpecificPlayer(0)
@@ -710,6 +606,7 @@ return {
             end
 
             -- do the same thing for radios
+            local radioChannel = info.message:getRadioChannel()
             local devices = zomboidRadio:getDevices()
             for i = 0, devices:size() - 1 do
                 local device = devices:get(i) ---@cast device IsoWaveSignal
@@ -717,7 +614,7 @@ return {
                 if deviceData and instanceof(device, 'IsoRadio') then
                     local canTransmit = not deviceData:isPlayingMedia() and not deviceData:isNoTransmit()
                     local hasSayLine = canTransmit and device.getSayLine and device:getSayLine()
-                    if hasSayLine and deviceData:getChannel() == info.message:getRadioChannel() then
+                    if hasSayLine and deviceData:getChannel() == radioChannel then
                         for _ = 1, 5 do
                             device:Say(' ')
                         end

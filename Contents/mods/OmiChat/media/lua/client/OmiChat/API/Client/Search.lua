@@ -6,7 +6,6 @@ local vanillaCommands = require 'OmiChat/Definition/VanillaCommandList'
 local API = require 'OmiChat/API/Client/Core'
 
 local utils = API.utils
-local StreamInfo = API.StreamInfo
 
 ---@class omichat.search.InternalSearchContext : omichat.SearchContext
 ---@field search string
@@ -38,18 +37,18 @@ end
 
 ---Builds a list of streams to search.
 ---@param options omichat.StreamSearchOptions
----@return (omichat.StreamInfo | omichat.VanillaCommand)
+---@return (omichat.Stream | omichat.VanillaCommand)[]
 local function buildStreamList(options)
     local list = {}
     if not options.excludeChatStreams then
-        for i = 1, #ISChat.allChatStreams do
-            list[#list + 1] = StreamInfo:new(ISChat.allChatStreams[i])
+        for stream in API.chatStreams() do
+            list[#list + 1] = stream
         end
     end
 
     if not options.excludeCommandStreams then
         for i = 1, #API._commandStreams do
-            list[#list + 1] = StreamInfo:new(API._commandStreams[i])
+            list[#list + 1] = API._commandStreams[i]
         end
     end
 
@@ -63,11 +62,11 @@ local function buildStreamList(options)
 end
 
 ---Filter function for streams.
----@param stream omichat.StreamInfo | omichat.VanillaCommand
+---@param stream omichat.Stream | omichat.VanillaCommand
 ---@return boolean
 local function filterStream(stream)
-    if utils.isinstance(stream, StreamInfo) then
-        ---@cast stream omichat.StreamInfo
+    if utils.isinstance(stream, API.Stream) then
+        ---@cast stream omichat.Stream
         local tabID = ISChat.instance.currentTabID
         return stream:isTabID(tabID) and stream:isEnabled()
     end
@@ -89,15 +88,15 @@ local function getPerkDisplay(perk)
 end
 
 ---Display function for streams.
----@param stream omichat.StreamInfo | omichat.VanillaCommand
+---@param stream omichat.Stream | omichat.VanillaCommand
 ---@param command string
 ---@return string
 local function getStreamDisplay(stream, command)
-    if not utils.isinstance(stream, StreamInfo) then
+    if not utils.isinstance(stream, API.Stream) then
         return command
     end
 
-    ---@cast stream omichat.StreamInfo
+    ---@cast stream omichat.Stream
     local streamCommand = utils.trim(stream:getCommand())
 
     command = utils.trim(command)
@@ -370,8 +369,8 @@ function API.searchStreams(ctxOrSearch, options)
     for i = 1, #streamList do
         local result
         local stream = streamList[i]
-        if utils.isinstance(stream, StreamInfo) then
-            ---@cast stream omichat.StreamInfo
+        if utils.isinstance(stream, API.Stream) then
+            ---@cast stream omichat.Stream
             ctx.caseInsensitive = stream:isCaseInsensitive()
             result = API.searchInternal(ctx, stream:getCommand(), stream, stream:getShortCommand())
 

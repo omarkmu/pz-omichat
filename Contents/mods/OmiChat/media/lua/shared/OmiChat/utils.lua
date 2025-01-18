@@ -188,19 +188,25 @@ end
 
 ---Decodes an encoded character.
 ---@param text string
+---@param index integer?
 ---@return integer
-function utils.decodeInvisibleCharacter(text)
-    if not text or #text == 0 then
+function utils.decodeInvisibleCharacter(text, index)
+    text = text or ''
+    if index then
+        text = text:sub(index, index)
+    end
+
+    if #text == 0 then
         return 0
     end
 
     return text:byte() - 127
 end
 
----Decodes an encoded integer value.
+---Decodes an encoded invisible integer value.
 ---@param text string
----@return integer? value
----@return string? remaining
+---@return integer? value The decoded integer value.
+---@return string? remaining The remaining text after the integer.
 function utils.decodeInvisibleInt(text)
     local len = utils.decodeInvisibleCharacter(text)
     if len < 1 or len > 32 then
@@ -221,11 +227,11 @@ function utils.decodeInvisibleInt(text)
     return value, text:sub(endPos + 1)
 end
 
----Decodes a sequence of encoded integers.
+---Decodes a sequence of encoded invisible integers.
 ---@param text string
 ---@param amount integer
----@return integer[]? sequence The integer sequence.
----@return string? remaining The remaining text, after the sequence.
+---@return integer[]? sequence The decoded integer sequence.
+---@return string? remaining The remaining text after the sequence.
 function utils.decodeInvisibleIntSequence(text, amount)
     local decoded
     local remaining = text ---@type string?
@@ -244,10 +250,10 @@ function utils.decodeInvisibleIntSequence(text, amount)
     return results, text
 end
 
----Decodes an encoded string of character indices.
+---Decodes an encoded invisible string.
 ---@param text any
----@return string? result
----@return string? remaining
+---@return string? result The decoded string.
+---@return string? remaining The remaining text after the string.
 function utils.decodeInvisibleString(text)
     local seq
     local length
@@ -285,7 +291,7 @@ end
 function utils.encodeInvisibleInt(value)
     value = floor(value)
     if value < 0 then
-        utils.log.error('attempted to encode negative value: ' .. value)
+        utils.log.error('Attempted to encode negative value: %f', value)
         return ''
     end
 
@@ -293,7 +299,7 @@ function utils.encodeInvisibleInt(value)
     local result = {}
     while value > 0 do
         if #result == 32 then
-            utils.log.error('value is too large to encode: ' .. originalValue)
+            utils.log.error('Value is too large to encode: %f', originalValue)
             return ''
         end
 
@@ -335,8 +341,8 @@ function utils.extractError(tokens)
         err = getText(errorID)
     end
 
-    tokens.error = nil
-    tokens.errorID = nil
+    tokens.error = ''
+    tokens.errorID = ''
 
     return err
 end
@@ -648,7 +654,7 @@ end
 ---@param seed unknown? Seed value for random functions.
 ---@return unknown
 function utils.interpolateRaw(text, tokens, seed)
-    if text == '' then
+    if not text or text == '' then
         return ''
     end
 
@@ -808,7 +814,7 @@ end
 function utils.unwrapStringArgument(text, n, pattern)
     pattern = pattern or '(.-)'
     local c = utils.encodeInvisibleCharacter(n)
-    return text:match(concat { c, pattern, c })
+    return text:match(c .. pattern .. c)
 end
 
 ---Encodes `n` as an invisible character and wraps text with it.
@@ -817,7 +823,7 @@ end
 ---@return string
 function utils.wrapStringArgument(text, n)
     local c = utils.encodeInvisibleCharacter(n)
-    return concat { c, text, c }
+    return c .. text .. c
 end
 
 

@@ -2,64 +2,7 @@
 
 ---@class omichat.api.shared
 local API = require 'OmiChat/API/Shared/Core'
-API._languageInfo = {
-    languageCount = 0,
-    availableLanguages = '',
-    signedLanguages = '',
-    idToLanguage = {},
-    languageToID = {},
-    languageIsSignedMap = {},
-}
-
-local utils = API.utils
-local Option = API.Option
-
-
----Retrieves information about configured roleplay language options.
----Performs a refresh of cached language info if necessary.
----@return omichat.LanguageInfoStore
-local function getLanguageInfo()
-    local langInfo = API._languageInfo
-
-    local noChanges = langInfo.availableLanguages == Option.AvailableLanguages
-        and langInfo.signedLanguages == Option.SignedLanguages
-    if noChanges then
-        return langInfo
-    end
-
-    langInfo.availableLanguages = Option.AvailableLanguages
-    langInfo.signedLanguages = Option.SignedLanguages
-    table.wipe(langInfo.languageToID)
-    table.wipe(langInfo.idToLanguage)
-    table.wipe(langInfo.languageIsSignedMap)
-
-    local nextId = 1
-    local languageList = Option.AvailableLanguages:split(';')
-    for i = 1, #languageList do
-        local lang = utils.trim(languageList[i])
-        if lang ~= '' and not langInfo.languageToID[lang] then
-            langInfo.languageToID[lang] = nextId
-            langInfo.idToLanguage[nextId] = lang
-
-            nextId = nextId + 1
-            if nextId > API.config:maxDefinedLanguages() then
-                -- skip languages after the maximum
-                break
-            end
-        end
-    end
-
-    local signedLanguageList = Option.SignedLanguages:split(';')
-    for i = 1, #signedLanguageList do
-        local language = utils.trim(signedLanguageList[i])
-        if language ~= '' then
-            langInfo.languageIsSignedMap[language] = true
-        end
-    end
-
-    langInfo.languageCount = nextId - 1
-    return langInfo
-end
+local config = API.Configuration
 
 
 ---Checks whether the player with the given username can understand a given roleplay language.
@@ -67,8 +10,7 @@ end
 ---@param language string
 ---@return boolean
 function API.checkPlayerKnowsLanguage(username, language)
-    local langInfo = getLanguageInfo()
-    if langInfo.languageCount == 0 then
+    if config:getLanguageCount() == 0 then
         -- no configured languages → understand everything
         return true
     end
@@ -77,7 +19,8 @@ function API.checkPlayerKnowsLanguage(username, language)
     local knownLanguages = modData.languages[username]
     if type(knownLanguages) ~= 'table' or #knownLanguages == 0 then
         -- no languages chosen → understand only default language
-        return langInfo.languageToID[language] == 1
+        local langInfo = config:getLanguageByName(language)
+        return langInfo ~= nil and langInfo.ID == 1
     end
 
     for i = 1, #knownLanguages do
@@ -92,7 +35,7 @@ end
 ---Returns a list of configured roleplay languages.
 ---@return string[]
 function API.getConfiguredRoleplayLanguages()
-    return utils.copy(getLanguageInfo().idToLanguage)
+    return config:getLanguageNameList()
 end
 
 ---Gets the default roleplay language, which is the first one listed in the configuration.
@@ -105,39 +48,33 @@ end
 ---@param id integer
 ---@return string?
 function API.getRoleplayLanguageFromID(id)
-    if id < 1 or id > API.config:maxDefinedLanguages() then
-        return
-    end
-
-    return getLanguageInfo().idToLanguage[id]
+    return config:getLanguageNameFromId(id)
 end
 
 ---Returns the ID used for a configured roleplay language.
 ---@param language string
 ---@return integer?
 function API.getRoleplayLanguageID(language)
-    return getLanguageInfo().languageToID[language]
+    return config:getLanguageIDFromName(language)
 end
 
 ---Checks whether the language is a configured roleplay language.
 ---@param language string
 ---@return boolean
 function API.isConfiguredRoleplayLanguage(language)
-    return getLanguageInfo().languageToID[language] ~= nil
+    return config:getLanguageByName(language) ~= nil
 end
 
 ---Returns whether a configured roleplay language is signed.
 ---@param language string
 ---@return boolean
 function API.isRoleplayLanguageSigned(language)
-    return getLanguageInfo().languageIsSignedMap[language] or false
+    return config:isLanguageSigned(language)
 end
 
 ---Refreshes roleplay language information for the given username.
 ---@param username string
 function API.refreshLanguageInfo(username)
-    getLanguageInfo()
-
     local modData = API.getModData()
     local currentLang = modData.currentLanguage[username]
     local languages = modData.languages[username]

@@ -2,7 +2,7 @@
 
 local API = require 'OmiChat/Client'
 local utils = API.utils
-local Option = API.Option
+local config = API.Configuration
 
 local getText = getText
 local pairs = pairs
@@ -475,7 +475,7 @@ end
 ---@param ctxOrSearch omichat.SearchContext | string
 ---@return omichat.SearchResults?
 local function searchKnownDances(ctxOrSearch)
-    if not Option:compatTADEnabled() then
+    if not config:compatTADEnabled() then
         return
     end
 
@@ -510,41 +510,41 @@ local function searchKnownDances(ctxOrSearch)
 end
 
 
----@type omichat.CommandStream
-local danceStream = {
+local danceStream = API.CommandStream:new {
     name = 'dance',
-    command = '/dance ',
-    omichat = {
-        helpText = 'UI_OmiChat_HelpText_Dance',
-        isEnabled = function() return Option:compatTADEnabled() end,
-        suggestSpec = { 'known-dance' },
-        onUse = function(args)
-            local player = getSpecificPlayer(0)
-            if not player then
-                return
-            end
+    helpTextID = 'UI_OmiChat_HelpText_Dance',
+    suggestSpec = { 'known-dance' },
+    isEnabled = function() return config:compatTADEnabled() end,
+    onUse = function(args)
+        local player = getSpecificPlayer(0)
+        if not player then
+            return
+        end
 
-            local feedback
-            local info = processDanceCommand(args.text, player)
-            if info.emote then
-                player:setPrimaryHandItem(nil)
-                player:setSecondaryHandItem(nil)
-                player:playEmote(info.emote)
-            elseif info.unknownRecipe then
-                feedback = getText('UI_OmiChat_Info_DanceUnknownRecipe', info.name)
-            elseif info.missingItem then
-                feedback = getText('UI_OmiChat_Info_DanceMissingItem', info.name)
-            elseif info.list then
-                feedback = getAvailableDanceHelpText(player)
-            else
-                feedback = getText('UI_OmiChat_Info_DanceUnknown')
-            end
+        local feedback
+        local info = processDanceCommand(args.text, player)
+        if info.emote then
+            player:setPrimaryHandItem(nil)
+            player:setSecondaryHandItem(nil)
+            player:playEmote(info.emote)
+        elseif info.unknownRecipe then
+            feedback = getText('UI_OmiChat_Info_DanceUnknownRecipe', info.name)
+        elseif info.missingItem then
+            feedback = getText('UI_OmiChat_Info_DanceMissingItem', info.name)
+        elseif info.list then
+            feedback = getAvailableDanceHelpText(player)
+        else
+            feedback = getText('UI_OmiChat_Info_DanceUnknown')
+        end
 
-            if feedback then
-                API.addInfoMessage(feedback)
-            end
-        end,
-    },
+        if feedback then
+            API.addInfoMessage(feedback)
+        end
+    end,
+    onUseDisabled = function()
+        -- the easter egg should still be available when this is disabled
+        SendCommandToServer('/dance')
+    end,
 }
 
 ---Applies the TAD patch.

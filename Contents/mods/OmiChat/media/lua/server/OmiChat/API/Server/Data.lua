@@ -5,7 +5,7 @@ if not isServer() then return end
 
 ---@class omichat.api.server
 local API = require 'OmiChat/API/Server/Core'
-local Option = API.Option
+local config = API.Configuration
 
 
 ---Adds a roleplay language for a given player.
@@ -21,7 +21,7 @@ function API.addRoleplayLanguage(username, language)
     end
 
     local languages = API.getRoleplayLanguages(username)
-    if #languages >= API.config:maxLanguageSlots() then
+    if #languages >= config.MAX_LANGUAGE_SLOTS then
         return false, 'FULL'
     end
 
@@ -87,7 +87,7 @@ end
 ---@return integer
 function API.getRoleplayLanguageSlots(username)
     local modData = API.getModData()
-    return modData.languageSlots[username] or Option.LanguageSlots
+    return modData.languageSlots[username] or config.Language.DefaultSlots
 end
 
 ---Resets roleplay languages for a given player.
@@ -128,16 +128,6 @@ function API.setCurrentRoleplayLanguage(username, language)
     return true
 end
 
----Sets the name color for the player with the given username.
----This does not transmit changes to clients.
----@see omichat.api.server.transmitModData
----@param username string
----@param color string? The color to use, in hex format.
-function API.setNameColorString(username, color)
-    local modData = API.getModData()
-    modData.nameColors[username] = color
-end
-
 ---Sets the roleplay languages for the player with the given username.
 ---This does not transmit changes to clients.
 ---@see omichat.api.server.transmitModData
@@ -156,7 +146,7 @@ end
 ---@param slots integer?
 ---@return boolean success
 function API.setRoleplayLanguageSlots(username, slots)
-    if slots and (slots < 1 or slots > API.config:maxLanguageSlots()) then
+    if slots and (slots < 1 or slots > config.MAX_LANGUAGE_SLOTS) then
         return false
     end
 
@@ -184,7 +174,6 @@ function API.setUserModData(username, data)
     data = data or {}
     API.setNickname(username, data.nickname)
     API.setChatIcon(username, data.icon)
-    API.setNameColorString(username, data.nameColor)
     API.setRoleplayLanguageSlots(username, data.languageSlots)
     API.setRoleplayLanguages(username, data.languages)
     API.setCurrentRoleplayLanguage(username, data.currentLanguage)

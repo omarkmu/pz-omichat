@@ -1,43 +1,36 @@
 ---Compatibility patch for Buffy's Character Bios.
 
 local API = require 'OmiChat/Client'
-local Option = API.Option
+local config = API.Configuration
 local utils = API.utils
 
 API.addMessageTransformer({
     name = 'handle-buffy-character-bios',
-    priority = 34,
+    priority = 65,
     transform = function(_, info)
-        if info.context.ocIsOtherOverhead or info.tokens.customStream or info.context.ocCustomStream then
+        if not config:compatBuffyCharacterBiosEnabled() then
             return
         end
 
-        if info.chatType ~= 'say' or not Option:compatBuffyCharacterBiosEnabled() then
-            return
-        end
-
-        local text = info.content or info.rawText
+        local text = info:getCurrentText()
         if not text:match('^.+ updated their description%.$') and not text:match('^.+ updated their portrait%.$') then
             return
         end
 
-        if info.context.ocIsRadio then
-            info.message:setShowInChat(false)
-            info.message:setOverHeadSpeech(false)
+        local chatType = info:getChatType()
+        if chatType == 'radio' then
+            info:hide()
+            return
+        elseif chatType ~= 'say' then
             return
         end
 
-        info.chatType = 'server'
-        info.tokens.stream = 'server'
-        info.titleID = 'UI_chat_server_chat_title_id'
-        info.format = Option.ChatFormatServer
-        info.formatOptions.color = API.getColorOrDefault('server')
-        info.formatOptions.useDefaultChatColor = false
-        info.context.ocSkipLanguage = true
+        info:skipLanguageProcessing()
+        info:setStream(API.getServerStream(), { forceFormat = true, overwriteTags = true })
 
-        local authorEnd = utils.getAuthorEndPos(text, info.author)
+        local authorEnd = utils.getAuthorEndPos(text, info:getAuthor())
         if authorEnd then
-            info.content = text:sub(authorEnd + 1)
+            info:setContent(text:sub(authorEnd + 1))
         end
     end,
 })

@@ -1,10 +1,9 @@
 ---Handles IsoPlayer overrides.
 
 local API = require 'OmiChat/API/Client/Core'
-local config = API.config
+local config = API.Configuration
 
 local min = math.min
-local Option = API.Option
 local _IsoPlayer = __classmetatables[IsoPlayer.class].__index
 local _Callout = _IsoPlayer.Callout
 
@@ -31,11 +30,19 @@ function _IsoPlayer:Callout(playEmote)
         return
     end
 
+    local stream = API.getFirstChatStreamWithTag('Callout') or API.getStreamByName('yell')
+    if not stream then
+        API.utils.log.once('No stream defined for callouts. Add the `Callout` tag to a stream.')
+        _Callout(self, playEmote)
+        return
+    end
+
     local isSneaking = self:isSneaking()
-    local range = isSneaking and Option.RangeSneakCalloutZombies or Option.RangeCalloutZombies
+    local zombieConfig = config.ZombieAttraction
+    local range = isSneaking and zombieConfig.SneakCalloutRange or zombieConfig.CalloutRange
 
     local shouts
-    if Option.EnableCustomShouts then
+    if config:isCustomShoutsEnabled() then
         shouts = API.getCustomShouts(isSneaking and 'sneakcallouts' or 'callouts')
     end
 
@@ -48,7 +55,7 @@ function _IsoPlayer:Callout(playEmote)
         shouts = getDefaultShouts(isSneaking)
         shoutMax = #shouts
     else
-        shoutMax = min(#shouts, config:maxCustomShouts())
+        shoutMax = min(#shouts, config.MAX_CUSTOM_SHOUTS)
     end
 
     local formatterName
@@ -61,13 +68,18 @@ function _IsoPlayer:Callout(playEmote)
         shout = shout:upper()
     end
 
-    API.sendShout {
+    API.send {
+        stream = stream,
         text = shout,
-        formatterName = formatterName,
+        formatter = API.getFormatter(formatterName),
         playSignedEmote = not playEmote,
         tokens = {
             callout = '1',
             sneakCallout = isSneaking and '1' or nil,
+        },
+        extraTags = {
+            'IsCallout',
+            isSneaking and 'IsSneakCallout' or nil,
         },
     }
 

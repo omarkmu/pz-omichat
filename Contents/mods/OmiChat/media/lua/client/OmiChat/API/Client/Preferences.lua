@@ -4,7 +4,7 @@
 local API = require 'OmiChat/API/Client/Core'
 
 local utils = API.utils
-local Option = API.Option
+local config = API.Configuration
 
 
 ---@type table<omichat.AdminOption, string>
@@ -26,7 +26,7 @@ end
 local function readPrefsJson()
     local decoded, err = utils.schema.read(API._prefsFileName)
     if err then
-        utils.log.error('failed to read preferences: %s', err)
+        utils.log.error('Failed to read preferences: %s', err)
     end
 
     if not decoded then
@@ -147,7 +147,7 @@ end
 ---@param shoutType omichat.CalloutCategory The type of shouts to retrieve.
 ---@return string[]?
 function API.getCustomShouts(shoutType)
-    if not Option.EnableCustomShouts then
+    if not config:isCustomShoutsEnabled() then
         return
     end
 
@@ -236,7 +236,8 @@ function API.getPlayerPreferences()
     local version = decoded.VERSION
     if version > API._prefsVersion then
         -- use default settings & add flag to avoid overwrite
-        utils.log.info('preferences file has a higher version (%d > %d)', version, API._prefsVersion)
+        utils.log.once('Preferences file has a higher version (%d > %d). Changes to preferences will not be saved.',
+            version, API._prefsVersion)
         prefs.HIGHER_VERSION = true
         return prefs
     elseif version == 1 then
@@ -248,16 +249,16 @@ function API.getPlayerPreferences()
     return prefs
 end
 
----Gets a color table for the current player's preference for a category, or `nil` if unset.
----@param category omichat.ColorCategory
+---Gets a color table for the current player's preference for a stream, or `nil` if unset.
+---@param id string
 ---@return omi.ColorTable?
-function API.getPreferredColor(category)
+function API.getPreferredColor(id)
     local profile = API.getCurrentProfile()
     if not profile then
         return
     end
 
-    return profile.colors[category]
+    return profile.colors[id]
 end
 
 ---Returns the configured player profiles.
@@ -359,7 +360,7 @@ function API.savePlayerPreferences()
     }
 
     if not encoded then
-        utils.log.error('failed to write preferences: %s', err)
+        utils.log.error('Failed to write preferences: %s', err)
         return false
     end
 
@@ -395,7 +396,7 @@ end
 ---@param shoutType omichat.CalloutCategory The type of shouts to set.
 ---@return boolean success
 function API.setCustomShouts(shouts, shoutType)
-    if not Option.EnableCustomShouts then
+    if not config:isCustomShoutsEnabled() then
         return false
     end
 
@@ -417,9 +418,9 @@ function API.setNameColorEnabled(enabled)
     API.savePlayerPreferences()
 end
 
----Sets a color table for the current player's preference for a category, on the current profile.
+---Sets a color table for the current player's preference for a stream.
 ---This sets the value in the current profile.
----@param category omichat.ColorCategory
+---@param category string
 ---@param color omi.ColorTable?
 function API.setPreferredColor(category, color)
     local profile = API.getCurrentProfile()
@@ -431,7 +432,7 @@ function API.setPreferredColor(category, color)
 end
 
 ---Sets the list of player profiles.
----This assumes the input is a valid list of PlayerProfile tables.
+---This assumes the input is a valid list of `PlayerProfile` tables.
 ---@param profiles omichat.PlayerProfile[]
 function API.setProfiles(profiles)
     local prefs = API.getPlayerPreferences()
@@ -512,7 +513,7 @@ function API.switchProfile(idx)
     API.changeColor('name', colors.name)
     API.changeSpeechColor(colors.speech)
 
-    if profile and profile.chatNickname and Option:isNicknameEnabled() then
+    if profile and profile.chatNickname and config:isNicknameEnabled() then
         API.setNickname(profile.chatNickname)
     end
 

@@ -13,7 +13,7 @@ local API = require 'OmiChat/API/Client/Core'
 ---@field chatFont omichat.ChatFont The current font of the chat.
 ---@field chatText omichat.ChatTab The current chat tabs.
 ---@field tabs omichat.ChatTab[] List of available chat tabs.
----@field allChatStreams omichat.ChatStream[] List of all available chat streams.
+---@field allChatStreams (omichat.ChatStream | omichat.StreamTable)[] List of all available chat streams.
 ---@field defaultTabStream table<integer, omichat.ChatStream?> An association of 1-indexed tab IDs to default streams.
 ---@field gearButton ISButton The settings button.
 ---@field textEntry ISTextEntryBox The text entry UI element.
@@ -27,8 +27,7 @@ local API = require 'OmiChat/API/Client/Core'
 local ISChat = ISChat
 
 local utils = API.utils
-local config = API.config
-local Option = API.Option
+local config = API.Configuration
 local UI = API.utils.ui
 local SuggesterBox = API.SuggesterBox
 local getText = getText
@@ -189,7 +188,7 @@ end
 ---@param context ISContextMenu
 local function addLanguageOptions(context)
     local languages = API.getRoleplayLanguages()
-    local languageSlots = math.min(API.getRoleplayLanguageSlots(), config:maxLanguageSlots())
+    local languageSlots = math.min(API.getRoleplayLanguageSlots(), config.MAX_LANGUAGE_SLOTS)
 
     local isKnown = {}
     local knownLanguages = {}
@@ -206,7 +205,7 @@ local function addLanguageOptions(context)
         local allLanguages = API.getConfiguredRoleplayLanguages()
         for i = 1, #allLanguages do
             local lang = allLanguages[i]
-            if not isKnown[lang] and Option:canAddLanguage(lang) then
+            if not isKnown[lang] and config:canAddLanguage(lang) then
                 addLanguages[#addLanguages + 1] = {
                     language = lang,
                     translated = utils.getTranslatedLanguageName(lang),
@@ -364,7 +363,7 @@ local function addChatSettings(context)
     submenu:addOption(timestampOptName, instance, ISChat.onToggleTimestampPrefix)
     submenu:addOption(tagOptName, instance, ISChat.onToggleTagPrefix)
 
-    if Option.PredicateShowTypingIndicator ~= '' then
+    if config.TypingIndicator.Enable then
         local typingOptName = API.getShowTyping()
             and getText('UI_OmiChat_ContextDisableTypingIndicator')
             or getText('UI_OmiChat_ContextEnableTypingIndicator')
@@ -401,7 +400,7 @@ local function addCustomizationSettings(context)
     -- chat customization
     addSignEmoteOption(submenu)
 
-    if Option.EnableSetNameColor or Option.EnableSpeechColorAsDefaultNameColor then
+    if config.Customization.EnableNameColors then
         local nameColorOptName = API.getNameColorsEnabled()
             and getText('UI_OmiChat_ContextDisableNameColors')
             or getText('UI_OmiChat_ContextEnableNameColors')
@@ -413,8 +412,8 @@ local function addCustomizationSettings(context)
     submenu:addOption(manageOptName, instance, ISChat.onManageProfiles)
 
     -- character customization
-    if Option.EnableCharacterCustomization then
-        if Option:isCleanCustomizationEnabled() then
+    if config.Customization.EnableCharacterCustomization then
+        if config:isCleanCustomizationEnabled() then
             local cleanOptName = getText('UI_OmiChat_ContextClean')
             submenu:addOption(cleanOptName, instance, ISChat.onCleanCharacter)
         end
@@ -452,7 +451,7 @@ local function refreshLastCommand(tab)
         return
     end
 
-    local stream = API.chatCommandToStream(lastChatCommand, true)
+    local stream = API.chatCommandToStream(lastChatCommand)
     local commandType = stream and stream:getCommandType() or 'other'
     if not API.getRetainCommand(commandType) then
         tab.lastChatCommand = ''
@@ -523,7 +522,7 @@ function ISChat.onCleanCharacter(target)
         visual:setBlood(bodyPart, 0)
     end
 
-    local shouldUpdateClothing = Option:isCleanClothingEnabled()
+    local shouldUpdateClothing = config:isCleanClothingEnabled()
     if shouldUpdateClothing then
         -- update clothing
         local items = player:getWornItems()
@@ -770,7 +769,7 @@ function ISChat.onIconClick(target, icon)
     local text = target.textEntry:getInternalText()
 
     local addSpace = #text > 0 and text:sub(-1) ~= ' '
-    target.textEntry:setText(concat { text, addSpace and ' *' or '*', icon, '*' })
+    target.textEntry:setText(text .. (addSpace and ' *' or '*') .. icon .. '*')
     API.updateSuggesterComponent()
 end
 
@@ -896,14 +895,14 @@ function ISChat.validateCustomCalloutText(target, text)
         return true
     end
 
-    local maxShouts = config:maxCustomShouts()
+    local maxShouts = config.MAX_CUSTOM_SHOUTS
     if #lines > maxShouts then
         target:setValidateTooltipText(getText('UI_OmiChat_Error_TooManyShouts', tostring(maxShouts)))
         return false
     end
 
+    local maxLen = config.MAX_CUSTOM_SHOUT_LEN
     for i = 1, #lines do
-        local maxLen = config:maxCustomShoutLength()
         if #lines[i] > maxLen then
             target:setValidateTooltipText(getText('UI_OmiChat_Error_TooLongShout', tostring(maxLen)))
             return false
@@ -958,27 +957,30 @@ function ISChat.addLineInChat(message, tabID)
     local mtIndex = (getmetatable(message) or {}).__index
     if mtIndex == _ChatMessage or mtIndex == _ServerChatMessage or utils.isinstance(message, API.MimicMessage) then
         local username = player and player:getUsername()
-        local chatType = API.getMessageChatType(message)
+        local chatType = API.MessageInfo.getMessageChatType(message)
 
         if chatType == 'radio' then
             local formatter = API.getFormatter('onlineID')
-            local value = formatter:read(message:getText())
-            local onlineID = value and utils.decodeInvisibleInt(value)
-            local authorPlayer = onlineID and utils.getPlayerInfoByOnlineID(onlineID)
-
-            if authorPlayer then
-                message:setAuthor(authorPlayer.username)
-            elseif username and message:getAuthor() == username then
-                -- if we can't find the author, clear instead of attributing to this player
-                message:setAuthor('')
+            if formatter then
+                local value = formatter:read(message:getText())
+                local onlineID = value and utils.decodeInvisibleInt(value)
+                local authorPlayer = onlineID and utils.getPlayerInfoByOnlineID(onlineID)
+                if authorPlayer then
+                    message:setAuthor(authorPlayer.username)
+                elseif username and message:getAuthor() == username then
+                    -- if we can't find the author, clear instead of attributing to the local player
+                    message:setAuthor('')
+                end
             end
         end
 
-        if Option:compatChatBubbleEnabled() and message:getText():match('%[img=media/textures/bubble%d%.png%]') then
+        if config:compatChatBubbleEnabled() and message:getText():match('%[img=media/textures/bubble%d%.png%]') then
             return
         end
 
-        message:setCustomTag(API.encodeMessageTag(message))
+        if not API.MessageInfo.hasEncodedMetadata(message) then
+            API.MessageInfo.encodeMessageTag(message)
+        end
 
         -- necessary to process transforms so we know whether this message should be added to chat
         local info = API.buildMessageInfo(message, true)
@@ -988,7 +990,7 @@ function ISChat.addLineInChat(message, tabID)
             end
 
             if message:isShouldAttractZombies() and username == message:getAuthor() then
-                soundRange = info.attractRange
+                soundRange = info:getZombieAttractionRange()
             end
         end
     end
@@ -1006,7 +1008,7 @@ end
 
 ---Override to unfocus on close.
 function ISChat:close()
-    if Option.EnableAlwaysShowChat then
+    if config.General.AlwaysShowChat then
         return
     end
 
@@ -1098,7 +1100,9 @@ function ISChat:onCommandEntered()
 
     local instance = ISChat.instance ---@cast instance omichat.ISChat
     local input = instance.textEntry:getText()
-    local stream, command, chatCommand, disabledStream = API.chatCommandToStream(input, true, true)
+
+    ---@type omichat.Stream?
+    local stream, command, chatCommand, disabledStream = API.chatCommandToStream(input, { enabledOnly = true })
 
     local useCallback
     local callbackStream
@@ -1123,18 +1127,23 @@ function ISChat:onCommandEntered()
     end
 
     if stream then
+        ---@cast stream omichat.Stream
+        shouldHandle = true
+
         if not stream:isTabID(instance.currentTabID) then
             -- wrong chat tab
             showWrongChatTabMessage(instance.currentTabID - 1, stream:getTabID() - 1, chatCommand or '')
             stream = nil
             allowEmotes = false
-            shouldHandle = true
         else
-            shouldHandle = true
             callbackStream = stream
             allowEmotes = not isDefault and stream:isAllowEmotes() or allowEmotes
-            useCallback = stream:getUseCallback() or API.send
             commandType = stream:getCommandType()
+
+            useCallback = stream:getUseCallback()
+            if not useCallback and stream:isChatStream() then
+                useCallback = API.send
+            end
         end
 
         if isDefault then
@@ -1144,7 +1153,7 @@ function ISChat:onCommandEntered()
 
     -- handle emotes specified with .emote
     local playedEmote
-    if allowEmotes and Option.EnableEmotes then
+    if allowEmotes and config:isEmoteMacroEnabled() then
         local emoteToPlay, start, finish, emote = API.getEmoteFromCommand(command)
         if emoteToPlay then
             -- remove the emote text
@@ -1170,9 +1179,17 @@ function ISChat:onCommandEntered()
         API.cycleStream(stream:getName())
     end
 
-    if callbackStream and not callbackStream:validate(command) then
-        shouldHandle = true
-        callbackStream = nil
+    if callbackStream then
+        ---@cast callbackStream omichat.Stream
+        local success, err = callbackStream:validate(command)
+        if err then
+            API.addInfoMessage(err)
+        end
+
+        if not success then
+            shouldHandle = true
+            callbackStream = nil
+        end
     end
 
     if disabledStream then
@@ -1184,10 +1201,22 @@ function ISChat:onCommandEntered()
         else
             local msg = { getText('UI_chat_chat_disabled_msg', utils.trim(disabledStream:getCommand())) }
             for i = 1, #ISChat.allChatStreams do
-                local info = API.StreamInfo:new(ISChat.allChatStreams[i])
-                if info:isEnabled() then
+                local availableStream = ISChat.allChatStreams[i]
+
+                local availableCommand
+                if utils.isinstance(availableStream, API.ChatStream) then
+                    ---@cast availableStream omichat.ChatStream
+                    if availableStream:isEnabled() then
+                        availableCommand = availableStream:getCommand()
+                    end
+                else
+                    ---@cast availableStream omichat.StreamTable
+                    availableCommand = availableStream.command
+                end
+
+                if availableCommand then
                     msg[#msg + 1] = '* '
-                    msg[#msg + 1] = utils.trim(info:getCommand())
+                    msg[#msg + 1] = utils.trim(availableCommand)
                     msg[#msg + 1] = ' <LINE> '
                 end
             end
@@ -1413,20 +1442,25 @@ function ISChat.onTextChange()
     for i = 1, #chatText.chatStreams do
         local prefix
         local stream = chatText.chatStreams[i]
+        if utils.isinstance(stream, API.ChatStream) then
+            ---@cast stream omichat.ChatStream
 
-        if stream.command then
-            prefix = shouldResetText(stream.command, text, internalText)
-        end
+            local command = stream:getCommand()
+            local shortCommand = stream:getCommand()
+            if command then
+                prefix = shouldResetText(command, text, internalText)
+            end
 
-        if not prefix and stream.shortCommand then
-            prefix = shouldResetText(stream.shortCommand, text, internalText)
-        end
+            if not prefix and shortCommand then
+                prefix = shouldResetText(shortCommand, text, internalText)
+            end
 
-        if not prefix and stream.omichat and stream.omichat.aliases then
-            for j = 1, #stream.omichat.aliases do
-                prefix = shouldResetText(stream.omichat.aliases[j], text, internalText)
-                if prefix then
-                    break
+            if not prefix then
+                for alias in stream:aliases() do
+                    prefix = shouldResetText(alias, text, internalText)
+                    if prefix then
+                        break
+                    end
                 end
             end
         end
@@ -1465,7 +1499,7 @@ end
 ---Override to keep the close button hidden if the always show chat option is enabled.
 ---@param visible boolean
 function ISChat:setDrawFrame(visible)
-    if not Option.EnableAlwaysShowChat then
+    if not config.General.AlwaysShowChat then
         _setDrawFrame(self, visible)
         return
     end

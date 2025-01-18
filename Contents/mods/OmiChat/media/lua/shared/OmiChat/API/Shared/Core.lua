@@ -1,9 +1,7 @@
 ---Base shared API.
 
-local config = require 'OmiChat/config'
-local Configuration = require 'OmiChat/Component/Configuration'
+local config = require 'OmiChat/Component/Configuration'
 local utils = require 'OmiChat/utils'
-local Option = require 'OmiChat/Component/Options'
 local MetaFormatter = require 'OmiChat/Component/MetaFormatter'
 
 
@@ -11,13 +9,10 @@ local MetaFormatter = require 'OmiChat/Component/MetaFormatter'
 ---@field protected _modDataKey string
 ---@field protected _modDataVersion integer
 ---@field protected _playerModDataVersion integer
----@field protected _languageInfo omichat.LanguageInfoStore
 local API = {}
 
-API.Configuration = Configuration
-API.Option = Option
+API.Configuration = config
 API.MetaFormatter = MetaFormatter
-API.config = config
 API.utils = utils
 API._modDataKey = 'omichat'
 API._modDataVersion = 1
@@ -26,7 +21,6 @@ API._playerModDataVersion = 1
 
 local modDataFields = {
     { key = 'nicknames', name = 'nickname' },
-    { key = 'nameColors', name = 'nameColor' },
     { key = 'icons', name = 'icon' },
     { key = 'currentLanguage', name = 'currentLanguage' },
     { key = 'languageSlots', name = 'languageSlots' },
@@ -62,24 +56,9 @@ function API._clearModData(username)
     modData.icons[username] = nil
     modData.languageSlots[username] = nil
     modData.languages[username] = nil
-    modData.nameColors[username] = nil
     modData.nicknames[username] = nil
 end
 
----Returns the admin chat icon for a given username.
----@param username string
----@return string?
-function API.getAdminChatIcon(username)
-    if not username then
-        return
-    end
-
-    local tokens = {
-        username = username,
-    }
-
-    return utils.interpolate(Option.FormatAdminIcon, tokens, username)
-end
 
 ---Returns the chat icon for a given username.
 ---@param username string
@@ -96,7 +75,6 @@ function API.getModData()
 
     modData.version = API._modDataVersion
     modData.nicknames = modData.nicknames or {}
-    modData.nameColors = modData.nameColors or {}
     modData.languages = modData.languages or {}
     modData.languageSlots = modData.languageSlots or {}
     modData.currentLanguage = modData.currentLanguage or {}
@@ -137,46 +115,6 @@ function API.getModDataList()
     return list, utils.copy(modDataKeys)
 end
 
----Retrieves mod data for a given user.
----@param username string
----@return omichat.UserModData
-function API.getUserModData(username)
-    local data = { username = username }
-    local modData = API.getModData()
-
-    for _, field in pairs(modDataFields) do
-        data[field.name] = modData[field.key][username]
-    end
-
-    return data
-end
-
----Returns the color table for a player's name color, or `nil` if unset.
----@param username string
----@return omi.ColorTable?
-function API.getNameColor(username)
-    if not Option.EnableSetNameColor or not username then
-        return
-    end
-
-    return utils.color.fromString(API.getModData().nameColors[username])
-end
-
----Returns the color table used for a player's name color in chat, or `nil` if unset.
----This respects the `EnableSpeechColorAsDefaultNameColor` option.
----@param username string
----@return omi.ColorTable?
-function API.getNameColorInChat(username)
-    local nameColor = API.getNameColor(username)
-    if nameColor then
-        return nameColor
-    end
-
-    if Option.EnableSpeechColorAsDefaultNameColor then
-        return Option:getDefaultColor('name', username)
-    end
-end
-
 ---Retrieves the name that should be used in chat for a given username.
 ---@param username string?
 ---@param chatType omichat.ChatTypeString The chat type to use in format string interpolation.
@@ -211,8 +149,12 @@ end
 ---@param menuType omichat.MenuTypeString
 ---@return string?
 function API.getPlayerMenuName(player, menuType)
-    local nameFormat = Option.FormatMenuName
-    if not player or not nameFormat or nameFormat == '' then
+    if not player then
+        return
+    end
+
+    local nameFormat = config:getMenuNameFormat(menuType)
+    if not nameFormat or nameFormat == '' then
         return
     end
 
@@ -224,8 +166,8 @@ function API.getPlayerMenuName(player, menuType)
 
     tokens.name = API.utils.unescapeRichText(chatName)
     tokens.menuType = menuType
-    local result = API.utils.interpolate(nameFormat, tokens, getPlayerUsername(player))
 
+    local result = API.utils.interpolate(nameFormat, tokens, getPlayerUsername(player))
     if result == '' then
         return
     end
@@ -252,7 +194,7 @@ function API.getPlayerNameInChat(player, chatType)
 
     tokens.username = username
     tokens.chatType = chatType
-    return utils.interpolate(Option.FormatName, tokens, username)
+    return utils.interpolate(config.Format.Component.Name, tokens, username)
 end
 
 ---Gets substitution tokens to use in interpolation for a given player.
@@ -282,17 +224,30 @@ function API.getPlayerSubstitutions(player)
     }
 end
 
----Returns true if the custom chat stream specified is enabled.
----@param name omichat.CustomStreamName
----@return boolean
-function API.isCustomStreamEnabled(name)
-    local info = config:getCustomStreamInfo(name)
-    if not info then
-        return false
+---Gets the speech color of the player with the given username, or `nil` if unset.
+---@param username string
+---@return omi.ColorTable?
+function API.getSpeechColor(username)
+    local player = username and utils.getPlayerInfoByUsername(username)
+    local speechColor = player and player.speechColor
+
+    if speechColor then
+        return utils.color.copy(speechColor)
+    end
+end
+
+---Retrieves mod data for a given user.
+---@param username string
+---@return omichat.UserModData
+function API.getUserModData(username)
+    local data = { username = username }
+    local modData = API.getModData()
+
+    for _, field in pairs(modDataFields) do
+        data[field.name] = modData[field.key][username]
     end
 
-    local value = Option[info.chatFormatOpt]
-    return value and value ~= ''
+    return data
 end
 
 ---Adds a function that should be available to all interpolator patterns.

@@ -8,14 +8,14 @@ local lib = require 'OmiLibrary/Client'
 ---@field utils omichat.utils.client
 ---@field private _commandStreams omichat.CommandStream[]
 ---@field private _emotes table<string, string | omichat.EmoteHandler>
----@field private _formatters table<string, omichat.MetaFormatter>
+---@field private _chatFormatters table<integer, omichat.MetaFormatter>
+---@field private _metadataFormatters table<omichat.FormatterName, omichat.MetaFormatter>
 ---@field private _iconsToExclude table<string, true>
 ---@field private _transformers omichat.MessageTransformer[]
 ---@field private _suggesters omichat.Suggester[]
 ---@field private _prefsVersion integer
 ---@field private _prefsFileName string
 ---@field private _playerPrefs omichat.PlayerPreferences
----@field private _customChatStreams table<string, omichat.ChatStream>
 ---@field private _customButtons ISButton[]
 ---@field private _customSuggesterArgTypes table<string, omichat.SuggestSearchCallback>
 ---@field private _settingHandlers table<omichat.SettingCategory, omichat.SettingHandlerCallback[]>
@@ -24,7 +24,17 @@ local lib = require 'OmiLibrary/Client'
 ---@field private _typingInfo table<string, omichat.TypingInformation>
 ---@field private _leftmostBtn ISButton?
 ---@field private _mock omi.chat.Mock?
+---@field private _serverStream omichat.ChatStream
+---@field private _radioStream omichat.ChatStream
+---@field private _discordStream omichat.ChatStream
+---@field private _cardCommand omichat.CommandStream
+---@field private _flipCommand omichat.CommandStream
+---@field private _rollCommand omichat.CommandStream
 local API = require 'OmiChat/Shared'
+
+local utils = API.utils
+local config = API.Configuration
+
 
 ---@class omichat.utils.client : omichat.utils
 ---@field ui omi.ui
@@ -35,13 +45,17 @@ API.utils.lib = lib
 
 API.IconPicker = require 'OmiChat/Component/IconPicker'
 API.SuggesterBox = require 'OmiChat/Component/SuggesterBox'
-API.StreamInfo = require 'OmiChat/Component/StreamInfo'
+API.Stream = require 'OmiChat/Component/Stream'
+API.Stream.__api = API ---@diagnostic disable-line: invisible
+API.ChatStream = require 'OmiChat/Component/ChatStream'
+API.CommandStream = require 'OmiChat/Component/CommandStream'
 API.MimicMessage = lib.chat.MimicMessage
 
 API._prefsVersion = 2
 API._prefsFileName = 'omichat.json'
 
-API._formatters = {}
+API._chatFormatters = {}
+API._metadataFormatters = {}
 API._customButtons = {}
 API._customSuggesterArgTypes = {}
 API._typingDisplay = nil
@@ -161,6 +175,159 @@ API._emotes = {
     fire = 'signalfire',
 }
 
+API._discordStream = API.ChatStream:new {
+    name = 'discord',
+    chatType = 'general',
+    chatFormat = API.Configuration.Discord.ChatFormat,
+    defaultColor = API.Configuration.Discord.DefaultColor,
+    tags = API.Configuration.Discord.Tags,
+}
+
+API._radioStream = API.ChatStream:new {
+    name = 'radio',
+    chatType = 'radio',
+    chatFormat = API.Configuration.Radio.ChatFormat,
+    defaultColor = API.Configuration.Radio.DefaultColor,
+    tags = API.Configuration.Radio.Tags,
+}
+
+API._serverStream = API.ChatStream:new {
+    name = 'server',
+    chatType = 'server',
+    chatFormat = API.Configuration.ServerMessages.ChatFormat,
+    defaultColor = API.Configuration.ServerMessages.DefaultColor,
+    tags = API.Configuration.ServerMessages.Tags,
+}
+
+API._cardCommand = API.CommandStream:new {
+    name = 'card',
+    command = '/card ',
+    formatter = API.MetaFormatter:new(config.ID_CARD),
+    helpTextID = 'UI_ServerOptionDesc_Card',
+    autoTags = { 'IsCardCommand' },
+    onUse = function(ctx)
+        if not API.requestDrawCard() then
+            ctx.stream:showHelpText()
+        end
+    end,
+    isEnabled = function()
+        local player = getSpecificPlayer(0)
+        if not player then
+            return false
+        end
+
+        if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, config:getCardItems()) then
+            return false
+        end
+
+        if not config.Commands.Card.Global and not API.getFirstChatStreamWithTag('CardCommandTarget') then
+            return false
+        end
+
+        return true
+    end,
+    onUseDisabled = function(stream)
+        if not API.getFirstChatStreamWithTag('CardCommandTarget') then
+            utils.log.once('No target stream defined for /card')
+            API.addInfoMessage('Unknown command ' .. stream:getCommand():sub(2))
+        else
+            stream:showHelpText()
+        end
+    end,
+}
+
+API._flipCommand = API.CommandStream:new {
+    name = 'flip',
+    command = '/flip ',
+    formatter = API.MetaFormatter:new(config.ID_FLIP),
+    helpTextID = 'UI_OmiChat_HelpText_Flip',
+    autoTags = { 'IsFlipCommand' },
+    onUse = function(ctx)
+        if not API.requestFlipCoin() then
+            ctx.stream:showHelpText()
+        end
+    end,
+    isEnabled = function()
+        local player = getSpecificPlayer(0)
+        if not player then
+            return false
+        end
+
+        if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, config:getCoinItems()) then
+            return false
+        end
+
+        if not config.Commands.Flip.Global and not API.getFirstChatStreamWithTag('FlipCommandTarget') then
+            return false
+        end
+
+        return true
+    end,
+    onUseDisabled = function(stream)
+        if not API.getFirstChatStreamWithTag('FlipCommandTarget') then
+            utils.log.once('No target stream defined for /flip')
+            API.addInfoMessage('Unknown command ' .. stream:getCommand():sub(2))
+        else
+            stream:showHelpText()
+        end
+    end,
+}
+
+API._rollCommand = API.CommandStream:new {
+    name = 'roll',
+    command = '/roll ',
+    formatter = API.MetaFormatter:new(config.ID_ROLL),
+    helpTextID = 'UI_ServerOptionDesc_Roll',
+    autoTags = { 'IsRollCommand' },
+    onUse = function(ctx)
+        local command = utils.trim(ctx.text)
+        local first = command:split(' ')[1]
+        local sides = first and tonumber(first)
+        if not sides and #command == 0 then
+            sides = 6
+        elseif not sides then
+            ctx.stream:showHelpText()
+            return
+        end
+
+        if not API.requestRollDice(sides) then
+            ctx.stream:showHelpText()
+        end
+    end,
+    isEnabled = function()
+        local player = getSpecificPlayer(0)
+        if not player then
+            return false
+        end
+
+        if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, config:getDiceItems()) then
+            return false
+        end
+
+        if not config.Commands.Roll.Global and not API.getFirstChatStreamWithTag('RollCommandTarget') then
+            return false
+        end
+
+        return true
+    end,
+    onUseDisabled = function(stream)
+        if not API.getFirstChatStreamWithTag('RollCommandTarget') then
+            utils.log.once('No target stream defined for /roll')
+            API.addInfoMessage('Unknown command ' .. stream:getCommand():sub(2))
+        else
+            stream:showHelpText()
+        end
+    end,
+}
+
+
+---Called when configuration is saved to a file.
+---@protected
+function API._onConfigurationSave()
+    if API.updateState then
+        API.updateState(true)
+    end
+end
 
 ---Event handler that runs when a player is created.
 ---@param playerNum integer

@@ -33,7 +33,7 @@ local function insertStreamRelative(stream, other, value)
 
     for i = 1, #tabs do
         local tab = tabs[i]
-        if stream.tabID == tab.tabID + 1 then
+        if stream:getTabID() == tab.tabID + 1 then
             pos = #tab.chatStreams + 1
             for j = 1, #tab.chatStreams do
                 if tab.chatStreams[i] == other then
@@ -103,11 +103,6 @@ end
 ---Adds information about a command that can be triggered from chat.
 ---@param stream omichat.CommandStream
 function API.addCommand(stream)
-    if not stream.omichat then
-        stream.omichat = {}
-    end
-
-    stream.omichat.isCommand = true
     API._commandStreams[#API._commandStreams + 1] = stream
 end
 
@@ -152,7 +147,7 @@ function API.addStream(stream)
 
     for i = 1, #tabs do
         local tab = tabs[i]
-        if stream.tabID == tab.tabID + 1 then
+        if stream:getTabID() == tab.tabID + 1 then
             tab.chatStreams[#tab.chatStreams + 1] = stream
         end
     end

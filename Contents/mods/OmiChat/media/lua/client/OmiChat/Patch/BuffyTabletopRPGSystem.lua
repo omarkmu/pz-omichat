@@ -1,18 +1,17 @@
 ---Compatibility patch for Buffy's Tabletop RPG System.
 
 local API = require 'OmiChat/Client'
-local Option = API.Option
+local config = API.Configuration
 
 API.addMessageTransformer({
     name = 'handle-buffy-rpg',
-    priority = 49,
+    priority = 65,
     transform = function(_, info)
-        if not Option:compatBuffyRPGSystemEnabled() then
+        if not config:compatBuffyRPGSystemEnabled() then
             return
         end
 
-        local text = info.content or info.rawText
-
+        local text = info:getCurrentText()
         local patt = '^.+<IMAGE:Item_Dice[%d,]+>%s+<RGB:([%d%.,]+)>%s*%[CRITICAL (.+)%!].+(rolled%s+.+:%s*%d.+)$'
         local critColor, crit, suffix = text:match(patt)
 
@@ -23,7 +22,13 @@ API.addMessageTransformer({
             end
         end
 
-        info.content = suffix
+        if info:isChatType('radio') then
+            info:hide()
+            return
+        end
+
+        info:setContent(suffix)
+        info:addTags({ 'IsBuffyRoll' })
         info.tokens.buffyRoll = suffix
 
         if critColor and crit then
@@ -31,13 +36,11 @@ API.addMessageTransformer({
             info.tokens.buffyCritRaw = crit:lower()
         end
 
-        if API.isCustomStreamEnabled('me') then
-            info.tokens.stream = 'me'
-            info.context.ocCustomStream = 'me'
-            info.format = Option.ChatFormatMe
-            info.formatOptions.color = API.getColorOrDefault('me')
+        local targetStream = API.getFirstChatStreamWithTag('BuffyRPGTarget')
+        if targetStream then
+            info:setStream(targetStream)
         end
 
-        info.context.ocSkipLanguage = true
+        info:skipLanguageProcessing()
     end,
 })

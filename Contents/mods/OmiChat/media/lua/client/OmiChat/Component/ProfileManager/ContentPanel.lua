@@ -2,8 +2,7 @@ local API = require 'OmiChat/Client'
 local UI = API.utils.ui
 local TextEntry = UI.TextEntry
 local ColorEntry = UI.ColorEntry
-local Option = API.Option
-local config = API.config
+local config = API.Configuration
 
 local ISLabel = ISLabel
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
@@ -54,7 +53,7 @@ function ContentPanel:addControls(manager)
     local startY = nameControl.y + nameControl.height + CONTROL_PAD_Y
 
     -- chat nickname
-    if Option:isNicknameEnabled() then
+    if config:isNicknameEnabled() then
         local nicknameText = getText('UI_OmiChat_ProfileManager_Label_Nickname')
         local nicknameLabel = ISLabel:new(PAD_X, startY, LABEL_H, nicknameText, 1, 1, 1, 1, FONT, true)
         nicknameLabel:initialise()
@@ -89,7 +88,7 @@ function ContentPanel:addControls(manager)
     manager.colorControls, maxY = self:createColorControls(manager, nextY)
 
     -- callouts
-    if Option.EnableCustomShouts then
+    if config:isCustomShoutsEnabled() then
         manager.calloutControls, maxY = self:createCalloutControls(manager, maxY + SECTION_PAD_Y)
     else
         manager.calloutControls = {}
@@ -134,7 +133,7 @@ end
 ---@return table<string, omi.ui.TextEntry>
 ---@return number
 function ContentPanel:createCalloutControls(manager, startY)
-    local numLines = config:maxCustomShouts() * 0.5
+    local numLines = config.MAX_CUSTOM_SHOUTS * 0.5
 
     local controls = {}
     local nextY = startY
@@ -202,7 +201,7 @@ function ContentPanel:createColorControls(manager, startY)
         local opt = availableColorOpts[i]
         local labelText = getTextOrNull('UI_OmiChat_ContextColor_' .. opt)
         if not labelText then
-            labelText = getText('UI_OmiChat_ContextColor', API.getColorCategoryCommand(opt))
+            labelText = getText('UI_OmiChat_ContextColor', API.getDisplayCommand(opt))
         end
 
         local leftCol = i <= splitIdx
@@ -211,7 +210,7 @@ function ContentPanel:createColorControls(manager, startY)
         local tooltip = getTextOrNull('UI_OmiChat_ProfileManager_Tooltip_Color_' .. opt)
         if not tooltip then
             local optName = getTextOrNull('UI_OmiChat_ContextMessageType_' .. opt)
-                or API.getColorCategoryCommand(opt)
+                or API.getDisplayCommand(opt)
             tooltip = getText('UI_OmiChat_ProfileManager_Tooltip_Color', optName)
         end
 

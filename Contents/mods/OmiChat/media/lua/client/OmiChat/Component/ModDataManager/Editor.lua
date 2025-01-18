@@ -4,7 +4,7 @@ local Keyboard = Keyboard
 ---@class omichat.api.client
 local API = require 'OmiChat/API/Client/Core'
 local utils = API.utils
-local config = API.config
+local config = API.Configuration
 local UI = utils.ui
 local TextEntry = UI.TextEntry
 local ColorEntry = UI.ColorEntry
@@ -16,7 +16,6 @@ local SuggesterBox = API.SuggesterBox
 ---@field saveItem omichat.UserModData
 ---@field nicknameEntry omi.ui.TextEntry
 ---@field usernameEntry omi.ui.TextEntry
----@field nameColorEntry omi.ui.ColorEntry
 ---@field iconEntry omi.ui.TextEntry
 ---@field currentLangEntry omi.ui.TextEntry
 ---@field languageEntry omi.ui.TextEntry
@@ -66,6 +65,7 @@ local function createField(self, cls, y, labelText, default)
             h = LABEL_H,
             text = default,
             font = FIELD_FONT,
+            textColorDisabled = { r = 1, g = 1, b = 1, a = 1 },
         }
     elseif cls == ColorEntry then
         entry = ColorEntry:new {
@@ -117,7 +117,6 @@ function ModDataEditor:canSubmit()
     local fields = {
         self.usernameEntry,
         self.nicknameEntry,
-        self.nameColorEntry,
         self.iconEntry,
         self.currentLangEntry,
         self.languageSlotsEntry,
@@ -185,9 +184,6 @@ function ModDataEditor:createChildren()
     y, self.nicknameEntry = createField(self, TextEntry, y + PAD_Y, text, item.nickname)
     self.nicknameEntry:setValidateFunction(self.nicknameEntry, API.validateNicknameText)
 
-    text = getText('UI_OmiChat_ModDataManager_Column_nameColor')
-    y, self.nameColorEntry = createField(self, ColorEntry, y + PAD_Y, text, utils.color.fromString(item.nameColor))
-
     text = getText('UI_OmiChat_ModDataManager_Column_icon')
     y, self.iconEntry = createField(self, TextEntry, y + PAD_Y, text, item.icon)
     self.iconEntry:setValidateFunction(self, self.validateIconText, self.iconEntry)
@@ -200,7 +196,7 @@ function ModDataEditor:createChildren()
     y, self.languageSlotsEntry = createField(self, TextEntry, y + PAD_Y, text, item.languageSlots)
     self.languageSlotsEntry:setOnlyNumbers(true)
     self.languageSlotsEntry:setMinValue(0)
-    self.languageSlotsEntry:setMaxValue(config:maxLanguageSlots())
+    self.languageSlotsEntry:setMaxValue(config.MAX_LANGUAGE_SLOTS)
 
     text = getText('UI_OmiChat_ModDataManager_Column_languages')
     y, self.languageListbox = createField(self, ISScrollingListBox, y + PAD_Y, text, item.languages)
@@ -329,7 +325,7 @@ function ModDataEditor:isLanguageValidForAdd(language)
         return false
     end
 
-    if self.item.languages and #self.item.languages >= config:maxLanguageSlots() then
+    if self.item.languages and #self.item.languages >= config.MAX_LANGUAGE_SLOTS then
         return false, getText('UI_OmiChat_Error_AddLanguageFull', self.item.username)
     end
 
@@ -414,7 +410,6 @@ function ModDataEditor:onSave()
     item.icon = icon
     item.currentLanguage = self:getEntryValue(self.currentLangEntry)
     item.languageSlots = slots and tonumber(slots)
-    item.nameColor = self:getEntryValue(self.nameColorEntry)
     item.nickname = self:getEntryValue(self.nicknameEntry)
     item.languages = self.item.languages
 

@@ -23,15 +23,10 @@ API.raw = {
     admin = processAdminChatMessage,
 }
 
-local vanillaStreamConfigs = require 'OmiChat/Definition/VanillaStreams'
-local customChatStreams = require 'OmiChat/Definition/CustomStreams'
-
 local utils = API.utils
-local config = API.config
-local Option = API.Option
+local config = API.Configuration
 local IconPicker = API.IconPicker
-local StreamInfo = API.StreamInfo
-local MultiMap = utils.lib.interpolate.MultiMap
+local MultiMap = utils.MultiMap
 
 
 local signLanguageEmotes = {
@@ -60,6 +55,17 @@ local signLanguageEmotes = {
 local echoTypes = {
     faction = 1,
     safehouse = 2,
+}
+local chatTypeTitleIDs = {
+    general = 'UI_chat_general_chat_title_id',
+    whisper = 'UI_chat_private_chat_title_id',
+    say = 'UI_chat_local_chat_title_id',
+    shout = 'UI_chat_local_chat_title_id',
+    faction = 'UI_chat_faction_chat_title_id',
+    safehouse = 'UI_chat_safehouse_chat_title_id',
+    radio = 'UI_chat_radio_chat_title_id',
+    admin = 'UI_chat_admin_chat_title_id',
+    server = 'UI_chat_server_chat_title_id',
 }
 
 local wasTyping = false
@@ -154,11 +160,11 @@ local function addOrRemoveIconComponents()
 end
 
 ---Builds send arguments for the given stream.
----@param args string | omichat.SendArgs
----@param streamIdentifier string
+---@param args string | omichat.SendArgsPartial
+---@param streamName string
 ---@return omichat.SendArgs?
-local function transformSendArgs(args, streamIdentifier)
-    local stream = API.getChatStreamByIdentifier(streamIdentifier)
+local function transformSendArgs(args, streamName)
+    local stream = API.getChatStreamByName(streamName)
     if not stream then
         return
     end
@@ -174,7 +180,7 @@ local function transformSendArgs(args, streamIdentifier)
         return
     end
 
-    args = utils.copy(args)
+    args = utils.copy(args) ---@cast args omichat.SendArgs
     args.stream = stream
 
     return args
@@ -190,149 +196,181 @@ local function tryApplyBuff()
 
     local now = getTimestampMs()
     local lastBuff = modData and tonumber(modData.ocLastBuff)
-    if lastBuff and (now - lastBuff) / 60000 < Option.BuffCooldown then
+    local buffConfig = config.Buffs
+    if lastBuff and (now - lastBuff) / 60000 < buffConfig.Cooldown then
         return
     end
 
     local stats = player:getStats()
     local bodyDamage = player:getBodyDamage()
-    local cigaretteStressReduction = Option.BuffReduceCigaretteStress * stats:getMaxStressFromCigarettes()
+    local cigaretteStressReduction = buffConfig.CigaretteStress * stats:getMaxStressFromCigarettes()
 
-    stats:setHunger(stats:getHunger() - Option.BuffReduceHunger)
-    stats:setThirst(stats:getThirst() - Option.BuffReduceThirst)
-    stats:setFatigue(stats:getFatigue() - Option.BuffReduceFatigue)
+    stats:setHunger(stats:getHunger() - buffConfig.Hunger)
+    stats:setThirst(stats:getThirst() - buffConfig.Thirst)
+    stats:setFatigue(stats:getFatigue() - buffConfig.Fatigue)
     stats:setStressFromCigarettes(stats:getStressFromCigarettes() - cigaretteStressReduction)
-    bodyDamage:setBoredomLevel(bodyDamage:getBoredomLevel() - Option.BuffReduceBoredom * 100)
-    bodyDamage:setUnhappynessLevel(bodyDamage:getUnhappynessLevel() - Option.BuffReduceUnhappiness * 100)
+    bodyDamage:setBoredomLevel(bodyDamage:getBoredomLevel() - buffConfig.Boredom * 100)
+    bodyDamage:setUnhappynessLevel(bodyDamage:getUnhappynessLevel() - buffConfig.Unhappiness * 100)
     modData.ocLastBuff = now
 end
 
----Updates stream aliases.
-local function updateAliases()
-    -- clear all aliases
-    local i = 1
-    local numStreams = #ISChat.allChatStreams
-    local numCommands = #API._commandStreams
-    while i <= numStreams + numCommands do
-        local stream
-        if i <= numStreams then
-            stream = ISChat.allChatStreams[i]
-        else
-            stream = API._commandStreams[i - numStreams]
-        end
-
-        if stream and stream.omichat and stream.omichat.aliases then
-            table.wipe(stream.omichat.aliases)
-        end
-
-        i = i + 1
-    end
-
-    -- update aliases
-    local configuredAliases = utils.interpolateRaw(Option.FormatAliases, {})
-
-    ---@cast configuredAliases omi.interpolate.MultiMap
-    if not utils.isinstance(configuredAliases, MultiMap) then
-        return
-    end
-
-    local allAliases = {}
-    for alias, identifier in configuredAliases:pairs() do
-        alias = tostring(alias)
-        identifier = tostring(identifier)
-        if not allAliases[identifier] then
-            allAliases[identifier] = {}
-        end
-
-        local list = allAliases[identifier]
-        list[tostring(alias)] = true
-    end
-
-    for ident, tab in pairs(allAliases) do
-        local info = API.getChatStreamByIdentifier(ident)
-        local stream = info and info:getStream()
-        if stream then
-            if not stream.omichat then
-                stream.omichat = {}
-            end
-
-            if not stream.omichat.aliases then
-                stream.omichat.aliases = {}
-            end
-
-            local aliases = stream.omichat.aliases
-            for k in pairs(tab) do
-                aliases[#aliases + 1] = concat { '/', k, ' ' }
-            end
-        end
-    end
-end
-
----Creates or updates built-in formatters.
+---Creates or updates metadata formatters.
 local function updateFormatters()
+    config:updateFormatters()
+
+    table.wipe(API._metadataFormatters)
     for info in config:formatters() do
-        local name = info.name
-        local optName = config:getOverheadFormatOption(name) or info.overheadFormatOpt
-        local fmt = optName and Option[optName] or '$1'
-        if API._formatters[name] then
-            API._formatters[name]:setFormatString(fmt)
-        else
-            API._formatters[name] = API.MetaFormatter:new(info.formatID, { format = fmt })
+        API._metadataFormatters[info.name] = info.formatter
+    end
+
+    local cmdConfig = config.Commands
+    local commandsToUpdate = {
+        { API._cardCommand, cmdConfig.Card.OverheadFormat, cmdConfig.Card.Tags },
+        { API._flipCommand, cmdConfig.Flip.OverheadFormat, cmdConfig.Flip.Tags },
+        { API._rollCommand, cmdConfig.Roll.OverheadFormat, cmdConfig.Roll.Tags },
+    }
+
+    for i = 1, #commandsToUpdate do
+        local info = commandsToUpdate[i]
+        local stream = info[1]
+        local formatter = stream:getFormatter()
+
+        stream:setTags(info[3])
+        if formatter then
+            formatter:setFormatString(info[2])
         end
     end
 end
 
----Updates streams based on sandbox options.
+---Updates streams based on configuration options.
 local function updateStreams()
-    local vanillaWhisper
-    local exists = {}
+    -- collect existing stream formatters
+    local existingFormatters = {} ---@type table<string, omichat.MetaFormatter>
+    for stream in API.chatStreams() do
+        existingFormatters[stream:getName()] = stream:getFormatter()
+    end
 
-    for i = 1, #ISChat.allChatStreams do
-        local stream = ISChat.allChatStreams[i]
-        if stream.omichat then
-            local data = config:getCustomStreamInfo(stream.name)
-            if stream.name == 'private' then
-                vanillaWhisper = stream
-            elseif stream.name == 'whisper' then
-                if stream.omichat.isLocalWhisper then
-                    ---@cast data omichat.CustomStreamInfo
-                    exists[data.name] = stream
+    -- create stream objects
+    local seen = {}
+    local streams = {} ---@type omichat.ChatStream[]
+    local toCreate = {} ---@type omichat.ChatStream[]
+    local toCreateIDs = {} ---@type integer[]
+
+    local needsRecycle = false
+    local nextID = config.MIN_CHAT_ID
+
+    for def in config:chatStreams() do
+        local stream = API.ChatStream.fromDefinition(def, config.Streams.GlobalTags)
+        if stream and not seen[stream:getName()] then
+            local name = stream:getName()
+
+            seen[name] = true
+            streams[#streams + 1] = stream
+
+            local formatter = existingFormatters[name]
+            if formatter then
+                local id = formatter:getID()
+
+                -- if the stream order has changed, we need to recycle
+                if id ~= nextID then
+                    needsRecycle = true
                 else
-                    vanillaWhisper = stream
+                    formatter:setFormatString(stream:getOverheadFormat())
+                    stream:setFormatter(formatter)
                 end
-            elseif data then
-                exists[data.name] = stream
+            else
+                toCreate[#toCreate + 1] = stream
+                toCreateIDs[#toCreateIDs + 1] = nextID
             end
-        elseif stream.name == 'whisper' then
-            vanillaWhisper = stream
-            vanillaWhisper.omichat = vanillaStreamConfigs.private
-        elseif vanillaStreamConfigs[stream.name] then
-            stream.omichat = vanillaStreamConfigs[stream.name]
+
+            nextID = nextID + 1
+            if #streams == config.MAX_CHAT_STREAMS then
+                break
+            end
         end
     end
 
-    for data in config:chatStreams() do
-        local stream = customChatStreams[data.name]
-        if not exists[data.name] and stream then
-            API.addStreamBefore(stream, vanillaWhisper)
+    -- streams IDs must increase in order so players' streams all match
+    -- if that's not the case, "recycle" — reallocate all stream formatters and clear old messages
+    if needsRecycle then
+        utils.log.info('Recycling chat streams')
+
+        toCreate = streams  -- update all streams' formatters
+        API.clearMessages() -- clear so old messages don't use the wrong format
+
+        for i = 1, #toCreate do
+            toCreateIDs[i] = config.MIN_CHAT_ID + i - 1
         end
     end
 
-    if not vanillaWhisper then
+    -- create and save formatters
+    for i = 1, #toCreate do
+        local stream = toCreate[i]
+        local id = toCreateIDs[i]
+
+        local formatter = API._chatFormatters[id]
+        if not formatter then
+            formatter = API.MetaFormatter:new(id)
+            API._chatFormatters[id] = formatter
+        end
+
+        formatter:setFormatString(stream:getOverheadFormat())
+        stream:setFormatter(formatter)
+    end
+
+    -- clear chat tables
+    table.wipe(ISChat.allChatStreams)
+    table.wipe(ISChat.defaultTabStream)
+
+    local tabs = ISChat.instance and ISChat.instance.tabs or {}
+    for i = 1, #tabs do
+        table.wipe(tabs[i].chatStreams)
+    end
+
+    -- populate chat tables
+    local defaultTabStreams = ISChat.defaultTabStream
+    for i = 1, #streams do
+        local stream = streams[i]
+        local tabID = stream:getTabID()
+
+        ISChat.allChatStreams[#ISChat.allChatStreams + 1] = stream
+        if not defaultTabStreams[tabID] then
+            defaultTabStreams[tabID] = stream
+        end
+
+        local tab = tabs[tabID]
+        if tab then
+            tab.chatStreams[#tab.chatStreams + 1] = stream
+        end
+    end
+
+    -- update special stream types
+    local special = {
+        { API._discordStream, config.Discord },
+        { API._radioStream, config.Radio },
+        { API._serverStream, config.ServerMessages },
+    }
+
+    for i = 1, #special do
+        local info = special[i]
+        local stream = info[1]
+        local streamConfig = info[2]
+
+        stream:setChatFormat(streamConfig.ChatFormat)
+        stream:setDefaultColor(streamConfig.DefaultColor)
+        stream:setTags(streamConfig.Tags)
+    end
+
+    -- cycle if current stream is now unavailable
+    local instance = ISChat.instance
+    local chatText = instance and instance.chatText
+    if not chatText then
         return
     end
 
-    local useLocalWhisper = API.isCustomStreamEnabled('whisper')
-    if useLocalWhisper and vanillaWhisper.name == 'whisper' then
-        -- modify /whisper to be /pm
-        vanillaWhisper.name = 'private'
-        vanillaWhisper.command = '/pm '
-        vanillaWhisper.shortCommand = '/pm '
-    elseif not useLocalWhisper and vanillaWhisper.name == 'private' then
-        -- revert /pm to /whisper
-        vanillaWhisper.name = 'whisper'
-        vanillaWhisper.command = '/whisper '
-        vanillaWhisper.shortCommand = '/w '
+    local lastStream = API.chatCommandToStream(chatText.lastChatCommand)
+    if lastStream and not lastStream:checkPlayerCanUse() then
+        chatText.lastChatCommand = API.cycleStream()
     end
 end
 
@@ -347,67 +385,80 @@ end
 
 ---Determines stream information given a chat command.
 ---@param command string The input text.
----@param includeCommands boolean? If true, commands should be included. Defaults to true.
----@param enabledOnly boolean? If true, only enabled streams will be returned. Defaults to false.
----@return omichat.StreamInfo? #Information about the stream.
+---@param options omichat.Args.ChatCommandToStream? Options for retrieving the stream.
+---@return omichat.Stream? stream
 ---@return string #The text following the command in the input.
 ---@return string? #The command or short command that was used.
----@return omichat.StreamInfo? #Information about the disabled stream.
-function API.chatCommandToStream(command, includeCommands, enabledOnly)
+---@return omichat.Stream? #Information about the disabled stream.
+function API.chatCommandToStream(command, options)
     if not command or command == '' then
         return nil, ''
     end
 
-    if includeCommands == nil then
-        includeCommands = true
-    end
+    options = options or {}
+    local enabledOnly = options.enabledOnly
 
     local disabledCommand
-    local streamInfo
+    local foundStream
     local chatCommand
+    local remainder
 
-    local i = 1
-    local numStreams = #ISChat.allChatStreams
-    local numCommands = #API._commandStreams
-    while i <= numStreams + numCommands do
-        local stream, checkCommand
-        if i <= numStreams then
-            stream = ISChat.allChatStreams[i]
-        else
-            if not includeCommands then
-                break
-            end
+    local iterator
+    if options.commandsOnly then
+        iterator = API.commandStreams()
+    elseif options.chatsOnly then
+        iterator = API.chatStreams()
+    else
+        iterator = API.streams()
+    end
 
-            stream = API._commandStreams[i - numStreams]
-        end
-
-        local info = StreamInfo:new(stream)
-        chatCommand, checkCommand = info:checkMatch(command)
-        if chatCommand and (not enabledOnly or info:isEnabled()) then
-            streamInfo = info
-            command = checkCommand
+    for stream in iterator do
+        chatCommand, remainder = stream:checkMatch(command)
+        if chatCommand and (not enabledOnly or stream:isEnabled()) then
+            foundStream = stream
+            command = remainder
             disabledCommand = nil
             break
         elseif chatCommand then
-            disabledCommand = info
+            disabledCommand = stream
         end
-
-        i = i + 1
     end
 
-    return streamInfo, command, chatCommand, disabledCommand
+    return foundStream, command, chatCommand, disabledCommand
 end
 
 ---Retrieves a stream name given a chat command.
 ---@param command string A chat stream's command, with the leading slash.
----@param includeCommands boolean? If true, commands should be included.
----@param enabledOnly boolean? If true, only enabled streams will be returned. Defaults to false.
+---@param options omichat.Args.ChatCommandToStream? Options for retrieving the stream.
 ---@return string? #The name of the chat stream, or `nil` if not found.
-function API.chatCommandToStreamName(command, includeCommands, enabledOnly)
-    local stream = API.chatCommandToStream(command, includeCommands, enabledOnly)
+function API.chatCommandToStreamName(command, options)
+    local stream = API.chatCommandToStream(command, options)
     if stream then
         return stream:getName()
     end
+end
+
+---Returns an iterator over chat streams.
+---@return fun(): omichat.ChatStream?
+function API.chatStreams()
+    local i = 0
+    return function()
+        while i < #ISChat.allChatStreams do
+            i = i + 1
+            local stream = ISChat.allChatStreams[i]
+            if stream and utils.isinstance(stream, API.ChatStream) then
+                ---@cast stream omichat.ChatStream
+                return stream
+            end
+        end
+    end
+end
+
+---Returns the associated title ID for a chat type.
+---@param chatType omichat.ChatTypeString
+---@return string
+function API.chatTypeToTitleID(chatType)
+    return chatTypeTitleIDs[chatType]
 end
 
 ---Clears all of the current chat messages.
@@ -426,6 +477,18 @@ function API.clearMessages()
     end
 end
 
+---Returns an iterator over command streams.
+---@return fun(): omichat.CommandStream?
+function API.commandStreams()
+    local i = 0
+    return function()
+        while i < #API._commandStreams do
+            i = i + 1
+            return API._commandStreams[i]
+        end
+    end
+end
+
 ---Cycles to the next chat stream.
 ---This is used with onSwitchStream.
 ---@param target string? The name of a target stream to switch to instead of the next stream.
@@ -440,17 +503,13 @@ function API.cycleStream(target)
     for _ = 0, #chatStreams do
         streamID = streamID % #chatStreams + 1
         local stream = chatStreams[streamID]
-
-        if not target or stream.name == target then
-            if stream.omichat then
-                local info = StreamInfo:new(stream)
-                if info:isEnabled() then
+        if utils.isinstance(stream, API.ChatStream) then
+            ---@cast stream omichat.ChatStream
+            if not target or stream:getName() == target then
+                if stream:checkPlayerCanUse() then
                     targetID = streamID
                     break
                 end
-            elseif checkPlayerCanUseChat(stream.command) then
-                targetID = streamID
-                break
             end
         end
     end
@@ -459,70 +518,93 @@ function API.cycleStream(target)
         curChatText.streamID = targetID
     end
 
-    return curChatText.chatStreams[curChatText.streamID].command
-end
-
----Retrieves a stream given its identifier.
----@param identifier string
----@return omichat.StreamInfo?
-function API.getChatStreamByIdentifier(identifier)
-    for i = 1, #ISChat.allChatStreams do
-        local stream = ISChat.allChatStreams[i]
-        local id = stream.omichat and stream.omichat.streamIdentifier
-        if not id then
-            id = stream.name
-        end
-
-        if id == identifier then
-            return StreamInfo:new(stream)
-        end
+    local curStream = curChatText.chatStreams[curChatText.streamID]
+    if utils.isinstance(curStream, API.ChatStream) then
+        ---@cast curStream omichat.ChatStream
+        return curStream:getCommand()
+    else
+        ---@cast curStream omichat.StreamTable
+        return curStream.command
     end
 end
 
----Gets the command associated with a color category.
----@param cat omichat.ColorCategory
----@return string
-function API.getColorCategoryCommand(cat)
-    if cat == 'private' then
-        return API.isCustomStreamEnabled('whisper') and '/pm' or '/whisper'
+---Retrieves a chat stream given its name.
+---@param name string
+---@param options omichat.Args.StreamRetrieval?
+---@return omichat.ChatStream?
+function API.getChatStreamByName(name, options)
+    if name == 'server' then
+        return API._serverStream
+    elseif name == 'radio' then
+        return API._radioStream
+    elseif name == 'discord' then
+        return API._discordStream
     end
 
-    if cat == 'general' then
-        return '/all'
+    options = options or {}
+    for stream in API.chatStreams() do
+        if name == stream:getName() and (not options.enabledOnly or stream:isEnabled()) then
+            return stream
+        end
+    end
+end
+
+---Returns enabled chat streams with the given tag.
+---@param tag string
+---@param excludeTags string[]?
+---@return omichat.ChatStream[]
+function API.getChatStreamsWithTag(tag, excludeTags)
+    return API.getChatStreamsWithTags({ tag }, excludeTags)
+end
+
+---Returns enabled chat streams with the given tags.
+---@param tags string[]
+---@param excludeTags string[]?
+---@return omichat.ChatStream[]
+function API.getChatStreamsWithTags(tags, excludeTags)
+    excludeTags = excludeTags or {}
+    local streams = {}
+
+    for stream in API.chatStreams() do
+        if stream:isEnabled() and not stream:hasAnyTags(excludeTags) and stream:hasTags(tags) then
+            streams[#streams + 1] = stream
+        end
     end
 
-    if cat == 'shout' then
-        return '/yell'
-    end
+    return streams
+end
 
-    return '/' .. cat
+---Returns enabled chat streams without the given tag.
+---@param excludeTag string
+---@return omichat.ChatStream[]
+function API.getChatStreamsWithoutTag(excludeTag)
+    return API.getChatStreamsWithTags({}, { excludeTag })
+end
+
+---Returns enabled chat streams without the given tags.
+---@param excludeTags string[]
+---@return omichat.ChatStream[]
+function API.getChatStreamsWithoutTags(excludeTags)
+    return API.getChatStreamsWithTags({}, excludeTags)
 end
 
 ---Determines the color options that should be enabled based on the server configuration.
 ---@param all boolean? If given, all possible color options will be returned instead.
----@return omichat.ColorCategory[]
+---@return string[]
 function API.getColorOptions(all)
     local colorOpts = {}
-    local canUsePM = checkPlayerCanUseChat('/w')
-    local useLocalWhisper = API.isCustomStreamEnabled('whisper')
 
-    if all or Option.EnableSetNameColor then
-        colorOpts[#colorOpts + 1] = 'name'
-    end
-
-    if all or Option.EnableSetSpeechColor then
-        colorOpts[#colorOpts + 1] = 'speech'
-    end
-
+    colorOpts[#colorOpts + 1] = 'speech'
     colorOpts[#colorOpts + 1] = 'server'
 
-    if all or Option:showDiscordColorOption() then
-        colorOpts[#colorOpts + 1] = 'discord'
-    end
-
     if all then
+        colorOpts[#colorOpts + 1] = 'discord'
         colorOpts[#colorOpts + 1] = 'radio'
     else
+        if config:canShowDiscordColorOption() then
+            colorOpts[#colorOpts + 1] = 'discord'
+        end
+
         -- need to check the option because checkPlayerCanUseChat checks for a radio item
         local allowedStreams = getServerOptions():getOption('ChatStreams'):split(',')
         for i = 1, #allowedStreams do
@@ -533,56 +615,54 @@ function API.getColorOptions(all)
         end
     end
 
-    if all or checkPlayerCanUseChat('/a') then
-        colorOpts[#colorOpts + 1] = 'admin'
-    end
-
-    if all or checkPlayerCanUseChat('/all') then
-        colorOpts[#colorOpts + 1] = 'general'
-    end
-
-    if all or checkPlayerCanUseChat('/f') then
-        colorOpts[#colorOpts + 1] = 'faction'
-    end
-
-    if all or checkPlayerCanUseChat('/sh') then
-        colorOpts[#colorOpts + 1] = 'safehouse'
-    end
-
-    if all or (useLocalWhisper and canUsePM) then
-        colorOpts[#colorOpts + 1] = 'private' -- /pm
-    end
-
-    if all or checkPlayerCanUseChat('/s') then
-        colorOpts[#colorOpts + 1] = 'say'
-    end
-
-    if all or checkPlayerCanUseChat('/y') then
-        colorOpts[#colorOpts + 1] = 'shout'
-    end
-
-    if not all and (not useLocalWhisper and canUsePM) then
-        colorOpts[#colorOpts + 1] = 'private' -- /whisper
-    end
-
-    for info in config:chatStreams() do
-        local name = info.name
-        if info.autoColorOption ~= false and (all or API.isCustomStreamEnabled(name)) then
-            colorOpts[#colorOpts + 1] = name
+    for stream in API.chatStreams() do
+        if all or stream:checkPlayerCanUse() then
+            colorOpts[#colorOpts + 1] = stream:getName()
         end
     end
 
     return colorOpts
 end
 
+---Retrieves a command stream given its name.
+---@param name string
+---@return omichat.CommandStream?
+function API.getCommandStreamByName(name)
+    for i = 1, #API._commandStreams do
+        local stream = API._commandStreams[i]
+        if stream:getName() == name then
+            return stream
+        end
+    end
+end
+
 ---Returns information about the default stream for a given tab ID.
 ---@param tabID integer
----@return omichat.StreamInfo?
+---@return omichat.ChatStream?
 function API.getDefaultTabStream(tabID)
     local default = ISChat.defaultTabStream[tabID]
-    if default then
-        return StreamInfo:new(default)
+    if default and utils.isinstance(default, API.ChatStream) then
+        return default
     end
+end
+
+---Gets a special stream intended to represent Discord messages.
+---This stream should not be used for sending messages.
+function API.getDiscordStream()
+    return API._discordStream
+end
+
+---Gets the display command associated with a stream.
+---If the stream does not exist, this defaults to prefixing a forward slash.
+---@param streamName string
+---@return string
+function API.getDisplayCommand(streamName)
+    local stream = API.getChatStreamByName(streamName)
+    if stream then
+        return stream:getCommand()
+    end
+
+    return '/' .. streamName
 end
 
 ---Returns a playable emote given an emote name.
@@ -621,6 +701,41 @@ function API.getEmoteFromCommand(text)
     end
 end
 
+---Returns the first enabled chat stream with the given tag.
+---@param tag string
+---@param excludeTags string[]?
+---@return omichat.ChatStream?
+function API.getFirstChatStreamWithTag(tag, excludeTags)
+    return API.getFirstChatStreamWithTags({ tag }, excludeTags)
+end
+
+---Returns the first enabled chat stream with the given tags.
+---@param tags string[]
+---@param excludeTags string[]?
+---@return omichat.ChatStream?
+function API.getFirstChatStreamWithTags(tags, excludeTags)
+    excludeTags = excludeTags or {}
+    for stream in API.chatStreams() do
+        if stream:isEnabled() and not stream:hasAnyTags(excludeTags) and stream:hasTags(tags) then
+            return stream
+        end
+    end
+end
+
+---Returns the first enabled chat stream without the given tag.
+---@param excludeTag string
+---@return omichat.ChatStream?
+function API.getFirstChatStreamWithoutTag(excludeTag)
+    return API.getFirstChatStreamWithTags({}, { excludeTag })
+end
+
+---Returns the first enabled chat stream without the given tags.
+---@param excludeTags string[]
+---@return omichat.ChatStream?
+function API.getFirstChatStreamWithoutTags(excludeTags)
+    return API.getFirstChatStreamWithTags({}, excludeTags)
+end
+
 ---Gets the text that should display when clicking the info button.
 ---@param player IsoPlayer? The player to use to populate token values. If `nil`, this will be player 1.
 ---@return string
@@ -637,7 +752,7 @@ function API.getInfoRichText(player)
 
     local name = API.getPlayerNameInChat(player, 'say')
     tokens.name = name and utils.escapeRichText(name) or ''
-    return utils.interpolate(Option.FormatInfo, tokens, player:getUsername())
+    return utils.interpolate(config.General.InfoText, tokens, player:getUsername())
 end
 
 ---Returns the current leftmost button.
@@ -651,6 +766,18 @@ function API.getLeftmostButton()
     if instance then
         return instance.gearButton
     end
+end
+
+---Gets a special stream intended to represent radio messages.
+---This stream should not be used for sending messages.
+function API.getRadioStream()
+    return API._radioStream
+end
+
+---Gets a special stream intended to represent server messages.
+---This stream should not be used for sending messages.
+function API.getServerStream()
+    return API._serverStream
 end
 
 ---Returns the list of custom setting handlers for a given category.
@@ -669,6 +796,17 @@ function API.getSignLanguageEmote(text)
     rand:seed(utils.trim(text:lower()))
 
     return signLanguageEmotes[rand:random(1, #signLanguageEmotes)]
+end
+
+---Retrieves a chat or command stream given its name.
+---@param name string
+---@return omichat.Stream?
+function API.getStreamByName(name)
+    for stream in API.streams() do
+        if name == stream:getName() then
+            return stream
+        end
+    end
 end
 
 ---Retrieves the search callback for an argument type.
@@ -717,7 +855,7 @@ function API.getTypingDisplay(maxWidth)
     local txtMgr = getTextManager()
 
     if display and maxWidth and txtMgr:MeasureStringX(UIFont.Small, display) > maxWidth then
-        display = utils.interpolate(Option.FormatTyping, { alt = true })
+        display = utils.interpolate(config.TypingIndicator.Format, { alt = true })
     end
 
     return display
@@ -747,16 +885,17 @@ function API.redrawMessages(doScroll)
 
         local start = 1 + max(0, #messages - ISChat.maxLine - 1)
         for j = start, #messages do
-            local text = messages[j]:getTextWithPrefix()
+            local message = messages[j]
+            local text = message:getTextWithPrefix()
 
-            newText[#newText + 1] = text
-            newText[#newText + 1] = ' <LINE> '
-            newLines[#newLines + 1] = text .. ' <LINE> '
+            if message:isShowInChat() then
+                newText[#newText + 1] = text
+                newLines[#newLines + 1] = text .. ' <LINE> '
+            end
         end
 
-        newText[#newText] = nil
         chatText.chatTextLines = newLines
-        chatText.text = concat(newText)
+        chatText.text = concat(newText, ' <LINE> ')
 
         chatText:paginate()
     end
@@ -795,22 +934,14 @@ end
 ---@param args omichat.SendArgs?
 ---@return string?
 function API.send(args)
-    if not args then
+    local stream = args and args.stream
+    if not args or not stream or not utils.isinstance(stream, API.ChatStream) then
         return
     end
+
+    ---@cast stream omichat.ChatStream
 
     local text = utils.trim(args.text or '')
-    if #text == 0 then
-        return
-    end
-
-    local stream = args.stream
-    if not stream then
-        stream = API.getChatStreamByIdentifier('say')
-        if not stream then
-            return
-        end
-    end
 
     local prefix = ''
     local chatType = stream:getChatType()
@@ -830,6 +961,10 @@ function API.send(args)
         text = m2
     end
 
+    if #text == 0 then
+        return
+    end
+
     local language
     local currentLanguage = API.getCurrentRoleplayLanguage()
     if currentLanguage and currentLanguage ~= API.getDefaultRoleplayLanguage() then
@@ -841,12 +976,13 @@ function API.send(args)
         text = text,
         language = language,
         chatType = chatType,
-        icon = args.icon,
         echoType = args.echoType,
-        stream = args.streamName or stream:getIdentifier(),
-        formatterName = args.formatterName or stream:getFormatterName(),
+        stream = stream,
+        formatStream = args.formatStream,
+        formatter = args.formatter,
         playSignedEmote = args.playSignedEmote,
         tokens = args.tokens,
+        extraTags = args.extraTags,
     }
 
     text = formatResult.text
@@ -864,7 +1000,7 @@ function API.send(args)
         processResult = process(prefix .. text)
         if processResult and chatType == 'whisper' and API.getRetainCommand(stream:getCommandType()) then
             local chatText = ISChat.instance.chatText
-            chatText.lastChatCommand = concat { chatText.lastChatCommand, tostring(processResult), ' ' }
+            chatText.lastChatCommand = chatText.lastChatCommand .. tostring(processResult) .. ' '
         end
     end
 
@@ -876,27 +1012,15 @@ function API.send(args)
         end
     end
 
-    local username = utils.getPlayerUsername()
-    local tokens = args.tokens and utils.copy(args.tokens) or {}
-    tokens.chatType = chatType
-    tokens.input = initialText
-    tokens.username = username
-    tokens.name = API.getNameInChat(username, chatType)
-    tokens.stream = stream:getIdentifier()
-
-    if utils.testPredicate(Option.PredicateApplyBuff, tokens) then
+    if config.Buffs.Enable and stream:isAllowBuffs() then
         tryApplyBuff()
     end
 
     local echoType = echoTypes[chatType]
-    if Option.ChatFormatEcho ~= '' and echoType then
-        local echoStream = API.getChatStreamByIdentifier('low')
-        if not echoStream or not echoStream:isEnabled() then
-            echoStream = API.getChatStreamByIdentifier('say')
-
-            if not echoStream or not echoStream:isEnabled() then
-                return processResult
-            end
+    if config.EchoMessages.Enable and echoType then
+        local echoStream = API.getFirstChatStreamWithTag('EchoTarget')
+        if not echoStream or echoTypes[echoStream:getChatType()] or not echoStream:isEnabled() then
+            return processResult
         end
 
         local useCallback = echoStream:getUseCallback() or API.send
@@ -904,7 +1028,8 @@ function API.send(args)
             echoType = echoType,
             stream = echoStream,
             text = initialText,
-            icon = args.icon,
+            formatter = API._metadataFormatters.echo,
+            extraTags = config.EchoMessages.Tags,
         }
     end
 
@@ -912,46 +1037,46 @@ function API.send(args)
 end
 
 ---Sends an /admin message, formatted according to configuration.
----@param args string | omichat.SendArgs
+---@param args string | omichat.SendArgsPartial
 function API.sendAdmin(args)
     API.send(transformSendArgs(args, 'admin'))
 end
 
 ---Sends a /faction message, formatted according to configuration.
----@param args string | omichat.SendArgs
+---@param args string | omichat.SendArgsPartial
 function API.sendFaction(args)
     API.send(transformSendArgs(args, 'faction'))
 end
 
 ---Sends an /all message, formatted according to configuration.
----@param args string | omichat.SendArgs
+---@param args string | omichat.SendArgsPartial
 function API.sendGeneral(args)
     API.send(transformSendArgs(args, 'general'))
 end
 
 ---Sends a /pm message, formatted according to configuration.
----@param args string | omichat.SendArgs
+---@param args string | omichat.SendArgsPartial
 ---@return string
 function API.sendPM(args)
     return API.send(transformSendArgs(args, 'private')) or ''
 end
 
 ---Sends a /safehouse message, formatted according to configuration.
----@param args string | omichat.SendArgs
+---@param args string | omichat.SendArgsPartial
 function API.sendSafehouse(args)
     API.send(transformSendArgs(args, 'safehouse'))
 end
 
 ---Sends a /say message, formatted according to configuration.
----@param args string | omichat.SendArgs
+---@param args string | omichat.SendArgsPartial
 function API.sendSay(args)
     API.send(transformSendArgs(args, 'say'))
 end
 
 ---Sends a /yell message, formatted according to configuration.
----@param args string | omichat.SendArgs
+---@param args string | omichat.SendArgsPartial
 function API.sendShout(args)
-    API.send(transformSendArgs(args, 'shout'))
+    API.send(transformSendArgs(args, 'yell'))
 end
 
 ---Sets whether the icon picker button is enabled.
@@ -986,6 +1111,31 @@ end
 ---@param isTyping boolean
 function API.setTyping(isTyping)
     API._isTyping = isTyping
+end
+
+---Returns an iterator over chat and command streams.
+---@return fun(): omichat.Stream?
+function API.streams()
+    local i = 0
+    local numStreams = #ISChat.allChatStreams
+    local numCommands = #API._commandStreams
+
+    return function()
+        while i <= numStreams + numCommands do
+            i = i + 1
+            local stream
+            if i <= numStreams then
+                stream = ISChat.allChatStreams[i]
+            else
+                stream = API._commandStreams[i - numStreams]
+            end
+
+            if utils.isinstance(stream, API.Stream) then
+                ---@cast stream omichat.Stream
+                return stream
+            end
+        end
+    end
 end
 
 ---Updates the positions of custom buttons.
@@ -1030,7 +1180,7 @@ function API.updateChatPanelSize()
     instance.tabCnt = oldTabCnt
 
     local height = size.height
-    if Option.PredicateShowTypingIndicator ~= '' and API.getShowTyping() then
+    if config.TypingIndicator.Enable and API.getShowTyping() then
         height = height - instance.typingFontHgt - 4
     end
 
@@ -1051,11 +1201,12 @@ function API.updateChatVisibility()
     end
 
     local closeBtn = ISChat.instance.closeButton
-    if closeBtn and closeBtn:isVisible() == Option.EnableAlwaysShowChat then
-        closeBtn:setVisible(not Option.EnableAlwaysShowChat)
+    local alwaysShowChat = config.General.AlwaysShowChat
+    if closeBtn and closeBtn:isVisible() == alwaysShowChat then
+        closeBtn:setVisible(not alwaysShowChat)
     end
 
-    if Option.EnableAlwaysShowChat then
+    if alwaysShowChat then
         ISChat.instance:setVisible(true)
     end
 end
@@ -1089,8 +1240,7 @@ function API.updateIconComponents(text)
         stream = API.getDefaultTabStream(instance.currentTabID)
     end
 
-    local enable = stream and stream:isAllowIconPicker() or false
-    API.setIconButtonEnabled(enable)
+    API.setIconButtonEnabled(false)
 end
 
 ---Updates the info text to the configured value.
@@ -1107,14 +1257,14 @@ end
 ---Updates state to match sandbox variables.
 ---@param redraw boolean? If true, chat messages will be redrawn.
 function API.updateState(redraw)
+    updateFormatters()
+    updateStreams()
+
     if not ISChat.instance then
         return
     end
 
     API.getPlayerPreferences()
-    updateStreams()
-    updateFormatters()
-    updateAliases()
     addOrRemoveIconComponents()
     API.updateChatPanelSize()
     API.updateInfoText()
@@ -1169,7 +1319,7 @@ end
 
 ---Updates the display string for typing players based on the current typing information.
 function API.updateTypingDisplay()
-    if not API.getShowTyping() then
+    if not config.TypingIndicator.Enable or not API.getShowTyping() then
         API._typingDisplay = nil
         return
     end
@@ -1208,7 +1358,7 @@ function API.updateTypingDisplay()
         names = MultiMap:new(entries),
     }
 
-    local text = utils.interpolate(Option.FormatTyping, tokens) ---@type string?
+    local text = utils.interpolate(config.TypingIndicator.Format, tokens) ---@type string?
     if text == '' then
         text = nil
     end
@@ -1246,27 +1396,14 @@ function API.updateTypingStatus(skipTimer)
     if isTyping then
         local text = entry:getInternalText()
         local trimmed = text:trim()
-        local stream, command = API.chatCommandToStream(text, false, true)
+        local stream = API.chatCommandToStream(text, { chatsOnly = true, enabledOnly = true })
 
+        ---@cast stream omichat.ChatStream?
         if not stream and not utils.startsWith(trimmed, '/') then
-            stream = API.getDefaultTabStream(1)
-            command = trimmed
+            stream = API.getDefaultTabStream(instance.currentTabID)
         end
 
-        local tokens
-        if stream and #command:trim() > 0 and stream:isTabID(instance.currentTabID) then
-            chatType = stream:getChatType()
-            range = stream:getRange()
-            tokens = {
-                input = command,
-                range = range,
-                isRanged = range ~= nil,
-                chatType = chatType,
-                stream = stream:getIdentifier(),
-            }
-        end
-
-        if not tokens or not utils.testPredicate(Option.PredicateShowTypingIndicator, tokens) then
+        if not stream or not stream:isAllowTypingIndicator() then
             isTyping = false
         end
     end

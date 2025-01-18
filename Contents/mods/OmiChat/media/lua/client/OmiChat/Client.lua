@@ -19,6 +19,7 @@ Events.OnPlayerDeath.Add(API._onPlayerDeath)
 Events.OnServerCommand.Add(API._onServerCommand)
 Events.OnReceiveGlobalModData.Add(API._onReceiveGlobalModData)
 Events.OnTick.Add(API._onTickTemporary)
+API.Configuration:setOnSave(API._onConfigurationSave)
 
 
 require 'OmiChat/Override/Chat'

@@ -33,9 +33,9 @@ end
 ---@param input string
 ---@return omichat.SuggestSpec?
 local function getSuggestSpec(input)
-    local stream = API.chatCommandToStream(input, true, true)
+    local stream = API.chatCommandToStream(input, { enabledOnly = true })
     if stream then
-        return stream:suggestSpec()
+        return stream:getSuggestSpec()
     end
 
     local accessLevel = utils.getEffectiveAccessLevel()

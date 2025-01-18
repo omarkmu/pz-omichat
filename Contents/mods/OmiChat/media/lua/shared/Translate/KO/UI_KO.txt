@@ -16,6 +16,10 @@ UI_KO = {
     UI_OmiChat_Typing2 = "%1과/와 %2이/가 입력하고 있습니다...",
     UI_OmiChat_Typing3 = "%1, %2과/와 %3이/가 입력하고 있습니다...",
     UI_OmiChat_TypingMany = "여러 사람이 입력하고 있습니다...",
+    UI_OmiChat_FactionRadio = "(조직 라디오)",
+    UI_OmiChat_SafehouseRadio = "(은신처 라디오)",
+    UI_OmiChat_OverRadio = "(라디오)",
+    UI_OmiChat_AdminIndicator = "(관리자)",
 
     --[[ Info Messages ]]--
     UI_OmiChat_Info_SetNameEmpty = "이름이 설정되지 않았습니다. '/name Name'을 사용하세요.",
@@ -252,6 +256,7 @@ UI_KO = {
     UI_OmiChat_ContextManageProfiles = "프로필 관리",
     UI_OmiChat_ContextAdmin = "관리자",
     UI_OmiChat_ContextAdminManageModData = "데이터 관리",
+    UI_OmiChat_ContextAdminUpdateConfiguration = "설정",
     UI_OmiChat_ContextAdmin_ShowIcon = "관리자 아이콘 표시",
     UI_OmiChat_ContextAdmin_KnowAllLanguages = "모든 언어 이해",
     UI_OmiChat_ContextAdmin_IgnoreMessageRange = "메시지 범위 무시",
