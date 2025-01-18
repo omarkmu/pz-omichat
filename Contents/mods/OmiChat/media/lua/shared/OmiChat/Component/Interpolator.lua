@@ -16,6 +16,7 @@ local FUNCTION_MT = { __index = Interpolator._registeredFunctions }
 ---@return omichat.Interpolator
 function Interpolator:new(options)
     options = lib.copy(options)
+    options.caseSensitiveFunctions = lib.default(options.caseSensitiveFunctions, true)
     options.libraryExtra = lib.extend(lib.copy(options.libraryExtra or {}), Interpolator.Library)
 
     local this = BaseInterpolator.new(self, options)

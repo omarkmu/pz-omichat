@@ -255,7 +255,7 @@ end
 ---@param func function
 function API.registerInterpolatorFunction(name, func)
     ---@diagnostic disable-next-line: invisible
-    utils.Interpolator._registeredFunctions[name:lower()] = func
+    utils.Interpolator._registeredFunctions[name] = func
 end
 
 
