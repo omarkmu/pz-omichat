@@ -206,15 +206,15 @@ function Library.DefaultChatPrefix(interpolator, args)
 
     result[#result + 1] = interpolator:tokenString('tag')
 
-    if not tags.NoLanguage and not tags.NoLanguageChat then
-        result[#result + 1] = interpolator:tokenString('language')
-    end
-
     if not tags.NoVolumeIndicator and not tags.NoVolumeIndicatorChat then
         local volume = Helpers.getVolumeIndicator(options, tags, preset)
         if volume then
             result[#result + 1] = volume
         end
+    end
+
+    if not tags.NoLanguage and not tags.NoLanguageChat then
+        result[#result + 1] = interpolator:tokenString('language')
     end
 
     if tags.OverRadio then
@@ -678,17 +678,18 @@ function Library.DefaultOverheadPrefix(interpolator, args)
     local tags = readTags(interpolator)
     local result = {}
 
-    if not tags.NoLanguage and not tags.NoLanguageOverhead then
-        local language = interpolator:tokenString('languageRaw')
-        if language ~= '' then
-            result[#result + 1] = '[' .. language .. ']'
-        end
-    end
 
     if not tags.NoVolumeIndicator and not tags.NoVolumeIndicatorOverhead then
         local volume = Helpers.getVolumeIndicator(options, tags, preset)
         if volume then
             result[#result + 1] = volume
+        end
+    end
+
+    if not tags.NoLanguage and not tags.NoLanguageOverhead then
+        local language = interpolator:tokenString('languageRaw')
+        if language ~= '' then
+            result[#result + 1] = '[' .. language .. ']'
         end
     end
 
