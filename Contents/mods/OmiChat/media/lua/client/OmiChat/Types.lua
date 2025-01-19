@@ -48,8 +48,9 @@
 ---@field author string The username of the message author.
 ---@field zombieAttractRange integer? The range at which the message will be heard by zombies.
 ---@field tags omi.SimpleSet A set of tags to add to the message tokens.
----@field protected loudCallout boolean? Whether the stream is a non-sneak callout.
----@field protected sneakCallout boolean? Whether the stream is a sneak callout.
+---@field protected hidden boolean Whether the message has been hidden in chat and overhead.
+---@field protected loudCallout boolean Whether the message is a non-sneak callout.
+---@field protected sneakCallout boolean Whether the message is a sneak callout.
 ---@field protected datetime string A string representing the date and time the message was sent.
 ---@field protected options omichat.MessageInfo.FormatOptions Formatting options to apply to the message.
 ---@field protected skipLanguage boolean If `true`, language processing will skipped.

@@ -6,9 +6,11 @@ local MimicMessage = API.MimicMessage
 local MultiMap = utils.MultiMap
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
+local concat = table.concat
 local isempty = table.isempty
 local format = string.format
 local getTexture = getTexture
+local instanceof = instanceof
 
 
 ---@class omichat.MessageInfo : omi.Class
@@ -303,6 +305,24 @@ function MessageInfo:applyFormatting()
     return true
 end
 
+---Runs transformers on the message.
+---@param transformers omichat.MessageTransformer[]
+function MessageInfo:applyTransforms(transformers)
+    for i = 1, #transformers do
+        local transformer = transformers[i]
+        if transformer.transform and transformer:transform(self) == true then
+            break
+        end
+
+        -- message is hidden; stop processing transforms
+        if self.hidden then
+            break
+        end
+    end
+
+    self:_afterTransforms()
+end
+
 ---Gets the message text to use.
 ---This should be called after applying transforms and format options.
 ---@return string?
@@ -539,6 +559,7 @@ end
 function MessageInfo:hide()
     self.message:setShowInChat(false)
     self.message:setOverHeadSpeech(false)
+    self.hidden = true
 end
 
 ---Sets the message to not show overhead.
@@ -756,6 +777,45 @@ function MessageInfo:wasRadioSuppressed()
     return self.meta.suppressedRadio == true
 end
 
+---Runs checks and modifications that should occur after transforms run.
+---@protected
+function MessageInfo:_afterTransforms()
+    local text = self.content or self.rawText
+
+    local applyStormFix = config.NarrativeStyle.Enable and self.chatType == 'radio' and text:match('&lt;[bfws]zzt&gt;')
+    if applyStormFix then
+        -- avoid duplicate name when radios scramble narrative style messages during storms
+        -- this is not ideal, but for now it will have to do
+        local author = self.author
+        if author and author ~= '' then
+            text = text:gsub(utils.escape(author), '')
+        end
+
+        if self.tokens.nameRaw then
+            text = text:gsub(utils.escape(self.tokens.nameRaw), '')
+        end
+
+        self.content = text
+    end
+
+    -- avoid adding empty messages
+    local chars = {}
+    for i = 1, #text do
+        -- throw away invisible characters
+        local c = text:sub(i, i)
+        if not utils.isInvisibleByte(c:byte()) then
+            chars[#chars + 1] = c
+        end
+    end
+
+    text = utils.trim(concat(chars))
+    if #text == 0 then
+        self:hide()
+        return
+    end
+
+    self:_suppressRadioOverhead()
+end
 
 ---Decodes information encoded in the message's tag.
 ---@return omichat.MessageInfo.Metadata
@@ -818,6 +878,53 @@ function MessageInfo:_setupStreamInfo()
     self.tags = self.stream and self.stream:getTags() or {}
 end
 
+---Handles suppression of overhead radio messages.
+---@protected
+function MessageInfo:_suppressRadioOverhead()
+    -- the message showing overhead is hardcoded for radio messages,
+    -- so, if it shouldn't show overhead, we have to suppress it by overwriting with empty messages
+    if self.chatType ~= 'radio' or self.message:isOverHeadSpeech() then
+        return
+    end
+
+    if self.meta.suppressedRadio then
+        -- we've done this already (redrawing)
+        return
+    end
+
+    self:setMetadataRadioSuppressed(true) -- avoid doing this again
+
+    -- push the message up with blank text
+    local player = getSpecificPlayer(0)
+    if player then
+        for _ = 1, 5 do
+            player:Say(' ')
+        end
+    end
+
+    local zomboidRadio = getZomboidRadio()
+    if not zomboidRadio then
+        return
+    end
+
+    -- do the same thing for radios
+    local radioChannel = self.message:getRadioChannel()
+    local devices = zomboidRadio:getDevices()
+    for i = 0, devices:size() - 1 do
+        local device = devices:get(i) ---@cast device IsoWaveSignal
+        local deviceData = device and device:getDeviceData()
+        if deviceData and instanceof(device, 'IsoRadio') then
+            local canTransmit = not deviceData:isPlayingMedia() and not deviceData:isNoTransmit()
+            local hasSayLine = canTransmit and device.getSayLine and device:getSayLine()
+            if hasSayLine and deviceData:getChannel() == radioChannel then
+                for _ = 1, 5 do
+                    device:Say(' ')
+                end
+            end
+        end
+    end
+end
+
 
 ---Creates a new message information object.
 ---@param message omichat.Message
@@ -833,6 +940,7 @@ function MessageInfo:new(message)
     this.datetime = tostring(message:getDatetime())
     this.loudCallout = false
     this.sneakCallout = false
+    this.hidden = false
 
     this:_decodeMetadata()
 

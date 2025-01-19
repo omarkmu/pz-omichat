@@ -4,7 +4,6 @@ local config = API.Configuration
 
 local isAdmin = isAdmin
 local getText = getText
-local instanceof = instanceof
 
 
 local COMMAND_ARGS_START = utils.encodeInvisibleCharacter(config.ID_COMMAND_ARGS)
@@ -538,102 +537,6 @@ return {
 
             if not canTransmit then
                 info:hide()
-            end
-        end,
-    },
-    {
-        name = 'radio-storm-fix',
-        priority = 0,
-        transform = function(_, info)
-            if not config.NarrativeStyle.Enable or info.chatType ~= 'radio' then
-                return
-            end
-
-            local text = info.content or info.rawText
-            -- avoid duplicate name when radios scramble narrative style messages
-            if not text or not text:match('&lt;[bfws]zzt&gt;') then
-                return
-            end
-
-            -- this is not ideal, but for now it will have to do
-            local author = info.author
-            if author and author ~= '' then
-                text = text:gsub(utils.escape(author), '')
-            end
-
-            if info.tokens.nameRaw then
-                text = text:gsub(utils.escape(info.tokens.nameRaw), '')
-            end
-
-            info.content = text
-        end,
-    },
-    {
-        name = 'avoid-empty-chats',
-        priority = 0,
-        transform = function(_, info)
-            local text = info.content or info.rawText
-            local chars = {}
-            for i = 1, #text do
-                -- throw away invisible characters
-                local c = text:sub(i, i)
-                if not utils.isInvisibleByte(c:byte()) then
-                    chars[#chars + 1] = c
-                end
-            end
-
-            text = utils.trim(table.concat(chars))
-            if #text == 0 then
-                info:hide()
-            end
-        end,
-    },
-    {
-        name = 'suppress-radio-overhead',
-        priority = 0,
-        transform = function(_, info)
-            -- the message showing overhead is hardcoded for radio messages,
-            -- so, if it shouldn't show overhead, we have to suppress it by overwriting with empty messages
-            if info.chatType ~= 'radio' or info.message:isOverHeadSpeech() then
-                return
-            end
-
-            -- make sure we haven't done this already
-            if info.meta.suppressedRadio then
-                return
-            end
-
-            -- avoid doing this again
-            info:setMetadataRadioSuppressed(true)
-
-            -- push the message up with blank text
-            local player = getSpecificPlayer(0)
-            if player then
-                for _ = 1, 5 do
-                    player:Say(' ')
-                end
-            end
-
-            local zomboidRadio = getZomboidRadio()
-            if not zomboidRadio then
-                return
-            end
-
-            -- do the same thing for radios
-            local radioChannel = info.message:getRadioChannel()
-            local devices = zomboidRadio:getDevices()
-            for i = 0, devices:size() - 1 do
-                local device = devices:get(i) ---@cast device IsoWaveSignal
-                local deviceData = device and device:getDeviceData()
-                if deviceData and instanceof(device, 'IsoRadio') then
-                    local canTransmit = not deviceData:isPlayingMedia() and not deviceData:isNoTransmit()
-                    local hasSayLine = canTransmit and device.getSayLine and device:getSayLine()
-                    if hasSayLine and deviceData:getChannel() == radioChannel then
-                        for _ = 1, 5 do
-                            device:Say(' ')
-                        end
-                    end
-                end
             end
         end,
     },
