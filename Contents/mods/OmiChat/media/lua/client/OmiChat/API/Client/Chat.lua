@@ -235,7 +235,7 @@ local function updateFormatters()
         local stream = info[1]
         local formatter = stream:getFormatter()
 
-        stream:setTags(info[3])
+        stream:_setTags(info[3]) ---@diagnostic disable-line:invisible
         if formatter then
             formatter:setFormatString(info[2])
         end
@@ -358,7 +358,7 @@ local function updateStreams()
 
         stream:setChatFormat(streamConfig.ChatFormat)
         stream:setDefaultColor(streamConfig.DefaultColor)
-        stream:setTags(streamConfig.Tags)
+        stream:_setTags(streamConfig.Tags) ---@diagnostic disable-line:invisible
     end
 
     -- cycle if current stream is now unavailable
@@ -372,6 +372,8 @@ local function updateStreams()
     if lastStream and not lastStream:checkPlayerCanUse() then
         chatText.lastChatCommand = API.cycleStream()
     end
+
+    API._updateTagCache()
 end
 
 
@@ -554,10 +556,27 @@ end
 ---@param excludeTags string[]?
 ---@return omichat.ChatStream[]
 function API.getChatStreamsWithTag(tag, excludeTags)
-    return API.getChatStreamsWithTags({ tag }, excludeTags)
+    local list = API._tagToChatStreams[tag]
+    if not list then
+        return {}
+    end
+
+    if not excludeTags then
+        return utils.copyList(list)
+    end
+
+    local matches = {}
+    for i = 1, #list do
+        local stream = list[i]
+        if not stream:hasAnyTags(excludeTags) then
+            matches[#matches + 1] = stream
+        end
+    end
+
+    return matches
 end
 
----Returns enabled chat streams with the given tags.
+---Returns enabled chat streams with all of the given tags.
 ---@param tags string[]
 ---@param excludeTags string[]?
 ---@return omichat.ChatStream[]
@@ -581,7 +600,7 @@ function API.getChatStreamsWithoutTag(excludeTag)
     return API.getChatStreamsWithTags({}, { excludeTag })
 end
 
----Returns enabled chat streams without the given tags.
+---Returns enabled chat streams without any of the given tags.
 ---@param excludeTags string[]
 ---@return omichat.ChatStream[]
 function API.getChatStreamsWithoutTags(excludeTags)
@@ -706,10 +725,24 @@ end
 ---@param excludeTags string[]?
 ---@return omichat.ChatStream?
 function API.getFirstChatStreamWithTag(tag, excludeTags)
-    return API.getFirstChatStreamWithTags({ tag }, excludeTags)
+    local list = API._tagToChatStreams[tag]
+    if not list then
+        return
+    end
+
+    if not excludeTags then
+        return list[1]
+    end
+
+    for i = 1, #list do
+        local stream = list[i]
+        if not stream:hasAnyTags(excludeTags) then
+            return stream
+        end
+    end
 end
 
----Returns the first enabled chat stream with the given tags.
+---Returns the first enabled chat stream with all of the given tags.
 ---@param tags string[]
 ---@param excludeTags string[]?
 ---@return omichat.ChatStream?
@@ -729,7 +762,7 @@ function API.getFirstChatStreamWithoutTag(excludeTag)
     return API.getFirstChatStreamWithTags({}, { excludeTag })
 end
 
----Returns the first enabled chat stream without the given tags.
+---Returns the first enabled chat stream without any of the given tags.
 ---@param excludeTags string[]
 ---@return omichat.ChatStream?
 function API.getFirstChatStreamWithoutTags(excludeTags)
@@ -1414,5 +1447,24 @@ function API.updateTypingStatus(skipTimer)
         wasTyping = isTyping
 
         API.sendTypingStatus(range, chatType)
+    end
+end
+
+---Updates the tag cache for chat streams.
+---@protected
+function API._updateTagCache()
+    API._tagToChatStreams = {}
+
+    for stream in API.chatStreams() do
+        local tags = stream:getTags()
+
+        for tag in pairs(tags) do
+            if not API._tagToChatStreams[tag] then
+                API._tagToChatStreams[tag] = {}
+            end
+
+            local list = API._tagToChatStreams[tag]
+            list[#list + 1] = stream
+        end
     end
 end

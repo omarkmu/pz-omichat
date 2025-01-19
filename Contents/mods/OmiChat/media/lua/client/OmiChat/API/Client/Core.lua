@@ -30,6 +30,7 @@ local lib = require 'OmiLibrary/Client'
 ---@field private _cardCommand omichat.CommandStream
 ---@field private _flipCommand omichat.CommandStream
 ---@field private _rollCommand omichat.CommandStream
+---@field private _tagToChatStreams table<string, omichat.ChatStream[]>
 local API = require 'OmiChat/Shared'
 
 local utils = API.utils
@@ -58,6 +59,7 @@ API._chatFormatters = {}
 API._metadataFormatters = {}
 API._customButtons = {}
 API._customSuggesterArgTypes = {}
+API._tagToChatStreams = {}
 API._typingDisplay = nil
 API._typingInfo = {}
 API._isTyping = false
@@ -181,6 +183,7 @@ API._discordStream = API.ChatStream:new {
     chatFormat = API.Configuration.Discord.ChatFormat,
     defaultColor = API.Configuration.Discord.DefaultColor,
     tags = API.Configuration.Discord.Tags,
+    autoTags = { 'IsDiscordStream' },
 }
 
 API._radioStream = API.ChatStream:new {
@@ -189,6 +192,7 @@ API._radioStream = API.ChatStream:new {
     chatFormat = API.Configuration.Radio.ChatFormat,
     defaultColor = API.Configuration.Radio.DefaultColor,
     tags = API.Configuration.Radio.Tags,
+    autoTags = { 'IsRadioStream' },
 }
 
 API._serverStream = API.ChatStream:new {
@@ -197,6 +201,7 @@ API._serverStream = API.ChatStream:new {
     chatFormat = API.Configuration.ServerMessages.ChatFormat,
     defaultColor = API.Configuration.ServerMessages.DefaultColor,
     tags = API.Configuration.ServerMessages.Tags,
+    autoTags = { 'IsServerStream' },
 }
 
 API._cardCommand = API.CommandStream:new {

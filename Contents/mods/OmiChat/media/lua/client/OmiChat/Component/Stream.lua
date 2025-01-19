@@ -304,28 +304,6 @@ function Stream:setFormatter(formatter)
     self.formatter = formatter
 end
 
----Sets the tags included on the stream.
----@param tags string[]
-function Stream:setTags(tags)
-    self.tags = utils.set.simple(tags)
-
-    if self:isServerStream() then
-        self.tags.IsServerStream = true
-    elseif self:isRadioStream() then
-        self.tags.IsRadioStream = true
-    elseif self:isDiscordStream() then
-        self.tags.IsDiscordStream = true
-    end
-
-    if self:isCommandStream() then
-        self.tags.IsCommand = true
-    end
-
-    utils.extend(self.tags, self.autoTags)
-
-    self.noTags = isempty(self.tags)
-end
-
 ---Displays help text for the stream, if it exists.
 function Stream:showHelpText()
     local helpText = self:getHelpText()
@@ -351,6 +329,20 @@ function Stream:validate(input)
     return false, getText('IGUI_Commands_Whisper')
 end
 
+---Sets the tags included on the stream.
+---@param tags string[]
+---@protected
+function Stream:_setTags(tags)
+    self.tags = utils.set.simple(tags)
+    utils.extend(self.tags, self.autoTags)
+
+    if self:isCommandStream() then
+        self.tags.IsCommand = true
+    end
+
+    self.noTags = isempty(self.tags)
+end
+
 
 ---Creates a new stream.
 ---@param args omichat.Args.Stream
@@ -368,7 +360,7 @@ function Stream:new(args)
     this.isChat = false
     this.isCommand = false
     this.autoTags = utils.set.simple(args.autoTags)
-    this:setTags(args.tags or {})
+    this:_setTags(args.tags or {})
 
     if args.commandType then
         this.commandType = args.commandType

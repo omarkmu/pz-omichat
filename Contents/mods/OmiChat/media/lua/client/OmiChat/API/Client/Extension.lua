@@ -25,6 +25,7 @@ local function insertStreamRelative(stream, other, value)
     end
 
     table.insert(ISChat.allChatStreams, pos, stream)
+    API._updateTagCache()
 
     local tabs = ISChat.instance and ISChat.instance.tabs
     if not tabs then
@@ -139,6 +140,7 @@ end
 ---@return omichat.ChatStream
 function API.addStream(stream)
     ISChat.allChatStreams[#ISChat.allChatStreams + 1] = stream
+    API._updateTagCache()
 
     local tabs = ISChat.instance and ISChat.instance.tabs
     if not tabs then
