@@ -410,6 +410,16 @@ function Library.DefaultNameFilter(interpolator, args)
     local options = readOptions(args)
     local input = utils.trim(optionOrToken(interpolator, options, 'input'))
 
+    local maxLength = tonumber(options:get('maxLength'))
+    local minLength = tonumber(options:get('minLength'))
+    if maxLength and #input > maxLength then
+        interpolator:setToken('error', getText('UI_OmiLibrary_Error_LengthMax', tostring(maxLength)))
+        return
+    elseif minLength and #input < minLength then
+        interpolator:setToken('error', getText('UI_OmiLibrary_Error_LengthMin', tostring(minLength)))
+        return
+    end
+
     local truncateLength = tonumber(options:get('truncateTo', 40))
     if truncateLength then
         input = input:sub(1, truncateLength)
