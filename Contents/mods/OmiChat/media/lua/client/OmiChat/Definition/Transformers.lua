@@ -2,6 +2,7 @@ local API = require 'OmiChat/API/Client/Core'
 local utils = API.utils
 local config = API.Configuration
 
+local isAdmin = isAdmin
 local getText = getText
 local instanceof = instanceof
 
@@ -48,9 +49,16 @@ return {
                     end
                 end
             elseif chatType == 'faction' then
+                if info.meta.faction then
+                    info.tokens.faction = info.meta.faction
+                    return
+                end
+
                 local player = getSpecificPlayer(0)
                 local faction = player and Faction.getPlayerFaction(player)
-                info.tokens.faction = faction and faction:getName() or nil
+                local name = faction and faction:getName() or ''
+                info.tokens.faction = name
+                info:setMetadataFaction(name)
 
                 return
             elseif chatType == 'server' then
@@ -79,7 +87,7 @@ return {
 
                 if not other then
                     info.tokens.incomingPM = '1'
-                    info:addTags({ 'IsIncomingPM' })
+                    info.tags.IsIncomingPM = true
                     return
                 end
 
@@ -88,7 +96,7 @@ return {
                 info.tokens.recipientName = utils.escapeRichText(API.getNameInChat(other, 'whisper') or other)
                 info.tokens.recipientNameRaw = info.tokens.recipientName
                 info.tokens.outgoingPM = '1'
-                info:addTags({ 'IsOutgoingPM' })
+                info.tags.IsOutgoingPM = true
 
                 info.content = text:sub(msgStart + 1)
 
@@ -108,7 +116,7 @@ return {
         priority = 90,
         transform = function(_, info)
             local stream = info:getStream()
-            if not stream or not stream:isCommandStream() then
+            if not stream or not stream.isCommand then
                 return
             end
 
@@ -194,7 +202,7 @@ return {
             end
 
             info.tokens.echo = '1'
-            info:addTags({ 'IsEchoMessage' })
+            info.tags.IsEchoMessage = true
             info:addTags(config.EchoMessages.Tags)
 
             if not info.format then
@@ -365,17 +373,19 @@ return {
             -- they didn't understand it
             info:hideOverhead()
             info.tokens.unknownLanguage = language
-            info:addTags({ 'IsUnknownLanguage' })
+            info.tags.IsUnknownLanguage = true
 
             if isRadio then
                 info.format = config.Language.UnknownLanguageRadio
             else
                 info.format = config.Language.UnknownLanguage
 
+                info:syncTags()
+
                 local targetTags
-                if info.sneakCallout or info:hasTag('Quiet') then
+                if info.sneakCallout or info.tags.Quiet then
                     targetTags = { 'Quiet', 'Whisper' }
-                elseif info.callout or info:hasTag('Loud') then
+                elseif info.loudCallout or info.tags.Loud then
                     targetTags = { 'Loud' }
                 end
 
@@ -394,9 +404,9 @@ return {
                 -- if there's not a stream that matches the volume, use any action stream that displays names
                 targetStream = targetStream or streams[1]
                 if targetStream then
-                    local stream = info:getStream()
+                    local stream = info.stream
                     if stream and stream.tags.Action then
-                        info:addTags({ 'IsActionUnknownLanguage' })
+                        info.tags.IsActionUnknownLanguage = true
                     end
 
                     info:setStream(targetStream)
@@ -425,6 +435,8 @@ return {
                 return
             end
 
+            info:syncTags()
+
             local tokens = utils.copy(info.tokens)
             tokens.input = unstyled
             tokens.dialogueTag = dialogueTag
@@ -433,7 +445,7 @@ return {
             info.tokens.narrativeStyle = '1'
             info.tokens.dialogueTag = dialogueTag
             info.tokens.unstyled = unstyled
-            info:addTags({ 'IsNarrativeStyle' })
+            info.tags.IsNarrativeStyle = true
         end,
     },
     {
@@ -450,27 +462,31 @@ return {
                 return
             end
 
-            local defaultRange
-            local range = stream.range
-            if info.callout then
-                range = config.Callouts.Range
-                defaultRange = 60
-            elseif info.sneakCallout then
-                range = config.Callouts.SneakRange
-                defaultRange = 60
-            else
-                defaultRange = info.chatType == 'shout' and 60 or 30
-            end
+            local cached = info.meta.rangeResult
+            if cached then
+                if cached == 'out-of-range' then
+                    info:hide()
+                end
 
-            if not range then
                 return
             end
+
+            local maxRange = info.chatType == 'shout' and 60 or 30
+            local range = stream.range
+            if info.loudCallout then
+                range = config.Callouts.Range
+            elseif info.sneakCallout then
+                range = config.Callouts.SneakRange
+            end
+
+            range = range or maxRange
 
             if stream.attractZombies then
                 info.zombieAttractRange = range * config.ZombieAttraction.ChatRangeMultiplier
             end
 
             if isAdmin() and API.getIgnoreMessageRange() then
+                info:setMetadataRangeResult('in-range')
                 return
             end
 
@@ -485,7 +501,7 @@ return {
             local zMax = stream.verticalRange or 2
             if zMax and math.abs(authorPlayer:getZ() - localPlayer:getZ()) >= zMax then
                 outOfRange = true
-            elseif range ~= defaultRange then
+            elseif range ~= maxRange then
                 -- calculating distance using the distance formula like ChatUtility
                 -- assuming players are synced it works equivalently
                 local xDiff = authorPlayer:getX() - localPlayer:getX()
@@ -495,9 +511,10 @@ return {
             end
 
             if outOfRange then
-                -- show in chat value is only used on the initial message add,
-                -- so it's okay that this runs on refresh
+                info:setMetadataRangeResult('out-of-range')
                 info:hide()
+            else
+                info:setMetadataRangeResult('in-range')
             end
         end,
     },
@@ -585,12 +602,12 @@ return {
             end
 
             -- make sure we haven't done this already
-            if info.meta.suppressed then
+            if info.meta.suppressedRadio then
                 return
             end
 
             -- avoid doing this again
-            info:setMetadataOverheadSuppressed(true)
+            info:setMetadataRadioSuppressed(true)
 
             -- push the message up with blank text
             local player = getSpecificPlayer(0)

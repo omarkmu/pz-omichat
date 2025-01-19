@@ -951,6 +951,7 @@ function ISChat.addLineInChat(message, tabID)
         return
     end
 
+    local info ---@type omichat.MessageInfo?
     local soundRange
     local player = getSpecificPlayer(0)
 
@@ -983,13 +984,13 @@ function ISChat.addLineInChat(message, tabID)
         end
 
         -- necessary to process transforms so we know whether this message should be added to chat
-        local info = API.buildMessageInfo(message, true)
+        info = API.buildMessageInfo(message, true)
         if info then
             if not message:isShowInChat() then
                 return
             end
 
-            if message:isShouldAttractZombies() and username == message:getAuthor() then
+            if info:shouldAttractZombies(username) then
                 soundRange = info:getZombieAttractionRange()
             end
         end
@@ -997,12 +998,16 @@ function ISChat.addLineInChat(message, tabID)
 
     local s, e = pcall(_addLineInChat, message, tabID)
     if not s then
-        utils.log.error('error while adding message %s: %s', tostring(message), e)
+        utils.log.error('Error while adding message %s: %s', tostring(message), tostring(e))
         return
     end
 
     if player and soundRange and soundRange > 0 then
         addSound(player, player:getX(), player:getY(), player:getZ(), soundRange, soundRange)
+
+        if info then
+            info:setMetadataAttractedZombies()
+        end
     end
 end
 

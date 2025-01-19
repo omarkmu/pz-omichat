@@ -40,7 +40,10 @@ function MessageInfo.decodeMessageTag(tag, metadata)
         return metadata
     end
 
-    metadata.suppressed = decoded.suppressed
+    metadata.faction = decoded.faction
+    metadata.rangeResult = decoded.rangeResult
+    metadata.suppressedRadio = decoded.suppressedRadio
+    metadata.attractedZombies = decoded.attractedZombies
     metadata.language = decoded.language
     metadata.name = decoded.name
     metadata.nameColor = utils.color.fromString(decoded.nameColor)
@@ -68,7 +71,6 @@ function MessageInfo.encodeMessageTag(message)
 
     local color = author and API.getSpeechColor(author)
     local encoded = utils.json.tryEncode {
-        suppressed = false,
         language = API.decodeLanguage(message),
         name = API.getNameInChatRichText(author, MessageInfo.getMessageChatType(message)),
         nameColor = color and utils.color.toHexString(color) or nil,
@@ -145,19 +147,9 @@ end
 ---Adds the given tags to the set of tags in the interpolation tokens.
 ---@param tags string[]
 function MessageInfo:addTags(tags)
-    local tagSet = {}
-    local existingTags = self.tokens.tags
-
-    if utils.isinstance(existingTags, MultiMap) then
-        ---@cast existingTags omi.MultiMap
-        tagSet = existingTags:toValueSet()
-    end
-
     for i = 1, #tags do
-        tagSet[tags[i]] = true
+        self.tags[tags[i]] = true
     end
-
-    self.tokens.tags = MultiMap.fromSet(tagSet)
 end
 
 ---Applies the formatting determined by transformers.
@@ -180,6 +172,8 @@ function MessageInfo:applyFormatting()
     local options = self.options
     local seed = dt
     local stream = self.stream
+
+    self:syncTags()
 
     if options.showTimestamp then
         local hour, minute, second = dt:match('(%d%d):(%d%d):(%d%d)')
@@ -318,6 +312,8 @@ function MessageInfo:buildMessageText()
         return
     end
 
+    self:syncTags()
+
     local seed = self.datetime
     local tokens = {
         tag = self.tag,
@@ -448,6 +444,12 @@ function MessageInfo:getMetadataLanguage()
     return self.meta.language
 end
 
+---Gets the result of range checking stored in the message metadata.
+---@return omichat.MessageInfo.Metadata.RangeResult?
+function MessageInfo:getMetadataRangeResult()
+    return self.meta.rangeResult
+end
+
 ---Gets the name color encoded in the message.
 ---@return omi.ColorTable?
 function MessageInfo:getNameColor()
@@ -526,17 +528,11 @@ function MessageInfo:hasFormat()
     return self.format ~= nil
 end
 
----Checks whether the tags in the token table contain a given tag.
+---Checks whether the current tags contain a given tag.
 ---@param tag string
 ---@return boolean
 function MessageInfo:hasTag(tag)
-    local tags = self.tokens.tags
-    if not utils.isinstance(tags, MultiMap) then
-        return false
-    end
-
-    ---@cast tags omi.MultiMap
-    return tags:has(tag)
+    return self.tags[tag] == true
 end
 
 ---Sets the message to not show overhead or in chat.
@@ -550,10 +546,10 @@ function MessageInfo:hideOverhead()
     self.message:setOverHeadSpeech(false)
 end
 
----Returns whether this message has been marked as a callout.
+---Returns whether this message has been marked as a non-sneak callout.
 ---@return boolean
 function MessageInfo:isCallout()
-    return self.callout
+    return self.loudCallout
 end
 
 ---Returns whether this message has been marked as a sneak callout.
@@ -567,12 +563,6 @@ end
 ---@return boolean
 function MessageInfo:isChatType(chatType)
     return self.chatType == chatType
-end
-
----Checks whether overhead messages were already suppressed for this message.
----@return boolean
-function MessageInfo:overheadSuppressed()
-    return self.meta.suppressed
 end
 
 ---Sets the color to use for the message.
@@ -598,10 +588,10 @@ end
 function MessageInfo:setIsCallout(callout)
     if callout then
         self.tokens.callout = '1'
-        self:addTags({ 'IsCallout' })
+        self.tags.IsCallout = true
     end
 
-    self.callout = callout
+    self.loudCallout = callout
 end
 
 ---Sets whether the message should be marked as a sneak callout.
@@ -610,10 +600,23 @@ function MessageInfo:setIsSneakCallout(sneakCallout)
     if sneakCallout then
         self.tokens.callout = '1'
         self.tokens.sneakCallout = '1'
-        self:addTags({ 'IsCallout', 'IsSneakCallout' })
+        self.tags.IsCallout = true
+        self.tags.IsSneakCallout = true
     end
 
     self.sneakCallout = sneakCallout
+end
+
+---Sets a value in the message metadata to indicate that zombie attraction has already occurred.
+function MessageInfo:setMetadataAttractedZombies()
+    self:_setMetadataValue('attractedZombies', true)
+end
+
+---Sets the faction in the message metadata.
+---@param faction string
+---@return boolean success
+function MessageInfo:setMetadataFaction(faction)
+    return self:_setMetadataValue('faction', faction)
 end
 
 ---Sets the language in the message metadata.
@@ -629,11 +632,18 @@ function MessageInfo:setMetadataNameColor(color)
     self:_setMetadataValue('nameColor', utils.color.toHexString(color))
 end
 
----Sets a value in the message metadata to indicate the message has already been suppressed.
+---Sets a value in the message metadata to indicate the message has already been suppressed for the radio.
 ---@param suppressed boolean
 ---@return boolean success
-function MessageInfo:setMetadataOverheadSuppressed(suppressed)
-    return self:_setMetadataValue('suppressed', suppressed)
+function MessageInfo:setMetadataRadioSuppressed(suppressed)
+    return self:_setMetadataValue('suppressedRadio', suppressed)
+end
+
+---Sets a value in the message metadata to indicate the result of range checking.
+---@param result omichat.MessageInfo.Metadata.RangeResult
+---@return boolean success
+function MessageInfo:setMetadataRangeResult(result)
+    return self:_setMetadataValue('rangeResult', result)
 end
 
 ---Sets the color to use for the recipient name in the message metadata.
@@ -646,6 +656,10 @@ end
 ---@param stream omichat.Stream
 ---@param options omichat.Args.MessageInfo.SetStream?
 function MessageInfo:setStream(stream, options)
+    if stream == self.stream then
+        return
+    end
+
     options = options or {}
 
     local name = stream:getName()
@@ -667,17 +681,18 @@ function MessageInfo:setStream(stream, options)
         self.options.color = nil
     end
 
-    if options.noTagUpdate or stream:hasNoTags() then
+    if options.noTagUpdate then
         return
     end
 
-    local tags = self.tokens.tags
     local streamTags = stream:getTags()
-    if options.overwriteTags or not utils.isinstance(tags, MultiMap) then
-        self.tokens.tags = MultiMap.fromSet(streamTags)
+    if options.overwriteTags then
+        self.tokens.tags = nil
+        self.tags = streamTags
     else
-        ---@cast tags omi.MultiMap
-        self.tokens.tags = tags:withSet(streamTags)
+        for k in pairs(streamTags) do
+            self.tags[k] = true
+        end
     end
 end
 
@@ -694,6 +709,18 @@ function MessageInfo:setZombieAttractionRange(range)
     self.zombieAttractRange = range
 end
 
+---Determines whether a message should attract zombies for a given user.
+---@param username string
+---@return boolean
+function MessageInfo:shouldAttractZombies(username)
+    local range = self.zombieAttractRange
+    if not range or self.author ~= username or self.meta.attractedZombies then
+        return false
+    end
+
+    return self.message:isShouldAttractZombies()
+end
+
 ---Returns whether language processing should be skipped.
 ---@return boolean
 function MessageInfo:shouldSkipLanguageProcessing()
@@ -703,6 +730,30 @@ end
 ---Sets the message to not process roleplay languages.
 function MessageInfo:skipLanguageProcessing()
     self.skipLanguage = true
+end
+
+---Syncs tags between the token table and the cache.
+function MessageInfo:syncTags()
+    local tagSet
+    local existingTags = self.tokens.tags
+    if utils.isinstance(existingTags, MultiMap) then
+        ---@cast existingTags omi.MultiMap
+        tagSet = existingTags:toValueSet()
+    else
+        tagSet = {}
+    end
+
+    for k in pairs(tagSet) do
+        self.tags[k] = true
+    end
+
+    self.tokens.tags = MultiMap.fromSet(self.tags)
+end
+
+---Checks whether overhead radio messages were already suppressed for this message.
+---@return boolean
+function MessageInfo:wasRadioSuppressed()
+    return self.meta.suppressedRadio == true
 end
 
 
@@ -763,6 +814,8 @@ function MessageInfo:_setupStreamInfo()
     if self.originalStream then
         self:_setMetadataValue('originalStream', self.originalStream:getName())
     end
+
+    self.tags = self.stream and self.stream:getTags() or {}
 end
 
 
@@ -772,9 +825,14 @@ end
 function MessageInfo:new(message)
     local this = setmetatable({}, self) ---@cast this omichat.MessageInfo
 
-    this.message = message
-    this.context = {}
     this.meta = {}
+    this.context = {}
+    this.message = message
+    this.chatType = self.getMessageChatType(message)
+    this.author = message:getAuthor() or ''
+    this.datetime = tostring(message:getDatetime())
+    this.loudCallout = false
+    this.sneakCallout = false
 
     this:_decodeMetadata()
 
@@ -791,12 +849,6 @@ function MessageInfo:new(message)
         this.titleID = _getChatTitleID(chat)
     end
 
-    this.chatType = self.getMessageChatType(message)
-    this.author = message:getAuthor() or ''
-    this.datetime = tostring(message:getDatetime())
-    this.callout = false
-    this.sneakCallout = false
-
     this:_setupStreamInfo()
 
     local instance = ISChat.instance
@@ -810,7 +862,7 @@ function MessageInfo:new(message)
         authorRaw = this.author,
         name = this.meta.name or utils.escapeRichText(this.author),
         nameRaw = this.meta.name or utils.escapeRichText(this.author),
-        tags = MultiMap.fromSet(this.stream and this.stream:getTags()),
+        tags = MultiMap.fromSet(this.tags),
         originalTags = MultiMap.fromSet(this.originalStream and this.originalStream:getTags()),
     }
 

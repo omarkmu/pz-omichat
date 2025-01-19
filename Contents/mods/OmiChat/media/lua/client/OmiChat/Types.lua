@@ -47,7 +47,8 @@
 ---@field originalStream omichat.Stream? The original stream of a radio message.
 ---@field author string The username of the message author.
 ---@field zombieAttractRange integer? The range at which the message will be heard by zombies.
----@field protected callout boolean? Whether the stream is a callout.
+---@field tags omi.SimpleSet A set of tags to add to the message tokens.
+---@field protected loudCallout boolean? Whether the stream is a non-sneak callout.
 ---@field protected sneakCallout boolean? Whether the stream is a sneak callout.
 ---@field protected datetime string A string representing the date and time the message was sent.
 ---@field protected options omichat.MessageInfo.FormatOptions Formatting options to apply to the message.
@@ -71,9 +72,14 @@
 ---@field adminIcon string? The admin icon when this message was sent, if it was enabled.
 ---@field nameColor omi.ColorTable? The name color of the author when this message was sent.
 ---@field recipientNameColor omi.ColorTable? The name color of the recipient when this message was sent.
----@field suppressed boolean? Whether the overhead text for this message has already been suppressed.
+---@field suppressedRadio boolean? Whether the overhead text for this message has already been suppressed on radio.
 ---@field stream string? The name of the stream the message was sent over.
 ---@field originalStream string? The name of the original stream a radio message was sent over.
+---@field faction string? The name of the faction to which the message was sent.
+---@field rangeResult omichat.MessageInfo.Metadata.RangeResult? The result of range checking.
+---@field attractedZombies boolean? Whether the message has already attracted zombies.
+
+---@alias omichat.MessageInfo.Metadata.RangeResult 'in-range' | 'out-of-range'
 
 ---A suggestion that can display to the player.
 ---@class omichat.Suggestion
