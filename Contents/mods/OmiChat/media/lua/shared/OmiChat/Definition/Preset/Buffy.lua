@@ -106,6 +106,8 @@ return Preset:new {
                 Timestamp = '$DefaultTimestampFormat()',
                 Icon = '$DefaultIconFormat()',
                 Language = '$DefaultLanguageFormat()',
+                EmbeddedQuote = '$DefaultEmbeddedQuoteFormat()',
+                EmbeddedAction = '$DefaultEmbeddedActionFormat()',
             },
             Overhead = {
                 Final = '$DefaultFullOverheadFormat()',
@@ -185,7 +187,8 @@ return Preset:new {
                     Stream = 'yell',
                     Enable = true,
                     Range = 48,
-                    Tags = { 'AutoCapitalize',
+                    Tags = {
+                        'AutoCapitalize',
                         'AutoPunctuate',
                         'AutoColorActions',
                         'NoVolumeIndicator',
@@ -229,6 +232,8 @@ return Preset:new {
                     Tags = {
                         'AutoPunctuate',
                         'AutoColorQuotes',
+                        'AutoCapitalizeEmbeddedQuotes',
+                        'AutoCapitalizeNonInitialSegments',
                         'Action',
                         'NoAdminIndicator',
                         'NoIcon',
@@ -249,6 +254,8 @@ return Preset:new {
                     Tags = {
                         'AutoPunctuate',
                         'AutoColorQuotes',
+                        'AutoCapitalizeEmbeddedQuotes',
+                        'AutoCapitalizeNonInitialSegments',
                         'Action',
                         'NoAdminIndicator',
                         'NoIcon',
@@ -265,6 +272,8 @@ return Preset:new {
                     Tags = {
                         'AutoPunctuate',
                         'AutoColorQuotes',
+                        'AutoCapitalizeEmbeddedQuotes',
+                        'AutoCapitalizeNonInitialSegments',
                         'Action',
                         'NoAdminIndicator',
                         'NoIcon',
@@ -279,6 +288,8 @@ return Preset:new {
                     Tags = {
                         'AutoPunctuate',
                         'AutoColorQuotes',
+                        'AutoCapitalizeEmbeddedQuotes',
+                        'AutoCapitalizeNonInitialSegments',
                         'Action',
                         'NoAdminIndicator',
                         'NoIcon',

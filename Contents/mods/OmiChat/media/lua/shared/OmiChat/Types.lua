@@ -311,6 +311,8 @@
 ---@field Timestamp string
 ---@field Icon string
 ---@field Language string
+---@field EmbeddedAction string
+---@field EmbeddedQuote string
 
 ---@class omichat.Configuration.Format.Filter
 ---@field Name string

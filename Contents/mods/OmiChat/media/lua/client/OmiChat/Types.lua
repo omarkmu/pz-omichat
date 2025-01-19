@@ -176,6 +176,10 @@
 ---@field tabTitle string The title of this tab.
 ---@field streamID integer The stream ID of the current stream.
 
+---@class omichat.MessageSegment
+---@field type 'quote' | 'action'
+---@field text string
+
 ---@class omichat.Args.StreamRetrieval
 ---@field enabledOnly boolean? If `true`, only enabled streams will be returned.
 
@@ -189,6 +193,26 @@
 ---@field noTagUpdate boolean? If `true`, the tags won't be updated to include the target stream's tags.
 ---@field overwriteTags boolean? If `true`, the previous tags will be overwritten with the tags from the target stream, instead of merging.
 
+---@class omichat.Args.GetMessageSegments
+---@field startInAction boolean? If `true`, start reading as an action instead of a quote.
+---@field optionalActionAsterisk boolean? If `true`, the asterisk for actions will be considered optional.
+---@field onlyFirstSegment boolean? If `true`, only the first segment will be returned.
+
+---@class omichat.Args.PerformSharedOperations
+---@field interpolator omichat.Interpolator
+---@field options omi.MultiMap
+---@field tags omi.SimpleSet
+---@field input string
+---@field autoQuote boolean?
+---@field doCapitalize boolean?
+---@field doPunctuate boolean?
+---@field applyCase boolean?
+---@field applyEmbeddedActions boolean?
+---@field applyEmbeddedQuotes boolean?
+---@field doColorActions boolean?
+---@field doColorQuotes boolean?
+---@field doReplaceAsterisks boolean?
+---@field doAutoQuotes boolean?
 
 --#region Streams
 

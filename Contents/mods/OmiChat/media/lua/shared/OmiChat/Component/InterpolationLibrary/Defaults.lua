@@ -104,32 +104,25 @@ function Library.DefaultChatFormat(interpolator, args)
         message = '(( ' .. message .. ' ))'
     end
 
-    if not tags.IsNarrativeStyle then
-        local autoCapitalize
-        if tags.IsSneakCallout then
-            autoCapitalize = tags.AutoCapitalizeSneakCallout
-        else
-            autoCapitalize = tags.AutoCapitalize or tags.AutoCapitalizeChat
-        end
-
-        if autoCapitalize then
-            message = Library.Capitalize(interpolator, message)
-        end
+    local autoCapitalize = tags.AutoCapitalize or tags.AutoCapitalizeChat
+    if tags.IsSneakCallout then
+        autoCapitalize = tags.AutoCapitalizeSneakCallout
     end
 
+    message = Helpers.applySharedFormatting {
+        interpolator = interpolator,
+        options = options,
+        tags = tags,
+        input = message,
+        applyCase = not tags.IsNarrativeStyle,
+        applyEmbeddedQuotes = true,
+        applyEmbeddedActions = true,
+        doCapitalize = not tags.IsNarrativeStyle and autoCapitalize,
+        doPunctuate = tags.AutoPunctuate or tags.AutoPunctuateChat or (tags.IsNarrativeStyle and tags.AutoPunctuateNarrative),
+        doColorActions = tags.AutoColorActions and tags.IsNarrativeStyle,
+        doColorQuotes = tags.AutoColorQuotes,
+    }
 
-    if tags.AutoPunctuate or tags.AutoPunctuateChat then
-        local mark = (tags.Loud and not tags.Action and not tags.IsSneakCallout) and '!' or '.'
-        message = Library.Punctuate(interpolator, message, mark)
-    end
-
-    if tags.AutoColorActions then
-        message = Helpers.colorActions(message, options, tags)
-    end
-
-    if tags.AutoColorQuotes then
-        message = Helpers.colorQuotes(message, options, tags)
-    end
 
     if name == '' then
         name = nil
@@ -192,13 +185,6 @@ function Library.DefaultChatInputFilter(interpolator, args)
     local maxLen = options:getNumber('maxLength')
     if maxLen > 0 then
         text = text:sub(1, maxLen)
-    end
-
-    local doAutoQuote = not (options:getBoolean('noAutoEndQuote') or tags.NoAutoEndQuote)
-        and (options:getBoolean('autoEndQuote') or tags.AutoEndQuote or tags.AutoColorQuotes)
-        and (select(2, text:gsub('"', '')) % 2 == 1)
-    if doAutoQuote then
-        text = text .. '"'
     end
 
     return text
@@ -334,6 +320,56 @@ function Library.DefaultIconFormat(interpolator, args)
     return icon
 end
 
+---Default format for actions embedded in text.
+---@param interpolator omichat.Interpolator
+---@param args unknown?
+---@return string?
+function Library.DefaultEmbeddedActionFormat(interpolator, args)
+    local options = Helpers.readOptions(args)
+    local tags = Helpers.readTags(interpolator)
+
+    local input = tostring(options:get('input') or interpolator:tokenString('input'))
+    if utils.trim(input) == '' then
+        return
+    end
+
+    input = Helpers.applySharedFormatting {
+        interpolator = interpolator,
+        options = options,
+        tags = tags,
+        input = input,
+        applyCase = true,
+        doCapitalize = tags.AutoCapitalize or (tags.IsNarrativeStyle and tags.AutoCapitalizeNarrative) or tags.AutoCapitalizeEmbeddedActions,
+        doPunctuate = tags.AutoPunctuate or (tags.IsNarrativeStyle and tags.AutoPunctuateNarrative) or tags.AutoPunctuateEmbeddedActions,
+    }
+
+    return input
+end
+
+---Default format for quotes embedded in actions.
+---@param interpolator omichat.Interpolator
+---@param args unknown?
+---@return string?
+function Library.DefaultEmbeddedQuoteFormat(interpolator, args)
+    local options = Helpers.readOptions(args)
+    local tags = Helpers.readTags(interpolator)
+
+    local input = tostring(options:get('input') or interpolator:tokenString('input'))
+    if utils.trim(input) == '' then
+        return
+    end
+
+    return Helpers.applySharedFormatting {
+        interpolator = interpolator,
+        options = options,
+        tags = tags,
+        input = input,
+        applyCase = true,
+        doCapitalize = tags.AutoCapitalize or (tags.IsNarrativeStyle and tags.AutoCapitalizeNarrative) or tags.AutoCapitalizeEmbeddedQuotes,
+        doPunctuate = tags.AutoPunctuate or (tags.IsNarrativeStyle and tags.AutoPunctuateNarrative) or tags.AutoPunctuateEmbeddedQuotes,
+    }
+end
+
 ---Default format for roleplay languages.
 ---@param interpolator omichat.Interpolator
 ---@return string?
@@ -444,10 +480,16 @@ end
 ---@return string?
 function Library.DefaultNarrativeChatFormat(interpolator, args)
     local options = readOptions(args)
+    local tags = readTags(interpolator)
     local input = optionOrToken(interpolator, options, 'input')
     local dialogueTag = optionOrToken(interpolator, options, 'dialogueTag')
 
-    local content = '"' .. input .. '"'
+    local segments = Helpers.getMessageSegments(input, { optionalActionAsterisk = tags.OptionalActionAsterisk })
+
+    local startQuote = (segments[1] and segments[1].type == 'quote') and '"' or ''
+    local endQuote = (segments[#segments] and segments[#segments].type == 'quote') and '"' or ''
+
+    local content = Helpers.ensureWrapped(input, startQuote, endQuote)
     local dialogueTagIdent = dialogueTag:gsub('%s', '_')
 
     local translated = getTextOrNull('UI_OmiChat_NarrativeTag_' .. dialogueTagIdent, content)
@@ -464,33 +506,14 @@ end
 ---@return string
 function Library.DefaultNarrativeInputFilter(interpolator, args)
     local options = readOptions(args)
-    local tags = readTags(interpolator)
     local input = optionOrToken(interpolator, options, 'input')
 
-    if not options:getBoolean('noQuoteCleanup') then
-        if utils.startsWith(input, '"') then
-            input = input:sub(2)
-        end
-
-        if utils.endsWith(input, '"') then
-            input = input:sub(1, #input - 1)
-        end
+    if utils.startsWith(input, '"') then
+        input = input:sub(2)
     end
 
-    local autoCapitalize
-    if tags.IsSneakCallout then
-        autoCapitalize = tags.AutoCapitalizeSneakCallout
-    else
-        autoCapitalize = tags.AutoCapitalize or tags.AutoCapitalizeOverhead
-    end
-
-    if autoCapitalize then
-        input = Library.Capitalize(interpolator, input)
-    end
-
-    if tags.AutoPunctuate or tags.AutoPunctuateOverhead then
-        local mark = (tags.Loud and not tags.Action and not tags.IsSneakCallout) and '!' or '.'
-        input = Library.Punctuate(interpolator, input, mark)
+    if utils.endsWith(input, '"') then
+        input = input:sub(1, #input - 1)
     end
 
     return input
@@ -506,42 +529,24 @@ function Library.DefaultNarrativeOverheadFormat(interpolator, args)
     local input = optionOrToken(interpolator, options, 'input')
     local dialogueTag = optionOrToken(interpolator, options, 'dialogueTag')
 
-    local autoCapitalize
+    local autoCapitalize = tags.AutoCapitalize or tags.AutoCapitalizeOverhead or tags.AutoCapitalizeNarrative
     if tags.IsSneakCallout then
         autoCapitalize = tags.AutoCapitalizeSneakCallout
-    else
-        autoCapitalize = tags.AutoCapitalize or tags.AutoCapitalizeOverhead or tags.AutoCapitalizeNarrative
     end
 
-    if autoCapitalize then
-        input = Library.Capitalize(interpolator, input)
-    end
-
-    if tags.AutoPunctuate or tags.AutoPunctuateOverhead or tags.AutoPunctuateNarrative then
-        local mark = (tags.Loud and not tags.Action and not tags.IsSneakCallout) and '!' or '.'
-        input = Library.Punctuate(interpolator, input, mark)
-    end
-
-    if tags.AutoColorActions and not tags.AutoColorActionsKeepAsterisk then
-        input = Helpers.replaceColorActionsAsterisks(input)
-    end
-
-    if tags.Uppercase then
-        input = input:upper()
-    elseif tags.Lowercase then
-        input = input:lower()
-    end
-
-    if not options:getBoolean('noQuotes') then
-        local endQuote = '"'
-
-        -- if we're going to end with a colored action, don't include the final quote
-        if tags.AutoColorActions and Helpers.willEndWithAction(input) then
-            endQuote = ''
-        end
-
-        input = '"' .. input .. endQuote
-    end
+    input = Helpers.applySharedFormatting {
+        interpolator = interpolator,
+        options = options,
+        tags = tags,
+        input = input,
+        applyCase = true,
+        doCapitalize = autoCapitalize,
+        doPunctuate = tags.AutoPunctuate or tags.AutoPunctuateOverhead or tags.AutoPunctuateNarrative,
+        applyEmbeddedQuotes = true,
+        applyEmbeddedActions = true,
+        doAutoQuotes = true,
+        doReplaceAsterisks = tags.AutoColorActions and tags.IsNarrativeStyle,
+    }
 
     local comma = options:getBoolean('noComma') and '' or ', '
     return dialogueTag .. comma .. input
@@ -567,11 +572,25 @@ function Library.DefaultNarrativeTag(interpolator, args)
         return options:getString('whisperTag', 'whispers')
     end
 
-    if utils.endsWith(input, '?') then
+    -- only use the first quote to determine the punctuation-based narrative tag
+    local testInput = utils.getInternalText(input)
+    local segments = Helpers.getMessageSegments(testInput, {
+        onlyFirstSegment = true,
+        optionalActionAsterisk = tags.OptionalActionAsterisk,
+    })
+
+    if #segments > 0 and segments[1].type == 'quote' then
+        testInput = Helpers.ensureUnwrapped(segments[1].text, '"')
+    else
+        testInput = ''
+    end
+
+    testInput = utils.trim(testInput)
+    if utils.endsWith(testInput, '?') then
         return options:getString('questionTag', 'asks')
-    elseif utils.endsWith(input, '!') then
+    elseif utils.endsWith(testInput, '!') then
         return options:getString('exclamationTag', 'exclaims')
-    elseif #input < 10 and not utils.endsWith(input, '...') then
+    elseif #testInput < 10 and not utils.endsWith(testInput, '...') then
         return options:getString('shortStatementTag', 'states')
     end
 
@@ -593,33 +612,22 @@ function Library.DefaultOverheadFormat(interpolator, args)
     local name = tostring(options:get('name') or interpolator:token('name'))
     local input = tostring(options:get('input') or interpolator:tokenString(1))
 
-    if tags.AutoPunctuate or tags.AutoPunctuateOverhead then
-        local mark = (tags.Loud and not tags.Action and not tags.IsSneakCallout) and '!' or '.'
-        input = Library.Punctuate(interpolator, input, mark)
+    local autoCapitalize = tags.AutoCapitalize or tags.AutoCapitalizeOverhead
+    if tags.IsSneakCallout then
+        autoCapitalize = tags.AutoCapitalizeSneakCallout
     end
 
-    if not tags.IsNarrativeStyle then
-        if tags.Uppercase then
-            input = input:upper()
-        elseif tags.Lowercase then
-            input = input:lower()
-        end
-
-        local autoCapitalize
-        if tags.IsSneakCallout then
-            autoCapitalize = tags.AutoCapitalizeSneakCallout
-        else
-            autoCapitalize = tags.AutoCapitalize or tags.AutoCapitalizeOverhead
-        end
-
-        if autoCapitalize then
-            input = Library.Capitalize(interpolator, input)
-        end
-
-        if tags.AutoColorActions and not tags.AutoColorActionsKeepAsterisk then
-            input = Helpers.replaceColorActionsAsterisks(input)
-        end
-    end
+    input = Helpers.applySharedFormatting {
+        interpolator = interpolator,
+        options = options,
+        tags = tags,
+        input = input,
+        applyCase = not tags.IsNarrativeStyle,
+        applyEmbeddedQuotes = true,
+        applyEmbeddedActions = true,
+        doCapitalize = not tags.IsNarrativeStyle and autoCapitalize,
+        doPunctuate = not tags.IsNarrativeStyle and (tags.AutoPunctuate or tags.AutoPunctuateOverhead),
+    }
 
     if tags.OOC then
         input = '(( ' .. input .. ' ))'
@@ -798,7 +806,9 @@ function Library.DefaultUnknownLanguageFormat(interpolator, args)
     local fragment = Helpers.getFragmentedMessage(interpolator, message)
     if fragment then
         if tags.AutoColorQuotes then
-            fragment = Helpers.colorQuotes(fragment, options, tags)
+            local segment = { type = 'quote', text = fragment } ---@type omichat.MessageSegment
+            Helpers.colorQuotes({ segment }, options, tags)
+            fragment = segment.text
         end
 
         result = result .. ' <SPACE> ' .. fragment

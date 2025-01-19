@@ -201,6 +201,8 @@ return Schema:new {
                 Timestamp = str('$DefaultTimestampFormat()'),
                 Icon = str('$DefaultIconFormat()'),
                 Language = str('$DefaultLanguageFormat()'),
+                EmbeddedQuote = str('$DefaultEmbeddedQuoteFormat()'),
+                EmbeddedAction = str('$DefaultEmbeddedActionFormat()'),
             },
 
             Filter = container {
@@ -500,7 +502,9 @@ return Schema:new {
             },
 
             Format = rules {
-                OverheadFull = PAD_TOP,
+                Component = rules {
+                    EmbeddedQuote = PAD_TOP,
+                },
             },
 
             Language = rules {

@@ -3,16 +3,145 @@
 local API = require 'OmiChat/API/Shared/Core'
 
 local concat = table.concat
+local sort = table.sort
 local utils = API.utils
 local config = API.Configuration
 local MultiMap = utils.MultiMap
+local baseLib = utils.lib.interpolate.Interpolator.Libraries
+local stringLib = baseLib.string
 
 local ASTERISK_CHAR = utils.encodeInvisibleCharacter(config.ID_ASTERISK_SIGNAL)
+local ASTERISK_PREFIX_PATTERN = '^(%s*[*' .. ASTERISK_CHAR .. '])(.+)'
 
 
----@class omichat.InterpolationLibraryHelpers
+---@class omichat.InterpolationLibrary.Helpers
 local Helpers = {}
 
+
+---Adds quotes to quote segments if they're not already present.
+---@param segments omichat.MessageSegment[]
+function Helpers.applyAutoQuotes(segments)
+    for i = 1, #segments do
+        local quote = segments[i]
+        if quote.type == 'quote' and quote.text ~= '' then
+            quote.text = Helpers.ensureWrapped(quote.text, '"')
+        end
+    end
+end
+
+---Performs formatting shared between multiple default formats.
+---@param args omichat.Args.PerformSharedOperations
+---@return string
+function Helpers.applySharedFormatting(args)
+    local input = args.input
+    local tags = args.tags
+
+    local doEmbeddedActions = args.applyEmbeddedActions and Helpers.shouldFormatEmbeddedActions(tags)
+    local doEmbeddedQuotes = args.applyEmbeddedQuotes and Helpers.shouldFormatEmbeddedQuotes(tags)
+
+    local doSegments = args.doColorActions
+        or args.doColorQuotes
+        or args.doReplaceAsterisks
+        or doEmbeddedQuotes
+        or doEmbeddedActions
+
+    -- if we don't need to process segments, don't bother splitting the string
+    if not doSegments then
+        if args.applyCase then
+            if tags.Uppercase then
+                input = input:upper()
+            elseif tags.Lowercase then
+                input = input:lower()
+            end
+        end
+
+        local isAction = not tags.IsEmbeddedQuote and (tags.Action or tags.IsEmbeddedAction)
+        if args.doCapitalize then
+            local prefix = ''
+            if isAction then
+                local matchPrefix, matchInput = input:match(ASTERISK_PREFIX_PATTERN)
+                if matchPrefix and matchInput then
+                    prefix, input = matchPrefix, matchInput
+                end
+            end
+
+            input = prefix .. Helpers.capitalize(input)
+        end
+
+        if args.doPunctuate then
+            local mark = (tags.Loud and not isAction and not tags.IsSneakCallout) and '!' or '.'
+            input = Helpers.punctuate(input, mark)
+        end
+
+        if args.doAutoQuotes then
+            input = Helpers.ensureWrapped(input, '"')
+        end
+
+        return input
+    end
+
+    local options = args.options
+    local segments, prefix, suffix = Helpers.getMessageSegments(input, {
+        startInAction = tags.Action,
+        optionalActionAsterisk = tags.OptionalActionAsterisk,
+    })
+
+    local doBasicFormatting = args.applyCase or args.doCapitalize or args.doPunctuate
+
+    if doEmbeddedQuotes then
+        Helpers.formatEmbeddedQuotes(segments, args.interpolator)
+    end
+
+    if doEmbeddedActions then
+        Helpers.formatEmbeddedActions(segments, args.interpolator)
+    end
+
+    if args.doReplaceAsterisks then
+        Helpers.replaceColorActionsAsterisks(segments)
+    end
+
+    if doBasicFormatting or doEmbeddedActions or args.doColorActions then
+        Helpers.formatQuoteSegments(segments, tags, args)
+    end
+
+    if args.doAutoQuotes then
+        Helpers.applyAutoQuotes(segments)
+    end
+
+    if doBasicFormatting or doEmbeddedQuotes or args.doColorQuotes then
+        Helpers.formatActionSegments(segments, tags, args)
+    end
+
+    if args.doColorActions then
+        Helpers.colorActions(segments, options, tags)
+    end
+
+    if args.doColorQuotes then
+        Helpers.colorQuotes(segments, options, tags)
+    end
+
+    return prefix .. Helpers.combineSegments(segments) .. suffix
+end
+
+---Capitalizes the first non-invisible character of a string. Handles leading spaces.
+---@param input string
+---@return string
+function Helpers.capitalize(input)
+    local prefix, suffix
+    input, prefix, suffix = utils.getInternalText(input)
+
+    local spaces, first = input:match('^(%s*)()')
+    spaces = spaces or ''
+    if first then
+        input = input:sub(first)
+    end
+
+    -- doesn't actually use the interpolator
+    ---@diagnostic disable-next-line: param-type-mismatch
+    input = stringLib.Capitalize(nil, input)
+
+    return prefix .. spaces .. input .. suffix
+end
 
 ---Checks whether the language being sent is signed and returns an error ID if it is.
 ---The translation of the error assumes the stream is intended to be a "radio" channel for RP purposes.
@@ -35,123 +164,243 @@ function Helpers.checkSignedOverRadio(interpolator)
     return errorID
 end
 
----Colors actions in a string based on the streams tagged with `ActionColorTarget`.
----@param message string
+---Colors actions based on the streams tagged with `ActionColorTarget`.
+---@param segments omichat.MessageSegment[]
 ---@param options omi.MultiMap?
 ---@param tags omi.SimpleSet?
----@return string
-function Helpers.colorActions(message, options, tags)
+function Helpers.colorActions(segments, options, tags)
     tags = tags or {}
     local color = Helpers.getColorTarget('ActionColorTarget', options, tags)
     if color == '' then
-        return message
+        return
     end
 
-    local narrativeStyle
-    local keepAsterisk
+    local keepAsterisk = false
     if options then
-        narrativeStyle = options:get('narrativeStyle', tags.IsNarrativeStyle)
-        keepAsterisk = options:get('keepAsterisk', tags.AutoColorActionsKeepAsterisk)
-    else
-        narrativeStyle = tags.IsNarrativeStyle
-        keepAsterisk = tags.AutoColorActionsKeepAsterisk
+        keepAsterisk = options:get('keepActionAsterisk') or false
     end
 
-    local prefix = ''
-    local suffix = ''
-    local origMessage = message
-    if narrativeStyle then
-        local startQ = message:find('"')
-        local endQ = message:match('.*"()') -- find last quote
-        endQ = endQ and (endQ - 1)
+    for i = 1, #segments do
+        local part = segments[i]
+        if part.type == 'action' then
+            local text = part.text:gsub(ASTERISK_CHAR, '*')
+            local space, asterisk, after = text:match('^(%s*)(%*)()')
+            if asterisk and not keepAsterisk then
+                text = space .. text:sub(after)
+            end
 
-        if startQ and endQ and startQ ~= endQ and endQ == #message then
-            prefix = message:sub(1, startQ)
-            suffix = message:sub(endQ)
-            message = message:sub(startQ + 1, endQ - 1)
+            part.text = ' <SPACE> ' .. color .. text .. ' <POPRGB> <SPACE> '
         end
     end
-
-    message = message:gsub(ASTERISK_CHAR, '*')
-
-    local pos = 1
-    local result = {}
-    local patt = '"%s*%*'
-    local next, nextEnd = message:find(patt)
-
-    local endsWithAction = false
-    while next and nextEnd and next <= #message do
-        local sub = message:sub(pos, next - 1)
-        result[#result + 1] = sub
-        result[#result + 1] = '"'
-
-        result[#result + 1] = color
-        result[#result + 1] = ' <SPACE> '
-
-        if keepAsterisk then
-            result[#result + 1] = '*'
-        end
-
-        pos = nextEnd + 1
-
-        -- maintain action color until next quote character
-        local nextQuote = message:find('"', pos)
-        if not nextQuote then
-            result[#result + 1] = message:sub(pos)
-            result[#result + 1] = ' <SPACE> <POPRGB> '
-            pos = #message + 1
-            endsWithAction = true
-            break
-        end
-
-        result[#result + 1] = message:sub(pos, nextQuote - 1)
-        result[#result + 1] = ' <SPACE> <POPRGB> '
-
-        pos = nextQuote
-        next, nextEnd = message:find(patt, pos)
-    end
-
-    if #result == 0 then
-        return origMessage
-    end
-
-    if pos <= #message then
-        result[#result + 1] = message:sub(pos)
-    end
-
-    message = concat(result)
-
-    if endsWithAction or utils.endsWith(message, '"') then
-        suffix = suffix:sub(2)
-    end
-
-    return prefix .. message .. suffix
 end
 
----Colors quotes in a string based on the streams tagged with `QuoteColorTarget`.
----@param message string
+---Colors quotes based on the streams tagged with `QuoteColorTarget`.
+---@param segments omichat.MessageSegment[]
 ---@param options omi.MultiMap?
 ---@param tags omi.SimpleSet?
----@return string
-function Helpers.colorQuotes(message, options, tags)
+function Helpers.colorQuotes(segments, options, tags)
     local color = Helpers.getColorTarget('QuoteColorTarget', options, tags)
     if color == '' then
-        return message
+        return
     end
 
-    message = message:gsub('%b""', function(quote)
-        if quote == '""' then
-            return ''
+    for i = 1, #segments do
+        local segment = segments[i]
+        if segment.type == 'quote' then
+            segment.text = ' <SPACE> ' .. color .. segment.text .. ' <POPRGB> <SPACE> '
         end
+    end
+end
 
-        return
-            ' <SPACE>' ..
-            color ..
-            quote ..
-            ' <POPRGB> <SPACE> '
-    end)
+---Concatenates message segments into a string.
+---@param segments omichat.MessageSegment[]
+---@return string
+function Helpers.combineSegments(segments)
+    local result = {}
 
-    return message
+    for i = 1, #segments do
+        result[#result + 1] = segments[i].text
+    end
+
+    return concat(result)
+end
+
+---Wraps text in characters, if it's not already wrapped.
+---@param text string
+---@param prefix string
+---@param suffix string?
+---@return string
+function Helpers.ensureUnwrapped(text, prefix, suffix)
+    suffix = suffix or prefix
+    if utils.startsWith(text, prefix) then
+        text = text:sub(2)
+    end
+
+    if utils.endsWith(text, suffix) then
+        text = text:sub(1, #text - 1)
+    end
+
+    return text
+end
+
+---Wraps text in characters, if it's not already wrapped.
+---@param text string
+---@param prefix string
+---@param suffix string?
+---@return string
+function Helpers.ensureWrapped(text, prefix, suffix)
+    suffix = suffix or prefix
+    if not utils.startsWith(text, prefix) then
+        text = prefix .. text
+    end
+
+    if not utils.endsWith(text, suffix) then
+        text = text .. suffix
+    end
+
+    return text
+end
+
+---Formats segments that have been tagged as actions.
+---@param segments omichat.MessageSegment[]
+---@param tags omi.SimpleSet
+---@param args omichat.Args.PerformSharedOperations
+---@param onlyFirst boolean?
+function Helpers.formatActionSegments(segments, tags, args, onlyFirst)
+    local skipCapitalize = tags.AutoCapitalizeNonInitialSegments
+    local shouldCapitalize = args.doCapitalize or skipCapitalize
+
+    for i = 1, #segments do
+        local action = segments[i]
+        if action.type == 'action' then
+            local text = action.text
+            if shouldCapitalize and not skipCapitalize then
+                local prefix = ''
+                local matchPrefix, matchInput = text:match(ASTERISK_PREFIX_PATTERN)
+                if matchPrefix and matchInput then
+                    prefix, text = matchPrefix, matchInput
+                end
+
+                text = prefix .. Helpers.capitalize(text)
+            end
+
+            if args.applyCase then
+                if tags.Uppercase then
+                    text = text:upper()
+                elseif tags.Lowercase then
+                    text = text:lower()
+                end
+            end
+
+            if args.doPunctuate then
+                text = Helpers.punctuate(text)
+            end
+
+            action.text = text
+            skipCapitalize = false
+
+            if onlyFirst then
+                break
+            end
+        end
+    end
+end
+
+---Formats segments that have been tagged as quotes.
+---@param segments omichat.MessageSegment[]
+---@param tags omi.SimpleSet
+---@param args omichat.Args.PerformSharedOperations
+---@param onlyFirst boolean?
+function Helpers.formatQuoteSegments(segments, tags, args, onlyFirst)
+    local skipCapitalize = tags.AutoCapitalizeNonInitialSegments
+    local shouldCapitalize = args.doCapitalize or skipCapitalize
+    local isFirstPunctuate = true
+
+    for i = 1, #segments do
+        local action = segments[i]
+        if action.type == 'quote' then
+            local prefix, text, suffix = action.text:match('^(%s*"?)(.-)("?%s*)$')
+            if shouldCapitalize and not skipCapitalize then
+                text = Helpers.capitalize(text)
+            end
+
+            if args.applyCase then
+                if tags.Uppercase then
+                    text = text:upper()
+                elseif tags.Lowercase then
+                    text = text:lower()
+                end
+            end
+
+            if args.doPunctuate then
+                local mark = (isFirstPunctuate and tags.Loud and not tags.IsSneakCallout) and '!' or '.'
+                text = Helpers.punctuate(text, mark)
+                isFirstPunctuate = false
+            end
+
+            action.text = prefix .. text .. suffix
+            skipCapitalize = false
+
+            if onlyFirst then
+                break
+            end
+        end
+    end
+end
+
+---Formats actions based on the embedded action format.
+---@param segments omichat.MessageSegment[]
+---@param interpolator omichat.Interpolator
+function Helpers.formatEmbeddedActions(segments, interpolator)
+    local tokens = interpolator:getTokens()
+
+    local tags = tokens.tags
+    if utils.isinstance(tags, MultiMap) then
+        ---@cast tags omi.MultiMap
+        tokens.tags = tags:withSetValue('IsEmbeddedAction')
+    else
+        tokens.tags = MultiMap.fromSet({ IsEmbeddedAction = true })
+    end
+
+    for i = 1, #segments do
+        local action = segments[i]
+        if action.type == 'action' then
+            tokens.input = action.text
+
+            local result = utils.interpolate(config.Format.Component.EmbeddedAction, tokens)
+            action.text = result
+        end
+    end
+end
+
+---Formats quotes based on the embedded quote format.
+---@param segments omichat.MessageSegment[]
+---@param interpolator omichat.Interpolator
+function Helpers.formatEmbeddedQuotes(segments, interpolator)
+    local tokens = interpolator:getTokens()
+
+    local tags = tokens.tags
+    if utils.isinstance(tags, MultiMap) then
+        ---@cast tags omi.MultiMap
+        tokens.tags = tags:withSetValue('IsEmbeddedQuote')
+    else
+        tokens.tags = MultiMap.fromSet({ IsEmbeddedQuote = true })
+    end
+
+    for i = 1, #segments do
+        local quote = segments[i]
+        if quote.type == 'quote' then
+            local text = Helpers.ensureUnwrapped(quote.text, '"')
+            tokens.input = text
+
+            local result = utils.interpolate(config.Format.Component.EmbeddedQuote, tokens)
+            if result ~= '' then
+                result = Helpers.ensureWrapped(result, '"')
+            end
+
+            quote.text = result
+        end
+    end
 end
 
 ---Gets a string for the base unknown language string, without a message fragment.
@@ -305,7 +554,7 @@ function Helpers.getFragmentedMessage(interpolator, message)
         return
     end
 
-    table.sort(selected)
+    sort(selected)
 
     -- build fragmented message
     local last = 0
@@ -325,6 +574,67 @@ function Helpers.getFragmentedMessage(interpolator, message)
     end
 
     return '"' .. concat(built, ' ') .. '"'
+end
+
+---Gets the segments in a message, tagging them as actions or quotes.
+---@param input string
+---@param options omichat.Args.GetMessageSegments?
+---@return omichat.MessageSegment[]
+---@return string prefix
+---@return string suffix
+function Helpers.getMessageSegments(input, options)
+    options = options or {}
+
+    local inAction = options.startInAction or false
+    local onlyFirstSegment = options.onlyFirstSegment
+    local requireAsterisk = not options.startInAction and not options.optionalActionAsterisk
+
+    local start = 1
+    local pos = 1
+    local prefix, suffix
+
+    input, prefix, suffix = utils.getInternalText(utils.trim(input))
+    local asteriskDelimPattern = '^"%s*[*' .. ASTERISK_CHAR .. ']'
+
+    local segments = {} ---@type omichat.MessageSegment[]
+    while pos <= #input do
+        if input:sub(pos, pos) == '"' then
+            if start ~= pos then
+                if inAction then
+                    segments[#segments + 1] = {
+                        type = 'action',
+                        text = input:sub(start, pos - 1),
+                    }
+
+                    start = pos
+                    inAction = not inAction
+                elseif not requireAsterisk or input:match(asteriskDelimPattern, pos) then
+                    segments[#segments + 1] = {
+                        type = 'quote',
+                        text = input:sub(start, pos),
+                    }
+
+                    start = pos + 1
+                    inAction = not inAction
+                end
+            end
+
+            if onlyFirstSegment and #segments > 0 then
+                return segments, prefix, suffix
+            end
+        end
+
+        pos = pos + 1
+    end
+
+    if #input > 0 and start <= #input then
+        segments[#segments + 1] = {
+            type = inAction and 'action' or 'quote',
+            text = input:sub(start, #input),
+        }
+    end
+
+    return segments, prefix, suffix
 end
 
 ---Gets the text to use for an "over radio" indicator based on the chat type.
@@ -380,6 +690,29 @@ end
 ---@return string
 function Helpers.optionOrToken(interpolator, options, key, token)
     return options:getString(key, interpolator:tokenString(token or key))
+end
+
+---Adds punctuation to a string if it isn't already present.
+---Handles encoded invisible characters and trailing spaces.
+---@param input string
+---@param punctuation string?
+---@param characters string?
+---@return string
+function Helpers.punctuate(input, punctuation, characters)
+    local prefix, suffix
+    input, prefix, suffix = utils.getInternalText(input)
+
+    local last, spaces = input:match('()(%s*)$')
+    spaces = spaces or ''
+    if last then
+        input = input:sub(1, last - 1)
+    end
+
+    -- doesn't actually use the interpolator
+    ---@diagnostic disable-next-line: param-type-mismatch
+    input = stringLib.Punctuate(nil, input, punctuation, characters)
+
+    return prefix .. input .. spaces .. suffix
 end
 
 ---Reads at-function options.
@@ -441,45 +774,45 @@ function Helpers.readTags(interpolator)
     return tagSet
 end
 
----Replaces asterisks in a message intended for coloring actions with invisible characters.
+---Replaces asterisks intended for coloring actions with invisible characters.
 ---This prevents them from displaying overhead while still allowing the action coloring to handle them properly.
----@param message string
----@return string
-function Helpers.replaceColorActionsAsterisks(message)
-    local pos = 1
-    local result = {}
-    local patt = '("%s*)%*'
-    local next, nextEnd, prefix = message:find(patt)
-
-    while next and nextEnd and next <= #message do
-        result[#result + 1] = message:sub(pos, next - 1)
-        result[#result + 1] = prefix
-        result[#result + 1] = ASTERISK_CHAR
-
-        pos = nextEnd + 1
-
-        local nextQuote = message:find('"', pos)
-        if not nextQuote then
-            result[#result + 1] = message:sub(pos)
-            pos = #message + 1
-            break
+---@param segments omichat.MessageSegment[]
+function Helpers.replaceColorActionsAsterisks(segments)
+    for i = 1, #segments do
+        local action = segments[i]
+        if action.type == 'action' then
+            local space, after = action.text:match('^(%s*)%*()')
+            if space then
+                action.text = space .. ASTERISK_CHAR .. action.text:sub(after)
+            end
         end
+    end
+end
 
-        result[#result + 1] = message:sub(pos, nextQuote - 1)
-
-        pos = nextQuote
-        next, nextEnd, prefix = message:find(patt, pos)
+---Checks whether embedded actions should be processed.
+---@param tags omi.SimpleSet
+---@return boolean
+function Helpers.shouldFormatEmbeddedActions(tags)
+    if tags.NoEmbeddedActions then
+        return false
     end
 
-    if #result == 0 then
-        return message
+    if tags.AutoColorActions and tags.IsNarrativeStyle then
+        return true
     end
 
-    if pos <= #message then
-        result[#result + 1] = message:sub(pos)
+    return tags.EmbeddedActions or not tags.Action
+end
+
+---Checks whether embedded quotes should be processed.
+---@param tags omi.SimpleSet
+---@return boolean
+function Helpers.shouldFormatEmbeddedQuotes(tags)
+    if tags.NoEmbeddedQuotes then
+        return false
     end
 
-    return concat(result)
+    return tags.EmbeddedQuotes or tags.Action or tags.AutoColorQuotes or false
 end
 
 ---Stringifies inputs into a single string.
@@ -501,32 +834,6 @@ function Helpers.stringifySep(sep, ...)
 
     return concat(t, sep)
 end
-
----Checks whether a message with automatically colored actions will end with an action when formatted.
----@param message string
----@return boolean
-function Helpers.willEndWithAction(message)
-    message = message:gsub(ASTERISK_CHAR, '*')
-
-    local pos = 1
-    local patt = '"%s*%*'
-    local next, nextEnd = message:find(patt)
-
-    while next and nextEnd and next <= #message do
-        pos = nextEnd + 1
-
-        local nextQuote = message:find('"', pos)
-        if not nextQuote then
-            return true
-        end
-
-        pos = nextQuote
-        next, nextEnd = message:find(patt, pos)
-    end
-
-    return false
-end
-
 
 
 return Helpers

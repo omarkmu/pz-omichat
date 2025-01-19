@@ -102,6 +102,8 @@ return Preset:new {
                 Timestamp = '$DefaultTimestampFormat()',
                 Icon = '$DefaultIconFormat()',
                 Language = '$DefaultLanguageFormat()',
+                EmbeddedQuote = '$DefaultEmbeddedQuoteFormat()',
+                EmbeddedAction = '$DefaultEmbeddedActionFormat()',
             },
             Overhead = {
                 Final = '$DefaultFullOverheadFormat()',

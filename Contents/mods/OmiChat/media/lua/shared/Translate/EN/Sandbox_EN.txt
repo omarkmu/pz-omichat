@@ -91,6 +91,8 @@ Sandbox_EN = {
     Sandbox_OmiChat_Format_Component_Timestamp = "Timestamp",
     Sandbox_OmiChat_Format_Component_Icon = "Icon",
     Sandbox_OmiChat_Format_Component_Language = "Language",
+    Sandbox_OmiChat_Format_Component_EmbeddedQuote = "Embedded Quotes",
+    Sandbox_OmiChat_Format_Component_EmbeddedAction = "Embedded Actions",
     Sandbox_OmiChat_Format_Overhead = "Overhead Text",
     Sandbox_OmiChat_Format_Overhead_Final = "Final Format",
     Sandbox_OmiChat_Format_Overhead_Prefix = "Prefix Format",
@@ -269,6 +271,8 @@ Sandbox_EN = {
         " This controls the value of the <SPACE> <PUSHRGB:0,0.5,1> $timestamp <POPRGB> <SPACE> token in other format strings.",
     Sandbox_OmiChat_Format_Component_Icon_tooltip = "Defines the value of the <SPACE> <PUSHRGB:0,0.5,1> $icon <POPRGB> <SPACE> token in other format strings.",
     Sandbox_OmiChat_Format_Component_Language_tooltip = "Defines the value of the <SPACE> <PUSHRGB:0,0.5,1> $language <POPRGB> <SPACE> token in the final chat format.",
+    Sandbox_OmiChat_Format_Component_EmbeddedQuote_tooltip = "Defines the format used for quotes embedded in actions.",
+    Sandbox_OmiChat_Format_Component_EmbeddedAction_tooltip = "Defines the format used for actions embedded in text.",
     Sandbox_OmiChat_Format_Filter_tooltip = "Format strings used to control whether an input is allowed.",
     Sandbox_OmiChat_Format_Filter_ChatInput_tooltip = "Filters chat input before sending it. If this results in the empty string or sets an error token, the input won't be sent.",
     Sandbox_OmiChat_Format_Filter_Name_tooltip = "Filters names set with the <SPACE> <PUSHRGB:0,1,0> /name <POPRGB> <SPACE> and <SPACE> <PUSHRGB:0,1,0> /nickname <POPRGB> commands." ..

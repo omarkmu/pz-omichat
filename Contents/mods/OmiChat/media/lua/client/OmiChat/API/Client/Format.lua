@@ -45,8 +45,19 @@ local function applyNarrativeStyle(input, stream, tokens)
         return original, nil, err
     end
 
+    -- inject tag
+    local tags = tokens.tags
+    if utils.isinstance(tags, MultiMap) then
+        ---@cast tags omi.MultiMap
+        tokens.tags = tags:withSetValue('IsNarrativeStyle')
+    else
+        tokens.tags = MultiMap.fromSet({ IsNarrativeStyle = true })
+    end
+
     -- get dialogue tag
     local seed = input
+
+    tokens.input = input
     local dialogueTag = utils.interpolate(config.NarrativeStyle.DialogueTagFormat, tokens, seed)
     if dialogueTag == '' then
         return original

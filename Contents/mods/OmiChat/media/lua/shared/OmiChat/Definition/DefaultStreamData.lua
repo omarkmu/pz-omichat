@@ -32,6 +32,7 @@ return {
         Tags = {
             'AutoCapitalizeNarrative',
             'AutoPunctuateNarrative',
+            'AutoColorActions',
             'QuoteColorTarget',
             'UseNameColor',
         },
@@ -55,6 +56,7 @@ return {
         Tags = {
             'AutoCapitalizeNarrative',
             'AutoPunctuateNarrative',
+            'AutoColorActions',
             'NoVolumeIndicator',
             'Loud',
             'Callout',
@@ -77,6 +79,7 @@ return {
         Tags = {
             'AutoCapitalizeNarrative',
             'AutoPunctuateNarrative',
+            'AutoColorActions',
             'Quiet',
             'EchoTarget',
         },
@@ -98,6 +101,7 @@ return {
         Tags = {
             'AutoCapitalizeNarrative',
             'AutoPunctuateNarrative',
+            'AutoColorActions',
             'Whisper',
         },
     },
@@ -117,6 +121,9 @@ return {
         Tags = {
             'AutoPunctuateChat',
             'AutoColorQuotes',
+            'AutoPunctuateEmbeddedQuotes',
+            'AutoCapitalizeEmbeddedQuotes',
+            'AutoCapitalizeNonInitialSegments',
             'Action',
             'IncludeName',
             'ActionColorTarget',
@@ -144,6 +151,9 @@ return {
         Tags = {
             'AutoPunctuateChat',
             'AutoColorQuotes',
+            'AutoPunctuateEmbeddedQuotes',
+            'AutoCapitalizeEmbeddedQuotes',
+            'AutoCapitalizeNonInitialSegments',
             'Action',
             'IncludeName',
             'Loud',
@@ -166,6 +176,9 @@ return {
         Tags = {
             'AutoPunctuateChat',
             'AutoColorQuotes',
+            'AutoPunctuateEmbeddedQuotes',
+            'AutoCapitalizeEmbeddedQuotes',
+            'AutoCapitalizeNonInitialSegments',
             'Action',
             'IncludeName',
             'Quiet',
@@ -188,6 +201,9 @@ return {
         Tags = {
             'AutoPunctuateChat',
             'AutoColorQuotes',
+            'AutoPunctuateEmbeddedQuotes',
+            'AutoCapitalizeEmbeddedQuotes',
+            'AutoCapitalizeNonInitialSegments',
             'Action',
             'IncludeName',
             'Whisper',

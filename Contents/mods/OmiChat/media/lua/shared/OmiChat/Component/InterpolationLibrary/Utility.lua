@@ -4,23 +4,11 @@ local API = require 'OmiChat/API/Shared/Core'
 
 local utils = API.utils
 local MultiMap = utils.MultiMap
-local baseLib = utils.lib.interpolate.Interpolator.Libraries
-local stringLib = baseLib.string
 
 
 ---@class omichat.InterpolationLibrary
 local Library = require 'OmiChat/Component/InterpolationLibrary/Core'
 local Helpers = Library.Helpers
-
-
----Capitalizes the first non-invisible character of a string.
----@type fun(interpolator: omi.Interpolator, ...: unknown): string
-Library.Capitalize = Helpers.internalWrap(stringLib.Capitalize)
-
----Adds punctuation to a string if it isn't already present.
----Handles encoded invisible characters.
----@type fun(interpolator: omi.Interpolator, ...: unknown): string
-Library.Punctuate = Helpers.internalWrap(stringLib.Punctuate)
 
 
 ---Returns the access level of player 1.
@@ -30,25 +18,41 @@ function Library.AccessLevel()
     return player and player:getAccessLevel() or 'none'
 end
 
+---Capitalizes the first non-invisible character of a string.
+---@param interpolator omichat.Interpolator
+---@param ... unknown
+---@return string
+---@diagnostic disable-next-line: unused-local
+function Library.Capitalize(interpolator, ...)
+    return Helpers.capitalize(utils.concat({ ... }))
+end
+
 ---Colors actions in a string based on the streams tagged with `ActionColorTarget`.
 ---@param interpolator omichat.Interpolator
 ---@param message unknown
 ---@param options unknown
 ---@return string?
 function Library.ColorActions(interpolator, message, options)
-    if not message then
+    message = tostring(message or '')
+    if message == '' then
         return
     end
 
-    message = tostring(message)
+    local optionalAsterisks = false
     if utils.isinstance(options, MultiMap) then
         ---@cast options omi.MultiMap
         options = options:toOptions()
+        optionalAsterisks = options:getBoolean('optionalAsterisks')
     else
         options = nil
     end
 
-    return Helpers.colorActions(message, options, Helpers.readTags(interpolator))
+    local segments, prefix, suffix = Helpers.getMessageSegments(tostring(message), {
+        optionalActionAsterisk = optionalAsterisks,
+    })
+
+    Helpers.colorActions(segments, options, Helpers.readTags(interpolator))
+    return prefix .. Helpers.combineSegments(segments) .. suffix
 end
 
 ---Colors quotes in a string based on the streams tagged with `QuoteColorTarget`.
@@ -57,19 +61,27 @@ end
 ---@param options unknown
 ---@return string?
 function Library.ColorQuotes(interpolator, message, options)
-    if not message then
+    message = tostring(message or '')
+    if message == '' then
         return
     end
 
-    message = tostring(message)
+    local optionalAsterisks = false
     if utils.isinstance(options, MultiMap) then
         ---@cast options omi.MultiMap
         options = options:toOptions()
+        optionalAsterisks = options:getBoolean('optionalAsterisks')
     else
         options = nil
     end
 
-    return Helpers.colorQuotes(message, options, Helpers.readTags(interpolator))
+    local segments, prefix, suffix = Helpers.getMessageSegments(tostring(message), {
+        startInAction = true,
+        optionalActionAsterisk = optionalAsterisks,
+    })
+
+    Helpers.colorQuotes(segments, options, Helpers.readTags(interpolator))
+    return prefix .. Helpers.combineSegments(segments) .. suffix
 end
 
 ---Validates that the message is not being sent with a signed language.
@@ -170,6 +182,17 @@ end
 ---@diagnostic disable-next-line: unused-local
 function Library.Parens(interpolator, ...)
     return '(' .. Helpers.stringifySep(' ', ...) .. ')'
+end
+
+---Adds punctuation to a string if it isn't already present.
+---@param interpolator omichat.Interpolator
+---@param s unknown
+---@param punctuation unknown?
+---@param chars unknown?
+---@return string
+---@diagnostic disable-next-line: unused-local
+function Library.Punctuate(interpolator, s, punctuation, chars)
+    return Helpers.punctuate(tostring(s or ''), punctuation, chars)
 end
 
 ---Returns the stream category given a stream name.
