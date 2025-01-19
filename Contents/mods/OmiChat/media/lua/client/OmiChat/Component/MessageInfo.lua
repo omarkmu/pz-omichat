@@ -54,6 +54,7 @@ function MessageInfo.decodeMessageTag(tag, metadata)
     metadata.adminIcon = decoded.adminIcon
     metadata.stream = decoded.stream
     metadata.originalStream = decoded.originalStream
+    metadata.displayedOverhead = decoded.displayedOverhead
 
     return metadata
 end
@@ -320,7 +321,31 @@ function MessageInfo:applyTransforms(transformers)
         end
     end
 
+    -- hide the original overhead text
+    if self.overheadText and not self.meta.displayedOverhead then
+        self.message:setOverHeadSpeech(false)
+    end
+
+    -- process modifications first, in case this is a radio message
     self:_afterTransforms()
+
+    -- show the modified message
+    if self.overheadText and not self.hidden and not self.meta.displayedOverhead then
+        self:_setMetadataValue('displayedOverhead', true)
+
+        local authorPlayer = utils.getPlayerByUsername(self.author)
+        if not authorPlayer then
+            return
+        end
+
+        local color = authorPlayer:getSpeakColour()
+        local r, g, b = color:getR(), color:getG(), color:getB()
+        authorPlayer:addLineChatElement(
+            self.overheadText, r, g, b,
+            UIFont.Medium, 0, 'default',
+            true, true, true, true, false, true
+        )
+    end
 end
 
 ---Gets the message text to use.
@@ -671,6 +696,16 @@ end
 ---@param color omi.ColorTable
 function MessageInfo:setMetadataRecipientNameColor(color)
     self:_setMetadataValue('recipientNameColor', utils.color.toHexString(color))
+end
+
+---Sets the text to show overhead for this message.
+---@param text string?
+function MessageInfo:setOverheadText(text)
+    self.overheadText = text
+
+    if not text then
+        self:hideOverhead()
+    end
 end
 
 ---Updates the stream and associated information to act as if the message was sent on another stream.

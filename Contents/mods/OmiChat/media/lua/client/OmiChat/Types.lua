@@ -48,6 +48,7 @@
 ---@field author string The username of the message author.
 ---@field zombieAttractRange integer? The range at which the message will be heard by zombies.
 ---@field tags omi.SimpleSet A set of tags to add to the message tokens.
+---@field protected overheadText string? The text to show overhead instead of the message text.
 ---@field protected hidden boolean Whether the message has been hidden in chat and overhead.
 ---@field protected loudCallout boolean Whether the message is a non-sneak callout.
 ---@field protected sneakCallout boolean Whether the message is a sneak callout.
@@ -79,6 +80,7 @@
 ---@field faction string? The name of the faction to which the message was sent.
 ---@field rangeResult omichat.MessageInfo.Metadata.RangeResult? The result of range checking.
 ---@field attractedZombies boolean? Whether the message has already attracted zombies.
+---@field displayedOverhead boolean? Whether the replacement overhead text has already displayed.
 
 ---@alias omichat.MessageInfo.Metadata.RangeResult 'in-range' | 'out-of-range'
 
