@@ -30,14 +30,20 @@ function _IsoPlayer:Callout(playEmote)
         return
     end
 
-    local stream = API.getFirstChatStreamWithTag('Callout') or API.getStreamByName('yell')
+    local isSneaking = self:isSneaking()
+
+    local stream
+    if isSneaking then
+        stream = API.getFirstChatStreamWithTag('SneakCallout')
+    end
+
+    stream = stream or API.getFirstChatStreamWithTag('Callout') or API.getStreamByName('yell')
     if not stream then
         API.utils.log.once('No stream defined for callouts. Add the `Callout` tag to a stream.')
         _Callout(self, playEmote)
         return
     end
 
-    local isSneaking = self:isSneaking()
     local zombieConfig = config.ZombieAttraction
     local range = isSneaking and zombieConfig.SneakCalloutRange or zombieConfig.CalloutRange
 

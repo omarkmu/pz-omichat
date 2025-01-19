@@ -250,10 +250,6 @@ return {
         name = 'callouts',
         priority = 80,
         transform = function(_, info)
-            if not info:isChatType('shout') then
-                return
-            end
-
             local text = info.content or info.rawText
             local calloutFormatter = API._metadataFormatters.callout
             local sneakCalloutFormatter = API._metadataFormatters.sneakCallout
@@ -272,6 +268,7 @@ return {
                 return
             end
 
+            targetStream = targetStream or API.getStreamByName('yell')
             if targetStream then
                 info:setStream(targetStream)
             end
