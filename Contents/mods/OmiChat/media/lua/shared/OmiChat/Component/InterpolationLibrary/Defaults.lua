@@ -51,7 +51,7 @@ function Library.DefaultChatFormat(interpolator, args)
         end
     end
 
-    local message = options:getString('message')
+    local message = options:getString('input')
     if message == '' then
         if tags.IsCardCommand then
             message = getText('UI_OmiChat_CardLocal', interpolator:tokenString('card'))
@@ -63,7 +63,7 @@ function Library.DefaultChatFormat(interpolator, args)
             local sides = interpolator:tokenString('sides')
             message = getText('UI_OmiChat_RollLocal', roll, sides)
         else
-            message = interpolator:tokenString('message')
+            message = interpolator:tokenString('input')
         end
     end
 
@@ -292,7 +292,7 @@ function Library.DefaultFullOverheadFormat(interpolator, args)
         prefix = prefix .. ' '
     end
 
-    return prefix .. interpolator:tokenString(1)
+    return prefix .. interpolator:tokenString('input')
 end
 
 ---Default format for chat icons.
@@ -620,7 +620,7 @@ function Library.DefaultOverheadFormat(interpolator, args)
     end
 
     local name = tostring(options:get('name') or interpolator:token('name'))
-    local input = tostring(options:get('input') or interpolator:tokenString(1))
+    local input = tostring(options:get('input') or interpolator:tokenString('input'))
 
     local autoCapitalize = tags.AutoCapitalize or tags.AutoCapitalizeOverhead
     if tags.IsSneakCallout then
@@ -812,8 +812,8 @@ function Library.DefaultUnknownLanguageFormat(interpolator, args)
 
     local result = prefix .. base
 
-    local messageOpt = options:get('message')
-    local message = tostring(messageOpt or interpolator:token('unstyled') or interpolator:token('message') or '')
+    local opt = options:get('input')
+    local message = tostring(opt or interpolator:token('unstyled') or interpolator:token('input') or '')
     local fragment = Helpers.getFragmentedMessage(interpolator, message)
     if fragment then
         if tags.AutoColorQuotes then

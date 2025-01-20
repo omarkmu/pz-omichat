@@ -35,7 +35,7 @@ end
 ---Formats the text according to the formatter's format string.
 ---This encodes invisible characters for later identification.
 ---If the format string doesn't return proper content, this will
----behave as if the format string were `$1`.
+---behave as if the format string were `$input`.
 ---@param text string
 ---@param tokens table?
 ---@return string
@@ -47,7 +47,7 @@ function MetaFormatter:format(text, tokens)
         tokens = {}
     end
 
-    tokens[1] = text
+    tokens.input = text
 
     local formatted = utils.replaceEntities(utils.interpolate(self:getFormatString(), tokens))
 
@@ -142,7 +142,7 @@ end
 ---Sets the format string to the given string.
 ---@param format string?
 function MetaFormatter:setFormatString(format)
-    self._formatString = format or '$1'
+    self._formatString = format or '$input'
 end
 
 ---Creates a new meta formatter.

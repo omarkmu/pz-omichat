@@ -302,7 +302,7 @@ function MessageInfo:applyFormatting()
         options.color = color or self:getOriginalColor()
     end
 
-    self.tokens.message = content
+    self.tokens.input = content
     return true
 end
 
