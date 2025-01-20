@@ -492,19 +492,14 @@ function Library.DefaultNarrativeChatFormat(interpolator, args)
     local dialogueTag = optionOrToken(interpolator, options, 'dialogueTag')
 
     local segments = Helpers.getMessageSegments(input, { optionalActionAsterisk = tags.OptionalActionAsterisk })
-
     local startQuote = (segments[1] and segments[1].type == 'quote') and '"' or ''
     local endQuote = (segments[#segments] and segments[#segments].type == 'quote') and '"' or ''
 
-    local content = Helpers.ensureWrapped(input, startQuote, endQuote)
-    local dialogueTagIdent = dialogueTag:gsub('%s', '_')
+    local comma = options:getBoolean('noComma') and '' or ', '
+    input = Helpers.ensureWrapped(input, startQuote, endQuote)
+    dialogueTag = dialogueTag:lower()
 
-    local translated = getTextOrNull('UI_OmiChat_NarrativeTag_' .. dialogueTagIdent, content)
-    if not translated then
-        translated = getText('UI_OmiChat_NarrativeTag', dialogueTag, content)
-    end
-
-    return translated
+    return dialogueTag .. comma .. input
 end
 
 ---Default filter for narrative style messages.

@@ -112,17 +112,6 @@ UI_FR = {
     UI_OmiChat_PerceivedChat_Quiet = "%1 says something quietly.",
     UI_OmiChat_PerceivedChat_Loud = "%1 shouts something.",
 
-    --[[ Dialogue Tags ]]--
-    UI_OmiChat_NarrativeTag = "%1, %2", ---@ignore identical
-    UI_OmiChat_NarrativeTag_asks = "demande, %1",
-    UI_OmiChat_NarrativeTag_says = "dit, %1",
-    UI_OmiChat_NarrativeTag_states = "déclare, %1",
-    UI_OmiChat_NarrativeTag_shouts = "crie, %1",
-    UI_OmiChat_NarrativeTag_hisses = "siffle, %1",
-    UI_OmiChat_NarrativeTag_exclaims = "s'exclame, %1",
-    UI_OmiChat_NarrativeTag_whispers = "chuchote, %1",
-    UI_OmiChat_NarrativeTag_whisper_shouts = "chuchote à voix haute, %1",
-
     --[[ Languages ]]--
     UI_OmiChat_Language_Arabic = "Arabe",
     UI_OmiChat_Language_ASL = "Langage des Signes Américain",

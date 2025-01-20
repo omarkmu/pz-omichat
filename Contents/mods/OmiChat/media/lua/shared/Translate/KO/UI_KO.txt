@@ -112,17 +112,6 @@ UI_KO = {
     UI_OmiChat_PerceivedChat_Quiet = "%1이/가 무슨 말을 조용하게 했습니다.",
     UI_OmiChat_PerceivedChat_Loud = "%1이/가 무슨 말을 소리쳤습니다.",
 
-    --[[ Dialogue Tags ]]--
-    UI_OmiChat_NarrativeTag = "%1, %2", ---@ignore identical
-    UI_OmiChat_NarrativeTag_asks = "%1냐고 물었습니다.",
-    UI_OmiChat_NarrativeTag_says = "%1라고 말했습니다.",
-    UI_OmiChat_NarrativeTag_states = "%1라고 말했습니다.",
-    UI_OmiChat_NarrativeTag_shouts = "%1라고 소리쳤습니다.",
-    UI_OmiChat_NarrativeTag_hisses = "%1라고 크게 속삭였습니다.",
-    UI_OmiChat_NarrativeTag_exclaims = "%1라고 말했습니다.",
-    UI_OmiChat_NarrativeTag_whispers = "%1라고 조용하게 말했습니다.",
-    UI_OmiChat_NarrativeTag_whisper_shouts = "%1라고 크게 속삭였습니다.",
-
     --[[ Languages ]]--
     UI_OmiChat_Language_Arabic = "아랍어",
     UI_OmiChat_Language_ASL = "수어",
