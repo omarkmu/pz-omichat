@@ -130,7 +130,7 @@ function Library.DefaultChatFormat(interpolator, args)
 
     local prefix = ''
     if tags.IsRadioStream then
-        prefix = getText('UI_OmiChat_Radio', interpolator:tokenString('frequency') or '???')
+        prefix = getText('UI_OmiChat_Radio', tostring(interpolator:token('frequency') or '???'))
         noColon = true
 
         if not tags.NoColon then
@@ -141,18 +141,11 @@ function Library.DefaultChatFormat(interpolator, args)
     end
 
     if tags.Action then
-        local result = message
         if name then
-            result = name .. ' <SPACE> ' .. message
+            message = name .. ' <SPACE> ' .. message
         end
 
-        if tags.UseActionAsterisks or tags.UseActionAsterisksChat then
-            result = '** <SPACE> ' .. result
-        elseif not (tags.UseActionPlain or tags.UseActionPlainChat) then
-            result = getText('UI_OmiChat_RPEmote', ' <SPACE> ' .. result .. ' <SPACE> ')
-        end
-
-        return prefix .. result
+        return prefix .. Helpers.wrapActionChat(message, tags)
     end
 
     if not name then
@@ -213,11 +206,21 @@ function Library.DefaultChatPrefix(interpolator, args)
         end
     end
 
-    if not tags.NoLanguage and not tags.NoLanguageChat then
+    if tags.IsPerceptionRange and not tags.NoPerceptionRangeIndicator and not tags.NoPerceptionRangeIndicatorChat then
+        result[#result + 1] = '[' .. getText('UI_OmiChat_OutOfRange') .. ']'
+    end
+
+    if not tags.NoLanguage and not tags.NoLanguageChat and not tags.IsPerceptionRange then
         result[#result + 1] = interpolator:tokenString('language')
     end
 
-    if tags.OverRadio then
+    local buffyCrit = interpolator:tokenString('buffyCrit')
+    if buffyCrit ~= '' then
+        result[#result + 1] = ' <SPACE> '
+        result[#result + 1] = buffyCrit
+    end
+
+    if tags.OverRadio and not tags.IsPerceptionRange then
         result[#result + 1] = ' <SPACE> '
         result[#result + 1] = Helpers.getOverRadioText(interpolator:token('chatType'))
     end
@@ -233,12 +236,6 @@ function Library.DefaultChatPrefix(interpolator, args)
             result[#result + 1] = ' <SPACE> '
             result[#result + 1] = icon
         end
-    end
-
-    local buffyCrit = interpolator:tokenString('buffyCrit')
-    if buffyCrit ~= '' then
-        result[#result + 1] = ' <SPACE> '
-        result[#result + 1] = buffyCrit
     end
 
     if tags.IncludeAdminIndicator and not tags.NoAdminIndicator then
@@ -654,11 +651,7 @@ function Library.DefaultOverheadFormat(interpolator, args)
     end
 
     if tags.Action then
-        if tags.UseActionAsterisks or tags.UseActionAsterisksOverhead then
-            input = '** ' .. input
-        elseif not (tags.UseActionPlain or tags.UseActionPlainOverhead) then
-            input = '( ' .. input .. ' )'
-        end
+        input = Helpers.wrapActionOverhead(input, tags)
     end
 
     if tags.OverRadio then
@@ -678,7 +671,6 @@ function Library.DefaultOverheadPrefix(interpolator, args)
     local tags = readTags(interpolator)
     local result = {}
 
-
     if not tags.NoVolumeIndicator and not tags.NoVolumeIndicatorOverhead then
         local volume = Helpers.getVolumeIndicator(options, tags, preset)
         if volume then
@@ -686,7 +678,11 @@ function Library.DefaultOverheadPrefix(interpolator, args)
         end
     end
 
-    if not tags.NoLanguage and not tags.NoLanguageOverhead then
+    if tags.IsPerceptionRange and not tags.NoPerceptionRangeIndicator and not tags.NoPerceptionRangeIndicatorOverhead then
+        result[#result + 1] = '[Out of Range]'
+    end
+
+    if not tags.NoLanguage and not tags.NoLanguageOverhead and not tags.IsPerceptionRange then
         local language = interpolator:tokenString('languageRaw')
         if language ~= '' then
             result[#result + 1] = '[' .. language .. ']'
@@ -698,6 +694,36 @@ function Library.DefaultOverheadPrefix(interpolator, args)
     end
 
     return concat(result, ' ')
+end
+
+---Default chat format for out-of-range, perceived messages.
+---@param interpolator omichat.Interpolator
+---@return string?
+function Library.DefaultPerceptionRangeChatFormat(interpolator)
+    local tags = Helpers.readTags(interpolator)
+
+    local name = interpolator:tokenString('name')
+    if name == '' then
+        return
+    end
+
+    name = name .. ' <SPACE> '
+
+    return Helpers.wrapActionChat(Helpers.getPerceivedChatString(name, tags), tags)
+end
+
+---Default overhead format for out-of-range, perceived messages.
+---@param interpolator omichat.Interpolator
+---@return string?
+function Library.DefaultPerceptionRangeOverheadFormat(interpolator)
+    local tags = Helpers.readTags(interpolator)
+
+    local name = interpolator:tokenString('name')
+    if name == '' then
+        return
+    end
+
+    return Helpers.wrapActionOverhead(Helpers.getPerceivedChatString(name, tags), tags)
 end
 
 ---Default format for `/roll` command result content.
@@ -797,20 +823,7 @@ function Library.DefaultUnknownLanguageFormat(interpolator, args)
         return
     end
 
-    local prefix = ''
-    if tags.IsRadioStream then
-        prefix = getText('UI_OmiChat_Radio', tostring(interpolator:token('frequency') or '???'))
-
-        if tags.IncludeColon or not (tags.NoColon or tags.NoColonChat or tags.IsNarrativeStyle or tags.IsBuffyRoll) then
-            prefix = prefix .. ':'
-        end
-
-        prefix = prefix .. ' <SPACE> '
-    elseif tags.OverRadio or tags.IsEchoMessage then
-        prefix = Helpers.getOverRadioText(interpolator:token('chatType')) .. ' <SPACE> '
-    end
-
-    local result = prefix .. base
+    local result = Helpers.getRadioPrefix(interpolator, tags) .. base
 
     local opt = options:get('input')
     local message = tostring(opt or interpolator:token('unstyled') or interpolator:token('input') or '')
@@ -825,11 +838,5 @@ function Library.DefaultUnknownLanguageFormat(interpolator, args)
         result = result .. ' <SPACE> ' .. fragment
     end
 
-    if tags.UseActionAsterisks or tags.UseActionAsterisksChat then
-        return '** <SPACE> ' .. result
-    elseif tags.UseActionPlain or tags.UseActionPlainChat then
-        return result
-    end
-
-    return getText('UI_OmiChat_RPEmote', ' <SPACE> ' .. result)
+    return Helpers.wrapActionChat(result, tags)
 end

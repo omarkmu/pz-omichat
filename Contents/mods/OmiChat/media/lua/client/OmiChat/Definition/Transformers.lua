@@ -18,6 +18,34 @@ local rangedChatTypes = {
 ---@diagnostic disable: invisible
 
 
+---Gets the best action stream to use for displaying a message.
+---@param info omichat.MessageInfo
+---@return omichat.ChatStream?
+local function getActionStream(info)
+    local targetTags
+    if info.sneakCallout or info.tags.Quiet then
+        targetTags = { 'Quiet', 'Whisper' }
+    elseif info.loudCallout or info.tags.Loud then
+        targetTags = { 'Loud' }
+    end
+
+    local streams = API.getChatStreamsWithTag('Action', { 'NoName' })
+
+    local targetStream
+    if targetTags then
+        for i = 1, #streams do
+            local stream = streams[i]
+            if stream:hasAnyTags(targetTags) then
+                targetStream = stream
+                break
+            end
+        end
+    end
+
+    return targetStream or streams[1]
+end
+
+
 ---@type omichat.MessageTransformer[]
 return {
     {
@@ -378,27 +406,8 @@ return {
 
                 info:syncTags()
 
-                local targetTags
-                if info.sneakCallout or info.tags.Quiet then
-                    targetTags = { 'Quiet', 'Whisper' }
-                elseif info.loudCallout or info.tags.Loud then
-                    targetTags = { 'Loud' }
-                end
-
-                local streams = API.getChatStreamsWithTag('Action', { 'NoName' })
-                local targetStream
-                if targetTags then
-                    for i = 1, #streams do
-                        local stream = streams[i]
-                        if stream:hasAnyTags(targetTags) then
-                            targetStream = stream
-                            break
-                        end
-                    end
-                end
-
-                -- if there's not a stream that matches the volume, use any action stream that displays names
-                targetStream = targetStream or streams[1]
+                -- use an action stream that displays names
+                local targetStream = getActionStream(info)
                 if targetStream then
                     local stream = info.stream
                     if stream and stream.tags.Action then
@@ -447,7 +456,29 @@ return {
     {
         name = 'check-range',
         priority = 20,
-        transform = function(_, info)
+
+        ---@param info omichat.MessageInfo
+        setPerceivedText = function(_, info)
+            info.format = config.Format.PerceptionRange.Chat
+
+            info.tags.IsPerceptionRange = true
+            info:syncTags()
+
+            local overhead = utils.interpolate(config.Format.PerceptionRange.Overhead, info:getOverheadTokens())
+
+            if overhead ~= '' then
+                info:setOverheadText(overhead, true)
+            else
+                info:hideOverhead()
+            end
+
+            local targetStream = getActionStream(info)
+            if targetStream then
+                info:setStream(targetStream)
+            end
+        end,
+
+        transform = function(self, info)
             local stream = info.stream
             if not stream or not stream.isChat then
                 return
@@ -462,6 +493,8 @@ return {
             if cached then
                 if cached == 'out-of-range' then
                     info:hide()
+                elseif cached == 'in-perception-range' then
+                    self:setPerceivedText(info)
                 end
 
                 return
@@ -495,6 +528,8 @@ return {
 
             local outOfRange = false
             local zMax = stream.verticalRange or 2
+
+            local dist
             if zMax and math.abs(authorPlayer:getZ() - localPlayer:getZ()) >= zMax then
                 outOfRange = true
             elseif range ~= maxRange then
@@ -503,15 +538,24 @@ return {
                 local xDiff = authorPlayer:getX() - localPlayer:getX()
                 local yDiff = authorPlayer:getY() - localPlayer:getY()
 
-                outOfRange = math.sqrt(xDiff * xDiff + yDiff * yDiff) > range
+                dist = math.sqrt(xDiff * xDiff + yDiff * yDiff)
+                outOfRange = dist > range
             end
 
-            if outOfRange then
-                info:setMetadataRangeResult('out-of-range')
-                info:hide()
-            else
+            if not outOfRange then
                 info:setMetadataRangeResult('in-range')
+                return
             end
+
+            local perceptionRange = stream.perceptionRange
+            if not info.tags.Action and dist and dist <= perceptionRange then
+                info:setMetadataRangeResult('in-perception-range')
+                self:setPerceivedText(info)
+                return
+            end
+
+            info:setMetadataRangeResult('out-of-range')
+            info:hide()
         end,
     },
     {

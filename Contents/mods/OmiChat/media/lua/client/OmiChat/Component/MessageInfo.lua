@@ -321,8 +321,9 @@ function MessageInfo:applyTransforms(transformers)
         end
     end
 
-    -- hide the original overhead text
-    if self.overheadText and not self.meta.displayedOverhead then
+    local overheadText = self.overheadText
+    if overheadText and not self.meta.displayedOverhead then
+        -- hide the original overhead text
         self.message:setOverHeadSpeech(false)
     end
 
@@ -330,7 +331,7 @@ function MessageInfo:applyTransforms(transformers)
     self:_afterTransforms()
 
     -- show the modified message
-    if self.overheadText and not self.hidden and not self.meta.displayedOverhead then
+    if overheadText and not self.hidden and not self.meta.displayedOverhead then
         self:_setMetadataValue('displayedOverhead', true)
 
         local authorPlayer = utils.getPlayerByUsername(self.author)
@@ -338,10 +339,21 @@ function MessageInfo:applyTransforms(transformers)
             return
         end
 
+        if self.doFullOverhead then
+            local formatter = API._metadataFormatters.overheadFinal
+            local overheadFormat = formatter and formatter:getFormatString()
+            if overheadFormat then
+                local tokens = self:getOverheadTokens()
+                tokens.input = overheadText
+                tokens.prefix = utils.trimleft(utils.interpolate(config.Format.Overhead.Prefix, tokens))
+                overheadText = utils.interpolate(overheadFormat, tokens)
+            end
+        end
+
         local color = authorPlayer:getSpeakColour()
         local r, g, b = color:getR(), color:getG(), color:getB()
         authorPlayer:addLineChatElement(
-            self.overheadText, r, g, b,
+            overheadText, r, g, b,
             UIFont.Medium, 0, 'default',
             true, true, true, true, false, true
         )
@@ -360,6 +372,12 @@ function MessageInfo:buildMessageText()
     self:syncTags()
 
     local seed = self.datetime
+    local input = utils.interpolate(inputFormat, self.tokens, seed)
+    if input == '' then
+        self:hide()
+        return
+    end
+
     local tokens = {
         tag = self.tag,
         chatType = self.chatType,
@@ -375,7 +393,7 @@ function MessageInfo:buildMessageText()
         buffyCritRaw = self.tokens.buffyCritRaw,
         tags = self.tokens.tags,
         originalTags = self.tokens.originalTags,
-        input = utils.interpolate(inputFormat, self.tokens, seed),
+        input = input,
     }
 
     tokens.prefix = utils.trim(utils.interpolate(config.Format.Chat.Prefix, tokens, seed))
@@ -516,6 +534,20 @@ end
 ---@return omichat.Stream?
 function MessageInfo:getOriginalStream()
     return self.originalStream
+end
+
+---Gets tokens to use for an overhead format.
+---@return table
+function MessageInfo:getOverheadTokens()
+    self:syncTags()
+
+    return {
+        chatType = self.chatType,
+        username = self.author,
+        name = self.tokens.name,
+        stream = self.stream and self.stream:getName(),
+        tags = self.tokens.tags,
+    }
 end
 
 ---Gets the raw message text, without transformations.
@@ -700,8 +732,10 @@ end
 
 ---Sets the text to show overhead for this message.
 ---@param text string?
-function MessageInfo:setOverheadText(text)
+---@param doFullFormatting boolean?
+function MessageInfo:setOverheadText(text, doFullFormatting)
     self.overheadText = text
+    self.doFullOverhead = doFullFormatting
 
     if not text then
         self:hideOverhead()
@@ -712,10 +746,6 @@ end
 ---@param stream omichat.Stream
 ---@param options omichat.Args.MessageInfo.SetStream?
 function MessageInfo:setStream(stream, options)
-    if stream == self.stream then
-        return
-    end
-
     options = options or {}
 
     local name = stream:getName()

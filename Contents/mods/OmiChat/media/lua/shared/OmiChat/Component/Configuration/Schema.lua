@@ -195,6 +195,11 @@ return Schema:new {
                 Final = str('$DefaultFullOverheadFormat()'),
             },
 
+            PerceptionRange = container {
+                Chat = str('$DefaultPerceptionRangeChatFormat()'),
+                Overhead = str('$DefaultPerceptionRangeOverheadFormat()'),
+            },
+
             Component = container {
                 Name = str('$DefaultNameFormat()'),
                 Tag = str('$DefaultTagFormat()'),
@@ -353,6 +358,7 @@ return Schema:new {
                         DefaultColor = color(),
                         Range = int(30, 1, 60), -- maximum is dependent on chat type
                         VerticalRange = int(2, 1, 32),
+                        PerceptionRange = int(0, 0, 60),
 
                         AllowBuffs = bool(false),
                         AllowEmotes = bool(false),
@@ -577,7 +583,7 @@ return Schema:new {
                         Enable = PAD_BOTTOM,
                         ShortCommand = PAD_BOTTOM,
                         Aliases = PAD_BOTTOM,
-                        VerticalRange = PAD_BOTTOM,
+                        PerceptionRange = PAD_BOTTOM,
                     },
 
                     createItem = function()
@@ -656,12 +662,18 @@ return Schema:new {
                             rangeControl:setMaxValue(maxRange)
                         end
 
+                        local perceiveRangeControl = form:getFieldControl({ 'Streams', 'List', 'PerceptionRange' }) ---@cast perceiveRangeControl omi.ui.TextEntry?
+                        if perceiveRangeControl then
+                            perceiveRangeControl:setMaxValue(maxRange)
+                        end
+
                         -- enable range & overhead fields only for ranged stream types
                         if not allDisabled then
                             local isRanged = chatType == 'say' or chatType == 'shout'
                             local dependentFields = {
                                 { form:getFieldInfo({ 'Streams', 'List', 'Range' }) },
                                 { form:getFieldInfo({ 'Streams', 'List', 'VerticalRange' }) },
+                                { form:getFieldInfo({ 'Streams', 'List', 'PerceptionRange' }) },
                                 { form:getFieldInfo({ 'Streams', 'List', 'OverheadFormat' }) },
                                 { form:getFieldInfo({ 'Streams', 'List', 'AttractZombies' }), false },
                             }

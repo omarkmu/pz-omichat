@@ -89,7 +89,8 @@ return Preset:new {
             ShowColorOption = 'Respect_Server_Setting',
             Tags = {
                 'UseAuthorUsername',
-                'OOC' },
+                'OOC',
+            },
         },
         EchoMessages = {
             Enable = true,
@@ -112,6 +113,10 @@ return Preset:new {
             Overhead = {
                 Final = '$DefaultFullOverheadFormat()',
                 Prefix = '$DefaultOverheadPrefix()',
+            },
+            PerceptionRange = {
+                Chat = '$DefaultPerceptionRangeChatFormat()',
+                Overhead = '$DefaultPerceptionRangeOverheadFormat()',
             },
             Chat = {
                 Final = '$DefaultFullChatFormat()',
@@ -201,6 +206,7 @@ return Preset:new {
                     Stream = 'low',
                     Enable = true,
                     Range = 4,
+                    PerceptionRange = 8,
                     DefaultColor = { r = 177, g = 210, b = 187 },
                     Tags = {
                         'AutoCapitalize',
@@ -215,6 +221,7 @@ return Preset:new {
                     Stream = 'whisper',
                     Enable = true,
                     Range = 2,
+                    PerceptionRange = 6,
                     DefaultColor = { r = 177, g = 210, b = 187 },
                     Tags = {
                         'AutoCapitalize',

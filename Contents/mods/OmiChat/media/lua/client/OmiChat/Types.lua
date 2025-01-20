@@ -49,6 +49,7 @@
 ---@field zombieAttractRange integer? The range at which the message will be heard by zombies.
 ---@field tags omi.SimpleSet A set of tags to add to the message tokens.
 ---@field protected overheadText string? The text to show overhead instead of the message text.
+---@field protected doFullOverhead boolean? If `true`, the replacement overhead text will also use the overhead prefix and final formats.
 ---@field protected hidden boolean Whether the message has been hidden in chat and overhead.
 ---@field protected loudCallout boolean Whether the message is a non-sneak callout.
 ---@field protected sneakCallout boolean Whether the message is a sneak callout.
@@ -82,7 +83,7 @@
 ---@field attractedZombies boolean? Whether the message has already attracted zombies.
 ---@field displayedOverhead boolean? Whether the replacement overhead text has already displayed.
 
----@alias omichat.MessageInfo.Metadata.RangeResult 'in-range' | 'out-of-range'
+---@alias omichat.MessageInfo.Metadata.RangeResult 'in-range' | 'out-of-range' | 'in-perception-range'
 
 ---A suggestion that can display to the player.
 ---@class omichat.Suggestion
@@ -281,6 +282,7 @@
 ---@field protected tabID integer The tab ID of the tab in which this stream is available (1-indexed).
 ---@field protected useNarrativeStyle boolean Whether the stream should apply narrative style if it's enabled.
 ---@field protected verticalRange integer The vertical range of the chat stream.
+---@field protected perceptionRange integer The perception range of the chat stream.
 
 ---@class omichat.Args.ChatStream : omichat.Args.Stream
 ---@field defaultColor omi.ColorTable? The default color for messages on the stream.
@@ -293,6 +295,7 @@
 ---@field chatType omichat.ChatTypeString? The chat type that stream messages are sent over.
 ---@field range integer? The range of the chat stream.
 ---@field verticalRange integer? The vertical range of the chat stream.
+---@field perceptionRange integer? The perception range of the chat stream.
 ---@field tabID integer? The tab ID of the tab in which this stream is available (1-indexed).
 
 

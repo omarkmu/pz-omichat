@@ -87,13 +87,17 @@ return Preset:new {
             ChatFormat = '$DefaultChatFormat()',
             DefaultColor = { r = 144, g = 137, b = 218 },
             ShowColorOption = 'Respect_Server_Setting',
-            Tags = { 'UseAuthorUsername' },
+            Tags = {
+                'UseAuthorUsername',
+            },
         },
         EchoMessages = {
             Enable = false,
             ChatFormat = '$DefaultChatFormat()',
             OverheadFormat = '$DefaultOverheadFormat()',
-            Tags = { 'OverRadio' },
+            Tags = {
+                'OverRadio',
+            },
         },
         Format = {
             Component = {
@@ -108,6 +112,10 @@ return Preset:new {
             Overhead = {
                 Final = '$DefaultFullOverheadFormat()',
                 Prefix = '$DefaultOverheadPrefix()',
+            },
+            PerceptionRange = {
+                Chat = '$DefaultPerceptionRangeChatFormat()',
+                Overhead = '$DefaultPerceptionRangeOverheadFormat()',
             },
             Chat = {
                 Final = '$DefaultFullChatFormat()',

@@ -299,6 +299,7 @@
 ---@field Component omichat.Configuration.Format.Component
 ---@field Filter omichat.Configuration.Format.Filter
 ---@field MenuName omichat.Configuration.Format.MenuName
+---@field PerceptionRange omichat.Configuration.Format.PerceptionRange
 ---@field Overhead omichat.Configuration.Format.Overhead
 
 ---@class omichat.Configuration.Format.Chat
@@ -325,6 +326,10 @@
 ---@field SearchPlayer string?
 ---@field Typing string?
 ---@field MiniScoreboard string?
+
+---@class omichat.Configuration.Format.PerceptionRange
+---@field Chat string
+---@field Overhead string
 
 ---@class omichat.Configuration.Format.Overhead
 ---@field Final string
@@ -385,6 +390,7 @@
 ---@field ChatFormat string?
 ---@field Range integer?
 ---@field VerticalRange integer?
+---@field PerceptionRange integer?
 ---@field AllowBuffs boolean?
 ---@field AllowEmotes boolean?
 ---@field AllowLanguages boolean?

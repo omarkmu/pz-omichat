@@ -650,6 +650,44 @@ function Helpers.getOverRadioText(chatType)
     return getText('UI_OmiChat_OverRadio')
 end
 
+---Gets the string to display when an out-of-range chat is perceived.
+---@param name string
+---@param tags omi.SimpleSet
+---@return string
+function Helpers.getPerceivedChatString(name, tags)
+    local stringID = 'UI_OmiChat_PerceivedChat'
+    if tags.Whisper then
+        stringID = 'UI_OmiChat_PerceivedChat_Whisper'
+    elseif tags.Quiet then
+        stringID = 'UI_OmiChat_PerceivedChat_Quiet'
+    elseif tags.Loud then
+        stringID = 'UI_OmiChat_PerceivedChat_Loud'
+    end
+
+    return getText(stringID, name)
+end
+
+---Gets the prefix to use for a message to indicate that it was sent over the radio.
+---@param interpolator omichat.Interpolator
+---@param tags omi.SimpleSet
+---@return string
+function Helpers.getRadioPrefix(interpolator, tags)
+    local prefix = ''
+    if tags.IsRadioStream then
+        prefix = getText('UI_OmiChat_Radio', tostring(interpolator:token('frequency') or '???'))
+
+        if tags.IncludeColon or not (tags.NoColon or tags.NoColonChat or tags.IsNarrativeStyle or tags.IsBuffyRoll) then
+            prefix = prefix .. ':'
+        end
+
+        prefix = prefix .. ' <SPACE> '
+    elseif tags.OverRadio or tags.IsEchoMessage then
+        prefix = Helpers.getOverRadioText(interpolator:token('chatType')) .. ' <SPACE> '
+    end
+
+    return prefix
+end
+
 ---Gets a volume indicator based on tags.
 ---@param options omi.MultiMap
 ---@param tags omi.SimpleSet
@@ -833,6 +871,34 @@ function Helpers.stringifySep(sep, ...)
     end
 
     return concat(t, sep)
+end
+
+---Wraps an action for chat based on the provided tags.
+---@param text string
+---@param tags omi.SimpleSet
+---@return string
+function Helpers.wrapActionChat(text, tags)
+    if tags.UseActionAsterisks or tags.UseActionAsterisksChat then
+        return '** <SPACE> ' .. text
+    elseif not (tags.UseActionPlain or tags.UseActionPlainChat) then
+        return getText('UI_OmiChat_RPEmote', ' <SPACE> ' .. text .. ' <SPACE> ')
+    end
+
+    return text
+end
+
+---Wraps an action for an overhead message based on the provided tags.
+---@param text string
+---@param tags omi.SimpleSet
+---@return string
+function Helpers.wrapActionOverhead(text, tags)
+    if tags.UseActionAsterisks or tags.UseActionAsterisksOverhead then
+        return '** ' .. text
+    elseif not (tags.UseActionPlain or tags.UseActionPlainOverhead) then
+        return '( ' .. text .. ' )'
+    end
+
+    return text
 end
 
 

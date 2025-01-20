@@ -79,6 +79,7 @@ function ChatStream.fromDefinition(def, additionalTags)
         disabled = def.Enable == false,
         range = def.Range,
         verticalRange = def.VerticalRange,
+        perceptionRange = def.PerceptionRange,
         allowBuffs = def.AllowBuffs,
         allowEmotes = def.AllowEmotes,
         allowLanguages = def.AllowLanguages,
@@ -169,6 +170,16 @@ function ChatStream:getDefaultColor()
     return { r = 255, g = 255, b = 255 }
 end
 
+---Returns the perception range of the stream if it's a ranged stream.
+---@return integer?
+function ChatStream:getPerceptionRange()
+    if not self:isRanged() then
+        return
+    end
+
+    return self.perceptionRange
+end
+
 ---Returns the range of the stream if it's a ranged stream.
 ---@return integer?
 function ChatStream:getRange()
@@ -224,6 +235,7 @@ function ChatStream:new(args)
     this.range = args.range or (this.chatType == 'shout' and 60 or 30)
     this.tabID = args.tabID or 1
     this.verticalRange = args.verticalRange or 2
+    this.perceptionRange = args.perceptionRange or 0
     this.defaultColor = args.defaultColor and utils.copy(args.defaultColor) or { r = 255, g = 255, b = 255 }
 
     return this

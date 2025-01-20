@@ -99,6 +99,13 @@ UI_EN = {
     UI_OmiChat_UnknownLanguageNarrative_whispers = "%1 whispers something in %2.",
     UI_OmiChat_UnknownLanguageNarrative_whisper_shouts = "%1 whisper shouts something in %2.",
 
+    -- [[ Perception Range ]]--
+    UI_OmiChat_OutOfRange = "Out of Range",
+    UI_OmiChat_PerceivedChat = "%1 says something.",
+    UI_OmiChat_PerceivedChat_Whisper = "%1 whispers something.",
+    UI_OmiChat_PerceivedChat_Quiet = "%1 says something quietly.",
+    UI_OmiChat_PerceivedChat_Loud = "%1 shouts something.",
+
     --[[ Dialogue Tags ]]--
     UI_OmiChat_NarrativeTag = "%1, %2",
     UI_OmiChat_NarrativeTag_asks = "asks, %1",
