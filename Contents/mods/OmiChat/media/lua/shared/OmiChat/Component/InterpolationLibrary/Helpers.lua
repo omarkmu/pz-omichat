@@ -692,8 +692,9 @@ end
 ---@param options omi.MultiMap
 ---@param tags omi.SimpleSet
 ---@param preset string
+---@param shouldTranslate boolean?
 ---@return string?
-function Helpers.getVolumeIndicator(options, tags, preset)
+function Helpers.getVolumeIndicator(options, tags, preset, shouldTranslate)
     local indicator
     if not tags.IsSneakCallout and (tags.Loud or tags.IsCallout) then
         indicator = options:getString('loudIndicator', preset == 'Buffy' and 'Long' or 'Loud')
@@ -703,9 +704,15 @@ function Helpers.getVolumeIndicator(options, tags, preset)
         indicator = options:getString('whisperIndicator', 'Whisper')
     end
 
-    if indicator then
-        return '[' .. indicator .. ']'
+    if not indicator then
+        return
     end
+
+    if shouldTranslate then
+        indicator = getTextOrNull('UI_OmiChat_VolumeIndicator_' .. indicator) or indicator
+    end
+
+    return '[' .. indicator .. ']'
 end
 
 ---Wraps a function so that it gets the internal value before being applied, then reapplies the invisible characters.

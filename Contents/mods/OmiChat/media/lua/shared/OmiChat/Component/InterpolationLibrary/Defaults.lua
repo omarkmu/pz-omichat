@@ -200,7 +200,7 @@ function Library.DefaultChatPrefix(interpolator, args)
     result[#result + 1] = interpolator:tokenString('tag')
 
     if not tags.NoVolumeIndicator and not tags.NoVolumeIndicatorChat then
-        local volume = Helpers.getVolumeIndicator(options, tags, preset)
+        local volume = Helpers.getVolumeIndicator(options, tags, preset, true)
         if volume then
             result[#result + 1] = volume
         end

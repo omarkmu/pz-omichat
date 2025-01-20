@@ -99,6 +99,12 @@ UI_KO = {
     UI_OmiChat_UnknownLanguageNarrative_whispers = "%1이/가 %2(으)로 무슨 말을 조용하게 했습니다.",
     UI_OmiChat_UnknownLanguageNarrative_whisper_shouts = "%1이/가 %2(으)로 무슨 말을 크게 속삭였습니다.",
 
+    -- [[ Volume Indicators ]]--
+    UI_OmiChat_VolumeIndicator_Low = "조용하게",
+    UI_OmiChat_VolumeIndicator_Long = "장거리",
+    UI_OmiChat_VolumeIndicator_Loud = "시끄럽게",
+    UI_OmiChat_VolumeIndicator_Whisper = "속삭임",
+
     -- [[ Perception Range ]]--
     UI_OmiChat_OutOfRange = "범위를 벗어남",
     UI_OmiChat_PerceivedChat = "%1이/가 무슨 말을 했습니다.",

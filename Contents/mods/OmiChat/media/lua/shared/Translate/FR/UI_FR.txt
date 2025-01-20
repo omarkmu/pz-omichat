@@ -99,6 +99,12 @@ UI_FR = {
     UI_OmiChat_UnknownLanguageNarrative_whispers = "%1 chuchote quelque chose en %2.",
     UI_OmiChat_UnknownLanguageNarrative_whisper_shouts = "%1 chuchote quelque chose en %2.",
 
+    -- [[ Volume Indicators ]]--
+    UI_OmiChat_VolumeIndicator_Low = "Low",
+    UI_OmiChat_VolumeIndicator_Long = "Long",
+    UI_OmiChat_VolumeIndicator_Loud = "Loud",
+    UI_OmiChat_VolumeIndicator_Whisper = "Whisper",
+
     -- [[ Perception Range ]]--
     UI_OmiChat_OutOfRange = "Out of Range",
     UI_OmiChat_PerceivedChat = "%1 says something.",
