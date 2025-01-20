@@ -415,53 +415,59 @@ function Helpers.getBaseUnknownLanguageString(tags, language, author, dialogueTa
         return
     end
 
+    local languageName = utils.getTranslatedLanguageName(language)
+
     author = tostring(author or '')
     if author ~= '' then
         author = author .. ' <SPACE> '
     else
-        author = nil
+        return getText('UI_OmiChat_UnknownLanguageNoAuthor', languageName)
     end
 
-    if tags.IsRadioStream and not author then
-        return getText('UI_OmiChat_UnknownLanguageRadioNoAuthor', language)
+    dialogueTag = tostring(dialogueTag or '')
+    if dialogueTag == '' then
+        -- no narrative style tag → pick the most suitable one
+        if tags.IsSneakCallout then
+            dialogueTag = 'whisper shouts'
+        elseif tags.Whisper then
+            dialogueTag = 'whispers'
+        elseif tags.Loud then
+            dialogueTag = 'shouts'
+        else
+            dialogueTag = 'says'
+        end
+    else
+        dialogueTag = dialogueTag:gsub('%s', '_')
     end
 
     local isSigned = API.isRoleplayLanguageSigned(language)
-    language = utils.getTranslatedLanguageName(language)
-
-    -- narrative style
-    dialogueTag = tostring(dialogueTag or '')
-    if author and dialogueTag ~= '' then
-        local stringID = 'UI_OmiChat_UnknownLanguageNarrative_' .. dialogueTag:gsub('%s', '_')
-
-        local translated = getTextOrNull(stringID, author, language)
+    if isSigned then
+        local stringID = 'UI_OmiChat_UnknownLanguageSigned_' .. dialogueTag
+        local translated = getTextOrNull(stringID, author, languageName)
         if translated then
             return translated
         end
 
-        stringID = 'UI_OmiChat_UnknownLanguageNarrative_' .. (isSigned and 'signs' or 'says')
-        return getText(stringID, author, language)
+        if dialogueTag == 'exclaims' then
+            -- fallback to 'energetically signs'
+            return getText('UI_OmiChat_UnknownLanguage_shouts', author, languageName)
+        elseif dialogueTag == 'whisper_shouts' or dialogueTag == 'hisses' then
+            -- fallback to 'subtly signs'
+            return getText('UI_OmiChat_UnknownLanguage_whispers', author, languageName)
+        elseif dialogueTag == 'says' or dialogueTag == 'states' then
+            -- fallback to 'signs'
+            return getText('UI_OmiChat_UnknownLanguage_signs', author, languageName)
+        end
     end
 
-    local stringID = { 'UI_OmiChat_UnknownLanguage' }
-    if isSigned then
-        stringID[#stringID + 1] = 'Signed'
+    local stringID = 'UI_OmiChat_UnknownLanguage_' .. dialogueTag
+    local translated = getTextOrNull(stringID, author, languageName)
+    if translated then
+        return translated
     end
 
-    if tags.Whisper then
-        stringID[#stringID + 1] = 'Whisper'
-    elseif tags.Loud then
-        stringID[#stringID + 1] = 'Shout'
-    else
-        stringID[#stringID + 1] = 'Say'
-    end
-
-    local text = getText(concat(stringID), language)
-    if author then
-        return author .. text
-    end
-
-    return text
+    stringID = 'UI_OmiChat_UnknownLanguage_' .. (isSigned and 'signs' or 'says')
+    return getText(stringID, author, languageName)
 end
 
 ---Gets a color to use given a target tag.

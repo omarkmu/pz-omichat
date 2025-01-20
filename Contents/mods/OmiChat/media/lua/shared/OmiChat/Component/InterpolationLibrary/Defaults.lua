@@ -561,17 +561,14 @@ end
 function Library.DefaultNarrativeTag(interpolator, args)
     local options = readOptions(args)
     local tags = readTags(interpolator)
-    local preset = readPreset(options)
     local input = utils.trim(optionOrToken(interpolator, options, 'input'))
 
     if tags.IsSneakCallout then
-        return options:getString('sneakCalloutTag', preset == 'Buffy' and 'whisper shouts' or 'hisses')
-    end
-
-    if tags.Loud then
-        return options:getString('loudTag', 'shouts')
+        return options:getString('sneakCalloutTag', 'whisper shouts')
     elseif tags.Whisper then
         return options:getString('whisperTag', 'whispers')
+    elseif tags.Loud then
+        return options:getString('loudTag', 'shouts')
     end
 
     -- only use the first quote to determine the punctuation-based narrative tag

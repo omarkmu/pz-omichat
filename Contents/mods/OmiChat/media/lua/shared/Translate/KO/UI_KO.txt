@@ -80,24 +80,20 @@ UI_KO = {
     UI_OmiChat_HelpText_Dance = "/dance 명령어를 사용하여 랜덤한 춤을 춰보세요. /dance 명령어와 특정 춤 이름을 입력하여 특정 춤을 춰보세요. 사용가능한 춤 목록을 보려면, '/dance list'라고 입력하세요.",
 
     --[[ Unknown Language ]]--
-    UI_OmiChat_UnknownLanguageSay = "%1(으)로 무슨 말을 했습니다.",
-    UI_OmiChat_UnknownLanguageWhisper = "%1(으)로 무슨 말을 조용하게 했습니다.",
-    UI_OmiChat_UnknownLanguageShout = "%1(으)로 무슨 말을 소리쳤습니다.",
-    UI_OmiChat_UnknownLanguageSignedSay = "%1(으)로 무슨 수화를 했습니다.",
-    UI_OmiChat_UnknownLanguageSignedWhisper = "%1(으)로 무슨 수화를 몰래 했습니다.",
-    UI_OmiChat_UnknownLanguageSignedShout = "%1(으)로 무슨 수화를 활기차게 했습니다.",
-    UI_OmiChat_UnknownLanguageRadioNoAuthor = "%1(으)로 무슨 말을 했습니다.",
+    UI_OmiChat_UnknownLanguageNoAuthor = "%1(으)로 무슨 말을 했습니다.",
 
-    --[[ Unknown Language (Narrative) ]]--
-    UI_OmiChat_UnknownLanguageNarrative_asks = "%1이/가 %2(으)로 무슨 질문을 물었습니다.",
-    UI_OmiChat_UnknownLanguageNarrative_says = "%1이/가 %2(으)로 무슨 말을 했습니다.",
-    UI_OmiChat_UnknownLanguageNarrative_signs = "%1이/가 %2(으)로 무슨 수화를 했습니다.",
-    UI_OmiChat_UnknownLanguageNarrative_states = "%1이/가 %2(으)로 무슨 말을 했습니다.",
-    UI_OmiChat_UnknownLanguageNarrative_shouts = "%1이/가 %2(으)로 무슨 말을 소리쳤습니다.",
-    UI_OmiChat_UnknownLanguageNarrative_hisses = "%1이/가 %2(으)로 무슨 말을 크게 속삭였습니다.",
-    UI_OmiChat_UnknownLanguageNarrative_exclaims = "%1이/가 %2(으)로 무슨 말을 했습니다.",
-    UI_OmiChat_UnknownLanguageNarrative_whispers = "%1이/가 %2(으)로 무슨 말을 조용하게 했습니다.",
-    UI_OmiChat_UnknownLanguageNarrative_whisper_shouts = "%1이/가 %2(으)로 무슨 말을 크게 속삭였습니다.",
+    UI_OmiChat_UnknownLanguage_asks = "%1이/가 %2(으)로 무슨 질문을 물었습니다.",
+    UI_OmiChat_UnknownLanguage_says = "%1이/가 %2(으)로 무슨 말을 했습니다.",
+    UI_OmiChat_UnknownLanguage_signs = "%1이/가 %2(으)로 무슨 수화를 했습니다.",
+    UI_OmiChat_UnknownLanguage_states = "%1이/가 %2(으)로 무슨 말을 했습니다.",
+    UI_OmiChat_UnknownLanguage_shouts = "%1이/가 %2(으)로 무슨 말을 소리쳤습니다.",
+    UI_OmiChat_UnknownLanguage_hisses = "%1이/가 %2(으)로 무슨 말을 크게 속삭였습니다.",
+    UI_OmiChat_UnknownLanguage_exclaims = "%1이/가 %2(으)로 무슨 말을 했습니다.",
+    UI_OmiChat_UnknownLanguage_whispers = "%1이/가 %2(으)로 무슨 말을 조용하게 했습니다.",
+    UI_OmiChat_UnknownLanguage_whisper_shouts = "%1이/가 %2(으)로 무슨 말을 크게 속삭였습니다.",
+
+    UI_OmiChat_UnknownLanguageSigned_whispers = "%1이/가 %2(으)로 무슨 수화를 몰래 했습니다.",
+    UI_OmiChat_UnknownLanguageSigned_shouts = "%1이/가 %2(으)로 무슨 수화를 활기차게 했습니다.",
 
     -- [[ Volume Indicators ]]--
     UI_OmiChat_VolumeIndicator_Low = "조용하게",

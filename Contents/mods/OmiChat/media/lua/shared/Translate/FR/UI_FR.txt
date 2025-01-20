@@ -80,24 +80,20 @@ UI_FR = {
     UI_OmiChat_HelpText_Dance = "Utilisez /dance pour faire une danse aléatoire. Utilisez /dance suivi du nom de la danse pour faire une danse spécifique. Pour voir une liste de danses, utilisez /dance list",
 
     --[[ Unknown Language ]]--
-    UI_OmiChat_UnknownLanguageSay = "dit quelque chose en %1.",
-    UI_OmiChat_UnknownLanguageWhisper = "chuchote quelque chose en %1.",
-    UI_OmiChat_UnknownLanguageShout = "crie quelque chose en %1.",
-    UI_OmiChat_UnknownLanguageSignedSay = "signe quelque chose en %1.",
-    UI_OmiChat_UnknownLanguageSignedWhisper = "signe subtilement quelque chose en %1.",
-    UI_OmiChat_UnknownLanguageSignedShout = "signe énergiquement quelque chose en %1.",
-    UI_OmiChat_UnknownLanguageRadioNoAuthor = "Quelque chose est dit en %1.",
+    UI_OmiChat_UnknownLanguageNoAuthor = "Quelque chose est dit en %1.",
 
-    --[[ Unknown Language (Narrative) ]]--
-    UI_OmiChat_UnknownLanguageNarrative_asks = "%1 demande quelque chose en %2.",
-    UI_OmiChat_UnknownLanguageNarrative_says = "%1 dit quelque chose en %2.",
-    UI_OmiChat_UnknownLanguageNarrative_signs = "%1 signe quelque chose en %2.",
-    UI_OmiChat_UnknownLanguageNarrative_states = "%1 déclare quelque chose en %2.",
-    UI_OmiChat_UnknownLanguageNarrative_shouts = "%1 crie quelque chose en %2.",
-    UI_OmiChat_UnknownLanguageNarrative_hisses = "%1 siffle quelque chose en %2.",
-    UI_OmiChat_UnknownLanguageNarrative_exclaims = "%1 s'exclame quelque chose en %2.",
-    UI_OmiChat_UnknownLanguageNarrative_whispers = "%1 chuchote quelque chose en %2.",
-    UI_OmiChat_UnknownLanguageNarrative_whisper_shouts = "%1 chuchote quelque chose en %2.",
+    UI_OmiChat_UnknownLanguage_asks = "%1 demande quelque chose en %2.",
+    UI_OmiChat_UnknownLanguage_says = "%1 dit quelque chose en %2.",
+    UI_OmiChat_UnknownLanguage_signs = "%1 signe quelque chose en %2.",
+    UI_OmiChat_UnknownLanguage_states = "%1 déclare quelque chose en %2.",
+    UI_OmiChat_UnknownLanguage_shouts = "%1 crie quelque chose en %2.",
+    UI_OmiChat_UnknownLanguage_hisses = "%1 siffle quelque chose en %2.",
+    UI_OmiChat_UnknownLanguage_exclaims = "%1 s'exclame quelque chose en %2.",
+    UI_OmiChat_UnknownLanguage_whispers = "%1 chuchote quelque chose en %2.",
+    UI_OmiChat_UnknownLanguage_whisper_shouts = "%1 chuchote quelque chose en %2.",
+
+    UI_OmiChat_UnknownLanguageSigned_whispers = "%1 signe subtilement quelque chose en %2.",
+    UI_OmiChat_UnknownLanguageSigned_shouts = "%1 signe énergiquement quelque chose en %2.",
 
     -- [[ Volume Indicators ]]--
     UI_OmiChat_VolumeIndicator_Low = "Low",
