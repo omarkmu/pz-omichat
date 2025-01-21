@@ -69,7 +69,7 @@ function Library.DefaultChatFormat(interpolator, args)
 
     if tags.IsIncomingPM and not tags.UseVanillaPM and name ~= '' then
         local parens = options:getNumber('parenCount', preset == 'Buffy' and 2 or 1)
-        local pmFrom = getText('UI_OmiChat_PrivateChatFrom', name)
+        local pmFrom = getText('UI_OmiChat_PrivateChatFrom', ' <SPACE> ' .. name)
 
         name = rep('(', parens) .. pmFrom .. rep(')', parens)
     elseif tags.IsOutgoingPM and not excludeName then
@@ -83,12 +83,12 @@ function Library.DefaultChatFormat(interpolator, args)
         end
 
         if recipient ~= '' then
-            name = tostring(recipient)
+            name = recipient
             if tags.UseVanillaPM then
                 name = 'to ' .. name
             else
                 local parens = options:getNumber('parenCount', preset == 'Buffy' and 2 or 1)
-                local pmTo = getText('UI_OmiChat_PrivateChatTo', tostring(name or ''))
+                local pmTo = getText('UI_OmiChat_PrivateChatTo', ' <SPACE> ' .. name)
 
                 name = rep('(', parens) .. pmTo .. rep(')', parens)
             end
