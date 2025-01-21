@@ -321,8 +321,46 @@ function MessageInfo:applyTransforms(transformers)
         end
     end
 
+    if self.useUnknownLanguageText then
+        if self.chatType == 'radio' then
+            self.format = config.Language.UnknownLanguageRadio
+        else
+            self.format = config.Language.UnknownLanguage
+            self.tags.IsUnknownLanguage = true
+
+            self:hideOverhead()
+
+            local targetStream = self:getActionStream()
+            if targetStream then
+                local stream = self.stream
+                if stream and stream:hasTag('Action') then
+                    self.tags.IsActionUnknownLanguage = true
+                end
+
+                self:setStream(targetStream)
+            end
+        end
+    elseif self.usePerceivedText then
+        self.format = config.Format.PerceptionRange.Chat
+        self.tags.IsPerceptionRange = true
+
+        self:syncTags() -- sync tags for perception range overhead format
+
+        local overhead = utils.interpolate(config.Format.PerceptionRange.Overhead, self:getOverheadTokens())
+        if overhead ~= '' then
+            self:setOverheadText(overhead, true)
+        else
+            self:hideOverhead()
+        end
+
+        local targetStream = self:getActionStream()
+        if targetStream then
+            self:setStream(targetStream)
+        end
+    end
+
     local overheadText = self.overheadText
-    if overheadText and not self.meta.displayedOverhead then
+    if self.tags.HideOverhead or (overheadText and not self.meta.displayedOverhead) then
         -- hide the original overhead text
         self.message:setOverHeadSpeech(false)
     end
@@ -348,6 +386,10 @@ function MessageInfo:applyTransforms(transformers)
                 tokens.prefix = utils.trimleft(utils.interpolate(config.Format.Overhead.Prefix, tokens))
                 overheadText = utils.interpolate(overheadFormat, tokens)
             end
+        end
+
+        if utils.trim(overheadText) == '' then
+            return
         end
 
         local color = authorPlayer:getSpeakColour()
@@ -433,6 +475,32 @@ function MessageInfo:checkMismatch()
     return false
 end
 
+---Gets the best action stream to use for displaying a message.
+---@return omichat.ChatStream?
+function MessageInfo:getActionStream()
+    local targetTags
+    if self.sneakCallout or self.tags.Quiet then
+        targetTags = { 'Quiet', 'Whisper' }
+    elseif self.loudCallout or self.tags.Loud then
+        targetTags = { 'Loud' }
+    end
+
+    local streams = API.getChatStreamsWithTag('Action', { 'NoName' })
+
+    local targetStream
+    if targetTags then
+        for i = 1, #streams do
+            local stream = streams[i]
+            if stream:hasAnyTags(targetTags) then
+                targetStream = stream
+                break
+            end
+        end
+    end
+
+    return targetStream or streams[1]
+end
+
 ---Gets the admin icon encoded in the message.
 ---@return string?
 function MessageInfo:getAdminIcon()
@@ -505,6 +573,12 @@ end
 ---@return string?
 function MessageInfo:getMetadataLanguage()
     return self.meta.language
+end
+
+---Gets the result of language checking stored in the message metadata.
+---@return omichat.MessageInfo.Metadata.LanguageResult?
+function MessageInfo:getMetadataLanguageResult()
+    return self.meta.languageResult
 end
 
 ---Gets the result of range checking stored in the message metadata.
@@ -704,6 +778,13 @@ function MessageInfo:setMetadataLanguage(language)
     return self:_setMetadataValue('language', language)
 end
 
+---Sets a value in the message metadata to indicate the result of language checking.
+---@param result omichat.MessageInfo.Metadata.LanguageResult
+---@return boolean success
+function MessageInfo:setMetadataLanguageResult(result)
+    return self:_setMetadataValue('languageResult', result)
+end
+
 ---Sets the color to use for the author name in the message metadata.
 ---@param color omi.ColorTable
 function MessageInfo:setMetadataNameColor(color)
@@ -788,6 +869,18 @@ function MessageInfo:setTitleID(titleID)
     self.titleID = titleID
 end
 
+---Sets a flag to use the text for a message in perception range.
+---@param usePerceived boolean
+function MessageInfo:setUsePerceivedText(usePerceived)
+    self.usePerceivedText = usePerceived
+end
+
+---Sets a flag to use the text for a message with an unknown language.
+---@param useUnknownLanguage boolean
+function MessageInfo:setUseUnknownLanguageText(useUnknownLanguage)
+    self.useUnknownLanguageText = useUnknownLanguage
+end
+
 ---Sets the range within which the message should attract zombies.
 ---A `nil` value indicates that the message should not attract zombies.
 ---@param range integer?
@@ -841,6 +934,7 @@ end
 function MessageInfo:wasRadioSuppressed()
     return self.meta.suppressedRadio == true
 end
+
 
 ---Runs checks and modifications that should occur after transforms run.
 ---@protected

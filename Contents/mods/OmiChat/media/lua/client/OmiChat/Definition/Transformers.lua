@@ -18,34 +18,6 @@ local rangedChatTypes = {
 ---@diagnostic disable: invisible
 
 
----Gets the best action stream to use for displaying a message.
----@param info omichat.MessageInfo
----@return omichat.ChatStream?
-local function getActionStream(info)
-    local targetTags
-    if info.sneakCallout or info.tags.Quiet then
-        targetTags = { 'Quiet', 'Whisper' }
-    elseif info.loudCallout or info.tags.Loud then
-        targetTags = { 'Loud' }
-    end
-
-    local streams = API.getChatStreamsWithTag('Action', { 'NoName' })
-
-    local targetStream
-    if targetTags then
-        for i = 1, #streams do
-            local stream = streams[i]
-            if stream:hasAnyTags(targetTags) then
-                targetStream = stream
-                break
-            end
-        end
-    end
-
-    return targetStream or streams[1]
-end
-
-
 ---@type omichat.MessageTransformer[]
 return {
     {
@@ -212,10 +184,6 @@ return {
             end
 
             info:setStream(targetStream)
-
-            if targetStream:hasTag('HideOverhead') or stream:hasTag('HideOverhead') then
-                info:hideOverhead()
-            end
         end,
     },
     {
@@ -239,10 +207,6 @@ return {
             local targetStream = API.getFirstChatStreamWithTag('EchoTarget')
             if targetStream then
                 info:setStream(targetStream)
-
-                if targetStream:hasTag('HideOverhead') then
-                    info:hideOverhead()
-                end
             end
 
             local player = getSpecificPlayer(0)
@@ -329,10 +293,6 @@ return {
             if not info.format then
                 info.format = stream:getChatFormat()
             end
-
-            if stream:hasTag('HideOverhead') then
-                info:hideOverhead()
-            end
         end,
     },
     {
@@ -384,39 +344,31 @@ return {
                 return
             end
 
+            local cached = info.meta.languageResult
+            if cached == 'unknown-language' then
+                info:setUseUnknownLanguageText(true)
+                return
+            elseif cached then
+                return
+            end
+
             local player = getSpecificPlayer(0)
             local username = player and player:getUsername()
             if not isRadio and username and info:getAuthor() == username then
                 -- everyone understands themselves
+                info:setMetadataLanguageResult('known-language')
                 return
             elseif API.checkKnowsLanguage(language) then
                 -- if they understand the language, we're done here
+                info:setMetadataLanguageResult('known-language')
                 return
             end
 
             -- they didn't understand it
-            info:hideOverhead()
+            info:setUseUnknownLanguageText(true)
+            info:setMetadataLanguageResult('unknown-language')
             info.tokens.unknownLanguage = language
             info.tags.IsUnknownLanguage = true
-
-            if isRadio then
-                info.format = config.Language.UnknownLanguageRadio
-            else
-                info.format = config.Language.UnknownLanguage
-
-                info:syncTags()
-
-                -- use an action stream that displays names
-                local targetStream = getActionStream(info)
-                if targetStream then
-                    local stream = info.stream
-                    if stream and stream.tags.Action then
-                        info.tags.IsActionUnknownLanguage = true
-                    end
-
-                    info:setStream(targetStream)
-                end
-            end
         end,
     },
     {
@@ -440,7 +392,7 @@ return {
                 return
             end
 
-            info:syncTags()
+            info:syncTags() -- sync tags for the narrative content format
 
             local tokens = utils.copy(info.tokens)
             tokens.input = unstyled
@@ -456,29 +408,7 @@ return {
     {
         name = 'check-range',
         priority = 20,
-
-        ---@param info omichat.MessageInfo
-        setPerceivedText = function(_, info)
-            info.format = config.Format.PerceptionRange.Chat
-
-            info.tags.IsPerceptionRange = true
-            info:syncTags()
-
-            local overhead = utils.interpolate(config.Format.PerceptionRange.Overhead, info:getOverheadTokens())
-
-            if overhead ~= '' then
-                info:setOverheadText(overhead, true)
-            else
-                info:hideOverhead()
-            end
-
-            local targetStream = getActionStream(info)
-            if targetStream then
-                info:setStream(targetStream)
-            end
-        end,
-
-        transform = function(self, info)
+        transform = function(_, info)
             local stream = info.stream
             if not stream or not stream.isChat then
                 return
@@ -490,13 +420,11 @@ return {
             end
 
             local cached = info.meta.rangeResult
-            if cached then
-                if cached == 'out-of-range' then
-                    info:hide()
-                elseif cached == 'in-perception-range' then
-                    self:setPerceivedText(info)
-                end
-
+            if cached == 'out-of-range' then
+                info:hide()
+            elseif cached == 'in-perception-range' then
+                info:setUsePerceivedText(true)
+            elseif cached then
                 return
             end
 
@@ -549,13 +477,13 @@ return {
 
             local perceptionRange = stream.perceptionRange
             if not info.tags.Action and dist and dist <= perceptionRange then
+                info:setUsePerceivedText(true)
                 info:setMetadataRangeResult('in-perception-range')
-                self:setPerceivedText(info)
                 return
             end
 
-            info:setMetadataRangeResult('out-of-range')
             info:hide()
+            info:setMetadataRangeResult('out-of-range')
         end,
     },
     {

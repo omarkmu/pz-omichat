@@ -48,6 +48,8 @@
 ---@field author string The username of the message author.
 ---@field zombieAttractRange integer? The range at which the message will be heard by zombies.
 ---@field tags omi.SimpleSet A set of tags to add to the message tokens.
+---@field protected usePerceivedText boolean? Whether the message text should be replaced by the "perception range" text.
+---@field protected useUnknownLanguageText boolean? Whether the message text should be replaced by the unknown language text.
 ---@field protected overheadText string? The text to show overhead instead of the message text.
 ---@field protected doFullOverhead boolean? If `true`, the replacement overhead text will also use the overhead prefix and final formats.
 ---@field protected hidden boolean Whether the message has been hidden in chat and overhead.
@@ -80,9 +82,11 @@
 ---@field originalStream string? The name of the original stream a radio message was sent over.
 ---@field faction string? The name of the faction to which the message was sent.
 ---@field rangeResult omichat.MessageInfo.Metadata.RangeResult? The result of range checking.
+---@field languageResult omichat.MessageInfo.Metadata.LanguageResult? The result of language checking.
 ---@field attractedZombies boolean? Whether the message has already attracted zombies.
 ---@field displayedOverhead boolean? Whether the replacement overhead text has already displayed.
 
+---@alias omichat.MessageInfo.Metadata.LanguageResult 'known-language' | 'unknown-language'
 ---@alias omichat.MessageInfo.Metadata.RangeResult 'in-range' | 'out-of-range' | 'in-perception-range'
 
 ---A suggestion that can display to the player.
