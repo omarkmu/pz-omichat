@@ -239,7 +239,7 @@ return {
     },
     {
         name = 'callouts',
-        priority = 80,
+        priority = 70,
         transform = function(_, info)
             local text = info.content or info.rawText
             local calloutFormatter = API._metadataFormatters.callout
@@ -270,7 +270,7 @@ return {
     },
     {
         name = 'read-stream',
-        priority = 70,
+        priority = 60,
         transform = function(_, info)
             if info:isChatType('radio') then
                 return
@@ -297,7 +297,7 @@ return {
     },
     {
         name = 'handle-language',
-        priority = 60,
+        priority = 50,
         transform = function(_, info)
             if info.skipLanguage then
                 return
@@ -373,7 +373,7 @@ return {
     },
     {
         name = 'handle-narrative',
-        priority = 50,
+        priority = 40,
         transform = function(_, info)
             local formatter = API._metadataFormatters.narrative
             if not formatter then
@@ -407,7 +407,7 @@ return {
     },
     {
         name = 'check-range',
-        priority = 20,
+        priority = 10,
         transform = function(_, info)
             local stream = info.stream
             if not stream or not stream.isChat then

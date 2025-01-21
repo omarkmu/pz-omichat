@@ -6,7 +6,7 @@ local utils = API.utils
 
 API.addMessageTransformer({
     name = 'handle-buffy-character-bios',
-    priority = 65,
+    priority = 55,
     transform = function(_, info)
         if not config:compatBuffyCharacterBiosEnabled() then
             return

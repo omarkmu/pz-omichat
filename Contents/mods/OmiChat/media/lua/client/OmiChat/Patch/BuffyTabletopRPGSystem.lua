@@ -5,7 +5,7 @@ local config = API.Configuration
 
 API.addMessageTransformer({
     name = 'handle-buffy-rpg',
-    priority = 65,
+    priority = 55,
     transform = function(_, info)
         if not config:compatBuffyRPGSystemEnabled() then
             return
