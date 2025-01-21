@@ -220,7 +220,7 @@ function Library.DefaultChatPrefix(interpolator, args)
         result[#result + 1] = buffyCrit
     end
 
-    if tags.OverRadio and not tags.IsPerceptionRange then
+    if tags.OverRadio and not tags.IsPerceptionRange and not tags.IsUnknownLanguage then
         result[#result + 1] = ' <SPACE> '
         result[#result + 1] = Helpers.getOverRadioText(interpolator:token('chatType'))
     end
@@ -646,7 +646,7 @@ function Library.DefaultOverheadFormat(interpolator, args)
         input = Helpers.wrapActionOverhead(input, tags)
     end
 
-    if tags.OverRadio then
+    if tags.OverRadio and not tags.IsPerceptionRange and not tags.IsUnknownLanguage then
         input = Helpers.getOverRadioText(interpolator:token('chatType')) .. ' ' .. input
     end
 
@@ -674,7 +674,7 @@ function Library.DefaultOverheadPrefix(interpolator, args)
         result[#result + 1] = '[Out of Range]'
     end
 
-    if not tags.NoLanguage and not tags.NoLanguageOverhead and not tags.IsPerceptionRange then
+    if not tags.NoLanguage and not tags.NoLanguageOverhead and not tags.IsPerceptionRange and not tags.IsUnknownLanguage then
         local language = interpolator:tokenString('languageRaw')
         if language ~= '' then
             result[#result + 1] = '[' .. language .. ']'
@@ -801,9 +801,7 @@ function Library.DefaultUnknownLanguageFormat(interpolator, args)
     end
 
     local options = readOptions(args)
-
     local name = optionOrToken(interpolator, options, 'name')
-
     if tags.NoName or tags.NoNameChat then
         name = ''
     end
@@ -831,4 +829,30 @@ function Library.DefaultUnknownLanguageFormat(interpolator, args)
     end
 
     return Helpers.wrapActionChat(result, tags)
+end
+
+---Default format for the overhead content of a message indicating that a language is unknown.
+---@param interpolator omichat.Interpolator
+---@param args unknown?
+---@return string?
+function Library.DefaultUnknownLanguageOverheadFormat(interpolator, args)
+    local tags = readTags(interpolator)
+    if tags.IsActionUnknownLanguage then
+        return Library.DefaultOverheadFormat(interpolator, args)
+    end
+
+    local options = readOptions(args)
+    local name = optionOrToken(interpolator, options, 'name')
+    if tags.NoName or tags.NoNameChat then
+        name = ''
+    end
+
+    local language = options:get('language') or interpolator:token('languageRaw')
+    local dialogueTag = options:get('dialogueTag') or interpolator:token('dialogueTag')
+    local result = Helpers.getBaseUnknownLanguageString(tags, language, name, dialogueTag, true)
+    if not result then
+        return
+    end
+
+    return Helpers.wrapActionOverhead(result, tags)
 end

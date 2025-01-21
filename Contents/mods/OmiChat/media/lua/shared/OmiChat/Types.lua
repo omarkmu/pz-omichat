@@ -341,8 +341,9 @@
 ---@field InterpretationChance integer
 ---@field SelfAddAllowlist string[]
 ---@field SelfAddBlocklist string[]
----@field UnknownLanguage string
+---@field UnknownLanguageChat string
 ---@field UnknownLanguageRadio string
+---@field UnknownLanguageOverhead string
 ---@field UseDefaultList boolean
 ---@field List omichat.Configuration.LanguageDefinition[]
 

@@ -408,8 +408,9 @@ end
 ---@param language string?
 ---@param author string?
 ---@param dialogueTag string?
+---@param overhead boolean?
 ---@return string?
-function Helpers.getBaseUnknownLanguageString(tags, language, author, dialogueTag)
+function Helpers.getBaseUnknownLanguageString(tags, language, author, dialogueTag, overhead)
     language = tostring(language or '')
     if language == '' then
         return
@@ -419,7 +420,7 @@ function Helpers.getBaseUnknownLanguageString(tags, language, author, dialogueTa
 
     author = tostring(author or '')
     if author ~= '' then
-        author = author .. ' <SPACE> '
+        author = author .. (overhead and ' ' or ' <SPACE> ')
     else
         return getText('UI_OmiChat_UnknownLanguageNoAuthor', languageName)
     end

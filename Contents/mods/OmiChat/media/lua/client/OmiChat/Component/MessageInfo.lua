@@ -6,11 +6,15 @@ local MimicMessage = API.MimicMessage
 local MultiMap = utils.MultiMap
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
-local concat = table.concat
 local isempty = table.isempty
 local format = string.format
 local getTexture = getTexture
 local instanceof = instanceof
+local getZomboidRadio = getZomboidRadio
+
+local INVISIBLE_PATTERN = '['
+    .. string.char(128) .. '-' .. string.char(159) .. ']?'
+    .. string.char(65535) .. '?'
 
 
 ---@class omichat.MessageInfo : omi.Class
@@ -321,85 +325,24 @@ function MessageInfo:applyTransforms(transformers)
         end
     end
 
-    if self.useUnknownLanguageText then
-        if self.chatType == 'radio' then
-            self.format = config.Language.UnknownLanguageRadio
-        else
-            self.format = config.Language.UnknownLanguage
-            self.tags.IsUnknownLanguage = true
-
-            self:hideOverhead()
-
-            local targetStream = self:getActionStream()
-            if targetStream then
-                local stream = self.stream
-                if stream and stream:hasTag('Action') then
-                    self.tags.IsActionUnknownLanguage = true
-                end
-
-                self:setStream(targetStream)
-            end
-        end
-    elseif self.usePerceivedText then
-        self.format = config.Format.PerceptionRange.Chat
-        self.tags.IsPerceptionRange = true
-
-        self:syncTags() -- sync tags for perception range overhead format
-
-        local overhead = utils.interpolate(config.Format.PerceptionRange.Overhead, self:getOverheadTokens())
-        if overhead ~= '' then
-            self:setOverheadText(overhead, true)
-        else
-            self:hideOverhead()
-        end
-
-        local targetStream = self:getActionStream()
-        if targetStream then
-            self:setStream(targetStream)
-        end
+    if self.usePerceivedText then
+        self:_applyPerceivedText()
+    elseif self.useUnknownLanguageText then
+        self:_applyUnknownLanguageText()
     end
 
-    local overheadText = self.overheadText
-    if self.tags.HideOverhead or (overheadText and not self.meta.displayedOverhead) then
-        -- hide the original overhead text
+    if self.tags.HideOverhead or (self.overheadText and not self.meta.displayedOverhead) then
         self.message:setOverHeadSpeech(false)
     end
 
-    -- process modifications first, in case this is a radio message
-    self:_afterTransforms()
+    self:_avoidEmptyMessages()
+    if self.chatType == 'radio' then
+        self:_applyRadioStormFix()
+        self:_suppressRadioOverhead()
+    end
 
     -- show the modified message
-    if overheadText and not self.hidden and not self.meta.displayedOverhead then
-        self:_setMetadataValue('displayedOverhead', true)
-
-        local authorPlayer = utils.getPlayerByUsername(self.author)
-        if not authorPlayer then
-            return
-        end
-
-        if self.doFullOverhead then
-            local formatter = API._metadataFormatters.overheadFinal
-            local overheadFormat = formatter and formatter:getFormatString()
-            if overheadFormat then
-                local tokens = self:getOverheadTokens()
-                tokens.input = overheadText
-                tokens.prefix = utils.trimleft(utils.interpolate(config.Format.Overhead.Prefix, tokens))
-                overheadText = utils.interpolate(overheadFormat, tokens)
-            end
-        end
-
-        if utils.trim(overheadText) == '' then
-            return
-        end
-
-        local color = authorPlayer:getSpeakColour()
-        local r, g, b = color:getR(), color:getG(), color:getB()
-        authorPlayer:addLineChatElement(
-            overheadText, r, g, b,
-            UIFont.Medium, 0, 'default',
-            true, true, true, true, false, true
-        )
-    end
+    self:_showReplacementOverheadText()
 end
 
 ---Gets the message text to use.
@@ -615,13 +558,12 @@ end
 function MessageInfo:getOverheadTokens()
     self:syncTags()
 
-    return {
-        chatType = self.chatType,
-        username = self.author,
-        name = self.tokens.name,
-        stream = self.stream and self.stream:getName(),
-        tags = self.tokens.tags,
-    }
+    local tokens = utils.copy(self.tokens)
+    tokens.chatType = self.chatType
+    tokens.username = self.author
+    tokens.stream = self.stream and self.stream:getName()
+
+    return tokens
 end
 
 ---Gets the raw message text, without transformations.
@@ -936,44 +878,96 @@ function MessageInfo:wasRadioSuppressed()
 end
 
 
----Runs checks and modifications that should occur after transforms run.
+---Applies the changes to show the out-of-range perceived text.
 ---@protected
-function MessageInfo:_afterTransforms()
+function MessageInfo:_applyPerceivedText()
+    self.format = config.Format.PerceptionRange.Chat
+    self.tags.IsPerceptionRange = true
+
+    self:syncTags() -- sync tags for overhead format
+
+    local overhead = utils.interpolate(config.Format.PerceptionRange.Overhead, self:getOverheadTokens())
+    if overhead ~= '' then
+        self:setOverheadText(overhead, true)
+    else
+        self:hideOverhead()
+    end
+
+    local targetStream = self:getActionStream()
+    if targetStream then
+        self:setStream(targetStream)
+    end
+end
+
+---Applies a partial fix to scrambling that occurs on radios during storms.
+---@protected
+function MessageInfo:_applyRadioStormFix()
     local text = self.content or self.rawText
-
-    local applyStormFix = config.NarrativeStyle.Enable and self.chatType == 'radio' and text:match('&lt;[bfws]zzt&gt;')
-    if applyStormFix then
-        -- avoid duplicate name when radios scramble narrative style messages during storms
-        -- this is not ideal, but for now it will have to do
-        local author = self.author
-        if author and author ~= '' then
-            text = text:gsub(utils.escape(author), '')
-        end
-
-        if self.tokens.nameRaw then
-            text = text:gsub(utils.escape(self.tokens.nameRaw), '')
-        end
-
-        self.content = text
-    end
-
-    -- avoid adding empty messages
-    local chars = {}
-    for i = 1, #text do
-        -- throw away invisible characters
-        local c = text:sub(i, i)
-        if not utils.isInvisibleByte(c:byte()) then
-            chars[#chars + 1] = c
-        end
-    end
-
-    text = utils.trim(concat(chars))
-    if #text == 0 then
-        self:hide()
+    if self.chatType ~= 'radio' or not config.NarrativeStyle.Enable or not text:match('&lt;[bfws]zzt&gt;') then
         return
     end
 
-    self:_suppressRadioOverhead()
+    -- avoid duplicate name when radios scramble narrative style messages during storms
+    -- this is not ideal, but for now it will have to do
+    local author = self.author
+    if author and author ~= '' then
+        text = text:gsub(utils.escape(author), '')
+    end
+
+    if self.tokens.nameRaw then
+        text = text:gsub(utils.escape(self.tokens.nameRaw), '')
+    end
+
+    self.content = text
+end
+
+---Applies the changes to use the unknown language format.
+---@protected
+function MessageInfo:_applyUnknownLanguageText()
+    local chatType = self.chatType
+    if chatType == 'radio' then
+        self.format = config.Language.UnknownLanguageRadio
+        return
+    end
+
+    self.format = config.Language.UnknownLanguageChat
+    self.tags.IsUnknownLanguage = true
+
+    if chatType ~= 'say' and chatType ~= 'shout' then
+        return
+    end
+
+    if self.message:isOverHeadSpeech() then
+        self:syncTags() -- sync tags for overhead format
+
+        local overhead = utils.interpolate(config.Language.UnknownLanguageOverhead, self:getOverheadTokens())
+        if overhead ~= '' then
+            self:setOverheadText(overhead, true)
+        else
+            self:hideOverhead()
+        end
+    end
+
+    local targetStream = self:getActionStream()
+    if targetStream then
+        local stream = self.stream
+        if stream and stream:hasTag('Action') then
+            self.tags.IsActionUnknownLanguage = true
+        end
+
+        self:setStream(targetStream)
+    end
+end
+
+---Avoids empty messages by checking for invisible character-only messages.
+---@protected
+function MessageInfo:_avoidEmptyMessages()
+    local text = self.content or self.rawText
+
+    text = utils.trim(text:gsub(INVISIBLE_PATTERN, ''))
+    if #text == 0 then
+        self:hide()
+    end
 end
 
 ---Decodes information encoded in the message's tag.
@@ -1035,6 +1029,50 @@ function MessageInfo:_setupStreamInfo()
     end
 
     self.tags = self.stream and self.stream:getTags() or {}
+end
+
+---Displays text overhead that has been designated as the replacement for the overhead text.
+---@protected
+function MessageInfo:_showReplacementOverheadText()
+    local overheadText = self.overheadText
+    if not overheadText or self.hidden or self.meta.displayedOverhead then
+        return
+    end
+
+    self:_setMetadataValue('displayedOverhead', true)
+
+    local authorPlayer = utils.getPlayerByUsername(self.author)
+    if not authorPlayer then
+        return
+    end
+
+    if self.doFullOverhead then
+        local formatter = API._metadataFormatters.overheadFinal
+        local overheadFormat = formatter and formatter:getFormatString()
+        if overheadFormat then
+            local tokens = self:getOverheadTokens()
+            tokens.input = overheadText
+            tokens.prefix = utils.trimleft(utils.interpolate(config.Format.Overhead.Prefix, tokens))
+            overheadText = utils.interpolate(overheadFormat, tokens)
+        end
+    end
+
+    if utils.trim(overheadText) == '' then
+        return
+    end
+
+    local range = self.stream and self.stream:getRange()
+    if not range then
+        range = self.chatType == 'shout' and 60 or 30
+    end
+
+    local color = authorPlayer:getSpeakColour()
+    local r, g, b = color:getR(), color:getG(), color:getB()
+    authorPlayer:addLineChatElement(
+        overheadText, r, g, b,
+        UIFont.Medium, range, 'default',
+        true, true, true, true, false, true
+    )
 end
 
 ---Handles suppression of overhead radio messages.
@@ -1125,6 +1163,7 @@ function MessageInfo:new(message)
     this.tokens = {
         admin = displayAsAdmin and '1' or nil,
         stream = this.stream and this.stream:getName() or this.chatType,
+        chatType = this.chatType,
         author = utils.escapeRichText(this.author),
         authorRaw = this.author,
         name = this.meta.name or utils.escapeRichText(this.author),

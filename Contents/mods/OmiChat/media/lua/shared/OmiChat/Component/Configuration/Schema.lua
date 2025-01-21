@@ -246,7 +246,8 @@ return Schema:new {
             InterpretationRolls = int(2, 0, 10),
             InterpretationChance = int(25, 0, 100),
 
-            UnknownLanguage = str('$DefaultUnknownLanguageFormat()'),
+            UnknownLanguageOverhead = str('$DefaultUnknownLanguageOverheadFormat()'),
+            UnknownLanguageChat = str('$DefaultUnknownLanguageFormat()'),
             UnknownLanguageRadio = str('$DefaultUnknownLanguageFormat()'),
 
             SelfAddAllowlist = array { items = str() },
