@@ -34,13 +34,14 @@ Sandbox_EN = {
     Sandbox_OmiChat_Callouts_SneakRange = "Sneak Callout Range",
 
     Sandbox_OmiChat_Commands = "Commands",
-    Sandbox_OmiChat_Commands_SetName = "Name Commands",
-    Sandbox_OmiChat_Commands_SetName_Disable = "Disable",
-    Sandbox_OmiChat_Commands_SetName_Nickname = "/name sets chat nickname",
-    Sandbox_OmiChat_Commands_SetName_Forename = "/name sets character's forename",
-    Sandbox_OmiChat_Commands_SetName_Fullname = "/name sets character's full name",
-    Sandbox_OmiChat_Commands_SetName_Forename_Plus_Nickname = "/name sets character's forename, /nickname sets chat nickname",
-    Sandbox_OmiChat_Commands_SetName_Fullname_Plus_Nickname = "/name sets character's full name, /nickname sets chat nickname",
+    Sandbox_OmiChat_Commands_Name = "Name Commands",
+    Sandbox_OmiChat_Commands_Name_Mode = "Mode",
+    Sandbox_OmiChat_Commands_Name_Mode_Disable = "Disable",
+    Sandbox_OmiChat_Commands_Name_Mode_Nickname = "/name sets chat nickname",
+    Sandbox_OmiChat_Commands_Name_Mode_Forename = "/name sets character's forename",
+    Sandbox_OmiChat_Commands_Name_Mode_Fullname = "/name sets character's full name",
+    Sandbox_OmiChat_Commands_Name_Mode_Forename_Plus_Nickname = "/name sets character's forename, /nickname sets chat nickname",
+    Sandbox_OmiChat_Commands_Name_Mode_Fullname_Plus_Nickname = "/name sets character's full name, /nickname sets chat nickname",
     Sandbox_OmiChat_Commands_Card = "/card",
     Sandbox_OmiChat_Commands_Card_Items = "Card Items",
     Sandbox_OmiChat_Commands_Roll = "/roll",
@@ -216,7 +217,8 @@ Sandbox_EN = {
     Sandbox_OmiChat_Callouts_Range_tooltip = "The maximum distance for callouts to be heard by players.",
     Sandbox_OmiChat_Callouts_SneakRange_tooltip = "The maximum distance for sneak callouts to be heard by players.",
 
-    Sandbox_OmiChat_Commands_SetName_tooltip = "Controls the behavior of the <SPACE> <PUSHRGB:0,1,0> /name <POPRGB> <SPACE> and <SPACE> <PUSHRGB:0,1,0> /nickname <POPRGB> <SPACE> commands." ..
+    Sandbox_OmiChat_Commands_Name_tooltip = "Options related to commands to set character names."
+    Sandbox_OmiChat_Commands_Name_Mode_tooltip = "Controls the behavior of the <SPACE> <PUSHRGB:0,1,0> /name <POPRGB> <SPACE> and <SPACE> <PUSHRGB:0,1,0> /nickname <POPRGB> <SPACE> commands." ..
         " <BR> If this is set to an option that sets the character's forename or fullname, players will not be able to reset their name using the <SPACE> <PUSHRGB:0,1,0> /name <POPRGB> <SPACE> command.",
     Sandbox_OmiChat_Commands_Card_tooltip = "Options that control the behavior and display of the <SPACE> <PUSHRGB:0,1,0> /card <POPRGB> <SPACE> command.",
     Sandbox_OmiChat_Commands_Card_Items_tooltip = "Semicolon-separated list of items players can use for the <SPACE> <PUSHRGB:0,1,0> /card <POPRGB> <SPACE> command." ..

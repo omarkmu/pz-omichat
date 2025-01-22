@@ -248,12 +248,15 @@
 ---@field SneakFormat string
 
 ---@class omichat.Configuration.Commands
----@field SetName omichat.Configuration.Commands.SetName
+---@field Name omichat.Configuration.Commands.Name
 ---@field Card omichat.Configuration.Commands.ItemCommand
 ---@field Roll omichat.Configuration.Commands.ItemCommand
 ---@field Flip omichat.Configuration.Commands.ItemCommand
 
----@alias omichat.Configuration.Commands.SetName
+---@class omichat.Configuration.Commands.Name
+---@field Mode omichat.Configuration.Commands.Name.Mode
+
+---@alias omichat.Configuration.Commands.Name.Mode
 ---| 'Disable'
 ---| 'Nickname'
 ---| 'Forename'

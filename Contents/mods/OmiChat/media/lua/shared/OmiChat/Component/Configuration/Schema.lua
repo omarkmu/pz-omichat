@@ -78,15 +78,17 @@ return Schema:new {
         },
 
         Commands = container {
-            SetName = enum {
-                default = 'Nickname',
-                values = {
-                    'Disable',
-                    'Nickname',
-                    'Forename',
-                    'Fullname',
-                    'Forename_Plus_Nickname',
-                    'Fullname_Plus_Nickname',
+            Name = container {
+                Mode = enum {
+                    default = 'Nickname',
+                    values = {
+                        'Disable',
+                        'Nickname',
+                        'Forename',
+                        'Fullname',
+                        'Forename_Plus_Nickname',
+                        'Fullname_Plus_Nickname',
+                    },
                 },
             },
 
@@ -443,6 +445,11 @@ return Schema:new {
             },
 
             Commands = rules {
+                Name = rules {
+                    Mode = {
+                        noLabel = true,
+                    },
+                },
                 Card = {
                     childPrefix = 'Sandbox_OmiChat_Commands_Command',
                     children = {

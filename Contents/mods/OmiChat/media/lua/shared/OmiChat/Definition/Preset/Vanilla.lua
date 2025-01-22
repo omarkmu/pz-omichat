@@ -35,7 +35,9 @@ return Preset:new {
             SneakRange = 6,
         },
         Commands = {
-            SetName = 'Disable',
+            Name = {
+                Mode = 'Disable',
+            },
             Card = {
                 Global = true,
                 Format = '$DefaultCardFormat()',

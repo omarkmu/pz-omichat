@@ -388,40 +388,40 @@ end
 ---Returns whether the /name command should be enabled.
 ---@return boolean
 function Configuration:isNameCommandEnabled()
-    return self.Commands.SetName ~= 'Disable'
+    return self.Commands.Name.Mode ~= 'Disable'
 end
 
 ---Returns whether /name should set characters' forenames.
 ---@return boolean
 function Configuration:isNameCommandSetForename()
-    local mode = self.Commands.SetName
+    local mode = self.Commands.Name.Mode
     return mode == 'Forename' or mode == 'Forename_Plus_Nickname'
 end
 
 ---Returns whether /name should set characters' full names.
 ---@return boolean
 function Configuration:isNameCommandSetFullName()
-    local mode = self.Commands.SetName
+    local mode = self.Commands.Name.Mode
     return mode == 'Fullname' or mode == 'Fullname_Plus_Nickname'
 end
 
 ---Returns whether /name should set characters' nicknames.
 ---@return boolean
 function Configuration:isNameCommandSetNickname()
-    return self.Commands.SetName == 'Nickname'
+    return self.Commands.Name.Mode == 'Nickname'
 end
 
 ---Returns whether the /nickname command should be enabled.
 ---@return boolean
 function Configuration:isNicknameCommandEnabled()
-    local mode = self.Commands.SetName
+    local mode = self.Commands.Name.Mode
     return mode == 'Forename_Plus_Nickname' or mode == 'Fullname_Plus_Nickname'
 end
 
 ---Returns whether the /nickname command is enabled, or /name sets nicknames.
 ---@return boolean
 function Configuration:isNicknameEnabled()
-    return self:isNicknameCommandEnabled() or self.Commands.SetName == 'Nickname'
+    return self:isNicknameCommandEnabled() or self.Commands.Name.Mode == 'Nickname'
 end
 
 ---Reads the currently enabled mods to a cache.
