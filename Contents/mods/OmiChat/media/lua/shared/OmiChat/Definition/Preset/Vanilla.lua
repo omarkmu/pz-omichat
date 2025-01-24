@@ -13,7 +13,7 @@ return Preset:new {
             Preset = 'Vanilla',
             AlwaysShowChat = false,
             CaseInsensitiveChatStreams = false,
-            ClearOnDeath = set { 'Icon', 'Languages', 'Nickname' },
+            ClearOnDeath = set { 'Icon', 'Languages', 'Nickname', 'Status' },
             MinimumCommandAccessLevel = 16,
             AdminIcon = 'Item_Hammer',
             InfoText = '',
@@ -37,6 +37,10 @@ return Preset:new {
         Commands = {
             Name = {
                 Mode = 'Disable',
+            },
+            Status = {
+                Enable = false,
+                Range = 20,
             },
             Card = {
                 Global = true,
@@ -125,6 +129,7 @@ return Preset:new {
             },
             Filter = {
                 Name = '$DefaultNameFilter()',
+                Status = '$DefaultStatusFilter()',
                 ChatInput = '$DefaultChatInputFilter()',
             },
             MenuName = {

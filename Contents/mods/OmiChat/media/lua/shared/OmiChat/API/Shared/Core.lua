@@ -21,6 +21,7 @@ API._playerModDataVersion = 1
 
 local modDataFields = {
     { key = 'nicknames', name = 'nickname' },
+    { key = 'statuses', name = 'status' },
     { key = 'icons', name = 'icon' },
     { key = 'currentLanguage', name = 'currentLanguage' },
     { key = 'languageSlots', name = 'languageSlots' },
@@ -79,6 +80,7 @@ function API.getModData()
     modData.languageSlots = modData.languageSlots or {}
     modData.currentLanguage = modData.currentLanguage or {}
     modData.icons = modData.icons or {}
+    modData.statuses = modData.statuses or {}
 
     return modData
 end
@@ -92,14 +94,8 @@ function API.getModDataList()
     local modData = API.getModData()
 
     for _, field in pairs(modDataFields) do
-        local key, fieldName
-        if type(field) == 'string' then
-            key = field
-            fieldName = field
-        else
-            key = field.key
-            fieldName = field.name
-        end
+        local key = field.key
+        local fieldName = field.name
 
         for username, v in pairs(modData[key]) do
             if not map[username] then
@@ -234,6 +230,14 @@ function API.getSpeechColor(username)
     if speechColor then
         return utils.color.copy(speechColor)
     end
+end
+
+---Gets the status for the player with the given username, or `nil` if unset.
+---@param username string
+---@return string?
+function API.getStatus(username)
+    local modData = API.getModData()
+    return modData.statuses[username]
 end
 
 ---Retrieves mod data for a given user.

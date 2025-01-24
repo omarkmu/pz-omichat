@@ -13,7 +13,7 @@ return Preset:new {
             Preset = 'Buffy',
             AlwaysShowChat = false,
             CaseInsensitiveChatStreams = true,
-            ClearOnDeath = set { 'Icon', 'Languages', 'Nickname' },
+            ClearOnDeath = set { 'Icon', 'Languages', 'Nickname', 'Status' },
             MinimumCommandAccessLevel = 16,
             AdminIcon = 'Item_Hammer',
             InfoText = '',
@@ -37,6 +37,10 @@ return Preset:new {
         Commands = {
             Name = {
                 Mode = 'Nickname',
+            },
+            Status = {
+                Enable = false,
+                Range = 20,
             },
             Card = {
                 Global = false,
@@ -126,6 +130,7 @@ return Preset:new {
             },
             Filter = {
                 Name = '$DefaultNameFilter()',
+                Status = '$DefaultStatusFilter()',
                 ChatInput = '$DefaultChatInputFilter()',
             },
             MenuName = {

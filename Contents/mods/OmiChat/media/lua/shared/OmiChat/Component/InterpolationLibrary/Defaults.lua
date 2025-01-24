@@ -727,6 +727,32 @@ function Library.DefaultRollFormat(interpolator)
     return 'rolls a ' .. roll .. ' on a ' .. sides .. '-sided die'
 end
 
+---Default filter for statuses.
+---@param interpolator omichat.Interpolator
+---@param args unknown?
+---@return string?
+function Library.DefaultStatusFilter(interpolator, args)
+    local options = readOptions(args)
+    local input = utils.trim(optionOrToken(interpolator, options, 'input'))
+
+    local maxLength = tonumber(options:get('maxLength', 64))
+    local minLength = tonumber(options:get('minLength', 8))
+    if maxLength and #input > maxLength then
+        interpolator:setToken('error', getText('UI_OmiLibrary_Error_LengthMax', tostring(maxLength)))
+        return
+    elseif minLength and #input < minLength then
+        interpolator:setToken('error', getText('UI_OmiLibrary_Error_LengthMin', tostring(minLength)))
+        return
+    end
+
+    local truncateLength = tonumber(options:get('truncateTo'))
+    if truncateLength then
+        input = input:sub(1, truncateLength)
+    end
+
+    return input
+end
+
 ---Default format for chat tags.
 ---@param interpolator omichat.Interpolator
 ---@return string

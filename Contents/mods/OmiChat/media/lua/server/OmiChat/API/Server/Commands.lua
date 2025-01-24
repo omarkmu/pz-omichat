@@ -145,6 +145,17 @@ function updateModData.nicknames(args)
     return true
 end
 
+---@param args omichat.request.ModDataUpdate
+---@return boolean
+function updateModData.statuses(args)
+    if not config.Commands.Status.Enable and not args.fromCommand then
+        return false
+    end
+
+    API.setStatus(args.target, args.value and tostring(args.value) or nil)
+    return true
+end
+
 
 --#region dispatch
 
@@ -302,6 +313,11 @@ function API.Commands.reportPlayerDeath(player)
 
     if clearConfig.Languages then
         updateModData.languages({ target = username })
+        doTransmit = true
+    end
+
+    if clearConfig.Status then
+        updateModData.statuses({ target = username })
         doTransmit = true
     end
 

@@ -41,12 +41,13 @@ return Schema:new {
             CaseInsensitiveChatStreams = bool(true),
 
             ClearOnDeath = set {
-                default = utils.set.simple { 'Icon', 'Languages', 'Nickname' },
+                default = utils.set.simple { 'Icon', 'Languages', 'Nickname', 'Status' },
                 items = enum {
                     values = {
                         'Icon',
                         'Languages',
                         'Nickname',
+                        'Status',
                     },
                 },
             },
@@ -90,6 +91,11 @@ return Schema:new {
                         'Fullname_Plus_Nickname',
                     },
                 },
+            },
+
+            Status = container {
+                Enable = bool(true),
+                Range = int(20, 1, 100),
             },
 
             Card = container {
@@ -215,6 +221,7 @@ return Schema:new {
             Filter = container {
                 ChatInput = str('$DefaultChatInputFilter()'),
                 Name = str('$DefaultNameFilter()'),
+                Status = str('$DefaultStatusFilter()'),
             },
 
             MenuName = container {

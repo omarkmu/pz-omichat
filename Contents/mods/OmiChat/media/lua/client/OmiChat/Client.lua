@@ -5,6 +5,9 @@ API._commandStreams = require 'OmiChat/Definition/CommandStreams'
 API._suggesters = require 'OmiChat/Definition/Suggesters'
 API._transformers = require 'OmiChat/Definition/Transformers'
 
+local StatusManager = require 'OmiChat/Component/StatusManager'
+
+
 require 'OmiChat/API/Client/Chat'
 require 'OmiChat/API/Client/Data'
 require 'OmiChat/API/Client/Commands'
@@ -13,6 +16,8 @@ require 'OmiChat/API/Client/Format'
 require 'OmiChat/API/Client/Search'
 require 'OmiChat/API/Client/Preferences'
 
+
+Events.OnGameStart.Add(StatusManager.init)
 Events.OnGameStart.Add(API._onGameStart)
 Events.OnCreatePlayer.Add(API._onCreatePlayer)
 Events.OnPlayerDeath.Add(API._onPlayerDeath)

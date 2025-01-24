@@ -315,3 +315,34 @@ function API.validateNicknameText(entry, text)
     entry:setValidateTooltipText(err or getText('UI_OmiChat_Error_InvalidName', utils.escapeRichText(text)))
     return false
 end
+
+---Text entry validator that validates against the status filter.
+---@param entry omi.ui.TextEntry
+---@param text string?
+---@return boolean
+---@return string? status
+function API.validateStatusText(entry, text)
+    if not text then
+        text = entry:getInternalText()
+    end
+
+    text = utils.trim(text)
+    if #text == 0 then
+        return true
+    end
+
+    local tokens = {
+        input = text,
+        error = '',
+        errorID = '',
+    }
+
+    local status = utils.interpolate(config.Format.Filter.Status, tokens)
+    local err = utils.extractError(tokens)
+    if not err and not utils.isNilOrWhitespace(status) then
+        return true, status
+    end
+
+    entry:setValidateTooltipText(err or getText('UI_OmiChat_Error_InvalidStatus', utils.escapeRichText(text)))
+    return false
+end

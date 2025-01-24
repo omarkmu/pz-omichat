@@ -165,6 +165,16 @@ function API.setNickname(username, nickname)
     modData.nicknames[username] = nickname
 end
 
+---Sets the status for the player with the given username.
+---This does not transmit changes to clients.
+---@see omichat.api.server.transmitModData
+---@param username string
+---@param status string?
+function API.setStatus(username, status)
+    local modData = API.getModData()
+    modData.statuses[username] = status
+end
+
 ---Sets the mod data for a given user.
 ---This does not transmit changes to clients.
 ---@see omichat.api.server.transmitModData
@@ -177,6 +187,7 @@ function API.setUserModData(username, data)
     API.setRoleplayLanguageSlots(username, data.languageSlots)
     API.setRoleplayLanguages(username, data.languages)
     API.setCurrentRoleplayLanguage(username, data.currentLanguage)
+    API.setStatus(username, data.status)
 end
 
 ---Transmits mod data to clients.

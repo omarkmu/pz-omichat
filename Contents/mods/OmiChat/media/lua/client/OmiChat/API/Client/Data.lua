@@ -224,6 +224,7 @@ function API.setModData(username, data)
     modData.languageSlots[username] = data.languageSlots
     modData.languages[username] = data.languages
     modData.currentLanguage[username] = data.currentLanguage
+    modData.statuses[username] = data.status
 
     API.requestDataUpdate({
         target = username,
@@ -301,6 +302,52 @@ function API.setRoleplayLanguageSlots(slots)
     })
 
     return true
+end
+
+---Sets the status of the current player.
+---@param status string? The status to set. A `nil` or empty value will unset the status.
+---@return boolean success
+---@return string? message
+function API.setStatus(status)
+    status = utils.trim(status or ''):gsub('[\r\n]', '')
+
+    local username = utils.getPlayerUsername()
+    if not username then
+        return false
+    end
+
+    local modData = API.getModData()
+    if #status == 0 then
+        modData.statuses[username] = nil
+        API.requestDataUpdate({
+            target = username,
+            field = 'statuses',
+        })
+
+        return true, getText('UI_OmiChat_Success_ResetStatus')
+    end
+
+    local original = status
+    local tokens = {
+        input = status,
+        error = '',
+        errorID = '',
+    }
+
+    status = utils.interpolate(config.Format.Filter.Status, tokens)
+    local err = utils.extractError(tokens)
+    if status == '' or err then
+        return false, err or getText('UI_OmiChat_Error_InvalidStatus', utils.escapeRichText(original))
+    end
+
+    modData.statuses[username] = status
+    API.requestDataUpdate({
+        value = status,
+        target = username,
+        field = 'statuses',
+    })
+
+    return true, getText('UI_OmiChat_Success_SetStatusSelf', utils.escapeRichText(status))
 end
 
 ---Updates the current player's character name.

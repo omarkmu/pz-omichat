@@ -96,6 +96,42 @@ return {
         end,
     },
     CommandStream:new {
+        name = 'status',
+        command = '/status ',
+        helpTextID = 'UI_OmiChat_HelpText_Status',
+        isEnabled = function() return config.Commands.Status.Enable end,
+        onUse = function(ctx)
+            local text = utils.trim(ctx.text)
+
+            if #text == 0 then
+                local username = utils.getPlayerUsername()
+                local status = username and API.getStatus(username)
+
+                local message
+                if status then
+                    message = getText('UI_OmiChat_Info_CurrentStatus', status)
+                else
+                    message = getText('UI_OmiChat_Info_CurrentStatusUnset')
+                end
+
+                local helpText = ctx.stream:getHelpText()
+                if helpText then
+                    message = message .. ' <LINE> ' .. helpText
+                end
+
+                API.addInfoMessage(message)
+                return
+            elseif text == 'clear' then
+                text = ''
+            end
+
+            local _, feedback = API.setStatus(text)
+            if feedback then
+                API.addInfoMessage(feedback)
+            end
+        end,
+    },
+    CommandStream:new {
         name = 'clearnames',
         command = '/clearnames ',
         helpTextID = 'UI_OmiChat_HelpText_ClearNames',

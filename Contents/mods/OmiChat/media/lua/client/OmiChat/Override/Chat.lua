@@ -1030,7 +1030,7 @@ function ISChat:createChildren()
     _createChildren(self)
 
     self.typingFont = UIFont.Small
-    self.typingFontHgt = getTextManager():getFontFromEnum(self.typingFont):getLineHeight()
+    self.typingFontHgt = getTextManager():getFontHeight(self.typingFont)
 
     local th = self:titleBarHeight()
     self.infoButton = ISButton:new(self.gearButton:getX() - th / 2 - th, 0, th, th, '', self, self.onInfo)

@@ -40,6 +40,7 @@
 ---| 'languageSlots'
 ---| 'currentLanguage'
 ---| 'icons'
+---| 'statuses'
 
 ---@alias omichat.AdminOption
 ---| 'ShowIcon'
@@ -91,6 +92,7 @@
 ---@field languages table<string, string[]> Map of usernames to roleplay languages.
 ---@field languageSlots table<string, integer> Map of usernames to roleplay language slots.
 ---@field currentLanguage table<string, string> Map of usernames to currently selected roleplay languages.
+---@field statuses table<string, string> Map of usernames to statuses.
 
 ---Global mod data associated with a username.
 ---@class omichat.UserModData
@@ -100,6 +102,7 @@
 ---@field languages string[]?
 ---@field languageSlots integer?
 ---@field currentLanguage string?
+---@field status string?
 
 ---@class omichat.utils.InterpolatorCacheItem
 ---@field interpolator omichat.Interpolator
@@ -230,6 +233,7 @@
 ---@field Icon boolean?
 ---@field Languages boolean?
 ---@field Nickname boolean?
+---@field Status boolean?
 
 ---@class omichat.Configuration.Buffs
 ---@field Enable boolean
@@ -249,6 +253,7 @@
 
 ---@class omichat.Configuration.Commands
 ---@field Name omichat.Configuration.Commands.Name
+---@field Status omichat.Configuration.Commands.Status
 ---@field Card omichat.Configuration.Commands.ItemCommand
 ---@field Roll omichat.Configuration.Commands.ItemCommand
 ---@field Flip omichat.Configuration.Commands.ItemCommand
@@ -263,6 +268,10 @@
 ---| 'Fullname'
 ---| 'Forename_Plus_Nickname'
 ---| 'Fullname_Plus_Nickname'
+
+---@class omichat.Configuration.Commands.Status
+---@field Enable boolean
+---@field Range number
 
 ---@class omichat.Configuration.Commands.ItemCommand
 ---@field Global boolean
@@ -320,6 +329,7 @@
 
 ---@class omichat.Configuration.Format.Filter
 ---@field Name string
+---@field Status string
 ---@field ChatInput string
 
 ---@class omichat.Configuration.Format.MenuName

@@ -23,6 +23,8 @@ UI_FR = {
 
     --[[ Info Messages ]]--
     UI_OmiChat_Info_SetNameEmpty = "Aucun nom spécifié. Utilisez /name Nom",
+    UI_OmiChat_Info_CurrentStatus = "Current status: %1",
+    UI_OmiChat_Info_CurrentStatusUnset = "No status is set.",
     UI_OmiChat_Info_Icon = "'%1' est le nom de l'icône pour : %2",
     UI_OmiChat_Info_IconUnknown = "'%1' n'est pas un nom d'icône connu.",
     UI_OmiChat_Info_IconAlias = "'%3' est un alias pour '%1', le nom de l'icône pour : %2",
@@ -36,7 +38,9 @@ UI_FR = {
 
     --[[ Success Messages ]]--
     UI_OmiChat_Success_SetNameSelf = "Votre nom est désormais '%1'.",
+    UI_OmiChat_Success_SetStatusSelf = "Your status has been set to '%1'.",
     UI_OmiChat_Success_ResetName = "Votre nom a été réinitialisé.",
+    UI_OmiChat_Success_ResetStatus = "Your status has been cleared.",
     UI_OmiChat_Success_ClearNames = "Tous les pseudonymes ont été effacés.",
     UI_OmiChat_Success_SwitchLanguage = "Langue active basculée vers %1.",
     UI_OmiChat_Success_SetNameOther = "Le nom a été défini sur '%2' pour le joueur '%1'.",
@@ -49,6 +53,7 @@ UI_FR = {
 
     --[[ Error Messages ]]--
     UI_OmiChat_Error_InvalidName = "Votre nom ne peut pas être défini sur '%1'.",
+    UI_OmiChat_Error_InvalidStatus = "Your status cannot be set to '%1'.",
     UI_OmiChat_Error_SignedRadio = "Vous ne pouvez pas utiliser la langue des signes via la radio.",
     UI_OmiChat_Error_SignedFactionRadio = "Vous ne pouvez pas utiliser la langue des signes via la radio de faction.",
     UI_OmiChat_Error_SignedSafehouseRadio = "Vous ne pouvez pas utiliser la langue des signes via la radio de refuge.",
@@ -67,6 +72,7 @@ UI_FR = {
     UI_OmiChat_HelpText_Name = "Pour définir votre nom, utilisez : /name Nom. Exemple : /name Bob",
     UI_OmiChat_HelpText_NameFull = "Pour définir votre nom, utilisez : /name Prénom Nom. Exemple : /name Bob Smith",
     UI_OmiChat_HelpText_Nickname = "Pour définir votre nom dans la discussion, utilisez : /nickname Nom. Exemple : /name Bob",
+    UI_OmiChat_HelpText_Status = "To set a status message, use: /status Description. To clear your status, use: /status clear",
     UI_OmiChat_HelpText_SetName = "Définir le nom d'un joueur dans la discussion. Exemple : /setname nom_utilisateur Nom",
     UI_OmiChat_HelpText_ResetName = "Réinitialiser le nom d'un joueur dans la discussion. Exemple : /resetname nom_utilisateur",
     UI_OmiChat_HelpText_ClearNames = "Efface tous les noms de chat des joueurs. Utilisez /clearnames",
@@ -207,7 +213,7 @@ UI_FR = {
     UI_OmiChat_ModDataManager_NoData = "(vide)",
     UI_OmiChat_ModDataManager_Column_username = "Nom d'utilisateur",
     UI_OmiChat_ModDataManager_Column_nickname = "Pseudo de chat",
-    UI_OmiChat_ModDataManager_Column_nameColor = "Couleur du Nom",
+    UI_OmiChat_ModDataManager_Column_status = "Status",
     UI_OmiChat_ModDataManager_Column_icon = "Icône",
     UI_OmiChat_ModDataManager_Column_currentLanguage = "Langue Actuelle",
     UI_OmiChat_ModDataManager_Column_languages = "Langues",

@@ -14,6 +14,7 @@ Sandbox_EN = {
     Sandbox_OmiChat_General_ClearOnDeath_Icon = "Icon",
     Sandbox_OmiChat_General_ClearOnDeath_Languages = "Languages",
     Sandbox_OmiChat_General_ClearOnDeath_Nickname = "Chat Nickname",
+    Sandbox_OmiChat_General_ClearOnDeath_Status = "Status",
     Sandbox_OmiChat_General_InfoText = "Info Text",
 
     Sandbox_OmiChat_Buffs = "Buffs",
@@ -42,6 +43,9 @@ Sandbox_EN = {
     Sandbox_OmiChat_Commands_Name_Mode_Fullname = "/name sets character's full name",
     Sandbox_OmiChat_Commands_Name_Mode_Forename_Plus_Nickname = "/name sets character's forename, /nickname sets chat nickname",
     Sandbox_OmiChat_Commands_Name_Mode_Fullname_Plus_Nickname = "/name sets character's full name, /nickname sets chat nickname",
+    Sandbox_OmiChat_Commands_Status = "/status",
+    Sandbox_OmiChat_Commands_Status_Enable = "Enabled",
+    Sandbox_OmiChat_Commands_Status_Range = "Visibility Range",
     Sandbox_OmiChat_Commands_Card = "/card",
     Sandbox_OmiChat_Commands_Card_Items = "Card Items",
     Sandbox_OmiChat_Commands_Roll = "/roll",
@@ -106,6 +110,7 @@ Sandbox_EN = {
     Sandbox_OmiChat_Format_Filter = "Filters",
     Sandbox_OmiChat_Format_Filter_ChatInput = "Chat Input Filter",
     Sandbox_OmiChat_Format_Filter_Name = "Name Filter",
+    Sandbox_OmiChat_Format_Filter_Status = "Status Filter",
     Sandbox_OmiChat_Format_MenuName = "In-Game Names",
     Sandbox_OmiChat_Format_MenuName_Default = "Default",
     Sandbox_OmiChat_Format_MenuName_Trade = "Trade Window",
@@ -219,7 +224,10 @@ Sandbox_EN = {
 
     Sandbox_OmiChat_Commands_Name_tooltip = "Options related to commands to set character names."
     Sandbox_OmiChat_Commands_Name_Mode_tooltip = "Controls the behavior of the <SPACE> <PUSHRGB:0,1,0> /name <POPRGB> <SPACE> and <SPACE> <PUSHRGB:0,1,0> /nickname <POPRGB> <SPACE> commands." ..
-        " <BR> If this is set to an option that sets the character's forename or fullname, players will not be able to reset their name using the <SPACE> <PUSHRGB:0,1,0> /name <POPRGB> <SPACE> command.",
+        " <BR> If this is set to an option that sets the character's forename or fullname, players will not be able to reset their name with the <SPACE> <PUSHRGB:0,1,0> /name <POPRGB> <SPACE> command.",
+    Sandbox_OmiChat_Commands_Status_tooltip = "Options related to the <SPACE> <PUSHRGB:0,1,0> /status <POPRGB> <SPACE> command.",
+    Sandbox_OmiChat_Commands_Status_Enable_tooltip = "If enabled, players will be able to set a status message visible to other players with the <SPACE> <PUSHRGB:0,1,0> /status <POPRGB> <SPACE> command.",
+    Sandbox_OmiChat_Commands_Status_Range_tooltip = "The range a player will have to be within to see another player's status.",
     Sandbox_OmiChat_Commands_Card_tooltip = "Options that control the behavior and display of the <SPACE> <PUSHRGB:0,1,0> /card <POPRGB> <SPACE> command.",
     Sandbox_OmiChat_Commands_Card_Items_tooltip = "Semicolon-separated list of items players can use for the <SPACE> <PUSHRGB:0,1,0> /card <POPRGB> <SPACE> command." ..
         " <BR> If a player doesn't have any of the items in the list, the command will fail. If this is blank, the command won't require an item.",
@@ -286,6 +294,8 @@ Sandbox_EN = {
     Sandbox_OmiChat_Format_Filter_tooltip = "Format strings used to control whether an input is allowed.",
     Sandbox_OmiChat_Format_Filter_ChatInput_tooltip = "Filters chat input before sending it. If this results in the empty string or sets an error token, the input won't be sent.",
     Sandbox_OmiChat_Format_Filter_Name_tooltip = "Filters names set with the <SPACE> <PUSHRGB:0,1,0> /name <POPRGB> <SPACE> and <SPACE> <PUSHRGB:0,1,0> /nickname <POPRGB> commands." ..
+        " If this results in the empty string or sets an error token, the command will fail.",
+    Sandbox_OmiChat_Format_Filter_Status_tooltip = "Filters statuses set with the <SPACE> <PUSHRGB:0,1,0> /status <POPRGB> <SPACE> command." ..
         " If this results in the empty string or sets an error token, the command will fail.",
     Sandbox_OmiChat_Format_MenuName_tooltip = "Options that control how character names are displayed within in-game menus.",
     Sandbox_OmiChat_Format_MenuName_Default_tooltip = "The default format used when any of the options below are empty. If this and the format for a given menu is blank, that menu will not be affected.",

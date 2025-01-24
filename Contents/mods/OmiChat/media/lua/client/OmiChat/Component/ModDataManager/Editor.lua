@@ -19,6 +19,7 @@ local SuggesterBox = API.SuggesterBox
 ---@field iconEntry omi.ui.TextEntry
 ---@field currentLangEntry omi.ui.TextEntry
 ---@field languageEntry omi.ui.TextEntry
+---@field statusEntry omi.ui.TextEntry
 ---@field languageSlotsEntry omi.ui.TextEntry
 ---@field languageListbox ISScrollingListBox
 ---@field langSuggester omichat.SuggesterBox
@@ -117,6 +118,7 @@ function ModDataEditor:canSubmit()
     local fields = {
         self.usernameEntry,
         self.nicknameEntry,
+        self.statusEntry,
         self.iconEntry,
         self.currentLangEntry,
         self.languageSlotsEntry,
@@ -183,6 +185,10 @@ function ModDataEditor:createChildren()
     text = getText('UI_OmiChat_ModDataManager_Column_nickname')
     y, self.nicknameEntry = createField(self, TextEntry, y + PAD_Y, text, item.nickname)
     self.nicknameEntry:setValidateFunction(self.nicknameEntry, API.validateNicknameText)
+
+    text = getText('UI_OmiChat_ModDataManager_Column_status')
+    y, self.statusEntry = createField(self, TextEntry, y + PAD_Y, text, item.status)
+    self.statusEntry:setValidateFunction(self.statusEntry, API.validateStatusText)
 
     text = getText('UI_OmiChat_ModDataManager_Column_icon')
     y, self.iconEntry = createField(self, TextEntry, y + PAD_Y, text, item.icon)
@@ -411,6 +417,7 @@ function ModDataEditor:onSave()
     item.currentLanguage = self:getEntryValue(self.currentLangEntry)
     item.languageSlots = slots and tonumber(slots)
     item.nickname = self:getEntryValue(self.nicknameEntry)
+    item.status = self:getEntryValue(self.statusEntry)
     item.languages = self.item.languages
 
     API.setModData(username, item)

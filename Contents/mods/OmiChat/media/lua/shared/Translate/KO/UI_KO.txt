@@ -23,6 +23,8 @@ UI_KO = {
 
     --[[ Info Messages ]]--
     UI_OmiChat_Info_SetNameEmpty = "이름이 설정되지 않았습니다. '/name Name'을 사용하세요.",
+    UI_OmiChat_Info_CurrentStatus = "Current status: %1",
+    UI_OmiChat_Info_CurrentStatusUnset = "No status is set.",
     UI_OmiChat_Info_Icon = "'%1'은(는) 다음 아이콘의 이름입니다. %2",
     UI_OmiChat_Info_IconUnknown = "'%1'은(는) 알려진 아이콘 이름이 아닙니다.",
     UI_OmiChat_Info_IconAlias = "'%3'은(는) 다음 아이콘의 이름인 '%1'의 별칭입니다. %2",
@@ -36,7 +38,9 @@ UI_KO = {
 
     --[[ Success Messages ]]--
     UI_OmiChat_Success_SetNameSelf = "당신의 이름은 이제 '%1' 입니다.",
+    UI_OmiChat_Success_SetStatusSelf = "Your status has been set to '%1'.",
     UI_OmiChat_Success_ResetName = "이름이 리셋되었습니다.",
+    UI_OmiChat_Success_ResetStatus = "Your status has been cleared.",
     UI_OmiChat_Success_ClearNames = "모든 닉네임이 삭제되었습니다.",
     UI_OmiChat_Success_SwitchLanguage = "현재 활성 언어를 %1(으)로 전환했습니다.",
     UI_OmiChat_Success_SetNameOther = "'%2'라는 이름이 '%1' 플레이어에게 적용되었습니다.",
@@ -49,6 +53,7 @@ UI_KO = {
 
     --[[ Error Messages ]]--
     UI_OmiChat_Error_InvalidName = "'%1'은 이름으로 사용할 수 없습니다.",
+    UI_OmiChat_Error_InvalidStatus = "Your status cannot be set to '%1'.",
     UI_OmiChat_Error_SignedRadio = "라디오에서는 수화를 사용할 수 없습니다.",
     UI_OmiChat_Error_SignedFactionRadio = "조직 라디오에서는 수화를 사용할 수 없습니다.",
     UI_OmiChat_Error_SignedSafehouseRadio = "은신처 라디오에서는 수화를 사용할 수 없습니다.",
@@ -67,6 +72,7 @@ UI_KO = {
     UI_OmiChat_HelpText_Name = "이름을 설정하기위해, '/name Name'을 사용하세요. Example: /name Bob",
     UI_OmiChat_HelpText_NameFull = "이름을 설정하기위해, '/name FirstName LastName'을 사용하세요. Example: /name Bob Smith",
     UI_OmiChat_HelpText_Nickname = "채팅에 사용할 이름을 설정하기위해, '/nickname Name'을 사용하세요. Example: /nickname Bob",
+    UI_OmiChat_HelpText_Status = "To set a status message, use: /status Description. To clear your status, use: /status clear",
     UI_OmiChat_HelpText_SetName = "플레이어의 채팅에 사용할 이름을 설정하려면 '/setname'을 사용하세요. Example: /setname username Name",
     UI_OmiChat_HelpText_ResetName = "플레이어의 이름을 재설정하려면 다음 커맨드를 입력하세요. Example: /resetname username",
     UI_OmiChat_HelpText_ClearNames = "모든 채팅 이름을 지우려면 '/clearnames'을 사용하세요.",
@@ -207,7 +213,7 @@ UI_KO = {
     UI_OmiChat_ModDataManager_NoData = "(값 없음)",
     UI_OmiChat_ModDataManager_Column_username = "사용자 이름",
     UI_OmiChat_ModDataManager_Column_nickname = "채팅 이름",
-    UI_OmiChat_ModDataManager_Column_nameColor = "이름색",
+    UI_OmiChat_ModDataManager_Column_status = "Status",
     UI_OmiChat_ModDataManager_Column_icon = "아이콘",
     UI_OmiChat_ModDataManager_Column_currentLanguage = "현재 언어",
     UI_OmiChat_ModDataManager_Column_languages = "아는 언어",
