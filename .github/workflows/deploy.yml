@@ -28,15 +28,6 @@ jobs:
           mkdir mdbook
           curl -sSL $url | tar -xz --directory=./mdbook
           echo `pwd`/mdbook >> $GITHUB_PATH
-      - name: Install Lua language server
-        run: |
-          tag=$(curl 'https://api.github.com/repos/LuaLS/lua-language-server/releases/latest' | jq -r '.tag_name')
-          url="https://github.com/LuaLS/lua-language-server/releases/download/${tag}/lua-language-server-${tag}-linux-x64.tar.gz"
-          mkdir lls
-          curl -sSL $url | tar -xz --directory=./lls
-          echo `pwd`/lls/bin >> $GITHUB_PATH
-      - name: Run pre-deploy script
-        run: ./scripts/predeploy.sh
       - name: Build Book
         run: mdbook build
       - name: Setup Pages

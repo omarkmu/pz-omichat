@@ -1,176 +1,60 @@
 ---Vanilla preset.
 
-local utils = require 'OmiChat/utils'
 local Preset = require 'OmiChat/Component/Configuration/Preset'
-
-local set = utils.set.simple
 
 
 return Preset:new {
     name = 'Vanilla',
     values = {
-        General = {
-            Preset = 'Vanilla',
-            AlwaysShowChat = false,
+        General = Preset.general {
+            Name = 'Vanilla',
             CaseInsensitiveChatStreams = false,
-            ClearOnDeath = set { 'Icon', 'Languages', 'Nickname', 'Status' },
-            MinimumCommandAccessLevel = 16,
-            AdminIcon = 'Item_Hammer',
-            InfoText = '',
         },
-        Buffs = {
+        Buffs = Preset.buffs(),
+        Callouts = Preset.callouts(),
+        Commands = Preset.commands {
+            NameMode = 'Disable',
+            EnableStatus = false,
+            GlobalCommands = true,
+        },
+        Compatibility = Preset.compatibility(false),
+        Customization = Preset.customization {
             Enable = false,
-            Cooldown = 15,
-            Boredom = 0.2,
-            Unhappiness = 0.2,
-            Hunger = 0.1,
-            Thirst = 0.1,
-            Fatigue = 0.1,
-            CigaretteStress = 0.2,
         },
-        Callouts = {
-            Format = '$DefaultOverheadFormat()',
-            SneakFormat = '$DefaultOverheadFormat()',
-            Range = 60,
-            SneakRange = 6,
+        Discord = Preset.discord(),
+        EchoMessages = Preset.echo(),
+        Format = Preset.format(),
+        Language = Preset.languages {
+            UseDefaultList = false,
         },
-        Commands = {
-            Name = {
-                Mode = 'Disable',
-            },
-            Status = {
-                Enable = false,
-                Range = 20,
-            },
-            Card = {
-                Global = true,
-                Format = '$DefaultCardFormat()',
-                OverheadFormat = '$DefaultOverheadFormat()',
-                ChatFormat = '$DefaultChatFormat()',
-                Items = { 'CardDeck' },
-                Tags = {},
-            },
-            Roll = {
-                Global = true,
-                Format = '$DefaultRollFormat()',
-                OverheadFormat = '$DefaultOverheadFormat()',
-                ChatFormat = '$DefaultChatFormat()',
-                Items = {
-                    'Dice',
-                    'Dice_00',
-                    'Dice_4',
-                    'Dice_6',
-                    'Dice_8',
-                    'Dice_10',
-                    'Dice_12',
-                    'Dice_20',
-                },
-                Tags = {},
-            },
-            Flip = {
-                Global = true,
-                Format = '$DefaultFlipFormat()',
-                OverheadFormat = '$DefaultOverheadFormat()',
-                ChatFormat = '$DefaultChatFormat()',
-                Items = {},
-                Tags = {},
-            },
+        Macros = Preset.macros {
+            AllowEmotes = false,
         },
-        Compatibility = {
-            BuffyCharacterBios = 'Disable',
-            BuffyRPGSystem = 'Disable',
-            ChatBubble = 'Disable',
-            SearchPlayers = 'Disable',
-            TrueActionsDancing = 'Disable',
+        NarrativeStyle = Preset.narrative {
+            Enable = false,
         },
-        Customization = {
-            AllowCustomShouts = false,
-            EnableNameColors = false,
-            EnableCharacterCustomization = false,
-            CleanEffects = {},
-        },
-        Discord = {
-            ChatFormat = '$DefaultChatFormat()',
-            DefaultColor = { r = 144, g = 137, b = 218 },
-            ShowColorOption = 'Respect_Server_Setting',
+        Radio = Preset.radio {
             Tags = {
                 'UseAuthorUsername',
             },
         },
-        EchoMessages = {
-            Enable = false,
-            ChatFormat = '$DefaultChatFormat()',
-            OverheadFormat = '$DefaultOverheadFormat()',
+        ServerMessages = Preset.server {
             Tags = {
-                'OverRadio',
+                'NoTimestamp',
             },
         },
-        Format = {
-            Component = {
-                Name = '$DefaultNameFormat()',
-                Tag = '$DefaultTagFormat()',
-                Timestamp = '$DefaultTimestampFormat()',
-                Icon = '$DefaultIconFormat()',
-                Language = '$DefaultLanguageFormat()',
-                EmbeddedQuote = '$DefaultEmbeddedQuoteFormat()',
-                EmbeddedAction = '$DefaultEmbeddedActionFormat()',
-            },
-            Overhead = {
-                Final = '$DefaultFullOverheadFormat()',
-                Prefix = '$DefaultOverheadPrefix()',
-            },
-            PerceptionRange = {
-                Chat = '$DefaultPerceptionRangeChatFormat()',
-                Overhead = '$DefaultPerceptionRangeOverheadFormat()',
-            },
-            Chat = {
-                Final = '$DefaultFullChatFormat()',
-                Prefix = '$DefaultChatPrefix()',
-            },
-            Filter = {
-                Name = '$DefaultNameFilter()',
-                Status = '$DefaultStatusFilter()',
-                ChatInput = '$DefaultChatInputFilter()',
-            },
-            MenuName = {
-                Default = '$DefaultMenuNameFormat()',
-            },
-        },
-        Language = {
-            UseDefaultList = false,
-            List = {},
-            DefaultSlots = 1,
-            InterpretationRolls = 2,
-            InterpretationChance = 25,
-            UnknownLanguageChat = '$DefaultUnknownLanguageFormat()',
-            UnknownLanguageRadio = '$DefaultUnknownLanguageFormat()',
-            UnknownLanguageOverhead = '$DefaultUnknownLanguageOverheadFormat()',
-            SelfAddAllowlist = {},
-            SelfAddBlocklist = {},
-        },
-        Macros = {
-            AllowEmotes = false,
-        },
-        NarrativeStyle = {
+        TypingIndicator = Preset.typing {
             Enable = false,
-            OverheadContentFormat = '$DefaultNarrativeOverheadFormat()',
-            ChatContentFormat = '$DefaultNarrativeChatFormat()',
-            DialogueTagFormat = '$DefaultNarrativeTag()',
-            InputFilter = '$DefaultNarrativeInputFilter()',
         },
-        Radio = {
-            ChatFormat = '$DefaultChatFormat()',
-            DefaultColor = { r = 178, g = 178, b = 178 },
-            Tags = { 'UseAuthorUsername' },
-        },
-        ServerMessages = {
-            ChatFormat = '$DefaultChatFormat()',
-            DefaultColor = { r = 0, g = 128, b = 255 },
-            Tags = { 'NoTimestamp' },
-        },
+        ZombieAttraction = Preset.zombies(),
+
         Streams = {
             UseDefaultList = false,
-            GlobalTags = { 'BracketedNames', 'NoPrefixSpaceChat', 'NoIcon' },
+            GlobalTags = {
+                'BracketedNames',
+                'NoPrefixSpaceChat',
+                'NoIcon',
+            },
             List = {
                 {
                     Stream = 'admin',
@@ -271,15 +155,6 @@ return Preset:new {
                     Enable = true,
                 },
             },
-        },
-        TypingIndicator = {
-            Enable = false,
-            Format = '$DefaultTypingFormat()',
-        },
-        ZombieAttraction = {
-            ChatRangeMultiplier = 0,
-            CalloutRange = 30,
-            SneakCalloutRange = 6,
         },
     },
 }

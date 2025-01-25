@@ -1,3 +1,5 @@
+---Stream for sending chat messages.
+
 local Stream = require 'OmiChat/Component/Stream'
 local defaultStreamData = require 'OmiChat/Definition/DefaultStreamData'
 local utils = require 'OmiChat/utils'
@@ -29,9 +31,9 @@ local otherReservedNames = {
 
 
 ---Returns whether a string is the name of a built-in stream.
----@static
 ---@param name string
 ---@return boolean
+---@static
 function ChatStream.isReservedName(name)
     if defaultStreamData[name] or otherReservedNames[name] then
         return true
@@ -41,9 +43,9 @@ function ChatStream.isReservedName(name)
 end
 
 ---Checks whether a stream definition is valid.
----@static
 ---@param def omichat.Configuration.StreamDefinition
 ---@return boolean
+---@static
 function ChatStream.isValidDefinition(def)
     if not def.Stream or def.Stream == 'custom' then
         local name = def.Name and def.Name:lower() or ''
@@ -54,10 +56,10 @@ function ChatStream.isValidDefinition(def)
 end
 
 ---Creates a chat stream given a stream definition, if it's valid.
----@static
 ---@param def omichat.Configuration.StreamDefinition
 ---@param additionalTags string[]?
 ---@return omichat.ChatStream?
+---@static
 function ChatStream.fromDefinition(def, additionalTags)
     if not ChatStream.isValidDefinition(def) then
         return

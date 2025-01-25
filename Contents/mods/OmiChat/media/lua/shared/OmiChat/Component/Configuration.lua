@@ -1,9 +1,10 @@
+---Contains mod configuration and enables updating it.
+
 local utils = require 'OmiChat/utils'
 local MetaFormatter = require 'OmiChat/Component/MetaFormatter'
 local base = utils.configuration.ConfigurationHelper
 
 
----Contains mod configuration and enables updating it.
 ---@class omichat.ConfigurationHelper : omi.ConfigurationHelper, omichat.Configuration
 local Configuration = utils.configuration {
     schema = require 'OmiChat/Component/Configuration/Schema',
@@ -39,8 +40,6 @@ local Configuration = utils.configuration {
     end,
 }
 
-
---#region constants
 
 -- reserved ID layout:
 --   1–10: general-purpose arguments
@@ -143,15 +142,13 @@ Configuration.FORMAT_NAMES = {
     [Configuration.ID_ECHO] = 'echo',
 }
 
---#endregion
-
 
 
 ---Checks the language against the add language allow/block list.
 ---This does not check whether the language is a valid roleplay language.
 ---@param language string
 ---@return boolean
----@see omichat.api.shared.isConfiguredRoleplayLanguage
+---@see omichat.api.shared.language.exists
 function Configuration:canAddLanguage(language)
     if not table.isempty(self._languageAllowSet) and not self._languageAllowSet[language] then
         return false
@@ -296,7 +293,7 @@ end
 ---Retrieves the list of configured roleplay languages' names.
 ---@return string[]
 function Configuration:getLanguageNameList()
-    return utils.copy(self._languageNameList)
+    return utils.copyList(self._languageNameList)
 end
 
 ---Returns the format to use for a given menu type.
@@ -471,7 +468,7 @@ function Configuration:setOnSave(onSave)
     self._onSaveCallback = onSave
 end
 
----Updates the format text used for formatters.
+---Updates the format text used for metadata formatters.
 function Configuration:updateFormatters()
     self._formatterInfo = self._formatterInfo or {}
 
@@ -480,9 +477,14 @@ function Configuration:updateFormatters()
     local echo = self.EchoMessages or {}
     for i = self.MIN_META_ID, self.MAX_META_ID do
         if not self._formatterInfo[i] then
+            local name = self.FORMAT_NAMES[i]
+            if not name then
+                utils.log.error('Missing name for metadata formatter with ID %d', i)
+            end
+
             self._formatterInfo[i] = {
                 id = i,
-                name = self.FORMAT_NAMES[i] or '',
+                name = name or '',
                 formatter = MetaFormatter:new(i),
             }
         end

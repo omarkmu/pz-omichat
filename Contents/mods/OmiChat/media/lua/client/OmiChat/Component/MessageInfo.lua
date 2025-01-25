@@ -1,4 +1,6 @@
-local API = require 'OmiChat/API/Client/Core' ---@class omichat.api.client
+---Helper for building information about a chat message.
+
+local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
 
 local utils = API.utils
 local config = API.Configuration
@@ -30,10 +32,10 @@ local _getTextWithPrefix = _ChatMessage.getTextWithPrefix
 
 
 ---Decodes information encoded in a message's tag.
----@static
 ---@param tag string The message tag to decode.
 ---@param metadata table? The table to populate with metadata.
 ---@return omichat.MessageInfo.Metadata
+---@static
 function MessageInfo.decodeMessageTag(tag, metadata)
     metadata = metadata or {} ---@type omichat.MessageInfo.Metadata
     table.wipe(metadata)
@@ -64,8 +66,8 @@ function MessageInfo.decodeMessageTag(tag, metadata)
 end
 
 ---Encodes message information including chat name and colors into a message's metadata.
----@static
 ---@param message omichat.Message The message to encode.
+---@static
 function MessageInfo.encodeMessageTag(message)
     local author = message:getAuthor() ---@type string?
     if author == '' then
@@ -73,15 +75,15 @@ function MessageInfo.encodeMessageTag(message)
     end
 
     local text = message:getText()
-    local adminFormatter = API.getFormatter('adminIcon')
+    local adminFormatter = API.format.get('adminIcon')
     local useAdminIcon = adminFormatter and adminFormatter:isMatch(text)
 
-    local color = author and API.getSpeechColor(author)
+    local color = author and API.data.getSpeechColor(author)
     local encoded = utils.json.tryEncode {
-        language = API.decodeLanguage(message),
-        name = API.getNameInChatRichText(author, MessageInfo.getMessageChatType(message)),
+        language = API.format.decodeLanguage(message),
+        name = API.data.getNameInChatRichText(author, MessageInfo.getMessageChatType(message)),
         nameColor = color and utils.color.toHexString(color) or nil,
-        icon = author and API.getChatIcon(author) or nil,
+        icon = author and API.data.getChatIcon(author) or nil,
         adminIcon = useAdminIcon and config.General.AdminIcon or nil,
     }
 
@@ -89,9 +91,9 @@ function MessageInfo.encodeMessageTag(message)
 end
 
 ---Returns the chat type of a chat message.
----@static
 ---@param message omichat.Message
 ---@return string
+---@static
 function MessageInfo.getMessageChatType(message)
     if utils.isinstance(message, MimicMessage) then
         ---@cast message omi.chat.MimicMessage
@@ -103,22 +105,22 @@ function MessageInfo.getMessageChatType(message)
 end
 
 ---Determines the source stream of a message based on encoded information.
----@static
 ---@param message omichat.Message
 ---@param chatType omichat.ChatTypeString
 ---@param excludeRadio boolean?
 ---@return omichat.Stream?
+---@static
 function MessageInfo.getMessageStream(message, chatType, excludeRadio)
     if chatType == 'server' then
-        return API.getServerStream()
+        return API.streams.getServerStream()
     elseif chatType == 'radio' and not excludeRadio then
-        return API.getRadioStream()
+        return API.streams.getRadioStream()
     elseif message:isFromDiscord() then
-        return API.getDiscordStream()
+        return API.streams.getDiscordStream()
     end
 
     local text = message:getText()
-    for stream in API.streams() do
+    for stream in API.streams.iter() do
         local formatter = stream:getFormatter()
         local isMatch = formatter and formatter:isMatch(text)
         if isMatch then
@@ -135,15 +137,15 @@ function MessageInfo.hasEncodedMetadata(message)
 end
 
 ---Returns whether name colors should be used for a stream.
----@static
 ---@param stream omichat.Stream?
 ---@return boolean
+---@static
 function MessageInfo.shouldUseNameColors(stream)
     if not config.Customization.EnableNameColors then
         return false
     end
 
-    if not API.getNameColorsEnabled() then
+    if not API.preferences.getNameColorsEnabled() then
         return false
     end
 
@@ -266,7 +268,7 @@ function MessageInfo:applyFormatting()
 
     if self.shouldUseNameColors(stream) then
         local encodedColor = self.meta.nameColor
-        local nameColor = encodedColor or API.getSpeechColor(self.author) or { r = 255, g = 255, b = 255 }
+        local nameColor = encodedColor or API.data.getSpeechColor(self.author) or { r = 255, g = 255, b = 255 }
         local nameColorTag = utils.color.toRichText(nameColor, true)
 
         if nameColorTag ~= '' then
@@ -281,7 +283,7 @@ function MessageInfo:applyFormatting()
         local recip = self.tokens.recipient
         if recip then
             local encodedRecipColor = self.meta.recipientNameColor
-            local recipColor = encodedRecipColor or API.getSpeechColor(recip) or { r = 255, g = 255, b = 255 }
+            local recipColor = encodedRecipColor or API.data.getSpeechColor(recip) or { r = 255, g = 255, b = 255 }
 
             local recipColorTag = utils.color.toRichText(recipColor, true)
 
@@ -300,7 +302,7 @@ function MessageInfo:applyFormatting()
     if not options.color then
         local color
         if stream then
-            color = API.getColorOrDefault(stream:getName())
+            color = API.player.getColorOrDefault(stream:getName())
         end
 
         options.color = color or self:getOriginalColor()
@@ -428,7 +430,7 @@ function MessageInfo:getActionStream()
         targetTags = { 'Loud' }
     end
 
-    local streams = API.getChatStreamsWithTag('Action', { 'NoName' })
+    local streams = API.streams.getChatStreamsWithTag('Action', { 'NoName' })
 
     local targetStream
     if targetTags then
@@ -779,7 +781,7 @@ function MessageInfo:setStream(stream, options)
     local chatType = options.chatType or stream:getChatType()
     if chatType then
         self.chatType = chatType
-        self.titleID = API.chatTypeToTitleID(chatType)
+        self.titleID = API.ui.chatTypeToTitleID(chatType)
     end
 
     if not self.format or options.forceFormat then
@@ -1011,10 +1013,10 @@ function MessageInfo:_setupStreamInfo()
     local message = self.message
 
     local meta = self.meta
-    self.stream = self.stream or (meta.stream and API.getChatStreamByName(meta.stream))
+    self.stream = self.stream or (meta.stream and API.streams.getChatStream(meta.stream))
     self.stream = self.stream or self.getMessageStream(message, self.chatType)
 
-    self.originalStream = self.originalStream or (meta.originalStream and API.getChatStreamByName(meta.originalStream))
+    self.originalStream = self.originalStream or (meta.originalStream and API.streams.getChatStream(meta.originalStream))
 
     if not self.originalStream and self.stream and self.stream:isRadioStream() then
         self.originalStream = self.getMessageStream(message, self.chatType, true)
@@ -1157,7 +1159,7 @@ function MessageInfo:new(message)
     this:_setupStreamInfo()
 
     local instance = ISChat.instance
-    local formatter = API.getFormatter('adminIcon')
+    local formatter = API.format.get('adminIcon')
     local displayAsAdmin = formatter and formatter:isMatch(message:getText())
 
     this.tokens = {

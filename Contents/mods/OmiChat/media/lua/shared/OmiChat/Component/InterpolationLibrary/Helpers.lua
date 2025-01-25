@@ -1,6 +1,6 @@
----Helper functions for interpolation functions.
+---Helpers for interpolation functions.
 
-local API = require 'OmiChat/API/Shared/Core'
+local API = require 'OmiChat/Module/Shared/Core'
 
 local concat = table.concat
 local sort = table.sort
@@ -149,7 +149,7 @@ end
 ---@return string? errorID
 function Helpers.checkSignedOverRadio(interpolator)
     local language = interpolator:token('languageRaw')
-    if not language or not API.isRoleplayLanguageSigned(language) then
+    if not language or not API.language.isSigned(language) then
         return
     end
 
@@ -441,7 +441,7 @@ function Helpers.getBaseUnknownLanguageString(tags, language, author, dialogueTa
         dialogueTag = dialogueTag:gsub('%s', '_')
     end
 
-    local isSigned = API.isRoleplayLanguageSigned(language)
+    local isSigned = API.language.isSigned(language)
     if isSigned then
         local stringID = 'UI_OmiChat_UnknownLanguageSigned_' .. dialogueTag
         local translated = getTextOrNull(stringID, author, languageName)
@@ -478,14 +478,14 @@ end
 ---@return string
 function Helpers.getColorTarget(colorTag, options, tags)
     ---@cast API unknown
-    if not API.getFirstChatStreamWithTag then
+    if not API.streams.firstChatStreamWithTag then
         return ''
     end
 
     tags = tags or {}
 
     ---@cast API omichat.api.client
-    local streams = API.getChatStreamsWithTag(colorTag)
+    local streams = API.streams.getChatStreamsWithTag(colorTag)
     local targetTag = options and options:get('colorTargetTag')
     if not targetTag then
         if tags.Loud then
@@ -513,7 +513,7 @@ function Helpers.getColorTarget(colorTag, options, tags)
         return ''
     end
 
-    return utils.color.toRichText(API.getColorOrDefault(colorStream:getName()), true)
+    return utils.color.toRichText(API.player.getColorOrDefault(colorStream:getName()), true)
     ---@cast API omichat.api.shared
 end
 

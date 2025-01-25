@@ -1,11 +1,11 @@
+---Schema class for mod configuration.
+
 local utils = require 'OmiChat/utils'
 local defaultStreamData = require 'OmiChat/Definition/DefaultStreamData'
 local schema = utils.schema
 
 
----Schema object for mod configuration.
 ---@class omichat.ConfigurationSchema : omi.Schema
----@field private _presets table<string, omichat.ConfigurationPreset> (static)
 local SchemaClass = schema.Schema:derive()
 
 SchemaClass._presets = {
@@ -18,6 +18,7 @@ SchemaClass._presets = {
 ---Gets a preset by name.
 ---@param name string
 ---@return omichat.ConfigurationPreset?
+---@static
 function SchemaClass.getPreset(name)
     if not name then
         return
@@ -117,11 +118,9 @@ function SchemaClass:processStreams(streams)
             seen[compareKey] = true
             local data = defaultStreamData[streamType]
             if not data then
-                if isCustom then
-                    data = {}
-                else
-                    streamType = 'say'
-                    data = defaultStreamData.say
+                data = {}
+                if not isCustom then
+                    utils.log.error('Missing defaults for built-in stream `%s`', tostring(streamType))
                 end
             end
 
@@ -130,7 +129,8 @@ function SchemaClass:processStreams(streams)
                 if not isCustom and (k == 'ChatType' or k == 'CommandType') then
                     -- always copy these keys for built-in streams
                     stream[k] = v
-                elseif type(stream[k]) ~= type_v then -- keep valid values
+                elseif type(stream[k]) ~= type_v then
+                    -- use defaults for invalid values
                     stream[k] = type_v == 'table' and utils.copy(v) or v
                 end
             end
@@ -145,8 +145,8 @@ function SchemaClass:processStreams(streams)
                 stream.Name = nil
             end
 
-            local isValidBuiltin = not utils.isNilOrWhitespace(stream.Stream) and stream.Stream ~= 'custom'
-            local isValidCustom = not utils.isNilOrWhitespace(stream.Name) and stream.Stream == 'custom'
+            local isValidBuiltin = stream.Stream ~= 'custom' and not utils.isNilOrWhitespace(stream.Stream)
+            local isValidCustom = stream.Stream == 'custom' and not utils.isNilOrWhitespace(stream.Name)
             if isValidBuiltin or isValidCustom then
                 processed[#processed + 1] = stream
             end

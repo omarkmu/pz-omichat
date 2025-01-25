@@ -1,10 +1,346 @@
----Handles configuration presets.
+---Class for configuration presets.
 
 local utils = require 'OmiChat/utils'
+local set = utils.set.simple
 
 
 ---@class omichat.ConfigurationPreset : omi.Class
 local Preset = utils.lib.class()
+
+
+---Creates a table for configuration of buffs based on the defaults.
+---@param options omichat.Args.ConfigurationPreset.Buffs? Options for creation of the table.
+---@return omichat.Configuration.Buffs
+---@static
+function Preset.buffs(options)
+    options = options or {}
+
+    ---@type omichat.Configuration.Buffs
+    return {
+        Enable = options.Enable or false,
+        Cooldown = 15,
+        Boredom = 0.2,
+        Unhappiness = 0.2,
+        Hunger = 0.1,
+        Thirst = 0.1,
+        Fatigue = 0.1,
+        CigaretteStress = 0.2,
+    }
+end
+
+---Creates a table for callout configuration based on the defaults.
+---@param options omichat.Args.ConfigurationPreset.Callouts?
+---@return omichat.Configuration.Callouts
+---@static
+function Preset.callouts(options)
+    options = options or {}
+
+    ---@type omichat.Configuration.Callouts
+    return {
+        Format = '$DefaultOverheadFormat()',
+        SneakFormat = '$DefaultOverheadFormat()',
+        Range = options.Range or 60,
+        SneakRange = options.SneakRange or 6,
+    }
+end
+
+---Returns the default set for information to clear on player character death.
+---@return omichat.Configuration.General.ClearOnDeath
+---@static
+function Preset.clearOnDeath()
+    return set {
+        'Icon',
+        'Languages',
+        'Nickname',
+        'Status',
+    }
+end
+
+---Creates a table for command configuration based on the defaults.
+---@param options omichat.Args.ConfigurationPreset.Commands?
+---@return omichat.Configuration.Commands
+---@static
+function Preset.commands(options)
+    options = options or {}
+
+    local globalCommands = options.GlobalCommands or false
+
+    ---@type omichat.Configuration.Commands
+    return {
+        Name = {
+            Mode = options.NameMode or 'Nickname',
+        },
+        Status = {
+            Enable = utils.default(options.EnableStatus, true),
+            Range = 20,
+        },
+        Card = {
+            Global = globalCommands,
+            Format = '$DefaultCardFormat()',
+            OverheadFormat = '$DefaultOverheadFormat()',
+            ChatFormat = '$DefaultChatFormat()',
+            Items = { 'CardDeck' },
+            Tags = {},
+        },
+        Roll = {
+            Global = globalCommands,
+            Format = '$DefaultRollFormat()',
+            OverheadFormat = '$DefaultOverheadFormat()',
+            ChatFormat = '$DefaultChatFormat()',
+            Items = {
+                'Dice',
+                'Dice_00',
+                'Dice_4',
+                'Dice_6',
+                'Dice_8',
+                'Dice_10',
+                'Dice_12',
+                'Dice_20',
+            },
+            Tags = {},
+        },
+        Flip = {
+            Global = globalCommands,
+            Format = '$DefaultFlipFormat()',
+            OverheadFormat = '$DefaultOverheadFormat()',
+            ChatFormat = '$DefaultChatFormat()',
+            Items = {},
+            Tags = {},
+        },
+    }
+end
+
+---Returns the default values for compatibility options.
+---@param enable boolean?
+---@return omichat.Configuration.Compatibility
+function Preset.compatibility(enable)
+    local value = utils.default(enable, true) and 'Auto' or 'Disable'
+
+    ---@type omichat.Configuration.Compatibility
+    return {
+        BuffyCharacterBios = value,
+        BuffyRPGSystem = value,
+        ChatBubble = value,
+        SearchPlayers = value,
+        TrueActionsDancing = value,
+    }
+end
+
+---Creates a table for customization configuration based on the defaults.
+---@param options omichat.Args.ConfigurationPreset.Customization?
+---@return omichat.Configuration.Customization
+---@static
+function Preset.customization(options)
+    options = options or {}
+
+    local value = utils.default(options.Enable, true)
+
+    ---@type omichat.Configuration.Customization
+    return {
+        AllowCustomShouts = value,
+        EnableNameColors = value,
+        EnableCharacterCustomization = value,
+        CleanEffects = set(options.CleanEffects or { 'Body', 'Clothing' }),
+    }
+end
+
+---Creates a table for Discord configuration based on the defaults.
+---@param options omichat.Args.ConfigurationPreset.Discord?
+---@return omichat.Configuration.Discord
+---@static
+function Preset.discord(options)
+    options = options or {}
+
+    ---@type omichat.Configuration.Discord
+    return {
+        ChatFormat = '$DefaultChatFormat()',
+        DefaultColor = { r = 144, g = 137, b = 218 },
+        ShowColorOption = 'Respect_Server_Setting',
+        Tags = options.Tags or { 'UseAuthorUsername' },
+    }
+end
+
+---Creates a table for echo message configuration based on the defaults.
+---@param options omichat.Args.ConfigurationPreset.Echo?
+---@return omichat.Configuration.EchoMessages
+---@static
+function Preset.echo(options)
+    options = options or {}
+
+    ---@type omichat.Configuration.EchoMessages
+    return {
+        Enable = options.Enable or false,
+        ChatFormat = '$DefaultChatFormat()',
+        OverheadFormat = '$DefaultOverheadFormat()',
+        Tags = options.Tags or { 'OverRadio' },
+    }
+end
+
+---Returns the default format configuration.
+---@return omichat.Configuration.Format
+---@static
+function Preset.format()
+    ---@type omichat.Configuration.Format
+    return {
+        Component = {
+            Name = '$DefaultNameFormat()',
+            Tag = '$DefaultTagFormat()',
+            Timestamp = '$DefaultTimestampFormat()',
+            Icon = '$DefaultIconFormat()',
+            Language = '$DefaultLanguageFormat()',
+            EmbeddedQuote = '$DefaultEmbeddedQuoteFormat()',
+            EmbeddedAction = '$DefaultEmbeddedActionFormat()',
+        },
+        Overhead = {
+            Final = '$DefaultFullOverheadFormat()',
+            Prefix = '$DefaultOverheadPrefix()',
+        },
+        PerceptionRange = {
+            Chat = '$DefaultPerceptionRangeChatFormat()',
+            Overhead = '$DefaultPerceptionRangeOverheadFormat()',
+        },
+        Chat = {
+            Final = '$DefaultFullChatFormat()',
+            Prefix = '$DefaultChatPrefix()',
+        },
+        Filter = {
+            Name = '$DefaultNameFilter()',
+            Status = '$DefaultStatusFilter()',
+            ChatInput = '$DefaultChatInputFilter()',
+        },
+        MenuName = {
+            Default = '$DefaultMenuNameFormat()',
+        },
+    }
+end
+
+---Creates a table for general configuration based on the defaults.
+---@param options omichat.Args.ConfigurationPreset.General
+---@return omichat.Configuration.General
+---@static
+function Preset.general(options)
+    ---@type omichat.Configuration.General
+    return {
+        Preset = options.Name,
+        AlwaysShowChat = false,
+        CaseInsensitiveChatStreams = utils.default(options.CaseInsensitiveChatStreams, true),
+        MinimumCommandAccessLevel = 16,
+        InfoText = '',
+        AdminIcon = options.AdminIcon or 'Item_Sledgehamer',
+        ClearOnDeath = options.ClearOnDeath or Preset.clearOnDeath(),
+    }
+end
+
+---Returns the default language configuration.
+---@param options omichat.Args.ConfigurationPreset.Language?
+---@return omichat.Configuration.Language
+---@static
+function Preset.languages(options)
+    options = options or {}
+
+    ---@type omichat.Configuration.Language
+    return {
+        UseDefaultList = utils.default(options.UseDefaultList, true),
+        List = options.List or {},
+        DefaultSlots = 1,
+        InterpretationRolls = 2,
+        InterpretationChance = 25,
+        UnknownLanguageChat = '$DefaultUnknownLanguageFormat()',
+        UnknownLanguageRadio = '$DefaultUnknownLanguageFormat()',
+        UnknownLanguageOverhead = '$DefaultUnknownLanguageOverheadFormat()',
+        SelfAddAllowlist = {},
+        SelfAddBlocklist = {},
+    }
+end
+
+---Returns the default macro configuration.
+---@param options omichat.Args.ConfigurationPreset.Macros?
+---@return omichat.Configuration.Macros
+---@static
+function Preset.macros(options)
+    options = options or {}
+
+    ---@type omichat.Configuration.Macros
+    return {
+        AllowEmotes = utils.default(options.AllowEmotes, true),
+    }
+end
+
+---Returns the default narrative style configuration.
+---@param options omichat.Args.ConfigurationPreset.NarrativeStyle?
+---@return omichat.Configuration.NarrativeStyle
+---@static
+function Preset.narrative(options)
+    options = options or {}
+
+    ---@type omichat.Configuration.NarrativeStyle
+    return {
+        Enable = options.Enable or false,
+        OverheadContentFormat = '$DefaultNarrativeOverheadFormat()',
+        ChatContentFormat = '$DefaultNarrativeChatFormat()',
+        DialogueTagFormat = '$DefaultNarrativeTag()',
+        InputFilter = '$DefaultNarrativeInputFilter()',
+    }
+end
+
+---Creates a table for radio configuration based on the defaults.
+---@param options omichat.Args.ConfigurationPreset.Radio?
+---@return omichat.Configuration.Radio
+---@static
+function Preset.radio(options)
+    options = options or {}
+
+    ---@type omichat.Configuration.Radio
+    return {
+        ChatFormat = '$DefaultChatFormat()',
+        DefaultColor = { r = 178, g = 178, b = 178 },
+        Tags = options.Tags or {},
+    }
+end
+
+---Creates a table for server message configuration based on the defaults.
+---@param options omichat.Args.ConfigurationPreset.ServerMessages?
+---@return omichat.Configuration.ServerMessages
+---@static
+function Preset.server(options)
+    options = options or {}
+
+    ---@type omichat.Configuration.ServerMessages
+    return {
+        ChatFormat = '$DefaultChatFormat()',
+        DefaultColor = { r = 0, g = 128, b = 255 },
+        Tags = options.Tags or { 'NoTimestamp', 'NoTagColon' },
+    }
+end
+
+---Creates a table for typing indicator configuration based on the defaults.
+---@param options omichat.Args.ConfigurationPreset.TypingIndicator?
+---@return omichat.Configuration.TypingIndicator
+---@static
+function Preset.typing(options)
+    options = options or {}
+
+    ---@type omichat.Configuration.TypingIndicator
+    return {
+        Enable = utils.default(options.Enable, true),
+        Format = '$DefaultTypingFormat()',
+    }
+end
+
+---Creates a table for zombie attraction configuration based on the defaults.
+---@param options omichat.Args.ConfigurationPreset.ZombieAttraction?
+---@return omichat.Configuration.ZombieAttraction
+---@static
+function Preset.zombies(options)
+    options = options or {}
+
+    ---@type omichat.Configuration.ZombieAttraction
+    return {
+        ChatRangeMultiplier = options.ChatRangeMultiplier or 0,
+        CalloutRange = options.CalloutRange or 30,
+        SneakCalloutRange = options.SneakCalloutRange or 6,
+    }
+end
 
 
 ---Returns the name of the preset.

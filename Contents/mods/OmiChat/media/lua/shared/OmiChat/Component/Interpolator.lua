@@ -1,14 +1,70 @@
+---Handles interpolation operations.
+
 local lib = require 'OmiLibrary'
 local BaseInterpolator = lib.interpolate.Interpolator
 
+local getTimestampMs = getTimestampMs
+
 
 ---@class omichat.Interpolator : omi.Interpolator
----@field private _registeredFunctions table<string, function>
 local Interpolator = BaseInterpolator:derive()
-Interpolator._registeredFunctions = {}
+Interpolator._cache = {}
+Interpolator._registered = {}
 
 
-local FUNCTION_MT = { __index = Interpolator._registeredFunctions }
+local CACHE_EXPIRY_MS = 600000 -- ten minutes
+local FUNCTION_MT = { __index = Interpolator._registered }
+
+
+---Cleans up unused cache items.
+---@param clear boolean If true, the cache will be cleared entirely.
+function Interpolator.cleanupCache(clear)
+    if clear then
+        Interpolator._cache = {}
+        return
+    end
+
+    local toRemove = {}
+    local currentTime = getTimestampMs()
+    for k, item in pairs(Interpolator._cache) do
+        if currentTime - item.lastAccess >= CACHE_EXPIRY_MS then
+            toRemove[#toRemove + 1] = k
+        end
+    end
+
+    for i = 1, #toRemove do
+        Interpolator._cache[toRemove[i]] = nil
+    end
+end
+
+---Gets a cached interpolator, creating one if it doesn't exist.
+---@param text string
+---@return omichat.Interpolator
+---@static
+function Interpolator.getOrCreate(text)
+    local item = Interpolator._cache[text]
+    if item then
+        item.lastAccess = getTimestampMs()
+        return item.interpolator
+    end
+
+    local interpolator = Interpolator:new()
+    interpolator:setPattern(text)
+    Interpolator._cache[text] = {
+        interpolator = interpolator,
+        lastAccess = getTimestampMs(),
+    }
+
+    return interpolator
+end
+
+---Registers an interpolator function.
+---@param name string
+---@param f fun(interpolator: omichat.Interpolator, ...: unknown)
+---@static
+function Interpolator.register(name, f)
+    Interpolator._registered[name] = f
+end
 
 
 ---Creates a new interpolator.

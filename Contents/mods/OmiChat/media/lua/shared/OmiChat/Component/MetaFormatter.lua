@@ -1,18 +1,14 @@
+---Handles formatting chat messages with invisible characters.
+
 local utils = require 'OmiChat/utils'
 
 local char = string.char
 local concat = table.concat
 local floor = math.floor
-
 local metaChar = char(65535)
 
 
----Handles formatting for special chat messages with invisible characters.
 ---@class omichat.MetaFormatter : omi.Class
----@field protected _id integer
----@field protected _formatString string
----@field protected _idPrefix string
----@field protected _idSuffix string
 local MetaFormatter = utils.lib.class()
 
 
@@ -21,8 +17,8 @@ local formatters = {}
 
 
 ---Returns the next free ID for a formatter.
----@static
 ---@return integer?
+---@static
 function MetaFormatter.getNextFreeID()
     for i = 101, 1024 do
         if not formatters[i] then

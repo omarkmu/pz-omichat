@@ -1,11 +1,14 @@
----Provides API access to OmiChat.
----@class omichat.api.shared
-local API = require 'OmiChat/API/Shared/Core'
+---Shared API.
 
-require 'OmiChat/API/Shared/Languages'
+---@class omichat.api.shared
+local API = require 'OmiChat/Module/Shared/Core'
+
+require 'OmiChat/Module/Shared/Data'
+require 'OmiChat/Module/Shared/Extension'
+require 'OmiChat/Module/Shared/Languages'
 require 'OmiChat/Component/InterpolationLibrary'
 
-Events.EveryDays.Add(API.utils.cleanupCache)
 
+require 'OmiChat/Module/Shared/SharedEvents'
 
 return API

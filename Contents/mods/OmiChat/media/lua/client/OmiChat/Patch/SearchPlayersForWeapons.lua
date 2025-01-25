@@ -1,5 +1,5 @@
----@diagnostic disable: undefined-global
 ---Compatibility patch for Search Players For Weapons.
+---@diagnostic disable: undefined-global
 
 local API = require 'OmiChat/Client'
 local config = API.Configuration
@@ -12,7 +12,7 @@ local _reportBeingSearched
 ---@return string
 local function getContextOptionText(otherPlayer)
     if config:compatSearchPlayersEnabled() then
-        local name = API.getPlayerMenuName(otherPlayer, 'search_player')
+        local name = API.data.getPlayerMenuName(otherPlayer, 'search_player')
         if name then
             return getText('UI_SearchStub', name)
         end
@@ -30,7 +30,7 @@ end
 ---@param otherPlayer IsoPlayer
 local function reportBeingSearched(player, otherPlayer)
     if config:compatSearchPlayersEnabled() then
-        local name = API.getNameInChat(otherPlayer:getUsername(), 'say')
+        local name = API.data.getNameInChat(otherPlayer:getUsername(), 'say')
         if name then
             player:Say(getText('UI_SearchedBy', name))
             return

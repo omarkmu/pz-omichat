@@ -1,5 +1,61 @@
 --#region Common
 
+---@class omichat.api.shared
+---@field protected _key 'omichat'
+
+---@class omichat.CallbackInfo
+---@field target unknown
+---@field callback function
+---@field args table
+
+---@class omichat.FormatterInfo
+---@field name string The name of the formatter.
+---@field id integer The formatter's ID.
+---@field formatter omichat.MetaFormatter The formatter.
+
+---@class omichat.MetaFormatterOptions
+---@field format string? The format string to use.
+
+---@class omichat.ModData
+---@field version integer The current mod data version.
+---@field nicknames table<string, string> Map of usernames to chat nicknames.
+---@field icons table<string, string> Map of usernames to chat icons.
+---@field languages table<string, string[]> Map of usernames to roleplay languages.
+---@field languageSlots table<string, integer> Map of usernames to roleplay language slots.
+---@field currentLanguage table<string, string> Map of usernames to currently selected roleplay languages.
+---@field statuses table<string, string> Map of usernames to statuses.
+
+---@class omichat.PlayerModData
+---@field username string
+---@field nickname string?
+---@field icon string?
+---@field languages string[]?
+---@field languageSlots integer?
+---@field currentLanguage string?
+---@field status string?
+
+---@class omichat.utils.InterpolatorCacheItem
+---@field interpolator omichat.Interpolator
+---@field lastAccess number
+
+---@class omichat.Interpolator
+---@field private _cache table<string, omichat.utils.InterpolatorCacheItem> (static)
+---@field private _registered table<string, function> (static)
+
+---@class omichat.MetaFormatter
+---@field protected _id integer
+---@field protected _formatString string
+---@field protected _idPrefix string
+---@field protected _idSuffix string
+
+---@class omichat.VanillaCommand
+---@field name string The name of the command.
+---@field helpText string The string ID of the command's help text.
+---@field access integer Access requirements to use the command.
+---@field helpTextArgs string[]? Arguments to supply to the command's help text.
+---@field suggestSpec omichat.SuggestSpec? Spec for suggestions.
+
+
 ---@alias omichat.ChatTypeString
 ---| 'general'
 ---| 'whisper'
@@ -22,7 +78,7 @@
 ---| 'callouts'
 ---| 'sneakcallouts'
 
----@see omichat.api.client.getFormatter
+---@see omichat.api.client.format.get
 ---@alias omichat.FormatterName
 ---| 'callout'
 ---| 'sneakCallout'
@@ -42,83 +98,22 @@
 ---| 'icons'
 ---| 'statuses'
 
----@alias omichat.AdminOption
----| 'ShowIcon'
----| 'KnowAllLanguages'
----| 'IgnoreMessageRange'
+--#endregion
 
----@class omichat.StreamSearchOptions
----@field excludeChatStreams boolean? Whether to exclude chat streams from the search.
----@field excludeCommandStreams boolean? Whether to exclude custom command streams from the search.
----@field includeVanillaCommandStreams boolean? Whether to include vanilla command streams in the search.
+--#region Data
 
----@class omichat.SearchContext
----@field search string The string to search for.
----@field terminateOnExact boolean? If true, exact matches will terminate the search.
----@field max integer? The maximum search results to return.
----@field searchDisplay boolean? If true, the display string will be searched as well.
----@field filter (fun(value: unknown, args: string[]): boolean)|nil Filter function for results.
----@field display (fun(value: unknown, str: string): string?)|nil Function to retrieve display strings for results.
----@field args table? Argument for the filter function.
+---@class omichat.api.shared.data
+---@field protected _version integer
+---@field protected _playerVersion integer
+---@field private _playerCacheByUsername table<string, omichat.PlayerCacheItem>
+---@field private _playerCacheByOnlineID table<string, omichat.PlayerCacheItem>
 
----@class omichat.SearchResult
----@field value string
----@field exact boolean
----@field display string?
-
----@class omichat.SearchResults
----@field results omichat.SearchResult[]
----@field exact omichat.SearchResult?
-
----@class omichat.CallbackInfo
----@field target unknown
----@field callback function
----@field args table
-
----@class omichat.FormatterInfo
----@field name string The name of the formatter.
----@field id integer The formatter's ID.
----@field formatter omichat.MetaFormatter The formatter.
-
----Options for initializing formatters.
----@class omichat.MetaFormatterOptions
----@field format string? The format string to use.
-
----Global mod data.
----@class omichat.ModData
----@field version integer The current mod data version.
----@field nicknames table<string, string> Map of usernames to chat nicknames.
----@field icons table<string, string> Map of usernames to chat icons.
----@field languages table<string, string[]> Map of usernames to roleplay languages.
----@field languageSlots table<string, integer> Map of usernames to roleplay language slots.
----@field currentLanguage table<string, string> Map of usernames to currently selected roleplay languages.
----@field statuses table<string, string> Map of usernames to statuses.
-
----Global mod data associated with a username.
----@class omichat.UserModData
----@field username string
----@field nickname string?
----@field icon string?
----@field languages string[]?
----@field languageSlots integer?
----@field currentLanguage string?
----@field status string?
-
----@class omichat.utils.InterpolatorCacheItem
----@field interpolator omichat.Interpolator
----@field lastAccess number
-
----@class omichat.utils.PlayerCacheItem
+---@class omichat.PlayerCacheItem
 ---@field username string
 ---@field forename string
 ---@field surname string
 ---@field onlineID number
 ---@field speechColor omi.ColorTable
-
----@class omichat.utils
----@field private _interpolatorCache table<string, omichat.utils.InterpolatorCacheItem>
----@field private _playerCacheByUsername table<string, omichat.utils.PlayerCacheItem>
----@field private _playerCacheByOnlineID table<string, omichat.utils.PlayerCacheItem>
 
 --#endregion
 
@@ -127,6 +122,10 @@
 ---Request to clear mod data for a username.
 ---@class omichat.request.ClearModData
 ---@field username string
+
+---@class omichat.request.Command
+---@field name omichat.request.CommandName The name of the command.
+---@field text string The command text, excluding the command itself.
 
 ---Request to update global mod data fields on the server.
 ---@class omichat.request.ModDataUpdate
@@ -172,21 +171,31 @@
 ---@field username string Whether the target player is typing.
 ---@field typing boolean Whether the target player is typing.
 
----Request to handle a command on the server.
----@class omichat.request.Command
----@field command string The command text, excluding the command itself.
-
 ---Request to update the player cache.
 ---@class omichat.request.UpdatePlayerCache
----@field items omichat.utils.PlayerCacheItem[]
+---@field items omichat.PlayerCacheItem[]
 
 ---Request to update the configuration.
 ---@class omichat.request.UpdateConfiguration
 ---@field value omichat.Configuration The new configuration values.
 
+---@alias omichat.request.CommandName
+---| 'addLanguage'
+---| 'clearNames'
+---| 'resetIcon'
+---| 'resetLanguages'
+---| 'resetName'
+---| 'setIcon'
+---| 'setLanguageSlots'
+---| 'setName'
+
 --#endregion
 
 --#region Configuration
+
+---@class omichat.ConfigurationSchema
+---@field private _presets table<string, omichat.ConfigurationPreset> (static)
+
 
 ---@class omichat.ConfigurationHelper
 ---@field protected _enabledMods table<string, boolean>
@@ -200,6 +209,7 @@
 
 ---@class omichat.LanguageRecord : omichat.Configuration.LanguageDefinition
 ---@field ID integer
+
 
 ---@class omichat.Configuration
 ---@field General omichat.Configuration.General
@@ -333,7 +343,7 @@
 ---@field ChatInput string
 
 ---@class omichat.Configuration.Format.MenuName
----@field Default string?
+---@field Default string
 ---@field Trade string?
 ---@field Medical string?
 ---@field SearchPlayer string?
@@ -421,6 +431,7 @@
 ---@field CalloutRange integer
 ---@field SneakCalloutRange integer
 
+
 ---@class omichat.ConfigurationPreset
 ---@field protected _name string
 ---@field protected _values omichat.Configuration
@@ -434,6 +445,60 @@
 ---@field getLanguages omichat.Callback.ConfigurationPreset.GetLanguages?
 ---@field getStreams omichat.Callback.ConfigurationPreset.GetStreams?
 ---@field getValues omichat.Callback.ConfigurationPreset.GetValues?
+
+---@class omichat.Args.ConfigurationPreset.Buffs
+---@field Enable boolean?
+
+---@class omichat.Args.ConfigurationPreset.Callouts
+---@field Range integer?
+---@field SneakRange integer?
+
+---@class omichat.Args.ConfigurationPreset.Commands
+---@field NameMode omichat.Configuration.Commands.Name.Mode?
+---@field EnableStatus boolean?
+---@field GlobalCommands boolean?
+
+---@class omichat.Args.ConfigurationPreset.Customization
+---@field Enable boolean?
+---@field CleanEffects string[]?
+
+---@class omichat.Args.ConfigurationPreset.Discord
+---@field Tags string[]?
+
+---@class omichat.Args.ConfigurationPreset.Echo
+---@field Enable boolean?
+---@field Tags string[]?
+
+---@class omichat.Args.ConfigurationPreset.General
+---@field Name string
+---@field AdminIcon string?
+---@field CaseInsensitiveChatStreams boolean?
+---@field ClearOnDeath omichat.Configuration.General.ClearOnDeath?
+
+---@class omichat.Args.ConfigurationPreset.Language
+---@field UseDefaultList boolean?
+---@field List omichat.Configuration.LanguageDefinition[]?
+
+---@class omichat.Args.ConfigurationPreset.Macros
+---@field AllowEmotes boolean?
+
+---@class omichat.Args.ConfigurationPreset.NarrativeStyle
+---@field Enable boolean?
+
+---@class omichat.Args.ConfigurationPreset.Radio
+---@field Tags string[]?
+
+---@class omichat.Args.ConfigurationPreset.ServerMessages
+---@field Tags string[]?
+
+---@class omichat.Args.ConfigurationPreset.TypingIndicator
+---@field Enable boolean?
+
+---@class omichat.Args.ConfigurationPreset.ZombieAttraction
+---@field ChatRangeMultiplier number?
+---@field CalloutRange integer?
+---@field SneakCalloutRange integer?
+
 
 ---@alias omichat.PresetString 'Default' | 'Buffy' | 'Vanilla'
 

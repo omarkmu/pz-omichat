@@ -1,8 +1,9 @@
----Handles overriding player names shown within in-game menus.
+---Handles overrides to show chat names within in-game menus.
 ---@diagnostic disable: duplicate-set-field
 
 local API = require 'OmiChat/Client'
 local utils = API.utils
+local getText = getText
 
 
 --#region Medical
@@ -19,7 +20,7 @@ function ISMedicalCheckAction:perform()
         return
     end
 
-    local name = API.getPlayerMenuName(self.otherPlayer, 'medical')
+    local name = API.data.getPlayerMenuName(self.otherPlayer, 'medical')
     if not name then
         return
     end
@@ -34,7 +35,7 @@ function ISHealthPanel:update()
         return
     end
 
-    local name = API.getPlayerMenuName(self.character, 'medical')
+    local name = API.data.getPlayerMenuName(self.character, 'medical')
     if not name then
         return
     end
@@ -82,7 +83,7 @@ function ISTradingUI.ReceiveTradeRequest(requester)
         return
     end
 
-    local name = API.getPlayerMenuName(requester, 'trade')
+    local name = API.data.getPlayerMenuName(requester, 'trade')
     if not name then
         return
     end
@@ -103,7 +104,7 @@ function ISTradingUI.AcceptedTrade(accepted)
         return
     end
 
-    local name = API.getPlayerMenuName(instance.otherPlayer, 'trade')
+    local name = API.data.getPlayerMenuName(instance.otherPlayer, 'trade')
     if not name then
         return
     end
@@ -121,7 +122,7 @@ function ISTradingUI.OtherAddNewItem(player, item)
         return
     end
 
-    local name = API.getPlayerMenuName(player, 'trade')
+    local name = API.data.getPlayerMenuName(player, 'trade')
     if not name then
         return
     end
@@ -145,7 +146,7 @@ function ISTradingUI.RemoveItem(player, index)
         return
     end
 
-    local name = API.getPlayerMenuName(player, 'trade')
+    local name = API.data.getPlayerMenuName(player, 'trade')
     if not name then
         return
     end
@@ -169,7 +170,7 @@ function ISTradingUI.UpdateState(player, state)
         return
     end
 
-    local name = API.getPlayerMenuName(instance.otherPlayer, 'trade')
+    local name = API.data.getPlayerMenuName(instance.otherPlayer, 'trade')
     if not name then
         return
     end
@@ -201,7 +202,7 @@ end
 function ISTradingUI:update()
     ISTradingUI_update(self)
 
-    local name = API.getPlayerMenuName(self.otherPlayer, 'trade')
+    local name = API.data.getPlayerMenuName(self.otherPlayer, 'trade')
     if not name then
         return
     end
@@ -221,7 +222,7 @@ function ISTradingUI:update()
 end
 
 function ISTradingUI:prerender()
-    local name = API.getPlayerMenuName(self.otherPlayer, 'trade')
+    local name = API.data.getPlayerMenuName(self.otherPlayer, 'trade')
     if not name then
         return ISTradingUI_prerender(self)
     end
@@ -248,7 +249,7 @@ function ISTradingUI:prerender()
 end
 
 function ISTradingUIHistorical:prerender()
-    local name = API.getPlayerMenuName(self.otherPlayer, 'trade')
+    local name = API.data.getPlayerMenuName(self.otherPlayer, 'trade')
     if not name then
         return ISTradingUIHistorical_prerender(self)
     end
@@ -273,7 +274,7 @@ function ISWorldObjectContextMenu.onTrade(worldobjects, player, otherPlayer)
         return
     end
 
-    local name = API.getPlayerMenuName(otherPlayer, 'trade')
+    local name = API.data.getPlayerMenuName(otherPlayer, 'trade')
     if not name then
         return
     end
@@ -311,13 +312,13 @@ function ISMiniScoreboardUI:populateList()
         local item = self.playerList.items[i]
         local username = item.item and item.item.username ---@type string?
 
-        local player = username and utils.getPlayerInfoByUsername(username)
-        local name = player and API.getPlayerMenuName(player, 'mini_scoreboard')
+        local player = username and API.data.getPlayerInfoByUsername(username)
+        local name = player and API.data.getPlayerMenuName(player, 'mini_scoreboard')
         if player and name then
             item.text = name
             local forename = utils.trim(player.forename or '')
             local surname = utils.trim(player.surname or '')
-            local chatName = API.getPlayerNameInChat(player, 'say') or ''
+            local chatName = API.data.getPlayerNameInChat(player, 'say') or ''
 
             local details = {
                 'Username: ',
@@ -360,7 +361,7 @@ local function handleContextMenuOption(opt)
 
     local onSelect = opt.onSelect
     if onSelect == ISWorldObjectContextMenu.onTrade then
-        local name = API.getPlayerMenuName(otherPlayer, 'trade')
+        local name = API.data.getPlayerMenuName(otherPlayer, 'trade')
         if not name then
             return
         end
@@ -370,7 +371,7 @@ local function handleContextMenuOption(opt)
             opt.toolTip.description = getText('ContextMenu_GetCloserToTrade', name)
         end
     elseif onSelect == ISWorldObjectContextMenu.onMedicalCheck then
-        local name = opt.toolTip and opt.notAvailable and API.getPlayerMenuName(otherPlayer, 'medical')
+        local name = opt.toolTip and opt.notAvailable and API.data.getPlayerMenuName(otherPlayer, 'medical')
         if name then
             opt.toolTip.description = getText('ContextMenu_GetCloser', name)
         end

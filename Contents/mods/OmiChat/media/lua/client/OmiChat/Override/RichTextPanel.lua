@@ -1,4 +1,5 @@
 ---Handles overrides for rich text panels.
+
 require 'ISUI/ISRichTextPanel'
 
 local max = math.max

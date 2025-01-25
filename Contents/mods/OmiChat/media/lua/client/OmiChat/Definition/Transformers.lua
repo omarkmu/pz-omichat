@@ -1,4 +1,6 @@
-local API = require 'OmiChat/API/Client/Core'
+---Message transformer definitions.
+
+local API = require 'OmiChat/Module/Client/Core'
 local utils = API.utils
 local config = API.Configuration
 
@@ -7,12 +9,6 @@ local getText = getText
 
 
 local COMMAND_ARGS_START = utils.encodeInvisibleCharacter(config.ID_COMMAND_ARGS)
-
-
-local rangedChatTypes = {
-    say = true,
-    shout = true,
-}
 
 -- accessing fields directly where possible to avoid function call overhead
 ---@diagnostic disable: invisible
@@ -92,7 +88,7 @@ return {
 
                 info.tokens.recipient = other
                 info.tokens.recipientRaw = other
-                info.tokens.recipientName = utils.escapeRichText(API.getNameInChat(other, 'whisper') or other)
+                info.tokens.recipientName = utils.escapeRichText(API.data.getNameInChat(other, 'whisper') or other)
                 info.tokens.recipientNameRaw = info.tokens.recipientName
                 info.tokens.outgoingPM = '1'
                 info.tags.IsOutgoingPM = true
@@ -145,7 +141,7 @@ return {
                 info.content = matched:sub(3)
                 info.tokens.card = utils.getTranslatedCardName(card, suit)
 
-                targetStream = API.getFirstChatStreamWithTag('CardCommandTarget')
+                targetStream = API.streams.firstChatStreamWithTag('CardCommandTarget')
             elseif name == 'flip' then
                 local result = utils.decodeInvisibleCharacter(matched)
                 if result ~= 1 and result ~= 2 then
@@ -156,7 +152,7 @@ return {
                 info.content = matched:sub(2)
                 info.tokens.heads = result == 1
 
-                targetStream = API.getFirstChatStreamWithTag('FlipCommandTarget')
+                targetStream = API.streams.firstChatStreamWithTag('FlipCommandTarget')
             elseif name == 'roll' then
                 local seq = utils.decodeInvisibleIntSequence(matched, 2)
                 if not seq or #seq ~= 2 then
@@ -168,7 +164,7 @@ return {
                 info.tokens.roll = seq[1]
                 info.tokens.sides = seq[2]
 
-                targetStream = API.getFirstChatStreamWithTag('RollCommandTarget')
+                targetStream = API.streams.firstChatStreamWithTag('RollCommandTarget')
             else
                 return
             end
@@ -204,7 +200,7 @@ return {
                 info.format = config.EchoMessages.ChatFormat
             end
 
-            local targetStream = API.getFirstChatStreamWithTag('EchoTarget')
+            local targetStream = API.streams.firstChatStreamWithTag('EchoTarget')
             if targetStream then
                 info:setStream(targetStream)
             end
@@ -249,17 +245,18 @@ return {
             if calloutFormatter and calloutFormatter:isMatch(text) then
                 info:setIsCallout(true)
                 info.content = calloutFormatter:read(text)
-                targetStream = API.getFirstChatStreamWithTag('Callout')
+                targetStream = API.streams.firstChatStreamWithTag('Callout')
             elseif sneakCalloutFormatter and sneakCalloutFormatter:isMatch(text) then
                 info:setIsSneakCallout(true)
                 info.content = sneakCalloutFormatter:read(text)
 
-                targetStream = API.getFirstChatStreamWithTag('SneakCallout') or API.getFirstChatStreamWithTag('Callout')
+                targetStream = API.streams.firstChatStreamWithTag('SneakCallout') or
+                    API.streams.firstChatStreamWithTag('Callout')
             else
                 return
             end
 
-            targetStream = targetStream or API.getStreamByName('yell')
+            targetStream = targetStream or API.streams.get('yell')
             if targetStream then
                 info:setStream(targetStream)
             end
@@ -316,7 +313,7 @@ return {
                 -- radio messages don't have language metadata, so we need to read the language from the text
                 if formatter:isMatch(text) then
                     text = formatter:read(text)
-                    language = API.decodeLanguage(text)
+                    language = API.format.decodeLanguage(text)
 
                     if language then
                         info:setMetadataLanguage(language)
@@ -329,8 +326,8 @@ return {
             end
 
             -- add language information for format strings
-            local isSigned = API.isRoleplayLanguageSigned(language)
-            if language ~= API.getDefaultRoleplayLanguage() then
+            local isSigned = API.language.isSigned(language)
+            if language ~= API.language.getDefault() then
                 info.tokens.language = utils.getTranslatedLanguageName(language)
                 info.tokens.languageRaw = language
             end
@@ -340,7 +337,7 @@ return {
                 info:hide()
             end
 
-            if isAdmin() and API.getUnderstandAllLanguages() then
+            if isAdmin() and API.preferences.getUnderstandAllLanguages() then
                 return
             end
 
@@ -358,7 +355,7 @@ return {
                 -- everyone understands themselves
                 info:setMetadataLanguageResult('known-language')
                 return
-            elseif API.checkKnowsLanguage(language) then
+            elseif API.player.knowsLanguage(language) then
                 -- if they understand the language, we're done here
                 info:setMetadataLanguageResult('known-language')
                 return
@@ -415,7 +412,7 @@ return {
             end
 
             ---@cast stream omichat.ChatStream
-            if not rangedChatTypes[stream.chatType] then
+            if stream.chatType ~= 'say' and stream.chatType ~= 'shout' then
                 return
             end
 
@@ -442,7 +439,7 @@ return {
                 info.zombieAttractRange = range * config.ZombieAttraction.ChatRangeMultiplier
             end
 
-            if isAdmin() and API.getIgnoreMessageRange() then
+            if isAdmin() and API.preferences.getIgnoreMessageRange() then
                 info:setMetadataRangeResult('in-range')
                 return
             end

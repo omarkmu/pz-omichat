@@ -1,59 +1,14 @@
 ---Suggesters for input content.
 
-local vanillaCommands = require 'OmiChat/Definition/VanillaCommandList'
+local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
 
-local concat = table.concat
+local utils = API.utils
 local min = math.min
+local concat = table.concat
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
----@class omichat.api.client
-local API = require 'OmiChat/API/Client/Core'
-local utils = API.utils
+
 local MAX_RESULTS = 50
-
-
----Reads an arg spec from a suggest spec.
----@param spec omichat.SuggestSpec
----@param idx integer
----@return omichat.SuggestArgSpecTable?
-local function getArgSpec(spec, idx)
-    local argSpec = spec[idx]
-    if type(argSpec) == 'string' then
-        argSpec = { type = argSpec }
-    end
-
-    if not argSpec or argSpec.type == '?' then
-        return
-    end
-
-    return argSpec
-end
-
----Retrieves a suggestion spec given the current input.
----@param input string
----@return omichat.SuggestSpec?
-local function getSuggestSpec(input)
-    local stream = API.chatCommandToStream(input, { enabledOnly = true })
-    if stream then
-        return stream:getSuggestSpec()
-    end
-
-    local accessLevel = utils.getEffectiveAccessLevel()
-    if not accessLevel then
-        return
-    end
-
-    -- vanilla command specs
-    for i = 1, #vanillaCommands do
-        local commandInfo = vanillaCommands[i]
-        if utils.hasAccess(commandInfo.access, accessLevel) then
-            local vanillaCommand = '/' .. commandInfo.name .. ' '
-            if commandInfo.suggestSpec and utils.startsWith(input:lower(), vanillaCommand) then
-                return commandInfo.suggestSpec
-            end
-        end
-    end
-end
 
 
 ---@type omichat.Suggester[]
@@ -67,7 +22,7 @@ return {
                 return
             end
 
-            if API.chatCommandToStream(info.input) then
+            if API.streams.chatCommandToStream(info.input) then
                 -- already have a stream
                 return
             end
@@ -77,7 +32,7 @@ return {
                 return
             end
 
-            local search = API.searchStreams({
+            local search = API.search.streams({
                 search = command,
                 terminateOnExact = true,
                 max = MAX_RESULTS,
@@ -98,7 +53,7 @@ return {
         name = 'spec-suggestions',
         priority = 10,
         suggest = function(_, info)
-            local spec = getSuggestSpec(info.input)
+            local spec = API.search.getSuggestionSpec(info.input)
             if not spec then
                 return
             end
@@ -116,7 +71,7 @@ return {
                 idx = idx + 1
             end
 
-            local argSpec = getArgSpec(spec, idx)
+            local argSpec = API.search.getSuggesterArgumentSpec(spec, idx)
             if not argSpec then
                 return
             end
@@ -148,24 +103,24 @@ return {
             }
 
             if argType == 'online-username' then
-                search = API.searchOnlineUsernames(ctx, false, true)
+                search = API.search.onlineUsernames(ctx, false)
             elseif argType == 'online-username-with-self' then
-                search = API.searchOnlineUsernames(ctx, true, true)
+                search = API.search.onlineUsernames(ctx, true)
             elseif argType == 'language' then
                 ctx.display = ctx.display or utils.getTranslatedLanguageName
                 ctx.searchDisplay = utils.default(ctx.searchDisplay, true)
-                search = API.searchStrings(ctx, API.getConfiguredRoleplayLanguages())
+                search = API.search.strings(ctx, API.language.getList())
             elseif argType == 'known-language' then
                 ctx.display = ctx.display or utils.getTranslatedLanguageName
                 ctx.searchDisplay = utils.default(ctx.searchDisplay, true)
-                search = API.searchStrings(ctx, API.getRoleplayLanguages())
+                search = API.search.strings(ctx, API.player.getLanguages())
             elseif argType == 'perk' then
-                search = API.searchPerks(ctx)
+                search = API.search.perks(ctx)
                 applyQuotes = false
             elseif argType == 'option' and argSpec.options then
-                search = API.searchStrings(ctx, argSpec.options)
+                search = API.search.strings(ctx, argSpec.options)
             else
-                local callback = API.getSuggesterArgTypeCallback(argType)
+                local callback = API.search.getSuggesterTypeCallback(argType)
                 local cbResult = callback and callback(ctx, argSpec)
                 if not cbResult then
                     return
@@ -207,14 +162,14 @@ return {
             end
 
             local currentTabID = instance.currentTabID
-            local stream = API.chatCommandToStream(info.input)
+            local stream = API.streams.chatCommandToStream(info.input)
             if not stream then
                 if utils.startsWith(info.input, '/') then
                     -- disallow for unknown commands
                     return
                 end
 
-                local default = API.getDefaultTabStream(currentTabID)
+                local default = API.streams.getDefaultTabStream(currentTabID)
                 if not default then
                     return
                 end
@@ -230,7 +185,7 @@ return {
                 return
             end
 
-            local existingEmote = API.getEmoteFromCommand(info.input)
+            local existingEmote = API.chat.getEmoteFromCommand(info.input)
             if existingEmote then
                 return
             end
@@ -246,7 +201,7 @@ return {
                 keys[#keys + 1] = k
             end
 
-            local search = API.searchStrings(text, keys)
+            local search = API.search.strings(text, keys)
             if search.exact then
                 return
             end

@@ -3,7 +3,7 @@
 local API = require 'OmiChat/Client'
 local config = API.Configuration
 
-API.addMessageTransformer({
+API.extension.addMessageTransformer({
     name = 'handle-buffy-rpg',
     priority = 55,
     transform = function(_, info)
@@ -36,7 +36,7 @@ API.addMessageTransformer({
             info.tokens.buffyCritRaw = crit:lower()
         end
 
-        local targetStream = API.getFirstChatStreamWithTag('BuffyRPGTarget')
+        local targetStream = API.streams.firstChatStreamWithTag('BuffyRPGTarget')
         if targetStream then
             info:setStream(targetStream)
         end

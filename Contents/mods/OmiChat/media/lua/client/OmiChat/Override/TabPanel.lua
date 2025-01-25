@@ -16,6 +16,6 @@ function ISTabPanel:activateView(viewName)
 
     local instance = ISChat.instance
     if instance and self:getParent() == instance then
-        API.updateInfoText()
+        API.ui.updateInfoText()
     end
 end

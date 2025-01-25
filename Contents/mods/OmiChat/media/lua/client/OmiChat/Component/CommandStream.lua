@@ -1,3 +1,5 @@
+---Stream for sending commands in chat.
+
 local Stream = require 'OmiChat/Component/Stream'
 
 

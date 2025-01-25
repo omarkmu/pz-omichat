@@ -1,6 +1,6 @@
 ---Functionality for default interpolation formats.
 
-local API = require 'OmiChat/API/Shared/Core'
+local API = require 'OmiChat/Module/Shared/Core'
 
 local rep = string.rep
 local concat = table.concat

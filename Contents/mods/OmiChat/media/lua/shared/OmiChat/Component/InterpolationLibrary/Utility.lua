@@ -1,6 +1,7 @@
 ---Utility interpolation library functions.
+---@diagnostic disable: unused-local
 
-local API = require 'OmiChat/API/Shared/Core'
+local API = require 'OmiChat/Module/Shared/Core'
 
 local utils = API.utils
 local MultiMap = utils.MultiMap
@@ -22,7 +23,6 @@ end
 ---@param interpolator omichat.Interpolator
 ---@param ... unknown
 ---@return string
----@diagnostic disable-next-line: unused-local
 function Library.Capitalize(interpolator, ...)
     return Helpers.capitalize(utils.concat({ ... }))
 end
@@ -118,7 +118,6 @@ end
 ---@param interpolator omichat.Interpolator
 ---@param ... unknown
 ---@return string
----@diagnostic disable-next-line: unused-local
 function Library.EscapeRichText(interpolator, ...)
     return utils.escapeRichText(Helpers.stringify(...))
 end
@@ -127,7 +126,6 @@ end
 ---@param interpolator omichat.Interpolator
 ---@param ... unknown
 ---@return string
----@diagnostic disable-next-line: unused-local
 function Library.FormatRadio(interpolator, ...)
     local s = Helpers.stringify(...)
     if s == '' then
@@ -149,7 +147,6 @@ end
 ---@param interpolator omichat.Interpolator
 ---@param ... unknown
 ---@return string
----@diagnostic disable-next-line: unused-local
 function Library.Internal(interpolator, ...)
     return (utils.getInternalText(Helpers.stringify(...)))
 end
@@ -170,16 +167,14 @@ end
 ---@param interpolator omichat.Interpolator
 ---@param language unknown
 ---@return boolean
----@diagnostic disable-next-line: unused-local
 function Library.IsSigned(interpolator, language)
-    return API.isRoleplayLanguageSigned(tostring(language or ''))
+    return API.language.isSigned(tostring(language or ''))
 end
 
 ---Wraps text in parentheses.
 ---@param interpolator omichat.Interpolator
 ---@param ... unknown
 ---@return string
----@diagnostic disable-next-line: unused-local
 function Library.Parens(interpolator, ...)
     return '(' .. Helpers.stringifySep(' ', ...) .. ')'
 end
@@ -190,7 +185,6 @@ end
 ---@param punctuation unknown?
 ---@param chars unknown?
 ---@return string
----@diagnostic disable-next-line: unused-local
 function Library.Punctuate(interpolator, s, punctuation, chars)
     return Helpers.punctuate(tostring(s or ''), punctuation, chars)
 end
@@ -199,14 +193,13 @@ end
 ---@param interpolator omichat.Interpolator
 ---@param name unknown
 ---@return string?
----@diagnostic disable-next-line: unused-local
 function Library.StreamCategory(interpolator, name)
     ---@cast API omichat.api.client
-    if not API.getChatStreamByName then
+    if not API.streams.getChatStream then
         return
     end
 
-    local stream = API.getChatStreamByName(name)
+    local stream = API.streams.getChatStream(name)
     if not stream then
         return
     end
@@ -218,7 +211,6 @@ end
 ---@param interpolator omichat.Interpolator
 ---@param s unknown
 ---@return string
----@diagnostic disable-next-line: unused-local
 function Library.StripColors(interpolator, s)
     s = tostring(s or ''):gsub('<RGB:[%d,.]*>', '')
     return s

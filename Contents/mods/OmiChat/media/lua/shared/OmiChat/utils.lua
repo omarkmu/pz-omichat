@@ -1,25 +1,24 @@
+---Utility functions.
+
 local lib = require 'OmiLibrary'
 local Interpolator = require 'OmiChat/Component/Interpolator'
 
+local min = math.min
 local pow = math.pow
 local floor = math.floor
-local min = math.min
 local char = string.char
 local concat = table.concat
-local getTimestampMs = getTimestampMs
+local getPlayerFromUsername = getPlayerFromUsername
 
 
 ---@class omichat.utils : omi.proxy
 local utils = lib.proxy({ name = 'OmiChat' })
 utils.lib = lib
 utils.Interpolator = Interpolator
-utils._interpolatorCache = {}
-utils._playerCacheByUsername = {}
-utils._playerCacheByOnlineID = {}
 
 
-local CACHE_EXPIRY_MS = 600000 -- ten minutes
-
+local loadedIcons = false
+local iconToTextureNameMap = {} ---@type table<string, string>
 local accessLevels = {
     admin = 32,
     moderator = 16,
@@ -49,81 +48,6 @@ local cards = {
     'King',
 }
 
-local iconToTextureNameMap = {} ---@type table<string, string>
-local loadedIcons = false
-
-
----Gets an interpolator from the cache.
----@param text string
----@return omichat.Interpolator?
-local function getCachedInterpolator(text)
-    local item = utils._interpolatorCache[text]
-    if item then
-        item.lastAccess = getTimestampMs()
-        return item.interpolator
-    end
-end
-
----Collects valid icons and builds a map of icon names to texture names.
-local function loadIcons()
-    local dest = HashMap.new()
-    Texture.collectAllIcons(HashMap.new(), dest)
-    iconToTextureNameMap = transformIntoKahluaTable(dest)
-    iconToTextureNameMap.music = 'Icon_music_notes' -- special case for 'music'
-    loadedIcons = true
-end
-
----Adds an interpolator to the cache.
----@param text string
----@param interpolator omichat.Interpolator
-local function setCachedInterpolator(text, interpolator)
-    utils._interpolatorCache[text] = {
-        interpolator = interpolator,
-        lastAccess = getTimestampMs(),
-    }
-end
-
----Creates a cache item for the given player.
----@param player IsoPlayer
----@return omichat.utils.PlayerCacheItem
-local function buildPlayerCacheItem(player)
-    local desc = player:getDescriptor()
-
-    local speechColor
-    local color = player:getSpeakColour()
-    if color then
-        speechColor = {
-            r = color:getRed(),
-            g = color:getGreen(),
-            b = color:getBlue(),
-        }
-    else
-        speechColor = { r = 255, g = 255, b = 255 }
-    end
-
-    ---@type omichat.utils.PlayerCacheItem
-    local item = {
-        username = player:getUsername(),
-        forename = desc:getForename(),
-        surname = desc:getSurname(),
-        onlineID = player:getOnlineID(),
-        speechColor = speechColor,
-    }
-
-    return item
-end
-
----Updates the cache with the player's information.
----@param player IsoPlayer
----@return omichat.utils.PlayerCacheItem
-local function updateCacheWithPlayer(player)
-    local item = buildPlayerCacheItem(player)
-
-    utils._playerCacheByUsername[item.username] = item
-    utils._playerCacheByOnlineID[item.onlineID] = item
-    return item
-end
-
 
 ---Encodes additional information in a message tag.
 ---@param message omichat.Message
@@ -149,41 +73,6 @@ function utils.addMessageTagValue(message, key, value)
     end
 
     message:setCustomTag(encodedTag)
-end
-
----Adds a player to the cache.
----@param player IsoPlayer
----@return omichat.utils.PlayerCacheItem
-function utils.cachePlayer(player)
-    return updateCacheWithPlayer(player)
-end
-
----Adds an item to the player cache.
----@param item omichat.utils.PlayerCacheItem
-function utils.cachePlayerInfo(item)
-    utils._playerCacheByUsername[item.username] = item
-    utils._playerCacheByOnlineID[item.onlineID] = item
-end
-
----Cleans up unused cache items.
----@param clear boolean If true, the cache will be cleared entirely.
-function utils.cleanupCache(clear)
-    if clear then
-        utils._interpolatorCache = {}
-        return
-    end
-
-    local toRemove = {}
-    local currentTime = getTimestampMs()
-    for k, item in pairs(utils._interpolatorCache) do
-        if currentTime - item.lastAccess >= CACHE_EXPIRY_MS then
-            toRemove[#toRemove + 1] = k
-        end
-    end
-
-    for i = 1, #toRemove do
-        utils._interpolatorCache[toRemove[i]] = nil
-    end
 end
 
 ---Decodes an encoded character.
@@ -465,30 +354,6 @@ function utils.getNumericAccessLevel(access)
     return accessLevels[access:lower()] or 1
 end
 
----Retrieves player information given an online ID.
----@param onlineID number
----@return omichat.utils.PlayerCacheItem?
-function utils.getPlayerInfoByOnlineID(onlineID)
-    local found = getPlayerByOnlineID(onlineID)
-    if found then
-        return updateCacheWithPlayer(found)
-    end
-
-    return utils._playerCacheByOnlineID[onlineID]
-end
-
----Retrieves player information given a username.
----@param username string
----@return omichat.utils.PlayerCacheItem?
-function utils.getPlayerInfoByUsername(username)
-    local found = utils.getPlayerByUsername(username)
-    if found then
-        return updateCacheWithPlayer(found)
-    end
-
-    return utils._playerCacheByUsername[username]
-end
-
 ---Gets a player given their username.
 ---@param username string
 ---@return IsoPlayer?
@@ -506,22 +371,12 @@ function utils.getPlayerByUsername(username)
     end
 end
 
----Gets the username of player 1.
----@return string?
-function utils.getPlayerUsername()
-    local player = getSpecificPlayer(0)
-    local username = player and player:getUsername()
-    if username then
-        return username
-    end
-end
-
 ---Retrieves a texture name given a chat icon name.
 ---@param icon string
 ---@return string?
 function utils.getTextureNameFromIcon(icon)
     if not loadedIcons then
-        loadIcons()
+        utils._loadIcons()
     end
 
     return iconToTextureNameMap[icon]
@@ -658,16 +513,9 @@ function utils.interpolateRaw(text, tokens, seed)
         return ''
     end
 
-    local interpolator = getCachedInterpolator(text)
-    if not interpolator then
-        interpolator = Interpolator:new()
-        interpolator:setPattern(text)
+    local interpolator = Interpolator.getOrCreate(text)
+    interpolator:randomseed(seed) -- always seed to avoid content changing on refresh
 
-        setCachedInterpolator(text, interpolator)
-    end
-
-    -- always seed to avoid content changing on refresh
-    interpolator:randomseed(seed)
     return interpolator:interpolateRaw(tokens)
 end
 
@@ -683,17 +531,10 @@ end
 ---@return table<string, string>
 function utils.iterateIcons()
     if not loadedIcons then
-        loadIcons()
+        utils._loadIcons()
     end
 
     return pairs(iconToTextureNameMap)
-end
-
----Returns an iterator over the player cache.
----@return function
----@return table<string, omichat.utils.PlayerCacheItem>
-function utils.iteratePlayerCache()
-    return pairs(utils._playerCacheByUsername)
 end
 
 ---Parses arguments for a chat command.
@@ -740,36 +581,6 @@ function utils.parseCommandArgs(text)
     end
 
     return args, inQuote
-end
-
----Refreshes the cache with information from the currently online players.
----@return omichat.utils.PlayerCacheItem[]
-function utils.refreshPlayerCache()
-    local onlinePlayers = getOnlinePlayers()
-    local items = {}
-    for i = 0, onlinePlayers:size() - 1 do
-        items[#items + 1] = buildPlayerCacheItem(onlinePlayers:get(i))
-    end
-
-    utils.resetPlayerCache(items)
-    return items
-end
-
----Resets the player cache.
----@param items omichat.utils.PlayerCacheItem[]
-function utils.resetPlayerCache(items)
-    items = items or {}
-
-    local byUsername = {}
-    local byOnlineID = {}
-    for i = 1, #items do
-        local item = items[i]
-        byUsername[item.username] = item
-        byOnlineID[item.onlineID] = item
-    end
-
-    utils._playerCacheByUsername = byUsername
-    utils._playerCacheByOnlineID = byOnlineID
 end
 
 ---Tests a predicate.
@@ -824,6 +635,17 @@ end
 function utils.wrapStringArgument(text, n)
     local c = utils.encodeInvisibleCharacter(n)
     return c .. text .. c
+end
+
+
+---Collects valid icons and builds a map of icon names to texture names.
+---@private
+function utils._loadIcons()
+    local dest = HashMap.new()
+    Texture.collectAllIcons(HashMap.new(), dest)
+    iconToTextureNameMap = transformIntoKahluaTable(dest)
+    iconToTextureNameMap.music = 'Icon_music_notes' -- special case for 'music'
+    loadedIcons = true
 end
 
 

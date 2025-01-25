@@ -484,8 +484,7 @@ local function searchKnownDances(ctxOrSearch)
         return
     end
 
-    ---@diagnostic disable-next-line: invisible
-    local ctx = API.buildInternalSearchContext(ctxOrSearch)
+    local ctx = API.search._buildContext(ctxOrSearch) ---@diagnostic disable-line: invisible
     ctx.display = ctx.display or danceDisplay
     ctx.mapValue = mapDanceValue
 
@@ -495,8 +494,7 @@ local function searchKnownDances(ctxOrSearch)
         local dance = dances[i]
         local display = dance.display:gsub(' ', '_')
 
-        ---@diagnostic disable-next-line: invisible
-        local result = API.searchInternal(ctx, dance.name, dance, display)
+        local result = API.search._internal(ctx, dance.name, dance, display) ---@diagnostic disable-line: invisible
         if result and result.exact and ctx.terminateOnExact then
             exact = result
             break
@@ -538,7 +536,7 @@ local danceStream = API.CommandStream:new {
         end
 
         if feedback then
-            API.addInfoMessage(feedback)
+            API.chat.addInfoMessage(feedback)
         end
     end,
     onUseDisabled = function()
@@ -560,8 +558,8 @@ local function applyPatch()
         v.display = v.recipe:gsub('^BobTA%s*', '')
     end
 
-    API.addCommand(danceStream)
-    API.addSuggesterArgType('known-dance', searchKnownDances)
+    API.extension.addCommand(danceStream)
+    API.extension.addSuggesterType('known-dance', searchKnownDances)
 end
 
 Events.OnGameStart.Add(applyPatch)

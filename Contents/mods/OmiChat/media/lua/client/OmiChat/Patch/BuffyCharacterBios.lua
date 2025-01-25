@@ -4,7 +4,7 @@ local API = require 'OmiChat/Client'
 local config = API.Configuration
 local utils = API.utils
 
-API.addMessageTransformer({
+API.extension.addMessageTransformer({
     name = 'handle-buffy-character-bios',
     priority = 55,
     transform = function(_, info)
@@ -26,7 +26,7 @@ API.addMessageTransformer({
         end
 
         info:skipLanguageProcessing()
-        info:setStream(API.getServerStream(), { forceFormat = true, overwriteTags = true })
+        info:setStream(API.streams.getServerStream(), { forceFormat = true, overwriteTags = true })
 
         local authorEnd = utils.getAuthorEndPos(text, info:getAuthor())
         if authorEnd then

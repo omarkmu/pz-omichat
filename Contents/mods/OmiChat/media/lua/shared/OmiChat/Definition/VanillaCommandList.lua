@@ -1,9 +1,6 @@
----@class omichat.VanillaCommand
----@field name string The name of the command.
----@field helpText string The string ID of the command's help text.
----@field access integer Access requirements to use the command.
----@field helpTextArgs string[]? Arguments to supply to the command's help text.
----@field suggestSpec omichat.SuggestSpec? Spec for suggestions.
+---Vanilla command list. This is used for the rewritten `/help` command.
+---Excludes disabled commands and commands without help text.
+
 
 local debugTypes = {}; do
     local list = DebugLog.getDebugTypes()
@@ -12,8 +9,7 @@ local debugTypes = {}; do
     end
 end
 
----List of vanilla commands used for extending the /help command.
----Excludes disabled commands and commands without help text.
+
 ---@type omichat.VanillaCommand[]
 return {
     {
@@ -117,8 +113,7 @@ return {
     {
         name = 'log',
         helpText = 'UI_ServerOptionDesc_SetLogLevel',
-        -- avoid showing %1 %2
-        helpTextArgs = { '"type"', '"severity"' },
+        helpTextArgs = { '"type"', '"severity"' }, -- avoid showing %1 %2
         suggestSpec = {
             {
                 type = 'option',

@@ -1,7 +1,11 @@
+---Base stream type.
+
 local utils = require 'OmiChat/utils'
 local config = require 'OmiChat/Component/Configuration'
+local API ---@type omichat.api.client?
 
 local isempty = table.isempty
+
 
 ---@class omichat.Stream : omi.Class
 local Stream = utils.lib.class()
@@ -10,7 +14,9 @@ local Stream = utils.lib.class()
 ---Converts a string into a command by ensuring it starts with `/` and has a trailing whitespace.
 ---@param str string
 ---@return string
-local function stringToCommand(str)
+---@private
+---@static
+function Stream._stringToCommand(str)
     str = utils.trim(str)
     if not utils.startsWith(str, '/') then
         str = '/' .. str
@@ -186,7 +192,7 @@ function Stream:getCommand()
 end
 
 ---Returns the command type of the stream.
----@return omichat.ChatCommandType
+---@return omichat.ChatCommandCategory
 function Stream:getCommandType()
     return self.commandType
 end
@@ -308,7 +314,11 @@ end
 function Stream:showHelpText()
     local helpText = self:getHelpText()
     if helpText then
-        self.__api.addInfoMessage(helpText)
+        if not API then
+            API = require 'OmiChat/Client'
+        end
+
+        API.chat.addInfoMessage(helpText)
     end
 end
 
@@ -354,7 +364,7 @@ function Stream:new(args)
     this.allowEmotes = args.allowEmotes or false
     this.disabled = args.disabled or false
     this.commandType = 'other'
-    this.aliasesList = utils.map(stringToCommand, args.aliases or {})
+    this.aliasesList = utils.map(Stream._stringToCommand, args.aliases or {})
     this.suggestSpec = args.suggestSpec
     this.formatter = args.formatter
     this.isChat = false
@@ -367,13 +377,13 @@ function Stream:new(args)
     end
 
     if not utils.isNilOrWhitespace(args.command) then
-        this.command = stringToCommand(args.command)
+        this.command = Stream._stringToCommand(args.command)
     else
-        this.command = stringToCommand(this.name)
+        this.command = Stream._stringToCommand(this.name)
     end
 
     if not utils.isNilOrWhitespace(args.shortCommand) then
-        this.shortCommand = stringToCommand(args.shortCommand)
+        this.shortCommand = Stream._stringToCommand(args.shortCommand)
     end
 
     if not utils.isNilOrWhitespace(args.overheadFormat) then

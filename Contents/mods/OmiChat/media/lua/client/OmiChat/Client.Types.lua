@@ -1,39 +1,175 @@
----@alias omichat.ChatCommandType 'chat' | 'rp' | 'other'
+--#region Common
+
+---@class omichat.api.client
+---@field utils omichat.utils.client
+---@field private _commandStreams omichat.CommandStream[]
+---@field private _emotes table<string, string | omichat.EmoteHandler>
+---@field private _chatFormatters table<integer, omichat.MetaFormatter>
+---@field private _metadataFormatters table<omichat.FormatterName, omichat.MetaFormatter>
+---@field private _transformers omichat.MessageTransformer[]
+---@field private _suggesters omichat.Suggester[]
+---@field private _typingInfo table<string, omichat.TypingInformation>
+---@field private _serverStream omichat.ChatStream
+---@field private _radioStream omichat.ChatStream
+---@field private _discordStream omichat.ChatStream
+---@field private _cardCommand omichat.CommandStream
+---@field private _flipCommand omichat.CommandStream
+---@field private _rollCommand omichat.CommandStream
+
+---@class omichat.utils.client : omichat.utils
+---@field ui omi.ui
+---@field lib omi.client
+
+
+---@class omichat.MessageTransformer
+---@field name string? The name of the transformer.
+---@field transform fun(self: table, info: omichat.MessageInfo): true? Performs message transformation.
+---@field priority integer? The priority of the transformer. Higher numbers will run first.
+
+
+---@alias omichat.ChatCommandCategory 'chat' | 'rp' | 'other'
+
 ---@alias omichat.ChatFont 'small' | 'medium' | 'large'
 
----@alias omichat.SettingCategory
----| 'basic'
----| 'customization'
----| 'language'
----| 'admin'
----| 'suggestions'
----| 'main'
-
----@alias omichat.SettingHandlerCallback fun(submenu: ISContextMenu)
 ---@alias omichat.Message ChatMessage | omi.chat.MimicMessage
 
----@alias omichat.SuggestionType
----| 'online-username'
----| 'online-username-with-self'
----| 'language'
----| 'known-language'
----| 'perk'
----| 'option'
----| '?'
-
----@alias omichat.SuggestArgSpec omichat.SuggestArgSpecTable | omichat.SuggestionType | string
----@alias omichat.SuggestSpec omichat.SuggestArgSpec[]
----@alias omichat.SuggestSearchCallback fun(ctx: omichat.SearchContext | string, spec: omichat.SuggestArgSpec): omichat.SearchResults?
 ---@alias omichat.EmoteHandler fun(player: IsoPlayer, emote: string)
 
----@class omichat.SuggestArgSpecTable
----@field type omichat.SuggestionType | string The type of the argument.
----@field prefix string? A prefix to apply to the suggestion result.
----@field suffix string? A suffix to apply to the suggestion result.
----@field options string[]? String options for the `string` suggestion type.
----@field searchDisplay boolean? If true, the display string will be used for determining suggestions.
----@field filter (fun(result: unknown, args: string[]): boolean)? Filter function for results.
----@field display (fun(value: unknown, str: string): string?)? Function to retrieve display strings for results.
+--#endregion
+
+--#region Chat
+
+---@class omichat.api.client.chat
+---@field private _wasTyping boolean The typing status from the previous update.
+---@field private _isTyping boolean Whether the local player is currently typing.
+---@field private _mock omi.chat.Mock?
+
+---@class omichat.ChatTab : ISRichTextPanel
+---@field parent omichat.ISChat The parent chat.
+---@field logIndex integer The current index in the tab's input history.
+---@field tabID integer The tab ID of this tab (0-indexed).
+---@field text string The current rich text of the chat tab.
+---@field chatStreams (omichat.ChatStream | omichat.StreamTable)[] Chat streams available in this tab.
+---@field chatTextLines string[] An array of rich text strings of the current messages.
+---@field chatMessages omichat.Message[] Current chat messages.
+---@field log string[] The input history of this tab.
+---@field tabTitle string The title of this tab.
+---@field streamID integer The stream ID of the current stream.
+---@field infoButton ISButton
+
+---@class omichat.TypingInformation
+---@field display string
+---@field lastUpdate integer
+
+---@class omichat.Args.Send : omichat.Args.Send.Partial
+---@field stream omichat.Stream
+
+---@class omichat.Args.Send.Partial
+---@field text string
+---@field formatStream omichat.Stream?
+---@field playSignedEmote boolean?
+---@field echoType integer?
+---@field formatter omichat.MetaFormatter?
+---@field tokens table?
+---@field extraTags string[]?
+
+---@class omichat.ISChat : ISChat
+---@field instance omichat.ISChat? The ISChat instance.
+---@field focused boolean Whether the chat is currently focused.
+---@field showTitle boolean Whether chat type titles should display.
+---@field showTimestamp boolean Whether timestamps should display.
+---@field chatFont omichat.ChatFont The current font of the chat.
+---@field chatText omichat.ChatTab The current chat tabs.
+---@field tabs omichat.ChatTab[] List of available chat tabs.
+---@field allChatStreams (omichat.ChatStream | omichat.StreamTable)[] List of all available chat streams.
+---@field defaultTabStream table<integer, omichat.ChatStream?> An association of 1-indexed tab IDs to default streams.
+---@field gearButton ISButton The settings button.
+---@field textEntry ISTextEntryBox The text entry UI element.
+---@field currentTabID integer The 1-indexed tab ID of the current tab.
+---@field tabCnt integer The number of available tabs.
+
+--#endregion
+
+--#region IconPicker
+
+---@class omichat.IconPicker
+---@field includeDefaults boolean Whether to include default categories and icons.
+---@field includeUnknownAsMiscellaneous boolean Whether unknown icons should be added to a miscellaneous category.
+---@field padSize integer The size of the padding on all sides.
+---@field buttonSize integer The size of each icon button.
+---@field backgroundColor omi.DecimalColorTableRGBA The background color of the panel.
+---@field borderColor omi.DecimalColorTableRGBA The border color of the panel.
+---@field columns integer The number of columns to use.
+---@field scrollMultiplier integer Multiplier for scroll speed.
+---@field target ISUIElement? Target object for callbacks.
+---@field onclick function? Callback to run when an icon button is clicked.
+---@field categoryFont UIFont The font to use for categories.
+---@field icons omichat.IconPickerIcon[] Icons to include.
+---@field exclude table<string, true> Icons to exclude from the picker.
+---@field categoryOrder string[] Categories in the order in which they should display.
+---@field protected _rowContents table
+---@field protected _preparedIcons boolean
+
+---@class omichat.IconPickerIcon
+---@field name string The icon name.
+---@field textureName string The name of the texture to use.
+---@field texture Texture? The texture to use.
+---@field category string? The category in which the icon should be included.
+
+--#endregion
+
+--#region Interpolation
+
+---@class omichat.MessageSegment
+---@field type 'quote' | 'action'
+---@field text string
+
+---@class omichat.Args.GetMessageSegments
+---@field startInAction boolean? If `true`, start reading as an action instead of a quote.
+---@field optionalActionAsterisk boolean? If `true`, the asterisk for actions will be considered optional.
+---@field onlyFirstSegment boolean? If `true`, only the first segment will be returned.
+
+---@class omichat.Args.PerformSharedOperations
+---@field interpolator omichat.Interpolator
+---@field options omi.MultiMap
+---@field tags omi.SimpleSet
+---@field input string
+---@field autoQuote boolean?
+---@field doCapitalize boolean?
+---@field doPunctuate boolean?
+---@field applyCase boolean?
+---@field applyEmbeddedActions boolean?
+---@field applyEmbeddedQuotes boolean?
+---@field doColorActions boolean?
+---@field doColorQuotes boolean?
+---@field doReplaceAsterisks boolean?
+---@field doAutoQuotes boolean?
+
+--#endregion
+
+--#region Format
+
+---@class omichat.Args.FormatChat
+---@field text string
+---@field stream omichat.ChatStream
+---@field formatStream omichat.Stream?
+---@field chatType omichat.ChatTypeString
+---@field language string?
+---@field echoType integer?
+---@field formatter omichat.MetaFormatter?
+---@field name string?
+---@field username string?
+---@field tokens table?
+---@field extraTags string[]?
+
+---@class omichat.FormatResult
+---@field text string
+---@field error string?
+---@field allowLanguage boolean?
+
+--#endregion
+
+--#region MessageInfo
 
 ---@class omichat.MessageInfo
 ---@field message omichat.Message The message object.
@@ -86,80 +222,72 @@
 ---@field attractedZombies boolean? Whether the message has already attracted zombies.
 ---@field displayedOverhead boolean? Whether the replacement overhead text has already displayed.
 
+
+---@class omichat.Args.MessageInfo.SetStream
+---@field chatType omichat.ChatTypeString? The chat type to set alongside the stream. Defaults to the stream's chat type.
+---@field forceFormat boolean? If `true`, the format will be set to the chat's format regardless of whether it's already set.
+---@field noTagUpdate boolean? If `true`, the tags won't be updated to include the target stream's tags.
+---@field overwriteTags boolean? If `true`, the previous tags will be overwritten with the tags from the target stream, instead of merging.
+
+
 ---@alias omichat.MessageInfo.Metadata.LanguageResult 'known-language' | 'unknown-language'
+
 ---@alias omichat.MessageInfo.Metadata.RangeResult 'in-range' | 'out-of-range' | 'in-perception-range'
 
----A suggestion that can display to the player.
----@class omichat.Suggestion
----@field display string The text that will display in the menu.
----@field suggestion string Text that will replace the input text if the suggestion is selected.
+--#endregion
 
----Information used during suggestion building.
----@class omichat.SuggestionInfo
----@field input string The current input text.
----@field context table Table for arbitrary context data.
----@field suggestions omichat.Suggestion[] The current list of suggestions.
+--#region Mod Data Manager
 
----Transforms messages based on context and format strings.
----@class omichat.MessageTransformer
----@field name string? The name of the transformer.
----@field transform fun(self: table, info: omichat.MessageInfo): true? Performs message transformation.
----@field priority integer? The priority of the transformer. Higher numbers will run first.
+---@class omichat.ModDataManager
+---@field listbox ISScrollingListBox
+---@field elements omichat.PlayerModData[]
+---@field columnList string[]
+---@field columnDisplay table<string, string>
+---@field columnWidth table<string, integer>
+---@field headerH integer
+---@field titleW integer
+---@field buttonBorderColor omi.ColorTableRGBA
+---@field listHeaderColor omi.ColorTableRGBA
+---@field headerFont UIFont
+---@field listFont UIFont
+---@field titleText string
+---@field activeEditorPanel omichat.ModDataEditor?
+---@field closeBtn ISButton
+---@field refreshBtn ISButton
+---@field modifyBtn ISButton
+---@field addBtn ISButton
+---@field deleteBtn ISButton
 
----Suggests message content based on text input.
----@class omichat.Suggester
----@field name string? The name of the suggester.
----@field suggest fun(self: table, info: omichat.SuggestionInfo) Performs suggestion.
----@field priority integer? The priority of the suggester. Higher numbers will run first.
+---@class omichat.ModDataEditor
+---@field item omichat.PlayerModData
+---@field saveItem omichat.PlayerModData
+---@field nicknameEntry omi.ui.TextEntry
+---@field usernameEntry omi.ui.TextEntry
+---@field iconEntry omi.ui.TextEntry
+---@field currentLangEntry omi.ui.TextEntry
+---@field languageEntry omi.ui.TextEntry
+---@field statusEntry omi.ui.TextEntry
+---@field languageSlotsEntry omi.ui.TextEntry
+---@field languageListbox ISScrollingListBox
+---@field langSuggester omichat.SuggesterBox
+---@field buttonBorderColor omi.ColorTableRGBA
+---@field addLangBtn ISButton
+---@field deleteLangBtn ISButton
+---@field saveBtn ISButton
+---@field closeBtn ISButton
+---@field isAdd boolean
+---@field onsave function?
+---@field target unknown
 
----Context for sending chat messages.
----@class omichat.SendArgs : omichat.SendArgsPartial
----@field stream omichat.Stream
+--#endregion
 
----@class omichat.SendArgsPartial
----@field text string
----@field formatStream omichat.Stream?
----@field playSignedEmote boolean?
----@field echoType integer?
----@field formatter omichat.MetaFormatter?
----@field tokens table?
----@field extraTags string[]?
+--#region Preferences
 
----Argument table passed to `formatForChat`.
----@class omichat.FormatArgs
----@field text string
----@field stream omichat.ChatStream
----@field formatStream omichat.Stream?
----@field chatType omichat.ChatTypeString
----@field language string?
----@field echoType integer?
----@field formatter omichat.MetaFormatter?
----@field name string?
----@field username string?
----@field tokens table?
----@field extraTags string[]?
+---@class omichat.api.client.preferences
+---@field private _prefs omichat.PlayerPreferences The loaded player preferences.
+---@field private _filename string The filename from which preferences are loaded.
+---@field private _version integer The current preferences file version.
 
----Result of `formatForChat`.
----@see omichat.api.client.formatForChat
----@class omichat.FormatResult
----@field text string
----@field error string?
----@field allowLanguage boolean?
-
----Typing information record.
----@class omichat.TypingInformation
----@field display string
----@field lastUpdate integer
-
----Player preference profile.
----@class omichat.PlayerProfile
----@field name string
----@field chatNickname string? Nickname to use in chat alongside a profile.
----@field callouts string[] Custom callouts.
----@field sneakcallouts string[] Custom sneak callouts.
----@field colors table<string, omi.ColorTable> Custom chat colors.
-
----Player preferences.
 ---@class omichat.PlayerPreferences
 ---@field HIGHER_VERSION boolean Flag that's set when the preferences file had a higher verson than the current version, to avoid bad overwrites.
 ---@field showNameColors boolean Whether name colors are enabled.
@@ -177,68 +305,112 @@
 ---@field profileIndex integer The index of the current profile.
 ---@field profiles omichat.PlayerProfile[] List of chat profiles.
 
----Description of a chat tab object.
----@class omichat.ChatTab : ISRichTextPanel
----@field parent omichat.ISChat The parent chat.
----@field logIndex integer The current index in the tab's input history.
----@field tabID integer The tab ID of this tab (0-indexed).
----@field text string The current rich text of the chat tab.
----@field chatStreams (omichat.ChatStream | omichat.StreamTable)[] Chat streams available in this tab.
----@field chatTextLines string[] An array of rich text strings of the current messages.
----@field chatMessages omichat.Message[] Current chat messages.
----@field log string[] The input history of this tab.
----@field tabTitle string The title of this tab.
----@field streamID integer The stream ID of the current stream.
+---@class omichat.PlayerProfile
+---@field name string The name of the profile.
+---@field chatNickname string? Nickname to use in chat alongside a profile.
+---@field callouts string[] Custom callouts.
+---@field sneakcallouts string[] Custom sneak callouts.
+---@field colors table<string, omi.ColorTable> Custom chat colors.
 
----@class omichat.MessageSegment
----@field type 'quote' | 'action'
----@field text string
+---@class omichat.ProfileManager
+---@field current omichat.PlayerProfile?
+---@field profiles omichat.PlayerProfile[]
+---@field profileNameControl omi.ui.TextEntry
+---@field nicknameControl omi.ui.TextEntry?
+---@field colorControls table<string, omi.ui.ColorEntry>
+---@field calloutControls table<string, omi.ui.TextEntry>
+---@field deleteButton ISButton?
+---@field duplicateButton ISButton?
 
----@class omichat.Args.StreamRetrieval
----@field enabledOnly boolean? If `true`, only enabled streams will be returned.
 
----@class omichat.Args.ChatCommandToStream : omichat.Args.StreamRetrieval
----@field commandsOnly boolean? If `true`, only command streams will be checked.
----@field chatsOnly boolean? If `true`, only chat streams will be checked.
+---@alias omichat.AdminOption
+---| 'ShowIcon'
+---| 'KnowAllLanguages'
+---| 'IgnoreMessageRange'
 
----@class omichat.Args.MessageInfo.SetStream
----@field chatType omichat.ChatTypeString? The chat type to set alongside the stream. Defaults to the stream's chat type.
----@field forceFormat boolean? If `true`, the format will be set to the chat's format regardless of whether it's already set.
----@field noTagUpdate boolean? If `true`, the tags won't be updated to include the target stream's tags.
----@field overwriteTags boolean? If `true`, the previous tags will be overwritten with the tags from the target stream, instead of merging.
+--#endregion
 
----@class omichat.Args.GetMessageSegments
----@field startInAction boolean? If `true`, start reading as an action instead of a quote.
----@field optionalActionAsterisk boolean? If `true`, the asterisk for actions will be considered optional.
----@field onlyFirstSegment boolean? If `true`, only the first segment will be returned.
+--#region Search
 
----@class omichat.Args.PerformSharedOperations
----@field interpolator omichat.Interpolator
----@field options omi.MultiMap
----@field tags omi.SimpleSet
----@field input string
----@field autoQuote boolean?
----@field doCapitalize boolean?
----@field doPunctuate boolean?
----@field applyCase boolean?
----@field applyEmbeddedActions boolean?
----@field applyEmbeddedQuotes boolean?
----@field doColorActions boolean?
----@field doColorQuotes boolean?
----@field doReplaceAsterisks boolean?
----@field doAutoQuotes boolean?
+---@class omichat.api.client.search
+---@field private _customSuggesterTypes table<string, omichat.SuggestSearchCallback>
+
+
+---@class omichat.SearchContext
+---@field search string The string to search for.
+---@field terminateOnExact boolean? If true, exact matches will terminate the search.
+---@field max integer? The maximum search results to return.
+---@field searchDisplay boolean? If true, the display string will be searched as well.
+---@field filter (fun(value: unknown, args: string[]): boolean)|nil Filter function for results.
+---@field display (fun(value: unknown, str: string): string?)|nil Function to retrieve display strings for results.
+---@field args table? Argument for the filter function.
+
+---@class omichat.SearchResult
+---@field value string
+---@field exact boolean
+---@field display string?
+
+---@class omichat.SearchResults
+---@field results omichat.SearchResult[]
+---@field exact omichat.SearchResult?
+
+---@class omichat.StreamSearchOptions
+---@field excludeChatStreams boolean? Whether to exclude chat streams from the search.
+---@field excludeCommandStreams boolean? Whether to exclude custom command streams from the search.
+---@field includeVanillaCommandStreams boolean? Whether to include vanilla command streams in the search.
+
+---@class omichat.search.InternalSearchContext : omichat.SearchContext
+---@field search string
+---@field searchForStartsWith string?
+---@field searchForContains string?
+---@field startsWith omichat.search.InternalSearchResult[]
+---@field contains omichat.search.InternalSearchResult[]
+---@field mapValue (fun(value: unknown, str: string): unknown)?
+---@field caseInsensitive boolean?
+---@field args table
+
+---@class omichat.search.InternalSearchResult : omichat.SearchResult
+---@field value unknown
+
+---@class omichat.search.PerkInfo
+---@field perk Perk
+---@field name string
+---@field id string
+
+--#endregion
+
+--#region StatusManager
+
+---@class omichat.StatusManager
+---@field instance omichat.StatusManager
+---@field private _enabled boolean
+---@field private _displayByUsername table<string, omichat.StatusDisplay>
+
+---@class omichat.StatusDisplay
+---@field target IsoPlayer
+---@field mouseOver boolean
+---@field protected text string?
+---@field protected font UIFont
+---@field protected targetUsername string
+---@field protected drawObject TextDrawObject
+---@field protected shouldHide boolean
+
+--#endregion
 
 --#region Streams
 
+---@class omichat.api.client.streams
+---@field private _tagToChatStreams table<string, omichat.ChatStream[]> Map associating tags to chat streams that include them.
+
+
 ---@class omichat.Stream
----@field private __api omichat.api.client (static) Reference to the API.
 ---@field protected callbacks omichat.Stream.Callbacks Container for callbacks.
 ---@field protected name string The name of the stream.
 ---@field protected command string The stream command, with a trailing space.
 ---@field protected shortCommand string? An optional short stream command, with a trailing space.
 ---@field protected disabled boolean? If `true`, the stream will always be treated as not enabled.
 ---@field protected aliasesList string[] Additional aliases for the stream.
----@field protected commandType omichat.ChatCommandType The command type used to determine whether input should be retained.
+---@field protected commandType omichat.ChatCommandCategory The command type used to determine whether input should be retained.
 ---@field protected chatFormat string? The format to use for chat messages sent from this stream.
 ---@field protected overheadFormat string? The format to use for overhead messages sent from this stream.
 ---@field protected formatter omichat.MetaFormatter? The formatter to use for this stream.
@@ -261,7 +433,7 @@
 ---@field shortCommand string? An optional short stream command, with a trailing space.
 ---@field aliases string[]? Additional aliases for the stream.
 ---@field disabled boolean? If `true`, the stream will always be treated as not enabled.
----@field commandType omichat.ChatCommandType? The command type used to determine whether input should be retained.
+---@field commandType omichat.ChatCommandCategory? The command type used to determine whether input should be retained.
 ---@field isEnabled omichat.Stream.Callback.IsEnabled? Invoked to check whether the stream should be treated as enabled.
 ---@field overheadFormat string? The overhead format to use for the stream.
 ---@field chatFormat string? The format to use for the stream in chat.
@@ -322,12 +494,93 @@
 ---@field shortCommand string? An optional short stream command, with a trailing space.
 
 
+---@class omichat.Args.StreamRetrieval
+---@field enabledOnly boolean? If `true`, only enabled streams will be returned.
+
+---@class omichat.Args.ChatCommandToStream : omichat.Args.StreamRetrieval
+---@field commandsOnly boolean? If `true`, only command streams will be checked.
+---@field chatsOnly boolean? If `true`, only chat streams will be checked.
+
+
 ---@alias omichat.Stream.Callback.IsEnabled fun(self: omichat.Stream): boolean
 
----@alias omichat.Stream.Callback.OnUse fun(ctx: omichat.SendArgs) Callback triggered when the stream is used.
+---@alias omichat.Stream.Callback.OnUse fun(ctx: omichat.Args.Send) Callback triggered when the stream is used.
 
 ---@alias omichat.Stream.Callback.OnUseDisabled fun(self: omichat.Stream) Callback triggered when attempting to use a disabled stream.
 
 ---@alias omichat.Stream.Callback.OnHelp fun(self: omichat.Stream) Callback triggered when /help is used.
+
+--#endregion
+
+--#region Suggestions
+
+---@class omichat.SuggesterBox
+---@field maximumVisibleItems integer The number of items to show without scrolling.
+
+---@class omichat.Suggester
+---@field name string? The name of the suggester.
+---@field suggest fun(self: table, info: omichat.SuggestionInfo) Performs suggestion.
+---@field priority integer? The priority of the suggester. Higher numbers will run first.
+
+---@class omichat.Suggestion
+---@field display string The text that will display in the menu.
+---@field suggestion string Text that will replace the input text if the suggestion is selected.
+
+---@class omichat.SuggestionInfo
+---@field input string The current input text.
+---@field context table Table for arbitrary context data.
+---@field suggestions omichat.Suggestion[] The current list of suggestions.
+
+---@class omichat.SuggestArgSpecTable
+---@field type omichat.SuggestionType | string The type of the argument.
+---@field prefix string? A prefix to apply to the suggestion result.
+---@field suffix string? A suffix to apply to the suggestion result.
+---@field options string[]? String options for the `option` suggestion type.
+---@field searchDisplay boolean? If true, the display string will be used for determining suggestions.
+---@field filter (fun(result: unknown, args: string[]): boolean)? Filter function for results.
+---@field display (fun(value: unknown, str: string): string?)? Function to retrieve display strings for results.
+
+
+---@alias omichat.SuggestSpec omichat.SuggestArgSpec[]
+
+---@alias omichat.SuggestArgSpec omichat.SuggestArgSpecTable | omichat.SuggestionType | string
+
+---@alias omichat.SuggestSearchCallback fun(ctx: omichat.SearchContext | string, spec: omichat.SuggestArgSpec): omichat.SearchResults?
+
+---@alias omichat.SuggestionType
+---| 'online-username'
+---| 'online-username-with-self'
+---| 'language'
+---| 'known-language'
+---| 'perk'
+---| 'option'
+---| '?'
+
+--#endregion
+
+--#region UI
+
+---@class omichat.api.client.ui
+---@field iconButton ISButton? The icon button UI element.
+---@field iconPicker omichat.IconPicker? The icon picker UI element.
+---@field suggesterBox omichat.SuggesterBox? The suggester box UI element.
+---@field typingFont UIFont The font used for the typing indicator.
+---@field typingFontHgt integer The height of the font used for the typing indicator.
+---@field private _customButtons ISButton[]
+---@field private _iconsToExclude table<string, true> Icons to exclude from the icon picker.
+---@field private _leftmostBtn ISButton? The leftmost button on the chat window.
+---@field private _typingDisplay string? The current display text for the typing indicator.
+---@field private _settingHandlers table<omichat.SettingCategory, omichat.SettingHandler[]>
+
+
+---@alias omichat.SettingHandler fun(submenu: ISContextMenu)
+
+---@alias omichat.SettingCategory
+---| 'basic'
+---| 'customization'
+---| 'language'
+---| 'admin'
+---| 'suggestions'
+---| 'main'
 
 --#endregion

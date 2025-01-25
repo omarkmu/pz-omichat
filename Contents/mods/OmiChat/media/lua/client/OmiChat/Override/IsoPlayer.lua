@@ -1,31 +1,20 @@
 ---Handles IsoPlayer overrides.
 
-local API = require 'OmiChat/API/Client/Core'
+local API = require 'OmiChat/Module/Client/Core'
 local config = API.Configuration
+local core = getCore()
 
 local min = math.min
+local addSound = addSound
+local ZombRand = ZombRand
 local _IsoPlayer = __classmetatables[IsoPlayer.class].__index
 local _Callout = _IsoPlayer.Callout
-
-
----Returns the default shouts to use when shouts are not customized.
----@param isSneaking boolean
----@return string[]
-local function getDefaultShouts(isSneaking)
-    local result = {}
-
-    for i = 1, 3 do
-        result[#result + 1] = getText('IGUI_PlayerText_Callout' .. i .. (isSneaking and 'Sneak' or 'New'))
-    end
-
-    return result
-end
 
 
 ---Override to enable custom callouts.
 ---@param playEmote boolean
 function _IsoPlayer:Callout(playEmote)
-    if getCore():getGameMode() == 'Tutorial' then
+    if core:getGameMode() == 'Tutorial' then
         _Callout(self, playEmote)
         return
     end
@@ -34,10 +23,10 @@ function _IsoPlayer:Callout(playEmote)
 
     local stream
     if isSneaking then
-        stream = API.getFirstChatStreamWithTag('SneakCallout')
+        stream = API.streams.firstChatStreamWithTag('SneakCallout')
     end
 
-    stream = stream or API.getFirstChatStreamWithTag('Callout') or API.getStreamByName('yell')
+    stream = stream or API.streams.firstChatStreamWithTag('Callout') or API.streams.get('yell')
     if not stream then
         API.utils.log.once('No stream defined for callouts. Add the `Callout` tag to a stream.')
         _Callout(self, playEmote)
@@ -49,7 +38,7 @@ function _IsoPlayer:Callout(playEmote)
 
     local shouts
     if config:isCustomShoutsEnabled() then
-        shouts = API.getCustomShouts(isSneaking and 'sneakcallouts' or 'callouts')
+        shouts = API.preferences.getCustomShouts(isSneaking and 'sneakcallouts' or 'callouts')
     end
 
     -- this can't set .callOut, so minor boredom reduction will occur from shouting
@@ -58,7 +47,7 @@ function _IsoPlayer:Callout(playEmote)
 
     local shoutMax
     if not shouts or #shouts == 0 then
-        shouts = getDefaultShouts(isSneaking)
+        shouts = API.player.getDefaultShouts(isSneaking)
         shoutMax = #shouts
     else
         shoutMax = min(#shouts, config.MAX_CUSTOM_SHOUTS)
@@ -74,10 +63,10 @@ function _IsoPlayer:Callout(playEmote)
         shout = shout:upper()
     end
 
-    API.send {
+    API.chat.send {
         stream = stream,
         text = shout,
-        formatter = API.getFormatter(formatterName),
+        formatter = API.format.get(formatterName),
         playSignedEmote = not playEmote,
         tokens = {
             callout = '1',

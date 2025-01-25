@@ -16,6 +16,6 @@ function ISButton:setVisible(bVisible)
 
     local instance = ISChat.instance
     if instance and self:getParent() == instance then
-        API.updateButtons()
+        API.ui.updateButtons()
     end
 end
