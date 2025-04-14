@@ -401,10 +401,6 @@ end
 ---@param language string
 ---@return string
 function utils.getTranslatedLanguageName(language)
-    if not language then
-        return language
-    end
-
     return getTextOrNull('UI_OmiChat_Language_' .. language:gsub('%s', '_')) or language
 end
 
@@ -492,7 +488,6 @@ function utils.hasAnyItemType(player, list)
 end
 
 ---Interpolates substitution tokens into a string with format strings using `$var` format.
----Functions are referenced using `$func(...)` syntax.
 ---@param text string The format string.
 ---@param tokens table A table of format substitution strings.
 ---@param seed unknown? Seed value for random functions.
@@ -502,8 +497,19 @@ function utils.interpolate(text, tokens, seed)
 end
 
 ---Interpolates substitution tokens into a string with format strings using `$var` format.
----Functions are referenced using `$func(...)` syntax.
----This returns the raw result, which may or may not be a string.
+---Injects the name into the the `DEFAULT` key of the `tokens` table.
+---@param name string The name of the default to use for the interpolation.
+---@param text string The format string.
+---@param tokens table A table of format substitution strings.
+---@param seed unknown? Seed value for random functions.
+---@return string
+function utils.interpolateNamed(name, text, tokens, seed)
+    tokens.DEFAULT = name
+    return utils.interpolate(text, tokens, seed)
+end
+
+---Interpolates substitution tokens into a string with format strings using `$var` format.
+---Returns the raw result, which may or may not be a string.
 ---@param text string The format string.
 ---@param tokens table A table of format substitution strings.
 ---@param seed unknown? Seed value for random functions.

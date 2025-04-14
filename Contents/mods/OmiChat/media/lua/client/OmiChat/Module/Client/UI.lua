@@ -259,7 +259,7 @@ end
 function UI.getTypingDisplay(maxWidth)
     local display = UI._typingDisplay
     if display and maxWidth and textManager:MeasureStringX(UIFont.Small, display) > maxWidth then
-        display = utils.interpolate(config.TypingIndicator.Format, { alt = true })
+        display = utils.interpolateNamed('TypingIndicator', config.TypingIndicator.Format, { alt = true })
     end
 
     return display
@@ -561,7 +561,7 @@ function UI.updateTypingDisplay()
         names = MultiMap:new(entries),
     }
 
-    local text = utils.interpolate(config.TypingIndicator.Format, tokens) ---@type string?
+    local text = utils.interpolateNamed('TypingIndicator', config.TypingIndicator.Format, tokens) ---@type string?
     if text == '' then
         text = nil
     end

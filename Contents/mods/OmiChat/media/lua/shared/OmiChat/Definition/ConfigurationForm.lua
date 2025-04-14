@@ -239,8 +239,8 @@ return {
                         Stream = 'custom',
                         ChatType = 'say',
                         CommandType = 'chat',
-                        OverheadFormat = '$DefaultOverheadFormat()',
-                        ChatFormat = '$DefaultChatFormat()',
+                        OverheadFormat = '$Default()',
+                        ChatFormat = '$Default()',
                         Range = 30,
                         VerticalRange = 2,
                     }

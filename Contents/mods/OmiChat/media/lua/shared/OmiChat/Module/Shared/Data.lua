@@ -183,7 +183,7 @@ function Data.getPlayerMenuName(player, menuType)
     tokens.name = utils.unescapeRichText(chatName)
     tokens.menuType = menuType
 
-    local result = utils.interpolate(nameFormat, tokens, Data._getPlayerUsername(player))
+    local result = utils.interpolateNamed('MenuName', nameFormat, tokens, Data._getPlayerUsername(player))
     if result == '' then
         return
     end
@@ -210,7 +210,7 @@ function Data.getPlayerNameInChat(player, chatType)
 
     tokens.username = username
     tokens.chatType = chatType
-    return utils.interpolate(config.Format.Component.Name, tokens, username)
+    return utils.interpolateNamed('Name', config.Format.Component.Name, tokens, username)
 end
 
 ---Gets substitution tokens to use in interpolation for a given player.

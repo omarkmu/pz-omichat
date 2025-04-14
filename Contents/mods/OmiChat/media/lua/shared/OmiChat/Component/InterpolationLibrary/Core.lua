@@ -4,6 +4,10 @@
 ---@class omichat.InterpolationLibrary
 local Library = {}
 
+---@class omichat.InterpolationLibrary.Defaults
+Library.Defaults = {}
+
+
 Library.Helpers = require 'OmiChat/Component/InterpolationLibrary/Helpers'
 
 

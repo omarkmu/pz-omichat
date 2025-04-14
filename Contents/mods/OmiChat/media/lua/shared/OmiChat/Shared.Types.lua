@@ -15,6 +15,7 @@
 
 ---@class omichat.MetaFormatterOptions
 ---@field format string? The format string to use.
+---@field defaultName string? The name of the default to use for the `$Default()` function.
 
 ---@class omichat.ModData
 ---@field version integer The current mod data version.
@@ -47,6 +48,7 @@
 ---@field protected _formatString string
 ---@field protected _idPrefix string
 ---@field protected _idSuffix string
+---@field protected _defaultName string
 
 ---@class omichat.VanillaCommand
 ---@field name string The name of the command.

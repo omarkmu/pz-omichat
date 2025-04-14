@@ -179,6 +179,7 @@
 ---@field rawText string The raw text of the message. This should not be modified.
 ---@field chatType omichat.ChatTypeString The chat type of the message's chat.
 ---@field format string? The format string to use for the message. Set by transformers.
+---@field default string? The name of the default to use for the `$Default()` function.
 ---@field stream omichat.Stream? The source stream of the message.
 ---@field originalStream omichat.Stream? The original stream of a radio message.
 ---@field author string The username of the message author.

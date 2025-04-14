@@ -395,7 +395,7 @@ return {
             tokens.input = unstyled
             tokens.dialogueTag = dialogueTag
 
-            info.content = utils.interpolate(config.NarrativeStyle.ChatContentFormat, tokens)
+            info.content = utils.interpolateNamed('NarrativeChatContent', config.NarrativeStyle.ChatContentFormat, tokens)
             info.tokens.narrativeStyle = '1'
             info.tokens.dialogueTag = dialogueTag
             info.tokens.unstyled = unstyled

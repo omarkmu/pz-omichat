@@ -89,7 +89,7 @@ function Format.chat(args)
     end
 
     -- filter input
-    tokens.input = utils.interpolate(config.Format.Filter.ChatInput, tokens)
+    tokens.input = utils.interpolateNamed('FilterChatInput', config.Format.Filter.ChatInput, tokens)
 
     local err = utils.extractError(tokens)
     if err or tokens.input == '' then
@@ -146,7 +146,7 @@ function Format.chat(args)
     -- apply final overhead format
     local overheadFormatter = API._metadataFormatters.overheadFinal
     if overheadFormatter then
-        tokens.prefix = utils.trimleft(utils.interpolate(config.Format.Overhead.Prefix, tokens))
+        tokens.prefix = utils.trimleft(utils.interpolateNamed('OverheadPrefix', config.Format.Overhead.Prefix, tokens))
         tokens.input = overheadFormatter:format(tokens.input, tokens)
     end
 
@@ -237,7 +237,7 @@ function Format.validateName(entry, text)
         errorID = '',
     }
 
-    local nickname = utils.interpolate(config.Format.Filter.Name, tokens)
+    local nickname = utils.interpolateNamed('FilterName', config.Format.Filter.Name, tokens)
     local err = utils.extractError(tokens)
     if not err and not utils.isNilOrWhitespace(nickname) then
         return true, nickname
@@ -268,7 +268,7 @@ function Format.validateStatus(entry, text)
         errorID = '',
     }
 
-    local status = utils.interpolate(config.Format.Filter.Status, tokens)
+    local status = utils.interpolateNamed('FilterStatus', config.Format.Filter.Status, tokens)
     local err = utils.extractError(tokens)
     if not err and not utils.isNilOrWhitespace(status) then
         return true, status
@@ -307,7 +307,7 @@ function Format._applyNarrativeStyle(input, stream, tokens)
     -- filter input
     tokens.error = ''
     tokens.errorID = ''
-    input = utils.interpolate(config.NarrativeStyle.InputFilter, tokens)
+    input = utils.interpolateNamed('FilterNarrativeInput', config.NarrativeStyle.InputFilter, tokens)
 
     local err = utils.extractError(tokens)
     if err or input == '' then
@@ -327,7 +327,7 @@ function Format._applyNarrativeStyle(input, stream, tokens)
     local seed = input
 
     tokens.input = input
-    local dialogueTag = utils.interpolate(config.NarrativeStyle.DialogueTagFormat, tokens, seed)
+    local dialogueTag = utils.interpolateNamed('NarrativeTag', config.NarrativeStyle.DialogueTagFormat, tokens, seed)
     if dialogueTag == '' then
         return original
     end
@@ -338,7 +338,13 @@ function Format._applyNarrativeStyle(input, stream, tokens)
     tokens.input = input
     tokens.dialogueTag = dialogueTag
 
-    local content = utils.interpolate(config.NarrativeStyle.OverheadContentFormat, tokens, seed)
+    local content = utils.interpolateNamed(
+        'NarrativeOverheadContent',
+        config.NarrativeStyle.OverheadContentFormat,
+        tokens,
+        seed
+    )
+
     if content == '' then
         return original
     end

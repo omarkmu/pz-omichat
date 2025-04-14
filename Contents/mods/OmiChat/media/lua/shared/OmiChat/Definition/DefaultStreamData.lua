@@ -1,5 +1,8 @@
 ---Default configuration data for built-in streams.
 
+local DEFAULT = '$Default()'
+
+
 ---@type omichat.Configuration.StreamDefinition[]
 return {
     admin = {
@@ -8,7 +11,7 @@ return {
         Command = '/admin',
         ShortCommand = '/a',
         DefaultColor = { r = 210, g = 210, b = 210 },
-        ChatFormat = '$DefaultChatFormat()',
+        ChatFormat = DEFAULT,
         Tags = {
             'NoIcon',
             'NoAdminIndicator',
@@ -28,8 +31,8 @@ return {
         AllowTypingIndicator = true,
         AttractZombies = true,
         UseNarrativeStyle = true,
-        OverheadFormat = '$DefaultOverheadFormat()',
-        ChatFormat = '$DefaultChatFormat()',
+        OverheadFormat = DEFAULT,
+        ChatFormat = DEFAULT,
         Tags = {
             'AutoCapitalizeNarrative',
             'AutoPunctuateNarrative',
@@ -53,8 +56,8 @@ return {
         AllowTypingIndicator = true,
         AttractZombies = true,
         UseNarrativeStyle = true,
-        OverheadFormat = '$DefaultOverheadFormat()',
-        ChatFormat = '$DefaultChatFormat()',
+        OverheadFormat = DEFAULT,
+        ChatFormat = DEFAULT,
         Tags = {
             'AutoCapitalizeNarrative',
             'AutoPunctuateNarrative',
@@ -77,8 +80,8 @@ return {
         AllowLanguages = true,
         AllowTypingIndicator = true,
         UseNarrativeStyle = true,
-        OverheadFormat = '$DefaultOverheadFormat()',
-        ChatFormat = '$DefaultChatFormat()',
+        OverheadFormat = DEFAULT,
+        ChatFormat = DEFAULT,
         Tags = {
             'AutoCapitalizeNarrative',
             'AutoPunctuateNarrative',
@@ -100,8 +103,8 @@ return {
         AllowLanguages = true,
         AllowTypingIndicator = true,
         UseNarrativeStyle = true,
-        OverheadFormat = '$DefaultOverheadFormat()',
-        ChatFormat = '$DefaultChatFormat()',
+        OverheadFormat = DEFAULT,
+        ChatFormat = DEFAULT,
         Tags = {
             'AutoCapitalizeNarrative',
             'AutoPunctuateNarrative',
@@ -121,8 +124,8 @@ return {
         AllowBuffs = true,
         AllowEmotes = true,
         AllowTypingIndicator = true,
-        OverheadFormat = '$DefaultOverheadFormat()',
-        ChatFormat = '$DefaultChatFormat()',
+        OverheadFormat = DEFAULT,
+        ChatFormat = DEFAULT,
         Tags = {
             'AutoPunctuateChat',
             'AutoColorQuotes',
@@ -152,8 +155,8 @@ return {
         AllowEmotes = true,
         AllowTypingIndicator = true,
         AttractZombies = true,
-        OverheadFormat = '$DefaultOverheadFormat()',
-        ChatFormat = '$DefaultChatFormat()',
+        OverheadFormat = DEFAULT,
+        ChatFormat = DEFAULT,
         Tags = {
             'AutoPunctuateChat',
             'AutoColorQuotes',
@@ -178,8 +181,8 @@ return {
         AllowBuffs = true,
         AllowEmotes = true,
         AllowTypingIndicator = true,
-        OverheadFormat = '$DefaultOverheadFormat()',
-        ChatFormat = '$DefaultChatFormat()',
+        OverheadFormat = DEFAULT,
+        ChatFormat = DEFAULT,
         Tags = {
             'AutoPunctuateChat',
             'AutoColorQuotes',
@@ -204,8 +207,8 @@ return {
         AllowBuffs = true,
         AllowEmotes = true,
         AllowTypingIndicator = true,
-        OverheadFormat = '$DefaultOverheadFormat()',
-        ChatFormat = '$DefaultChatFormat()',
+        OverheadFormat = DEFAULT,
+        ChatFormat = DEFAULT,
         Tags = {
             'AutoPunctuateChat',
             'AutoColorQuotes',
@@ -229,8 +232,8 @@ return {
         PerceptionRange = 0,
         AllowEmotes = true,
         AllowTypingIndicator = true,
-        OverheadFormat = '$DefaultOverheadFormat()',
-        ChatFormat = '$DefaultChatFormat()',
+        OverheadFormat = DEFAULT,
+        ChatFormat = DEFAULT,
         Tags = {
             'AutoCapitalizeNarrative',
             'AutoCapitalizeChat',
@@ -253,8 +256,8 @@ return {
         AllowEmotes = true,
         AllowTypingIndicator = true,
         AttractZombies = true,
-        OverheadFormat = '$DefaultOverheadFormat()',
-        ChatFormat = '$DefaultChatFormat()',
+        OverheadFormat = DEFAULT,
+        ChatFormat = DEFAULT,
         Tags = {
             'AutoCapitalizeNarrative',
             'AutoCapitalizeChat',
@@ -277,8 +280,8 @@ return {
         PerceptionRange = 0,
         AllowEmotes = true,
         AllowTypingIndicator = true,
-        OverheadFormat = '$DefaultOverheadFormat()',
-        ChatFormat = '$DefaultChatFormat()',
+        OverheadFormat = DEFAULT,
+        ChatFormat = DEFAULT,
         Tags = {
             'AutoCapitalizeNarrative',
             'AutoCapitalizeChat',
@@ -302,8 +305,8 @@ return {
         AllowBuffs = true,
         AllowEmotes = true,
         AllowTypingIndicator = true,
-        OverheadFormat = '$DefaultOverheadFormat()',
-        ChatFormat = '$DefaultChatFormat()',
+        OverheadFormat = DEFAULT,
+        ChatFormat = DEFAULT,
         Tags = {
             'AutoCapitalizeNarrative',
             'AutoCapitalizeChat',
@@ -326,8 +329,8 @@ return {
         PerceptionRange = 0,
         AllowEmotes = true,
         AllowTypingIndicator = true,
-        OverheadFormat = '$DefaultOverheadFormat()',
-        ChatFormat = '$DefaultChatFormat()',
+        OverheadFormat = DEFAULT,
+        ChatFormat = DEFAULT,
         Tags = {
             'OOC',
             'NoNameOverhead',
@@ -338,7 +341,7 @@ return {
         CommandType = 'chat',
         Command = '/pm',
         DefaultColor = { r = 85, g = 26, b = 139 },
-        ChatFormat = '$DefaultChatFormat()',
+        ChatFormat = DEFAULT,
     },
     faction = {
         ChatType = 'faction',
@@ -348,7 +351,7 @@ return {
         DefaultColor = { r = 22, g = 113, b = 20 },
         AllowLanguages = true,
         UseNarrativeStyle = true,
-        ChatFormat = '$DefaultChatFormat()',
+        ChatFormat = DEFAULT,
         Tags = {
             'AutoCapitalizeNarrative',
             'AutoPunctuateNarrative',
@@ -362,7 +365,7 @@ return {
         DefaultColor = { r = 55, g = 148, b = 53 },
         AllowLanguages = true,
         UseNarrativeStyle = true,
-        ChatFormat = '$DefaultChatFormat()',
+        ChatFormat = DEFAULT,
         Tags = {
             'AutoCapitalizeNarrative',
             'AutoPunctuateNarrative',
@@ -373,6 +376,6 @@ return {
         CommandType = 'chat',
         Command = '/all',
         DefaultColor = { r = 255, g = 165, b = 0 },
-        ChatFormat = '$DefaultChatFormat()',
+        ChatFormat = DEFAULT,
     },
 }

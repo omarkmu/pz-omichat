@@ -44,6 +44,7 @@ function MetaFormatter:format(text, tokens)
     end
 
     tokens.input = text
+    tokens.DEFAULT = self._defaultName
 
     local formatted = utils.replaceEntities(utils.interpolate(self:getFormatString(), tokens))
 
@@ -81,6 +82,18 @@ function MetaFormatter:isMatch(text)
     return text:find(self:getPattern()) ~= nil
 end
 
+---Returns the name of the default used with the `$Default()` function.
+---@return string
+function MetaFormatter:getDefaultName()
+    return self._defaultName
+end
+
+---Returns the formatter's format string.
+---@return string
+function MetaFormatter:getFormatString()
+    return self._formatString
+end
+
 ---Returns the formatter's string pattern.
 ---@param exact boolean? If true, an exact match will be required. Defaults to false.
 ---@return string
@@ -93,12 +106,6 @@ function MetaFormatter:getPattern(exact)
         self._idSuffix,
         exact and '$' or '',
     }
-end
-
----Returns the formatter's format string.
----@return string
-function MetaFormatter:getFormatString()
-    return self._formatString
 end
 
 ---Sets the ID of the formatter.
@@ -135,6 +142,12 @@ function MetaFormatter:setID(id)
     formatters[self._id] = self
 end
 
+---Sets the default name used with `$Default()` to the given string.
+---@param default string?
+function MetaFormatter:setDefaultName(default)
+    self._defaultName = default or 'Overhead'
+end
+
 ---Sets the format string to the given string.
 ---@param format string?
 function MetaFormatter:setFormatString(format)
@@ -152,6 +165,7 @@ function MetaFormatter:new(id, options)
     options = options or {}
     this:setFormatString(options.format)
     this:setID(id)
+    this._defaultName = options.defaultName or 'Overhead'
 
     return this
 end

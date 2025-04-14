@@ -2,6 +2,7 @@
 
 local utils = require 'OmiChat/utils'
 local set = utils.set.simple
+local DEFAULT = '$Default()'
 
 
 ---@class omichat.ConfigurationPreset : omi.Class
@@ -37,8 +38,8 @@ function Preset.callouts(options)
 
     ---@type omichat.Configuration.Callouts
     return {
-        Format = '$DefaultOverheadFormat()',
-        SneakFormat = '$DefaultOverheadFormat()',
+        Format = DEFAULT,
+        SneakFormat = DEFAULT,
         Range = options.Range or 60,
         SneakRange = options.SneakRange or 6,
     }
@@ -76,17 +77,17 @@ function Preset.commands(options)
         },
         Card = {
             Global = globalCommands,
-            Format = '$DefaultCardFormat()',
-            OverheadFormat = '$DefaultOverheadFormat()',
-            ChatFormat = '$DefaultChatFormat()',
+            Format = DEFAULT,
+            OverheadFormat = DEFAULT,
+            ChatFormat = DEFAULT,
             Items = { 'CardDeck' },
             Tags = {},
         },
         Roll = {
             Global = globalCommands,
-            Format = '$DefaultRollFormat()',
-            OverheadFormat = '$DefaultOverheadFormat()',
-            ChatFormat = '$DefaultChatFormat()',
+            Format = DEFAULT,
+            OverheadFormat = DEFAULT,
+            ChatFormat = DEFAULT,
             Items = {
                 'Dice',
                 'Dice_00',
@@ -101,9 +102,9 @@ function Preset.commands(options)
         },
         Flip = {
             Global = globalCommands,
-            Format = '$DefaultFlipFormat()',
-            OverheadFormat = '$DefaultOverheadFormat()',
-            ChatFormat = '$DefaultChatFormat()',
+            Format = DEFAULT,
+            OverheadFormat = DEFAULT,
+            ChatFormat = DEFAULT,
             Items = {},
             Tags = {},
         },
@@ -153,7 +154,7 @@ function Preset.discord(options)
 
     ---@type omichat.Configuration.Discord
     return {
-        ChatFormat = '$DefaultChatFormat()',
+        ChatFormat = DEFAULT,
         DefaultColor = { r = 144, g = 137, b = 218 },
         ShowColorOption = 'Respect_Server_Setting',
         Tags = options.Tags or { 'UseAuthorUsername' },
@@ -170,8 +171,8 @@ function Preset.echo(options)
     ---@type omichat.Configuration.EchoMessages
     return {
         Enable = options.Enable or false,
-        ChatFormat = '$DefaultChatFormat()',
-        OverheadFormat = '$DefaultOverheadFormat()',
+        ChatFormat = DEFAULT,
+        OverheadFormat = DEFAULT,
         Tags = options.Tags or { 'OverRadio' },
     }
 end
@@ -183,33 +184,33 @@ function Preset.format()
     ---@type omichat.Configuration.Format
     return {
         Component = {
-            Name = '$DefaultNameFormat()',
-            Tag = '$DefaultTagFormat()',
-            Timestamp = '$DefaultTimestampFormat()',
-            Icon = '$DefaultIconFormat()',
-            Language = '$DefaultLanguageFormat()',
-            EmbeddedQuote = '$DefaultEmbeddedQuoteFormat()',
-            EmbeddedAction = '$DefaultEmbeddedActionFormat()',
+            Name = DEFAULT,
+            Tag = DEFAULT,
+            Timestamp = DEFAULT,
+            Icon = DEFAULT,
+            Language = DEFAULT,
+            EmbeddedQuote = DEFAULT,
+            EmbeddedAction = DEFAULT,
         },
         Overhead = {
-            Final = '$DefaultFullOverheadFormat()',
-            Prefix = '$DefaultOverheadPrefix()',
+            Prefix = DEFAULT,
+            Final = DEFAULT,
         },
         PerceptionRange = {
-            Chat = '$DefaultPerceptionRangeChatFormat()',
-            Overhead = '$DefaultPerceptionRangeOverheadFormat()',
+            Chat = DEFAULT,
+            Overhead = DEFAULT,
         },
         Chat = {
-            Final = '$DefaultFullChatFormat()',
-            Prefix = '$DefaultChatPrefix()',
+            Prefix = DEFAULT,
+            Final = DEFAULT,
         },
         Filter = {
-            Name = '$DefaultNameFilter()',
-            Status = '$DefaultStatusFilter()',
-            ChatInput = '$DefaultChatInputFilter()',
+            Name = DEFAULT,
+            Status = DEFAULT,
+            ChatInput = DEFAULT,
         },
         MenuName = {
-            Default = '$DefaultMenuNameFormat()',
+            Default = DEFAULT,
         },
     }
 end
@@ -245,9 +246,9 @@ function Preset.languages(options)
         DefaultSlots = 1,
         InterpretationRolls = 2,
         InterpretationChance = 25,
-        UnknownLanguageChat = '$DefaultUnknownLanguageFormat()',
-        UnknownLanguageRadio = '$DefaultUnknownLanguageFormat()',
-        UnknownLanguageOverhead = '$DefaultUnknownLanguageOverheadFormat()',
+        UnknownLanguageChat = DEFAULT,
+        UnknownLanguageRadio = DEFAULT,
+        UnknownLanguageOverhead = DEFAULT,
         SelfAddAllowlist = {},
         SelfAddBlocklist = {},
     }
@@ -276,10 +277,10 @@ function Preset.narrative(options)
     ---@type omichat.Configuration.NarrativeStyle
     return {
         Enable = options.Enable or false,
-        OverheadContentFormat = '$DefaultNarrativeOverheadFormat()',
-        ChatContentFormat = '$DefaultNarrativeChatFormat()',
-        DialogueTagFormat = '$DefaultNarrativeTag()',
-        InputFilter = '$DefaultNarrativeInputFilter()',
+        OverheadContentFormat = DEFAULT,
+        ChatContentFormat = DEFAULT,
+        DialogueTagFormat = DEFAULT,
+        InputFilter = DEFAULT,
     }
 end
 
@@ -292,7 +293,7 @@ function Preset.radio(options)
 
     ---@type omichat.Configuration.Radio
     return {
-        ChatFormat = '$DefaultChatFormat()',
+        ChatFormat = DEFAULT,
         DefaultColor = { r = 178, g = 178, b = 178 },
         Tags = options.Tags or {},
     }
@@ -307,7 +308,7 @@ function Preset.server(options)
 
     ---@type omichat.Configuration.ServerMessages
     return {
-        ChatFormat = '$DefaultChatFormat()',
+        ChatFormat = DEFAULT,
         DefaultColor = { r = 0, g = 128, b = 255 },
         Tags = options.Tags or { 'NoTimestamp', 'NoTagColon' },
     }
@@ -323,7 +324,7 @@ function Preset.typing(options)
     ---@type omichat.Configuration.TypingIndicator
     return {
         Enable = utils.default(options.Enable, true),
-        Format = '$DefaultTypingFormat()',
+        Format = DEFAULT,
     }
 end
 

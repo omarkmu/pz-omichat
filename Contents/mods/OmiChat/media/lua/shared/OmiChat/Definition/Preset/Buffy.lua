@@ -266,7 +266,6 @@ return Preset:new {
                 {
                     Stream = 'private',
                     Enable = true,
-                    ChatFormat = '$DefaultChatFormat()',
                     Tags = {
                         'UseNameColor',
                     },

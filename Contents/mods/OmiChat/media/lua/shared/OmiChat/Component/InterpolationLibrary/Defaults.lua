@@ -11,6 +11,10 @@ local MultiMap = utils.MultiMap
 ---@class omichat.InterpolationLibrary
 local Library = require 'OmiChat/Component/InterpolationLibrary/Core'
 
+
+---@class omichat.InterpolationLibrary.Defaults
+Library.Defaults = Library.Defaults or {}
+
 local Helpers = Library.Helpers
 local readTags = Helpers.readTags
 local readPreset = Helpers.readPreset
@@ -18,18 +22,33 @@ local readOptions = Helpers.readOptions
 local optionOrToken = Helpers.optionOrToken
 
 
----Default format for `/card` command result content.
+---Default forwarding function for format strings.
 ---@param interpolator omichat.Interpolator
----@return string
-function Library.DefaultCardFormat(interpolator)
-    return 'draws ' .. interpolator:tokenString('card')
+---@param args unknown?
+---@return unknown?
+function Library.Default(interpolator, args)
+    local target
+    if type(args) == 'string' then
+        target = args
+    else
+        local options = readOptions(args)
+        target = optionOrToken(interpolator, options, 'DEFAULT')
+    end
+
+    local func = target and Library.Defaults[target]
+    if func then
+        return func(interpolator, args)
+    else
+        utils.log.once('Tried to call unknown default: ' .. tostring(target))
+    end
 end
+
 
 ---Default format for text of chat messages.
 ---@param interpolator omichat.Interpolator
 ---@param args unknown?
 ---@return string?
-function Library.DefaultChatFormat(interpolator, args)
+function Library.Defaults.Chat(interpolator, args)
     local options = readOptions(args)
     local preset = readPreset(options)
     local tags = readTags(interpolator)
@@ -159,35 +178,28 @@ function Library.DefaultChatFormat(interpolator, args)
     return prefix .. name .. (noColon and '' or ':') .. ' <SPACE> ' .. message
 end
 
----Default filter for chat input.
+---Default format for the final chat text.
 ---@param interpolator omichat.Interpolator
 ---@param args unknown?
----@return string?
-function Library.DefaultChatInputFilter(interpolator, args)
-    local tags = readTags(interpolator)
-    if tags.NoSignedOverRadio then
-        local errorID = Helpers.checkSignedOverRadio(interpolator)
-        if errorID then
-            interpolator:setToken('errorID', errorID)
-            return
-        end
-    end
-
+---@return string
+function Library.Defaults.ChatFinal(interpolator, args)
     local options = readOptions(args)
-    local text = utils.trim(optionOrToken(interpolator, options, 'input'))
-    local maxLen = options:getNumber('maxLength')
-    if maxLen > 0 then
-        text = text:sub(1, maxLen)
+    local tags = readTags(interpolator)
+    local prefix = optionOrToken(interpolator, options, 'prefix')
+
+    local prefixSpace = not tags.NoPrefixSpace and not tags.NoPrefixSpaceChat and not options:getBoolean('noPrefixSpace')
+    if prefixSpace and prefix ~= '' then
+        prefix = prefix .. ' <SPACE> '
     end
 
-    return text
+    return prefix .. interpolator:tokenString('input')
 end
 
 ---Default format for the chat text prefix.
 ---@param interpolator omichat.Interpolator
 ---@param args unknown?
 ---@return string
-function Library.DefaultChatPrefix(interpolator, args)
+function Library.Defaults.ChatPrefix(interpolator, args)
     local options = readOptions(args)
     local preset = readPreset(options)
     local tags = readTags(interpolator)
@@ -248,80 +260,11 @@ function Library.DefaultChatPrefix(interpolator, args)
     return concat(result)
 end
 
----Default format for `/flip` command result content.
----@param interpolator omichat.Interpolator
----@return string
-function Library.DefaultFlipFormat(interpolator)
-    local result = interpolator:toBoolean(interpolator:token('heads')) and 'heads' or 'tails'
-    return 'flips a coin and gets ' .. result
-end
-
----Default format for the full chat text.
----@param interpolator omichat.Interpolator
----@param args unknown?
----@return string
-function Library.DefaultFullChatFormat(interpolator, args)
-    local options = readOptions(args)
-    local tags = readTags(interpolator)
-    local prefix = optionOrToken(interpolator, options, 'prefix')
-
-    local prefixSpace = not tags.NoPrefixSpace and not tags.NoPrefixSpaceChat and not options:getBoolean('noPrefixSpace')
-    if prefixSpace and prefix ~= '' then
-        prefix = prefix .. ' <SPACE> '
-    end
-
-    return prefix .. interpolator:tokenString('input')
-end
-
----Default format for the full overhead text.
----@param interpolator omichat.Interpolator
----@param args unknown?
----@return string
-function Library.DefaultFullOverheadFormat(interpolator, args)
-    local options = readOptions(args)
-    local tags = readTags(interpolator)
-    local prefix = optionOrToken(interpolator, options, 'prefix')
-
-    local prefixSpace = not tags.NoPrefixSpace and not tags.NoPrefixSpaceOverhead and
-        not options:getBoolean('noPrefixSpace')
-
-    if prefixSpace and prefix ~= '' then
-        prefix = prefix .. ' '
-    end
-
-    return prefix .. interpolator:tokenString('input')
-end
-
----Default format for chat icons.
+---Default format for actions embedded in dialogue text.
 ---@param interpolator omichat.Interpolator
 ---@param args unknown?
 ---@return string?
-function Library.DefaultIconFormat(interpolator, args)
-    local options = readOptions(args)
-    local tags = readTags(interpolator)
-
-    if tags.IsCardCommand then
-        return options:getString('cardIcon', 'Item_CardDeck')
-    elseif tags.IsFlipCommand then
-        -- the plate is the most coin-like icon I could find in vanilla
-        return options:getString('flipIcon', 'Item_Plate')
-    elseif tags.IsRollCommand or tags.IsBuffyRoll then
-        return options:getString('rollIcon', 'Item_Dice')
-    end
-
-    local icon = interpolator:tokenString('adminIcon')
-    if icon == '' then
-        icon = interpolator:tokenString('icon')
-    end
-
-    return icon
-end
-
----Default format for actions embedded in text.
----@param interpolator omichat.Interpolator
----@param args unknown?
----@return string?
-function Library.DefaultEmbeddedActionFormat(interpolator, args)
+function Library.Defaults.EmbeddedAction(interpolator, args)
     local options = Helpers.readOptions(args)
     local tags = Helpers.readTags(interpolator)
 
@@ -330,31 +273,12 @@ function Library.DefaultEmbeddedActionFormat(interpolator, args)
         return
     end
 
-    input = Helpers.applySharedFormatting {
-        interpolator = interpolator,
-        options = options,
-        tags = tags,
-        input = input,
-        applyCase = true,
-        doCapitalize = tags.AutoCapitalize or (tags.IsNarrativeStyle and tags.AutoCapitalizeNarrative) or tags.AutoCapitalizeEmbeddedActions,
-        doPunctuate = tags.AutoPunctuate or (tags.IsNarrativeStyle and tags.AutoPunctuateNarrative) or tags.AutoPunctuateEmbeddedActions,
-    }
-
-    return input
-end
-
----Default format for quotes embedded in actions.
----@param interpolator omichat.Interpolator
----@param args unknown?
----@return string?
-function Library.DefaultEmbeddedQuoteFormat(interpolator, args)
-    local options = Helpers.readOptions(args)
-    local tags = Helpers.readTags(interpolator)
-
-    local input = tostring(options:get('input') or interpolator:tokenString('input'))
-    if utils.trim(input) == '' then
-        return
-    end
+    local doCapitalize = tags.AutoCapitalize
+        or tags.AutoCapitalizeEmbeddedActions
+        or (tags.IsNarrativeStyle and tags.AutoCapitalizeNarrative)
+    local doPunctuate = tags.AutoPunctuate
+        or tags.AutoPunctuateEmbeddedActions
+        or (tags.IsNarrativeStyle and tags.AutoPunctuateNarrative)
 
     return Helpers.applySharedFormatting {
         interpolator = interpolator,
@@ -362,48 +286,71 @@ function Library.DefaultEmbeddedQuoteFormat(interpolator, args)
         tags = tags,
         input = input,
         applyCase = true,
-        doCapitalize = tags.AutoCapitalize or (tags.IsNarrativeStyle and tags.AutoCapitalizeNarrative) or tags.AutoCapitalizeEmbeddedQuotes,
-        doPunctuate = tags.AutoPunctuate or (tags.IsNarrativeStyle and tags.AutoPunctuateNarrative) or tags.AutoPunctuateEmbeddedQuotes,
+        doCapitalize = doCapitalize,
+        doPunctuate = doPunctuate,
     }
 end
 
----Default format for roleplay languages.
+---Default format for quotes embedded in actions.
 ---@param interpolator omichat.Interpolator
+---@param args unknown?
 ---@return string?
-function Library.DefaultLanguageFormat(interpolator)
-    local tags = readTags(interpolator)
-    if tags.NoLanguage or tags.IsUnknownLanguage then
+function Library.Defaults.EmbeddedQuote(interpolator, args)
+    local options = Helpers.readOptions(args)
+    local tags = Helpers.readTags(interpolator)
+
+    local input = tostring(options:get('input') or interpolator:tokenString('input'))
+    if utils.trim(input) == '' then
         return
     end
 
-    local language = interpolator:tokenString('language')
-    if language == '' then
-        return
-    end
+    local doCapitalize = tags.AutoCapitalize
+        or tags.AutoCapitalizeEmbeddedQuotes
+        or (tags.IsNarrativeStyle and tags.AutoCapitalizeNarrative)
+    local doPunctuate = tags.AutoPunctuate
+        or tags.AutoPunctuateEmbeddedQuotes
+        or (tags.IsNarrativeStyle and tags.AutoPunctuateNarrative)
 
-    return '[' .. language .. ']'
+    return Helpers.applySharedFormatting {
+        interpolator = interpolator,
+        options = options,
+        tags = tags,
+        input = input,
+        applyCase = true,
+        doCapitalize = doCapitalize,
+        doPunctuate = doPunctuate,
+    }
 end
 
----Default format for menu names.
+---Default filter for chat input.
 ---@param interpolator omichat.Interpolator
----@return string
-function Library.DefaultMenuNameFormat(interpolator)
-    local menuType = interpolator:tokenString('menuType') ---@type omichat.MenuTypeString
-    local name = interpolator:tokenString('name')
-
-    if menuType == 'mini_scoreboard' then
-        local username = interpolator:tokenString('username')
-        return username .. '[' .. name .. ']'
+---@param args unknown?
+---@return string?
+function Library.Defaults.FilterChatInput(interpolator, args)
+    local tags = readTags(interpolator)
+    if tags.NoSignedOverRadio then
+        local errorID = Helpers.checkSignedOverRadio(interpolator)
+        if errorID then
+            interpolator:setToken('errorID', errorID)
+            return
+        end
     end
 
-    return name
+    local options = readOptions(args)
+    local text = utils.trim(optionOrToken(interpolator, options, 'input'))
+    local maxLen = options:getNumber('maxLength')
+    if maxLen > 0 then
+        text = text:sub(1, maxLen)
+    end
+
+    return text
 end
 
 ---Default filter for names.
 ---@param interpolator omichat.Interpolator
 ---@param args unknown?
 ---@return string?
-function Library.DefaultNameFilter(interpolator, args)
+function Library.Defaults.FilterName(interpolator, args)
     local options = readOptions(args)
     local input = utils.trim(optionOrToken(interpolator, options, 'input'))
 
@@ -425,11 +372,137 @@ function Library.DefaultNameFilter(interpolator, args)
     return input
 end
 
----Default format for names.
+---Default filter for narrative style messages.
 ---@param interpolator omichat.Interpolator
 ---@param args unknown?
 ---@return string
-function Library.DefaultNameFormat(interpolator, args)
+function Library.Defaults.FilterNarrativeInput(interpolator, args)
+    local options = readOptions(args)
+    local input = optionOrToken(interpolator, options, 'input')
+
+    if utils.startsWith(input, '"') then
+        input = input:sub(2)
+    end
+
+    if utils.endsWith(input, '"') then
+        input = input:sub(1, #input - 1)
+    end
+
+    return input
+end
+
+---Default filter for statuses.
+---@param interpolator omichat.Interpolator
+---@param args unknown?
+---@return string?
+function Library.Defaults.FilterStatus(interpolator, args)
+    local options = readOptions(args)
+    local input = utils.trim(optionOrToken(interpolator, options, 'input'))
+
+    local maxLength = tonumber(options:get('maxLength', 64))
+    local minLength = tonumber(options:get('minLength', 8))
+    if maxLength and #input > maxLength then
+        interpolator:setToken('error', getText('UI_OmiLibrary_Error_LengthMax', tostring(maxLength)))
+        return
+    elseif minLength and #input < minLength then
+        interpolator:setToken('error', getText('UI_OmiLibrary_Error_LengthMin', tostring(minLength)))
+        return
+    end
+
+    local truncateLength = tonumber(options:get('truncateTo'))
+    if truncateLength then
+        input = input:sub(1, truncateLength)
+    end
+
+    return input
+end
+
+---Default format for `/card` command result content.
+---@param interpolator omichat.Interpolator
+---@return string
+function Library.Defaults.FormatCard(interpolator)
+    return 'draws ' .. interpolator:tokenString('card')
+end
+
+---Default format for `/flip` command result content.
+---@param interpolator omichat.Interpolator
+---@return string
+function Library.Defaults.FormatFlip(interpolator)
+    local result = interpolator:toBoolean(interpolator:token('heads')) and 'heads' or 'tails'
+    return 'flips a coin and gets ' .. result
+end
+
+---Default format for `/roll` command result content.
+---@param interpolator omichat.Interpolator
+---@return string
+function Library.Defaults.FormatRoll(interpolator)
+    local roll = interpolator:tokenString('roll')
+    local sides = interpolator:tokenString('sides')
+    return 'rolls a ' .. roll .. ' on a ' .. sides .. '-sided die'
+end
+
+---Default format for chat icons.
+---@param interpolator omichat.Interpolator
+---@param args unknown?
+---@return string?
+function Library.Defaults.Icon(interpolator, args)
+    local options = readOptions(args)
+    local tags = readTags(interpolator)
+
+    if tags.IsCardCommand then
+        return options:getString('cardIcon', 'Item_CardDeck')
+    elseif tags.IsFlipCommand then
+        -- the plate is the most coin-like icon I could find in vanilla
+        return options:getString('flipIcon', 'Item_Plate')
+    elseif tags.IsRollCommand or tags.IsBuffyRoll then
+        return options:getString('rollIcon', 'Item_Dice')
+    end
+
+    local icon = interpolator:tokenString('adminIcon')
+    if icon == '' then
+        icon = interpolator:tokenString('icon')
+    end
+
+    return icon
+end
+
+---Default format for roleplay languages in a message prefix.
+---@param interpolator omichat.Interpolator
+---@return string?
+function Library.Defaults.Language(interpolator)
+    local tags = readTags(interpolator)
+    if tags.NoLanguage or tags.IsUnknownLanguage then
+        return
+    end
+
+    local language = interpolator:tokenString('language')
+    if language == '' then
+        return
+    end
+
+    return '[' .. language .. ']'
+end
+
+---Default format for menu names.
+---@param interpolator omichat.Interpolator
+---@return string
+function Library.Defaults.MenuName(interpolator)
+    local menuType = interpolator:tokenString('menuType') ---@type omichat.MenuTypeString
+    local name = interpolator:tokenString('name')
+
+    if menuType == 'mini_scoreboard' then
+        local username = interpolator:tokenString('username')
+        return username .. '[' .. name .. ']'
+    end
+
+    return name
+end
+
+---Default format for name display in chat.
+---@param interpolator omichat.Interpolator
+---@param args unknown?
+---@return string
+function Library.Defaults.Name(interpolator, args)
     local options = readOptions(args)
     local preset = readPreset(options)
     local chatType = interpolator:token('chatType')
@@ -485,7 +558,7 @@ end
 ---@param interpolator omichat.Interpolator
 ---@param args unknown?
 ---@return string?
-function Library.DefaultNarrativeChatFormat(interpolator, args)
+function Library.Defaults.NarrativeChatContent(interpolator, args)
     local options = readOptions(args)
     local tags = readTags(interpolator)
     local input = optionOrToken(interpolator, options, 'input')
@@ -502,30 +575,11 @@ function Library.DefaultNarrativeChatFormat(interpolator, args)
     return dialogueTag .. comma .. input
 end
 
----Default filter for narrative style messages.
----@param interpolator omichat.Interpolator
----@param args unknown?
----@return string
-function Library.DefaultNarrativeInputFilter(interpolator, args)
-    local options = readOptions(args)
-    local input = optionOrToken(interpolator, options, 'input')
-
-    if utils.startsWith(input, '"') then
-        input = input:sub(2)
-    end
-
-    if utils.endsWith(input, '"') then
-        input = input:sub(1, #input - 1)
-    end
-
-    return input
-end
-
 ---Default overhead content format for narrative style.
 ---@param interpolator omichat.Interpolator
 ---@param args unknown?
 ---@return string?
-function Library.DefaultNarrativeOverheadFormat(interpolator, args)
+function Library.Defaults.NarrativeOverheadContent(interpolator, args)
     local options = readOptions(args)
     local tags = readTags(interpolator)
     local input = optionOrToken(interpolator, options, 'input')
@@ -558,7 +612,7 @@ end
 ---@param interpolator omichat.Interpolator
 ---@param args unknown?
 ---@return string?
-function Library.DefaultNarrativeTag(interpolator, args)
+function Library.Defaults.NarrativeTag(interpolator, args)
     local options = readOptions(args)
     local tags = readTags(interpolator)
     local input = utils.trim(optionOrToken(interpolator, options, 'input'))
@@ -571,7 +625,7 @@ function Library.DefaultNarrativeTag(interpolator, args)
         return options:getString('loudTag', 'shouts')
     end
 
-    -- only use the first quote to determine the punctuation-based narrative tag
+    -- only use the first dialogue segment to determine the punctuation-based narrative tag
     local testInput = utils.getInternalText(input)
     local segments = Helpers.getMessageSegments(testInput, {
         onlyFirstSegment = true,
@@ -600,7 +654,7 @@ end
 ---@param interpolator omichat.Interpolator
 ---@param args unknown?
 ---@return string?
-function Library.DefaultOverheadFormat(interpolator, args)
+function Library.Defaults.Overhead(interpolator, args)
     local options = readOptions(args)
     local tags = readTags(interpolator)
 
@@ -653,11 +707,30 @@ function Library.DefaultOverheadFormat(interpolator, args)
     return input
 end
 
+---Default format for the full overhead text.
+---@param interpolator omichat.Interpolator
+---@param args unknown?
+---@return string
+function Library.Defaults.OverheadFinal(interpolator, args)
+    local options = readOptions(args)
+    local tags = readTags(interpolator)
+    local prefix = optionOrToken(interpolator, options, 'prefix')
+
+    local prefixSpace = not tags.NoPrefixSpace and not tags.NoPrefixSpaceOverhead and
+        not options:getBoolean('noPrefixSpace')
+
+    if prefixSpace and prefix ~= '' then
+        prefix = prefix .. ' '
+    end
+
+    return prefix .. interpolator:tokenString('input')
+end
+
 ---Default format for the overhead prefix.
 ---@param interpolator omichat.Interpolator
 ---@param args unknown?
 ---@return string?
-function Library.DefaultOverheadPrefix(interpolator, args)
+function Library.Defaults.OverheadPrefix(interpolator, args)
     local options = readOptions(args)
     local preset = readPreset(options)
     local tags = readTags(interpolator)
@@ -691,7 +764,7 @@ end
 ---Default chat format for out-of-range, perceived messages.
 ---@param interpolator omichat.Interpolator
 ---@return string?
-function Library.DefaultPerceptionRangeChatFormat(interpolator)
+function Library.Defaults.PerceptionRangeChat(interpolator)
     local tags = Helpers.readTags(interpolator)
 
     local name = interpolator:tokenString('name')
@@ -707,7 +780,7 @@ end
 ---Default overhead format for out-of-range, perceived messages.
 ---@param interpolator omichat.Interpolator
 ---@return string?
-function Library.DefaultPerceptionRangeOverheadFormat(interpolator)
+function Library.Defaults.PerceptionRangeOverhead(interpolator)
     local tags = Helpers.readTags(interpolator)
 
     local name = interpolator:tokenString('name')
@@ -718,45 +791,10 @@ function Library.DefaultPerceptionRangeOverheadFormat(interpolator)
     return Helpers.wrapActionOverhead(Helpers.getPerceivedChatString(name, tags), tags)
 end
 
----Default format for `/roll` command result content.
+---Default format for chat tags in a message prefix.
 ---@param interpolator omichat.Interpolator
 ---@return string
-function Library.DefaultRollFormat(interpolator)
-    local roll = interpolator:tokenString('roll')
-    local sides = interpolator:tokenString('sides')
-    return 'rolls a ' .. roll .. ' on a ' .. sides .. '-sided die'
-end
-
----Default filter for statuses.
----@param interpolator omichat.Interpolator
----@param args unknown?
----@return string?
-function Library.DefaultStatusFilter(interpolator, args)
-    local options = readOptions(args)
-    local input = utils.trim(optionOrToken(interpolator, options, 'input'))
-
-    local maxLength = tonumber(options:get('maxLength', 64))
-    local minLength = tonumber(options:get('minLength', 8))
-    if maxLength and #input > maxLength then
-        interpolator:setToken('error', getText('UI_OmiLibrary_Error_LengthMax', tostring(maxLength)))
-        return
-    elseif minLength and #input < minLength then
-        interpolator:setToken('error', getText('UI_OmiLibrary_Error_LengthMin', tostring(minLength)))
-        return
-    end
-
-    local truncateLength = tonumber(options:get('truncateTo'))
-    if truncateLength then
-        input = input:sub(1, truncateLength)
-    end
-
-    return input
-end
-
----Default format for chat tags.
----@param interpolator omichat.Interpolator
----@return string
-function Library.DefaultTagFormat(interpolator)
+function Library.Defaults.Tag(interpolator)
     local tags = readTags(interpolator)
 
     local tag = '[' .. interpolator:tokenString('tag') .. ']'
@@ -767,10 +805,10 @@ function Library.DefaultTagFormat(interpolator)
     return tag
 end
 
----Default format for chat message timestamps.
+---Default format for chat message timestamps in a message prefix.
 ---@param interpolator omichat.Interpolator
 ---@return string
-function Library.DefaultTimestampFormat(interpolator)
+function Library.Defaults.Timestamp(interpolator)
     local hour
     if interpolator:tokenNumber('hourFormat') == 12 then
         hour = interpolator:tokenString('h')
@@ -785,7 +823,7 @@ end
 ---@param interpolator omichat.Interpolator
 ---@param args unknown?
 ---@return string?
-function Library.DefaultTypingFormat(interpolator, args)
+function Library.Defaults.TypingIndicator(interpolator, args)
     local options = readOptions(args)
 
     if interpolator:tokenBoolean('alt') then
@@ -820,10 +858,10 @@ end
 ---@param interpolator omichat.Interpolator
 ---@param args unknown?
 ---@return string?
-function Library.DefaultUnknownLanguageFormat(interpolator, args)
+function Library.Defaults.UnknownLanguageChat(interpolator, args)
     local tags = readTags(interpolator)
     if tags.IsActionUnknownLanguage then
-        return Library.DefaultChatFormat(interpolator, args)
+        return Library.Defaults.Chat(interpolator, args)
     end
 
     local options = readOptions(args)
@@ -861,15 +899,15 @@ end
 ---@param interpolator omichat.Interpolator
 ---@param args unknown?
 ---@return string?
-function Library.DefaultUnknownLanguageOverheadFormat(interpolator, args)
+function Library.Defaults.UnknownLanguageOverhead(interpolator, args)
     local tags = readTags(interpolator)
     if tags.IsActionUnknownLanguage then
-        return Library.DefaultOverheadFormat(interpolator, args)
+        return Library.Defaults.Overhead(interpolator, args)
     end
 
     local options = readOptions(args)
     local name = optionOrToken(interpolator, options, 'name')
-    if tags.NoName or tags.NoNameChat then
+    if tags.NoName or tags.NoNameOverhead then
         name = ''
     end
 

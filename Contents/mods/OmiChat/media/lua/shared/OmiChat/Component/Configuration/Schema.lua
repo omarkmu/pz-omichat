@@ -15,6 +15,7 @@ local int = utils.schema.int
 local object = utils.schema.object
 local set = utils.schema.set
 local str = utils.schema.string
+local DEFAULT = '$Default()'
 
 
 return Schema:new {
@@ -66,8 +67,8 @@ return Schema:new {
         },
 
         Callouts = container {
-            Format = str('$DefaultOverheadFormat()'),
-            SneakFormat = str('$DefaultOverheadFormat()'),
+            Format = str(DEFAULT),
+            SneakFormat = str(DEFAULT),
             Range = int(60, 1, 60),
             SneakRange = int(6, 1, 60),
         },
@@ -98,9 +99,9 @@ return Schema:new {
                     items = str(),
                     default = { 'CardDeck' },
                 },
-                Format = str('$DefaultCardFormat()'),
-                OverheadFormat = str('$DefaultOverheadFormat()'),
-                ChatFormat = str('$DefaultChatFormat()'),
+                Format = str(DEFAULT),
+                OverheadFormat = str(DEFAULT),
+                ChatFormat = str(DEFAULT),
                 Tags = array { items = str() },
             },
             Roll = container {
@@ -118,17 +119,17 @@ return Schema:new {
                         'Dice_20',
                     },
                 },
-                Format = str('$DefaultRollFormat()'),
-                OverheadFormat = str('$DefaultOverheadFormat()'),
-                ChatFormat = str('$DefaultChatFormat()'),
+                Format = str(DEFAULT),
+                OverheadFormat = str(DEFAULT),
+                ChatFormat = str(DEFAULT),
                 Tags = array { items = str() },
             },
             Flip = container {
                 Global = bool(false),
                 Items = array { items = str() },
-                Format = str('$DefaultFlipFormat()'),
-                OverheadFormat = str('$DefaultOverheadFormat()'),
-                ChatFormat = str('$DefaultChatFormat()'),
+                Format = str(DEFAULT),
+                OverheadFormat = str(DEFAULT),
+                ChatFormat = str(DEFAULT),
                 Tags = array { items = str() },
             },
         },
@@ -158,7 +159,7 @@ return Schema:new {
         },
 
         Discord = container {
-            ChatFormat = str('$DefaultChatFormat()'),
+            ChatFormat = str(DEFAULT),
             Tags = array {
                 items = str(),
                 default = { 'UseAuthorUsername' },
@@ -178,8 +179,8 @@ return Schema:new {
 
         EchoMessages = container {
             Enable = bool(false),
-            ChatFormat = str('$DefaultChatFormat()'),
-            OverheadFormat = str('$DefaultOverheadFormat()'),
+            ChatFormat = str(DEFAULT),
+            OverheadFormat = str(DEFAULT),
             Tags = array {
                 items = str(),
                 default = { 'OverRadio' },
@@ -188,38 +189,38 @@ return Schema:new {
 
         Format = container {
             Chat = container {
-                Prefix = str('$DefaultChatPrefix()'),
-                Final = str('$DefaultFullChatFormat()'),
+                Prefix = str(DEFAULT),
+                Final = str(DEFAULT),
             },
 
             Overhead = container {
-                Prefix = str('$DefaultOverheadPrefix()'),
-                Final = str('$DefaultFullOverheadFormat()'),
+                Prefix = str(DEFAULT),
+                Final = str(DEFAULT),
             },
 
             PerceptionRange = container {
-                Chat = str('$DefaultPerceptionRangeChatFormat()'),
-                Overhead = str('$DefaultPerceptionRangeOverheadFormat()'),
+                Chat = str(DEFAULT),
+                Overhead = str(DEFAULT),
             },
 
             Component = container {
-                Name = str('$DefaultNameFormat()'),
-                Tag = str('$DefaultTagFormat()'),
-                Timestamp = str('$DefaultTimestampFormat()'),
-                Icon = str('$DefaultIconFormat()'),
-                Language = str('$DefaultLanguageFormat()'),
-                EmbeddedQuote = str('$DefaultEmbeddedQuoteFormat()'),
-                EmbeddedAction = str('$DefaultEmbeddedActionFormat()'),
+                Name = str(DEFAULT),
+                Tag = str(DEFAULT),
+                Timestamp = str(DEFAULT),
+                Icon = str(DEFAULT),
+                Language = str(DEFAULT),
+                EmbeddedQuote = str(DEFAULT),
+                EmbeddedAction = str(DEFAULT),
             },
 
             Filter = container {
-                ChatInput = str('$DefaultChatInputFilter()'),
-                Name = str('$DefaultNameFilter()'),
-                Status = str('$DefaultStatusFilter()'),
+                ChatInput = str(DEFAULT),
+                Name = str(DEFAULT),
+                Status = str(DEFAULT),
             },
 
             MenuName = container {
-                Default = str('$DefaultMenuNameFormat()'),
+                Default = str(DEFAULT),
                 Trade = str(),
                 Medical = str(),
                 SearchPlayer = str(),
@@ -249,9 +250,9 @@ return Schema:new {
             InterpretationRolls = int(2, 0, 10),
             InterpretationChance = int(25, 0, 100),
 
-            UnknownLanguageOverhead = str('$DefaultUnknownLanguageOverheadFormat()'),
-            UnknownLanguageChat = str('$DefaultUnknownLanguageFormat()'),
-            UnknownLanguageRadio = str('$DefaultUnknownLanguageFormat()'),
+            UnknownLanguageOverhead = str(DEFAULT),
+            UnknownLanguageChat = str(DEFAULT),
+            UnknownLanguageRadio = str(DEFAULT),
 
             SelfAddAllowlist = array { items = str() },
             SelfAddBlocklist = array { items = str() },
@@ -263,14 +264,14 @@ return Schema:new {
 
         NarrativeStyle = container {
             Enable = bool(false),
-            OverheadContentFormat = str('$DefaultNarrativeOverheadFormat()'),
-            ChatContentFormat = str('$DefaultNarrativeChatFormat()'),
-            DialogueTagFormat = str('$DefaultNarrativeTag()'),
-            InputFilter = str('$DefaultNarrativeInputFilter()'),
+            OverheadContentFormat = str(DEFAULT),
+            ChatContentFormat = str(DEFAULT),
+            DialogueTagFormat = str(DEFAULT),
+            InputFilter = str(DEFAULT),
         },
 
         Radio = container {
-            ChatFormat = str('$DefaultChatFormat()'),
+            ChatFormat = str(DEFAULT),
             Tags = array { items = str() },
             DefaultColor = color {
                 default = { r = 178, g = 178, b = 178 },
@@ -278,7 +279,7 @@ return Schema:new {
         },
 
         ServerMessages = container {
-            ChatFormat = str('$DefaultChatFormat()'),
+            ChatFormat = str(DEFAULT),
             Tags = array {
                 items = str(),
                 default = { 'NoTimestamp', 'NoTagColon' },
@@ -355,8 +356,8 @@ return Schema:new {
 
                         Tags = array { items = str() },
 
-                        ChatFormat = str('$DefaultChatFormat()'),
-                        OverheadFormat = str('$DefaultOverheadFormat()'),
+                        ChatFormat = str(DEFAULT),
+                        OverheadFormat = str(DEFAULT),
                         Aliases = array { items = str() },
 
                         DefaultColor = color(),
@@ -378,7 +379,7 @@ return Schema:new {
 
         TypingIndicator = container {
             Enable = bool(true),
-            Format = str('$DefaultTypingFormat()'),
+            Format = str(DEFAULT),
         },
 
         ZombieAttraction = container {

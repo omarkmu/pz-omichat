@@ -67,7 +67,7 @@ function ClientHandler.reportDrawCard(args)
 
     -- display English text overhead, encode card values for per-client translation
     local cardName = englishCards[card] .. ' of ' .. englishSuits[suit]
-    local content = utils.interpolate(config.Commands.Card.Format, {
+    local content = utils.interpolateNamed('FormatCard', config.Commands.Card.Format, {
         suit = suit,
         number = card,
         card = cardName,
@@ -93,7 +93,7 @@ function ClientHandler.reportFlipCoin(args)
     end
 
     local heads = args.heads
-    local content = utils.interpolate(config.Commands.Flip.Format, {
+    local content = utils.interpolateNamed('FormatFlip', config.Commands.Flip.Format, {
         heads = args.heads and '1' or nil,
     })
 
@@ -117,7 +117,7 @@ function ClientHandler.reportRoll(args)
     end
 
     local tokens = { roll = tostring(args.roll), sides = tostring(args.sides) }
-    local content = utils.interpolate(config.Commands.Roll.Format, tokens)
+    local content = utils.interpolateNamed('FormatRoll', config.Commands.Roll.Format, tokens)
 
     local result = utils.encodeInvisibleInt(args.roll) .. utils.encodeInvisibleInt(args.sides)
     local encoded = COMMAND_ARGS_START .. result

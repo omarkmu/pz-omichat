@@ -202,7 +202,7 @@ function MessageInfo:applyFormatting()
             local prefHourPadded = format('%02d', prefer24 and hour or hour12)
 
             local ampm = hour < 12 and 'am' or 'pm'
-            self.timestamp = utils.interpolate(config.Format.Component.Timestamp, {
+            self.timestamp = utils.interpolateNamed('Timestamp', config.Format.Component.Timestamp, {
                 chatType = chatType,
                 stream = self.tokens.stream,
                 P = prefHour,
@@ -224,7 +224,7 @@ function MessageInfo:applyFormatting()
         end
     end
 
-    self.language = utils.interpolate(config.Format.Component.Language, {
+    self.language = utils.interpolateNamed('Language', config.Format.Component.Language, {
         chatType = chatType,
         stream = self.tokens.stream,
         languageRaw = self.tokens.languageRaw,
@@ -235,7 +235,7 @@ function MessageInfo:applyFormatting()
     })
 
     if options.showTitle then
-        self.tag = utils.interpolate(config.Format.Component.Tag, {
+        self.tag = utils.interpolateNamed('Tag', config.Format.Component.Tag, {
             chatType = chatType,
             stream = self.tokens.stream,
             tag = getText(self:getTitleID()),
@@ -244,7 +244,7 @@ function MessageInfo:applyFormatting()
         }, seed)
     end
 
-    local icon = utils.interpolate(config.Format.Component.Icon, {
+    local icon = utils.interpolateNamed('Icon', config.Format.Component.Icon, {
         chatType = chatType,
         stream = self.tokens.stream,
         buffyRoll = self.tokens.buffyRoll,
@@ -359,7 +359,7 @@ function MessageInfo:buildMessageText()
     self:syncTags()
 
     local seed = self.datetime
-    local input = utils.interpolate(inputFormat, self.tokens, seed)
+    local input = utils.interpolateNamed(self.default or 'Chat', inputFormat, self.tokens, seed)
     if input == '' then
         self:hide()
         return
@@ -383,11 +383,11 @@ function MessageInfo:buildMessageText()
         input = input,
     }
 
-    tokens.prefix = utils.trim(utils.interpolate(config.Format.Chat.Prefix, tokens, seed))
+    tokens.prefix = utils.trim(utils.interpolateNamed('ChatPrefix', config.Format.Chat.Prefix, tokens, seed))
 
     local color = utils.color.toRichText(self.options.color)
     local size = ' <SIZE:' .. (self.options.font or 'medium') .. '> '
-    local content = utils.interpolate(config.Format.Chat.Final, tokens, seed)
+    local content = utils.interpolateNamed('ChatFinal', config.Format.Chat.Final, tokens, seed)
 
     return color .. size .. content
 end
@@ -785,6 +785,7 @@ function MessageInfo:setStream(stream, options)
     end
 
     if not self.format or options.forceFormat then
+        self.default = nil
         self.format = stream:getChatFormat()
     end
 
@@ -884,11 +885,17 @@ end
 ---@protected
 function MessageInfo:_applyPerceivedText()
     self.format = config.Format.PerceptionRange.Chat
+    self.default = 'PerceptionRangeChat'
     self.tags.IsPerceptionRange = true
 
     self:syncTags() -- sync tags for overhead format
 
-    local overhead = utils.interpolate(config.Format.PerceptionRange.Overhead, self:getOverheadTokens())
+    local overhead = utils.interpolateNamed(
+        'PerceptionRangeOverhead',
+        config.Format.PerceptionRange.Overhead,
+        self:getOverheadTokens()
+    )
+
     if overhead ~= '' then
         self:setOverheadText(overhead, true)
     else
@@ -929,9 +936,11 @@ function MessageInfo:_applyUnknownLanguageText()
     local chatType = self.chatType
     if chatType == 'radio' then
         self.format = config.Language.UnknownLanguageRadio
+        self.default = 'UnknownLanguageChat'
         return
     end
 
+    self.default = 'UnknownLanguageChat'
     self.format = config.Language.UnknownLanguageChat
     self.tags.IsUnknownLanguage = true
 
@@ -942,7 +951,12 @@ function MessageInfo:_applyUnknownLanguageText()
     if self.message:isOverHeadSpeech() then
         self:syncTags() -- sync tags for overhead format
 
-        local overhead = utils.interpolate(config.Language.UnknownLanguageOverhead, self:getOverheadTokens())
+        local overhead = utils.interpolateNamed(
+            'UnknownLanguageOverhead',
+            config.Language.UnknownLanguageOverhead,
+            self:getOverheadTokens()
+        )
+
         if overhead ~= '' then
             self:setOverheadText(overhead, true)
         else
@@ -1054,8 +1068,11 @@ function MessageInfo:_showReplacementOverheadText()
         if overheadFormat then
             local tokens = self:getOverheadTokens()
             tokens.input = overheadText
-            tokens.prefix = utils.trimleft(utils.interpolate(config.Format.Overhead.Prefix, tokens))
-            overheadText = utils.interpolate(overheadFormat, tokens)
+            tokens.prefix = utils.trimleft(
+                utils.interpolateNamed('OverheadPrefix', config.Format.Overhead.Prefix, tokens)
+            )
+
+            overheadText = utils.interpolateNamed('OverheadFinal', overheadFormat, tokens)
         end
     end
 

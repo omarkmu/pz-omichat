@@ -164,7 +164,7 @@ function Helpers.checkSignedOverRadio(interpolator)
     return errorID
 end
 
----Colors actions based on the streams tagged with `ActionColorTarget`.
+---Colors actions based on the stream tagged with `ActionColorTarget`.
 ---@param segments omichat.MessageSegment[]
 ---@param options omi.MultiMap?
 ---@param tags omi.SimpleSet?
@@ -194,7 +194,7 @@ function Helpers.colorActions(segments, options, tags)
     end
 end
 
----Colors quotes based on the streams tagged with `QuoteColorTarget`.
+---Colors quotes based on the stream tagged with `QuoteColorTarget`.
 ---@param segments omichat.MessageSegment[]
 ---@param options omi.MultiMap?
 ---@param tags omi.SimpleSet?
@@ -225,7 +225,7 @@ function Helpers.combineSegments(segments)
     return concat(result)
 end
 
----Wraps text in characters, if it's not already wrapped.
+---Gets the text wrapped in a prefix and suffix.
 ---@param text string
 ---@param prefix string
 ---@param suffix string?
@@ -367,7 +367,7 @@ function Helpers.formatEmbeddedActions(segments, interpolator)
         if action.type == 'action' then
             tokens.input = action.text
 
-            local result = utils.interpolate(config.Format.Component.EmbeddedAction, tokens)
+            local result = utils.interpolateNamed('EmbeddedAction', config.Format.Component.EmbeddedAction, tokens)
             action.text = result
         end
     end
@@ -393,7 +393,7 @@ function Helpers.formatEmbeddedQuotes(segments, interpolator)
             local text = Helpers.ensureUnwrapped(quote.text, '"')
             tokens.input = text
 
-            local result = utils.interpolate(config.Format.Component.EmbeddedQuote, tokens)
+            local result = utils.interpolateNamed('EmbeddedQuote', config.Format.Component.EmbeddedQuote, tokens)
             if result ~= '' then
                 result = Helpers.ensureWrapped(result, '"')
             end
@@ -429,7 +429,7 @@ function Helpers.getBaseUnknownLanguageString(tags, language, author, dialogueTa
     if dialogueTag == '' then
         -- no narrative style tag → pick the most suitable one
         if tags.IsSneakCallout then
-            dialogueTag = 'whisper shouts'
+            dialogueTag = 'whisper_shouts'
         elseif tags.Whisper then
             dialogueTag = 'whispers'
         elseif tags.Loud then
@@ -451,10 +451,10 @@ function Helpers.getBaseUnknownLanguageString(tags, language, author, dialogueTa
 
         if dialogueTag == 'exclaims' then
             -- fallback to 'energetically signs'
-            return getText('UI_OmiChat_UnknownLanguage_shouts', author, languageName)
+            return getText('UI_OmiChat_UnknownLanguageSigned_shouts', author, languageName)
         elseif dialogueTag == 'whisper_shouts' or dialogueTag == 'hisses' then
             -- fallback to 'subtly signs'
-            return getText('UI_OmiChat_UnknownLanguage_whispers', author, languageName)
+            return getText('UI_OmiChat_UnknownLanguageSigned_whispers', author, languageName)
         elseif dialogueTag == 'says' or dialogueTag == 'states' then
             -- fallback to 'signs'
             return getText('UI_OmiChat_UnknownLanguage_signs', author, languageName)

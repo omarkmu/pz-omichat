@@ -490,11 +490,13 @@ function Configuration:updateFormatters()
         end
 
         local targetFormat
+        local defaultName
         if i == self.ID_CALLOUT then
             targetFormat = callout.Format
         elseif i == self.ID_SNEAK_CALLOUT then
             targetFormat = callout.SneakFormat
         elseif i == self.ID_OVERHEAD_FINAL then
+            defaultName = 'OverheadFinal'
             targetFormat = format.Overhead.Final
         elseif i == self.ID_ECHO then
             targetFormat = echo.OverheadFormat
@@ -502,6 +504,7 @@ function Configuration:updateFormatters()
 
         if targetFormat then
             local info = self._formatterInfo[i]
+            info.formatter:setDefaultName(defaultName)
             info.formatter:setFormatString(targetFormat)
         end
     end

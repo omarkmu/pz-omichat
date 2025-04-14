@@ -308,7 +308,7 @@ function Player.setNickname(nickname)
         errorID = '',
     }
 
-    nickname = utils.interpolate(config.Format.Filter.Name, tokens)
+    nickname = utils.interpolateNamed('FilterName', config.Format.Filter.Name, tokens)
     local err = utils.extractError(tokens)
     if nickname == '' or err then
         return false, err or getText('UI_OmiChat_Error_InvalidName', utils.escapeRichText(original))
@@ -383,7 +383,7 @@ function Player.setStatus(status)
         errorID = '',
     }
 
-    status = utils.interpolate(config.Format.Filter.Status, tokens)
+    status = utils.interpolateNamed('FilterStatus', config.Format.Filter.Status, tokens)
     local err = utils.extractError(tokens)
     if status == '' or err then
         return false, err or getText('UI_OmiChat_Error_InvalidStatus', utils.escapeRichText(original))
@@ -423,7 +423,7 @@ function Player.updateCharacterName(name, updateSurname)
         errorID = '',
     }
 
-    name = utils.trim(utils.interpolate(config.Format.Filter.Name, tokens))
+    name = utils.trim(utils.interpolateNamed('FilterName', config.Format.Filter.Name, tokens))
 
     local err = utils.extractError(tokens)
     if name == '' or err then
