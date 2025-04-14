@@ -151,6 +151,7 @@ end
 ---@param req omichat.request.UpdateConfiguration
 function ClientHandler.updateConfiguration(req)
     config:load(req.value)
+    config:saveModData()
     API.chat.updateState(true)
 end
 

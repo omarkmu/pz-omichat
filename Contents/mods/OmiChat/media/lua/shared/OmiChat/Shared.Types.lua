@@ -2,6 +2,7 @@
 
 ---@class omichat.api.shared
 ---@field protected _key 'omichat'
+---@field protected _configKey 'omichat.settings'
 
 ---@class omichat.CallbackInfo
 ---@field target unknown

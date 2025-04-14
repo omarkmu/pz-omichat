@@ -512,7 +512,7 @@ function ServerHandler.updateConfiguration(player, args)
     end
 
     config:load(args.value)
-    config:saveFile()
+    config:saveModData()
     API.request.sendConfiguration()
 end
 

@@ -8,23 +8,13 @@ local base = utils.configuration.ConfigurationHelper
 ---@class omichat.ConfigurationHelper : omi.ConfigurationHelper, omichat.Configuration
 local Configuration = utils.configuration {
     schema = require 'OmiChat/Component/Configuration/Schema',
-    filename = 'omichat_server.json',
+    modDataKey = 'omichat.settings',
     logger = utils.log,
 
     ---@param self omichat.ConfigurationHelper
     init = function(self)
         self:refreshEnabledMods()
-
-        -- server should load from file
-        if not isClient() and self:loadFile() then
-            self:saveFile()
-            self:updateFormatters()
-            return
-        end
-
-        -- client should load defaults; will ultimately be received from server
         self:loadDefaults()
-        self:updateFormatters()
     end,
 
     ---@param self omichat.ConfigurationHelper
@@ -511,6 +501,24 @@ function Configuration:updateFormatters()
 end
 
 
+---Event handler for initializing global mod data.
+---@protected
+function Configuration._onInitGlobalModData()
+    local self = Configuration
+
+    -- server loads from mod data
+    if not isClient() and self:loadModData() then
+        self:saveModData(true)
+        self:updateFormatters()
+        return
+    end
+
+    -- client loads cached settings; will ultimately be received from server
+    self:loadModData()
+    self:saveModData()
+    self:updateFormatters()
+end
+
 ---Caches the configured languages and information about them.
 ---@protected
 function Configuration:_cacheLanguages()
@@ -554,6 +562,8 @@ function Configuration:_isCompatEnabled(value, modId)
     return self._enabledMods[modId] == true
 end
 
+
+Events.OnInitGlobalModData.Add(Configuration._onInitGlobalModData)
 
 Configuration:init()
 return Configuration

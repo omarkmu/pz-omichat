@@ -8,6 +8,7 @@ local MetaFormatter = require 'OmiChat/Component/MetaFormatter'
 ---@class omichat.api.shared
 local API = {}
 API._key = 'omichat'
+API._configKey = 'omichat.settings'
 
 API.Configuration = config
 API.MetaFormatter = MetaFormatter

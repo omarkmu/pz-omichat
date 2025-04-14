@@ -67,18 +67,24 @@ function API._onPlayerDeath(player)
     end
 end
 
----Handler for receiving global mod data.
+---Called when receiving global mod data from the server.
 ---@param key string
 ---@param newData omichat.ModData
 ---@private
 function API._onReceiveGlobalModData(key, newData)
-    if key ~= API._key or type(newData) ~= 'table' then
+    if type(newData) ~= 'table' then
         return
     end
 
-    local modData = API.data.get()
-    for k in pairs(newData) do
-        modData[k] = newData[k]
+    if key == API._key then
+        local modData = API.data.get()
+        for k in pairs(newData) do
+            modData[k] = newData[k]
+        end
+    elseif key == API._configKey then
+        config:load(newData)
+        config:saveModData()
+        return
     end
 end
 
@@ -89,13 +95,13 @@ function API._onSaveConfiguration(args)
     config:load(args.values)
     API.request.updateConfiguration()
 
-    -- save to file if testing in singleplayer
+    -- save to mod data if testing in singleplayer
     if getDebug() and not isClient() then
-        config:saveFile()
+        config:saveModData()
     end
 end
 
----Handler for processing commands from the server.
+---Called when processing commands from the server.
 ---@param module string
 ---@param command string
 ---@param args table
