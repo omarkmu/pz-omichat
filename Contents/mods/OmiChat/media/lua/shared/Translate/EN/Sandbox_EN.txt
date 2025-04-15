@@ -202,10 +202,14 @@ Sandbox_EN = {
         " <LINE> Applies the default values of the preset.",
     Sandbox_OmiChat_General_AlwaysShowChat_tooltip = "If enabled, players will be unable to close the chat window.",
     Sandbox_OmiChat_General_CaseInsensitiveChatStreams_tooltip = "If enabled, chat streams will be case-insensitive." ..
-        " <LINE> This means that <SPACE> <PUSHRGB:0,1,0> /say <POPRGB> <SPACE> and <SPACE> <PUSHRGB:0,1,0> /SAY <POPRGB> <SPACE> will be treated equivalently.",
+        " <BR> This means that <SPACE> <PUSHRGB:0,1,0> /say <POPRGB> <SPACE> and <SPACE> <PUSHRGB:0,1,0> /SAY <POPRGB> <SPACE> will be treated equivalently.",
     Sandbox_OmiChat_General_MinimumCommandAccessLevel_tooltip = "The minimum access level required to execute admin commands added by the mod.",
     Sandbox_OmiChat_General_AdminIcon_tooltip = "Defines the value of the <SPACE> <PUSHRGB:0,0.5,1> $adminIcon <POPRGB> <SPACE> token in the icon format. This expects a valid texture name.",
     Sandbox_OmiChat_General_ClearOnDeath_tooltip = "Determines the information that is cleared when a player's character dies.",
+    Sandbox_OmiChat_General_ClearOnDeath_Icon_tooltip = "If enabled, chat icons will be cleared on death.",
+    Sandbox_OmiChat_General_ClearOnDeath_Languages_tooltip = "If enabled, roleplay languages will be cleared on death.",
+    Sandbox_OmiChat_General_ClearOnDeath_Nickname_tooltip = "If enabled, chat nicknames will be cleared on death.",
+    Sandbox_OmiChat_General_ClearOnDeath_Status_tooltip = "If enabled, chat statuses will be cleared on death.",
     Sandbox_OmiChat_General_InfoText_tooltip = "Information that can be accessed by clicking an info button on the chat window. If this is blank, the info button will not be available." ..
         " <BR> This can use rich text formatting to include different colors and fonts.",
 
@@ -230,16 +234,16 @@ Sandbox_EN = {
     Sandbox_OmiChat_Commands_Status_Enable_tooltip = "If enabled, players will be able to set a status message visible to other players with the <SPACE> <PUSHRGB:0,1,0> /status <POPRGB> <SPACE> command.",
     Sandbox_OmiChat_Commands_Status_Range_tooltip = "The range a player will have to be within to see another player's status.",
     Sandbox_OmiChat_Commands_Card_tooltip = "Options that control the behavior and display of the <SPACE> <PUSHRGB:0,1,0> /card <POPRGB> <SPACE> command.",
-    Sandbox_OmiChat_Commands_Card_Items_tooltip = "Semicolon-separated list of items players can use for the <SPACE> <PUSHRGB:0,1,0> /card <POPRGB> <SPACE> command." ..
+    Sandbox_OmiChat_Commands_Card_Items_tooltip = "List of items that players can use for the <SPACE> <PUSHRGB:0,1,0> /card <POPRGB> <SPACE> command." ..
         " <BR> If a player doesn't have any of the items in the list, the command will fail. If this is blank, the command won't require an item.",
     Sandbox_OmiChat_Commands_Roll_tooltip = "Options that control the behavior and display of the <SPACE> <PUSHRGB:0,1,0> /roll <POPRGB> <SPACE> command.",
-    Sandbox_OmiChat_Commands_Roll_Items_tooltip = "Semicolon-separated list of items players can use for the <SPACE> <PUSHRGB:0,1,0> /roll <POPRGB> <SPACE> command." ..
+    Sandbox_OmiChat_Commands_Roll_Items_tooltip = "List of items that players can use for the <SPACE> <PUSHRGB:0,1,0> /roll <POPRGB> <SPACE> command." ..
         " <BR> If a player doesn't have any of the items in the list, the command will fail. If this is blank, the command won't require an item.",
     Sandbox_OmiChat_Commands_Flip_tooltip = "Options that control the behavior and display of the <SPACE> <PUSHRGB:0,1,0> /flip <POPRGB> <SPACE> command.",
-    Sandbox_OmiChat_Commands_Flip_Items_tooltip = "Semicolon-separated list of items players can use for the <SPACE> <PUSHRGB:0,1,0> /flip <POPRGB> <SPACE> command." ..
+    Sandbox_OmiChat_Commands_Flip_Items_tooltip = "List of items that players can use for the <SPACE> <PUSHRGB:0,1,0> /flip <POPRGB> <SPACE> command." ..
         " <BR> If a player doesn't have any of the items in the list, the command will fail. If this is blank, the command won't require an item.",
     Sandbox_OmiChat_Commands_Command_Global_tooltip = "Controls whether the command should be global, similar to vanilla commands. This disables formatting options.",
-    Sandbox_OmiChat_Commands_Command_Format_tooltip = "Defines the value of the <SPACE> <PUSHRGB:0,0.5,1> $1 <POPRGB> <SPACE> token in the overhead format for the command.",
+    Sandbox_OmiChat_Commands_Command_Format_tooltip = "Defines the value of the <SPACE> <PUSHRGB:0,0.5,1> $input <POPRGB> <SPACE> token in the overhead format for the command.",
     Sandbox_OmiChat_Commands_Command_OverheadFormat_tooltip = "Defines the format of overhead speech bubbles for the command.",
     Sandbox_OmiChat_Commands_Command_ChatFormat_tooltip = "Defines how messages associated with the command appear in chat.",
     Sandbox_OmiChat_Commands_Command_Tags_tooltip = "Tags that modify the appearance and behavior of messages associated with the command.",
@@ -304,8 +308,8 @@ Sandbox_EN = {
     Sandbox_OmiChat_Format_MenuName_Default_tooltip = "The default format used when any of the options below are empty. If this and the format for a given menu is blank, that menu will not be affected.",
     Sandbox_OmiChat_Format_MenuName_Trade_tooltip = "The format used for names in the item trading UI.",
     Sandbox_OmiChat_Format_MenuName_Medical_tooltip = "The format used for names in the medical check UI.",
-    Sandbox_OmiChat_Format_MenuName_SearchPlayer_tooltip = "The format used for names in menus from <SPACE> <PUSHRGB:0,0.5,1> Search Players For Weapons <POPRGB> ."
-        " <LINE> This has no effect unless the relevant compatibility option is enabled.",
+    Sandbox_OmiChat_Format_MenuName_SearchPlayer_tooltip = "The format used for names in menus from <SPACE> <PUSHRGB:0,0.5,1> Search Players For Weapons <POPRGB> ." ..
+        " <BR> This has no effect unless the relevant compatibility option is enabled.",
     Sandbox_OmiChat_Format_MenuName_Typing_tooltip = "The format used for names in the typing indicator message.",
     Sandbox_OmiChat_Format_MenuName_MiniScoreboard_tooltip = "The format used for names in the admin mini-scoreboard.",
 
@@ -314,14 +318,14 @@ Sandbox_EN = {
     Sandbox_OmiChat_Language_List_Name_tooltip = "The name of the language.",
     Sandbox_OmiChat_Language_List_Signed_tooltip = "If this is enabled, the language will be treated as a signed language.",
     Sandbox_OmiChat_Language_DefaultSlots_tooltip = "The number of language slots players have by default." ..
-        " <LINE> Players can use these slots to choose additional languages beyond the primary one that their character can speak.",
+        " <BR> Players can use these slots to choose additional languages beyond the primary one that their character can speak.",
     Sandbox_OmiChat_Language_InterpretationRolls_tooltip = "The number of rolls to attempt to reveal a word in a message sent with a language the player doesn't understand.",
     Sandbox_OmiChat_Language_InterpretationChance_tooltip = "The percent chance for each interpretation roll to succeed.",
     Sandbox_OmiChat_Language_UnknownLanguageOverhead_tooltip = "Controls how messages appear overhead when sent using a roleplay language the player's character doesn't speak.",
     Sandbox_OmiChat_Language_UnknownLanguageChat_tooltip = "Controls how messages appear in chat when sent using a roleplay language the player's character doesn't speak.",
     Sandbox_OmiChat_Language_UnknownLanguageRadio_tooltip = "Controls how messages sent over the radio appear in chat when sent using a roleplay language the player's character doesn't speak.",
-    Sandbox_OmiChat_Language_SelfAddAllowlist_tooltip = "Semicolon-separated list of languages that should display in the menu for adding languages.",
-    Sandbox_OmiChat_Language_SelfAddBlocklist_tooltip = "Semicolon-separated list of languages that should not display in the menu for adding languages.",
+    Sandbox_OmiChat_Language_SelfAddAllowlist_tooltip = "The list of languages that should display in the menu for adding languages.",
+    Sandbox_OmiChat_Language_SelfAddBlocklist_tooltip = "The list of languages that should not display in the menu for adding languages.",
 
     Sandbox_OmiChat_Macros_AllowEmotes_tooltip = "Controls whether emote shortcuts can be used in chat to trigger animations.",
 
@@ -342,6 +346,8 @@ Sandbox_EN = {
 
     Sandbox_OmiChat_Streams_UseDefaultList_tooltip = "If this is enabled, the streams configured below will be ignored in favor of the default streams.",
     Sandbox_OmiChat_Streams_GlobalTags_tooltip = "Additional tags to include in every stream.",
+    Sandbox_OmiChat_Streams_List_tooltip_add_delete = " <PUSHRGB:1,0,0> Adding or removing chat streams may clear the chat history. <POPRGB> <LINE> ",
+    Sandbox_OmiChat_Streams_List_tooltip_up_down = " <PUSHRGB:1,0,0> Reordering chat streams will clear the chat history. <POPRGB> <LINE> ",
     Sandbox_OmiChat_Streams_List_Enable_tooltip = "Controls whether this stream is enabled.",
     Sandbox_OmiChat_Streams_List_Stream_tooltip = "The type of the stream." ..
         " <BR> Using a value other than <SPACE> <PUSHRGB:0.7,0.7,0.7> custom <POPRGB> <SPACE> for this option disables some other options. These will be inherited from the stream type.",
@@ -354,7 +360,7 @@ Sandbox_EN = {
     Sandbox_OmiChat_Streams_List_CommandType_tooltip = "The category of this stream. <BR> This is used to categorize streams for retaining options.",
     Sandbox_OmiChat_Streams_List_Tags_tooltip = "Tags that modify the appearance and behavior of the stream.",
     Sandbox_OmiChat_Streams_List_DefaultColor_tooltip = "The default color used for messages sent over this stream.",
-    Sandbox_OmiChat_Streams_List_Aliases_tooltip = "Semicolon-separated list of additional aliases that can be used to send messages on the stream.",
+    Sandbox_OmiChat_Streams_List_Aliases_tooltip = "List of additional aliases that can be used to send messages on the stream.",
     Sandbox_OmiChat_Streams_List_OverheadFormat_tooltip = "Format used for overhead speech bubbles.",
     Sandbox_OmiChat_Streams_List_ChatFormat_tooltip = "Controls how messages sent on this stream appear in chat.",
     Sandbox_OmiChat_Streams_List_Range_tooltip = "The range of this stream.",
@@ -372,7 +378,7 @@ Sandbox_EN = {
     Sandbox_OmiChat_TypingIndicator_Format_tooltip = "Defines the format of the typing message when the typing indicator is enabled.",
 
     Sandbox_OmiChat_ZombieAttraction_ChatRangeMultiplier_tooltip = "A multiplier that will be applied to chat ranges to determine zombie attraction range." ..
-        " <LINE> If this is zero, non-callout chat messages will not attract zombies.",
+        " <BR> If this is zero, non-callout chat messages will not attract zombies.",
     Sandbox_OmiChat_ZombieAttraction_CalloutRange_tooltip = "The maximum distance for callouts to attract zombies.",
     Sandbox_OmiChat_ZombieAttraction_SneakCalloutRange_tooltip = "The maximum distance for sneak callouts to attract zombies.",
 }

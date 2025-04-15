@@ -19,6 +19,8 @@ local DEFAULT = '$Default()'
 
 
 return Schema:new {
+    form = FormDefinition,
+
     properties = {
         VERSION = int(1),
 
@@ -95,17 +97,20 @@ return Schema:new {
 
             Card = container {
                 Global = bool(false),
+                Format = str(DEFAULT),
+                OverheadFormat = str(DEFAULT),
+                ChatFormat = str(DEFAULT),
                 Items = array {
                     items = str(),
                     default = { 'CardDeck' },
                 },
-                Format = str(DEFAULT),
-                OverheadFormat = str(DEFAULT),
-                ChatFormat = str(DEFAULT),
                 Tags = array { items = str() },
             },
             Roll = container {
                 Global = bool(false),
+                Format = str(DEFAULT),
+                OverheadFormat = str(DEFAULT),
+                ChatFormat = str(DEFAULT),
                 Items = array {
                     items = str(),
                     default = {
@@ -119,17 +124,14 @@ return Schema:new {
                         'Dice_20',
                     },
                 },
-                Format = str(DEFAULT),
-                OverheadFormat = str(DEFAULT),
-                ChatFormat = str(DEFAULT),
                 Tags = array { items = str() },
             },
             Flip = container {
                 Global = bool(false),
-                Items = array { items = str() },
                 Format = str(DEFAULT),
                 OverheadFormat = str(DEFAULT),
                 ChatFormat = str(DEFAULT),
+                Items = array { items = str() },
                 Tags = array { items = str() },
             },
         },
@@ -161,10 +163,6 @@ return Schema:new {
 
         Discord = container {
             ChatFormat = str(DEFAULT),
-            Tags = array {
-                items = str(),
-                default = { 'UseAuthorUsername' },
-            },
             DefaultColor = color {
                 default = { r = 144, g = 137, b = 218 },
             },
@@ -175,6 +173,10 @@ return Schema:new {
                     'No',
                     'Respect_Server_Setting',
                 },
+            },
+            Tags = array {
+                items = str(),
+                default = { 'UseAuthorUsername' },
             },
         },
 
@@ -233,11 +235,14 @@ return Schema:new {
         Language = container {
             UseDefaultList = bool(true),
             List = array {
+                maxItems = 1000, -- Configuration.MAX_LANGUAGES
+
                 ---@param schema omichat.ConfigurationSchema
                 ---@return table
                 getDefault = function(_, schema)
                     return schema:getDefaultLanguages()
                 end,
+
                 items = object {
                     skipMissing = true,
                     properties = {
@@ -273,32 +278,34 @@ return Schema:new {
 
         Radio = container {
             ChatFormat = str(DEFAULT),
-            Tags = array { items = str() },
             DefaultColor = color {
                 default = { r = 178, g = 178, b = 178 },
             },
+            Tags = array { items = str() },
         },
 
         ServerMessages = container {
             ChatFormat = str(DEFAULT),
+            DefaultColor = color {
+                default = { r = 0, g = 128, b = 255 },
+            },
             Tags = array {
                 items = str(),
                 default = { 'NoTimestamp', 'NoTagColon' },
             },
-            DefaultColor = color {
-                default = { r = 0, g = 128, b = 255 },
-            },
         },
 
         Streams = container {
-            GlobalTags = array { items = str() },
             UseDefaultList = bool(true),
             List = array {
+                maxItems = 32, -- Configuration.MAX_CHAT_STREAMS
+
                 ---@param schema omichat.ConfigurationSchema
                 ---@return table
                 getDefault = function(_, schema)
                     return schema:processStreams(schema:getDefaultStreams())
                 end,
+
                 items = object {
                     skipMissing = true,
                     properties = {
@@ -355,27 +362,29 @@ return Schema:new {
                             },
                         },
 
-                        Tags = array { items = str() },
-
-                        ChatFormat = str(DEFAULT),
-                        OverheadFormat = str(DEFAULT),
-                        Aliases = array { items = str() },
-
                         DefaultColor = color(),
                         Range = int(30, 1, 60), -- maximum is dependent on chat type
                         VerticalRange = int(2, 1, 32),
                         PerceptionRange = int(0, 0, 60),
+
+                        ChatFormat = str(DEFAULT),
+                        OverheadFormat = str(DEFAULT),
 
                         AllowBuffs = bool(false),
                         AllowEmotes = bool(false),
                         AllowLanguages = bool(false),
                         AllowTypingIndicator = bool(false),
                         AttractZombies = bool(false),
-
                         UseNarrativeStyle = bool(false),
+
+                        Tags = array { items = str() },
+                        Aliases = array { items = str() },
+
                     },
                 },
             },
+
+            GlobalTags = array { items = str() },
         },
 
         TypingIndicator = container {
@@ -389,8 +398,6 @@ return Schema:new {
             SneakCalloutRange = int(6, 1, 60),
         },
     },
-
-    form = FormDefinition,
 
     ---@param self omichat.ConfigurationSchema
     ---@param values omichat.Configuration

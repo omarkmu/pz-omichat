@@ -6,6 +6,7 @@ local utils = require 'OmiChat/utils'
 local PAD_N = 10
 local PAD_TOP = { paddingTop = PAD_N }
 local PAD_BOTTOM = { paddingBottom = PAD_N }
+local NO_REORDER = { noReorderButtons = true }
 
 ---Helper to create a rules table containing only rules for children.
 ---Wraps the given table in an outer table with a `children` key.
@@ -47,7 +48,6 @@ return {
             },
 
             CaseInsensitiveChatStreams = PAD_BOTTOM,
-            ClearOnDeath = PAD_BOTTOM,
             AdminIcon = {
                 noFullWidth = true,
                 paddingBottom = PAD_N,
@@ -88,7 +88,6 @@ return {
             Card = {
                 childPrefix = 'Sandbox_OmiChat_Commands_Command',
                 children = {
-                    Items = { prefix = 'Sandbox_OmiChat_Commands_Card_Items' },
                     Global = {
                         inverseToggleFields = {
                             { 'Commands', 'Card', 'Format' },
@@ -97,12 +96,16 @@ return {
                             { 'Commands', 'Card', 'Tags' },
                         },
                     },
+                    Items = {
+                        noReorderButtons = true,
+                        prefix = 'Sandbox_OmiChat_Commands_Card_Items',
+                    },
+                    Tags = NO_REORDER,
                 },
             },
             Roll = {
                 childPrefix = 'Sandbox_OmiChat_Commands_Command',
                 children = {
-                    Items = { prefix = 'Sandbox_OmiChat_Commands_Roll_Items' },
                     Global = {
                         inverseToggleFields = {
                             { 'Commands', 'Roll', 'Format' },
@@ -111,12 +114,16 @@ return {
                             { 'Commands', 'Roll', 'Tags' },
                         },
                     },
+                    Items = {
+                        noReorderButtons = true,
+                        prefix = 'Sandbox_OmiChat_Commands_Roll_Items',
+                    },
+                    Tags = NO_REORDER,
                 },
             },
             Flip = {
                 childPrefix = 'Sandbox_OmiChat_Commands_Command',
                 children = {
-                    Items = { prefix = 'Sandbox_OmiChat_Commands_Flip_Items' },
                     Global = {
                         inverseToggleFields = {
                             { 'Commands', 'Flip', 'Format' },
@@ -125,6 +132,11 @@ return {
                             { 'Commands', 'Flip', 'Tags' },
                         },
                     },
+                    Items = {
+                        noReorderButtons = true,
+                        prefix = 'Sandbox_OmiChat_Commands_Flip_Items',
+                    },
+                    Tags = NO_REORDER,
                 },
             },
         },
@@ -138,6 +150,7 @@ return {
 
         Discord = rules {
             ShowColorOption = PAD_TOP,
+            Tags = NO_REORDER,
         },
 
         EchoMessages = rules {
@@ -148,6 +161,7 @@ return {
                     { 'EchoMessages', 'Tags' },
                 },
             },
+            Tags = NO_REORDER,
         },
 
         Format = rules {
@@ -194,6 +208,9 @@ return {
                 },
             },
 
+            SelfAddAllowlist = NO_REORDER,
+            SelfAddBlocklist = NO_REORDER,
+
             InterpretationChance = PAD_BOTTOM,
             UnknownLanguageRadio = PAD_BOTTOM,
         },
@@ -211,10 +228,12 @@ return {
             ChatContentFormat = PAD_BOTTOM,
         },
 
-        TypingIndicator = rules {
-            Enable = {
-                toggleFields = { { 'TypingIndicator', 'Format' } },
-            },
+        Radio = rules {
+            Tags = NO_REORDER,
+        },
+
+        ServerMessages = rules {
+            Tags = NO_REORDER,
         },
 
         Streams = rules {
@@ -224,12 +243,16 @@ return {
             List = {
                 noLabel = true,
                 useFullPage = true,
+                paddingBottom = 16,
 
                 children = {
                     Enable = PAD_BOTTOM,
                     ShortCommand = PAD_BOTTOM,
                     Aliases = PAD_BOTTOM,
                     PerceptionRange = PAD_BOTTOM,
+                    OverheadFormat = PAD_BOTTOM,
+                    UseNarrativeStyle = PAD_BOTTOM,
+                    Tags = NO_REORDER,
                 },
 
                 createItem = function()
@@ -334,6 +357,13 @@ return {
                         end
                     end
                 end,
+            },
+            GlobalTags = NO_REORDER,
+        },
+
+        TypingIndicator = rules {
+            Enable = {
+                toggleFields = { { 'TypingIndicator', 'Format' } },
             },
         },
     },

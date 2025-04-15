@@ -23,8 +23,8 @@ return Preset:new {
         },
         Discord = Preset.discord {
             Tags = {
-                'UseAuthorUsername',
                 'OOC',
+                'UseAuthorUsername',
             },
         },
         EchoMessages = Preset.echo {
