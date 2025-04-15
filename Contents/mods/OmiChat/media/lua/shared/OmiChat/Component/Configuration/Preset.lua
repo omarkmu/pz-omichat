@@ -119,6 +119,7 @@ function Preset.compatibility(enable)
 
     ---@type omichat.Configuration.Compatibility
     return {
+        ApplyOverrides = false,
         BuffyCharacterBios = value,
         BuffyRPGSystem = value,
         ChatBubble = value,

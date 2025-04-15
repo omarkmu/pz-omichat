@@ -295,6 +295,7 @@
 ---@field Tags string[]
 
 ---@class omichat.Configuration.Compatibility
+---@field ApplyOverrides boolean
 ---@field BuffyCharacterBios omi.schema.CompatibilityValue
 ---@field BuffyRPGSystem omi.schema.CompatibilityValue
 ---@field ChatBubble omi.schema.CompatibilityValue

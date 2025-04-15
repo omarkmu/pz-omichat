@@ -60,6 +60,7 @@ Sandbox_EN = {
 
     Sandbox_OmiChat_Compatibility = "Compatibility",
     Sandbox_OmiChat_Compatibility_title = "Compatibility Options",
+    Sandbox_OmiChat_Compatibility_ApplyOverrides = "Automatic Overrides",
     Sandbox_OmiChat_Compatibility_BuffyCharacterBios = "Buffy's Character Bios",
     Sandbox_OmiChat_Compatibility_BuffyRPGSystem = "Buffy's Tabletop RPG System",
     Sandbox_OmiChat_Compatibility_ChatBubble = "Chat Bubble",
@@ -243,6 +244,8 @@ Sandbox_EN = {
     Sandbox_OmiChat_Commands_Command_ChatFormat_tooltip = "Defines how messages associated with the command appear in chat.",
     Sandbox_OmiChat_Commands_Command_Tags_tooltip = "Tags that modify the appearance and behavior of messages associated with the command.",
 
+    Sandbox_OmiChat_Compatibility_ApplyOverrides_tooltip = "If enabled, chat functions called by other mods will be intercepted by this mod." ..
+        " <BR> For example, if another mod sends a message directly to <SPACE> <PUSHRGB:0,1,0> /say <POPRGB> <SPACE>, this will attempt to apply the configured formatting.",
     Sandbox_OmiChat_Compatibility_BuffyCharacterBios_tooltip = "Controls compatibility with the <SPACE> <PUSHRGB:0,0.5,1> Buffy's Character Bios <POPRGB> <SPACE> mod." ..
         " <BR> The compatibility patch fixes an incompatibility with forename-setting commands and uses server message formatting for bio update notifications."
     Sandbox_OmiChat_Compatibility_BuffyRPGSystem_tooltip = "Controls compatibility with the <SPACE> <PUSHRGB:0,0.5,1> Buffy's Tabletop RPG System <POPRGB> <SPACE> mod." ..
