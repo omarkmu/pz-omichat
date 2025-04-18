@@ -112,7 +112,7 @@ end
 
 ---Suggests text based on the provided input text.
 ---@param text string
----@return omichat.Suggestion[]
+---@return omi.ui.SuggestBox.Suggestion[]
 function Chat.getSuggestions(text)
     if not text or text == '' then
         return {}
@@ -315,19 +315,13 @@ end
 ---@return boolean success
 function Chat.tryInputSuggestion()
     local instance = ISChat.instance
-    local suggesterBox = API.ui.suggesterBox
+    local suggesterBox = API.ui.suggestBox
     local visible = suggesterBox and suggesterBox:isVisible()
     if not instance or not suggesterBox or not visible then
         return false
     end
 
-    local item = suggesterBox:getSelectedItem()
-    if item then
-        API.callback.onSuggesterSelect(instance, item)
-        return true
-    end
-
-    return false
+    return suggesterBox:insertSelected()
 end
 
 ---Updates chat state to match configuration.

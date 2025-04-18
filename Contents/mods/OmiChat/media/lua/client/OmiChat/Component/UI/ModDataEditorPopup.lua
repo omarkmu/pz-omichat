@@ -5,11 +5,7 @@ local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
 local utils = API.utils
 local config = API.Configuration
 local UI = utils.ui
-local TextEntry = UI.TextEntry
-local ColorEntry = UI.ColorEntry
-local SuggesterBox = API.SuggesterBox
 
-local Keyboard = Keyboard
 local ISPanelJoypad = ISPanelJoypad
 local textManager = getTextManager()
 
@@ -71,42 +67,55 @@ function ModDataEditor:createChildren()
     local btnY = self.height - 10 - BTN_H
 
     local titleH = FONT_H_MEDIUM
-
     local titleText = getText('UI_OmiChat_ModDataManager_EditorTitle')
     local titleWidth = textManager:MeasureStringX(UIFont.Medium, titleText)
-    local titleX = self.width / 2 - titleWidth / 2
-    local title = ISLabel:new(titleX, 10, titleH, titleText, 1, 1, 1, 1, UIFont.Medium, true)
-    title:initialise()
-    title:instantiate()
-    self:addChild(title)
+
+    UI.label {
+        parent = self,
+        x = self.width / 2 - titleWidth / 2,
+        y = 10,
+        h = titleH,
+        text = titleText,
+        font = UIFont.Medium,
+    }
 
     local closeX = self.width - btnW - FIELD_X
-    local closeText = getText('IGUI_CraftUI_Close')
-    self.closeBtn = ISButton:new(closeX, btnY, btnW, BTN_H, closeText, self, self.destroy)
-    self.closeBtn.anchorTop = false
-    self.closeBtn.anchorBottom = true
-    self.closeBtn.internal = 'CLOSE'
-    self.closeBtn:initialise()
-    self.closeBtn:instantiate()
-    self.closeBtn.borderColor = utils.copy(self.buttonBorderColor)
-    self:addChild(self.closeBtn)
+    self.closeBtn = UI.button {
+        parent = self,
+        internal = 'CLOSE',
+        x = closeX,
+        y = btnY,
+        w = btnW,
+        h = BTN_H,
+        text = getText('IGUI_CraftUI_Close'),
+        borderColor = utils.copy(self.buttonBorderColor),
+        target = self,
+        onClick = self.destroy,
+        anchorTop = false,
+        anchorBottom = true,
+    }
 
     local saveX = self.closeBtn.x - btnW - FIELD_X * 0.5
-    local saveText = getText('IGUI_RadioSave')
-    self.saveBtn = ISButton:new(saveX, btnY, btnW, BTN_H, saveText, self, self.onSave)
-    self.saveBtn.anchorTop = false
-    self.saveBtn.anchorBottom = true
-    self.saveBtn.internal = 'SAVE'
-    self.saveBtn:initialise()
-    self.saveBtn:instantiate()
-    self.saveBtn.borderColor = utils.copy(self.buttonBorderColor)
-    self:addChild(self.saveBtn)
+    self.saveBtn = UI.button {
+        parent = self,
+        internal = 'SAVE',
+        x = saveX,
+        y = btnY,
+        w = btnW,
+        h = BTN_H,
+        text = getText('IGUI_RadioSave'),
+        borderColor = utils.copy(self.buttonBorderColor),
+        target = self,
+        onClick = self.onSave,
+        anchorTop = false,
+        anchorBottom = true,
+    }
 
     -- fields
     local y
     local item = self.item
     local text = getText('UI_OmiChat_ModDataManager_Column_username')
-    y, self.usernameEntry = self:_createField(TextEntry, titleH + 20, text, item.username)
+    y, self.usernameEntry = self:_createField('text', titleH + 20, text, item.username)
 
     if self.isAdd then
         self.usernameEntry:setRequireValue(true)
@@ -115,71 +124,73 @@ function ModDataEditor:createChildren()
     end
 
     text = getText('UI_OmiChat_ModDataManager_Column_nickname')
-    y, self.nicknameEntry = self:_createField(TextEntry, y + PAD_Y, text, item.nickname)
+    y, self.nicknameEntry = self:_createField('text', y + PAD_Y, text, item.nickname)
     self.nicknameEntry:setValidateFunction(self.nicknameEntry, API.format.validateName)
 
     text = getText('UI_OmiChat_ModDataManager_Column_status')
-    y, self.statusEntry = self:_createField(TextEntry, y + PAD_Y, text, item.status)
+    y, self.statusEntry = self:_createField('text', y + PAD_Y, text, item.status)
     self.statusEntry:setValidateFunction(self.statusEntry, API.format.validateStatus)
 
     text = getText('UI_OmiChat_ModDataManager_Column_icon')
-    y, self.iconEntry = self:_createField(TextEntry, y + PAD_Y, text, item.icon)
+    y, self.iconEntry = self:_createField('text', y + PAD_Y, text, item.icon)
     self.iconEntry:setValidateFunction(self, self.validateIconText, self.iconEntry)
 
     text = getText('UI_OmiChat_ModDataManager_Column_currentLanguage')
-    y, self.currentLangEntry = self:_createField(TextEntry, y + PAD_Y, text, item.currentLanguage)
+    y, self.currentLangEntry = self:_createField('text', y + PAD_Y, text, item.currentLanguage)
     self.currentLangEntry:setValidateFunction(self, self.validateLanguageText, self.currentLangEntry, true)
 
     text = getText('UI_OmiChat_ModDataManager_Column_languageSlots')
-    y, self.languageSlotsEntry = self:_createField(TextEntry, y + PAD_Y, text, item.languageSlots)
-    self.languageSlotsEntry:setOnlyNumbers(true)
-    self.languageSlotsEntry:setMinValue(0)
-    self.languageSlotsEntry:setMaxValue(config.MAX_LANGUAGE_SLOTS)
+    y, self.languageSlotsEntry = self:_createField('number', y + PAD_Y, text, item.languageSlots, 0,
+        config.MAX_LANGUAGE_SLOTS)
 
     text = getText('UI_OmiChat_ModDataManager_Column_languages')
-    y, self.languageListbox = self:_createField(ISScrollingListBox, y + PAD_Y, text, item.languages)
+    y, self.languageListbox = self:_createField('list', y + PAD_Y, text, item.languages)
     self.languageListbox:setOnMouseDownFunction(self, self.onLanguageListboxSelect)
 
     -- language input field
-    self.languageEntry = TextEntry:new {
+    self.languageEntry = UI.textEntry {
+        parent = self,
         x = FIELD_X,
         y = y + PAD_Y,
-        w = self.width - FIELD_X * 2,
+        w = saveX - FIELD_X * 1.5,
         h = LABEL_H,
         font = FIELD_FONT,
     }
 
-    self.languageEntry:initialise()
-    self.languageEntry:setOnChange(self, self.updateSuggester)
-    self.languageEntry:setOnFocus(self, self.updateSuggester)
-    self.languageEntry:setOnBlur(self, self.onLanguageEntryFocusLost)
-    self.languageEntry:setOnKey(self, self.handleLangEntryKey)
-    self:addChild(self.languageEntry)
+    self.langSuggestBox = UI.suggestBox {
+        entry = self.languageEntry,
+        suggestOnEnter = true,
+        openUpwards = true,
+        refocusOverScrollbar = true,
+        target = self,
+        populate = self.populateLanguageSuggest,
+    }
 
-    local addText = getText('UI_OmiChat_ProfileManager_AddButton')
-    self.addLangBtn = ISButton:new(saveX, self.languageEntry.y, btnW, BTN_H, addText, self, self.addLanguage)
-    self.addLangBtn.internal = 'ADD LANGUAGE'
-    self.addLangBtn:initialise()
-    self.addLangBtn:instantiate()
-    self.addLangBtn.borderColor = utils.copy(self.buttonBorderColor)
-    self:addChild(self.addLangBtn)
+    self.addLangBtn = UI.button {
+        parent = self,
+        internal = 'ADD LANGUAGE',
+        x = saveX,
+        y = self.languageEntry.y,
+        w = btnW,
+        h = BTN_H,
+        text = getText('UI_OmiChat_ProfileManager_AddButton'),
+        borderColor = utils.copy(self.buttonBorderColor),
+        target = self,
+        onClick = self.addLanguage,
+    }
 
-    local deleteText = getText('IGUI_DbViewer_Delete')
-    self.deleteLangBtn = ISButton:new(closeX, self.languageEntry.y, btnW, BTN_H, deleteText, self, self.removeLanguage)
-    self.deleteLangBtn.internal = 'DELETE LANGUAGE'
-    self.deleteLangBtn:initialise()
-    self.deleteLangBtn:instantiate()
-    self.deleteLangBtn.borderColor = utils.copy(self.buttonBorderColor)
-    self:addChild(self.deleteLangBtn)
-
-    self.langSuggester = SuggesterBox:new(0, 0, 0, 0)
-    self.langSuggester:setOnMouseDownFunction(self, self.onLanguageSuggesterSelect)
-    self.langSuggester:setAlwaysOnTop(true)
-    self.langSuggester:setUIName('chat suggester box')
-    self.langSuggester:addToUIManager()
-    self.langSuggester:setVisible(false)
-
-    self.languageEntry:setWidth(saveX - FIELD_X * 1.5)
+    self.deleteLangBtn = UI.button {
+        parent = self,
+        internal = 'DELETE LANGUAGE',
+        x = closeX,
+        y = self.languageEntry.y,
+        w = btnW,
+        h = BTN_H,
+        text = getText('IGUI_DbViewer_Delete'),
+        borderColor = utils.copy(self.buttonBorderColor),
+        target = self,
+        onClick = self.removeLanguage,
+    }
 
     y = self.languageEntry:getBottom() + PAD_Y + BTN_H + 10
     self:setHeight(math.max(self:getHeight(), y))
@@ -188,8 +199,8 @@ end
 
 ---Removes the mod data editor and its children from the UI.
 function ModDataEditor:destroy()
-    if self.langSuggester then
-        self.langSuggester:removeFromUIManager()
+    if self.langSuggestBox then
+        self.langSuggestBox:removeFromUIManager()
     end
 
     self:removeFromUIManager()
@@ -205,35 +216,6 @@ function ModDataEditor:getEntryValue(entry)
     end
 
     return value
-end
-
----Handles a keypress within the language entry.
----@param key number
-function ModDataEditor:handleLangEntryKey(key)
-    if not self.langSuggester:isVisible() then
-        return
-    end
-
-    if key == Keyboard.KEY_UP then
-        self.langSuggester:selectPrevious()
-        return
-    elseif key == Keyboard.KEY_DOWN then
-        self.langSuggester:selectNext()
-        return
-    end
-
-    if key ~= Keyboard.KEY_TAB and key ~= Keyboard.KEY_RETURN then
-        return
-    end
-
-
-    local item = self.langSuggester:getSelectedItem()
-    if not item then
-        return
-    end
-
-    self.languageEntry:setText(item.suggestion)
-    self.langSuggester:setVisible(false)
 end
 
 ---Checks whether the input language list contains the given language.
@@ -297,26 +279,10 @@ function ModDataEditor:isLanguageValidForRemove(language)
     return true
 end
 
----Called when the language entry loses focus.
-function ModDataEditor:onLanguageEntryFocusLost()
-    if self.langSuggester:isMouseOverScrollBar() then
-        self.languageEntry:focus()
-    else
-        self.langSuggester:setVisible(false)
-    end
-end
-
 ---Called when a language is selected in the listbox.
 ---@param language string
 function ModDataEditor:onLanguageListboxSelect(language)
     self.languageEntry:setText(language)
-end
-
----Called when a suggestion is selected in the language suggester.
----@param suggestion omichat.Suggestion
-function ModDataEditor:onLanguageSuggesterSelect(suggestion)
-    self.languageEntry:setText(suggestion.suggestion)
-    self.langSuggester:setVisible(false)
 end
 
 ---Called when the save button is clicked.
@@ -361,7 +327,37 @@ function ModDataEditor:onSave()
     self:destroy()
 end
 
----Called when the removes language button is clicked.
+---Populates suggestions for the language auto-suggest box.
+---@param suggestBox omi.ui.SuggestBox
+---@param text string
+function ModDataEditor:populateLanguageSuggest(suggestBox, text)
+    ---@type omichat.SearchContext
+    local ctx = {
+        searchDisplay = true,
+        search = text,
+        display = utils.getTranslatedLanguageName,
+        max = 50,
+    }
+
+    local search = API.search.strings(ctx, API.language.getList())
+    if #search.results == 1 and API.language.exists(text) then
+        suggestBox:setSuggestions({})
+        return
+    end
+
+    local suggestions = {} ---@type omi.ui.SuggestBox.Suggestion[]
+    for i = 1, #search.results do
+        local result = search.results[i]
+        suggestions[#suggestions + 1] = {
+            text = result.display,
+            content = result.value,
+        }
+    end
+
+    suggestBox:setSuggestions(suggestions)
+end
+
+---Called when the remove language button is clicked.
 ---Removes the current input language from the language list.
 function ModDataEditor:removeLanguage()
     local lang = utils.trim(self.languageEntry:getInternalText())
@@ -449,53 +445,6 @@ function ModDataEditor:updateLanguageList()
     self:setHeight(math.max(self:getHeight(), y))
 end
 
----Updates the language suggester based on the input.
-function ModDataEditor:updateSuggester()
-    local suggester = self.langSuggester
-
-    local input = self.languageEntry:getInternalText()
-    ---@type omichat.SearchContext
-    local ctx = {
-        searchDisplay = true,
-        search = input,
-        display = utils.getTranslatedLanguageName,
-        max = 50,
-    }
-
-    local search = API.search.strings(ctx, API.language.getList())
-    if #search.results == 1 and API.language.exists(input) then
-        suggester:setVisible(false)
-        return
-    end
-
-    local suggestions = {}
-    for i = 1, #search.results do
-        local result = search.results[i]
-        suggestions[#suggestions + 1] = {
-            suggestion = result.value,
-            display = result.display,
-        }
-    end
-
-    if #suggestions == 0 then
-        suggester:setVisible(false)
-        return
-    end
-
-    local langEntry = self.languageEntry
-    suggester:setSuggestions(suggestions)
-    suggester:setWidth(langEntry.width)
-    suggester:setHeight(suggester.itemheight * math.min(#suggestions, 5))
-    suggester:setX(langEntry:getAbsoluteX())
-    suggester:setY(langEntry:getAbsoluteY() - suggester.height)
-    suggester:setVisible(true)
-    suggester:bringToTop()
-
-    if suggester.vscroll then
-        suggester.vscroll:setHeight(suggester.height)
-    end
-end
-
 ---Text entry validator for icons.
 ---@param text string
 ---@param entry omi.ui.TextEntry
@@ -546,23 +495,46 @@ end
 
 
 ---Helper for creating an editor field.
----@param cls unknown
+---@param type 'text' | 'list' | 'number'
 ---@param y number
 ---@param labelText string
----@param default unknown
+---@param default unknown?
+---@param min number?
+---@param max number?
 ---@return number
 ---@return unknown
 ---@protected
-function ModDataEditor:_createField(cls, y, labelText, default)
+function ModDataEditor:_createField(type, y, labelText, default, min, max)
     local controlW = self.width - FIELD_X * 2
 
-    local label = ISLabel:new(FIELD_X, y, LABEL_H, labelText, 1, 1, 1, 1, FIELD_FONT, true)
-    self:addChild(label)
+    local label = UI.label {
+        parent = self,
+        x = FIELD_X,
+        y = y,
+        h = LABEL_H,
+        text = labelText,
+        font = FIELD_FONT,
+    }
 
     y = label.y + label.height
+
     local entry
-    if cls == TextEntry then
-        entry = TextEntry:new {
+    if type == 'list' then
+        entry = UI.listBox {
+            parent = self,
+            x = FIELD_X,
+            y = y,
+            w = controlW,
+            h = LABEL_H,
+            font = FIELD_FONT,
+            items = default,
+            itemPadY = 0,
+        }
+
+        entry:setHeight(entry.itemheight * math.max(1, math.min(#default, 5)))
+    else
+        entry = UI.textEntry {
+            parent = self,
             x = FIELD_X,
             y = y,
             w = controlW,
@@ -570,28 +542,11 @@ function ModDataEditor:_createField(cls, y, labelText, default)
             text = default,
             font = FIELD_FONT,
             textColorDisabled = { r = 1, g = 1, b = 1, a = 1 },
+            minValue = min,
+            maxValue = max,
+            onlyNumbers = type == 'number',
         }
-    elseif cls == ColorEntry then
-        entry = ColorEntry:new {
-            x = FIELD_X,
-            y = y,
-            w = controlW,
-            h = LABEL_H,
-            defaultColor = default,
-        }
-    else
-        default = default or {}
-        entry = ISScrollingListBox:new(FIELD_X, y, controlW, LABEL_H)
-        entry:setFont(FIELD_FONT)
-        entry:setHeight(entry.itemheight * math.max(1, math.min(#default, 5)))
-        entry:setWidth(controlW)
-        for i = 1, #default do
-            entry:addItem(default[i], default[i])
-        end
     end
-
-    entry:initialise()
-    self:addChild(entry)
 
     return entry.y + entry.height, entry
 end

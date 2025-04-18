@@ -18,9 +18,6 @@ local _focus = ISChat.focus
 local _unfocus = ISChat.unfocus
 local _close = ISChat.close
 local _onMouseDown = ISChat.onMouseDown
-local _onPressDown = ISChat.onPressDown
-local _onPressUp = ISChat.onPressUp
-local _onOtherKey = ISChat.onOtherKey
 local _onInfo = ISChat.onInfo
 local _onTabAdded = ISChat.onTabAdded
 local _onTabRemoved = ISChat.onTabRemoved
@@ -166,11 +163,6 @@ end
 ---Override to support custom commands and emote shortcuts.
 function ISChat:onCommandEntered()
     if API.player.isDeadOrUnavailable() then
-        return
-    end
-
-    if API.preferences.getSuggestOnEnter() and API.chat.tryInputSuggestion() then
-        API.ui.updateCustomComponents()
         return
     end
 
@@ -346,13 +338,13 @@ function ISChat:onGearButtonClick()
         return
     end
 
-    API.ui.hideSuggesterBox()
+    API.ui.hideSuggestBox()
     API.ui.showSettingsContextMenu()
 end
 
 ---Override to handle custom info text.
 function ISChat:onInfo()
-    API.ui.hideSuggesterBox()
+    API.ui.hideSuggestBox()
 
     local text = API.ui.getInfoRichText()
     self:setInfo(text)
@@ -378,7 +370,7 @@ function ISChat.onMouseDown(target, x, y)
     end
 
     local iconPicker = API.ui.iconPicker
-    API.ui.hideSuggesterBox()
+    API.ui.hideSuggestBox()
 
     if not handled or not iconPicker or not iconPicker:isVisible() then
         return handled
@@ -390,40 +382,6 @@ function ISChat.onMouseDown(target, x, y)
     end
 
     return handled
-end
-
----Override to update custom components.
-function ISChat:onOtherKey(key)
-    local suggesterBox = API.ui.suggesterBox
-    if suggesterBox and suggesterBox:isVisible() and key == Keyboard.KEY_ESCAPE then
-        API.ui.hideSuggesterBox()
-    else
-        _onOtherKey(self, key)
-    end
-end
-
----Override to update custom components.
-function ISChat.onPressDown()
-    local suggesterBox = API.ui.suggesterBox
-    if suggesterBox and suggesterBox:isVisible() then
-        suggesterBox:selectNext()
-        return
-    end
-
-    _onPressDown()
-    API.ui.updateCustomComponents()
-end
-
----Override to update custom components.
-function ISChat.onPressUp()
-    local suggesterBox = API.ui.suggesterBox
-    if suggesterBox and suggesterBox:isVisible() then
-        suggesterBox:selectPrevious()
-        return
-    end
-
-    _onPressUp()
-    API.ui.updateCustomComponents()
 end
 
 ---Override to control custom components and allow switching to custom streams.
@@ -572,7 +530,7 @@ end
 ---Override to hide icon picker and disable button on unfocus.
 function ISChat:unfocus()
     _unfocus(self)
-    API.ui.hideSuggesterBox()
+    API.ui.hideSuggestBox()
     API.ui.setIconButtonEnabled(false)
 end
 

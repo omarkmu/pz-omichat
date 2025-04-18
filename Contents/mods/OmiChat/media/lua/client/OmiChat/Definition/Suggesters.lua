@@ -3,6 +3,7 @@
 local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
 
 local utils = API.utils
+local config = API.Configuration
 local min = math.min
 local concat = table.concat
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
@@ -43,8 +44,8 @@ return {
                 local value = result.value
 
                 info.suggestions[#info.suggestions + 1] = {
-                    display = result.display or value,
-                    suggestion = value,
+                    text = result.display or value,
+                    content = value,
                 }
             end
         end,
@@ -146,8 +147,8 @@ return {
                 end
 
                 info.suggestions[#info.suggestions + 1] = {
-                    display = display,
-                    suggestion = prefix .. value .. suffix,
+                    text = display,
+                    content = prefix .. value .. suffix,
                 }
             end
         end,
@@ -156,6 +157,10 @@ return {
         name = 'emotes',
         priority = 5,
         suggest = function(_, info)
+            if not config.Macros.AllowEmotes then
+                return
+            end
+
             local instance = ISChat.instance
             if not instance then
                 return
@@ -211,8 +216,8 @@ return {
             for i = 1, #results do
                 local emote = results[i].value
                 info.suggestions[#info.suggestions + 1] = {
-                    display = '.' .. emote,
-                    suggestion = prefix .. emote,
+                    text = '.' .. emote,
+                    content = prefix .. emote,
                 }
             end
         end,

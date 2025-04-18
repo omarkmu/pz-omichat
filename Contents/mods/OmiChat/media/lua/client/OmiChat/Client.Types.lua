@@ -84,7 +84,7 @@
 ---@field allChatStreams (omichat.ChatStream | omichat.StreamTable)[] List of all available chat streams.
 ---@field defaultTabStream table<integer, omichat.ChatStream?> An association of 1-indexed tab IDs to default streams.
 ---@field gearButton ISButton The settings button.
----@field textEntry ISTextEntryBox The text entry UI element.
+---@field textEntry omi.ui.TextEntry The text entry UI element.
 ---@field currentTabID integer The 1-indexed tab ID of the current tab.
 ---@field tabCnt integer The number of available tabs.
 
@@ -270,7 +270,7 @@
 ---@field statusEntry omi.ui.TextEntry
 ---@field languageSlotsEntry omi.ui.TextEntry
 ---@field languageListbox ISScrollingListBox
----@field langSuggester omichat.SuggesterBox
+---@field langSuggestBox omi.ui.SuggestBox
 ---@field buttonBorderColor omi.ColorTableRGBA
 ---@field addLangBtn ISButton
 ---@field deleteLangBtn ISButton
@@ -515,22 +515,15 @@
 
 --#region Suggestions
 
----@class omichat.SuggesterBox
----@field maximumVisibleItems integer The number of items to show without scrolling.
-
 ---@class omichat.Suggester
 ---@field name string? The name of the suggester.
 ---@field suggest fun(self: table, info: omichat.SuggestionInfo) Performs suggestion.
 ---@field priority integer? The priority of the suggester. Higher numbers will run first.
 
----@class omichat.Suggestion
----@field display string The text that will display in the menu.
----@field suggestion string Text that will replace the input text if the suggestion is selected.
-
 ---@class omichat.SuggestionInfo
 ---@field input string The current input text.
 ---@field context table Table for arbitrary context data.
----@field suggestions omichat.Suggestion[] The current list of suggestions.
+---@field suggestions omi.ui.SuggestBox.Suggestion[] The current list of suggestions.
 
 ---@class omichat.SuggestArgSpecTable
 ---@field type omichat.SuggestionType | string The type of the argument.
@@ -564,7 +557,7 @@
 ---@class omichat.api.client.ui
 ---@field iconButton ISButton? The icon button UI element.
 ---@field iconPicker omichat.IconPicker? The icon picker UI element.
----@field suggesterBox omichat.SuggesterBox? The suggester box UI element.
+---@field suggestBox omi.ui.SuggestBox? The auto-suggest box for the chat input.
 ---@field typingFont UIFont The font used for the typing indicator.
 ---@field typingFontHgt integer The height of the font used for the typing indicator.
 ---@field private _customButtons ISButton[]

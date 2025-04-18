@@ -16,7 +16,6 @@ utils.ui = lib.ui
 
 API.MimicMessage = lib.chat.MimicMessage
 API.IconPicker = require 'OmiChat/Component/UI/IconPicker'
-API.SuggesterBox = require 'OmiChat/Component/UI/SuggesterBox'
 API.Stream = require 'OmiChat/Component/Stream'
 API.ChatStream = require 'OmiChat/Component/ChatStream'
 API.CommandStream = require 'OmiChat/Component/CommandStream'

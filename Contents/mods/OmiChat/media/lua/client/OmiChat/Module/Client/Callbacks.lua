@@ -151,17 +151,6 @@ function Callback.onIconClick(target, icon)
     API.ui.updateSuggesterComponent()
 end
 
----Callback for selecting a suggestion.
----@param target omichat.ISChat
----@param suggestion omichat.Suggestion
-function Callback.onSuggesterSelect(target, suggestion)
-    local entry = ISChat.instance.textEntry
-
-    API.ui.hideSuggesterBox()
-    entry:setText(suggestion.suggestion)
-    API.ui.updateSuggesterComponent()
-end
-
 ---Callback for clicking the update configuration admin context option.
 ---@param target omichat.ISChat
 function Callback.openConfiguration(target)
@@ -253,7 +242,7 @@ function Callback.openIconPicker(target)
     iconPicker:setY(y)
     iconPicker:bringToTop()
     iconPicker:setVisible(not iconPicker:isVisible())
-    API.ui.hideSuggesterBox()
+    API.ui.hideSuggestBox()
 
     return true
 end
@@ -301,6 +290,25 @@ function Callback.openProfileManager(target)
     panel:initialise()
     panel:addToUIManager()
     target.activeProfilesPanel = panel
+end
+
+---Populates the auto-suggest box with relevant suggestions.
+---@param target ISChat?
+---@param suggestBox omi.ui.SuggestBox
+---@param text string?
+function Callback.populateSuggestBox(target, suggestBox, text)
+    target = target or ISChat.instance
+    if not target then
+        return
+    end
+
+    if not API.preferences.getUseSuggester() then
+        suggestBox:setVisible(false)
+        return
+    end
+
+    text = text or target.textEntry:getInternalText()
+    suggestBox:setSuggestions(API.chat.getSuggestions(text))
 end
 
 ---Callback for selecting the current roleplay language.
@@ -356,7 +364,7 @@ function Callback.toggleShowNameColor(target)
     API.ui.redraw()
 end
 
----Callback for toggling using the suggester.
+---Callback for toggling showing typing indicators.
 ---@param target omichat.ISChat
 function Callback.toggleShowTyping(target)
     API.preferences.setShowTyping(not API.preferences.getShowTyping())
@@ -367,7 +375,12 @@ end
 ---Callback for toggling applying suggestions on Enter.
 ---@param target omichat.ISChat
 function Callback.toggleSuggestOnEnter(target)
-    API.preferences.setSuggestOnEnter(not API.preferences.getSuggestOnEnter())
+    local value = not API.preferences.getSuggestOnEnter()
+    API.preferences.setSuggestOnEnter(value)
+
+    if API.ui.suggestBox then
+        API.ui.suggestBox.suggestOnEnter = value
+    end
 end
 
 ---Callback for toggling applying suggestions on Tab.
@@ -382,7 +395,7 @@ function Callback.toggleUseSignEmotes(target)
     API.preferences.setSignEmotesEnabled(not API.preferences.getSignEmotesEnabled())
 end
 
----Callback for toggling using the suggester.
+---Callback for toggling using the auto-suggest box.
 ---@param target omichat.ISChat
 function Callback.toggleUseSuggester(target)
     API.preferences.setUseSuggester(not API.preferences.getUseSuggester())

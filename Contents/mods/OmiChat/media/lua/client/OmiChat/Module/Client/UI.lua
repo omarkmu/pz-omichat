@@ -2,10 +2,8 @@
 
 local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
 local callback = require 'OmiChat/Module/Client/Callbacks'
-local SuggesterBox = API.SuggesterBox
 
 local max = math.max
-local min = math.min
 local sort = table.sort
 local concat = table.concat
 local getTexture = getTexture
@@ -15,6 +13,7 @@ local textManager = getTextManager()
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
 local utils = API.utils
+local uiLib = utils.lib.ui
 local config = API.Configuration
 local IconPicker = API.IconPicker
 local MultiMap = utils.MultiMap
@@ -22,6 +21,9 @@ local MultiMap = utils.MultiMap
 
 ---@class omichat.api.client.ui
 local UI = {}
+
+UI.typingFont = UIFont.Small
+UI.typingFontHgt = textManager:getFontHeight(UI.typingFont)
 
 UI._customButtons = {}
 UI._iconsToExclude = {
@@ -149,39 +151,71 @@ end
 ---Creates additional children for the chat.
 ---@param instance omichat.ISChat
 function UI.createChildren(instance)
-    UI.typingFont = UIFont.Small
-    UI.typingFontHgt = getTextManager():getFontHeight(UI.typingFont)
-
     local th = instance:titleBarHeight()
-    local infoButton = ISButton:new(instance.gearButton:getX() - th / 2 - th, 0, th, th, '', instance, instance.onInfo)
-    infoButton.anchorRight = true
-    infoButton.anchorLeft = false
-    infoButton:initialise()
-    infoButton.borderColor.a = 0.0
-    infoButton.backgroundColor.a = 0.0
-    infoButton.backgroundColorMouseOver.a = 0
-    infoButton:setImage(instance.infoBtn)
-    infoButton:setUIName('chat info button')
-    infoButton:setVisible(false)
 
-    local suggesterBox = SuggesterBox:new(0, 0, 0, 0)
-    suggesterBox:setOnMouseDownFunction(instance, API.callback.onSuggesterSelect)
-    suggesterBox:setAlwaysOnTop(true)
-    suggesterBox:setUIName('chat suggester box')
-    suggesterBox:addToUIManager()
-    suggesterBox:setVisible(false)
+    instance.infoButton = uiLib.button {
+        parent = instance,
+        x = instance.gearButton:getX() - th / 2 - th,
+        w = th,
+        h = th,
+        anchorRight = true,
+        anchorLeft = false,
+        borderColor = { r = 0.7, g = 0.7, b = 0.7, a = 0 },
+        backgroundColor = { r = 0, g = 0, b = 0, a = 0 },
+        backgroundColorMouseOver = { r = 0.3, g = 0.3, b = 0.3, a = 0 },
+        image = instance.infoBtn,
+        uiName = 'chat info button',
+        visible = false,
+        target = instance,
+        onClick = instance.onInfo,
+    }
 
-    instance.infoButton = infoButton
-    UI.suggesterBox = suggesterBox
+    API.extension.addCustomButton(instance.infoButton)
 
-    API.extension.addCustomButton(infoButton)
+    -- replace the text entry so we can add the suggest box
+    instance:removeChild(instance.textEntry)
+
+    local inset, EdgeSize, fontHgt = instance.inset, 5, instance.fontHgt
+    local height = EdgeSize * 2 + fontHgt
+    instance.textEntry = uiLib.textEntry {
+        parent = instance,
+        uiName = ISChat.textEntryName,
+        x = inset,
+        y = instance:getHeight() - 8 - inset - height,
+        w = instance:getWidth() - inset * inset,
+        h = height,
+        font = UIFont.Medium,
+        backgroundColor = { r = 0, g = 0, b = 0, a = 0.5 },
+        borderColor = { r = 1, g = 1, b = 1, a = 0.0 },
+        hasFrame = true,
+        anchorTop = false,
+        anchorBottom = true,
+        anchorRight = true,
+        target = instance,
+        onCommand = ISChat.onCommandEntered,
+        onChange = ISChat.onTextChange,
+        onPressDown = ISChat.onPressDown,
+        onPressUp = ISChat.onPressUp,
+        onOtherKey = ISChat.onOtherKey,
+        onClick = ISChat.onMouseDown,
+        editable = false,
+    }
+
+    UI.suggestBox = uiLib.suggestBox {
+        entry = instance.textEntry,
+        openUpwards = true,
+        populateAfterInsert = true,
+        suggestOnTab = false, -- handled in `onSwitchStream`
+        suggestOnEnter = API.preferences.getSuggestOnEnter(),
+        target = instance,
+        populate = API.callback.populateSuggestBox,
+    }
 end
 
----Hides the suggester box if it's currently visible.
-function UI.hideSuggesterBox()
-    local suggesterBox = UI.suggesterBox
-    if suggesterBox then
-        suggesterBox:setVisible(false)
+---Hides the auto-suggest box if it's currently visible.
+function UI.hideSuggestBox()
+    if UI.suggestBox then
+        UI.suggestBox:setVisible(false)
     end
 end
 
@@ -435,7 +469,7 @@ function UI.updateCustomComponents(text)
     text = text or instance.textEntry:getInternalText()
 
     UI.updateIconComponents(text)
-    UI.updateSuggesterComponent(text)
+    UI.updateSuggesterComponent()
 end
 
 ---Enables or disables the icon picker based on the current input.
@@ -486,37 +520,16 @@ function UI.updateState(redraw)
     end
 end
 
----Shows or hides the suggester based on the current input.
----@param text string? The current text entry text. If omitted, the current text will be retrieved.
-function UI.updateSuggesterComponent(text)
-    local instance = ISChat.instance
-    local suggesterBox = UI.suggesterBox
-    if not instance or not suggesterBox then
+---Shows or hides the suggester based on user preferences.
+function UI.updateSuggesterComponent()
+    local suggesterBox = UI.suggestBox
+    if not suggesterBox then
         return
     end
 
     if not API.preferences.getUseSuggester() then
         suggesterBox:setVisible(false)
         return
-    end
-
-    text = text or instance.textEntry:getInternalText()
-    local suggestions = API.chat.getSuggestions(text)
-    if #suggestions == 0 then
-        suggesterBox:setVisible(false)
-        return
-    end
-
-    suggesterBox:setSuggestions(suggestions)
-    suggesterBox:setWidth(instance:getWidth())
-    suggesterBox:setHeight(suggesterBox.itemheight * min(#suggestions, 5))
-    suggesterBox:setX(instance:getX())
-    suggesterBox:setY(instance:getY() + instance.textEntry:getY() - suggesterBox.height)
-    suggesterBox:setVisible(true)
-    suggesterBox:bringToTop()
-
-    if suggesterBox.vscroll then
-        suggesterBox.vscroll:setHeight(suggesterBox.height)
     end
 end
 
