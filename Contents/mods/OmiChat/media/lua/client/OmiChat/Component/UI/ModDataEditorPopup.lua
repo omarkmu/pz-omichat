@@ -22,24 +22,6 @@ local BTN_H = math.max(25, textManager:getFontHeight(UIFont.Small) + 6)
 local LABEL_H = FONT_H_MEDIUM + 4
 
 
----Called when the add language button is clicked.
----Adds the current input language to the language list.
-function ModDataEditor:addLanguage()
-    local lang = utils.trim(self.languageEntry:getInternalText())
-    if not self:isLanguageValidForAdd(lang) then
-        return
-    end
-
-    local list = self.item.languages
-    if not list then
-        list = {}
-        self.item.languages = list
-    end
-
-    list[#list + 1] = lang
-    self:updateLanguageList()
-end
-
 ---Checks all fields for validity.
 ---@return boolean
 function ModDataEditor:canSubmit()
@@ -64,7 +46,6 @@ end
 ---Adds the children of the mod data editor.
 function ModDataEditor:createChildren()
     local btnW = 100
-    local btnY = self.height - 10 - BTN_H
 
     local titleH = FONT_H_MEDIUM
     local titleText = getText('UI_OmiChat_ModDataManager_EditorTitle')
@@ -80,36 +61,7 @@ function ModDataEditor:createChildren()
     }
 
     local closeX = self.width - btnW - FIELD_X
-    self.closeBtn = UI.button {
-        parent = self,
-        internal = 'CLOSE',
-        x = closeX,
-        y = btnY,
-        w = btnW,
-        h = BTN_H,
-        text = getText('IGUI_CraftUI_Close'),
-        borderColor = utils.copy(self.buttonBorderColor),
-        target = self,
-        onClick = self.destroy,
-        anchorTop = false,
-        anchorBottom = true,
-    }
-
-    local saveX = self.closeBtn.x - btnW - FIELD_X * 0.5
-    self.saveBtn = UI.button {
-        parent = self,
-        internal = 'SAVE',
-        x = saveX,
-        y = btnY,
-        w = btnW,
-        h = BTN_H,
-        text = getText('IGUI_RadioSave'),
-        borderColor = utils.copy(self.buttonBorderColor),
-        target = self,
-        onClick = self.onSave,
-        anchorTop = false,
-        anchorBottom = true,
-    }
+    local saveX = closeX - btnW - FIELD_X * 0.5
 
     -- fields
     local y
@@ -143,22 +95,29 @@ function ModDataEditor:createChildren()
     y, self.languageSlotsEntry = self:_createField('number', y + PAD_Y, text, item.languageSlots, 0,
         config.MAX_LANGUAGE_SLOTS)
 
-    text = getText('UI_OmiChat_ModDataManager_Column_languages')
-    y, self.languageListbox = self:_createField('list', y + PAD_Y, text, item.languages)
-    self.languageListbox:setOnMouseDownFunction(self, self.onLanguageListboxSelect)
+    y = self:_createLabel(y + PAD_Y, getText('UI_OmiChat_ModDataManager_Column_languages'))
 
-    -- language input field
-    self.languageEntry = UI.textEntry {
+    self.languageListEntry = UI.listEntry {
         parent = self,
         x = FIELD_X,
-        y = y + PAD_Y,
-        w = saveX - FIELD_X * 1.5,
-        h = LABEL_H,
-        font = FIELD_FONT,
+        y = y,
+        w = self.width - FIELD_X * 2,
+        visibleItems = 4,
+        itemPadY = 0,
+        maxEntryWidth = saveX - FIELD_X * 1.5,
+        items = item.languages,
+        textEntry = {
+            h = LABEL_H,
+            font = FIELD_FONT,
+            validateTarget = self,
+            validate = self.isLanguageValid,
+        },
+        target = self,
+        onChange = self.onUpdateLanguageList,
     }
 
-    self.langSuggestBox = UI.suggestBox {
-        entry = self.languageEntry,
+    self.languageSuggestBox = UI.suggestBox {
+        entry = self.languageListEntry.entry,
         suggestOnEnter = true,
         openUpwards = true,
         refocusOverScrollbar = true,
@@ -166,41 +125,41 @@ function ModDataEditor:createChildren()
         populate = self.populateLanguageSuggest,
     }
 
-    self.addLangBtn = UI.button {
-        parent = self,
-        internal = 'ADD LANGUAGE',
-        x = saveX,
-        y = self.languageEntry.y,
-        w = btnW,
-        h = BTN_H,
-        text = getText('UI_OmiChat_ProfileManager_AddButton'),
-        borderColor = utils.copy(self.buttonBorderColor),
-        target = self,
-        onClick = self.addLanguage,
-    }
+    y = self.languageListEntry:getBottom() + PAD_Y
+    self:setHeight(y + BTN_H + 10)
 
-    self.deleteLangBtn = UI.button {
+    local btnY = self.height - 10 - BTN_H
+    self.closeBtn = UI.button {
         parent = self,
-        internal = 'DELETE LANGUAGE',
+        internal = 'CLOSE',
         x = closeX,
-        y = self.languageEntry.y,
+        y = btnY,
         w = btnW,
         h = BTN_H,
-        text = getText('IGUI_DbViewer_Delete'),
+        text = getText('IGUI_CraftUI_Close'),
         borderColor = utils.copy(self.buttonBorderColor),
         target = self,
-        onClick = self.removeLanguage,
+        onClick = self.destroy,
     }
 
-    y = self.languageEntry:getBottom() + PAD_Y + BTN_H + 10
-    self:setHeight(math.max(self:getHeight(), y))
-    self:update()
+    self.saveBtn = UI.button {
+        parent = self,
+        internal = 'SAVE',
+        x = saveX,
+        y = btnY,
+        w = btnW,
+        h = BTN_H,
+        text = getText('IGUI_RadioSave'),
+        borderColor = utils.copy(self.buttonBorderColor),
+        target = self,
+        onClick = self.onSave,
+    }
 end
 
 ---Removes the mod data editor and its children from the UI.
 function ModDataEditor:destroy()
-    if self.langSuggestBox then
-        self.langSuggestBox:removeFromUIManager()
+    if self.languageSuggestBox then
+        self.languageSuggestBox:removeFromUIManager()
     end
 
     self:removeFromUIManager()
@@ -236,53 +195,29 @@ function ModDataEditor:hasLanguage(language)
     return false
 end
 
----Checks whether the given language can be added to the language list.
+---Checks whether the given language is a valid entry for the language list.
 ---@param language string
 ---@return boolean valid
----@return string? error
-function ModDataEditor:isLanguageValidForAdd(language)
+function ModDataEditor:isLanguageValid(language)
+    language = utils.trim(language)
     if #language == 0 then
+        return true
+    end
+
+    local listEntry = self.languageListEntry
+    local entry = listEntry.entry
+    if #listEntry.listbox.items >= config.MAX_LANGUAGE_SLOTS then
+        entry:setValidateTooltipText(getText('UI_OmiChat_Error_AddLanguageFull', self.item.username))
         return false
     end
 
-    if self.item.languages and #self.item.languages >= config.MAX_LANGUAGE_SLOTS then
-        return false, getText('UI_OmiChat_Error_AddLanguageFull', self.item.username)
-    end
-
-    local lang = utils.trim(self.languageEntry:getInternalText())
-    if not self:validateLanguageText(lang, self.languageEntry, false) then
-        local tooltip = self.languageEntry:getValidateTooltipText()
-        self.languageEntry:setValidateTooltipText()
-        return false, tooltip
-    end
-
-    return true
+    return self:validateLanguageText(language, entry, false)
 end
 
----Checks whether the given language can be removed from the language list.
----@param language string
----@return boolean valid
----@return string? error
-function ModDataEditor:isLanguageValidForRemove(language)
-    if #language == 0 then
-        return false
-    end
-
-    if not self:hasLanguage(language) then
-        if not API.language.exists(language) then
-            return false, getText('UI_OmiChat_Error_AddLanguageNotConfigured', language)
-        end
-
-        return false, getText('UI_OmiChat_Error_LanguageUnknown', self.item.username, language)
-    end
-
-    return true
-end
-
----Called when a language is selected in the listbox.
----@param language string
-function ModDataEditor:onLanguageListboxSelect(language)
-    self.languageEntry:setText(language)
+---Called when the language list entry is updated.
+---@param entry omi.ui.ListEntry
+function ModDataEditor:onUpdateLanguageList(entry)
+    self.item.languages = entry:getValue()
 end
 
 ---Called when the save button is clicked.
@@ -316,7 +251,7 @@ function ModDataEditor:onSave()
     item.languageSlots = slots and tonumber(slots)
     item.nickname = self:getEntryValue(self.nicknameEntry)
     item.status = self:getEntryValue(self.statusEntry)
-    item.languages = self.item.languages
+    item.languages = self.languageListEntry:getValue()
 
     API.request.setModData(username, item)
 
@@ -357,92 +292,9 @@ function ModDataEditor:populateLanguageSuggest(suggestBox, text)
     suggestBox:setSuggestions(suggestions)
 end
 
----Called when the remove language button is clicked.
----Removes the current input language from the language list.
-function ModDataEditor:removeLanguage()
-    local lang = utils.trim(self.languageEntry:getInternalText())
-    if not self:isLanguageValidForRemove(lang) then
-        return
-    end
-
-    local list = self.item.languages
-    if not list then
-        return
-    end
-
-    local idx
-    for i = 1, #list do
-        if list[i] == lang then
-            idx = i
-            break
-        end
-    end
-
-    if not idx then
-        return
-    end
-
-    table.remove(list, idx)
-    self:updateLanguageList()
-end
-
----Updates the validation state of the buttons.
+---Updates the validation state of the save button.
 function ModDataEditor:update()
-    local lang = utils.trim(self.languageEntry:getInternalText())
-    if #lang > 0 then
-        local addBtnEnable, addTooltip = self:isLanguageValidForAdd(lang)
-        self.addLangBtn:setEnable(addBtnEnable)
-        self.addLangBtn:setTooltip(addTooltip)
-
-        local deleteBtnEnable, deleteTooltip = self:isLanguageValidForRemove(lang)
-        self.deleteLangBtn:setEnable(deleteBtnEnable)
-        self.deleteLangBtn:setTooltip(deleteTooltip)
-    else
-        -- disable, but don't display as invalid
-        self.addLangBtn:setEnable(true)
-        self.addLangBtn:setTooltip()
-        self.deleteLangBtn:setEnable(true)
-        self.deleteLangBtn:setTooltip()
-
-        self.addLangBtn.enable = false
-        self.deleteLangBtn.enable = false
-    end
-
     self.saveBtn:setEnable(self:canSubmit())
-end
-
----Updates the listbox containing roleplay languages.
-function ModDataEditor:updateLanguageList()
-    local langs = self.item.languages or {}
-    local listbox = self.languageListbox
-
-    local idx = listbox.selected
-    local oldCount = #listbox.items
-    listbox:clear()
-
-    for i = 1, #langs do
-        listbox:addItem(langs[i], langs[i])
-    end
-
-    listbox:setHeight(listbox.itemheight * math.max(1, math.min(#langs, 5)))
-
-    local y = listbox:getBottom() + PAD_Y
-    self.languageEntry:setY(y)
-    self.languageEntry:clear()
-    self.addLangBtn:setY(y)
-    self.deleteLangBtn:setY(y)
-
-    local newCount = #listbox.items
-    if newCount > 0 then
-        if newCount < oldCount then
-            listbox.selected = math.min(newCount, math.max(1, idx - 1))
-        else
-            listbox.selected = newCount
-        end
-    end
-
-    y = self.languageEntry:getBottom() + PAD_Y + BTN_H + 10
-    self:setHeight(math.max(self:getHeight(), y))
 end
 
 ---Text entry validator for icons.
@@ -506,7 +358,32 @@ end
 ---@protected
 function ModDataEditor:_createField(type, y, labelText, default, min, max)
     local controlW = self.width - FIELD_X * 2
+    y = self:_createLabel(y, labelText)
 
+    local entry = UI.textEntry {
+        parent = self,
+        x = FIELD_X,
+        y = y,
+        w = controlW,
+        h = LABEL_H,
+        text = default,
+        font = FIELD_FONT,
+        textColorDisabled = { r = 1, g = 1, b = 1, a = 1 },
+        minValue = min,
+        maxValue = max,
+        onlyNumbers = type == 'number',
+    }
+
+    return entry.y + entry.height, entry
+end
+
+---Helper for creating an editor label.
+---@param y number
+---@param labelText string
+---@return number
+---@return ISLabel
+---@protected
+function ModDataEditor:_createLabel(y, labelText)
     local label = UI.label {
         parent = self,
         x = FIELD_X,
@@ -516,39 +393,7 @@ function ModDataEditor:_createField(type, y, labelText, default, min, max)
         font = FIELD_FONT,
     }
 
-    y = label.y + label.height
-
-    local entry
-    if type == 'list' then
-        entry = UI.listBox {
-            parent = self,
-            x = FIELD_X,
-            y = y,
-            w = controlW,
-            h = LABEL_H,
-            font = FIELD_FONT,
-            items = default,
-            itemPadY = 0,
-        }
-
-        entry:setHeight(entry.itemheight * math.max(1, math.min(#default, 5)))
-    else
-        entry = UI.textEntry {
-            parent = self,
-            x = FIELD_X,
-            y = y,
-            w = controlW,
-            h = LABEL_H,
-            text = default,
-            font = FIELD_FONT,
-            textColorDisabled = { r = 1, g = 1, b = 1, a = 1 },
-            minValue = min,
-            maxValue = max,
-            onlyNumbers = type == 'number',
-        }
-    end
-
-    return entry.y + entry.height, entry
+    return label.y + label.height, label
 end
 
 

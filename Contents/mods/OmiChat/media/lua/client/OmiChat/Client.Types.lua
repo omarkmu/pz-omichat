@@ -266,14 +266,12 @@
 ---@field usernameEntry omi.ui.TextEntry
 ---@field iconEntry omi.ui.TextEntry
 ---@field currentLangEntry omi.ui.TextEntry
----@field languageEntry omi.ui.TextEntry
+---@field languageListEntry omi.ui.ListEntry
 ---@field statusEntry omi.ui.TextEntry
 ---@field languageSlotsEntry omi.ui.TextEntry
 ---@field languageListbox ISScrollingListBox
----@field langSuggestBox omi.ui.SuggestBox
+---@field languageSuggestBox omi.ui.SuggestBox
 ---@field buttonBorderColor omi.ColorTableRGBA
----@field addLangBtn ISButton
----@field deleteLangBtn ISButton
 ---@field saveBtn ISButton
 ---@field closeBtn ISButton
 ---@field isAdd boolean
