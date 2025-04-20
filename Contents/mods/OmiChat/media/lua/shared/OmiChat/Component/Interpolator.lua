@@ -3,16 +3,16 @@
 local lib = require 'OmiLibrary'
 local BaseInterpolator = lib.interpolate.Interpolator
 
-local getTimestampMs = getTimestampMs
-
 
 ---@class omichat.Interpolator : omi.Interpolator
 local Interpolator = BaseInterpolator:derive()
-Interpolator._cache = {}
 Interpolator._registered = {}
+Interpolator._cache = lib.cache.new {
+    primaryKey = 'text',
+    ttl = 60000, -- ten minutes
+}
 
 
-local CACHE_EXPIRY_MS = 600000 -- ten minutes
 local FUNCTION_MT = { __index = Interpolator._registered }
 
 
@@ -20,21 +20,11 @@ local FUNCTION_MT = { __index = Interpolator._registered }
 ---@param clear boolean If true, the cache will be cleared entirely.
 function Interpolator.cleanupCache(clear)
     if clear then
-        Interpolator._cache = {}
+        Interpolator._cache:clear()
         return
     end
 
-    local toRemove = {}
-    local currentTime = getTimestampMs()
-    for k, item in pairs(Interpolator._cache) do
-        if currentTime - item.lastAccess >= CACHE_EXPIRY_MS then
-            toRemove[#toRemove + 1] = k
-        end
-    end
-
-    for i = 1, #toRemove do
-        Interpolator._cache[toRemove[i]] = nil
-    end
+    Interpolator._cache:update()
 end
 
 ---Gets a cached interpolator, creating one if it doesn't exist.
@@ -42,20 +32,8 @@ end
 ---@return omichat.Interpolator
 ---@static
 function Interpolator.getOrCreate(text)
-    local item = Interpolator._cache[text]
-    if item then
-        item.lastAccess = getTimestampMs()
-        return item.interpolator
-    end
-
-    local interpolator = Interpolator:new()
-    interpolator:setPattern(text)
-    Interpolator._cache[text] = {
-        interpolator = interpolator,
-        lastAccess = getTimestampMs(),
-    }
-
-    return interpolator
+    local item = Interpolator._cache:get(text) ---@cast item omichat.utils.InterpolatorCacheData
+    return item.interpolator
 end
 
 ---Registers an interpolator function.
@@ -64,6 +42,21 @@ end
 ---@static
 function Interpolator.register(name, f)
     Interpolator._registered[name] = f
+end
+
+---Creates a cache item for the interpolator cache.
+---@param _ unknown?
+---@param text string
+---@return omichat.utils.InterpolatorCacheData
+---@protected
+function Interpolator._createCacheItem(_, text)
+    local interpolator = Interpolator:new()
+    interpolator:setPattern(text)
+
+    return {
+        text = text,
+        interpolator = interpolator,
+    }
 end
 
 
@@ -85,4 +78,5 @@ function Interpolator:new(options)
 end
 
 
+Interpolator._cache:setOnCreateItem(nil, Interpolator._createCacheItem)
 return Interpolator

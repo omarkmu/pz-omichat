@@ -11,8 +11,7 @@ local ModData = ModData
 local Data = {}
 Data._version = 1
 Data._playerVersion = 1
-Data._playerCacheByUsername = {}
-Data._playerCacheByOnlineID = {}
+Data._playerCache = utils.lib.cache.player()
 
 local dataFields = {
     { key = 'nicknames', name = 'nickname' },
@@ -137,31 +136,31 @@ end
 
 ---Retrieves player information given an online ID.
 ---@param onlineID number
----@return omichat.PlayerCacheItem?
+---@return omi.PlayerCacheData?
 function Data.getPlayerInfoByOnlineID(onlineID)
-    local found = getPlayerByOnlineID(onlineID)
-    if found then
-        return Data._updateCacheWithPlayer(found)
+    local player = getPlayerByOnlineID(onlineID)
+    if player then
+        return Data._playerCache:updatePlayer(player)
     end
 
-    return Data._playerCacheByOnlineID[onlineID]
+    return Data._playerCache:getByIndex('onlineID', onlineID)
 end
 
 ---Retrieves player information given a username.
 ---@param username string
----@return omichat.PlayerCacheItem?
+---@return omi.PlayerCacheData?
 function Data.getPlayerInfoByUsername(username)
-    local found = utils.getPlayerByUsername(username)
-    if found then
-        return Data._updateCacheWithPlayer(found)
+    local player = utils.getPlayerByUsername(username)
+    if player then
+        return Data._playerCache:updatePlayer(player)
     end
 
-    return Data._playerCacheByUsername[username]
+    return Data._playerCache:get(username)
 end
 
 ---Retrieves the name that should be used in chat for the given menu type.
 ---If the menu name should not be affected or retrieving the name fails, this returns `nil`.
----@param player IsoPlayer | omichat.PlayerCacheItem
+---@param player IsoPlayer | omi.PlayerCacheData
 ---@param menuType omichat.MenuTypeString
 ---@return string?
 function Data.getPlayerMenuName(player, menuType)
@@ -192,7 +191,7 @@ function Data.getPlayerMenuName(player, menuType)
 end
 
 ---Retrieves the name that should be used in chat for a given player.
----@param player IsoPlayer | omichat.PlayerCacheItem
+---@param player IsoPlayer | omi.PlayerCacheData
 ---@param chatType omichat.ChatTypeString The chat type to use in format string interpolation.
 ---@return string? name The name to use in chat, or `nil` if unable to retrieve information about the player.
 function Data.getPlayerNameInChat(player, chatType)
@@ -215,11 +214,11 @@ end
 
 ---Gets substitution tokens to use in interpolation for a given player.
 ---If the player information could not be obtained, returns `nil`.
----@param player (IsoPlayer | omichat.PlayerCacheItem)?
+---@param player (IsoPlayer | omi.PlayerCacheData)?
 ---@return table?
 function Data.getPlayerSubstitutions(player)
     if player and not player.getUsername then
-        ---@cast player omichat.PlayerCacheItem
+        ---@cast player omi.PlayerCacheData
         return {
             forename = utils.trim(player.forename),
             surname = utils.trim(player.surname),
@@ -274,10 +273,9 @@ function Data.getPlayerModData(username)
 end
 
 ---Returns an iterator over the player cache.
----@return function
----@return table<string, omichat.PlayerCacheItem>
+---@return fun(): string?, omi.PlayerCacheData?
 function Data.iteratePlayerCache()
-    return pairs(Data._playerCacheByUsername)
+    return Data._playerCache:iterate()
 end
 
 ---Refreshes roleplay language information for the given username.
@@ -310,20 +308,9 @@ function Data.refreshLanguageInfo(username)
 end
 
 ---Resets the player cache.
----@param items omichat.PlayerCacheItem[]
+---@param items omi.PlayerCacheData[]
 function Data.resetPlayerCache(items)
-    items = items or {}
-
-    local byUsername = {}
-    local byOnlineID = {}
-    for i = 1, #items do
-        local item = items[i]
-        byUsername[item.username] = item
-        byOnlineID[item.onlineID] = item
-    end
-
-    Data._playerCacheByUsername = byUsername
-    Data._playerCacheByOnlineID = byOnlineID
+    Data._playerCache:fromList(items or {})
 end
 
 ---Sets the mod data for the given username.
@@ -339,39 +326,8 @@ function Data.set(username, data)
 end
 
 
----Creates a cache item for the given player.
----@param player IsoPlayer
----@return omichat.PlayerCacheItem
----@protected
-function Data._buildPlayerCacheItem(player)
-    local desc = player:getDescriptor()
-
-    local speechColor
-    local color = player:getSpeakColour()
-    if color then
-        speechColor = {
-            r = color:getRed(),
-            g = color:getGreen(),
-            b = color:getBlue(),
-        }
-    else
-        speechColor = { r = 255, g = 255, b = 255 }
-    end
-
-    ---@type omichat.PlayerCacheItem
-    local item = {
-        username = player:getUsername(),
-        forename = desc:getForename(),
-        surname = desc:getSurname(),
-        onlineID = player:getOnlineID(),
-        speechColor = speechColor,
-    }
-
-    return item
-end
-
 ---Gets the username for a player or player cache item.
----@param player IsoPlayer | omichat.PlayerCacheItem
+---@param player IsoPlayer | omi.PlayerCacheData
 ---@return string?
 ---@protected
 function Data._getPlayerUsername(player)
@@ -379,21 +335,9 @@ function Data._getPlayerUsername(player)
         ---@cast player IsoPlayer
         return player:getUsername()
     else
-        ---@cast player omichat.PlayerCacheItem
+        ---@cast player omi.PlayerCacheData
         return player.username
     end
-end
-
----Updates the cache with the player's information.
----@param player IsoPlayer
----@return omichat.PlayerCacheItem
----@protected
-function Data._updateCacheWithPlayer(player)
-    local item = Data._buildPlayerCacheItem(player)
-
-    Data._playerCacheByUsername[item.username] = item
-    Data._playerCacheByOnlineID[item.onlineID] = item
-    return item
 end
 
 

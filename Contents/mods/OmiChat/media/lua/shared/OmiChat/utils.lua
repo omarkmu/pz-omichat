@@ -8,7 +8,6 @@ local pow = math.pow
 local floor = math.floor
 local char = string.char
 local concat = table.concat
-local getPlayerFromUsername = getPlayerFromUsername
 
 
 ---@class omichat.utils : omi.proxy
@@ -352,23 +351,6 @@ function utils.getNumericAccessLevel(access)
     end
 
     return accessLevels[access:lower()] or 1
-end
-
----Gets a player given their username.
----@param username string
----@return IsoPlayer?
-function utils.getPlayerByUsername(username)
-    if not isServer() then
-        return getPlayerFromUsername(username)
-    end
-
-    local onlinePlayers = getOnlinePlayers()
-    for i = 0, onlinePlayers:size() - 1 do
-        local player = onlinePlayers:get(i)
-        if player:getUsername() == username then
-            return player
-        end
-    end
 end
 
 ---Retrieves a texture name given a chat icon name.

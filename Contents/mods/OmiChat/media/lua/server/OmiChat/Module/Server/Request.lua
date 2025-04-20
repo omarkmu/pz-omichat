@@ -124,7 +124,7 @@ function Request.sendTranslatedServerMessage(stringID, args, serverAlert)
 end
 
 ---Sends a request to all players to update the player cache.
----@param items omichat.PlayerCacheItem[]
+---@param items omi.PlayerCacheData[]
 function Request.updatePlayerCache(items)
     local req = { items = items } ---@type omichat.request.UpdatePlayerCache
 

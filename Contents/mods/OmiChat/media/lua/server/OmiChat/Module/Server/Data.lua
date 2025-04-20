@@ -44,14 +44,14 @@ end
 ---@see omichat.api.server.data.transmit
 ---@param username string
 function Data.clearModData(username)
-    API.data.clear(username)
+    Data.clear(username)
 end
 
 ---Clears all player nicknames.
 ---This does not transmit changes to clients.
 ---@see omichat.api.server.data.transmit
 function Data.clearNicknames()
-    local modData = API.data.get()
+    local modData = Data.get()
     modData.nicknames = {}
 end
 
@@ -59,7 +59,7 @@ end
 ---@param username string
 ---@return string[]
 function Data.getLanguages(username)
-    local modData = API.data.get()
+    local modData = Data.get()
     if not modData.languages[username] then
         Data.resetLanguages(username)
     end
@@ -71,7 +71,7 @@ end
 ---@param username string
 ---@return integer
 function Data.getLanguageSlots(username)
-    local modData = API.data.get()
+    local modData = Data.get()
     return modData.languageSlots[username] or config.Language.DefaultSlots
 end
 
@@ -80,18 +80,21 @@ end
 ---@param username string
 ---@see omichat.api.server.data.transmit
 function Data.resetLanguages(username)
-    local modData = API.data.get()
+    local modData = Data.get()
     modData.languages[username] = { API.language.getDefault() }
-    API.data.refreshLanguageInfo(username)
+    Data.refreshLanguageInfo(username)
 end
 
 ---Refreshes the cache with information from the currently online players.
----@return omichat.PlayerCacheItem[]
+---@return omi.PlayerCacheData[]
 function Data.refreshPlayerCache()
-    local onlinePlayers = getOnlinePlayers()
     local items = {}
-    for i = 0, onlinePlayers:size() - 1 do
-        items[#items + 1] = Data._buildPlayerCacheItem(onlinePlayers:get(i))
+
+    local onlinePlayers = getOnlinePlayers()
+    if onlinePlayers then
+        for i = 0, onlinePlayers:size() - 1 do
+            items[#items + 1] = Data._playerCache:createPlayerData(onlinePlayers:get(i))
+        end
     end
 
     Data.resetPlayerCache(items)
@@ -104,7 +107,7 @@ end
 ---@param icon string?
 ---@see omichat.api.server.data.transmit
 function Data.setChatIcon(username, icon)
-    local modData = API.data.get()
+    local modData = Data.get()
     modData.icons[username] = icon
 end
 
@@ -119,10 +122,10 @@ function Data.setCurrentLanguage(username, language)
         return false
     end
 
-    local modData = API.data.get()
+    local modData = Data.get()
     modData.currentLanguage[username] = language
 
-    API.data.refreshLanguageInfo(username)
+    Data.refreshLanguageInfo(username)
     return true
 end
 
@@ -132,9 +135,9 @@ end
 ---@param languages string[]?
 ---@see omichat.api.server.data.transmit
 function Data.setLanguages(username, languages)
-    local modData = API.data.get()
+    local modData = Data.get()
     modData.languages[username] = languages
-    API.data.refreshLanguageInfo(username)
+    Data.refreshLanguageInfo(username)
 end
 
 ---Sets the number of roleplay language slots for the player with the given username.
@@ -148,7 +151,7 @@ function Data.setLanguageSlots(username, slots)
         return false
     end
 
-    local modData = API.data.get()
+    local modData = Data.get()
     modData.languageSlots[username] = slots
     return true
 end
@@ -159,7 +162,7 @@ end
 ---@param nickname string?
 ---@see omichat.api.server.data.transmit
 function Data.setNickname(username, nickname)
-    local modData = API.data.get()
+    local modData = Data.get()
     modData.nicknames[username] = nickname
 end
 
@@ -184,13 +187,13 @@ end
 ---@param status string?
 ---@see omichat.api.server.data.transmit
 function Data.setStatus(username, status)
-    local modData = API.data.get()
+    local modData = Data.get()
     modData.statuses[username] = status
 end
 
 ---Transmits mod data to clients.
 function Data.transmit()
-    local data = API.data.get()
+    local data = Data.get()
     if SINGLEPLAYER then
         local _API = API --[[@as omichat.api.client]]
         _API._onReceiveGlobalModData(API._key, data) ---@diagnostic disable-line: invisible

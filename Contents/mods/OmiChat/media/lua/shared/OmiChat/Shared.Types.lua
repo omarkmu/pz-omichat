@@ -36,12 +36,12 @@
 ---@field currentLanguage string?
 ---@field status string?
 
----@class omichat.utils.InterpolatorCacheItem
+---@class omichat.utils.InterpolatorCacheData
+---@field text string
 ---@field interpolator omichat.Interpolator
----@field lastAccess number
 
 ---@class omichat.Interpolator
----@field private _cache table<string, omichat.utils.InterpolatorCacheItem> (static)
+---@field private _cache omi.Cache<omichat.utils.InterpolatorCacheData> (static)
 ---@field private _registered table<string, function> (static)
 
 ---@class omichat.MetaFormatter
@@ -108,15 +108,7 @@
 ---@class omichat.api.shared.data
 ---@field protected _version integer
 ---@field protected _playerVersion integer
----@field private _playerCacheByUsername table<string, omichat.PlayerCacheItem>
----@field private _playerCacheByOnlineID table<string, omichat.PlayerCacheItem>
-
----@class omichat.PlayerCacheItem
----@field username string
----@field forename string
----@field surname string
----@field onlineID number
----@field speechColor omi.ColorTable
+---@field protected _playerCache omi.PlayerCache
 
 --#endregion
 
@@ -176,7 +168,7 @@
 
 ---Request to update the player cache.
 ---@class omichat.request.UpdatePlayerCache
----@field items omichat.PlayerCacheItem[]
+---@field items omi.PlayerCacheData[]
 
 ---Request to update the configuration.
 ---@class omichat.request.UpdateConfiguration
