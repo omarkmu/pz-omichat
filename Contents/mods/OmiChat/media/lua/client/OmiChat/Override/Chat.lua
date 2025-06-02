@@ -6,6 +6,7 @@ local ISChat = ISChat ---@class omichat.ISChat
 
 local utils = API.utils
 local config = API.Configuration
+local UI = utils.ui
 local getText = getText
 local concat = table.concat
 
@@ -13,12 +14,10 @@ local _addLineInChat = ISChat.addLineInChat
 local _onCommandEntered = ISChat.onCommandEntered
 local _logChatCommand = ISChat.logChatCommand
 local _createChildren = ISChat.createChildren
-local _createTab = ISChat.createTab
 local _focus = ISChat.focus
 local _unfocus = ISChat.unfocus
 local _close = ISChat.close
 local _onMouseDown = ISChat.onMouseDown
-local _onInfo = ISChat.onInfo
 local _onTabAdded = ISChat.onTabAdded
 local _onTabRemoved = ISChat.onTabRemoved
 local _update = ISChat.update
@@ -123,11 +122,46 @@ function ISChat:createChildren()
     API.chat.updateState()
 end
 
----Override to mark chat tabs for rich text processing changes.
+---Override to use the extended rich text panel.
 ---@return omichat.ChatTab
 function ISChat:createTab()
-    local tab = _createTab(self)
-    tab.ocIsChatTab = true
+    local y = self:titleBarHeight() + self.btnHeight + self.inset * 2
+
+    ---@type omi.ui.InitArgs.RichTextPanel
+    local args = {
+        x = 0,
+        y = y,
+        w = self:getWidth(),
+        h = self.textEntry:getY() - y,
+        autosetheight = false,
+        visible = false,
+        background = false,
+        anchorBottom = true,
+        anchorLeft = true,
+        anchorTop = true,
+        anchorRight = true,
+        addVerticalScrollbar = true,
+        invisibleScrollbars = true,
+        clip = true,
+        maxLines = 500,
+        marginTop = 2,
+        marginBottom = 0,
+        logger = utils.log,
+    }
+
+    local tab = API.ChatTab:new(args)
+
+    tab:initialise()
+    tab:instantiate()
+    UI.init(tab, args)
+
+    tab.onRightMouseUp = ISChat.onRightMouseUp
+    tab.onRightMouseDown = ISChat.onRightMouseDown
+    tab.onMouseUp = ISChat.onMouseUp
+    tab.onMouseDown = ISChat.onMouseDown
+    tab.render = ISChat.render_chatText
+
+    tab:ignoreHeightChange()
     return tab
 end
 
@@ -310,7 +344,7 @@ function ISChat:onCommandEntered()
     API.ui.scrollToBottom()
 
     if shouldRetain and stream then
-        instance.chatText.lastChatCommand = chatCommand
+        instance.chatText.lastChatCommand = chatCommand or ''
     elseif stream then
         -- if the used stream shouldn't be set as the last, cycle to the previous command
         local lastChatStream = API.streams.chatCommandToStreamName(instance.chatText.lastChatCommand)
@@ -349,12 +383,39 @@ function ISChat:onInfo()
     local text = API.ui.getInfoRichText()
     self:setInfo(text)
 
-    if text == '' and self.infoRichText then
-        self.infoRichText:removeFromUIManager()
+    if text == '' then
+        if self.infoRichText then
+            self.infoRichText:removeFromUIManager()
+        end
+
         return
     end
 
-    _onInfo(self)
+    if not self.infoRichText then
+        local screenW, screenH = UI.getScreenCenter(400, 300)
+        self.infoRichText = UI.dialog {
+            x = screenW,
+            y = screenH,
+            w = 600,
+            h = 600,
+            richText = true,
+            text = self.infoText,
+            alwaysOnTop = true,
+            moveWithMouse = false,
+            backgroundColor = { r = 0, g = 0, b = 0, a = 0.8 },
+        }
+
+        self.infoRichText:setHeightToContents()
+        self.infoRichText:ignoreHeightChange()
+        return
+    end
+
+    if self.infoRichText:isReallyVisible() then
+        self.infoRichText:removeFromUIManager()
+    else
+        self.infoRichText:setVisible(true)
+        self.infoRichText:addToUIManager()
+    end
 end
 
 ---Override to hide components on text panel or entry click.
@@ -512,6 +573,14 @@ function ISChat:render()
     local y = self.textEntry:getY() - API.ui.typingFontHgt - 3
     self:setStencilRect(0, 0, w, self:getHeight())
     self:drawText(text, x, y, 1, 1, 1, 1, API.ui.typingFont)
+    self:clearStencilRect()
+end
+
+---Override to use the extended rich text panel rendering.
+---@param self omichat.ChatTab
+function ISChat.render_chatText(self)
+    self:setStencilRect(0, 0, self.width, self.height)
+    API.ChatTab.render(self)
     self:clearStencilRect()
 end
 

@@ -44,7 +44,7 @@
 ---@field private _isTyping boolean Whether the local player is currently typing.
 ---@field private _mock omi.chat.Mock?
 
----@class omichat.ChatTab : ISRichTextPanel
+---@class omichat.ChatTab : omi.ui.RichTextPanel
 ---@field parent omichat.ISChat The parent chat.
 ---@field logIndex integer The current index in the tab's input history.
 ---@field tabID integer The tab ID of this tab (0-indexed).
@@ -55,7 +55,7 @@
 ---@field log string[] The input history of this tab.
 ---@field tabTitle string The title of this tab.
 ---@field streamID integer The stream ID of the current stream.
----@field infoButton ISButton
+---@field lastChatCommand string The last command input in the chat tab.
 
 ---@class omichat.TypingInformation
 ---@field display string
@@ -79,7 +79,7 @@
 ---@field showTitle boolean Whether chat type titles should display.
 ---@field showTimestamp boolean Whether timestamps should display.
 ---@field chatFont omichat.ChatFont The current font of the chat.
----@field chatText omichat.ChatTab The current chat tabs.
+---@field chatText omichat.ChatTab The current chat tab.
 ---@field tabs omichat.ChatTab[] List of available chat tabs.
 ---@field allChatStreams (omichat.ChatStream | omichat.StreamTable)[] List of all available chat streams.
 ---@field defaultTabStream table<integer, omichat.ChatStream?> An association of 1-indexed tab IDs to default streams.
@@ -87,6 +87,7 @@
 ---@field textEntry omi.ui.TextEntry The text entry UI element.
 ---@field currentTabID integer The 1-indexed tab ID of the current tab.
 ---@field tabCnt integer The number of available tabs.
+---@field infoButton ISButton The info button.
 
 --#endregion
 
