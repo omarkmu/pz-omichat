@@ -1,6 +1,7 @@
 ---Handles player preferences.
 
 local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
+local schema = require 'OmiChat/Component/PreferencesSchema'
 
 local utils = API.utils
 local config = API.Configuration
@@ -38,17 +39,19 @@ function Preferences.get()
     local version = decoded.VERSION
     if version > Preferences._version then
         -- use default settings & add flag to avoid overwrite
-
         local msg = 'Preferences file has a higher version (%d > %d). Changes to preferences will not be saved.'
         utils.log.once(msg, version, Preferences._version)
         prefs.HIGHER_VERSION = true
+
         return prefs
-    elseif version == 1 then
-        Preferences._readPrefsV1(decoded, prefs)
-    elseif version == 2 then
-        Preferences._readPrefsV2(decoded, prefs)
     end
 
+    for k, v in pairs(decoded.settings) do
+        prefs[k] = v
+    end
+
+    prefs.profiles = decoded.profiles
+    prefs.profileIndex = decoded.profileIndex
     return prefs
 end
 
@@ -126,9 +129,6 @@ function Preferences.getDefaultPlayerPreferences()
         adminKnowLanguages = true,
         adminIgnoreRange = true,
         showTyping = true,
-        colors = {},
-        callouts = {},
-        sneakcallouts = {},
         profileIndex = 0,
         profiles = {},
     }
@@ -138,7 +138,8 @@ end
 ---This does not check for admin permissions.
 ---@return boolean
 function Preferences.getIgnoreMessageRange()
-    return Preferences.getAdminOption('IgnoreMessageRange')
+    local prefs = Preferences.get()
+    return prefs.adminIgnoreRange
 end
 
 ---Retrieves a boolean for whether the current player has name colors enabled.
@@ -174,14 +175,16 @@ end
 ---Retrieves a boolean for whether the current player has sign language emotes enabled.
 ---@return boolean
 function Preferences.getSignEmotesEnabled()
-    return Preferences.get().useSignEmotes
+    local prefs = Preferences.get()
+    return prefs.useSignEmotes
 end
 
 ---Retrieves whether the player has the admin option to display a chat icon enabled.
 ---This does not check for admin permissions.
 ---@return boolean
 function Preferences.getShowAdminIcon()
-    return Preferences.getAdminOption('ShowIcon')
+    local prefs = Preferences.get()
+    return prefs.adminShowIcon
 end
 
 ---Retrieves whether the player has the option to show typing indicators enabled.
@@ -208,7 +211,8 @@ end
 ---This does not check for admin permissions.
 ---@return boolean
 function Preferences.getUnderstandAllLanguages()
-    return Preferences.getAdminOption('KnowAllLanguages')
+    local prefs = Preferences.get()
+    return prefs.adminKnowLanguages
 end
 
 ---Gets whether the current player wants to use chat suggestions.
@@ -273,7 +277,7 @@ function Preferences.setAdminOption(option, value)
     prefs[mappedPref] = not not value
     Preferences.save()
 
-    if mappedPref == 'adminKnowLanguages' then
+    if mappedPref == 'adminKnowLanguages' or mappedPref == 'adminIgnoreRange' then
         API.ui.redraw()
     end
 end
@@ -409,21 +413,11 @@ function Preferences.switchToDefaultProfile()
 end
 
 
----Converts the input to a boolean.
----If the input is `nil`, `default` is returned.
----@param value unknown
----@param default boolean
----@return boolean
----@private
-function Preferences._readBool(value, default)
-    return not not utils.default(value, default)
-end
-
 ---Reads the JSON preferences file and converts it to an equivalent Lua table.
 ---@return table?
 ---@private
 function Preferences._readPrefsJson()
-    local decoded, err = utils.schema.read(Preferences._filename)
+    local decoded, err = schema:readFile(Preferences._filename)
     if err then
         utils.log.error('Failed to read preferences: %s', err)
     end
@@ -437,101 +431,6 @@ function Preferences._readPrefsJson()
     end
 
     return decoded
-end
-
----Reads player preferences file with format version 1.
----@param decoded table
----@param prefs omichat.PlayerPreferences
----@param ignoreObsolete boolean?
----@private
-function Preferences._readPrefsV1(decoded, prefs, ignoreObsolete)
-    prefs.showNameColors = Preferences._readBool(decoded.showNameColors, prefs.showNameColors)
-    prefs.useSuggester = Preferences._readBool(decoded.useSuggester, prefs.useSuggester)
-    prefs.useSignEmotes = Preferences._readBool(decoded.useSignEmotes, prefs.useSignEmotes)
-    prefs.retainChatInput = Preferences._readBool(decoded.retainChatInput, prefs.retainChatInput)
-    prefs.retainRPInput = Preferences._readBool(decoded.retainRPInput, prefs.retainRPInput)
-    prefs.retainOtherInput = Preferences._readBool(decoded.retainOtherInput, prefs.retainOtherInput)
-    prefs.adminShowIcon = Preferences._readBool(decoded.adminShowIcon, prefs.adminShowIcon)
-    prefs.adminKnowLanguages = Preferences._readBool(decoded.adminKnowLanguages, prefs.adminShowIcon)
-    prefs.adminIgnoreRange = Preferences._readBool(decoded.adminIgnoreRange, prefs.adminShowIcon)
-
-    if ignoreObsolete then
-        return
-    end
-
-    local callouts, sneakcallouts, colors
-    if type(decoded.callouts) == 'table' then
-        callouts = Preferences._readStringList(decoded.callouts)
-        if #callouts == 0 then
-            callouts = nil
-        end
-    end
-
-    if type(decoded.sneakcallouts) == 'table' then
-        sneakcallouts = Preferences._readStringList(decoded.sneakcallouts)
-        if #sneakcallouts == 0 then
-            sneakcallouts = nil
-        end
-    end
-
-    if type(decoded.colors) == 'table' then
-        colors = {}
-
-        local hasColor
-        for k, v in pairs(decoded.colors) do
-            local color = utils.color.fromString(v)
-            if color then
-                hasColor = true
-                colors[k] = color
-            end
-        end
-
-        if not hasColor then
-            colors = nil
-        end
-    end
-
-    if callouts or sneakcallouts or colors then
-        prefs.profileIndex = 1
-        prefs.profiles = {
-            {
-                name = getText('UI_OmiChat_ProfileManager_DefaultProfileName', '1'),
-                colors = colors or {},
-                callouts = callouts or {},
-                sneakcallouts = sneakcallouts or {},
-            },
-        }
-    end
-end
-
----Reads player preferences file with format version 2.
----@param decoded table
----@param prefs omichat.PlayerPreferences
----@private
-function Preferences._readPrefsV2(decoded, prefs)
-    local settings = decoded.settings
-    if type(settings) == 'table' then
-        Preferences._readPrefsV1(settings, prefs, true)
-        prefs.showTyping = Preferences._readBool(settings.showTyping, prefs.showTyping)
-        prefs.suggestOnEnter = Preferences._readBool(settings.suggestOnEnter, prefs.suggestOnEnter)
-        prefs.suggestOnTab = Preferences._readBool(settings.suggestOnTab, prefs.suggestOnTab)
-    end
-
-    local profiles = decoded.profiles
-    if type(profiles) == 'table' then
-        prefs.profiles = profiles
-
-        local idx = tonumber(decoded.profileIndex) or 0
-        prefs.profileIndex = utils.clamp(idx, 0, #profiles)
-    end
-end
-
----Converts all elements of a list to strings.
----@param tab table
----@return string[]
----@private
-function Preferences._readStringList(tab)
-    return utils.mapList(tostring, tab)
 end
 
 
