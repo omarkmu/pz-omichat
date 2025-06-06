@@ -527,13 +527,11 @@ function Streams._updateChatStreams()
     -- cycle if current stream is now unavailable
     local instance = ISChat.instance
     local chatText = instance and instance.chatText
-    if not chatText then
-        return
-    end
-
-    local lastStream = Streams.chatCommandToStream(chatText.lastChatCommand)
-    if lastStream and not lastStream:checkPlayerCanUse() then
-        chatText.lastChatCommand = Streams.cycle()
+    if chatText then
+        local lastStream = Streams.chatCommandToStream(chatText.lastChatCommand)
+        if not lastStream or not lastStream:checkPlayerCanUse() then
+            chatText.lastChatCommand = Streams.cycle()
+        end
     end
 
     Streams.updateTagCache()
