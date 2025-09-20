@@ -159,7 +159,7 @@ This can be extended by other mods. In the base mod, however, this will be one o
 
 ## `$surname`
 
-The relevant player character's forename.
+The relevant player character's surname.
 
 ## `$unknownLanguage`
 
