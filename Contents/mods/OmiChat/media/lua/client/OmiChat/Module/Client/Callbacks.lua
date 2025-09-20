@@ -166,7 +166,7 @@ function Callback.openConfiguration(target)
         w = 800,
         h = 600,
         values = config:getValuesForSave(),
-        onSave = API._onSaveConfiguration,
+        onSave = API._onConfigurationSave,
     }
 
     panel:initialise()

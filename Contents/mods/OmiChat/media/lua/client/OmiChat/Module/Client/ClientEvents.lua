@@ -6,11 +6,16 @@ local lib = API.utils.lib
 local config = API.Configuration
 
 
----Called when configuration is saved to a file.
+---Called when configuration is saved from the editor form.
+---@param args omi.forms.Args.Callback.Save
 ---@private
-function API._onConfigurationSave()
-    if API.chat and API.chat.updateState then
-        API.chat.updateState(true)
+function API._onConfigurationSave(args)
+    config:load(args.values)
+    API.request.updateConfiguration()
+
+    -- immediately save to mod data if testing in singleplayer
+    if getDebug() and not isClient() then
+        config:saveModData()
     end
 end
 
@@ -88,19 +93,6 @@ function API._onReceiveGlobalModData(key, newData)
     end
 end
 
----Called when configuration is saved from the editor form.
----@param args omi.forms.Args.Callback.Save
----@private
-function API._onSaveConfiguration(args)
-    config:load(args.values)
-    API.request.updateConfiguration()
-
-    -- save to mod data if testing in singleplayer
-    if getDebug() and not isClient() then
-        config:saveModData()
-    end
-end
-
 ---Called when processing commands from the server.
 ---@param module string
 ---@param command string
@@ -135,4 +127,3 @@ Events.OnPlayerDeath.Add(API._onPlayerDeath)
 Events.OnServerCommand.Add(API._onServerCommand)
 Events.OnReceiveGlobalModData.Add(API._onReceiveGlobalModData)
 Events.OnTick.Add(API._onTickTemporary)
-config:setOnSave(API._onConfigurationSave)

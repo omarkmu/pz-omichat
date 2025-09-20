@@ -88,6 +88,11 @@
 ---@field currentTabID integer The 1-indexed tab ID of the current tab.
 ---@field tabCnt integer The number of available tabs.
 ---@field infoButton ISButton The info button.
+---@field activeProfilesPanel omichat.ProfileManager?
+---@field activeConfigurationPanel omi.forms.Form?
+---@field activeLanguageModal omi.ui.Dialog?
+---@field activeColorModal omi.ui.Dialog?
+---@field activeModDataPanel omichat.ModDataManager
 
 --#endregion
 

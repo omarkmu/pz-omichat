@@ -19,15 +19,6 @@ local Configuration = utils.configuration {
 
     ---@param self omichat.ConfigurationHelper
     onLoad = function(self) self:refreshValueCaches() end,
-
-    ---@param self omichat.ConfigurationHelper
-    onSave = function(self)
-        ---@diagnostic disable-next-line: invisible
-        local cb = self._onSaveCallback
-        if cb then
-            cb()
-        end
-    end,
 }
 
 
@@ -452,12 +443,6 @@ function Configuration:requireDiceItem()
     return #self.Commands.Roll.Items > 0
 end
 
----Sets a callback to call on save.
----@param onSave function
-function Configuration:setOnSave(onSave)
-    self._onSaveCallback = onSave
-end
-
 ---Updates the format text used for metadata formatters.
 function Configuration:updateFormatters()
     self._formatterInfo = self._formatterInfo or {}
@@ -501,24 +486,6 @@ function Configuration:updateFormatters()
 end
 
 
----Event handler for initializing global mod data.
----@protected
-function Configuration._onInitGlobalModData()
-    local self = Configuration
-
-    -- server loads from mod data
-    if not isClient() and self:loadModData() then
-        self:saveModData(true)
-        self:updateFormatters()
-        return
-    end
-
-    -- client loads cached settings; will ultimately be received from server
-    self:loadModData()
-    self:saveModData()
-    self:updateFormatters()
-end
-
 ---Caches the configured languages and information about them.
 ---@protected
 function Configuration:_cacheLanguages()
@@ -560,6 +527,23 @@ function Configuration:_isCompatEnabled(value, modId)
     end
 
     return self._enabledMods[modId] == true
+end
+
+---Event handler for initializing global mod data.
+---@protected
+function Configuration._onInitGlobalModData()
+    local loadSuccess = Configuration:loadModData()
+
+    -- server loads from mod data
+    if not isClient() and loadSuccess then
+        Configuration:saveModData(true)
+        Configuration:updateFormatters()
+        return
+    end
+
+    -- client loads cached settings; will ultimately be received from server
+    Configuration:saveModData()
+    Configuration:updateFormatters()
 end
 
 

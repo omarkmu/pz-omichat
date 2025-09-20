@@ -200,7 +200,6 @@
 ---@field protected _languageAllowSet omi.SimpleSet
 ---@field protected _languageBlockSet omi.SimpleSet
 ---@field protected _formatterInfo table<integer, omichat.FormatterInfo>
----@field protected _onSaveCallback function
 
 ---@class omichat.LanguageRecord : omichat.Configuration.LanguageDefinition
 ---@field ID integer
