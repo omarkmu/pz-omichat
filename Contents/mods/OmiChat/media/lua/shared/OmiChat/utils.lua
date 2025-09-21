@@ -16,6 +16,7 @@ utils.lib = lib
 utils.Interpolator = Interpolator
 
 
+local clientAPI ---@type omichat.api.client?
 local loadedIcons = false
 local iconToTextureNameMap = {} ---@type table<string, string>
 local accessLevels = {
@@ -242,6 +243,17 @@ end
 function utils.getAuthorEndPos(text, author)
     local _, authorEnd = text:find('%[' .. utils.escape(author) .. '%]:')
     return authorEnd
+end
+
+---Helper for requiring the client API in a shared context.
+---Should only be used client-side.
+---@return omichat.api.client
+function utils.getAPI()
+    if not clientAPI then
+        clientAPI = require 'OmiChat/Shared' --[[@as omichat.api.client]]
+    end
+
+    return clientAPI
 end
 
 ---Gets the base color picker class given a class object.

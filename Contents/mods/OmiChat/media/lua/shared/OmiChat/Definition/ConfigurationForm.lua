@@ -7,6 +7,8 @@ local PAD_N = 10
 local PAD_TOP = { paddingTop = PAD_N }
 local PAD_BOTTOM = { paddingBottom = PAD_N }
 local NO_REORDER = { noReorderButtons = true }
+local PATH_PRESET = { 'General', 'Preset' }
+local PATH_INFO = { 'General', 'InfoText' }
 
 ---Helper to create a rules table containing only rules for children.
 ---Wraps the given table in an outer table with a `children` key.
@@ -14,6 +16,166 @@ local NO_REORDER = { noReorderButtons = true }
 ---@return omi.forms.Rules
 local function rules(ruleTable)
     return { children = ruleTable }
+end
+
+---Applies values from a preset to the form.
+---@param form omi.forms.Form
+---@param preset omichat.ConfigurationPreset
+local function applyPreset(form, preset)
+    local values = form.values
+    local schema = form:getSchema() ---@cast schema omichat.ConfigurationSchema
+    local id = preset:getID()
+
+    -- get info text value before setting values
+    local infoText = form:getValue(PATH_INFO)
+
+    -- ensure ID matches expected preset ID
+    local presetValues = preset:getValues(schema)
+    presetValues.General = presetValues.General or {}
+    presetValues.General.Preset = id
+
+    form:setValues(presetValues)
+
+    -- keep the existing info text when applying a built-in preset
+    if not preset:isCustom() then
+        values.General = values.General or {}
+        values.General.InfoText = infoText
+        form:setControlValue(PATH_INFO, infoText)
+    end
+
+    form:setStatusMessage(getText('Sandbox_OmiChat_status_preset', preset:getName()))
+end
+
+---Gets a list of options for the preset configuration value.
+---@return omi.ui.Dropdown.OptionOrString[]
+local function getPresetOptions()
+    local list = {} ---@type omi.ui.Dropdown.OptionOrString[]
+    local presetList = utils.getAPI().Configuration:getPresetList()
+    for i = 1, #presetList do
+        local preset = presetList[i]
+
+        list[#list + 1] = {
+            data = preset:getID(),
+            text = preset:getName(),
+            tooltip = preset:isCustom() and getText('UI_OmiChat_PresetUserDefined') or nil,
+        }
+    end
+
+    return list
+end
+
+---Refreshes the list of presets to match the current custom presets.
+---@param form omi.forms.Form
+local function refreshPresetsList(form)
+    local dropdown = form:getFieldControl(PATH_PRESET) ---@cast dropdown omi.ui.Dropdown?
+    if not dropdown then
+        return
+    end
+
+    local options = getPresetOptions()
+
+    dropdown:clear()
+    for i = 1, #options do
+        local opt = options[i]
+        dropdown:addOptionWithData(opt.text, opt.data)
+
+        local added = dropdown.options[#dropdown.options]
+        added.tooltip = opt.tooltip
+    end
+end
+
+---Called when a preset action button is clicked.
+---@param args omi.forms.Args.Callback.ButtonClick
+local function onPresetAction(args)
+    local API = utils.getAPI()
+    local config = API.Configuration
+    local lib = utils.lib --[[@as omi.client]]
+    local state = args.state
+    local form = args.form
+    local value = args.value ---@type string
+
+    if args.buttonIndex == 1 then
+        -- apply preset
+        local preset = config:getPreset(value)
+        if preset then
+            applyPreset(form, preset)
+        end
+    elseif args.buttonIndex == 2 then
+        -- save preset
+        if state.activePresetDialog then
+            state.activePresetDialog:destroy()
+        end
+
+        local values = args.values
+        local dialog ---@type omi.ui.TextDialog
+        local warningMessage = getText('UI_OmiChat_SavePreset_Overwrite')
+
+        dialog = lib.ui.textDialog {
+            type = 'OKCancel',
+            w = 500,
+            h = 200,
+            text = getText('UI_OmiChat_SavePreset_Prompt'),
+            minLength = 1,
+            maxLength = 50,
+            onClick = function(_, _args)
+                if _args.internal == 'CANCEL' then
+                    return
+                end
+
+                local name = utils.trim(_args.text)
+                if #name == 0 then
+                    return
+                end
+
+                local preset = API.extension.addCustomPreset(name, values, true)
+                refreshPresetsList(form)
+                applyPreset(form, preset)
+            end,
+            validate = function(_, text)
+                if config:getCustomPreset(text) then
+                    dialog:showWarningMessage(warningMessage)
+                else
+                    dialog:hideWarningMessage()
+                end
+
+                return true
+            end,
+        }
+
+        state.activePresetDialog = dialog
+    else
+        if not utils.startsWith(value, 'custom:') then
+            return
+        end
+
+        -- delete preset
+        if state.activePresetDialog then
+            state.activePresetDialog:destroy()
+        end
+
+        local name = value:sub(8)
+        state.activePresetDialog = lib.ui.yesNoDialog {
+            w = 400,
+            h = 100,
+            text = getText('UI_OmiChat_DeletePreset_Confirm', name),
+            onClick = function(_, _args)
+                if _args.internal == 'NO' then
+                    return
+                end
+
+                API.extension.removeCustomPreset(name, true)
+
+                local currentValue = form:getValue(PATH_PRESET)
+                if currentValue == value then
+                    refreshPresetsList(form)
+
+                    local values = form.values
+                    values.General.Preset = 'Default'
+                    form:setControlValue(PATH_PRESET, 'Default')
+                end
+            end,
+        }
+    end
 end
 
 
@@ -25,25 +187,12 @@ return {
         General = rules {
             Preset = {
                 paddingBottom = 16,
-                onActionClick = function(args)
-                    local schema = args.schema ---@cast schema omichat.ConfigurationSchema
-                    local preset = schema.getPreset(args.value)
-                    local values = args.values
-                    if not preset then
-                        return
-                    end
-
-                    local path = { 'General', 'InfoText' }
-                    local infoText = args.form:getValue(path)
-
-                    args.form:setValues(preset:getValues(schema))
-
-                    -- keep the existing info text when applying a preset
-                    values.General = values.General or {}
-                    values.General.InfoText = infoText
-                    args.form:setControlValue(path, infoText)
-
-                    args.form:setStatusMessage(getText('Sandbox_OmiChat_status_preset', preset:getName()))
+                actionCount = 3,
+                getEnumOptions = getPresetOptions,
+                onActionClick = onPresetAction,
+                onChange = function(args)
+                    local deleteBtn = args.info.actionButtons[3]
+                    deleteBtn:setEnabled(utils.startsWith(args.value, 'custom:'))
                 end,
             },
 

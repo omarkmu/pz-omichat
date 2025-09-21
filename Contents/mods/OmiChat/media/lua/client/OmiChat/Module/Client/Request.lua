@@ -28,6 +28,20 @@ function Request.addLanguage(command)
     return Request._dispatch('executeCommand', req)
 end
 
+---Requests adding a user-defined configuration preset to the list.
+---@param name string
+---@param values table
+---@return boolean success
+function Request.addPreset(name, values)
+    ---@type omichat.request.AddPreset
+    local req = {
+        name = name,
+        values = values,
+    }
+
+    return Request._dispatch('requestAddPreset', req)
+end
+
 ---Requests clearing mod data for a given username.
 ---@param username string
 ---@return boolean success
@@ -139,6 +153,19 @@ end
 function Request.updatePlayerCache()
     return Request._dispatch('requestPlayerCacheUpdate')
 end
+
+---Requests removing a user-defined configuration preset to the list.
+---@param name string
+---@return boolean success
+function Request.removePreset(name)
+    ---@type omichat.request.RemovePreset
+    local req = {
+        name = name,
+    }
+
+    return Request._dispatch('requestRemovePreset', req)
+end
+
 
 ---Executes the /resetlanguages command.
 ---@param command string

@@ -1,11 +1,13 @@
 Sandbox_EN = {
     Sandbox_OmiChat_title = "OmiChat Settings",
-    Sandbox_OmiChat_status_preset = "Updated values with defaults from the %1 preset.",
+    Sandbox_OmiChat_status_preset = "Applied values from the %1 preset.",
 
     Sandbox_OmiChat_General = "General",
     Sandbox_OmiChat_General_title = "General Settings",
     Sandbox_OmiChat_General_Preset = "Preset",
-    Sandbox_OmiChat_General_Preset_action = "Apply Preset",
+    Sandbox_OmiChat_General_Preset_action1 = "Apply",
+    Sandbox_OmiChat_General_Preset_action2 = "New",
+    Sandbox_OmiChat_General_Preset_action3 = "Delete",
     Sandbox_OmiChat_General_AlwaysShowChat = "Always Show Chat",
     Sandbox_OmiChat_General_CaseInsensitiveChatStreams = "Case-Insensitive Streams",
     Sandbox_OmiChat_General_MinimumCommandAccessLevel = "Admin Command Access Level",
@@ -198,8 +200,10 @@ Sandbox_EN = {
 
     /* Tooltips */
     Sandbox_OmiChat_General_Preset_tooltip = "The preset used to define the behavior of default format strings.",
-    Sandbox_OmiChat_General_Preset_action_tooltip = " <PUSHRGB:1,0,0> This will replace the current values with preset values. <POPRGB>" ..
-        " <LINE> Applies the default values of the preset.",
+    Sandbox_OmiChat_General_Preset_action_tooltip1 = " <PUSHRGB:1,0,0> This will replace all current settings. <POPRGB>" ..
+        " <LINE> Apply the settings of the preset.",
+    Sandbox_OmiChat_General_Preset_action_tooltip2 = "Create a new custom preset using all current values.",
+    Sandbox_OmiChat_General_Preset_action_tooltip3 = "Delete a custom preset.",
     Sandbox_OmiChat_General_AlwaysShowChat_tooltip = "If enabled, players will be unable to close the chat window.",
     Sandbox_OmiChat_General_CaseInsensitiveChatStreams_tooltip = "If enabled, chat streams will be case-insensitive." ..
         " <BR> This means that <SPACE> <PUSHRGB:0,1,0> /say <POPRGB> <SPACE> and <SPACE> <PUSHRGB:0,1,0> /SAY <POPRGB> <SPACE> will be treated equivalently.",

@@ -155,6 +155,12 @@ function ClientHandler.updateConfiguration(req)
     API.chat.updateState(true)
 end
 
+---Updates the custom presets with new data from the server.
+---@param req omichat.request.UpdatePresets
+function ClientHandler.updatePresets(req)
+    config:_setCustomPresets(req.list) ---@diagnostic disable-line: invisible
+end
+
 ---Updates player cache state.
 ---@param info omichat.request.UpdatePlayerCache
 function ClientHandler.updatePlayerCache(info)

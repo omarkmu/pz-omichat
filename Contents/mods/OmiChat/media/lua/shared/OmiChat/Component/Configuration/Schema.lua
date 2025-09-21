@@ -25,14 +25,7 @@ return Schema:new {
         VERSION = int(1),
 
         General = container {
-            Preset = enum {
-                default = 'Default',
-                values = {
-                    'Default',
-                    'Buffy',
-                    'Vanilla',
-                },
-            },
+            Preset = str('Default'),
 
             AlwaysShowChat = bool(false),
             CaseInsensitiveChatStreams = bool(true),

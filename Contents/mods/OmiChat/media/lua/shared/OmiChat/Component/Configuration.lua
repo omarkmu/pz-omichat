@@ -2,7 +2,9 @@
 
 local utils = require 'OmiChat/utils'
 local MetaFormatter = require 'OmiChat/Component/MetaFormatter'
+local Preset = require 'OmiChat/Component/Configuration/Preset'
 local base = utils.configuration.ConfigurationHelper
+local sort = table.sort
 
 
 ---@class omichat.ConfigurationHelper : omi.ConfigurationHelper, omichat.Configuration
@@ -13,6 +15,7 @@ local Configuration = utils.configuration {
 
     ---@param self omichat.ConfigurationHelper
     init = function(self)
+        self:loadCustomPresets()
         self:refreshEnabledMods()
         self:loadDefaults()
     end,
@@ -20,6 +23,18 @@ local Configuration = utils.configuration {
     ---@param self omichat.ConfigurationHelper
     onLoad = function(self) self:refreshValueCaches() end,
 }
+
+Configuration.Preset = Preset
+
+Configuration._presetFilename = 'omichat_presets.json'
+Configuration._presetList = {}
+Configuration._customPresets = {}
+Configuration._presets = {
+    Default = require 'OmiChat/Definition/Preset/Default',
+    Buffy = require 'OmiChat/Definition/Preset/Buffy',
+    Vanilla = require 'OmiChat/Definition/Preset/Vanilla',
+}
+
 
 
 -- reserved ID layout:
@@ -124,7 +139,6 @@ Configuration.FORMAT_NAMES = {
 }
 
 
-
 ---Checks the language against the add language allow/block list.
 ---This does not check whether the language is a valid roleplay language.
 ---@param language string
@@ -201,6 +215,35 @@ function Configuration:formatters()
     end
 end
 
+---Gets the default built-in preset.
+---@return omichat.ConfigurationPreset
+function Configuration:getDefaultPreset()
+    return Configuration._presets.Default
+end
+
+---Gets a preset by name.
+---If the name is prefixed by `custom:`, this will get a custom preset.
+---Otherwise, a built-in preset will be returned.
+---@param name string
+---@return omichat.ConfigurationPreset?
+function Configuration:getPreset(name)
+    if not name then
+        return
+    end
+
+    if utils.startsWith(name, 'custom:') then
+        return Configuration._customPresets[name:sub(8)]
+    end
+
+    return Configuration._presets[name]
+end
+
+---Gets a list of all presets, including built-in and user defined.
+---@return omichat.ConfigurationPreset[]
+function Configuration:getPresetList()
+    return utils.copyList(self._presetList)
+end
+
 ---Returns a table of valid items for /card.
 ---@return string[]
 function Configuration:getCardItems()
@@ -211,6 +254,36 @@ end
 ---@return table
 function Configuration:getCoinItems()
     return utils.copy(self.Commands.Flip.Items)
+end
+
+---Gets a user-defined custom preset by name.
+---@param name string
+---@return omichat.ConfigurationPreset?
+function Configuration:getCustomPreset(name)
+    if not name then
+        return
+    end
+
+    return Configuration._customPresets[name]
+end
+
+---Returns a list of user-defined custom presets as simple tables.
+---@return omichat.Configuration.PresetTable[]
+function Configuration:getCustomPresetsSimple()
+    local list = {}
+    local schema = self:getSchema()
+    for i = 1, #self._presetList do
+        local preset = self._presetList[i]
+        if preset:isCustom() then
+            local values = preset:getValues(schema)
+            list[#list + 1] = {
+                name = preset:getName(),
+                values = schema:sanitize(values),
+            }
+        end
+    end
+
+    return list
 end
 
 ---Returns a table of valid items for /roll.
@@ -402,6 +475,22 @@ function Configuration:isNicknameEnabled()
     return self:isNicknameCommandEnabled() or self.Commands.Name.Mode == 'Nickname'
 end
 
+---Loads custom presets from a file.
+---If called on the client, this will reset the cache without loading anything.
+function Configuration:loadCustomPresets()
+    if isClient() then
+        self:_cachePresetList()
+        return
+    end
+
+    local result = utils.schema.read({ filename = self._presetFilename })
+    if not result or type(result.list) ~= 'table' then
+        return
+    end
+
+    self:_setCustomPresets(result.list)
+end
+
 ---Reads the currently enabled mods to a cache.
 function Configuration:refreshEnabledMods()
     local enabledMods = {}
@@ -486,6 +575,14 @@ function Configuration:updateFormatters()
 end
 
 
+---Adds a custom preset to the configuration.
+---@param preset omichat.ConfigurationPreset
+---@protected
+function Configuration:_addCustomPreset(preset)
+    self._customPresets[preset:getName()] = preset
+    self:_cachePresetList()
+end
+
 ---Caches the configured languages and information about them.
 ---@protected
 function Configuration:_cacheLanguages()
@@ -516,6 +613,27 @@ function Configuration:_cacheLanguages()
     self._languageBlockSet = utils.set.simple(self.Language.SelfAddBlocklist)
 end
 
+---Caches the list of presets.
+---@protected
+function Configuration:_cachePresetList()
+    local list = { Configuration._presets.Default }
+
+    local other = {}
+    for k, v in pairs(Configuration._presets) do
+        if k ~= 'Default' then
+            other[#other + 1] = v
+        end
+    end
+
+    for _, v in pairs(Configuration._customPresets) do
+        other[#other + 1] = v
+    end
+
+    sort(other, Configuration._sortPresets)
+
+    self._presetList = utils.append(list, other)
+end
+
 ---Checks whether a mod compatibility option is enabled.
 ---@param value omi.schema.CompatibilityValue The value of the option.
 ---@param modId string The mod ID of the relevant mod.
@@ -544,6 +662,49 @@ function Configuration._onInitGlobalModData()
     -- client loads cached settings; will ultimately be received from server
     Configuration:saveModData()
     Configuration:updateFormatters()
+end
+
+---Removes a custom preset from the configuration.
+---@param name string
+---@protected
+function Configuration:_removeCustomPreset(name)
+    self._customPresets[name] = nil
+    self:_cachePresetList()
+end
+
+---Replaces the custom presets list with the given list.
+---@param list omichat.Configuration.PresetTable[]
+---@protected
+function Configuration:_setCustomPresets(list)
+    self._customPresets = {}
+    for i = 1, #list do
+        local data = list[i]
+        local preset = Configuration.Preset:new({
+            name = data.name,
+            values = data.values,
+            isCustom = true,
+        })
+
+        self._customPresets[data.name] = preset
+    end
+
+    self:_cachePresetList()
+end
+
+---Sort function for presets.
+---@param a omichat.ConfigurationPreset
+---@param b omichat.ConfigurationPreset
+---@return boolean
+---@protected
+function Configuration._sortPresets(a, b)
+    local aIsCustom = a:isCustom()
+    local bIsCustom = b:isCustom()
+
+    if aIsCustom ~= bIsCustom then
+        return bIsCustom
+    end
+
+    return a:getName() < b:getName()
 end
 
 

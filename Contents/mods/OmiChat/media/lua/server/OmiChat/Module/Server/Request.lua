@@ -68,6 +68,20 @@ function Request.sendConfiguration(player)
     end
 end
 
+---Sends the user-defined configuration presets to the given player.
+---If no player is given, presets are sent to all players.
+---@param player IsoPlayer?
+function Request.sendPresets(player)
+    ---@type omichat.request.UpdatePresets
+    local req = { list = config:getCustomPresetsSimple() }
+
+    if player then
+        Request._dispatch('updatePresets', player, req)
+    else
+        Request._dispatchAll('updatePresets', req)
+    end
+end
+
 ---Notifies the client about another typing player.
 ---@param player IsoPlayer
 ---@param target IsoPlayer

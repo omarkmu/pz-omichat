@@ -345,6 +345,23 @@ function Preset.zombies(options)
 end
 
 
+---Returns whether the preset is a user-defined custom preset.
+---@return boolean
+function Preset:isCustom()
+    return self._isCustom
+end
+
+---Returns the ID of the preset.
+---For built-in presets, this is the preset name. Custom user-defined presets are prefixed with `custom:`.
+---@return string
+function Preset:getID()
+    if not self._isCustom then
+        return self._name
+    end
+
+    return 'custom:' .. self._name
+end
+
 ---Returns the name of the preset.
 ---@return string
 function Preset:getName()
@@ -382,6 +399,7 @@ function Preset:new(args)
 
     args = args or {}
     this._name = args.name
+    this._isCustom = utils.default(args.isCustom, false)
     this._values = args.values or {}
     this._getValues = args.getValues
     this._getLanguages = args.getLanguages

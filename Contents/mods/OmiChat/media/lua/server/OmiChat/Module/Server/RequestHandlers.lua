@@ -400,6 +400,19 @@ end
 function ServerHandler.playerJoined(player)
     ServerHandler.requestPlayerCacheUpdate()
     API.request.sendConfiguration(player)
+    API.request.sendPresets(player)
+end
+
+---Handles a request to add a user-defined configuration preset.
+---@param player IsoPlayer
+---@param req omichat.request.AddPreset
+function ServerHandler.requestAddPreset(player, req)
+    if player:getAccessLevel() ~= 'Admin' then
+        return
+    end
+
+    API.extension.addCustomPreset(req.name, req.values)
+    API.request.sendPresets()
 end
 
 ---Handles a request to clear mod data for a given username.
@@ -466,6 +479,18 @@ end
 ---Updates player cache information.
 function ServerHandler.requestPlayerCacheUpdate()
     API._refreshCache()
+end
+
+---Handles a request to add a user-defined configuration preset.
+---@param player IsoPlayer
+---@param req omichat.request.RemovePreset
+function ServerHandler.requestRemovePreset(player, req)
+    if player:getAccessLevel() ~= 'Admin' then
+        return
+    end
+
+    API.extension.removeCustomPreset(req.name)
+    API.request.sendPresets()
 end
 
 ---Handles the /roll command.

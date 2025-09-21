@@ -114,6 +114,11 @@
 
 --#region Requests
 
+---Request to add a new user-defined configuration preset.
+---@class omichat.request.AddPreset
+---@field name string The name of the preset.
+---@field values table The configuration values.
+
 ---Request to clear mod data for a username.
 ---@class omichat.request.ClearModData
 ---@field username string
@@ -128,6 +133,10 @@
 ---@field field omichat.ModDataField The field to update.
 ---@field fromCommand boolean? Whether this request was created from a command.
 ---@field value unknown? The value to set on the field.
+
+---Request to remove a user-defined configuration preset.
+---@class omichat.request.RemovePreset
+---@field name string The name of the preset.
 
 ---Request to report the result of drawing a card on the client.
 ---@class omichat.request.ReportDrawCard
@@ -161,6 +170,10 @@
 ---@field range integer? Optional range to limit notifications to.
 ---@field chatType omichat.ChatTypeString? The chat type of the stream on which the player is typing.
 
+---Request to update the configuration.
+---@class omichat.request.UpdateConfiguration
+---@field value omichat.Configuration The new configuration values.
+
 ---Request to update client information about typing.
 ---@class omichat.request.UpdateTyping
 ---@field username string Whether the target player is typing.
@@ -170,9 +183,9 @@
 ---@class omichat.request.UpdatePlayerCache
 ---@field items omi.PlayerCacheData[]
 
----Request to update the configuration.
----@class omichat.request.UpdateConfiguration
----@field value omichat.Configuration The new configuration values.
+---Request to update the user-defined configuration presets.
+---@class omichat.request.UpdatePresets
+---@field list omichat.Configuration.PresetTable[] The new values.
 
 ---@alias omichat.request.CommandName
 ---| 'addLanguage'
@@ -188,10 +201,6 @@
 
 --#region Configuration
 
----@class omichat.ConfigurationSchema
----@field private _presets table<string, omichat.ConfigurationPreset> (static)
-
-
 ---@class omichat.ConfigurationHelper
 ---@field protected _enabledMods table<string, boolean>
 ---@field protected _idToLanguage omichat.LanguageRecord[]
@@ -200,6 +209,10 @@
 ---@field protected _languageAllowSet omi.SimpleSet
 ---@field protected _languageBlockSet omi.SimpleSet
 ---@field protected _formatterInfo table<integer, omichat.FormatterInfo>
+---@field protected _presetFilename string
+---@field protected _presets table<string, omichat.ConfigurationPreset> Table containing built-in presets.
+---@field protected _presetList omichat.ConfigurationPreset[] List containing presets in presentation order.
+---@field protected _customPresets table<string, omichat.ConfigurationPreset> Table containing user-defined presets.
 
 ---@class omichat.LanguageRecord : omichat.Configuration.LanguageDefinition
 ---@field ID integer
@@ -225,7 +238,7 @@
 ---@field ZombieAttraction omichat.Configuration.ZombieAttraction
 
 ---@class omichat.Configuration.General
----@field Preset omichat.PresetString
+---@field Preset string
 ---@field AlwaysShowChat boolean
 ---@field CaseInsensitiveChatStreams boolean
 ---@field MinimumCommandAccessLevel integer
@@ -429,13 +442,19 @@
 
 ---@class omichat.ConfigurationPreset
 ---@field protected _name string
+---@field protected _isCustom boolean
 ---@field protected _values omichat.Configuration
 ---@field protected _getLanguages omichat.Callback.ConfigurationPreset.GetLanguages?
 ---@field protected _getStreams omichat.Callback.ConfigurationPreset.GetStreams?
 ---@field protected _getValues omichat.Callback.ConfigurationPreset.GetValues?
 
+---@class omichat.Configuration.PresetTable
+---@field name string The name of the preset.
+---@field values table The configuration values.
+
 ---@class omichat.Args.ConfigurationPreset
 ---@field name string
+---@field isCustom boolean?
 ---@field values omichat.Configuration?
 ---@field getLanguages omichat.Callback.ConfigurationPreset.GetLanguages?
 ---@field getStreams omichat.Callback.ConfigurationPreset.GetStreams?

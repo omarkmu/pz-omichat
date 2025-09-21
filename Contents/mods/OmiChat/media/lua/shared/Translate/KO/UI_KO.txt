@@ -219,6 +219,12 @@ UI_KO = {
     UI_OmiChat_ModDataManager_Column_languages = "아는 언어",
     UI_OmiChat_ModDataManager_Column_languageSlots = "언어 슬롯",
 
+    --[[ Configuration Presets ]]--
+    UI_OmiChat_PresetUserDefined = "User-defined preset",
+    UI_OmiChat_SavePreset_Prompt = "Enter a name for the new preset.",
+    UI_OmiChat_DeletePreset_Confirm = "Delete the %1 custom preset? This cannot be undone.",
+    UI_OmiChat_SavePreset_Overwrite = "Saving will overwrite the existing preset with this name.",
+
     --[[ Context Menus ]]--
     UI_OmiChat_ContextChatSettings = "채팅 설정",
     UI_OmiChat_ContextCustomization = "커스터마이징",

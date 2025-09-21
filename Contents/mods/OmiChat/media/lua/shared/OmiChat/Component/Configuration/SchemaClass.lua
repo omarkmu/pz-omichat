@@ -6,31 +6,12 @@ local schema = utils.schema
 
 
 ---@class omichat.ConfigurationSchema : omi.Schema
-local SchemaClass = schema.Schema:derive()
-
-SchemaClass._presets = {
-    Default = require 'OmiChat/Definition/Preset/Default',
-    Buffy = require 'OmiChat/Definition/Preset/Buffy',
-    Vanilla = require 'OmiChat/Definition/Preset/Vanilla',
-}
+local ConfigurationSchema = schema.Schema:derive()
 
 
----Gets a preset by name.
----@param name string
----@return omichat.ConfigurationPreset?
----@static
-function SchemaClass.getPreset(name)
-    if not name then
-        return
-    end
-
-    return SchemaClass._presets[name]
-end
-
-
----Creates the default list of language objects.
+---Returns a list of default language objects.
 ---@return omichat.Configuration.LanguageDefinition[]
-function SchemaClass:getDefaultLanguages()
+function ConfigurationSchema:getDefaultLanguages()
     return {
         { Name = 'English' },
         { Name = 'French' },
@@ -57,7 +38,7 @@ end
 
 ---Returns a list of default stream configuration objects, without default data.
 ---@return omichat.Configuration.StreamDefinition[]
-function SchemaClass:getDefaultStreams()
+function ConfigurationSchema:getDefaultStreams()
     return {
         { Stream = 'admin', Enable = true },
         { Stream = 'say', Enable = true },
@@ -83,7 +64,7 @@ end
 ---Gets the chat type associated with a built-in stream.
 ---@param stream string
 ---@return omichat.ChatTypeString?
-function SchemaClass:getStreamChatType(stream)
+function ConfigurationSchema:getStreamChatType(stream)
     if not stream then
         return
     end
@@ -95,7 +76,11 @@ end
 ---Gets the command type associated with a built-in stream.
 ---@param stream string
 ---@return string?
-function SchemaClass:getStreamCommandType(stream)
+function ConfigurationSchema:getStreamCommandType(stream)
+    if not stream then
+        return
+    end
+
     local data = defaultStreamData[stream]
     return data and data.CommandType
 end
@@ -103,7 +88,7 @@ end
 ---Transforms configured streams to include required data and fix incompatible fields.
 ---@param streams omichat.Configuration.StreamDefinition[]
 ---@return omichat.Configuration.StreamDefinition[]
-function SchemaClass:processStreams(streams)
+function ConfigurationSchema:processStreams(streams)
     local seen = { [''] = true }
     local processed = {}
 
@@ -125,13 +110,13 @@ function SchemaClass:processStreams(streams)
             end
 
             for k, v in pairs(data) do
-                local type_v = type(v)
+                local vType = type(v)
                 if not isCustom and (k == 'ChatType' or k == 'CommandType') then
                     -- always copy these keys for built-in streams
                     stream[k] = v
-                elseif type(stream[k]) ~= type_v then
+                elseif type(stream[k]) ~= vType then
                     -- use defaults for invalid values
-                    stream[k] = type_v == 'table' and utils.copy(v) or v
+                    stream[k] = vType == 'table' and utils.copy(v) or v
                 end
             end
 
@@ -159,9 +144,9 @@ end
 
 ---@param options omi.Args.Schema
 ---@return omichat.ConfigurationSchema
-function SchemaClass:new(options)
+function ConfigurationSchema:new(options)
     local this = schema.Schema.new(self, options) ---@cast this omichat.ConfigurationSchema
     return this
 end
 
-return SchemaClass
+return ConfigurationSchema

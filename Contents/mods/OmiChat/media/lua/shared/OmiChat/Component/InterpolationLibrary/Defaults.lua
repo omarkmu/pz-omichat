@@ -438,7 +438,7 @@ end
 function Library.Defaults.FormatRoll(interpolator)
     local roll = interpolator:tokenString('roll')
     local sides = interpolator:tokenString('sides')
-    return 'rolls a ' .. roll .. ' on a ' .. sides .. '-sided die'
+    return 'rolls ' .. roll .. ' on a ' .. sides .. '-sided die'
 end
 
 ---Default format for chat icons.
