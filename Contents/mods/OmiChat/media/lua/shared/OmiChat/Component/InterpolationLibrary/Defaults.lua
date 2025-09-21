@@ -87,7 +87,7 @@ function Library.Defaults.Chat(interpolator, args)
     end
 
     if tags.IsIncomingPM and not tags.UseVanillaPM and name ~= '' then
-        local parens = options:getNumber('parenCount', preset == 'Buffy' and 2 or 1)
+        local parens = tonumber(preset:getSetting('PMParenCount')) or 1
         local pmFrom = getText('UI_OmiChat_PrivateChatFrom', ' <SPACE> ' .. name)
 
         name = rep('(', parens) .. pmFrom .. rep(')', parens)
@@ -106,7 +106,7 @@ function Library.Defaults.Chat(interpolator, args)
             if tags.UseVanillaPM then
                 name = 'to ' .. name
             else
-                local parens = options:getNumber('parenCount', preset == 'Buffy' and 2 or 1)
+                local parens = tonumber(preset:getSetting('PMParenCount')) or 1
                 local pmTo = getText('UI_OmiChat_PrivateChatTo', ' <SPACE> ' .. name)
 
                 name = rep('(', parens) .. pmTo .. rep(')', parens)
@@ -513,16 +513,12 @@ function Library.Defaults.Name(interpolator, args)
 
     -- if a mode isn't given, use preset defaults
     if mode ~= 'username' and mode ~= 'name' and mode ~= 'both' then
-        if preset == 'Vanilla' then
+        local defaultForChatType = preset:getSetting('DefaultNameMode_' .. chatType)
+        local defaultMode = defaultForChatType or preset:getSetting('DefaultNameMode')
+        if defaultMode == 'username' then
             mode = defaultUsernameMode
-        elseif preset == 'Buffy' then
-            if chatType == 'admin' then
-                mode = defaultUsernameMode
-            elseif chatType == 'whisper' then
-                mode = 'both'
-            else
-                mode = 'name'
-            end
+        elseif defaultMode == 'name' or defaultMode == 'both' then
+            mode = defaultMode
         elseif chatType == 'general' or chatType == 'admin' or chatType == 'whisper' then
             mode = defaultUsernameMode
         else

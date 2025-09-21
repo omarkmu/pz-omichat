@@ -444,6 +444,7 @@
 ---@field protected _name string
 ---@field protected _isCustom boolean
 ---@field protected _values omichat.Configuration
+---@field protected _settings table
 ---@field protected _getLanguages omichat.Callback.ConfigurationPreset.GetLanguages?
 ---@field protected _getStreams omichat.Callback.ConfigurationPreset.GetStreams?
 ---@field protected _getValues omichat.Callback.ConfigurationPreset.GetValues?
@@ -456,6 +457,7 @@
 ---@field name string
 ---@field isCustom boolean?
 ---@field values omichat.Configuration?
+---@field settings table?
 ---@field getLanguages omichat.Callback.ConfigurationPreset.GetLanguages?
 ---@field getStreams omichat.Callback.ConfigurationPreset.GetStreams?
 ---@field getValues omichat.Callback.ConfigurationPreset.GetValues?

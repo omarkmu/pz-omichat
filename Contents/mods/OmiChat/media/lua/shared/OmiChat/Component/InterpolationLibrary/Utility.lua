@@ -38,14 +38,8 @@ function Library.ColorActions(interpolator, message, options)
         return
     end
 
-    local optionalAsterisks = false
-    if utils.isinstance(options, MultiMap) then
-        ---@cast options omi.MultiMap
-        options = options:toOptions()
-        optionalAsterisks = options:getBoolean('optionalAsterisks')
-    else
-        options = nil
-    end
+    options = Helpers.readOptions(options)
+    local optionalAsterisks = options:getBoolean('optionalAsterisks')
 
     local segments, prefix, suffix = Helpers.getMessageSegments(tostring(message), {
         optionalActionAsterisk = optionalAsterisks,
@@ -66,14 +60,8 @@ function Library.ColorQuotes(interpolator, message, options)
         return
     end
 
-    local optionalAsterisks = false
-    if utils.isinstance(options, MultiMap) then
-        ---@cast options omi.MultiMap
-        options = options:toOptions()
-        optionalAsterisks = options:getBoolean('optionalAsterisks')
-    else
-        options = nil
-    end
+    options = Helpers.readOptions(options)
+    local optionalAsterisks = options:getBoolean('optionalAsterisks')
 
     local segments, prefix, suffix = Helpers.getMessageSegments(tostring(message), {
         startInAction = true,
@@ -90,12 +78,8 @@ end
 ---@param options omi.MultiMap?
 ---@return boolean
 function Library.DisallowSignedOverRadio(interpolator, options)
-    if utils.isinstance(options, MultiMap) then
-        ---@cast options omi.MultiMap
-        options = options:toOptions()
-    else
-        options = nil
-    end
+    options = Helpers.readOptions(options)
+    local optionalAsterisks = options:getBoolean('optionalAsterisks')
 
     local condition = options and options:get('condition')
     if condition ~= nil and not interpolator:toBoolean(condition) then

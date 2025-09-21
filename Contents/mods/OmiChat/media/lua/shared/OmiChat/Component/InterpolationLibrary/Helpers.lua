@@ -698,20 +698,20 @@ end
 ---Gets a volume indicator based on tags.
 ---@param options omi.MultiMap
 ---@param tags omi.SimpleSet
----@param preset string
+---@param preset omichat.ConfigurationPreset
 ---@param shouldTranslate boolean?
 ---@return string?
 function Helpers.getVolumeIndicator(options, tags, preset, shouldTranslate)
     local indicator
     if not tags.IsSneakCallout and (tags.Loud or tags.IsCallout) then
-        indicator = options:getString('loudIndicator', preset == 'Buffy' and 'Long' or 'Loud')
+        indicator = options:getString('loudIndicator', preset:getSetting('VolumeIndicatorLoud', 'Loud'))
     elseif tags.Quiet or tags.IsSneakCallout then
-        indicator = options:getString('quietIndicator', 'Low')
+        indicator = options:getString('quietIndicator', preset:getSetting('VolumeIndicatorQuiet', 'Low'))
     elseif tags.Whisper then
-        indicator = options:getString('whisperIndicator', 'Whisper')
+        indicator = options:getString('whisperIndicator', preset:getSetting('VolumeIndicatorWhisper', 'Whisper'))
     end
 
-    if not indicator then
+    if not indicator or type(indicator) ~= 'string' then
         return
     end
 
@@ -781,21 +781,12 @@ end
 
 ---Reads the preset to use from the options.
 ---@param options omi.MultiMap
----@return omichat.PresetString
+---@return omichat.ConfigurationPreset
 function Helpers.readPreset(options)
-    local preset
-    local presetArg = options:getString('preset'):lower()
-    if presetArg == 'vanilla' then
-        preset = 'Vanilla'
-    elseif presetArg == 'buffy' then
-        preset = 'Buffy'
-    elseif presetArg == 'default' then
-        preset = 'Default'
-    else
-        preset = config.General.Preset
-    end
-
-    return preset
+    local arg = options:getString('preset')
+    return config:getPreset(arg)
+        or config:getPreset(config.General.Preset)
+        or config:getDefaultPreset()
 end
 
 ---Reads tags from an interpolator.

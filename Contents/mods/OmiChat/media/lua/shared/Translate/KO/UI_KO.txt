@@ -103,7 +103,7 @@ UI_KO = {
 
     -- [[ Volume Indicators ]]--
     UI_OmiChat_VolumeIndicator_Low = "조용하게",
-    UI_OmiChat_VolumeIndicator_Long = "장거리",
+    UI_OmiChat_VolumeIndicator_Long = "시끄럽게",
     UI_OmiChat_VolumeIndicator_Loud = "시끄럽게",
     UI_OmiChat_VolumeIndicator_Whisper = "속삭임",
 

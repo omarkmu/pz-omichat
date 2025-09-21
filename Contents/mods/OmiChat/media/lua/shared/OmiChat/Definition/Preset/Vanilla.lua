@@ -5,6 +5,9 @@ local Preset = require 'OmiChat/Component/Configuration/Preset'
 
 return Preset:new {
     name = 'Vanilla',
+    settings = {
+        DefaultNameMode = 'username',
+    },
     values = {
         General = Preset.general {
             Name = 'Vanilla',

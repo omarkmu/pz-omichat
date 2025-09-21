@@ -5,6 +5,14 @@ local Preset = require 'OmiChat/Component/Configuration/Preset'
 
 return Preset:new {
     name = 'Buffy',
+    settings = {
+        PMParenCount = 2,
+        VolumeIndicatorLoud = 'Long',
+
+        DefaultNameMode = 'name',
+        DefaultNameMode_admin = 'username',
+        DefaultNameMode_whisper = 'both',
+    },
     values = {
         General = Preset.general {
             Name = 'Buffy',
