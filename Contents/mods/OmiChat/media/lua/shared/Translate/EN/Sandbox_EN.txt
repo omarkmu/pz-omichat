@@ -18,6 +18,7 @@ Sandbox_EN = {
     Sandbox_OmiChat_General_ClearOnDeath_Nickname = "Chat Nickname",
     Sandbox_OmiChat_General_ClearOnDeath_Status = "Status",
     Sandbox_OmiChat_General_InfoText = "Info Text",
+    Sandbox_OmiChat_General_Variables = "Variables",
 
     Sandbox_OmiChat_Buffs = "Buffs",
     Sandbox_OmiChat_Buffs_Enable = "Enabled",
@@ -199,7 +200,7 @@ Sandbox_EN = {
     Sandbox_OmiChat_ZombieAttraction_SneakCalloutRange = "Sneak Callout Range",
 
     /* Tooltips */
-    Sandbox_OmiChat_General_Preset_tooltip = "The preset used to define the behavior of default format strings.",
+    Sandbox_OmiChat_General_Preset_tooltip = "Presets that can be applied to update all settings.",
     Sandbox_OmiChat_General_Preset_action_tooltip1 = " <PUSHRGB:1,0,0> This will replace all current settings. <POPRGB>" ..
         " <LINE> Apply the settings of the preset.",
     Sandbox_OmiChat_General_Preset_action_tooltip2 = "Create a new custom preset using all current values.",
@@ -216,6 +217,7 @@ Sandbox_EN = {
     Sandbox_OmiChat_General_ClearOnDeath_Status_tooltip = "If enabled, chat statuses will be cleared on death.",
     Sandbox_OmiChat_General_InfoText_tooltip = "Information that can be accessed by clicking an info button on the chat window. If this is blank, the info button will not be available." ..
         " <BR> This can use rich text formatting to include different colors and fonts.",
+    Sandbox_OmiChat_General_Variables_tooltip = "Arbitrary key-value pairs that can be used by interpolation functions. Keys and values are separated with a colon.",
 
     Sandbox_OmiChat_Buffs_Enable_tooltip = "Controls whether buffs are enabled for streams that allow them. Other buff options have no effect if this is off.",
     Sandbox_OmiChat_Buffs_Cooldown_tooltip = "The cooldown for applying buffs, in real-time minutes.",

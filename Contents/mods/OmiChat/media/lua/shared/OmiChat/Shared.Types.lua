@@ -213,6 +213,7 @@
 ---@field protected _presets table<string, omichat.ConfigurationPreset> Table containing built-in presets.
 ---@field protected _presetList omichat.ConfigurationPreset[] List containing presets in presentation order.
 ---@field protected _customPresets table<string, omichat.ConfigurationPreset> Table containing user-defined presets.
+---@field protected _variables table<string, string> Table containing arbitrary variables.
 
 ---@class omichat.LanguageRecord : omichat.Configuration.LanguageDefinition
 ---@field ID integer
@@ -245,6 +246,7 @@
 ---@field AdminIcon string
 ---@field ClearOnDeath omichat.Configuration.General.ClearOnDeath
 ---@field InfoText string
+---@field Variables string[]
 
 ---@class omichat.Configuration.General.ClearOnDeath
 ---@field Icon boolean?
@@ -444,7 +446,6 @@
 ---@field protected _name string
 ---@field protected _isCustom boolean
 ---@field protected _values omichat.Configuration
----@field protected _settings table
 ---@field protected _getLanguages omichat.Callback.ConfigurationPreset.GetLanguages?
 ---@field protected _getStreams omichat.Callback.ConfigurationPreset.GetStreams?
 ---@field protected _getValues omichat.Callback.ConfigurationPreset.GetValues?
@@ -457,7 +458,6 @@
 ---@field name string
 ---@field isCustom boolean?
 ---@field values omichat.Configuration?
----@field settings table?
 ---@field getLanguages omichat.Callback.ConfigurationPreset.GetLanguages?
 ---@field getStreams omichat.Callback.ConfigurationPreset.GetStreams?
 ---@field getValues omichat.Callback.ConfigurationPreset.GetValues?
@@ -490,6 +490,7 @@
 ---@field AdminIcon string?
 ---@field CaseInsensitiveChatStreams boolean?
 ---@field ClearOnDeath omichat.Configuration.General.ClearOnDeath?
+---@field Variables string[]?
 
 ---@class omichat.Args.ConfigurationPreset.Language
 ---@field UseDefaultList boolean?

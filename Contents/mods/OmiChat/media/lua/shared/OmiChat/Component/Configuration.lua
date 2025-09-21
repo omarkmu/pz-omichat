@@ -215,35 +215,6 @@ function Configuration:formatters()
     end
 end
 
----Gets the default built-in preset.
----@return omichat.ConfigurationPreset
-function Configuration:getDefaultPreset()
-    return Configuration._presets.Default
-end
-
----Gets a preset by name.
----If the name is prefixed by `custom:`, this will get a custom preset.
----Otherwise, a built-in preset will be returned.
----@param name string
----@return omichat.ConfigurationPreset?
-function Configuration:getPreset(name)
-    if not name then
-        return
-    end
-
-    if utils.startsWith(name, 'custom:') then
-        return Configuration._customPresets[name:sub(8)]
-    end
-
-    return Configuration._presets[name]
-end
-
----Gets a list of all presets, including built-in and user defined.
----@return omichat.ConfigurationPreset[]
-function Configuration:getPresetList()
-    return utils.copyList(self._presetList)
-end
-
 ---Returns a table of valid items for /card.
 ---@return string[]
 function Configuration:getCardItems()
@@ -284,6 +255,12 @@ function Configuration:getCustomPresetsSimple()
     end
 
     return list
+end
+
+---Gets the default built-in preset.
+---@return omichat.ConfigurationPreset
+function Configuration:getDefaultPreset()
+    return Configuration._presets.Default
 end
 
 ---Returns a table of valid items for /roll.
@@ -376,6 +353,29 @@ function Configuration:getMenuNameFormat(menuType)
     return format or option.Default or ''
 end
 
+---Gets a preset by name.
+---If the name is prefixed by `custom:`, this will get a custom preset.
+---Otherwise, a built-in preset will be returned.
+---@param name string
+---@return omichat.ConfigurationPreset?
+function Configuration:getPreset(name)
+    if not name then
+        return
+    end
+
+    if utils.startsWith(name, 'custom:') then
+        return Configuration._customPresets[name:sub(8)]
+    end
+
+    return Configuration._presets[name]
+end
+
+---Gets a list of all presets, including built-in and user defined.
+---@return omichat.ConfigurationPreset[]
+function Configuration:getPresetList()
+    return utils.copyList(self._presetList)
+end
+
 ---Returns the schema of the configuration.
 ---@return omichat.ConfigurationSchema
 function Configuration:getSchema()
@@ -393,6 +393,32 @@ end
 ---@return omichat.Configuration
 function Configuration:getValuesForSave()
     return base.getValuesForSave(self)
+end
+
+---Gets the string value of a variable. Returns `nil` if the variable doesn't exist.
+---@param key string
+---@return string?
+function Configuration:getVariable(key)
+    return self._variables[key]
+end
+
+---Gets the boolean value of a variable. Returns `nil` if the variable doesn't exist.
+---@param key string
+---@return boolean?
+function Configuration:getVariableAsBool(key)
+    local value = self._variables[key]
+    if not value then
+        return nil
+    end
+
+    return value:lower() == 'true'
+end
+
+---Gets the number value of a variable. Returns `nil` if the variable doesn't exist or is not a number.
+---@param key string
+---@return number?
+function Configuration:getVariableAsNumber(key)
+    return tonumber(self._variables[key])
 end
 
 ---Returns whether the clean character option is set to clean the body.
@@ -512,6 +538,7 @@ end
 ---Refreshes caches associated with configuration values.
 function Configuration:refreshValueCaches()
     self:_cacheLanguages()
+    self:_cacheVariables()
 end
 
 ---Checks whether an item is required for /card.
@@ -611,6 +638,23 @@ function Configuration:_cacheLanguages()
 
     self._languageAllowSet = utils.set.simple(self.Language.SelfAddAllowlist)
     self._languageBlockSet = utils.set.simple(self.Language.SelfAddBlocklist)
+end
+
+---Caches the variables and stores them as a map.
+---@protected
+function Configuration:_cacheVariables()
+    local varList = self.General.Variables
+
+    self._variables = {}
+    for i = 1, #varList do
+        local varString = varList[i]
+        local split = varString:find(':')
+        if split then
+            local key = utils.trim(varString:sub(1, split - 1))
+            local value = utils.trim(varString:sub(split + 1))
+            self._variables[key] = value
+        end
+    end
 end
 
 ---Caches the list of presets.

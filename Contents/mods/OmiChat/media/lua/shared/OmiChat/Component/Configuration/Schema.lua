@@ -47,6 +47,8 @@ return Schema:new {
             AdminIcon = str('Item_Sledgehamer'),
 
             InfoText = str(),
+
+            Variables = array { items = str() },
         },
 
         Buffs = container {

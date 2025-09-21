@@ -114,6 +114,7 @@ local function onPresetAction(args)
             type = 'OKCancel',
             w = 500,
             h = 200,
+            okText = getText('IGUI_RadioSave'),
             text = getText('UI_OmiChat_SavePreset_Prompt'),
             minLength = 1,
             maxLength = 50,
@@ -206,6 +207,8 @@ return {
                 displayLines = 10,
                 maxLines = 50,
             },
+
+            Variables = NO_REORDER,
         },
 
         Buffs = rules {

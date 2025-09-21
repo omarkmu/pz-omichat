@@ -4,6 +4,7 @@ local API = require 'OmiChat/Module/Shared/Core'
 
 local rep = string.rep
 local concat = table.concat
+local config = API.Configuration
 local utils = API.utils
 local MultiMap = utils.MultiMap
 
@@ -17,7 +18,6 @@ Library.Defaults = Library.Defaults or {}
 
 local Helpers = Library.Helpers
 local readTags = Helpers.readTags
-local readPreset = Helpers.readPreset
 local readOptions = Helpers.readOptions
 local optionOrToken = Helpers.optionOrToken
 
@@ -50,7 +50,6 @@ end
 ---@return string?
 function Library.Defaults.Chat(interpolator, args)
     local options = readOptions(args)
-    local preset = readPreset(options)
     local tags = readTags(interpolator)
 
     local defaultNoColon = tags.IsNarrativeStyle or tags.IsBuffyRoll or tags.IsServerStream
@@ -87,7 +86,7 @@ function Library.Defaults.Chat(interpolator, args)
     end
 
     if tags.IsIncomingPM and not tags.UseVanillaPM and name ~= '' then
-        local parens = tonumber(preset:getSetting('PMParenCount')) or 1
+        local parens = config:getVariableAsNumber('PMParenthesisCount') or 1
         local pmFrom = getText('UI_OmiChat_PrivateChatFrom', ' <SPACE> ' .. name)
 
         name = rep('(', parens) .. pmFrom .. rep(')', parens)
@@ -106,7 +105,7 @@ function Library.Defaults.Chat(interpolator, args)
             if tags.UseVanillaPM then
                 name = 'to ' .. name
             else
-                local parens = tonumber(preset:getSetting('PMParenCount')) or 1
+                local parens = config:getVariableAsNumber('PMParenthesisCount') or 1
                 local pmTo = getText('UI_OmiChat_PrivateChatTo', ' <SPACE> ' .. name)
 
                 name = rep('(', parens) .. pmTo .. rep(')', parens)
@@ -201,7 +200,6 @@ end
 ---@return string
 function Library.Defaults.ChatPrefix(interpolator, args)
     local options = readOptions(args)
-    local preset = readPreset(options)
     local tags = readTags(interpolator)
     local result = {}
 
@@ -212,7 +210,7 @@ function Library.Defaults.ChatPrefix(interpolator, args)
     result[#result + 1] = interpolator:tokenString('tag')
 
     if not tags.NoVolumeIndicator and not tags.NoVolumeIndicatorChat then
-        local volume = Helpers.getVolumeIndicator(options, tags, preset, true)
+        local volume = Helpers.getVolumeIndicator(options, tags, true)
         if volume then
             result[#result + 1] = volume
         end
@@ -504,7 +502,6 @@ end
 ---@return string
 function Library.Defaults.Name(interpolator, args)
     local options = readOptions(args)
-    local preset = readPreset(options)
     local chatType = interpolator:token('chatType')
 
     local name = options:getString('name')
@@ -513,8 +510,9 @@ function Library.Defaults.Name(interpolator, args)
 
     -- if a mode isn't given, use preset defaults
     if mode ~= 'username' and mode ~= 'name' and mode ~= 'both' then
-        local defaultForChatType = preset:getSetting('DefaultNameMode_' .. chatType)
-        local defaultMode = defaultForChatType or preset:getSetting('DefaultNameMode')
+        local defaultMode = config:getVariable('DefaultNameMode_' .. chatType)
+            or config:getVariable('DefaultNameMode')
+
         if defaultMode == 'username' then
             mode = defaultUsernameMode
         elseif defaultMode == 'name' or defaultMode == 'both' then
@@ -728,12 +726,11 @@ end
 ---@return string?
 function Library.Defaults.OverheadPrefix(interpolator, args)
     local options = readOptions(args)
-    local preset = readPreset(options)
     local tags = readTags(interpolator)
     local result = {}
 
     if not tags.NoVolumeIndicator and not tags.NoVolumeIndicatorOverhead then
-        local volume = Helpers.getVolumeIndicator(options, tags, preset)
+        local volume = Helpers.getVolumeIndicator(options, tags)
         if volume then
             result[#result + 1] = volume
         end

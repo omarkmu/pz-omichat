@@ -5,13 +5,13 @@ local Preset = require 'OmiChat/Component/Configuration/Preset'
 
 return Preset:new {
     name = 'Vanilla',
-    settings = {
-        DefaultNameMode = 'username',
-    },
     values = {
         General = Preset.general {
             Name = 'Vanilla',
             CaseInsensitiveChatStreams = false,
+            Variables = {
+                'DefaultNameMode:username',
+            },
         },
         Buffs = Preset.buffs(),
         Callouts = Preset.callouts(),

@@ -230,6 +230,7 @@ function Preset.general(options)
         InfoText = '',
         AdminIcon = options.AdminIcon or 'Item_Sledgehamer',
         ClearOnDeath = options.ClearOnDeath or Preset.clearOnDeath(),
+        Variables = options.Variables or {},
     }
 end
 
@@ -368,19 +369,6 @@ function Preset:getName()
     return self._name
 end
 
----Gets the value of a preset setting.
----@param key string
----@param default unknown?
----@return unknown?
-function Preset:getSetting(key, default)
-    local value = self._settings[key]
-    if value == nil then
-        return default
-    end
-
-    return value
-end
-
 ---Gets the values associated with the preset.
 ---@param schema omichat.ConfigurationSchema
 ---@return omichat.Configuration
@@ -414,7 +402,6 @@ function Preset:new(args)
     this._name = args.name
     this._isCustom = utils.default(args.isCustom, false)
     this._values = args.values or {}
-    this._settings = args.settings or {}
     this._getValues = args.getValues
     this._getLanguages = args.getLanguages
     this._getStreams = args.getStreams
