@@ -6,19 +6,6 @@ local lib = API.utils.lib
 local config = API.Configuration
 
 
----Called when configuration is saved from the editor form.
----@param args omi.forms.Args.Callback.Save
----@private
-function API._onConfigurationSave(args)
-    config:load(args.values)
-    API.request.updateConfiguration()
-
-    -- immediately save to mod data if testing in singleplayer
-    if getDebug() and not isClient() then
-        config:saveModData()
-    end
-end
-
 ---Called when a player is created.
 ---@param playerNum integer
 ---@param player IsoPlayer

@@ -166,7 +166,7 @@ function Callback.openConfiguration(target)
         w = 800,
         h = 600,
         values = config:getValuesForSave(),
-        onSave = API._onConfigurationSave,
+        onSave = Callback.onConfigurationSave,
     }
 
     panel:initialise()
@@ -290,6 +290,18 @@ function Callback.openProfileManager(target)
     panel:initialise()
     panel:addToUIManager()
     target.activeProfilesPanel = panel
+end
+
+---Called when configuration is saved from the editor form.
+---@param args omi.forms.Args.Callback.Save
+function Callback.onConfigurationSave(args)
+    config:load(args.values)
+    API.request.updateConfiguration()
+
+    -- immediately save to mod data if testing in singleplayer
+    if getDebug() and not isClient() then
+        config:saveModData()
+    end
 end
 
 ---Populates the auto-suggest box with relevant suggestions.
