@@ -105,7 +105,7 @@ return {
         command = '/clearnames ',
         helpTextID = 'UI_OmiChat_HelpText_ClearNames',
         isEnabled = API.player.canUseAdminCommands,
-        onUse = function() API.request.clearNames() end,
+        onUse = function() API.request.executeCommand('clearNames') end,
     },
     CommandStream:new {
         name = 'setname',
@@ -113,7 +113,7 @@ return {
         helpTextID = 'UI_OmiChat_HelpText_SetName',
         suggestSpec = { 'online-username' },
         isEnabled = API.player.canUseAdminCommands,
-        onUse = function(ctx) API.request.setName(ctx.text) end,
+        onUse = function(ctx) API.request.executeCommand('setName', ctx.text) end,
     },
     CommandStream:new {
         name = 'iconinfo',
@@ -150,7 +150,7 @@ return {
         suggestSpec = { 'online-username-with-self' },
         isEnabled = API.player.canUseAdminCommands,
         onUse = function(ctx)
-            if not API.request.setIcon(ctx.text) then
+            if not API.request.executeCommand('setIcon', ctx.text) then
                 local args = utils.parseCommandArgs(ctx.text)
                 local icon = args[2]
                 if not args[1] or not icon then
@@ -168,7 +168,7 @@ return {
         suggestSpec = { 'online-username' },
         isEnabled = API.player.canUseAdminCommands,
         onUse = function(ctx)
-            API.request.resetName(ctx.text)
+            API.request.executeCommand('resetName', ctx.text)
         end,
     },
     CommandStream:new {
@@ -178,7 +178,7 @@ return {
         suggestSpec = { 'online-username-with-self' },
         isEnabled = API.player.canUseAdminCommands,
         onUse = function(ctx)
-            API.request.resetIcon(ctx.text)
+            API.request.executeCommand('resetIcon', ctx.text)
         end,
     },
     CommandStream:new {
@@ -205,7 +205,7 @@ return {
         },
         isEnabled = API.player.canUseAdminCommands,
         onUse = function(ctx)
-            API.request.addLanguage(ctx.text)
+            API.request.executeCommand('addLanguage', ctx.text)
         end,
     },
     CommandStream:new {
@@ -215,7 +215,7 @@ return {
         suggestSpec = { 'online-username-with-self' },
         isEnabled = API.player.canUseAdminCommands,
         onUse = function(ctx)
-            API.request.resetLanguages(ctx.text)
+            API.request.executeCommand('resetLanguages', ctx.text)
         end,
     },
     CommandStream:new {
@@ -225,7 +225,7 @@ return {
         suggestSpec = { 'online-username-with-self' },
         isEnabled = API.player.canUseAdminCommands,
         onUse = function(ctx)
-            API.request.setLanguageSlots(ctx.text)
+            API.request.executeCommand('setLanguageSlots', ctx.text)
         end,
     },
     CommandStream:new {

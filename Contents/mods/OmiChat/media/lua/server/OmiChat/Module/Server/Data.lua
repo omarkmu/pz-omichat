@@ -4,6 +4,7 @@ if isClient() then return end
 
 local API = require 'OmiChat/Module/Server/Core' ---@class omichat.api.server
 local config = API.Configuration
+local utils = API.utils
 local SINGLEPLAYER = not isServer()
 
 
@@ -201,6 +202,91 @@ function Data.transmit()
     end
 
     ModData.transmit(API._key)
+end
+
+---Attempts to update data as the given player.
+---@param player IsoPlayer The player to perform the update as.
+---@param args omichat.request.ModDataUpdate The data for the update.
+---@param transmit boolean? Whether the update should be transmitted. Defaults to `true`.
+---@return boolean success
+---@return string? errorID
+function Data.tryUpdate(player, args, transmit)
+    local field = args.field
+    if field ~= 'all' then
+        -- individual fields can only be set for online players
+        local targetPlayer = args.target and utils.getPlayerByUsername(args.target)
+        if not targetPlayer then
+            return false, 'UNKNOWN_PLAYER'
+        end
+    end
+
+    local minAccessLevel = config.General.MinimumCommandAccessLevel
+    if not utils.canAccessTarget(player, args.target, minAccessLevel, args.fromCommand) then
+        return false
+    end
+
+    local success, err = Data._updateField(field, args.target, args.value, args.fromCommand)
+
+    if transmit ~= false then
+        API.data.transmit()
+    end
+
+    return success, err
+end
+
+---Updates a mod data field.
+---@param field omichat.ModDataField
+---@param target string
+---@param value unknown?
+---@param fromCommand boolean?
+---@return boolean success
+---@return string? errorID
+---@protected
+function Data._updateField(field, target, value, fromCommand)
+    if field == 'all' then
+        if not value then
+            return false
+        end
+
+        API.data.setPlayerData(target, value)
+    elseif field == 'currentLanguage' then
+        if not value then
+            return false
+        end
+
+        return API.data.setCurrentLanguage(target, value)
+    elseif field == 'icons' then
+        API.data.setChatIcon(target, value and tostring(value) or nil)
+        return true
+    elseif field == 'languages' then
+        if not value then
+            API.data.resetLanguages(target)
+            return true
+        end
+
+        return API.data.addLanguage(target, value)
+    elseif field == 'languageSlots' then
+        local slots = tonumber(value)
+        if not slots then
+            return false
+        end
+
+        return API.data.setLanguageSlots(target, slots)
+    elseif field == 'nicknames' then
+        if not config:isNicknameEnabled() and not fromCommand then
+            return false
+        end
+
+        API.data.setNickname(target, value and tostring(value) or nil)
+    elseif field == 'statuses' then
+        if not config.Commands.Status.Enable and not fromCommand then
+            return false
+        end
+
+        API.data.setStatus(target, value and tostring(value) or nil)
+    end
+
+    return true
 end
 
 

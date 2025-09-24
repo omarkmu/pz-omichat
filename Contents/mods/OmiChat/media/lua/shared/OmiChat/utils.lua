@@ -75,6 +75,30 @@ function utils.addMessageTagValue(message, key, value)
     message:setCustomTag(encodedTag)
 end
 
+---Checks whether a player has permission to execute a command for the given target username.
+---@param player IsoPlayer
+---@param target string
+---@param minAccessLevel integer
+---@param fromCommand boolean?
+---@return boolean
+function utils.canAccessTarget(player, target, minAccessLevel, fromCommand)
+    if not target then
+        return false
+    end
+
+    local access = utils.getNumericAccessLevel(player:getAccessLevel())
+    if fromCommand and access < minAccessLevel then
+        return false
+    end
+
+    if access == 1 and target ~= player:getUsername() then
+        return false
+    end
+
+    return true
+end
+
+
 ---Decodes an encoded character.
 ---@param text string
 ---@param index integer?
@@ -267,6 +291,27 @@ function utils.getBaseColorPicker(cls)
     end
 
     return cls
+end
+
+---Gets the name of a playing card in English.
+---@param card integer The card value, in [1, 13].
+---@param suit integer The suit value, in [1, 4].
+---@return string
+function utils.getCardName(card, suit)
+    local cardName = cards[card]
+    local suitName = suits[suit]
+    if not cardName or not suitName then
+        return ''
+    end
+
+    local article = 'a '
+    if card == 8 then
+        article = 'an '
+    elseif card == 1 or card > 10 then
+        article = 'the '
+    end
+
+    return article .. cardName .. ' of ' .. suitName
 end
 
 ---Returns the player's current access level.

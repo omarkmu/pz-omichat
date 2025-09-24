@@ -41,24 +41,6 @@ function API._onGameStart()
     API.StatusManager.init()
 end
 
----Called on player death.
----@param player IsoPlayer
----@private
-function API._onPlayerDeath(player)
-    if player ~= getSpecificPlayer(0) then
-        return
-    end
-
-    -- reset nickname, icon, and languages
-    API.request.reportPlayerDeath()
-
-    local instance = ISChat.instance
-    if instance then
-        instance:unfocus()
-        instance:close()
-    end
-end
-
 ---Called when receiving global mod data from the server.
 ---@param key string
 ---@param newData omichat.ModData
@@ -80,37 +62,7 @@ function API._onReceiveGlobalModData(key, newData)
     end
 end
 
----Called when processing commands from the server.
----@param module string
----@param command string
----@param args table
----@private
-function API._onServerCommand(module, command, args)
-    if module ~= API._key then
-        return
-    end
-
-    local handler = API.handlers[command]
-    if handler then
-        handler(args)
-    end
-end
-
----Called on tick until the player has loaded.
----@private
-function API._onTickTemporary()
-    if not getSpecificPlayer(0) then
-        return
-    end
-
-    Events.OnTick.Remove(API._onTickTemporary)
-    API.request.reportPlayerJoined()
-end
-
 
 Events.OnGameStart.Add(API._onGameStart)
 Events.OnCreatePlayer.Add(API._onCreatePlayer)
-Events.OnPlayerDeath.Add(API._onPlayerDeath)
-Events.OnServerCommand.Add(API._onServerCommand)
 Events.OnReceiveGlobalModData.Add(API._onReceiveGlobalModData)
-Events.OnTick.Add(API._onTickTemporary)

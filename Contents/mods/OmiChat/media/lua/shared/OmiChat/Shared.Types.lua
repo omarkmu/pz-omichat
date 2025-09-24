@@ -114,15 +114,17 @@
 
 --#region Requests
 
----Request to add a new user-defined configuration preset.
----@class omichat.request.AddPreset
+---Request to add or remove a user-defined configuration preset.
+---@class omichat.request.AddOrRemovePreset
+---@field type 'ADD' | 'DELETE' The operation to complete.
 ---@field name string The name of the preset.
----@field values table The configuration values.
+---@field values table? The configuration values.
 
 ---Request to clear mod data for a username.
 ---@class omichat.request.ClearModData
 ---@field username string
 
+---Request to execute a command on the server.
 ---@class omichat.request.Command
 ---@field name omichat.request.CommandName The name of the command.
 ---@field text string The command text, excluding the command itself.
@@ -133,10 +135,6 @@
 ---@field field omichat.ModDataField The field to update.
 ---@field fromCommand boolean? Whether this request was created from a command.
 ---@field value unknown? The value to set on the field.
-
----Request to remove a user-defined configuration preset.
----@class omichat.request.RemovePreset
----@field name string The name of the preset.
 
 ---Request to report the result of drawing a card on the client.
 ---@class omichat.request.ReportDrawCard
@@ -172,7 +170,7 @@
 
 ---Request to update the configuration.
 ---@class omichat.request.UpdateConfiguration
----@field value omichat.Configuration The new configuration values.
+---@field values omichat.Configuration The new configuration values.
 
 ---Request to update client information about typing.
 ---@class omichat.request.UpdateTyping
