@@ -1,6 +1,7 @@
 ---Helpers for interpolation functions.
 
 local API = require 'OmiChat/Module/Shared/Core'
+local API_C = API --[[@as omichat.api.client]]
 
 local concat = table.concat
 local sort = table.sort
@@ -9,6 +10,8 @@ local config = API.Configuration
 local MultiMap = utils.MultiMap
 local baseLib = utils.lib.interpolate.Interpolator.Libraries
 local stringLib = baseLib.string
+
+local IS_CLIENT = not isServer()
 
 local ASTERISK_CHAR = utils.encodeInvisibleCharacter(config.ID_ASTERISK_SIGNAL)
 local ASTERISK_PREFIX_PATTERN = '^(%s*[*' .. ASTERISK_CHAR .. '])(.+)'
@@ -477,15 +480,13 @@ end
 ---@param tags omi.SimpleSet?
 ---@return string
 function Helpers.getColorTarget(colorTag, options, tags)
-    ---@cast API unknown
-    if not API.streams.firstChatStreamWithTag then
+    if not IS_CLIENT then
         return ''
     end
 
     tags = tags or {}
 
-    ---@cast API omichat.api.client
-    local streams = API.streams.getChatStreamsWithTag(colorTag)
+    local streams = API_C.streams.getChatStreamsWithTag(colorTag)
     local targetTag = options and options:get('colorTargetTag')
     if not targetTag then
         if tags.Loud then
@@ -513,8 +514,7 @@ function Helpers.getColorTarget(colorTag, options, tags)
         return ''
     end
 
-    return utils.color.toRichText(API.player.getColorOrDefault(colorStream:getName()), true)
-    ---@cast API omichat.api.shared
+    return utils.color.toRichText(API_C.player.getColorOrDefault(colorStream:getName()), true)
 end
 
 ---Returns a partial quote representing a fragment of what a player character understood.

@@ -2,10 +2,12 @@
 ---@diagnostic disable: unused-local
 
 local API = require 'OmiChat/Module/Shared/Core'
+local API_C = API --[[@as omichat.api.client]]
 
 local utils = API.utils
 local MultiMap = utils.MultiMap
 
+local IS_CLIENT = not isServer()
 
 ---@class omichat.InterpolationLibrary
 local Library = require 'OmiChat/Component/InterpolationLibrary/Core'
@@ -178,12 +180,11 @@ end
 ---@param name unknown
 ---@return string?
 function Library.StreamCategory(interpolator, name)
-    ---@cast API omichat.api.client
-    if not API.streams.getChatStream then
+    if not IS_CLIENT then
         return
     end
 
-    local stream = API.streams.getChatStream(name)
+    local stream = API_C.streams.getChatStream(name)
     if not stream then
         return
     end
