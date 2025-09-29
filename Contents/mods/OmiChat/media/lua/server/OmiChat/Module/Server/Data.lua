@@ -5,7 +5,6 @@ if isClient() then return end
 local API = require 'OmiChat/Module/Server/Core' ---@class omichat.api.server
 local config = API.Configuration
 local utils = API.utils
-local SINGLEPLAYER = not isServer()
 
 
 ---@class omichat.api.server.data : omichat.api.shared.data
@@ -194,13 +193,6 @@ end
 
 ---Transmits mod data to clients.
 function Data.transmit()
-    local data = Data.get()
-    if SINGLEPLAYER then
-        local _API = API --[[@as omichat.api.client]]
-        _API._onReceiveGlobalModData(API._key, data) ---@diagnostic disable-line: invisible
-        return
-    end
-
     ModData.transmit(API._key)
 end
 

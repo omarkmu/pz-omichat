@@ -297,11 +297,6 @@ end
 function Callback.onConfigurationSave(args)
     config:load(args.values)
     API.request.updateConfiguration()
-
-    -- immediately save to mod data if testing in singleplayer
-    if getDebug() and not isClient() then
-        config:saveModData()
-    end
 end
 
 ---Populates the auto-suggest box with relevant suggestions.

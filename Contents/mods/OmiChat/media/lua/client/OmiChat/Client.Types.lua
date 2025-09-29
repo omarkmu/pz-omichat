@@ -42,7 +42,6 @@
 ---@class omichat.api.client.chat
 ---@field private _wasTyping boolean The typing status from the previous update.
 ---@field private _isTyping boolean Whether the local player is currently typing.
----@field private _mock omi.chat.Mock?
 
 ---@class omichat.ChatTab : omi.ui.RichTextPanel
 ---@field parent omichat.ISChat The parent chat.

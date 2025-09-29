@@ -2,7 +2,6 @@
 
 local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
 
-local lib = API.utils.lib
 local config = API.Configuration
 
 
@@ -20,23 +19,6 @@ end
 ---Called on game start.
 ---@private
 function API._onGameStart()
-    if getDebug() and not isClient() then
-        -- if we're running in singleplayer & debug, mock the chat
-        local mock = lib.chat.Mock:new()
-        mock:start()
-
-        API.chat._mock = mock ---@diagnostic disable-line: invisible
-        API.chat.raw = {
-            say = processSayMessage,
-            shout = processShoutMessage,
-            whisper = proceedPM,
-            general = processGeneralMessage,
-            safehouse = processSafehouseMessage,
-            faction = proceedFactionMessage,
-            admin = processAdminChatMessage,
-        }
-    end
-
     API.chat.updateState(true)
     API.StatusManager.init()
 end
