@@ -19,13 +19,8 @@
 ---@field defaultName string? The name of the default to use for the `$Default()` function.
 
 ---@class omichat.ModData
----@field version integer The current mod data version.
----@field nicknames table<string, string> Map of usernames to chat nicknames.
----@field icons table<string, string> Map of usernames to chat icons.
----@field languages table<string, string[]> Map of usernames to roleplay languages.
----@field languageSlots table<string, integer> Map of usernames to roleplay language slots.
----@field currentLanguage table<string, string> Map of usernames to currently selected roleplay languages.
----@field statuses table<string, string> Map of usernames to statuses.
+---@field version integer
+---@field players table<string, omichat.PlayerModData>
 
 ---@class omichat.PlayerModData
 ---@field username string
@@ -35,6 +30,8 @@
 ---@field languageSlots integer?
 ---@field currentLanguage string?
 ---@field status string?
+
+---@class omichat.PlayerCacheData : omi.PlayerCacheData, omichat.PlayerModData
 
 ---@class omichat.utils.InterpolatorCacheData
 ---@field text string
@@ -94,12 +91,12 @@
 
 ---@alias omichat.ModDataField
 ---| 'all'
----| 'nicknames'
+---| 'nickname'
 ---| 'languages'
 ---| 'languageSlots'
 ---| 'currentLanguage'
----| 'icons'
----| 'statuses'
+---| 'icon'
+---| 'status'
 
 --#endregion
 
@@ -107,7 +104,7 @@
 
 ---@class omichat.api.shared.data
 ---@field protected _version integer
----@field protected _playerVersion integer
+---@field protected _modData omichat.ModData?
 ---@field protected _playerCache omi.PlayerCache
 
 --#endregion
@@ -135,6 +132,10 @@
 ---@field field omichat.ModDataField The field to update.
 ---@field fromCommand boolean? Whether this request was created from a command.
 ---@field value unknown? The value to set on the field.
+
+---Response to a request for mod data.
+---@class omichat.request.ModDataListResponse
+---@field list omichat.PlayerModData[] The request list of player data.
 
 ---Request to report the result of drawing a card on the client.
 ---@class omichat.request.ReportDrawCard
@@ -179,7 +180,7 @@
 
 ---Request to update the player cache.
 ---@class omichat.request.UpdatePlayerCache
----@field items omi.PlayerCacheData[]
+---@field items omichat.PlayerCacheData[]
 
 ---Request to update the user-defined configuration presets.
 ---@class omichat.request.UpdatePresets

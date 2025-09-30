@@ -87,11 +87,11 @@ Request.TOPIC.CONFIGURATION = dispatch:topic('CONFIGURATION', {
     ---@param args omichat.request.UpdateConfiguration
     onReceive = function(req, args)
         config:load(args.values)
-        config:saveModData()
 
         if req:isFromServer() then
             API_C.chat.updateState(true)
         else
+            config:saveModData()
             req:broadcast()
         end
     end,
@@ -136,6 +136,59 @@ Request.TOPIC.CONFIGURATION_PRESETS = dispatch:topic('CONFIGURATION_PRESETS', {
         end
 
         req:broadcast()
+    end,
+})
+
+---Client → server: request clearing data for a username (admin only).
+Request.TOPIC.DATA_CLEAR = dispatch:topic('DATA_CLEAR', {
+    requireAdmin = true,
+
+    ---@param args omichat.request.ClearModData
+    onServerReceive = function(_, args)
+        API_S.data.clear(args.username)
+        API_S.request.updatePlayerCache()
+    end,
+})
+
+---Client → server: request a list of all data for all players (admin only).
+---Server → client: return a list of player data.
+Request.TOPIC.DATA_LIST = dispatch:topic('DATA_LIST', {
+    requireAdmin = true,
+
+    ---@param args omichat.request.ModDataListResponse
+    ---@return string?
+    onStringifyServerArgs = function(args)
+        if #args.list > 0 then
+            return '{"list": ' .. Request._encodeListDisplay(args.list) .. '}'
+        end
+    end,
+
+    ---@param args omichat.request.ModDataListResponse
+    onClientReceive = function(_, args)
+        local instance = ISChat.instance --[[@as omichat.ISChat]]
+        local panel = instance and instance.activeModDataPanel
+        if not panel then
+            return
+        end
+
+        panel:onUpdateList(args.list)
+    end,
+
+    onServerReceive = function(req)
+        ---@type omichat.request.ModDataListResponse
+        local resp = { list = API_S.data.getPlayerDataList() }
+
+        req:reply(resp)
+    end,
+})
+
+---Client → server: request updating data for a username.
+Request.TOPIC.DATA_UPDATE = dispatch:topic('DATA_UPDATE', {
+    ---@param req omi.ClientRequest
+    ---@param args omichat.request.ModDataUpdate
+    onServerReceive = function(req, args)
+        args.fromCommand = false
+        API_S.data.tryUpdate(req:getPlayer(), args)
     end,
 })
 
@@ -269,26 +322,6 @@ Request.TOPIC.FLIP_COIN = dispatch:topic('FLIP_COIN', {
     end,
 })
 
----Client → server: request clearing mod data for a username (admin only).
-Request.TOPIC.MOD_DATA_CLEAR = dispatch:topic('MOD_DATA_CLEAR', {
-    ---@param args omichat.request.ClearModData
-    onServerReceive = function(_, args)
-        API_S.data.clearModData(args.username)
-        API_S.data.transmit()
-    end,
-})
-
----Client → server: request updating mod data for a username (admin only).
-Request.TOPIC.MOD_DATA_UPDATE = dispatch:topic('MOD_DATA_UPDATE', {
-    ---@param req omi.ClientRequest
-    ---@param args omichat.request.ModDataUpdate
-    onServerReceive = function(req, args)
-        args.fromCommand = false
-        API_S.data.tryUpdate(req:getPlayer(), args)
-        API_S.data.transmit()
-    end,
-})
-
 ---Client → server: requests that the server refreshes the player cache for all players.
 ---Server → client: updates the player cache.
 Request.TOPIC.PLAYER_CACHE = dispatch:topic('PLAYER_CACHE', {
@@ -311,7 +344,7 @@ Request.TOPIC.PLAYER_CACHE = dispatch:topic('PLAYER_CACHE', {
 
     ---@param args omichat.request.UpdatePlayerCache
     onClientReceive = function(_, args)
-        API.data.resetPlayerCache(args.items)
+        API.data.setPlayerCache(args.items)
     end,
 
     onServerReceive = function(req) req:broadcast() end,
@@ -337,30 +370,30 @@ Request.TOPIC.PLAYER_DEATH = dispatch:topic('PLAYER_DEATH', {
         local player = req:getPlayer()
         local username = player:getUsername()
 
-        local doTransmit = false
+        local doBroadcast = false
         local clearConfig = config.General.ClearOnDeath
         if clearConfig.Nickname then
-            API_S.data.tryUpdate(player, { field = 'nicknames', target = username }, false)
-            doTransmit = true
+            API_S.data.tryUpdate(player, { field = 'nickname', target = username }, false)
+            doBroadcast = true
         end
 
         if clearConfig.Icon then
-            API_S.data.tryUpdate(player, { field = 'icons', target = username }, false)
-            doTransmit = true
+            API_S.data.tryUpdate(player, { field = 'icon', target = username }, false)
+            doBroadcast = true
         end
 
         if clearConfig.Languages then
             API_S.data.tryUpdate(player, { field = 'languages', target = username }, false)
-            doTransmit = true
+            doBroadcast = true
         end
 
         if clearConfig.Status then
-            API_S.data.tryUpdate(player, { field = 'statuses', target = username }, false)
-            doTransmit = true
+            API_S.data.tryUpdate(player, { field = 'status', target = username }, false)
+            doBroadcast = true
         end
 
-        if doTransmit then
-            API_S.data.transmit()
+        if doBroadcast then
+            API_S.request.updatePlayerCache()
         end
     end,
 })

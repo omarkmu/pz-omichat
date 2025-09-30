@@ -484,7 +484,7 @@ function Search._mapPerkToId(perk)
 end
 
 ---Checks whether a player should be included in the username search.
----@param player IsoPlayer | omi.PlayerCacheData
+---@param player IsoPlayer | omichat.PlayerCacheData
 ---@param ctx omichat.search.InternalSearchContext
 ---@param ownUsername string
 ---@param includeSelf boolean?

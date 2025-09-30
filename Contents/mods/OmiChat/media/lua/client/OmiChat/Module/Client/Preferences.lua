@@ -396,10 +396,12 @@ function Preferences.switchProfile(idx)
 
     prefs.profileIndex = math.max(0, math.min(idx, #prefs.profiles))
 
-    local colors = profile and profile.colors or {}
-    API.player.setSpeechColor(colors.speech)
+    local doNickname = profile and profile.chatNickname and config:isNicknameEnabled()
 
-    if profile and profile.chatNickname and config:isNicknameEnabled() then
+    local colors = profile and profile.colors or {}
+    API.player.setSpeechColor(colors.speech, not doNickname)
+
+    if profile and doNickname then
         API.player.setNickname(profile.chatNickname)
     end
 

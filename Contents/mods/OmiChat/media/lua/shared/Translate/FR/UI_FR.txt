@@ -208,8 +208,8 @@ UI_FR = {
     UI_OmiChat_ProfileManager_Tooltip_Color_speech = "Entrez une couleur en format RGB ou hex pour définir la couleur de vos bulles de discours.",
 
     --[[ Mod Data Manager ]]--
-    UI_OmiChat_ModDataManager_Title = "Visionneuse de Données de Mod OmiChat",
-    UI_OmiChat_ModDataManager_EditorTitle = "Modifier les Données de Mod",
+    UI_OmiChat_ModDataManager_Title = "OmiChat Player Data",
+    UI_OmiChat_ModDataManager_EditorTitle = "Edit Player Data",
     UI_OmiChat_ModDataManager_NoData = "(vide)",
     UI_OmiChat_ModDataManager_Column_username = "Nom d'utilisateur",
     UI_OmiChat_ModDataManager_Column_nickname = "Pseudo de chat",
@@ -265,7 +265,7 @@ UI_FR = {
     UI_OmiChat_ContextProfileDefault = "Défaut",
     UI_OmiChat_ContextManageProfiles = "Gérer les profils",
     UI_OmiChat_ContextAdmin = "Options administrateur",
-    UI_OmiChat_ContextAdminManageModData = "Voir les données de mod",
+    UI_OmiChat_ContextAdminManageModData = "View player data",
     UI_OmiChat_ContextAdminUpdateConfiguration = "Paramètres",
     UI_OmiChat_ContextAdmin_ShowIcon = "Afficher l'icône de discussion",
     UI_OmiChat_ContextAdmin_KnowAllLanguages = "Comprendre toutes les langues",

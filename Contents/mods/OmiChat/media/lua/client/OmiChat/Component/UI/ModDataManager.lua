@@ -5,8 +5,19 @@ local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
 local utils = API.utils
 local UI = utils.ui
 
+local isAdmin = isAdmin
 local ISPanelJoypad = ISPanelJoypad
 local textManager = getTextManager()
+
+local COLUMNS = {
+    'username',
+    'nickname',
+    'status',
+    'icon',
+    'currentLanguage',
+    'languageSlots',
+    'languages',
+}
 
 
 ---@class omichat.ModDataManager : ISPanelJoypad
@@ -25,7 +36,7 @@ function ModDataManager:confirmDeleteItem()
         text = getText('IGUI_DbViewer_DeleteConfirm'),
         target = self,
         onClick = self.onConfirmDelete,
-        onclickArgs = { item, idx },
+        onClickArgs = { item, idx },
     }
 end
 
@@ -198,19 +209,77 @@ function ModDataManager:onConfirmDelete(button, item, idx)
     end
 
     local username = item.username
-    API.data.clear(username)
-    API.request.clearModData(username)
+    API.request.clearData(username)
 
     self.listbox:removeItemByIndex(idx)
     if #self.listbox.items > 0 then
         self.listbox.selected = math.max(1, idx - 1)
     end
+
+    self:refresh()
 end
 
 ---Called when the modify button is clicked.
 function ModDataManager:onModifyClick()
     local item = self:getSelectedItem()
     self:openEditPanel(item)
+end
+
+---Called when a new mod data list is returned from the server.
+---@param list omichat.PlayerModData[]
+function ModDataManager:onUpdateList(list)
+    if #self.elements == 0 and #list > 0 then
+        self:setVisible(true)
+    end
+
+    local selected = self.listbox.selected or 1
+    self.refreshBtn.enable = true
+    self.elements = list
+
+    self.headerH = textManager:getFontHeight(self.headerFont)
+    self.listbox.font = self.listFont
+    self.titleW = textManager:MeasureStringX(UIFont.Medium, self.titleText)
+    self.listbox.itemheight = textManager:getFontHeight(self.listFont) + 4
+    self.listbox:clear()
+
+    local sizes = utils.copy(self.columnSizes)
+    local emptyText = getText('UI_OmiChat_ModDataManager_NoData')
+    for i = 1, #list do
+        local el = list[i]
+        local display = {}
+        local empty = {}
+        for j = 1, #COLUMNS do
+            local colName = COLUMNS[j]
+            local colValue = el[colName]
+
+            local colType = type(colValue)
+            if colType == 'table' then
+                colType = 'string'
+                colValue = table.concat(colValue, ', ')
+            end
+
+            if colType == 'string' and colValue ~= '' then
+                display[colName] = colValue
+            elseif colValue == nil or colValue == '' then
+                empty[colName] = true
+                display[colName] = emptyText
+            else
+                display[colName] = tostring(colValue)
+            end
+
+            local elSize = textManager:MeasureStringX(self.listFont, display[colName]) + 20
+            sizes[colName] = math.max(math.min(elSize, 300), sizes[colName] or 0)
+        end
+
+        self.listbox:addItem(el.username, {
+            data = el,
+            display = display,
+            empty = empty,
+        })
+    end
+
+    self.listbox.selected = utils.clamp(selected, 1, #self.listbox.items)
+    self.columnWidth = sizes
 end
 
 ---Opens the edit panel with the given item.
@@ -232,63 +301,15 @@ function ModDataManager:openEditPanel(item, isAdd)
     self.activeEditorPanel:addToUIManager()
 end
 
----Refreshes the mod data information.
+---Requests a refresh of the list of mod data.
 function ModDataManager:refresh()
-    local elements, fields = API.data.getList()
-    self.elements = elements
-    self.columnList = fields
-
-    self.headerH = textManager:getFontHeight(self.headerFont)
-    self.listbox.font = self.listFont
-    self.titleW = textManager:MeasureStringX(UIFont.Medium, self.titleText)
-    self.listbox.itemheight = textManager:getFontHeight(self.listFont) + 4
-    self.listbox:clear()
-
-    self.columnDisplay = {}
-    local sizes = {}
-    for i = 1, #fields do
-        local colName = fields[i]
-        local colDisplay = getText('UI_OmiChat_ModDataManager_Column_' .. colName)
-
-        self.columnDisplay[colName] = colDisplay
-        sizes[colName] = textManager:MeasureStringX(self.headerFont, colDisplay) + 20
+    -- hide the menu before the initial refresh
+    if #self.elements == 0 then
+        self:setVisible(false)
     end
 
-    local emptyText = getText('UI_OmiChat_ModDataManager_NoData')
-    for i = 1, #elements do
-        local el = elements[i]
-        local display = {}
-        local empty = {}
-        for j = 1, #fields do
-            local colName = fields[j]
-            local colValue = el[colName]
-
-            local tp = type(colValue)
-            if tp == 'table' then
-                colValue = table.concat(colValue, ', ')
-            end
-
-            if tp == 'string' and colValue ~= '' then
-                display[colName] = colValue
-            elseif colValue == nil or colValue == '' then
-                empty[colName] = true
-                display[colName] = emptyText
-            else
-                display[colName] = tostring(colValue)
-            end
-
-            local elSize = textManager:MeasureStringX(self.listFont, display[colName]) + 20
-            sizes[colName] = math.max(math.min(elSize, 300), sizes[colName] or 0)
-        end
-
-        self.listbox:addItem(el.username, {
-            data = el,
-            display = display,
-            empty = empty,
-        })
-    end
-
-    self.columnWidth = sizes
+    self.refreshBtn.enable = false
+    API.request.getDataList()
 end
 
 ---Renders the table for the listbox items.
@@ -354,6 +375,20 @@ function ModDataManager:new(x, y, width, height)
     this.borderColor = { r = 0.4, g = 0.4, b = 0.4, a = 1 }
     this.listHeaderColor = { r = 0.4, g = 0.4, b = 0.4, a = 0.4 }
     this.backgroundColor = { r = 0, g = 0, b = 0, a = 0.8 }
+
+    this.columnList = COLUMNS
+    this.columnDisplay = {}
+    this.columnSizes = {}
+    this.columnWidth = {}
+    this.elements = {}
+
+    for i = 1, #COLUMNS do
+        local colName = COLUMNS[i]
+        local colDisplay = getText('UI_OmiChat_ModDataManager_Column_' .. colName)
+
+        this.columnDisplay[colName] = colDisplay
+        this.columnSizes[colName] = textManager:MeasureStringX(this.headerFont, colDisplay) + 20
+    end
 
     return this
 end

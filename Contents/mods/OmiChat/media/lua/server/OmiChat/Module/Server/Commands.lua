@@ -59,7 +59,7 @@ function Command.clearNames(player)
     end
 
     API.data.clearNicknames()
-    API.data.transmit()
+    API.request.updatePlayerCache()
     API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ClearNames')
 end
 
@@ -75,7 +75,7 @@ function Command.resetIcon(player, args)
     if username then
         success, err = API.data.tryUpdate(player, {
             target = username,
-            field = 'icons',
+            field = 'icon',
             fromCommand = true,
         })
     end
@@ -137,7 +137,7 @@ function Command.resetName(player, args)
     if username then
         success, err = API.data.tryUpdate(player, {
             target = username,
-            field = 'nicknames',
+            field = 'nickname',
             fromCommand = true,
         })
     end
@@ -169,7 +169,7 @@ function Command.setIcon(player, args)
     if username and icon then
         success, err = API.data.tryUpdate(player, {
             target = username,
-            field = 'icons',
+            field = 'icon',
             value = icon,
             fromCommand = true,
         })
@@ -235,7 +235,7 @@ function Command.setName(player, args)
     if username and name then
         success, err = API.data.tryUpdate(player, {
             target = username,
-            field = 'nicknames',
+            field = 'nickname',
             value = name,
             fromCommand = true,
         })

@@ -2,6 +2,8 @@
 
 local API = require 'OmiChat/Module/Shared/Core' ---@class omichat.api.shared
 
+local IS_CLIENT = isClient()
+
 local config = API.Configuration
 local utils = API.utils
 local ModData = ModData
@@ -10,92 +12,31 @@ local ModData = ModData
 ---@class omichat.api.shared.data
 local Data = {}
 Data._version = 1
-Data._playerVersion = 1
-Data._playerCache = utils.lib.cache.player()
-
-local dataFields = {
-    { key = 'nicknames', name = 'nickname' },
-    { key = 'statuses', name = 'status' },
-    { key = 'icons', name = 'icon' },
-    { key = 'currentLanguage', name = 'currentLanguage' },
-    { key = 'languageSlots', name = 'languageSlots' },
-    { key = 'languages', name = 'languages' },
-}
-
-local dataKeys = { 'username' }
-for i = 1, #dataFields do
-    dataKeys[#dataKeys + 1] = dataFields[i].name
-end
+Data._playerCache = utils.lib.cache.player({
+    onCreatePlayerData = function(_, player) return Data._createPlayerCacheData(player) end,
+})
 
 
----Clears mod data for a given username.
----@param username string
-function Data.clear(username)
-    local modData = Data.get()
-
-    for _, field in pairs(dataFields) do
-        modData[field.key][username] = nil
-    end
-end
-
----Gets or creates the global mod data table.
----@return omichat.ModData
-function Data.get()
-    ---@type omichat.ModData
-    local modData = ModData.getOrCreate(API._key)
-
-    modData.version = Data._version
-    for _, field in pairs(dataFields) do
-        modData[field.key] = modData[field.key] or {}
-    end
-
-    return modData
-end
 
 ---Returns the chat icon for a given username.
 ---@param username string
 ---@return string?
 function Data.getChatIcon(username)
-    return Data.get().icons[username]
+    local playerData = Data.getPlayerData(username)
+    return playerData and playerData.icon
 end
 
 ---Gets the currently active roleplay language for the player with the given username.
 ---@param username string
 ---@return string?
 function Data.getCurrentLanguage(username)
-    local modData = API.data.get()
-    local language = modData.currentLanguage[username]
+    local playerData = Data.getPlayerData(username)
+    local language = playerData and playerData.currentLanguage
     if language and not API.language.exists(language) then
         return
     end
 
     return language
-end
-
----Gets the global mod data as a list associated with usernames.
----@return omichat.PlayerModData[] data
----@return string[] fieldList
-function Data.getList()
-    local list = {}
-    local map = {}
-    local modData = Data.get()
-
-    for _, field in pairs(dataFields) do
-        local key = field.key
-        local fieldName = field.name
-
-        for username, v in pairs(modData[key]) do
-            if not map[username] then
-                local userData = { username = username }
-                list[#list + 1] = userData
-                map[username] = userData
-            end
-
-            map[username][fieldName] = v
-        end
-    end
-
-    return list, utils.copyList(dataKeys)
 end
 
 ---Retrieves the name that should be used in chat for a given username.
@@ -131,12 +72,26 @@ end
 ---@param username string
 ---@return string?
 function Data.getNickname(username)
-    return Data.get().nicknames[username]
+    local playerData = Data.getPlayerData(username)
+    return playerData and playerData.nickname
+end
+
+---Gets player data on the client or server.
+---On the server, this retrieves information from mod data.
+---On the client, it returns a player from the cache.
+---@param username string
+---@return omichat.PlayerModData?
+function Data.getPlayerData(username)
+    if IS_CLIENT then
+        return Data._playerCache:get(username, false)
+    end
+
+    return Data._getPlayerData(username)
 end
 
 ---Retrieves player information given an online ID.
 ---@param onlineID number
----@return omi.PlayerCacheData?
+---@return omichat.PlayerCacheData?
 function Data.getPlayerInfoByOnlineID(onlineID)
     local player = getPlayerByOnlineID(onlineID)
     if player then
@@ -148,7 +103,7 @@ end
 
 ---Retrieves player information given a username.
 ---@param username string
----@return omi.PlayerCacheData?
+---@return omichat.PlayerCacheData?
 function Data.getPlayerInfoByUsername(username)
     local player = utils.getPlayerByUsername(username)
     if player then
@@ -160,7 +115,7 @@ end
 
 ---Retrieves the name that should be used in chat for the given menu type.
 ---If the menu name should not be affected or retrieving the name fails, this returns `nil`.
----@param player IsoPlayer | omi.PlayerCacheData
+---@param player IsoPlayer | omichat.PlayerCacheData
 ---@param menuType omichat.MenuTypeString
 ---@return string?
 function Data.getPlayerMenuName(player, menuType)
@@ -191,7 +146,7 @@ function Data.getPlayerMenuName(player, menuType)
 end
 
 ---Retrieves the name that should be used in chat for a given player.
----@param player IsoPlayer | omi.PlayerCacheData
+---@param player IsoPlayer | omichat.PlayerCacheData
 ---@param chatType omichat.ChatTypeString The chat type to use in format string interpolation.
 ---@return string? name The name to use in chat, or `nil` if unable to retrieve information about the player.
 function Data.getPlayerNameInChat(player, chatType)
@@ -202,11 +157,7 @@ function Data.getPlayerNameInChat(player, chatType)
 
     local username = Data._getPlayerUsername(player)
 
-    local modData = Data.get()
-    if modData.nicknames[username] then
-        tokens.name = modData.nicknames[username]
-    end
-
+    tokens.name = Data.getNickname(username)
     tokens.username = username
     tokens.chatType = chatType
     return utils.interpolateNamed('Name', config.Format.Component.Name, tokens, username)
@@ -214,11 +165,11 @@ end
 
 ---Gets substitution tokens to use in interpolation for a given player.
 ---If the player information could not be obtained, returns `nil`.
----@param player (IsoPlayer | omi.PlayerCacheData)?
+---@param player (IsoPlayer | omichat.PlayerCacheData)?
 ---@return table?
 function Data.getPlayerSubstitutions(player)
     if player and not player.getUsername then
-        ---@cast player omi.PlayerCacheData
+        ---@cast player omichat.PlayerCacheData
         return {
             forename = utils.trim(player.forename),
             surname = utils.trim(player.surname),
@@ -255,87 +206,111 @@ end
 ---@param username string
 ---@return string?
 function Data.getStatus(username)
-    return Data.get().statuses[username]
-end
-
----Retrieves mod data for a given player.
----@param username string
----@return omichat.PlayerModData
-function Data.getPlayerModData(username)
-    local modData = Data.get()
-
-    local data = { username = username }
-    for _, field in pairs(dataFields) do
-        data[field.name] = modData[field.key][username]
-    end
-
-    return data
+    local playerData = Data.getPlayerData(username)
+    return playerData and playerData.status
 end
 
 ---Returns an iterator over the player cache.
----@return fun(): string?, omi.PlayerCacheData?
+---@return fun(): string?, omichat.PlayerCacheData?
 function Data.iteratePlayerCache()
     return Data._playerCache:iterate()
 end
 
----Refreshes roleplay language information for the given username.
----@param username string
-function Data.refreshLanguageInfo(username)
-    local modData = API.data.get()
-    local currentLang = modData.currentLanguage[username]
-    local languages = modData.languages[username]
-    if not languages then
-        modData.currentLanguage[username] = nil
-        return
-    end
-
-    local hasCurrentLang = false
-    local validLanguages = {}
-    for i = 1, #languages do
-        local lang = languages[i]
-        if API.language.exists(lang) then
-            validLanguages[#validLanguages + 1] = lang
-            if lang == currentLang then
-                hasCurrentLang = true
-            end
-        end
-    end
-
-    modData.languages[username] = validLanguages
-    if not hasCurrentLang or not currentLang then
-        modData.currentLanguage[username] = validLanguages[1]
-    end
-end
-
----Resets the player cache.
----@param items omi.PlayerCacheData[]
-function Data.resetPlayerCache(items)
+---Resets the player cache with the data from the given list.
+---@param items omichat.PlayerCacheData[]?
+function Data.setPlayerCache(items)
     Data._playerCache:fromList(items or {})
 end
 
----Sets the mod data for the given username.
----@param username string
----@param data omichat.PlayerModData?
-function Data.set(username, data)
-    local modData = Data.get()
 
-    data = data or {}
-    for _, field in pairs(dataFields) do
-        modData[field.key][username] = data[field.name]
+---Creates player cache data given a player object.
+---@param player IsoPlayer
+---@return omichat.PlayerCacheData
+---@protected
+function Data._createPlayerCacheData(player)
+    local username = player:getUsername()
+    if IS_CLIENT then
+        local existing = Data._playerCache:get(username, false)
+        return existing or Data._playerCache:defaultCreatePlayerData(player)
     end
+
+    local item = Data._playerCache:defaultCreatePlayerData(player) --[[@as omichat.PlayerCacheData]]
+
+    local data = Data._getPlayerData(username)
+    if not data then
+        return item
+    end
+
+    for k, v in pairs(data) do
+        item[k] = v
+    end
+
+    item.languages = data.languages and utils.copyList(data.languages)
+    return item
 end
 
+---Gets or creates the global mod data table for player data.
+---This should only be used on the server.
+---@return omichat.ModData
+---@protected
+function Data._get()
+    if Data._modData then
+        return Data._modData
+    end
+
+    if IS_CLIENT then
+        error('Data.get cannot be used on the client')
+    end
+
+    ---@type omichat.ModData
+    local modData = ModData.getOrCreate(API._key)
+
+    modData.version = Data._version
+    modData.players = modData.players or {}
+
+    Data._modData = modData
+    return modData
+end
+
+---Gets or creates the player data for a player with the given username.
+---This should only be used on the server.
+---@param username string
+---@return omichat.PlayerModData
+---@protected
+function Data._getOrCreatePlayerData(username)
+    local modData = Data._get()
+
+    if not modData.players[username] then
+        modData.players[username] = { username = username }
+    end
+
+    return modData.players[username]
+end
+
+---Gets the player data for a player with the given username. Returns `nil` if no data for the player exists.
+---This should only be used on the server.
+---@param username string
+---@return omichat.PlayerModData?
+---@protected
+function Data._getPlayerData(username)
+    local modData = Data._get()
+    if not modData.players[username] then
+        return
+    end
+
+    return modData.players[username]
+end
 
 ---Gets the username for a player or player cache item.
----@param player IsoPlayer | omi.PlayerCacheData
----@return string?
+---@param player IsoPlayer | omichat.PlayerCacheData
+---@return string
 ---@protected
 function Data._getPlayerUsername(player)
     if player.getUsername then
         ---@cast player IsoPlayer
         return player:getUsername()
     else
-        ---@cast player omi.PlayerCacheData
+        ---@cast player omichat.PlayerCacheData
         return player.username
     end
 end

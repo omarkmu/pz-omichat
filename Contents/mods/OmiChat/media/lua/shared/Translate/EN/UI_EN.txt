@@ -208,8 +208,8 @@ UI_EN = {
     UI_OmiChat_ProfileManager_Tooltip_Color_speech = "Enter a color in RGB or hex format to set the color of your overhead speech bubbles.",
 
     --[[ Mod Data Manager ]]--
-    UI_OmiChat_ModDataManager_Title = "OmiChat Mod Data Viewer",
-    UI_OmiChat_ModDataManager_EditorTitle = "Edit Mod Data",
+    UI_OmiChat_ModDataManager_Title = "OmiChat Player Data",
+    UI_OmiChat_ModDataManager_EditorTitle = "Edit Player Data",
     UI_OmiChat_ModDataManager_NoData = "(empty)",
     UI_OmiChat_ModDataManager_Column_username = "Username",
     UI_OmiChat_ModDataManager_Column_nickname = "Chat Nickname",
@@ -265,7 +265,7 @@ UI_EN = {
     UI_OmiChat_ContextProfileDefault = "Default",
     UI_OmiChat_ContextManageProfiles = "Manage profiles",
     UI_OmiChat_ContextAdmin = "Admin options",
-    UI_OmiChat_ContextAdminManageModData = "View mod data",
+    UI_OmiChat_ContextAdminManageModData = "View player data",
     UI_OmiChat_ContextAdminUpdateConfiguration = "Open settings",
     UI_OmiChat_ContextAdmin_ShowIcon = "Display chat icon",
     UI_OmiChat_ContextAdmin_KnowAllLanguages = "Understand all languages",

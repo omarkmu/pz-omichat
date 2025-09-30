@@ -95,13 +95,7 @@ function Player.getCurrentLanguage()
         return
     end
 
-    local modData = API.data.get()
-    local language = modData.currentLanguage[username]
-    if language and not API.language.exists(language) then
-        return
-    end
-
-    return language
+    return API.data.getCurrentLanguage(username)
 end
 
 ---Gets the default color associated with a stream or speech color.
@@ -137,12 +131,12 @@ function Player.getLanguages()
         return {}
     end
 
-    local modData = API.data.get()
-    if not modData.languages[username] then
-        modData.languages[username] = { API.language.getDefault() }
+    local playerData = API.data.getPlayerInfoByUsername(username)
+    if not playerData or not playerData.languages then
+        return { API.language.getDefault() }
     end
 
-    return modData.languages[username]
+    return playerData.languages
 end
 
 ---Gets the number of available roleplay language slots for the local player.
@@ -154,7 +148,8 @@ function Player.getLanguageSlots()
         return default
     end
 
-    return API.data.get().languageSlots[username] or default
+    local playerData = API.data.getPlayerInfoByUsername(username)
+    return playerData and playerData.languageSlots or default
 end
 
 ---Gets the nickname for the local player, or `nil` if unset.
@@ -165,8 +160,7 @@ function Player.getNickname()
         return
     end
 
-    local modData = API.data.get()
-    return modData.nicknames[username]
+    return API.data.getNickname(username)
 end
 
 ---Returns a color table for the local player's speech color.
@@ -239,11 +233,6 @@ function Player.setCurrentLanguage(language)
         return false
     end
 
-    local modData = API.data.get()
-    if API.language.exists(language) then
-        modData.currentLanguage[username] = language
-    end
-
     API.request.updateData({
         field = 'currentLanguage',
         target = username,
@@ -266,8 +255,6 @@ function Player.setLanguageSlots(slots)
         return false
     end
 
-    local modData = API.data.get()
-    modData.languageSlots[username] = slots
     API.request.updateData({
         field = 'languageSlots',
         target = username,
@@ -289,12 +276,10 @@ function Player.setNickname(nickname)
         return false
     end
 
-    local modData = API.data.get()
     if #nickname == 0 then
-        modData.nicknames[username] = nil
         API.request.updateData({
             target = username,
-            field = 'nicknames',
+            field = 'nickname',
         })
 
         return true, getText('UI_OmiChat_Success_ResetName')
@@ -314,11 +299,10 @@ function Player.setNickname(nickname)
         return false, err or getText('UI_OmiChat_Error_InvalidName', utils.escapeRichText(original))
     end
 
-    modData.nicknames[username] = nickname
     API.request.updateData({
         value = nickname,
         target = username,
-        field = 'nicknames',
+        field = 'nickname',
     })
 
     return true, getText('UI_OmiChat_Success_SetNameSelf', utils.escapeRichText(nickname))
@@ -326,9 +310,10 @@ end
 
 ---Sets the color used for overhead chat bubbles.
 ---This will set the speech color in-game option.
----@param color omi.ColorTable?
+---@param color omi.ColorTable? The new speech color.
+---@param requestCacheUpdate boolean? Whether a request to update the cache should be made. Defaults to `true`.
 ---@return boolean success
-function Player.setSpeechColor(color)
+function Player.setSpeechColor(color, requestCacheUpdate)
     local player = getSpecificPlayer(0)
     if not player then
         return false
@@ -349,7 +334,10 @@ function Player.setSpeechColor(color)
     player:setSpeakColourInfo(core:getMpTextColor())
     sendPersonalColor(player)
 
-    API.request.updatePlayerCache()
+    if requestCacheUpdate ~= false then
+        API.request.updatePlayerCache()
+    end
+
     return true
 end
 
@@ -365,12 +353,10 @@ function Player.setStatus(status)
         return false
     end
 
-    local modData = API.data.get()
     if #status == 0 then
-        modData.statuses[username] = nil
         API.request.updateData({
             target = username,
-            field = 'statuses',
+            field = 'status',
         })
 
         return true, getText('UI_OmiChat_Success_ResetStatus')
@@ -389,11 +375,10 @@ function Player.setStatus(status)
         return false, err or getText('UI_OmiChat_Error_InvalidStatus', utils.escapeRichText(original))
     end
 
-    modData.statuses[username] = status
     API.request.updateData({
         value = status,
         target = username,
-        field = 'statuses',
+        field = 'status',
     })
 
     return true, getText('UI_OmiChat_Success_SetStatusSelf', utils.escapeRichText(status))

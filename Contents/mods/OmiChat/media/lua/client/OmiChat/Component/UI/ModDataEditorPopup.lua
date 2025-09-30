@@ -253,7 +253,7 @@ function ModDataEditor:onSave()
     item.status = self:getEntryValue(self.statusEntry)
     item.languages = self.languageListEntry:getValue()
 
-    API.request.setModData(username, item)
+    API.request.setPlayerData(username, item)
 
     if self.onsave then
         self.onsave(self.target)

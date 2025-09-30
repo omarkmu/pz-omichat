@@ -36,6 +36,7 @@ Configuration._presets = {
 }
 
 
+--#region Constants
 
 -- reserved ID layout:
 --   1–10: general-purpose arguments
@@ -137,6 +138,8 @@ Configuration.FORMAT_NAMES = {
     [Configuration.ID_ONLINE_ID] = 'onlineID',
     [Configuration.ID_ECHO] = 'echo',
 }
+
+--#endregion
 
 
 ---Checks the language against the add language allow/block list.
@@ -691,23 +694,6 @@ function Configuration:_isCompatEnabled(value, modId)
     return self._enabledMods[modId] == true
 end
 
----Event handler for initializing global mod data.
----@protected
-function Configuration._onInitGlobalModData()
-    local loadSuccess = Configuration:loadModData()
-
-    -- server loads from mod data
-    if not isClient() and loadSuccess then
-        Configuration:saveModData(true)
-        Configuration:updateFormatters()
-        return
-    end
-
-    -- client loads cached settings; will ultimately be received from server
-    Configuration:saveModData()
-    Configuration:updateFormatters()
-end
-
 ---Removes a custom preset from the configuration.
 ---@param name string
 ---@protected
@@ -751,8 +737,6 @@ function Configuration._sortPresets(a, b)
     return a:getName() < b:getName()
 end
 
-
-Events.OnInitGlobalModData.Add(Configuration._onInitGlobalModData)
 
 Configuration:init()
 return Configuration

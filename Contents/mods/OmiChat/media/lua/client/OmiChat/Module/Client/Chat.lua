@@ -334,12 +334,6 @@ function Chat.updateState(redraw)
     end
 
     API.preferences.get()
-
-    local username = API.player.getUsername()
-    if username then
-        API.data.refreshLanguageInfo(username)
-    end
-
     API.ui.updateState(redraw)
 end
 

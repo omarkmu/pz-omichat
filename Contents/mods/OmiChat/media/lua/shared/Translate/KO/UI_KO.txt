@@ -208,7 +208,7 @@ UI_KO = {
     UI_OmiChat_ProfileManager_Tooltip_Color_speech = "RGB 또는 16진수 형식의 색을 입력하여 말풍선의 색을 설정합니다.",
 
     --[[ Mod Data Manager ]]--
-    UI_OmiChat_ModDataManager_Title = "오미챗 데이터 뷰어",
+    UI_OmiChat_ModDataManager_Title = "오미챗 플레이어 데이터",
     UI_OmiChat_ModDataManager_EditorTitle = "데이터 편집",
     UI_OmiChat_ModDataManager_NoData = "(값 없음)",
     UI_OmiChat_ModDataManager_Column_username = "사용자 이름",

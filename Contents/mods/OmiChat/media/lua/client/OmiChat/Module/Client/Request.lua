@@ -24,11 +24,11 @@ end
 ---@param username string
 ---@return boolean success
 ---@return string? error
-function Request.clearModData(username)
+function Request.clearData(username)
     ---@type omichat.request.ClearModData
     local args = { username = username }
 
-    return Topic.MOD_DATA_CLEAR:toServer(args)
+    return Topic.DATA_CLEAR:toServer(args)
 end
 
 ---Requests drawing a card from a card deck in the player's inventory.
@@ -53,6 +53,11 @@ end
 ---@return string? error
 function Request.flipCoin() return Topic.FLIP_COIN:toServer() end
 
+---Requests a list of player mod data.
+---@return boolean success
+---@return string? error
+function Request.getDataList() return Topic.DATA_LIST:toServer() end
+
 ---Requests rolling dice.
 ---@param sides integer
 ---@return boolean success
@@ -68,7 +73,7 @@ end
 ---@param updates omichat.request.ModDataUpdate
 ---@return boolean success
 ---@return string? error
-function Request.updateData(updates) return Topic.MOD_DATA_UPDATE:toServer(updates) end
+function Request.updateData(updates) return Topic.DATA_UPDATE:toServer(updates) end
 
 ---Requests that the server updates the player cache.
 ---@return boolean success
@@ -91,9 +96,7 @@ end
 ---@param data omichat.PlayerModData?
 ---@return boolean success
 ---@return string? error
-function Request.setModData(username, data)
-    API.data.set(username, data)
-
+function Request.setPlayerData(username, data)
     return Request.updateData({
         target = username,
         field = 'all',

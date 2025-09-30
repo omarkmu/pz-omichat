@@ -19,8 +19,8 @@ function Language.doesPlayerKnow(username, language)
         return true
     end
 
-    local modData = API.data.get()
-    local knownLanguages = modData.languages[username]
+    local playerData = API.data.getPlayerData(username)
+    local knownLanguages = playerData and playerData.languages
     if type(knownLanguages) ~= 'table' or #knownLanguages == 0 then
         -- no languages chosen → understand only default language
         return config:getLanguageIDFromName(language) == 1
