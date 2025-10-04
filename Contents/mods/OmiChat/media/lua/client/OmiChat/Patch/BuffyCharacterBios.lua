@@ -28,7 +28,8 @@ API.extension.addMessageTransformer({
         info:skipLanguageProcessing()
         info:setStream(API.streams.getServerStream(), { forceFormat = true, overwriteTags = true })
 
-        local authorEnd = utils.getAuthorEndPos(text, info:getAuthor())
+        local author = info:getAuthor()
+        local _, authorEnd = text:find('%[' .. utils.escape(author) .. '%]:')
         if authorEnd then
             info:setContent(text:sub(authorEnd + 1))
         end

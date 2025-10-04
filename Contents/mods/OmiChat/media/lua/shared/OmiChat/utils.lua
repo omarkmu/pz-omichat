@@ -49,32 +49,6 @@ local cards = {
 }
 
 
----Encodes additional information in a message tag.
----@param message omichat.Message
----@param key string
----@param value unknown
-function utils.addMessageTagValue(message, key, value)
-    local tag = message:getCustomTag()
-    local success, newTag, encodedTag
-    success, newTag = utils.json.tryDecode(tag)
-    if not success or type(newTag) ~= 'table' then
-        newTag = {}
-    end
-
-    newTag[key] = value
-    encodedTag = utils.json.tryEncode(newTag)
-    if not encodedTag then
-        -- other data is bad, so just throw it out
-        if type(value) == 'string' then
-            value = string.format('%q', value)
-        end
-
-        encodedTag = string.format('{"%s":%s}', key, tostring(value))
-    end
-
-    message:setCustomTag(encodedTag)
-end
-
 ---Checks whether a player has permission to execute a command for the given target username.
 ---@param player IsoPlayer
 ---@param target string
@@ -97,7 +71,6 @@ function utils.canAccessTarget(player, target, minAccessLevel, fromCommand)
 
     return true
 end
-
 
 ---Decodes an encoded character.
 ---@param text string
@@ -258,15 +231,6 @@ function utils.extractError(tokens)
     tokens.errorID = ''
 
     return err
-end
-
----Gets the end position of an author in a raw chat message, if present.
----@param text string
----@param author string
----@return integer?
-function utils.getAuthorEndPos(text, author)
-    local _, authorEnd = text:find('%[' .. utils.escape(author) .. '%]:')
-    return authorEnd
 end
 
 ---Helper for requiring the client API in a shared context.
@@ -503,6 +467,10 @@ end
 ---@param list string[]
 ---@return boolean
 function utils.hasAnyItemType(player, list)
+    if #list == 0 then
+        return true
+    end
+
     player = player or getSpecificPlayer(0)
     if not player then
         return false
@@ -511,10 +479,6 @@ function utils.hasAnyItemType(player, list)
     local inv = player:getInventory()
     if not inv then
         return false
-    end
-
-    if #list == 0 then
-        return true
     end
 
     for i = 1, #list do
@@ -626,40 +590,6 @@ function utils.parseCommandArgs(text)
     end
 
     return args, inQuote
-end
-
----Tests a predicate.
----@param pred string
----@param tokens table?
----@param seed unknown?
----@param default boolean?
----@return boolean
-function utils.testPredicate(pred, tokens, seed, default)
-    if pred == '' then
-        return default or false
-    end
-
-    return utils.interpolate(pred, tokens or {}, seed) ~= ''
-end
-
----Converts a color table to a color string for overhead messages.
----@param color omi.ColorTable
----@param bbCodeFormat boolean? If true, BBCode format will be used.
----@return string
-function utils.toOverheadColor(color, bbCodeFormat)
-    if not utils.color.isValid(color) then
-        return ''
-    end
-
-    return concat {
-        bbCodeFormat and '[col=' or '*',
-        color.r,
-        ',',
-        color.g,
-        ',',
-        color.b,
-        bbCodeFormat and ']' or '*',
-    }
 end
 
 ---Matches on text wrapped in invisible characters.
