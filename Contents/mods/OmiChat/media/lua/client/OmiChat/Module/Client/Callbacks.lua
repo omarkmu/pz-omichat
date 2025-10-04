@@ -130,27 +130,6 @@ function Callback.onHairColorMenuClick(target, args)
     sendVisual(player)
 end
 
----Callback for icon picker selection.
----@param target omichat.ISChat
----@param icon string The icon that was selected.
-function Callback.onIconClick(target, icon)
-    if API.player.isDeadOrUnavailable() then
-        return
-    end
-
-    if not ISChat.focused then
-        target:focus()
-    elseif not ISChat.instance.textEntry:isFocused() then
-        ISChat.instance.textEntry:focus()
-    end
-
-    local text = target.textEntry:getInternalText()
-
-    local addSpace = #text > 0 and text:sub(-1) ~= ' '
-    target.textEntry:setText(text .. (addSpace and ' *' or '*') .. icon .. '*')
-    API.ui.updateSuggesterComponent()
-end
-
 ---Callback for clicking the update configuration admin context option.
 ---@param target omichat.ISChat
 function Callback.openConfiguration(target)
@@ -210,41 +189,6 @@ function Callback.openHairColorDialog(target)
         target = target,
         onClick = Callback.onHairColorMenuClick,
     }
-end
-
----Callback for icon button click.
----@param target omichat.ISChat
----@return boolean
-function Callback.openIconPicker(target)
-    if API.player.isDeadOrUnavailable() then
-        return false
-    end
-
-    local iconPicker = API.ui.iconPicker
-    if not ISChat.focused or not iconPicker then
-        return false
-    end
-
-    local targetHeight = target:getHeight()
-    local x = target:getX() + target:getWidth()
-    local y = target:getY() + max(0, targetHeight - iconPicker:getHeight())
-
-    -- avoid covering the button
-    if x + iconPicker:getWidth() >= getPlayerScreenWidth(0) then
-        y = y - target.textEntry:getHeight() - target.inset * 2 - 5
-
-        if y <= 0 then
-            y = targetHeight
-        end
-    end
-
-    iconPicker:setX(x)
-    iconPicker:setY(y)
-    iconPicker:bringToTop()
-    iconPicker:setVisible(not iconPicker:isVisible())
-    API.ui.hideSuggestBox()
-
-    return true
 end
 
 ---Callback for adding a roleplay language.

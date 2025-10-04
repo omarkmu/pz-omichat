@@ -6,7 +6,6 @@ local callback = require 'OmiChat/Module/Client/Callbacks'
 local max = math.max
 local sort = table.sort
 local concat = table.concat
-local getTexture = getTexture
 local getTimestampMs = getTimestampMs
 local getServerOptions = getServerOptions
 local textManager = getTextManager()
@@ -15,7 +14,6 @@ local ISChat = ISChat ---@cast ISChat omichat.ISChat
 local utils = API.utils
 local uiLib = utils.lib.ui
 local config = API.Configuration
-local IconPicker = API.IconPicker
 local MultiMap = utils.MultiMap
 
 
@@ -26,78 +24,6 @@ UI.typingFont = UIFont.Small
 UI.typingFontHgt = textManager:getFontHeight(UI.typingFont)
 
 UI._customButtons = {}
-UI._iconsToExclude = {
-    -- shadowed by colors
-    thistle = true,
-    salmon = true,
-    tomato = true,
-    orange = true,
-
-    -- doesn't work/often not included by collectAllIcons
-    boilersuitblue = true,
-    boilersuitred = true,
-    glovesleatherbrown = true,
-    jumpsuitprisonkhaki = true,
-    jumpsuitprisonorange = true,
-    jacketgreen = true,
-    jacketlongblack = true,
-    jacketlongbrown = true,
-    jacketvarsity_alpha = true,
-    jacketvarsity_ky = true,
-    shirtdenimblue = true,
-    shirtdenimlightblue = true,
-    shirtdenimlightblack = true,
-    shirtlumberjackblue = true,
-    shirtlumberjackgreen = true,
-    shirtlumberjackgrey = true,
-    shirtlumberjackred = true,
-    shirtlumberjackyellow = true,
-    shirtscrubsblue = true,
-    shirtscrubsgreen = true,
-    shortsathleticblue = true,
-    shortsathleticgreen = true,
-    shortsathleticred = true,
-    shortsathleticyellow = true,
-    shortsdenimblack = true,
-    shortslongathleticgreen = true,
-    tshirtathleticblue = true,
-    tshirtathleticred = true,
-    tshirtathleticyellow = true,
-    tshirtathleticgreen = true,
-    trousersscrubsblue = true,
-    trousersscrubsgreen = true,
-
-    -- visually identical to other icons
-    tz_mayonnaisefullrotten = true,
-    tz_mayonnaisehalf = true,
-    tz_mayonnaisehalfrotten = true,
-    tz_remouladefullrotten = true,
-    tz_remouladehalf = true,
-    tz_remouladehalfrotten = true,
-    glovecompartment = true,
-    truckbed = true,
-    fishcatfishcooked = true,
-    fishcatfishoverdone = true,
-    fishcrappiecooked = true,
-    fishpanfishcooked = true,
-    fishpanfishoverdone = true,
-    fishperchcooked = true,
-    fishperchoverdone = true,
-    fishpikecooked = true,
-    fishpikeoverdone = true,
-    fishtroutcooked = true,
-    fishtroutoverdone = true,
-    tvdinnerburnt = true,
-    tvdinnerrotten = true,
-
-    -- shows up overhead as text
-    composter = true,
-    clothingdryer = true,
-    clothingwasher = true,
-    mailbox = true,
-    mannequin = true,
-    toolcabinet = true,
-}
 UI._settingHandlers = {
     admin = {},
     basic = {},
@@ -361,33 +287,6 @@ function UI.scrollToTop()
     end
 end
 
----Sets whether the icon picker button is enabled.
----If the button is disabled, the icon picker component will also be hidden.
----@param enable boolean?
-function UI.setIconButtonEnabled(enable)
-    local iconButton = UI.iconButton
-    if not iconButton then
-        return
-    end
-
-    local value = enable and 0.8 or 0.3
-    iconButton:setTextureRGBA(value, value, value, 1)
-    iconButton.enable = enable
-
-    local iconPicker = UI.iconPicker
-    if not enable and iconPicker then
-        iconPicker:setVisible(false)
-    end
-end
-
----Sets the icons that should be excluded by the icon picker.
----This does not update the icon picker icons.
----@see omichat.IconPicker.updateIcons
----@param icons table<string, true>?
-function UI.setIconsToExclude(icons)
-    UI._iconsToExclude = icons or {}
-end
-
 ---Creates and populates the context menu for chat settings.
 function UI.showSettingsContextMenu()
     local x = getMouseX()
@@ -458,7 +357,7 @@ function UI.updateChatPanelSize()
     end
 end
 
----Updates the icon picker and suggester box based on the current input text.
+---Updates the suggester box based on the current input text.
 ---@param text string? The current text entry text. If omitted, the current text will be retrieved.
 function UI.updateCustomComponents(text)
     local instance = ISChat.instance
@@ -468,26 +367,7 @@ function UI.updateCustomComponents(text)
 
     text = text or instance.textEntry:getInternalText()
 
-    UI.updateIconComponents(text)
     UI.updateSuggesterComponent()
-end
-
----Enables or disables the icon picker based on the current input.
----@param text string? The current text entry text.
-function UI.updateIconComponents(text)
-    local instance = ISChat.instance
-    if not instance or not UI.iconButton then
-        return
-    end
-
-    text = text or instance.textEntry:getInternalText()
-    local stream = API.streams.chatCommandToStream(text)
-
-    if not stream then
-        stream = API.streams.getDefaultTabStream(instance.currentTabID)
-    end
-
-    UI.setIconButtonEnabled(false)
 end
 
 ---Updates the info text to the configured value.
@@ -508,7 +388,6 @@ function UI.updateState(redraw)
         return
     end
 
-    UI._addOrRemoveIconComponents()
     UI._updateChatVisibility()
     UI.updateChatPanelSize()
     UI.updateInfoText()
@@ -582,94 +461,6 @@ function UI.updateTypingDisplay()
     UI._typingDisplay = text
 end
 
-
----Creates or removes the icon button and picker from the chat box based on sandbox options.
----@private
-function UI._addOrRemoveIconComponents()
-    local instance = ISChat.instance
-    if not instance then
-        return
-    end
-
-    local add = false
-    local iconPicker = UI.iconPicker
-    local iconButton = UI.iconButton
-    local epIncludeMisc = iconPicker and iconPicker.includeUnknownAsMiscellaneous
-    local includeMisc = false
-    if iconPicker and epIncludeMisc ~= includeMisc then
-        iconPicker.includeUnknownAsMiscellaneous = includeMisc
-        iconPicker:updateIcons()
-    end
-
-    if add and iconButton then
-        return
-    end
-
-    if not add and not iconButton then
-        return
-    end
-
-    if add then
-        local size = math.floor(instance.textEntry.height * 0.75)
-        iconButton = ISButton:new(
-            instance.width - size * 1.25 - 2.5,
-            instance.textEntry.y + instance.textEntry.height * 0.5 - size * 0.5 + 1,
-            size,
-            size,
-            '',
-            instance,
-            callback.openIconPicker
-        )
-
-        instance.textEntry.width = instance.textEntry.width - size * 1.5
-        instance.textEntry.javaObject:setWidth(instance.textEntry.width)
-
-        iconButton.anchorRight = true
-        iconButton.anchorBottom = true
-        iconButton.anchorLeft = false
-        iconButton.anchorTop = false
-
-        iconButton:initialise()
-        iconButton.borderColor.a = 0
-        iconButton.backgroundColor.a = 0
-        iconButton.backgroundColorMouseOver.a = 0
-        iconButton:setImage(getTexture('Item_PlushSpiffo'))
-        iconButton:setTextureRGBA(0.3, 0.3, 0.3, 1)
-        iconButton:setUIName('chat icon button')
-        instance:addChild(iconButton)
-
-        iconButton:bringToTop()
-
-        iconPicker = IconPicker:new(0, 0, instance, callback.onIconClick)
-        iconPicker.exclude = UI._iconsToExclude
-        iconPicker.includeUnknownAsMiscellaneous = false
-
-        iconPicker:initialise()
-        iconPicker:addToUIManager()
-        iconPicker:setVisible(false)
-
-        UI.iconButton = iconButton
-        UI.iconPicker = iconPicker
-
-        return
-    end
-
-    instance.textEntry.width = instance:getWidth() - instance.inset * 2
-    instance.textEntry.javaObject:setWidth(instance.textEntry.width)
-
-    if iconButton then
-        instance:removeChild(iconButton)
-        iconButton:setVisible(false)
-        iconButton:removeFromUIManager()
-        iconButton = nil
-    end
-
-    if iconPicker then
-        iconPicker:setVisible(false)
-        iconPicker:removeFromUIManager()
-        iconPicker = nil
-    end
-end
 
 ---Adds context menu options for admin controls.
 ---@param context ISContextMenu

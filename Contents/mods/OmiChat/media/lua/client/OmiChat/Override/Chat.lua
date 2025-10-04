@@ -425,23 +425,7 @@ end
 ---@return boolean
 function ISChat.onMouseDown(target, x, y)
     local handled = _onMouseDown(target, x, y)
-    local instance = ISChat.instance
-    if not instance then
-        return handled
-    end
-
-    local iconPicker = API.ui.iconPicker
     API.ui.hideSuggestBox()
-
-    if not handled or not iconPicker or not iconPicker:isVisible() then
-        return handled
-    end
-
-    local name = target:getUIName()
-    if name == ISChat.textPanelName or name == ISChat.textEntryName then
-        iconPicker:setVisible(false)
-    end
-
     return handled
 end
 
@@ -596,11 +580,10 @@ function ISChat:setDrawFrame(visible)
     self.drawFrame = visible
 end
 
----Override to hide icon picker and disable button on unfocus.
+---Override to hide suggest box and disable button on unfocus.
 function ISChat:unfocus()
     _unfocus(self)
     API.ui.hideSuggestBox()
-    API.ui.setIconButtonEnabled(false)
 end
 
 ---Override to process typing indicators.

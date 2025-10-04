@@ -177,17 +177,6 @@ UI_FR = {
     UI_OmiChat_CardSuit_Hearts = "Cœurs",
     UI_OmiChat_CardSuit_Spades = "Piques",
 
-    --[[ Icon Picker ]]--
-    UI_OmiChat_IconCategory_Clothing = "Vêtements",
-    UI_OmiChat_IconCategory_Cooking = "Cuisine",
-    UI_OmiChat_IconCategory_Food = "Nourriture",
-    UI_OmiChat_IconCategory_Items = "Objets",
-    UI_OmiChat_IconCategory_Miscellaneous = "Divers",
-    UI_OmiChat_IconCategory_Nature = "Nature", ---@ignore identical
-    UI_OmiChat_IconCategory_Objects = "Objets",
-    UI_OmiChat_IconCategory_Tools = "Outils",
-    UI_OmiChat_IconCategory_Weapons = "Armes",
-
     --[[ Profile Manager ]]--
     UI_OmiChat_ProfileManager_Title = "Gestionnaire de Profil",
     UI_OmiChat_ProfileManager_Empty = "Vous n'avez aucun profil.",

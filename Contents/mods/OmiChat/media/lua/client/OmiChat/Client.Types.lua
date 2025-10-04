@@ -95,34 +95,6 @@
 
 --#endregion
 
---#region IconPicker
-
----@class omichat.IconPicker
----@field includeDefaults boolean Whether to include default categories and icons.
----@field includeUnknownAsMiscellaneous boolean Whether unknown icons should be added to a miscellaneous category.
----@field padSize integer The size of the padding on all sides.
----@field buttonSize integer The size of each icon button.
----@field backgroundColor omi.DecimalColorTableRGBA The background color of the panel.
----@field borderColor omi.DecimalColorTableRGBA The border color of the panel.
----@field columns integer The number of columns to use.
----@field scrollMultiplier integer Multiplier for scroll speed.
----@field target ISUIElement? Target object for callbacks.
----@field onclick function? Callback to run when an icon button is clicked.
----@field categoryFont UIFont The font to use for categories.
----@field icons omichat.IconPickerIcon[] Icons to include.
----@field exclude table<string, true> Icons to exclude from the picker.
----@field categoryOrder string[] Categories in the order in which they should display.
----@field protected _rowContents table
----@field protected _preparedIcons boolean
-
----@class omichat.IconPickerIcon
----@field name string The icon name.
----@field textureName string The name of the texture to use.
----@field texture Texture? The texture to use.
----@field category string? The category in which the icon should be included.
-
---#endregion
-
 --#region Interpolation
 
 ---@class omichat.MessageSegment
@@ -558,13 +530,10 @@
 --#region UI
 
 ---@class omichat.api.client.ui
----@field iconButton ISButton? The icon button UI element.
----@field iconPicker omichat.IconPicker? The icon picker UI element.
 ---@field suggestBox omi.ui.SuggestBox? The auto-suggest box for the chat input.
 ---@field typingFont UIFont The font used for the typing indicator.
 ---@field typingFontHgt integer The height of the font used for the typing indicator.
 ---@field private _customButtons ISButton[]
----@field private _iconsToExclude table<string, true> Icons to exclude from the icon picker.
 ---@field private _leftmostBtn ISButton? The leftmost button on the chat window.
 ---@field private _typingDisplay string? The current display text for the typing indicator.
 ---@field private _settingHandlers table<omichat.SettingCategory, omichat.SettingHandler[]>

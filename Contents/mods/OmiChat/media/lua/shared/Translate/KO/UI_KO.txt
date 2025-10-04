@@ -177,17 +177,6 @@ UI_KO = {
     UI_OmiChat_CardSuit_Hearts = "하트",
     UI_OmiChat_CardSuit_Spades = "스페이드",
 
-    --[[ Icon Picker ]]--
-    UI_OmiChat_IconCategory_Clothing = "의류",
-    UI_OmiChat_IconCategory_Cooking = "요리",
-    UI_OmiChat_IconCategory_Food = "음식",
-    UI_OmiChat_IconCategory_Items = "아이템",
-    UI_OmiChat_IconCategory_Miscellaneous = "기타",
-    UI_OmiChat_IconCategory_Nature = "자연",
-    UI_OmiChat_IconCategory_Objects = "물건",
-    UI_OmiChat_IconCategory_Tools = "도구",
-    UI_OmiChat_IconCategory_Weapons = "무기",
-
     --[[ Profile Manager ]]--
     UI_OmiChat_ProfileManager_Title = "프로필 관리",
     UI_OmiChat_ProfileManager_Empty = "프로필이 없습니다.",
