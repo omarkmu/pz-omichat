@@ -16,6 +16,7 @@ local textManager = getTextManager()
 
 ---@class omichat.api.client.callbacks
 local Callback = {}
+Callback._infoUpdateCounter = 0
 
 
 ---Callback for the clean character customization option.
@@ -189,6 +190,28 @@ function Callback.openHairColorDialog(target)
         target = target,
         onClick = Callback.onHairColorMenuClick,
     }
+end
+
+---Called every 100ms while the info text panel is visible.
+---Updates info text with the latest token values every second.
+---@param target omichat.ISChat
+function Callback.onInfoPanelUpdate(target)
+    local counter = Callback._infoUpdateCounter
+    if counter < 9 then
+        Callback._infoUpdateCounter = counter + 1
+        return
+    end
+
+    Callback._infoUpdateCounter = 0
+    target = target or ISChat.instance
+    if not target then
+        return
+    end
+
+    local text = API.ui.getInfoRichText()
+    if text ~= target.infoText then
+        target:setInfo(text)
+    end
 end
 
 ---Callback for adding a roleplay language.

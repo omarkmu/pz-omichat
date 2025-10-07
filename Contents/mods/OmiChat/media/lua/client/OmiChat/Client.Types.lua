@@ -20,6 +20,9 @@
 ---@field ui omi.ui
 ---@field lib omi.client
 
+---@class omichat.api.client.callbacks
+---@field protected _infoUpdateCounter integer
+
 
 ---@class omichat.MessageTransformer
 ---@field name string? The name of the transformer.

@@ -383,17 +383,19 @@ function ISChat:onInfo()
     local text = API.ui.getInfoRichText()
     self:setInfo(text)
 
+    local infoDialog = self.infoRichText
     if text == '' then
-        if self.infoRichText then
-            self.infoRichText:removeFromUIManager()
+        if infoDialog then
+            infoDialog:removeFromUIManager()
         end
 
         return
     end
 
-    if not self.infoRichText then
+    if not infoDialog then
+        local instance = ISChat.instance
         local screenW, screenH = UI.getScreenCenter(400, 300)
-        self.infoRichText = UI.dialog {
+        infoDialog = UI.dialog {
             x = screenW,
             y = screenH,
             w = 600,
@@ -405,16 +407,21 @@ function ISChat:onInfo()
             backgroundColor = { r = 0, g = 0, b = 0, a = 0.8 },
         }
 
-        self.infoRichText:setHeightToContents()
-        self.infoRichText:ignoreHeightChange()
+        infoDialog.chatText:setOnUpdate(instance, API.callback.onInfoPanelUpdate)
+        infoDialog:setHeightToContents()
+        infoDialog:ignoreHeightChange()
+
+        infoDialog:setY(getPlayerScreenTop(0) + (getPlayerScreenHeight(0) - infoDialog:getHeight()) * 0.5)
+
+        self.infoRichText = infoDialog
         return
     end
 
-    if self.infoRichText:isReallyVisible() then
-        self.infoRichText:removeFromUIManager()
+    if infoDialog:isReallyVisible() then
+        infoDialog:removeFromUIManager()
     else
-        self.infoRichText:setVisible(true)
-        self.infoRichText:addToUIManager()
+        infoDialog:setVisible(true)
+        infoDialog:addToUIManager()
     end
 end
 
