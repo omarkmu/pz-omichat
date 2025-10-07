@@ -132,7 +132,7 @@ return Schema:new {
         },
 
         Compatibility = container {
-            ApplyOverrides = bool(false),
+            ApplyOverrides = bool(true),
             BuffyCharacterBios = compat(),
             BuffyRPGSystem = compat(),
             ChatBubble = compat(),
