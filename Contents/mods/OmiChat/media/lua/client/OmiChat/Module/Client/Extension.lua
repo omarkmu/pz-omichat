@@ -2,7 +2,6 @@
 ---@diagnostic disable: invisible
 
 local insert = table.insert
-local remove = table.remove
 local sort = table.sort
 
 ---@class omichat.api.client
@@ -13,6 +12,12 @@ local API = require 'OmiChat/Module/Client/Core'
 local Extension = API.extension
 
 
+---Adds information about a command that can be triggered from chat.
+---@param stream omichat.CommandStream
+function Extension.addCommand(stream)
+    API._commandStreams[#API._commandStreams + 1] = stream
+end
+
 ---Registers a new button for the chat.
 ---@param button ISButton
 ---@return ISButton
@@ -21,12 +26,6 @@ function Extension.addCustomButton(button)
 
     API.ui.updateButtons()
     return button
-end
-
----Adds information about a command that can be triggered from chat.
----@param stream omichat.CommandStream
-function Extension.addCommand(stream)
-    API._commandStreams[#API._commandStreams + 1] = stream
 end
 
 ---Adds an emote that is playable from chat with the .emote syntax.
@@ -45,6 +44,13 @@ end
 function Extension.addMessageTransformer(transformer)
     API._transformers[#API._transformers + 1] = transformer
     sort(API._transformers, Extension._prioritySort)
+end
+
+---Adds a callback that can be triggered by clicking an action in a rich text panel.
+---@param name string
+---@param callback omichat.RichTextAction
+function Extension.addRichTextAction(name, callback)
+    API.ui._actionHandlers[name] = callback
 end
 
 ---Adds a handler for adding setting context menu options.
@@ -115,18 +121,7 @@ end
 ---This does not remove the button from the chat.
 ---@param button ISButton
 function Extension.removeCustomButton(button)
-    local pos
-    local list = API.ui._customButtons
-    for i = 1, #list do
-        if list[i] == button then
-            pos = i
-            break
-        end
-    end
-
-    if pos then
-        remove(list, pos)
-    end
+    Extension._remove(API.ui._customButtons, button)
 end
 
 ---Removes a stream from the list of available chat commands.
@@ -150,18 +145,13 @@ end
 ---Removes the first message transformer with the provided name.
 ---@param name string
 function Extension.removeMessageTransformerByName(name)
-    local target
-    for i = 1, #API._transformers do
-        local transformer = API._transformers[i]
-        if transformer.name and transformer.name == name then
-            target = i
-            break
-        end
-    end
+    Extension._removeByName(API._transformers, name)
+end
 
-    if target then
-        remove(API._transformers, target)
-    end
+---Removes a rich text action handler.
+---@param name string
+function Extension.removeRichTextAction(name)
+    API.ui._actionHandlers[name] = nil
 end
 
 ---Removes a handler for adding setting context menu options.
@@ -197,27 +187,16 @@ function Extension.removeSuggester(suggester)
     Extension._remove(API._suggesters, suggester)
 end
 
+---Removes the first suggester with the provided name.
+---@param name string
+function Extension.removeSuggesterByName(name)
+    Extension._removeByName(API._suggesters, name)
+end
+
 ---Removes an argument type for suggester specs.
 ---@param argType string
 function Extension.removeSuggesterType(argType)
     API.search._customSuggesterTypes[argType] = nil
-end
-
----Removes the first suggester with the provided name.
----@param name string
-function Extension.removeSuggesterByName(name)
-    local target
-    for i = 1, #API._suggesters do
-        local suggester = API._suggesters[i]
-        if suggester.name and suggester.name == name then
-            target = i
-            break
-        end
-    end
-
-    if target then
-        remove(API._suggesters, target)
-    end
 end
 
 
@@ -225,10 +204,10 @@ end
 ---If the other chat stream isn't found, inserts at the end.
 ---@param stream omichat.ChatStream
 ---@param other omichat.ChatStream?
----@param value integer The relative index.
+---@param relativeIndex integer The relative index.
 ---@return omichat.ChatStream
 ---@private
-function Extension._insertStreamRelative(stream, other, value)
+function Extension._insertStreamRelative(stream, other, relativeIndex)
     if not other then
         return Extension.addStream(stream)
     end
@@ -237,7 +216,7 @@ function Extension._insertStreamRelative(stream, other, value)
     for i = 1, #ISChat.allChatStreams do
         local chatStream = ISChat.allChatStreams[i]
         if chatStream == other then
-            pos = i + value
+            pos = i + relativeIndex
             break
         end
     end
@@ -256,7 +235,7 @@ function Extension._insertStreamRelative(stream, other, value)
             pos = #tab.chatStreams + 1
             for j = 1, #tab.chatStreams do
                 if tab.chatStreams[i] == other then
-                    pos = j + value
+                    pos = j + relativeIndex
                     break
                 end
             end
@@ -268,8 +247,7 @@ function Extension._insertStreamRelative(stream, other, value)
     return stream
 end
 
----Sorts items by priority.
----Not stable sorting.
+---Sort function for sorting items by a priority field.
 ---@param a table
 ---@param b table
 ---@return boolean
@@ -295,6 +273,35 @@ function Extension._remove(tab, target)
     local found = false
     while i <= #tab and not found do
         found = tab[i] == target
+        i = i + 1
+    end
+
+    if found then
+        while i <= #tab do
+            tab[i - 1] = tab[i]
+            i = i + 1
+        end
+
+        tab[#tab] = nil
+    end
+
+    return found
+end
+
+---Removes an element from a table by name, shifting subsequent elements.
+---@param tab table[]
+---@param name string
+---@return boolean
+---@private
+function Extension._removeByName(tab, name)
+    if name == nil then
+        return false
+    end
+
+    local i = 1
+    local found = false
+    while i <= #tab and not found do
+        found = tab[i].name == name
         i = i + 1
     end
 

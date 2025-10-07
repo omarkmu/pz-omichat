@@ -23,6 +23,7 @@ local UI = {}
 UI.typingFont = UIFont.Small
 UI.typingFontHgt = textManager:getFontHeight(UI.typingFont)
 
+UI._actionHandlers = {}
 UI._customButtons = {}
 UI._settingHandlers = {
     admin = {},

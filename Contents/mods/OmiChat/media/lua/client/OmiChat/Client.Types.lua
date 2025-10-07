@@ -536,11 +536,14 @@
 ---@field suggestBox omi.ui.SuggestBox? The auto-suggest box for the chat input.
 ---@field typingFont UIFont The font used for the typing indicator.
 ---@field typingFontHgt integer The height of the font used for the typing indicator.
----@field private _customButtons ISButton[]
+---@field private _customButtons ISButton[] A list of custom buttons added to the chat window.
+---@field private _actionHandlers table<string, omichat.RichTextAction> Handlers for rich text actions.
 ---@field private _leftmostBtn ISButton? The leftmost button on the chat window.
 ---@field private _typingDisplay string? The current display text for the typing indicator.
----@field private _settingHandlers table<omichat.SettingCategory, omichat.SettingHandler[]>
+---@field private _settingHandlers table<omichat.SettingCategory, omichat.SettingHandler[]> Handlers for setting sections.
 
+
+---@alias omichat.RichTextAction fun(name: string, action: omi.RichTextActionType, ...: string)
 
 ---@alias omichat.SettingHandler fun(submenu: ISContextMenu)
 

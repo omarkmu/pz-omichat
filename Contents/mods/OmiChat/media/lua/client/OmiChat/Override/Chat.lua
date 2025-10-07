@@ -407,6 +407,7 @@ function ISChat:onInfo()
             backgroundColor = { r = 0, g = 0, b = 0, a = 0.8 },
         }
 
+        infoDialog.chatText:setOnAction(instance, API.callback.onInfoPanelAction)
         infoDialog.chatText:setOnUpdate(instance, API.callback.onInfoPanelUpdate)
         infoDialog:setHeightToContents()
         infoDialog:ignoreHeightChange()

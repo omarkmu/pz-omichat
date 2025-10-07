@@ -8,6 +8,7 @@ local config = API.Configuration
 local UI = API.utils.ui
 local getText = getText
 local max = math.max
+local concat = table.concat
 local BloodBodyPartType = BloodBodyPartType
 local getCoveredParts = BloodClothingType.getCoveredParts
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
@@ -190,6 +191,27 @@ function Callback.openHairColorDialog(target)
         target = target,
         onClick = Callback.onHairColorMenuClick,
     }
+end
+
+---Called when an action is clicked in the info panel.
+---@param target omichat.ISChat
+---@param name string
+---@param action omi.RichTextActionType
+---@param ... string
+function Callback.onInfoPanelAction(target, name, action, ...)
+    local cb = API.ui._actionHandlers[name] ---@diagnostic disable-line: invisible
+    if not cb then
+        local args = { ... }
+        if #args == 0 then
+            utils.log.debug('Unknown rich text %s action: %s', action, name)
+        else
+            utils.log.debug('Unknown rich text %s action: %s(%s)', action, name, concat(args, ','))
+        end
+
+        return
+    end
+
+    cb(name, action, ...)
 end
 
 ---Called every 100ms while the info text panel is visible.
