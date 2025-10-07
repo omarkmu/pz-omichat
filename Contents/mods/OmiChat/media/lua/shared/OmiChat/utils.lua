@@ -512,17 +512,28 @@ function utils.interpolateNamed(name, text, tokens, seed)
 end
 
 ---Interpolates substitution tokens into a string with format strings using `$var` format.
+---Leaves character entities as-is.
+---@param text string The format string.
+---@param tokens table A table of format substitution strings.
+---@param seed unknown? Seed value for random functions.
+---@return string
+function utils.interpolateNoEntities(text, tokens, seed)
+    return tostring(utils.interpolateRaw(text, tokens, seed, true))
+end
+
+---Interpolates substitution tokens into a string with format strings using `$var` format.
 ---Returns the raw result, which may or may not be a string.
 ---@param text string The format string.
 ---@param tokens table A table of format substitution strings.
 ---@param seed unknown? Seed value for random functions.
+---@param noEntities boolean? If given, character entities will be disallowed.
 ---@return unknown
-function utils.interpolateRaw(text, tokens, seed)
+function utils.interpolateRaw(text, tokens, seed, noEntities)
     if not text or text == '' then
         return ''
     end
 
-    local interpolator = Interpolator.getOrCreate(text)
+    local interpolator = Interpolator.getOrCreate(text, noEntities)
     interpolator:randomseed(seed) -- always seed to avoid content changing on refresh
 
     return interpolator:interpolateRaw(tokens)

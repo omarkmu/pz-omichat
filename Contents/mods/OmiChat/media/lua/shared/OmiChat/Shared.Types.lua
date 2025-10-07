@@ -39,6 +39,7 @@
 
 ---@class omichat.Interpolator
 ---@field private _cache omi.Cache<omichat.utils.InterpolatorCacheData> (static)
+---@field private _noEntityCache omi.Cache<omichat.utils.InterpolatorCacheData> (static)
 ---@field private _registered table<string, function> (static)
 
 ---@class omichat.MetaFormatter

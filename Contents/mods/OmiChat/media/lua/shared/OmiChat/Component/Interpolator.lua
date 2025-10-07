@@ -2,14 +2,19 @@
 
 local lib = require 'OmiLibrary'
 local BaseInterpolator = lib.interpolate.Interpolator
-
+local TEN_MINUTES = 60000
 
 ---@class omichat.Interpolator : omi.Interpolator
 local Interpolator = BaseInterpolator:derive()
 Interpolator._registered = {}
+
 Interpolator._cache = lib.cache.new {
     primaryKey = 'text',
-    ttl = 60000, -- ten minutes
+    ttl = TEN_MINUTES,
+}
+Interpolator._noEntityCache = lib.cache.new {
+    primaryKey = 'text',
+    ttl = TEN_MINUTES,
 }
 
 
@@ -21,18 +26,22 @@ local FUNCTION_MT = { __index = Interpolator._registered }
 function Interpolator.cleanupCache(clear)
     if clear then
         Interpolator._cache:clear()
+        Interpolator._noEntityCache:clear()
         return
     end
 
     Interpolator._cache:update()
+    Interpolator._noEntityCache:update()
 end
 
 ---Gets a cached interpolator, creating one if it doesn't exist.
 ---@param text string
+---@param noEntities boolean?
 ---@return omichat.Interpolator
 ---@static
-function Interpolator.getOrCreate(text)
-    local item = Interpolator._cache:get(text) ---@cast item omichat.utils.InterpolatorCacheData
+function Interpolator.getOrCreate(text, noEntities)
+    local cache = noEntities and Interpolator._noEntityCache or Interpolator._cache
+    local item = cache:get(text) --[[@as omichat.utils.InterpolatorCacheData]]
     return item.interpolator
 end
 
@@ -51,6 +60,21 @@ end
 ---@protected
 function Interpolator._createCacheItem(_, text)
     local interpolator = Interpolator:new()
+    interpolator:setPattern(text)
+
+    return {
+        text = text,
+        interpolator = interpolator,
+    }
+end
+
+---Creates a cache item for the entity-disallowed interpolator cache.
+---@param _ unknown?
+---@param text string
+---@return omichat.utils.InterpolatorCacheData
+---@protected
+function Interpolator._createNoEntityCacheItem(_, text)
+    local interpolator = Interpolator:new({ allowCharacterEntities = false })
     interpolator:setPattern(text)
 
     return {
@@ -79,4 +103,5 @@ end
 
 
 Interpolator._cache:setOnCreateItem(nil, Interpolator._createCacheItem)
+Interpolator._noEntityCache:setOnCreateItem(nil, Interpolator._createNoEntityCacheItem)
 return Interpolator

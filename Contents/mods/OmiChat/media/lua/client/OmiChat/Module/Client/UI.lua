@@ -198,7 +198,7 @@ function UI.getInfoRichText(player)
 
     local name = API.data.getPlayerNameInChat(player, 'say')
     tokens.name = name and utils.escapeRichText(name) or ''
-    return utils.interpolate(config.General.InfoText, tokens, player:getUsername())
+    return utils.interpolateNoEntities(config.General.InfoText, tokens, player:getUsername())
 end
 
 ---Returns the current leftmost chat button.
