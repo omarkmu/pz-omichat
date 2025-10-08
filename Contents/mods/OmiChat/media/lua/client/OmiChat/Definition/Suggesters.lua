@@ -116,6 +116,9 @@ return {
                 search = API.search.languages(ctx, false)
             elseif argType == 'known-language' then
                 search = API.search.languages(ctx, true)
+            elseif argType == 'icon' then
+                ctx.maxSearch = nil -- search all icons
+                search = API.search.icons(ctx)
             elseif argType == 'perk' then
                 search = API.search.perks(ctx)
                 applyQuotes = false
@@ -150,6 +153,7 @@ return {
                 info.suggestions[#info.suggestions + 1] = {
                     text = display,
                     content = prefix .. value .. suffix,
+                    texture = result.texture,
                 }
             end
         end,

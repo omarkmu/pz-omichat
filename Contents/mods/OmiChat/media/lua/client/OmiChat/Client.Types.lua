@@ -233,11 +233,14 @@
 ---@field listFont UIFont
 ---@field titleText string
 ---@field activeEditorPanel omichat.ModDataEditor?
+---@field activeDialog omi.ui.Dialog?
 ---@field closeBtn ISButton
 ---@field refreshBtn ISButton
 ---@field modifyBtn ISButton
 ---@field addBtn ISButton
 ---@field deleteBtn ISButton
+
+---@class omichat.Args.ModDataManager : omi.ui.Args.Base
 
 ---@class omichat.ModDataEditor
 ---@field item omichat.PlayerModData
@@ -251,12 +254,19 @@
 ---@field languageSlotsEntry omi.ui.TextEntry
 ---@field languageListbox ISScrollingListBox
 ---@field languageSuggestBox omi.ui.SuggestBox
+---@field iconSuggestBox omi.ui.SuggestBox
 ---@field buttonBorderColor omi.ColorTableRGBA
 ---@field saveBtn ISButton
 ---@field closeBtn ISButton
 ---@field isAdd boolean
 ---@field onsave function?
 ---@field target unknown
+
+---@class omichat.Args.ModDataEditor : omi.ui.Args.Base
+---@field item omichat.PlayerModData The original data to be edited.
+---@field isAdd boolean? If `true`, the editor is for adding user data rather than editing existing data.
+---@field target unknown? The target for the `onSave` callback.
+---@field onSave function? A function to call when saving the data.
 
 --#endregion
 
@@ -314,6 +324,7 @@
 ---@class omichat.api.client.search
 ---@field private _customSuggesterTypes table<string, omichat.SuggestSearchCallback>
 ---@field private _perkList omichat.search.PerkInfo[]?
+---@field private _iconList omichat.search.IconInfo[]?
 
 
 ---@class omichat.SearchContext
@@ -333,6 +344,7 @@
 ---@field value string
 ---@field exact boolean
 ---@field display string?
+---@field texture Texture?
 
 ---@class omichat.SearchResults
 ---@field results omichat.SearchResult[]
@@ -344,6 +356,7 @@
 ---@field startsWith omichat.search.InternalSearchResult[]
 ---@field contains omichat.search.InternalSearchResult[]
 ---@field mapValue (fun(value: unknown, searchString: string): string)?
+---@field mapTexture (fun(value: unknown, searchString: string): Texture)?
 ---@field caseSensitive boolean?
 ---@field args string[]
 
@@ -358,6 +371,10 @@
 ---@field perk Perk
 ---@field name string
 ---@field id string
+
+---@class omichat.search.IconInfo
+---@field name string
+---@field alias string
 
 ---@class omichat.StreamSearchOptions
 ---@field excludeChatStreams boolean? Whether to exclude chat streams from the search.
@@ -534,6 +551,7 @@
 ---| 'online-username-with-self'
 ---| 'language'
 ---| 'known-language'
+---| 'icon'
 ---| 'perk'
 ---| 'option'
 ---| '?'

@@ -119,6 +119,7 @@ return {
         name = 'iconinfo',
         command = '/iconinfo ',
         helpTextID = 'UI_OmiChat_HelpText_IconInfo',
+        suggestSpec = { 'icon' },
         isEnabled = API.player.canUseAdminCommands,
         onUse = function(ctx)
             local command = utils.trim(ctx.text)
@@ -147,7 +148,7 @@ return {
         name = 'seticon',
         command = '/seticon ',
         helpTextID = 'UI_OmiChat_HelpText_SetIcon',
-        suggestSpec = { 'online-username-with-self' },
+        suggestSpec = { 'online-username-with-self', 'icon' },
         isEnabled = API.player.canUseAdminCommands,
         onUse = function(ctx)
             if not API.request.executeCommand('setIcon', ctx.text) then

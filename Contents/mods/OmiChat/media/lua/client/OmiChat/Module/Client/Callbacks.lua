@@ -260,7 +260,7 @@ function Callback.openModDataManager(target)
     end
 
     local x, y = UI.getScreenCenter(1200, 650)
-    local panel = API.ModDataManager:new(x, y, 1200, 650)
+    local panel = API.ModDataManager:new({ x = x, y = y, w = 1200, h = 650 })
     panel:initialise()
     panel:addToUIManager()
 

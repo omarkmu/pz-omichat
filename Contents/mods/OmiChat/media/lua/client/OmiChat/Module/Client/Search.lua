@@ -4,7 +4,7 @@ local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
 local vanillaCommands = require 'OmiChat/Definition/VanillaCommandList'
 
 local utils = API.utils
-local min = math.min
+local getTexture = getTexture
 
 
 ---@class omichat.api.client.search
@@ -60,6 +60,28 @@ function Search.getSuggestionSpec(input)
             end
         end
     end
+end
+
+---Searches for an icon by texture name or chat alias.
+---@param ctxOrSearch omichat.SearchContext | string
+---@return omichat.SearchResults
+function Search.icons(ctxOrSearch)
+    local ctx = Search._buildContext(ctxOrSearch)
+    ctx.display = ctx.display or Search._getIconDisplay
+    ctx.mapValue = ctx.mapValue or Search._getIconDisplay
+    ctx.mapTexture = ctx.mapTexture or Search._getIconTexture
+
+    local icons = Search._buildIconList()
+    for i = 1, #icons do
+        local info = icons[i]
+        Search._internal(ctx, info.alias, info)
+
+        if ctx.isTerminated then
+            break
+        end
+    end
+
+    return Search._collectResults(ctx)
 end
 
 ---Searches either the language list or the current player's known languages for a string.
@@ -153,18 +175,15 @@ end
 ---Populates a suggest box with search results.
 ---@param suggestBox omi.ui.SuggestBox
 ---@param search omichat.SearchResults
----@param maxResults integer?
 ---@param allowExact boolean?
-function Search.populateSuggestions(suggestBox, search, maxResults, allowExact)
+function Search.populateSuggestions(suggestBox, search, allowExact)
     if search.exact and not allowExact then
         suggestBox:setSuggestions({})
         return
     end
 
-    local nResults = maxResults and min(#search.results, maxResults) or #search.results
-
     local suggestions = {} ---@type omi.ui.SuggestBox.Suggestion[]
-    for i = 1, nResults do
+    for i = 1, #search.results do
         local result = search.results[i]
         suggestions[#suggestions + 1] = {
             text = result.display,
@@ -276,6 +295,28 @@ function Search._buildContext(ctx)
     }
 end
 
+---Builds a list of icons, or returns the cached list if already built.
+---@return omichat.search.IconInfo[]
+---@private
+function Search._buildIconList()
+    if Search._iconList then
+        return Search._iconList
+    end
+
+    local iconList = {} ---@type omichat.search.IconInfo[]
+    for alias, name in utils.iterateIcons() do
+        iconList[#iconList + 1] = {
+            name = name,
+            alias = alias,
+        }
+    end
+
+    table.sort(iconList, function(a, b) return not string.sort(a.alias, b.alias) end)
+
+    Search._iconList = iconList
+    return iconList
+end
+
 ---Builds a list of perks, or returns the cached list if already built.
 ---@return omichat.search.PerkInfo[]
 ---@private
@@ -344,6 +385,7 @@ function Search._collectResults(ctx)
 
     local mapValue = ctx.mapValue
     local mapDisplay = ctx.display
+    local mapTexture = ctx.mapTexture
 
     local results = {} ---@type omichat.SearchResult[]
     for i = 1, #mergedResults do
@@ -356,6 +398,7 @@ function Search._collectResults(ctx)
             exact = internal.exact,
             value = mapValue and mapValue(raw, str) or raw,
             display = internal.display or mapDisplay and mapDisplay(raw, str),
+            texture = mapTexture and mapTexture(raw, str),
         }
 
         if result.exact then
@@ -527,6 +570,22 @@ function Search._filterStream(stream)
 
     ---@cast stream omichat.VanillaCommand
     return utils.hasAccess(stream.access, accessLevel)
+end
+
+---Display function for icons.
+---@param icon omichat.search.IconInfo
+---@return string
+---@private
+function Search._getIconDisplay(icon)
+    return icon.alias
+end
+
+---Returns the texture of an icon.
+---@param icon omichat.search.PerkInfo
+---@return Texture
+---@private
+function Search._getIconTexture(icon)
+    return getTexture(icon.name)
 end
 
 ---Display function for perks.

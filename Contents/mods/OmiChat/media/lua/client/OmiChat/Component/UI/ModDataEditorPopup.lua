@@ -10,8 +10,9 @@ local ISPanelJoypad = ISPanelJoypad
 local textManager = getTextManager()
 
 
----@class omichat.ModDataEditor : ISPanelJoypad
+---@class omichat.ModDataEditor : ISPanelJoypad, omi.ui.Destroyable
 local ModDataEditor = ISPanelJoypad:derive('ModDataEditor')
+utils.extend(ModDataEditor, UI.mixin.Destroyable)
 
 
 local PAD_Y = 10
@@ -125,6 +126,17 @@ function ModDataEditor:createChildren()
         populate = self.populateLanguageSuggest,
     }
 
+    self.iconSuggestBox = UI.suggestBox {
+        entry = self.iconEntry,
+        suggestOnEnter = true,
+        refocusOverScrollbar = true,
+        target = self,
+        populate = self.populateIconSuggest,
+    }
+
+    self:removeOnDestroy(self.languageSuggestBox)
+    self:removeOnDestroy(self.iconSuggestBox)
+
     y = self.languageListEntry:getBottom() + PAD_Y
     self:setHeight(y + BTN_H + 10)
 
@@ -154,15 +166,6 @@ function ModDataEditor:createChildren()
         target = self,
         onClick = self.onSave,
     }
-end
-
----Removes the mod data editor and its children from the UI.
-function ModDataEditor:destroy()
-    if self.languageSuggestBox then
-        self.languageSuggestBox:removeFromUIManager()
-    end
-
-    self:removeFromUIManager()
 end
 
 ---Gets the computed value of an entry.
@@ -262,6 +265,19 @@ function ModDataEditor:onSave()
     self:destroy()
 end
 
+---Populates suggestions for the icon auto-suggest box.
+---@param suggestBox omi.ui.SuggestBox
+---@param text string
+function ModDataEditor:populateIconSuggest(suggestBox, text)
+    local search = API.search.icons {
+        search = text,
+        terminateOnExact = true,
+        maxResults = 50,
+    }
+
+    API.search.populateSuggestions(suggestBox, search)
+end
+
 ---Populates suggestions for the language auto-suggest box.
 ---@param suggestBox omi.ui.SuggestBox
 ---@param text string
@@ -269,9 +285,10 @@ function ModDataEditor:populateLanguageSuggest(suggestBox, text)
     local search = API.search.languages {
         search = text,
         terminateOnExact = true,
+        maxResults = 50,
     }
 
-    API.search.populateSuggestions(suggestBox, search, 50)
+    API.search.populateSuggestions(suggestBox, search)
 end
 
 ---Updates the validation state of the save button.
@@ -380,29 +397,26 @@ end
 
 
 ---Creates a new mod data editor popup.
----@param x number
----@param y number
----@param width number
----@param height number
----@param item omichat.PlayerModData
----@param target unknown?
----@param onsave function?
----@param isAdd boolean?
+---@param args omichat.Args.ModDataEditor
 ---@return omichat.ModDataEditor
-function ModDataEditor:new(x, y, width, height, item, target, onsave, isAdd)
+function ModDataEditor:new(args)
+    local x = args.x or 0
+    local y = args.y or 0
+    local width = args.w or 0
+    local height = args.h or 0
     local this = ISPanelJoypad.new(self, x, y, width, height)
 
-    local itemCopy = utils.copy(item)
+    local itemCopy = utils.copy(args.item)
     itemCopy.languages = itemCopy.languages and utils.copy(itemCopy.languages) or nil
 
     ---@cast this omichat.ModDataEditor
-    this.saveItem = item
+    this.saveItem = args.item
     this.item = itemCopy
     this.moveWithMouse = true
-    this.target = target
+    this.target = args.target
     this.buttonBorderColor = { r = 0.7, g = 0.7, b = 0.7, a = 0.5 }
-    this.onsave = onsave
-    this.isAdd = isAdd or false
+    this.onsave = args.onSave
+    this.isAdd = args.isAdd or false
     this.backgroundColor.a = 0.9
 
     return this

@@ -5,6 +5,8 @@ local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
 local utils = API.utils
 local UI = utils.ui
 
+local max = math.max
+local min = math.min
 local isAdmin = isAdmin
 local ISPanelJoypad = ISPanelJoypad
 local textManager = getTextManager()
@@ -20,8 +22,9 @@ local COLUMNS = {
 }
 
 
----@class omichat.ModDataManager : ISPanelJoypad
+---@class omichat.ModDataManager : ISPanelJoypad, omi.ui.Destroyable
 local ModDataManager = ISPanelJoypad:derive('ModDataManager')
+utils.extend(ModDataManager, UI.mixin.Destroyable)
 
 
 ---Called when the delete button is clicked.
@@ -32,12 +35,18 @@ function ModDataManager:confirmDeleteItem()
         return
     end
 
-    UI.yesNoDialog {
+    if self.activeDialog then
+        self.activeDialog:destroy()
+    end
+
+    self.activeDialog = UI.yesNoDialog {
         text = getText('IGUI_DbViewer_DeleteConfirm'),
         target = self,
         onClick = self.onConfirmDelete,
         onClickArgs = { item, idx },
     }
+
+    self:removeOnDestroy(self.activeDialog)
 end
 
 ---Creates the children of the mod data manager.
@@ -49,7 +58,7 @@ function ModDataManager:createChildren()
     local btnW = 100
     local padBottom = 10
     local padBtn = 5
-    local btnH = math.max(25, textManager:getFontHeight(UIFont.Small) + 6)
+    local btnH = max(25, textManager:getFontHeight(UIFont.Small) + 6)
     local btnY = self.height - btnH - padBottom
 
     local closeX = self.width - btnW - padBtn * 2
@@ -109,15 +118,6 @@ function ModDataManager:createChildren()
     self:addChild(self.listbox)
 
     self:refresh()
-end
-
----Removes the mod data manager and its children from the UI.
-function ModDataManager:destroy()
-    if self.activeEditorPanel then
-        self.activeEditorPanel:destroy()
-    end
-
-    self:removeFromUIManager()
 end
 
 ---Renders an item in the data list.
@@ -213,7 +213,7 @@ function ModDataManager:onConfirmDelete(button, item, idx)
 
     self.listbox:removeItemByIndex(idx)
     if #self.listbox.items > 0 then
-        self.listbox.selected = math.max(1, idx - 1)
+        self.listbox.selected = max(1, idx - 1)
     end
 
     self:refresh()
@@ -268,7 +268,7 @@ function ModDataManager:onUpdateList(list)
             end
 
             local elSize = textManager:MeasureStringX(self.listFont, display[colName]) + 20
-            sizes[colName] = math.max(math.min(elSize, 300), sizes[colName] or 0)
+            sizes[colName] = max(min(elSize, 300), sizes[colName] or 0)
         end
 
         self.listbox:addItem(el.username, {
@@ -294,11 +294,20 @@ function ModDataManager:openEditPanel(item, isAdd)
         self.activeEditorPanel:destroy()
     end
 
-    local x = self.x + (self.width - 500) * 0.5
-    local y = self.y + (self.height - 600) * 0.5
-    self.activeEditorPanel = Editor:new(x, y, 500, 100, item, self, self.refresh, isAdd)
+    self.activeEditorPanel = Editor:new {
+        x = self.x + (self.width - 500) * 0.5,
+        y = self.y + (self.height - 600) * 0.5,
+        w = 500,
+        h = 100,
+        item = item,
+        target = self,
+        onSave = self.refresh,
+        isAdd = isAdd,
+    }
+
     self.activeEditorPanel:initialise()
     self.activeEditorPanel:addToUIManager()
+    self:removeOnDestroy(self.activeEditorPanel)
 end
 
 ---Requests a refresh of the list of mod data.
@@ -354,12 +363,13 @@ end
 
 
 ---Creates a new panel for managing mod data.
----@param x number
----@param y number
----@param width number
----@param height number
+---@param args omichat.Args.ModDataManager
 ---@return omichat.ModDataManager
-function ModDataManager:new(x, y, width, height)
+function ModDataManager:new(args)
+    local x = args.x or 0
+    local y = args.y or 0
+    local width = args.w or 0
+    local height = args.h or 0
     local this = ISPanelJoypad.new(self, x, y, width, height)
 
     ---@cast this omichat.ModDataManager
