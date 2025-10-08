@@ -107,9 +107,9 @@ local function onPresetAction(args)
         end
 
         local values = args.values
-        local dialog ---@type omi.ui.TextDialog
         local warningMessage = getText('UI_OmiChat_SavePreset_Overwrite')
 
+        local dialog ---@type omi.ui.TextDialog
         dialog = lib.ui.textDialog {
             type = 'OKCancel',
             w = 500,
@@ -119,7 +119,7 @@ local function onPresetAction(args)
             minLength = 1,
             maxLength = 50,
             onClick = function(_, _args)
-                if _args.internal == 'CANCEL' then
+                if _args.internal ~= 'OK' then
                     return
                 end
 
@@ -143,24 +143,25 @@ local function onPresetAction(args)
             end,
         }
 
+        form:removeOnDestroy(dialog)
         state.activePresetDialog = dialog
     else
+        -- delete preset
         if not utils.startsWith(value, 'custom:') then
             return
         end
 
-        -- delete preset
         if state.activePresetDialog then
             state.activePresetDialog:destroy()
         end
 
         local name = value:sub(8)
-        state.activePresetDialog = lib.ui.yesNoDialog {
+        local dialog = lib.ui.yesNoDialog {
             w = 400,
             h = 100,
             text = getText('UI_OmiChat_DeletePreset_Confirm', name),
             onClick = function(_, _args)
-                if _args.internal == 'NO' then
+                if _args.internal ~= 'YES' then
                     return
                 end
 
@@ -176,6 +177,9 @@ local function onPresetAction(args)
                 end
             end,
         }
+
+        form:removeOnDestroy(dialog)
+        state.activePresetDialog = dialog
     end
 end
 
