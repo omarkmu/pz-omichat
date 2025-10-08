@@ -547,7 +547,7 @@ function utils.isInvisibleByte(byte)
 end
 
 ---Returns an iterator over an icon-to-texture name map.
----@return function
+---@return fun(): string?, string?
 ---@return table<string, string>
 function utils.iterateIcons()
     if not loadedIcons then

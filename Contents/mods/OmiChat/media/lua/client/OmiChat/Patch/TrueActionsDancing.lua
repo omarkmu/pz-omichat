@@ -484,27 +484,24 @@ local function searchKnownDances(ctxOrSearch)
         return
     end
 
-    local ctx = API.search._buildContext(ctxOrSearch) ---@diagnostic disable-line: invisible
+    ---@diagnostic disable: invisible
+    local ctx = API.search._buildContext(ctxOrSearch)
     ctx.display = ctx.display or danceDisplay
     ctx.mapValue = mapDanceValue
 
-    local exact
     local dances = getAvailableDances(player)
     for i = 1, #dances do
         local dance = dances[i]
         local display = dance.display:gsub(' ', '_')
 
-        local result = API.search._internal(ctx, dance.name, dance, display) ---@diagnostic disable-line: invisible
-        if result and result.exact and ctx.terminateOnExact then
-            exact = result
+        API.search._internal(ctx, dance.name, dance, display)
+        if ctx.isTerminated then
             break
         end
     end
 
-    return {
-        exact = exact,
-        results = utils.append(ctx.startsWith, ctx.contains),
-    }
+    return API.search._collectResults(ctx)
+    ---@diagnostic enable: invisible
 end
 
 

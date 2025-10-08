@@ -4,17 +4,18 @@ local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
 
 local utils = API.utils
 local config = API.Configuration
-local min = math.min
 local concat = table.concat
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
 
-local MAX_RESULTS = 50
+local MAX_RESULTS = 30
+local MAX_SEARCH = 100
 
 
 ---@type omichat.Suggester[]
 return {
     {
+        -- Provides suggestions for command names.
         name = 'commands',
         priority = 15,
         suggest = function(_, info)
@@ -36,8 +37,10 @@ return {
             local search = API.search.streams({
                 search = command,
                 terminateOnExact = true,
-                max = MAX_RESULTS,
-            }, { includeVanillaCommandStreams = true })
+                maxSearch = MAX_SEARCH,
+                maxResults = MAX_RESULTS,
+                includeVanillaCommandStreams = true,
+            })
 
             for i = 1, #search.results do
                 local result = search.results[i]
@@ -51,6 +54,7 @@ return {
         end,
     },
     {
+        -- Provides suggestions based on a stream's suggestion spec.
         name = 'spec-suggestions',
         priority = 10,
         suggest = function(_, info)
@@ -72,7 +76,7 @@ return {
                 idx = idx + 1
             end
 
-            local argSpec = API.search.getSuggesterArgumentSpec(spec, idx)
+            local argSpec = API.search.getSuggestionArgumentSpec(spec, idx)
             if not argSpec then
                 return
             end
@@ -100,7 +104,8 @@ return {
                 display = argSpec.display,
                 searchDisplay = argSpec.searchDisplay,
                 args = args,
-                max = MAX_RESULTS,
+                maxSearch = MAX_SEARCH,
+                maxResults = MAX_RESULTS,
             }
 
             if argType == 'online-username' then
@@ -108,20 +113,16 @@ return {
             elseif argType == 'online-username-with-self' then
                 search = API.search.onlineUsernames(ctx, true)
             elseif argType == 'language' then
-                ctx.display = ctx.display or utils.getTranslatedLanguageName
-                ctx.searchDisplay = utils.default(ctx.searchDisplay, true)
-                search = API.search.strings(ctx, API.language.getList())
+                search = API.search.languages(ctx, false)
             elseif argType == 'known-language' then
-                ctx.display = ctx.display or utils.getTranslatedLanguageName
-                ctx.searchDisplay = utils.default(ctx.searchDisplay, true)
-                search = API.search.strings(ctx, API.player.getLanguages())
+                search = API.search.languages(ctx, true)
             elseif argType == 'perk' then
                 search = API.search.perks(ctx)
                 applyQuotes = false
             elseif argType == 'option' and argSpec.options then
                 search = API.search.strings(ctx, argSpec.options)
             else
-                local callback = API.search.getSuggesterTypeCallback(argType)
+                local callback = API.search.getSuggestionTypeCallback(argType)
                 local cbResult = callback and callback(ctx, argSpec)
                 if not cbResult then
                     return
@@ -137,7 +138,7 @@ return {
             prefix = prefix .. (argSpec.prefix or '')
             local suffix = argSpec.suffix or ' '
 
-            for i = 1, min(#search.results, MAX_RESULTS) do
+            for i = 1, #search.results do
                 local result = search.results[i]
                 local value = result.value
                 local display = result.display or value
@@ -154,6 +155,7 @@ return {
         end,
     },
     {
+        -- Provides suggestions for emote animation shortcuts.
         name = 'emotes',
         priority = 5,
         suggest = function(_, info)
@@ -206,7 +208,13 @@ return {
                 keys[#keys + 1] = k
             end
 
-            local search = API.search.strings(text, keys)
+            local search = API.search.strings({
+                search = text,
+                terminateOnExact = true,
+                maxSearch = MAX_SEARCH,
+                maxResults = MAX_RESULTS,
+            }, keys)
+
             if search.exact then
                 return
             end

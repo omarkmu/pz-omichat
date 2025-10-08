@@ -275,7 +275,7 @@ return {
                 return
             end
 
-            local lang = API.search.matchLanguage(command, API.player.getLanguages())
+            local lang = API.search.matchLanguage(command)
             if not lang or not API.player.setCurrentLanguage(lang) then
                 API.chat.addInfoMessage(getText('UI_OmiChat_Error_SwitchUnknownLanguage', command))
                 return

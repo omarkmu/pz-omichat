@@ -266,30 +266,12 @@ end
 ---@param suggestBox omi.ui.SuggestBox
 ---@param text string
 function ModDataEditor:populateLanguageSuggest(suggestBox, text)
-    ---@type omichat.SearchContext
-    local ctx = {
-        searchDisplay = true,
+    local search = API.search.languages {
         search = text,
-        display = utils.getTranslatedLanguageName,
-        max = 50,
+        terminateOnExact = true,
     }
 
-    local search = API.search.strings(ctx, API.language.getList())
-    if #search.results == 1 and API.language.exists(text) then
-        suggestBox:setSuggestions({})
-        return
-    end
-
-    local suggestions = {} ---@type omi.ui.SuggestBox.Suggestion[]
-    for i = 1, #search.results do
-        local result = search.results[i]
-        suggestions[#suggestions + 1] = {
-            text = result.display,
-            content = result.value,
-        }
-    end
-
-    suggestBox:setSuggestions(suggestions)
+    API.search.populateSuggestions(suggestBox, search, 50)
 end
 
 ---Updates the validation state of the save button.

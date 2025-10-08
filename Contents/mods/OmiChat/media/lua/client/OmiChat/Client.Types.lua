@@ -313,16 +313,21 @@
 
 ---@class omichat.api.client.search
 ---@field private _customSuggesterTypes table<string, omichat.SuggestSearchCallback>
+---@field private _perkList omichat.search.PerkInfo[]?
 
 
 ---@class omichat.SearchContext
 ---@field search string The string to search for.
 ---@field terminateOnExact boolean? If true, exact matches will terminate the search.
----@field max integer? The maximum search results to return.
+---@field maxResults integer? The maximum number of search results to return.
+---@field maxSearch integer? The maximum number of elements to search before terminating.
 ---@field searchDisplay boolean? If true, the display string will be searched as well.
----@field filter (fun(value: unknown, args: string[]): boolean)|nil Filter function for results.
----@field display (fun(value: unknown, str: string): string?)|nil Function to retrieve display strings for results.
----@field args table? Argument for the filter function.
+---@field filter (fun(value: unknown, args: string[]): boolean)? Filter function for results.
+---@field display (fun(value: unknown, searchString: string): string?)? Function to retrieve display strings for results.
+---@field args string[]? Argument for the filter function.
+---@field isTerminated boolean? Whether the search should stop.
+---@field exactInternal omichat.search.InternalSearchResult? The last exact match for the internal search.
+---@field exact omichat.SearchResult? The last exact match for the search.
 
 ---@class omichat.SearchResult
 ---@field value string
@@ -333,28 +338,33 @@
 ---@field results omichat.SearchResult[]
 ---@field exact omichat.SearchResult?
 
----@class omichat.StreamSearchOptions
----@field excludeChatStreams boolean? Whether to exclude chat streams from the search.
----@field excludeCommandStreams boolean? Whether to exclude custom command streams from the search.
----@field includeVanillaCommandStreams boolean? Whether to include vanilla command streams in the search.
-
 ---@class omichat.search.InternalSearchContext : omichat.SearchContext
----@field search string
 ---@field searchForStartsWith string?
 ---@field searchForContains string?
 ---@field startsWith omichat.search.InternalSearchResult[]
 ---@field contains omichat.search.InternalSearchResult[]
----@field mapValue (fun(value: unknown, str: string): unknown)?
----@field caseInsensitive boolean?
----@field args table
+---@field mapValue (fun(value: unknown, searchString: string): string)?
+---@field caseSensitive boolean?
+---@field args string[]
 
----@class omichat.search.InternalSearchResult : omichat.SearchResult
----@field value unknown
+---@class omichat.search.InternalSearchResult
+---@field exact boolean
+---@field raw unknown
+---@field display string?
+---@field searchString string
+---@field value string?
 
 ---@class omichat.search.PerkInfo
 ---@field perk Perk
 ---@field name string
 ---@field id string
+
+---@class omichat.StreamSearchOptions
+---@field excludeChatStreams boolean? Whether to exclude chat streams from the search.
+---@field excludeCommandStreams boolean? Whether to exclude custom command streams from the search.
+---@field includeVanillaCommandStreams boolean? Whether to include vanilla command streams in the search.
+
+---@class omichat.Args.StreamSearch : omichat.StreamSearchOptions, omichat.SearchContext
 
 --#endregion
 
