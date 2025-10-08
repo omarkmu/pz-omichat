@@ -388,7 +388,6 @@
 --#region StatusManager
 
 ---@class omichat.StatusManager
----@field instance omichat.StatusManager
 ---@field private _enabled boolean
 ---@field private _displayByUsername table<string, omichat.StatusDisplay>
 

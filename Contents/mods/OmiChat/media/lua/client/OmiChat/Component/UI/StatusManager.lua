@@ -3,6 +3,7 @@
 local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
 local StatusDisplay = require 'OmiChat/Component/UI/StatusDisplay'
 
+local utils = API.utils
 local config = API.Configuration
 local getPicked = UIManager.getPicked
 local getClassFieldVal = getClassFieldVal
@@ -74,24 +75,9 @@ function StatusManager.getPickedSquare()
     return value:getSquare()
 end
 
----Sets up the status manager instance.
----@static
-function StatusManager.init()
-    if StatusManager.instance then
-        return
-    end
-
-    local instance = ISUIElement.new(StatusManager, 0, 0, 0, 0) ---@cast instance omichat.StatusManager
-    instance:initialise()
-    instance:addToUIManager()
-
-    StatusManager.instance = instance
-end
-
-
 ---Updates status display elements based on mouse hover.
 ---Called every 100ms.
-function StatusManager:update()
+function StatusManager.update()
     local statusEnabled = config.Commands.Status.Enable
     if not statusEnabled and not StatusManager._enabled then
         return
@@ -142,6 +128,7 @@ function StatusManager:update()
     end
 end
 
+utils.setIntervalUI(StatusManager.update)
 
 API.StatusManager = StatusManager
 return StatusManager

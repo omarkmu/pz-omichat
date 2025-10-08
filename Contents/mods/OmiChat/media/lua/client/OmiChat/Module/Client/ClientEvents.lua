@@ -17,7 +17,6 @@ end
 ---@private
 function API._onGameStart()
     API.chat.updateState(true)
-    API.StatusManager.init()
 end
 
 
