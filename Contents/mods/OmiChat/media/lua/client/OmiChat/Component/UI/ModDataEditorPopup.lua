@@ -168,6 +168,11 @@ function ModDataEditor:createChildren()
     }
 end
 
+---Filter function for languages in the language list entry.
+function ModDataEditor:filterLanguages(text)
+    return not self:hasLanguage(text)
+end
+
 ---Gets the computed value of an entry.
 ---@param entry omi.ui.TextEntry
 ---@return string?
@@ -189,13 +194,7 @@ function ModDataEditor:hasLanguage(language)
         return false
     end
 
-    for i = 1, #langs do
-        if langs[i] == language then
-            return true
-        end
-    end
-
-    return false
+    return utils.includes(langs, language)
 end
 
 ---Checks whether the given language is a valid entry for the language list.
@@ -286,6 +285,7 @@ function ModDataEditor:populateLanguageSuggest(suggestBox, text)
         search = text,
         terminateOnExact = true,
         maxResults = 50,
+        filter = self.languageFilter,
     }
 
     API.search.populateSuggestions(suggestBox, search)
@@ -416,6 +416,7 @@ function ModDataEditor:new(args)
     this.target = args.target
     this.buttonBorderColor = { r = 0.7, g = 0.7, b = 0.7, a = 0.5 }
     this.onsave = args.onSave
+    this.languageFilter = utils.bind(this.filterLanguages, this)
     this.isAdd = args.isAdd or false
     this.backgroundColor.a = 0.9
 

@@ -260,6 +260,7 @@
 ---@field closeBtn ISButton
 ---@field isAdd boolean
 ---@field onsave function?
+---@field languageFilter function?
 ---@field target unknown
 
 ---@class omichat.Args.ModDataEditor : omi.ui.Args.Base
