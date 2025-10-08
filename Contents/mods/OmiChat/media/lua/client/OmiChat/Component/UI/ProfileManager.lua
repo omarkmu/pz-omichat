@@ -316,11 +316,14 @@ end
 ---Callback for apply changes button.
 function ProfileManager:onSave()
     API.preferences.setProfiles(ProfileManager._cloneProfiles(self.profiles))
+
     if self.deletedCurrentProfile then
         API.preferences.switchToDefaultProfile()
-        API.ui.redraw()
+    else
+        API.preferences.refreshProfile()
     end
 
+    API.ui.redraw()
     self:removeFromUIManager()
 end
 

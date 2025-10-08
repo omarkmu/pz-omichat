@@ -222,6 +222,14 @@ function Preferences.getUseSuggester()
     return prefs.useSuggester
 end
 
+---Reloads the currently set profile.
+---If no profile is set, this switches to the default profile.
+function Preferences.refreshProfile()
+    local prefs = Preferences.get()
+
+    Preferences.switchProfile(prefs.profileIndex or 0)
+end
+
 ---Saves the current player preferences to a file.
 ---@return boolean success
 function Preferences.save()
