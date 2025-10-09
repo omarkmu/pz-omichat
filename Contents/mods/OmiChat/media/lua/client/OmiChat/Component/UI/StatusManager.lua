@@ -9,8 +9,8 @@ local getPicked = UIManager.getPicked
 local getClassFieldVal = getClassFieldVal
 
 
----@class omichat.StatusManager : ISUIElement
-local StatusManager = ISUIElement:derive('StatusManager')
+---@class omichat.StatusManager
+local StatusManager = {}
 StatusManager._enabled = false
 StatusManager._displayByUsername = {}
 

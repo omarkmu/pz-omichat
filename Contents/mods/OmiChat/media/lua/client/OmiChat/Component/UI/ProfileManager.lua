@@ -1,28 +1,32 @@
 ---UI element for managing player preference profiles.
 
 local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
-local ContentPanel = require 'OmiChat/Component/UI/ProfileManagerContent'
 
 local config = API.Configuration
 local utils = API.utils
-local ISLabel = ISLabel
-local ISPanelJoypad = ISPanelJoypad
+local UI = utils.ui
 
 
----@class omichat.ProfileManager : ISPanelJoypad
-local ProfileManager = ISPanelJoypad:derive('ProfileManager')
+---@class omichat.ProfileManager : omi.ui.Panel
+local ProfileManager = UI.Panel:derive('ProfileManager')
 
 local textManager = getTextManager()
+
+local CONTROL_FONT = UIFont.Medium
 local FONT_H_LARGE = textManager:getFontHeight(UIFont.Large)
 local FONT_H_MEDIUM = textManager:getFontHeight(UIFont.Medium)
 local FONT_H_SMALL = textManager:getFontHeight(UIFont.Small)
+local LABEL_H = FONT_H_MEDIUM + 4
+local CONTENT_PAD_X = 20
+local CONTENT_PAD_Y = 10
+local CONTROL_PAD_Y = 5
+local SECTION_PAD_Y = 20
 
 
 ---Creates a copy of a player profile.
 ---@param profile omichat.PlayerProfile
 ---@return omichat.PlayerProfile
 ---@private
----@static
 function ProfileManager._cloneProfile(profile)
     ---@type omichat.PlayerProfile
     local clone = {
@@ -30,12 +34,8 @@ function ProfileManager._cloneProfile(profile)
         chatNickname = profile.chatNickname,
         callouts = utils.copy(profile.callouts),
         sneakcallouts = utils.copy(profile.sneakcallouts),
-        colors = {},
+        colors = utils.deepcopy(profile.colors),
     }
-
-    for k, v in pairs(profile.colors) do
-        clone.colors[k] = utils.copy(v)
-    end
 
     return clone
 end
@@ -45,7 +45,6 @@ end
 ---@param markIndices boolean?
 ---@return omichat.PlayerProfile[]
 ---@private
----@static
 function ProfileManager._cloneProfiles(profiles, markIndices)
     local result = {}
     for i = 1, #profiles do
@@ -59,126 +58,34 @@ function ProfileManager._cloneProfiles(profiles, markIndices)
     return result
 end
 
+---Validation function for custom callout text.
+---@param entry omi.ui.TextEntry
+---@param text string
+---@return boolean
+---@private
+function ProfileManager._validateCustomCalloutText(entry, text)
+    local lines = utils.getLines(text)
+    if not lines then
+        return true
+    end
 
----Adds a profile to the listbox.
----@param profile omichat.PlayerProfile
-function ProfileManager:addListboxItem(profile)
-    local item = self.listbox:addItem(profile.name, profile)
-    self:updateListboxText(item.itemindex, profile.name)
+    local maxShouts = config.MAX_CUSTOM_SHOUTS
+    if #lines > maxShouts then
+        entry:setValidateTooltipText(getText('UI_OmiChat_Error_TooManyShouts', tostring(maxShouts)))
+        return false
+    end
+
+    local maxLen = config.MAX_CUSTOM_SHOUT_LEN
+    for i = 1, #lines do
+        if #lines[i] > maxLen then
+            entry:setValidateTooltipText(getText('UI_OmiChat_Error_TooLongShout', tostring(maxLen)))
+            return false
+        end
+    end
+
+    return true
 end
 
----Creates the panel used to display profile content.
----@return omichat.ProfileManagerContent
-function ProfileManager:createContentPanel()
-    local listbox = self.listbox
-    local x = listbox:getRight() + 24
-    local w = self.width - listbox:getRight() - 48
-    local panel = ContentPanel:new(x, listbox:getY(), w, listbox:getHeight())
-
-    panel:initialise()
-    panel:instantiate()
-    panel:setAnchorRight(true)
-    panel:setAnchorBottom(true)
-    panel:setScrollChildren(true)
-    panel:addScrollBars()
-
-    return panel
-end
-
----Creates the children of the profile manager.
-function ProfileManager:createChildren()
-    local titleText = getText('UI_OmiChat_ProfileManager_Title')
-    local titleWidth = textManager:MeasureStringX(UIFont.Large, titleText)
-    local titleX = self.width / 2 - titleWidth / 2
-    local titleH = FONT_H_LARGE
-    local title = ISLabel:new(titleX, 10, titleH, titleText, 1, 1, 1, 1, UIFont.Large, true)
-    title:initialise()
-    title:instantiate()
-
-    local btnWidth = 100
-    local btnHgt = math.max(25, FONT_H_SMALL + 6)
-    local btnY = self.height - 10 - btnHgt
-
-    local listboxY = titleH + 20
-    local listboxW = math.min(100, self.width / 4)
-    local listboxH = self.height - btnHgt - titleH - 40
-    local listbox = ISScrollingListBox:new(24, listboxY, listboxW, listboxH)
-    listbox.drawBorder = true
-    listbox:setAnchorLeft(true)
-    listbox:setAnchorRight(false)
-    listbox:setAnchorTop(true)
-    listbox:setAnchorBottom(true)
-    listbox:setFont(UIFont.Small, 4)
-    listbox:setOnMouseDownFunction(self, self.updateControlState)
-
-    local closeX = self.width - 124
-    local closeText = getText('IGUI_CraftUI_Close')
-    local closeButton = ISButton:new(closeX, btnY, btnWidth, btnHgt, closeText, self, self.destroy)
-    closeButton.internal = 'CLOSE'
-    closeButton.borderColor = { r = 1, g = 1, b = 1, a = 0.1 }
-    closeButton:initialise()
-    closeButton:instantiate()
-    closeButton:setAnchorLeft(false)
-    closeButton:setAnchorTop(false)
-    closeButton:setAnchorRight(false)
-    closeButton:setAnchorBottom(true)
-
-    local saveText = getText('IGUI_RadioSave')
-    local saveButton = ISButton:new(0, btnY, btnWidth, btnHgt, saveText, self, self.onSave)
-    saveButton.internal = 'SAVE'
-    saveButton.borderColor = { r = 1, g = 1, b = 1, a = 0.1 }
-    saveButton:initialise()
-    saveButton:instantiate()
-    saveButton:setAnchorLeft(false)
-    saveButton:setAnchorTop(false)
-    saveButton:setAnchorRight(false)
-    saveButton:setAnchorBottom(true)
-    saveButton:setWidthToTitle(btnWidth)
-    saveButton:setX(closeButton.x - 20 - saveButton.width)
-
-    local createText = getText('UI_OmiChat_ProfileManager_CreateButton')
-    local createButton = ISButton:new(0, 0, btnWidth, btnHgt, createText, self, self.addProfile)
-    createButton.internal = 'CREATE'
-    createButton.borderColor = { r = 1, g = 1, b = 1, a = 0.1 }
-    createButton:initialise()
-    createButton:instantiate()
-    createButton:setAnchorLeft(true)
-    createButton:setAnchorTop(false)
-    createButton:setAnchorRight(true)
-    createButton:setAnchorBottom(true)
-    createButton:setWidthToTitle(btnWidth)
-    createButton:setX(self.width / 2 - createButton.width / 2)
-    createButton:setY(self.height / 2 - createButton.height / 2)
-
-    local emptyText = getText('UI_OmiChat_ProfileManager_Empty')
-    local emptyLabel = ISLabel:new(0, 0, FONT_H_MEDIUM, emptyText, 1, 1, 1, 1, UIFont.Medium, false)
-    emptyLabel:initialise()
-    emptyLabel:setX(self.width / 2 - emptyLabel.width / 2)
-    emptyLabel:setY(self.height / 2 - emptyLabel.height / 2 - createButton.height)
-
-    self.listbox = listbox
-    self.createButton = createButton
-    self.closeButton = closeButton
-    self.saveButton = saveButton
-    self.emptyLabel = emptyLabel
-
-    self.contentPanel = self:createContentPanel()
-    self.contentPanel:addControls(self)
-
-    self:addChild(title)
-    self:addChild(listbox)
-    self:addChild(closeButton)
-    self:addChild(saveButton)
-    self:addChild(createButton)
-    self:addChild(emptyLabel)
-    self:addChild(self.contentPanel)
-    self:updateUIState(true)
-end
-
----Removes the panel from the UI.
-function ProfileManager:destroy()
-    self:removeFromUIManager()
-end
 
 ---Adds a new profile to the manager.
 function ProfileManager:addProfile()
@@ -196,8 +103,132 @@ function ProfileManager:addProfile()
 
     self.profiles[idx] = profile
 
-    self:addListboxItem(profile)
-    self:updateUIState(nil, idx)
+    self:_addListboxItem(profile)
+    self:_updateUIState(false, idx)
+end
+
+---Creates the children of the profile manager.
+function ProfileManager:createChildren()
+    local titleText = getText('UI_OmiChat_ProfileManager_Title')
+    local titleWidth = textManager:MeasureStringX(UIFont.Large, titleText)
+    local titleH = FONT_H_LARGE
+
+    local padX = 24
+    local btnW = 100
+    local btnH = math.max(25, FONT_H_SMALL + 6)
+    local btnY = self.height - 10 - btnH
+
+    UI.label {
+        parent = self,
+        text = titleText,
+        x = (self.width - titleWidth) * 0.5,
+        y = 10,
+        h = titleH,
+        font = UIFont.Large,
+    }
+
+    self.listbox = UI.listBox {
+        parent = self,
+        x = padX,
+        y = titleH + 20,
+        w = math.min(100, self.width / 4),
+        h = self.height - btnH - titleH - 40,
+        drawBorder = true,
+        anchorLeft = true,
+        anchorRight = false,
+        anchorTop = true,
+        anchorBottom = true,
+        font = UIFont.Small,
+        itemPadY = 4,
+        target = self,
+        onMouseDown = self._updateControlState,
+    }
+
+    self.closeBtn = UI.button {
+        parent = self,
+        x = self.width - btnW - padX,
+        y = btnY,
+        w = btnW,
+        h = btnH,
+        minWidth = btnW,
+        anchorLeft = false,
+        anchorTop = false,
+        anchorRight = false,
+        anchorBottom = true,
+        internal = 'CLOSE',
+        text = getText('IGUI_CraftUI_Close'),
+        target = self,
+        onClick = self.destroy,
+        setWidthToText = true,
+    }
+
+    self.saveBtn = UI.button {
+        parent = self,
+        x = 0,
+        y = btnY,
+        w = btnW,
+        h = btnH,
+        minWidth = btnW,
+        anchorLeft = false,
+        anchorTop = false,
+        anchorRight = false,
+        anchorBottom = true,
+        internal = 'SAVE',
+        text = getText('IGUI_RadioSave'),
+        target = self,
+        onClick = self.onSave,
+        setWidthToText = true,
+    }
+
+    self.createBtn = UI.button {
+        parent = self,
+        w = btnW,
+        h = btnH,
+        minWidth = btnW,
+        anchorLeft = true,
+        anchorTop = true,
+        anchorRight = true,
+        anchorBottom = true,
+        internal = 'CREATE',
+        text = self.createText,
+        target = self,
+        onClick = self.addProfile,
+        setWidthToText = true,
+    }
+
+    self.emptyLabel = UI.label {
+        parent = self,
+        h = FONT_H_MEDIUM,
+        text = getText('UI_OmiChat_ProfileManager_Empty'),
+        font = UIFont.Medium,
+        left = false,
+    }
+
+    self.contentPanel = UI.panel {
+        parent = self,
+        x = self.listbox:getRight() + padX,
+        y = self.listbox:getY(),
+        w = self.width - self.listbox:getRight() - padX * 2,
+        h = self.listbox:getHeight(),
+        anchorRight = true,
+        anchorBottom = true,
+        scrollChildren = true,
+        addVerticalScrollbar = true,
+        handleScrolling = true,
+    }
+
+    self.closeBtn:setX(self.width - self.closeBtn.width - padX)
+    self.saveBtn:setX(self.closeBtn.x - self.saveBtn.width - padX)
+
+    self.createBtn.borderColor.a = 0.5
+    self.createBtn:setX((self.width - self.createBtn.width) * 0.5)
+    self.createBtn:setY((self.height - self.createBtn.height) * 0.5)
+
+    self.emptyLabel:setX((self.width - self.emptyLabel.width) * 0.5)
+    self.emptyLabel:setY((self.height - self.emptyLabel.height) * 0.5 - self.createBtn.height)
+
+    self:_addControls()
+    self:_updateUIState(true)
 end
 
 ---Deletes the currently selected profile.
@@ -208,13 +239,13 @@ function ProfileManager:deleteProfile()
         return
     end
 
-    item = item.item
-    if not self.deletedCurrentProfile and item._originalIndex then
-        self.deletedCurrentProfile = item._originalIndex == API.preferences.getCurrentProfileIndex()
+    local data = item.item
+    if not self.deletedCurrentProfile and data._originalIndex then
+        self.deletedCurrentProfile = data._originalIndex == API.preferences.getCurrentProfileIndex()
     end
 
     table.remove(self.profiles, idx)
-    self:updateUIState(true, idx)
+    self:_updateUIState(true, idx)
 end
 
 ---Duplicates the currently selected profile.
@@ -224,9 +255,7 @@ function ProfileManager:duplicateProfile()
         return
     end
 
-    local idx = self.listbox.selected
-    local item = self.listbox.items[idx]
-    item = item and item.item
+    local item = self.listbox:getSelectedItem()
     if not item then
         return
     end
@@ -235,8 +264,8 @@ function ProfileManager:duplicateProfile()
     profile.name = getText('UI_OmiChat_ProfileManager_DefaultProfileName', newIdx)
 
     self.profiles[newIdx] = profile
-    self:addListboxItem(profile)
-    self:updateUIState(true, newIdx)
+    self:_addListboxItem(profile)
+    self:_updateUIState(true, newIdx)
 end
 
 ---Callback for callout update.
@@ -309,8 +338,8 @@ function ProfileManager:onProfileNameChange(entry)
         profile.name = text
     end
 
-    self:updateListboxText(self.listbox.selected, text)
-    self:updateUIState()
+    self:_updateListboxText(self.listbox.selected, text)
+    self:_updateUIState()
 end
 
 ---Callback for apply changes button.
@@ -327,15 +356,254 @@ function ProfileManager:onSave()
     self:removeFromUIManager()
 end
 
----Updates the state of controls.
----@param force boolean?
-function ProfileManager:updateControlState(force)
-    local selectedProfile = self.profiles[self.listbox.selected]
-    if not selectedProfile then
-        return
+
+---Adds the label and control elements.
+---@protected
+function ProfileManager:_addControls()
+    local panel = self.contentPanel
+    local controlW = panel.width * 0.5 - CONTENT_PAD_X * 2
+    local startY = CONTENT_PAD_Y
+
+    -- profile name
+    local nameLabel = UI.label {
+        parent = panel,
+        x = CONTENT_PAD_X,
+        y = CONTENT_PAD_Y,
+        h = LABEL_H,
+        text = getText('UI_OmiChat_ProfileManager_Label_ProfileName'),
+        font = CONTROL_FONT,
+    }
+
+    local nameControl = UI.textEntry {
+        parent = panel,
+        x = CONTENT_PAD_X,
+        y = nameLabel:getBottom(),
+        w = controlW,
+        h = LABEL_H,
+        font = CONTROL_FONT,
+        minLength = 1,
+        maxLength = 50,
+    }
+
+    nameControl:setOnChange(self, self.onProfileNameChange, nameControl)
+    self.profileNameControl = nameControl
+
+    startY = nameControl:getBottom() + CONTROL_PAD_Y
+
+    -- chat nickname
+    if config:isNicknameEnabled() then
+        local nicknameLabel = UI.label {
+            parent = panel,
+            x = CONTENT_PAD_X,
+            y = startY,
+            h = LABEL_H,
+            text = getText('UI_OmiChat_ProfileManager_Label_Nickname'),
+            font = CONTROL_FONT,
+        }
+
+        local nicknameControl = UI.textEntry {
+            parent = panel,
+            x = CONTENT_PAD_X,
+            y = nicknameLabel:getBottom(),
+            w = controlW,
+            h = LABEL_H,
+            font = CONTROL_FONT,
+            tooltip = getText('UI_OmiChat_ProfileManager_Tooltip_Nickname'),
+        }
+
+        nicknameControl:setValidateFunction(nicknameControl, API.format.validateName)
+        nicknameControl:setOnChange(self, self.onNicknameChange, nicknameControl)
+
+        self.nicknameControl = nicknameControl
+        startY = nicknameControl:getBottom() + CONTROL_PAD_Y
     end
 
-    if not force and selectedProfile == self.current then
+    -- colors
+    local maxY = startY + SECTION_PAD_Y
+    self.colorControls, maxY = self:_createColorControls(maxY)
+
+    -- callouts
+    if config:isCustomShoutsEnabled() then
+        self.calloutControls, maxY = self:_createCalloutControls(maxY + SECTION_PAD_Y)
+    end
+
+    panel:setScrollHeight(maxY + CONTENT_PAD_Y)
+    self:_createButtons()
+end
+
+---Adds a profile to the listbox.
+---@param profile omichat.PlayerProfile
+---@protected
+function ProfileManager:_addListboxItem(profile)
+    local item = self.listbox:addItem(profile.name, profile)
+    self:_updateListboxText(item.itemindex, profile.name)
+end
+
+---Adds buttons to the content panel.
+---@protected
+function ProfileManager:_createButtons()
+    local panel = self.contentPanel
+    local btnX = panel.width * 0.5
+    local btnW = panel.width * 0.25 - CONTENT_PAD_X * 2
+    local btnH = math.max(25, FONT_H_SMALL + 6)
+    local btnY = CONTENT_PAD_Y + LABEL_H
+
+    self.deleteBtn = UI.button {
+        parent = panel,
+        x = btnX,
+        y = btnY,
+        w = btnW,
+        h = btnH,
+        internal = 'DELETE',
+        text = getText('UI_OmiChat_ProfileManager_DeleteButton'),
+        target = self,
+        onClick = self.deleteProfile,
+        setWidthToText = true,
+    }
+
+    self.duplicateBtn = UI.button {
+        parent = panel,
+        x = self.deleteBtn:getRight() + CONTENT_PAD_X,
+        y = btnY,
+        w = btnW,
+        h = btnH,
+        internal = 'DUPLICATE',
+        text = getText('UI_OmiChat_ProfileManager_DuplicateButton'),
+        target = self,
+        onClick = self.duplicateProfile,
+        setWidthToText = true,
+    }
+
+    self.deleteBtn.borderColor.a = 0.5
+    self.duplicateBtn.borderColor.a = 0.5
+end
+
+---Creates the labels and controls for callout text.
+---@param startY number
+---@return table<string, omi.ui.TextEntry> controls
+---@return number maxY
+---@protected
+function ProfileManager:_createCalloutControls(startY)
+    local panel = self.contentPanel
+    local numLines = config.MAX_CUSTOM_SHOUTS * 0.5
+
+    local controls = {}
+    local nextY = startY
+
+    local categories = { 'callouts', 'sneakcallouts' }
+    for i = 1, #categories do
+        local category = categories[i]
+        local calloutText
+        if category == 'callouts' then
+            calloutText = getText('UI_OmiChat_ProfileManager_Label_Callouts')
+        else
+            calloutText = getText('UI_OmiChat_ProfileManager_Label_SneakCallouts')
+        end
+
+        local label = UI.label {
+            parent = panel,
+            x = CONTENT_PAD_X,
+            y = nextY,
+            h = LABEL_H,
+            text = calloutText,
+            font = CONTROL_FONT,
+        }
+
+        local control = UI.textEntry {
+            parent = panel,
+            x = CONTENT_PAD_X,
+            y = label:getBottom(),
+            w = panel.width - CONTENT_PAD_X * 2,
+            h = FONT_H_MEDIUM * numLines + 4,
+            font = CONTROL_FONT,
+            tooltip = getText('UI_OmiChat_ProfileManager_Tooltip_Callouts'),
+            maxLines = numLines,
+            forceUppercase = category == 'callouts',
+        }
+
+        control:setValidateFunction(control, self._validateCustomCalloutText)
+        control:setOnChange(self, self.onCalloutsChange, control, category)
+
+        controls[category] = control
+        nextY = control:getBottom() + CONTROL_PAD_Y
+    end
+
+    return controls, nextY
+end
+
+---Creates the labels and controls for chat colors.
+---@param startY number
+---@return table<string, omi.ui.ColorEntry> controls
+---@return number maxY
+---@protected
+function ProfileManager:_createColorControls(startY)
+    local panel = self.contentPanel
+    local controls = {}
+
+    local nextY = startY
+    local maxY = startY
+
+    local availableColorOpts = API.ui.getColorOptions()
+    local splitIdx = math.ceil(#availableColorOpts * 0.5)
+    local controlW = panel.width * 0.5 - CONTENT_PAD_X * 2
+
+    for i = 1, #availableColorOpts do
+        local opt = availableColorOpts[i]
+        local displayCommand = API.streams.getDisplayCommand(opt)
+        local labelText = getTextOrNull('UI_OmiChat_ContextColor_' .. opt)
+        if not labelText then
+            labelText = getText('UI_OmiChat_ContextColor', displayCommand)
+        end
+
+        local leftCol = i <= splitIdx
+        local x = leftCol and CONTENT_PAD_X or (controlW + CONTENT_PAD_X * 2)
+
+        local tooltip = getTextOrNull('UI_OmiChat_ProfileManager_Tooltip_Color_' .. opt)
+        if not tooltip then
+            local optName = getTextOrNull('UI_OmiChat_ContextMessageType_' .. opt) or displayCommand
+            tooltip = getText('UI_OmiChat_ProfileManager_Tooltip_Color', optName)
+        end
+
+        local label = UI.label {
+            parent = panel,
+            x = x,
+            y = nextY,
+            h = LABEL_H,
+            text = labelText,
+            font = CONTROL_FONT,
+        }
+
+        local control = UI.colorEntry {
+            parent = panel,
+            text = '',
+            x = x,
+            y = label:getBottom(),
+            w = controlW,
+            h = LABEL_H,
+            font = CONTROL_FONT,
+            minValue = opt == 'speech' and 48 or 0,
+            tooltip = tooltip,
+        }
+
+        control:setOnChange(self, self.onColorChange, control, opt)
+
+        nextY = control:getBottom() + CONTROL_PAD_Y
+        maxY = math.max(maxY, nextY)
+        if i == splitIdx then
+            nextY = startY
+        end
+
+        controls[opt] = control
+    end
+
+    return controls, maxY
+end
+
+---Updates the state of controls.
+---@protected
+function ProfileManager:_updateControlState()
+    local selectedProfile = self.profiles[self.listbox.selected]
+    if not selectedProfile then
         return
     end
 
@@ -367,7 +635,8 @@ end
 ---Updates the listbox item at the given index to use the given text.
 ---@param idx integer
 ---@param text string
-function ProfileManager:updateListboxText(idx, text)
+---@protected
+function ProfileManager:_updateListboxText(idx, text)
     text = utils.trim(text)
     local item = self.listbox.items[idx]
     if not item then
@@ -386,17 +655,18 @@ end
 ---Updates the state of the UI based on the number of available profiles.
 ---@param resetItems boolean?
 ---@param selectIdx integer?
-function ProfileManager:updateUIState(resetItems, selectIdx)
+---@protected
+function ProfileManager:_updateUIState(resetItems, selectIdx)
     local panel = self.contentPanel
     local listbox = self.listbox
     local emptyLabel = self.emptyLabel
-    local createButton = self.createButton
-    local dupButton = self.duplicateButton
+    local createBtn = self.createBtn
+    local dupBtn = self.duplicateBtn
 
     if resetItems then
         listbox:clear()
         for i = 1, #self.profiles do
-            self:addListboxItem(self.profiles[i])
+            self:_addListboxItem(self.profiles[i])
         end
     end
 
@@ -406,58 +676,50 @@ function ProfileManager:updateUIState(resetItems, selectIdx)
 
     local addEnabled = #self.profiles < config.MAX_PROFILES
     local addTooltip = not addEnabled and getText('UI_OmiChat_ProfileManager_MaxProfiles') or nil
-    createButton:setEnable(addEnabled)
-    createButton:setTooltip(addTooltip)
+    createBtn:setEnable(addEnabled)
+    createBtn:setTooltip(addTooltip)
 
-    if dupButton then
-        dupButton:setEnable(addEnabled)
-        dupButton:setTooltip(addTooltip)
+    if dupBtn then
+        dupBtn:setEnable(addEnabled)
+        dupBtn:setTooltip(addTooltip)
     end
 
     if #self.profiles == 0 then
         panel:setVisible(false)
         listbox:setVisible(false)
         emptyLabel:setVisible(true)
-        createButton:setTitle(getText('UI_OmiChat_ProfileManager_CreateButton'))
-        createButton:setX(self.width / 2 - createButton.width / 2)
-        createButton:setY(self.height / 2 - createButton.height / 2)
+        createBtn:setTitle(self.createText)
+        createBtn:setX((self.width - createBtn.width) * 0.5)
+        createBtn:setY((self.height - createBtn.height) * 0.5)
         return
     end
 
     panel:setVisible(true)
     listbox:setVisible(true)
     emptyLabel:setVisible(false)
-    createButton:setTitle(getText('UI_OmiChat_ProfileManager_AddButton'))
-    createButton:setX(listbox.x + (listbox.width - createButton.width) / 2)
-    createButton:setY(self.height - 10 - math.max(25, FONT_H_SMALL + 6))
-    self:updateControlState()
+    createBtn:setTitle(self.addText)
+    createBtn:setX(listbox.x + (listbox.width - createBtn.width) * 0.5)
+    createBtn:setY(self.height - 10 - math.max(25, FONT_H_SMALL + 6))
+    self:_updateControlState()
 end
 
+
 ---Creates a new panel for managing profiles.
----@param x number
----@param y number
----@param width number
----@param height number
----@param profiles omichat.PlayerProfile[]
+---@param args omichat.Args.ProfileManager
 ---@return omichat.ProfileManager
-function ProfileManager:new(x, y, width, height, profiles)
-    local this = ISPanelJoypad.new(self, x, y, width, height)
-    ---@cast this omichat.ProfileManager
+function ProfileManager:new(args)
+    local this = UI.Panel.new(self, args) --[[@as omichat.ProfileManager]]
 
-    setmetatable(this, self)
-    self.__index = self
-
-    this.anchorLeft = true
-    this.anchorRight = false
-    this.anchorTop = true
-    this.anchorBottom = false
     this.moveWithMouse = true
     this.deletedCurrentProfile = false
     this.borderColor = { r = 0.4, g = 0.4, b = 0.4, a = 1 }
     this.backgroundColor = { r = 0, g = 0, b = 0, a = 0.8 }
-    this.profiles = ProfileManager._cloneProfiles(profiles, true)
+    this.profiles = ProfileManager._cloneProfiles(args.profiles, true)
     this.colorControls = {}
     this.calloutControls = {}
+
+    this.addText = getText('UI_OmiChat_ProfileManager_AddButton')
+    this.createText = getText('UI_OmiChat_ProfileManager_CreateButton')
 
     return this
 end

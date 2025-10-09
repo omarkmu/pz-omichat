@@ -4,6 +4,7 @@ local API = require 'OmiChat/Module/Client/Core'
 
 local config = API.Configuration
 local utils = API.utils
+local UI = utils.ui
 local isoToScreenX = isoToScreenX
 local isoToScreenY = isoToScreenY
 local core = getCore()
@@ -11,13 +12,11 @@ local tileScale = Core.getTileScale()
 
 
 ---@class omichat.StatusDisplay : omi.ui.Base
-local StatusDisplay = ISUIElement:derive('OmiStatusDisplay')
-utils.extend(StatusDisplay, utils.ui.mixin.Base)
-
+local StatusDisplay = UI.class('OmiStatusDisplay')
 
 ---Initializes the display element.
 function StatusDisplay:initialise()
-    ISUIElement.initialise(self)
+    StatusDisplay.__base.initialise(self)
     self:setFollowGameWorld(true)
 
     local drawObject = TextDrawObject.new()
@@ -99,7 +98,7 @@ end
 ---@param target IsoPlayer
 ---@return omichat.StatusDisplay
 function StatusDisplay:new(target)
-    local this = ISUIElement.new(self, 0, 0, 0, 0) ---@cast this omichat.StatusDisplay
+    local this = StatusDisplay.__base.new(self, 0, 0, 0, 0) --[[@as omichat.StatusDisplay]]
 
     this.font = UIFont.Small
     this.target = target

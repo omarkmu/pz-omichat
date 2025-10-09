@@ -46,7 +46,7 @@
 ---@field private _wasTyping boolean The typing status from the previous update.
 ---@field private _isTyping boolean Whether the local player is currently typing.
 
----@class omichat.ChatTab : omi.ui.RichTextPanel
+---@class omichat.ChatTab
 ---@field parent omichat.ISChat The parent chat.
 ---@field logIndex integer The current index in the tab's input history.
 ---@field tabID integer The tab ID of this tab (0-indexed).
@@ -89,12 +89,12 @@
 ---@field textEntry omi.ui.TextEntry The text entry UI element.
 ---@field currentTabID integer The 1-indexed tab ID of the current tab.
 ---@field tabCnt integer The number of available tabs.
----@field infoButton ISButton The info button.
+---@field infoButton omi.ui.Button The info button.
 ---@field activeProfilesPanel omichat.ProfileManager?
 ---@field activeConfigurationPanel omi.forms.Form?
 ---@field activeLanguageModal omi.ui.Dialog?
 ---@field activeColorModal omi.ui.Dialog?
----@field activeModDataPanel omichat.ModDataManager
+---@field activePlayerDataPanel omichat.PlayerDataManager
 
 --#endregion
 
@@ -219,8 +219,8 @@
 
 --#region Mod Data Manager
 
----@class omichat.ModDataManager
----@field listbox ISScrollingListBox
+---@class omichat.PlayerDataManager
+---@field listbox omi.ui.ListBox
 ---@field elements omichat.PlayerModData[]
 ---@field columnList string[]
 ---@field columnDisplay table<string, string>
@@ -232,17 +232,19 @@
 ---@field headerFont UIFont
 ---@field listFont UIFont
 ---@field titleText string
----@field activeEditorPanel omichat.ModDataEditor?
+---@field activeEditorPanel omichat.PlayerDataEditor?
 ---@field activeDialog omi.ui.Dialog?
----@field closeBtn ISButton
----@field refreshBtn ISButton
----@field modifyBtn ISButton
----@field addBtn ISButton
----@field deleteBtn ISButton
+---@field closeBtn omi.ui.Button
+---@field refreshBtn omi.ui.Button
+---@field modifyBtn omi.ui.Button
+---@field addBtn omi.ui.Button
+---@field deleteBtn omi.ui.Button
 
----@class omichat.Args.ModDataManager : omi.ui.Args.Base
+---@class omichat.Args.PlayerDataManager : omi.ui.Args.Panel
 
----@class omichat.ModDataEditor
+
+---@class omichat.PlayerDataEditor
+---@field protected callbacks omichat.PlayerDataEditor.Callbacks
 ---@field item omichat.PlayerModData
 ---@field saveItem omichat.PlayerModData
 ---@field nicknameEntry omi.ui.TextEntry
@@ -252,22 +254,23 @@
 ---@field languageListEntry omi.ui.ListEntry
 ---@field statusEntry omi.ui.TextEntry
 ---@field languageSlotsEntry omi.ui.TextEntry
----@field languageListbox ISScrollingListBox
 ---@field languageSuggestBox omi.ui.SuggestBox
 ---@field iconSuggestBox omi.ui.SuggestBox
 ---@field buttonBorderColor omi.ColorTableRGBA
----@field saveBtn ISButton
----@field closeBtn ISButton
+---@field saveBtn omi.ui.Button
+---@field closeBtn omi.ui.Button
 ---@field isAdd boolean
----@field onsave function?
 ---@field languageFilter function?
----@field target unknown
 
----@class omichat.Args.ModDataEditor : omi.ui.Args.Base
+---@class omichat.PlayerDataEditor.Callbacks : omi.ui.Panel.Callbacks
+---@field onSave omi.CallbackInfo?
+
+---@class omichat.Args.PlayerDataEditor : omi.ui.Args.Panel
 ---@field item omichat.PlayerModData The original data to be edited.
 ---@field isAdd boolean? If `true`, the editor is for adding user data rather than editing existing data.
----@field target unknown? The target for the `onSave` callback.
 ---@field onSave function? A function to call when saving the data.
+---@field onSaveArgs table? Arguments for `onSave`.
+---@field onSaveTarget unknown? The first argument to pass to the `onSave` callback.
 
 --#endregion
 
@@ -303,14 +306,21 @@
 ---@field colors table<string, omi.ColorTable> Custom chat colors.
 
 ---@class omichat.ProfileManager
----@field current omichat.PlayerProfile?
+---@field current omichat.PlayerProfile? The profile being edited.
+---@field profiles omichat.PlayerProfile[] The list of profiles.
+---@field profileNameControl omi.ui.TextEntry The control for setting a profile name.
+---@field nicknameControl omi.ui.TextEntry? The control for setting a nickname to use when switching to a profile.
+---@field colorControls table<string, omi.ui.ColorEntry> Associates color options to controls.
+---@field calloutControls table<string, omi.ui.TextEntry> Associates callout types to controls.
+---@field createBtn omi.ui.Button The button to add a new profile.
+---@field deleteBtn omi.ui.Button The button to delete the current profile.
+---@field duplicateBtn omi.ui.Button The button to duplicate the current profile.
+---@field emptyLabel omi.ui.Label The label to display when there are no profiles.
+---@field addText string The text for the create button in the non-empty state.
+---@field createText string The text for the create button in the empty state.
+
+---@class omichat.Args.ProfileManager : omi.ui.Args.Panel
 ---@field profiles omichat.PlayerProfile[]
----@field profileNameControl omi.ui.TextEntry
----@field nicknameControl omi.ui.TextEntry?
----@field colorControls table<string, omi.ui.ColorEntry>
----@field calloutControls table<string, omi.ui.TextEntry>
----@field deleteButton ISButton?
----@field duplicateButton ISButton?
 
 
 ---@alias omichat.AdminOption

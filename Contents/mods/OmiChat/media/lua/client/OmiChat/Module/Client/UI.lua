@@ -12,7 +12,7 @@ local textManager = getTextManager()
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
 
 local utils = API.utils
-local uiLib = utils.lib.ui
+local UI_LIB = utils.lib.ui
 local config = API.Configuration
 local MultiMap = utils.MultiMap
 
@@ -80,7 +80,7 @@ end
 function UI.createChildren(instance)
     local th = instance:titleBarHeight()
 
-    instance.infoButton = uiLib.button {
+    instance.infoButton = UI_LIB.button {
         parent = instance,
         x = instance.gearButton:getX() - th / 2 - th,
         w = th,
@@ -104,7 +104,7 @@ function UI.createChildren(instance)
 
     local inset, EdgeSize, fontHgt = instance.inset, 5, instance.fontHgt
     local height = EdgeSize * 2 + fontHgt
-    instance.textEntry = uiLib.textEntry {
+    instance.textEntry = UI_LIB.textEntry {
         parent = instance,
         uiName = ISChat.textEntryName,
         x = inset,
@@ -128,7 +128,7 @@ function UI.createChildren(instance)
         editable = false,
     }
 
-    UI.suggestBox = uiLib.suggestBox {
+    UI.suggestBox = UI_LIB.suggestBox {
         entry = instance.textEntry,
         openUpwards = true,
         populateAfterInsert = true,
@@ -484,8 +484,8 @@ function UI._addAdminOptions(context)
     local submenu = context:getNew(context)
     context:addSubMenu(adminOption, submenu)
 
-    local manageName = getText('UI_OmiChat_ContextAdminManageModData')
-    submenu:addOption(manageName, ISChat.instance, callback.openModDataManager)
+    local manageName = getText('UI_OmiChat_ContextAdminViewPlayerData')
+    submenu:addOption(manageName, ISChat.instance, callback.openPlayerDataManager)
 
     local optionsName = getText('UI_OmiChat_ContextAdminUpdateConfiguration')
     submenu:addOption(optionsName, ISChat.instance, callback.openConfiguration)

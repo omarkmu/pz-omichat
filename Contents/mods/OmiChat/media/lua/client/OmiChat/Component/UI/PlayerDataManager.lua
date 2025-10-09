@@ -1,6 +1,6 @@
----UI element for the admin mod data manager.
+---UI element for the player data manager admin utility.
 
-local Editor = require 'OmiChat/Component/UI/ModDataEditorPopup'
+local Editor = require 'OmiChat/Component/UI/PlayerDataEditor'
 local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
 local utils = API.utils
 local UI = utils.ui
@@ -8,7 +8,6 @@ local UI = utils.ui
 local max = math.max
 local min = math.min
 local isAdmin = isAdmin
-local ISPanelJoypad = ISPanelJoypad
 local textManager = getTextManager()
 
 local COLUMNS = {
@@ -22,36 +21,12 @@ local COLUMNS = {
 }
 
 
----@class omichat.ModDataManager : ISPanelJoypad, omi.ui.Destroyable
-local ModDataManager = ISPanelJoypad:derive('ModDataManager')
-utils.extend(ModDataManager, UI.mixin.Destroyable)
+---@class omichat.PlayerDataManager : omi.ui.Panel
+local PlayerDataManager = UI.Panel:derive('PlayerDataManager')
 
-
----Called when the delete button is clicked.
----Prompts for confirmation.
-function ModDataManager:confirmDeleteItem()
-    local item, idx = self:getSelectedItem()
-    if not item then
-        return
-    end
-
-    if self.activeDialog then
-        self.activeDialog:destroy()
-    end
-
-    self.activeDialog = UI.yesNoDialog {
-        text = getText('IGUI_DbViewer_DeleteConfirm'),
-        target = self,
-        onClick = self.onConfirmDelete,
-        onClickArgs = { item, idx },
-    }
-
-    self:removeOnDestroy(self.activeDialog)
-end
 
 ---Creates the children of the mod data manager.
-function ModDataManager:createChildren()
-    ISPanelJoypad.createChildren(self)
+function PlayerDataManager:createChildren()
     self.headerH = textManager:getFontHeight(self.headerFont)
 
     local titleH = textManager:getFontHeight(UIFont.Medium) + 10
@@ -61,72 +36,95 @@ function ModDataManager:createChildren()
     local btnH = max(25, textManager:getFontHeight(UIFont.Small) + 6)
     local btnY = self.height - btnH - padBottom
 
-    local closeX = self.width - btnW - padBtn * 2
-    local closeText = getText('IGUI_CraftUI_Close')
-    self.closeBtn = ISButton:new(closeX, btnY, btnW, btnH, closeText, self, self.destroy)
-    self.closeBtn.internal = 'CLOSE'
-    self.closeBtn:initialise()
-    self.closeBtn:instantiate()
-    self.closeBtn.borderColor = self.buttonBorderColor
-    self:addChild(self.closeBtn)
-
-    local refreshX = closeX - btnW - padBtn
-    local refreshText = getText('IGUI_DbViewer_Refresh')
-    self.refreshBtn = ISButton:new(refreshX, btnY, btnW, btnH, refreshText, self, self.refresh)
-    self.refreshBtn.internal = 'REFRESH'
-    self.refreshBtn:initialise()
-    self.refreshBtn:instantiate()
-    self.refreshBtn.borderColor = self.buttonBorderColor
-    self:addChild(self.refreshBtn)
-
-    local modifyText = getText('IGUI_DbViewer_Modify')
-    self.modifyBtn = ISButton:new(padBtn * 2, btnY, btnW, btnH, modifyText, self, self.onModifyClick)
-    self.modifyBtn.internal = 'MODIFY'
-    self.modifyBtn:initialise()
-    self.modifyBtn:instantiate()
-    self.modifyBtn.enable = false
-    self.modifyBtn.borderColor = self.buttonBorderColor
-    self:addChild(self.modifyBtn)
-
-    local addText = getText('UI_OmiChat_ProfileManager_AddButton')
-    self.addBtn = ISButton:new(self.modifyBtn:getRight() + padBtn, btnY, btnW, btnH, addText, self, self.onAddClick)
-    self.addBtn.internal = 'ADD'
-    self.addBtn:initialise()
-    self.addBtn:instantiate()
-    self.addBtn.borderColor = self.buttonBorderColor
-    self:addChild(self.addBtn)
-
-    local deleteText = getText('IGUI_DbViewer_Delete')
-    local deleteX = self.addBtn:getRight() + padBtn
-    self.deleteBtn = ISButton:new(deleteX, btnY, btnW, btnH, deleteText, self, self.confirmDeleteItem)
-    self.deleteBtn.internal = 'DELETE'
-    self.deleteBtn:initialise()
-    self.deleteBtn:instantiate()
-    self.deleteBtn.borderColor = self.buttonBorderColor
-    self.deleteBtn.enable = false
-    self:addChild(self.deleteBtn)
-
     local listboxY = self.headerH + titleH + 5
-    local listboxH = self.height - listboxY - btnH - padBottom * 2
-    self.listbox = ISScrollingListBox:new(10, listboxY, self.width - 20, listboxH)
-    self.listbox:initialise()
-    self.listbox:instantiate()
-    self.listbox.selected = 0
-    self.listbox.doDrawItem = utils.bind(self.drawItem, self)
-    self.listbox.drawBorder = true
-    self.listbox.joypadParent = self
-    self:addChild(self.listbox)
+    self.listbox = UI.listBox {
+        parent = self,
+        x = 10,
+        y = listboxY,
+        w = self.width - 20,
+        h = self.height - listboxY - btnH - padBottom * 2,
+        selected = 0,
+        target = self,
+        draw = self.drawItem,
+        drawBorder = true,
+        joypadParent = self,
+    }
+
+    self.modifyBtn = UI.button {
+        parent = self,
+        enable = false,
+        x = padBtn * 2,
+        y = btnY,
+        w = btnW,
+        h = btnH,
+        internal = 'MODIFY',
+        text = getText('IGUI_DbViewer_Modify'),
+        target = self,
+        onClick = self.onModifyClick,
+        borderColor = self.buttonBorderColor,
+    }
+
+    self.addBtn = UI.button {
+        parent = self,
+        x = self.modifyBtn:getRight() + padBtn,
+        y = btnY,
+        w = btnW,
+        h = btnH,
+        internal = 'ADD',
+        text = getText('UI_OmiChat_ProfileManager_AddButton'),
+        target = self,
+        onClick = self.onAddClick,
+        borderColor = self.buttonBorderColor,
+    }
+
+    self.deleteBtn = UI.button {
+        parent = self,
+        enable = false,
+        x = self.addBtn:getRight() + padBtn,
+        y = btnY,
+        w = btnW,
+        h = btnH,
+        internal = 'DELETE',
+        text = getText('IGUI_DbViewer_Delete'),
+        target = self,
+        onClick = self.onDeleteClick,
+        borderColor = self.buttonBorderColor,
+    }
+
+    self.closeBtn = UI.button {
+        parent = self,
+        x = self.width - btnW - padBtn * 2,
+        y = btnY,
+        w = btnW,
+        h = btnH,
+        text = getText('IGUI_CraftUI_Close'),
+        target = self,
+        onClick = self.destroy,
+        borderColor = self.buttonBorderColor,
+    }
+
+    self.refreshBtn = UI.button {
+        parent = self,
+        x = self.closeBtn:getX() - btnW - padBtn,
+        y = btnY,
+        w = btnW,
+        h = btnH,
+        text = getText('IGUI_DbViewer_Refresh'),
+        target = self,
+        onClick = self.refresh,
+        borderColor = self.buttonBorderColor,
+    }
 
     self:refresh()
 end
 
 ---Renders an item in the data list.
----@param listbox ISScrollingListBox
+---@param listbox omi.ui.ListBox
 ---@param y number
 ---@param item table
 ---@param alt boolean
 ---@return number
-function ModDataManager:drawItem(listbox, y, item, alt)
+function PlayerDataManager:drawItem(y, item, alt, listbox)
     local borderColor = listbox.borderColor
     local width = listbox:getWidth()
 
@@ -182,19 +180,18 @@ end
 ---Returns the currently selected item, or `nil`.
 ---@return omichat.PlayerModData? item
 ---@return integer? index
-function ModDataManager:getSelectedItem()
+function PlayerDataManager:getSelectedItem()
     local listbox = self.listbox
-    local idx = listbox.selected
-    local item = listbox.items[idx]
+    local item = listbox:getSelectedItem()
     if not item then
         return
     end
 
-    return item.item.data, idx
+    return item.data, listbox.selected
 end
 
 ---Called when the add button is clicked.
-function ModDataManager:onAddClick()
+function PlayerDataManager:onAddClick()
     self:openEditPanel({ username = '' }, true)
 end
 
@@ -203,7 +200,7 @@ end
 ---@param button omi.ui.Args.Dialog.Click
 ---@param item omichat.PlayerModData
 ---@param idx integer
-function ModDataManager:onConfirmDelete(button, item, idx)
+function PlayerDataManager:onConfirmDelete(button, item, idx)
     if button.internal ~= 'YES' then
         return
     end
@@ -219,15 +216,37 @@ function ModDataManager:onConfirmDelete(button, item, idx)
     self:refresh()
 end
 
+---Called when the delete button is clicked.
+---Prompts for confirmation.
+function PlayerDataManager:onDeleteClick()
+    local item, idx = self:getSelectedItem()
+    if not item then
+        return
+    end
+
+    if self.activeDialog then
+        self.activeDialog:destroy()
+    end
+
+    self.activeDialog = UI.yesNoDialog {
+        text = getText('IGUI_DbViewer_DeleteConfirm'),
+        target = self,
+        onClick = self.onConfirmDelete,
+        onClickArgs = { item, idx },
+    }
+
+    self:removeOnDestroy(self.activeDialog)
+end
+
 ---Called when the modify button is clicked.
-function ModDataManager:onModifyClick()
+function PlayerDataManager:onModifyClick()
     local item = self:getSelectedItem()
     self:openEditPanel(item)
 end
 
 ---Called when a new mod data list is returned from the server.
 ---@param list omichat.PlayerModData[]
-function ModDataManager:onUpdateList(list)
+function PlayerDataManager:onUpdateList(list)
     if #self.elements == 0 and #list > 0 then
         self:setVisible(true)
     end
@@ -243,7 +262,7 @@ function ModDataManager:onUpdateList(list)
     self.listbox:clear()
 
     local sizes = utils.copy(self.columnSizes)
-    local emptyText = getText('UI_OmiChat_ModDataManager_NoData')
+    local emptyText = getText('UI_OmiChat_PlayerDataManager_NoData')
     for i = 1, #list do
         local el = list[i]
         local display = {}
@@ -285,7 +304,7 @@ end
 ---Opens the edit panel with the given item.
 ---@param item omichat.PlayerModData? The item to edit.
 ---@param isAdd boolean? Whether this should be treated as an add rather than an edit.
-function ModDataManager:openEditPanel(item, isAdd)
+function PlayerDataManager:openEditPanel(item, isAdd)
     if not item then
         return
     end
@@ -311,7 +330,7 @@ function ModDataManager:openEditPanel(item, isAdd)
 end
 
 ---Requests a refresh of the list of mod data.
-function ModDataManager:refresh()
+function PlayerDataManager:refresh()
     -- hide the menu before the initial refresh
     if #self.elements == 0 then
         self:setVisible(false)
@@ -322,10 +341,10 @@ function ModDataManager:refresh()
 end
 
 ---Renders the table for the listbox items.
-function ModDataManager:render()
-    ISPanelJoypad.render(self)
+function PlayerDataManager:render()
+    UI.Panel.render(self)
 
-    self:drawText(self.titleText, self.width / 2 - self.titleW / 2, 10, 1, 1, 1, 1, UIFont.Medium)
+    self:drawText(self.titleText, (self.width - self.titleW) * 0.5, 10, 1, 1, 1, 1, UIFont.Medium)
     local listbox = self.listbox
     local borderC = self.borderColor
     local headerC = self.listHeaderColor
@@ -348,7 +367,7 @@ function ModDataManager:render()
 end
 
 ---Checks for button enable state.
-function ModDataManager:update()
+function PlayerDataManager:update()
     if not isAdmin() then
         self:destroy()
         return
@@ -363,17 +382,12 @@ end
 
 
 ---Creates a new panel for managing mod data.
----@param args omichat.Args.ModDataManager
----@return omichat.ModDataManager
-function ModDataManager:new(args)
-    local x = args.x or 0
-    local y = args.y or 0
-    local width = args.w or 0
-    local height = args.h or 0
-    local this = ISPanelJoypad.new(self, x, y, width, height)
+---@param args omichat.Args.PlayerDataManager
+---@return omichat.PlayerDataManager
+function PlayerDataManager:new(args)
+    local this = UI.Panel.new(self, args) --[[@as omichat.PlayerDataManager]]
 
-    ---@cast this omichat.ModDataManager
-    this.titleText = getText('UI_OmiChat_ModDataManager_Title')
+    this.titleText = getText('UI_OmiChat_PlayerDataManager_Title')
     this.anchorLeft = true
     this.anchorRight = false
     this.anchorTop = true
@@ -394,7 +408,7 @@ function ModDataManager:new(args)
 
     for i = 1, #COLUMNS do
         local colName = COLUMNS[i]
-        local colDisplay = getText('UI_OmiChat_ModDataManager_Column_' .. colName)
+        local colDisplay = getText('UI_OmiChat_PlayerDataManager_Column_' .. colName)
 
         this.columnDisplay[colName] = colDisplay
         this.columnSizes[colName] = textManager:MeasureStringX(this.headerFont, colDisplay) + 20
@@ -404,5 +418,5 @@ function ModDataManager:new(args)
 end
 
 
-API.ModDataManager = ModDataManager
-return ModDataManager
+API.PlayerDataManager = PlayerDataManager
+return PlayerDataManager

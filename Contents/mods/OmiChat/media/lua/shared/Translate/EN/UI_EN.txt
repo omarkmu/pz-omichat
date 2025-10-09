@@ -196,17 +196,17 @@ UI_EN = {
     UI_OmiChat_ProfileManager_Tooltip_Color_name = "Enter a color in RGB or hex format to set the color of your name in chat.",
     UI_OmiChat_ProfileManager_Tooltip_Color_speech = "Enter a color in RGB or hex format to set the color of your overhead speech bubbles.",
 
-    --[[ Mod Data Manager ]]--
-    UI_OmiChat_ModDataManager_Title = "OmiChat Player Data",
-    UI_OmiChat_ModDataManager_EditorTitle = "Edit Player Data",
-    UI_OmiChat_ModDataManager_NoData = "(empty)",
-    UI_OmiChat_ModDataManager_Column_username = "Username",
-    UI_OmiChat_ModDataManager_Column_nickname = "Chat Nickname",
-    UI_OmiChat_ModDataManager_Column_status = "Status",
-    UI_OmiChat_ModDataManager_Column_icon = "Icon",
-    UI_OmiChat_ModDataManager_Column_currentLanguage = "Current Language",
-    UI_OmiChat_ModDataManager_Column_languages = "Languages",
-    UI_OmiChat_ModDataManager_Column_languageSlots = "Language Slots",
+    --[[ Player Data Manager ]]--
+    UI_OmiChat_PlayerDataManager_Title = "OmiChat Player Data",
+    UI_OmiChat_PlayerDataManager_EditorTitle = "Edit Player Data",
+    UI_OmiChat_PlayerDataManager_NoData = "(empty)",
+    UI_OmiChat_PlayerDataManager_Column_username = "Username",
+    UI_OmiChat_PlayerDataManager_Column_nickname = "Chat Nickname",
+    UI_OmiChat_PlayerDataManager_Column_status = "Status",
+    UI_OmiChat_PlayerDataManager_Column_icon = "Icon",
+    UI_OmiChat_PlayerDataManager_Column_currentLanguage = "Current Language",
+    UI_OmiChat_PlayerDataManager_Column_languages = "Languages",
+    UI_OmiChat_PlayerDataManager_Column_languageSlots = "Language Slots",
 
     --[[ Configuration Presets ]]--
     UI_OmiChat_PresetUserDefined = "User-defined preset",
@@ -254,7 +254,7 @@ UI_EN = {
     UI_OmiChat_ContextProfileDefault = "Default",
     UI_OmiChat_ContextManageProfiles = "Manage profiles",
     UI_OmiChat_ContextAdmin = "Admin options",
-    UI_OmiChat_ContextAdminManageModData = "View player data",
+    UI_OmiChat_ContextAdminViewPlayerData = "View player data",
     UI_OmiChat_ContextAdminUpdateConfiguration = "Open settings",
     UI_OmiChat_ContextAdmin_ShowIcon = "Display chat icon",
     UI_OmiChat_ContextAdmin_KnowAllLanguages = "Understand all languages",

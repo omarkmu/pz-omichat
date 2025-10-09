@@ -1,19 +1,11 @@
----UI element for the mod data editor.
+---UI element for the player data editor admin utility.
 
 local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
 
 local utils = API.utils
 local config = API.Configuration
 local UI = utils.ui
-
-local ISPanelJoypad = ISPanelJoypad
 local textManager = getTextManager()
-
-
----@class omichat.ModDataEditor : ISPanelJoypad, omi.ui.Destroyable
-local ModDataEditor = ISPanelJoypad:derive('ModDataEditor')
-utils.extend(ModDataEditor, UI.mixin.Destroyable)
-
 
 local PAD_Y = 10
 local FIELD_X = 20
@@ -23,9 +15,13 @@ local BTN_H = math.max(25, textManager:getFontHeight(UIFont.Small) + 6)
 local LABEL_H = FONT_H_MEDIUM + 4
 
 
+---@class omichat.PlayerDataEditor : omi.ui.Panel
+local PlayerDataEditor = UI.Panel:derive('PlayerDataEditor')
+
+
 ---Checks all fields for validity.
 ---@return boolean
-function ModDataEditor:canSubmit()
+function PlayerDataEditor:canSubmit()
     local fields = {
         self.usernameEntry,
         self.nicknameEntry,
@@ -45,11 +41,11 @@ function ModDataEditor:canSubmit()
 end
 
 ---Adds the children of the mod data editor.
-function ModDataEditor:createChildren()
+function PlayerDataEditor:createChildren()
     local btnW = 100
 
     local titleH = FONT_H_MEDIUM
-    local titleText = getText('UI_OmiChat_ModDataManager_EditorTitle')
+    local titleText = getText('UI_OmiChat_PlayerDataManager_EditorTitle')
     local titleWidth = textManager:MeasureStringX(UIFont.Medium, titleText)
 
     UI.label {
@@ -67,7 +63,7 @@ function ModDataEditor:createChildren()
     -- fields
     local y
     local item = self.item
-    local text = getText('UI_OmiChat_ModDataManager_Column_username')
+    local text = getText('UI_OmiChat_PlayerDataManager_Column_username')
     y, self.usernameEntry = self:_createField('text', titleH + 20, text, item.username)
 
     if self.isAdd then
@@ -76,27 +72,27 @@ function ModDataEditor:createChildren()
         self.usernameEntry:setEditable(false)
     end
 
-    text = getText('UI_OmiChat_ModDataManager_Column_nickname')
+    text = getText('UI_OmiChat_PlayerDataManager_Column_nickname')
     y, self.nicknameEntry = self:_createField('text', y + PAD_Y, text, item.nickname)
     self.nicknameEntry:setValidateFunction(self.nicknameEntry, API.format.validateName)
 
-    text = getText('UI_OmiChat_ModDataManager_Column_status')
+    text = getText('UI_OmiChat_PlayerDataManager_Column_status')
     y, self.statusEntry = self:_createField('text', y + PAD_Y, text, item.status)
     self.statusEntry:setValidateFunction(self.statusEntry, API.format.validateStatus)
 
-    text = getText('UI_OmiChat_ModDataManager_Column_icon')
+    text = getText('UI_OmiChat_PlayerDataManager_Column_icon')
     y, self.iconEntry = self:_createField('text', y + PAD_Y, text, item.icon)
-    self.iconEntry:setValidateFunction(self, self.validateIconText, self.iconEntry)
+    self.iconEntry:setValidateFunction(self, self._validateIconText, self.iconEntry)
 
-    text = getText('UI_OmiChat_ModDataManager_Column_currentLanguage')
+    text = getText('UI_OmiChat_PlayerDataManager_Column_currentLanguage')
     y, self.currentLangEntry = self:_createField('text', y + PAD_Y, text, item.currentLanguage)
-    self.currentLangEntry:setValidateFunction(self, self.validateLanguageText, self.currentLangEntry, true)
+    self.currentLangEntry:setValidateFunction(self, self._validateLanguageText, self.currentLangEntry, true)
 
-    text = getText('UI_OmiChat_ModDataManager_Column_languageSlots')
+    text = getText('UI_OmiChat_PlayerDataManager_Column_languageSlots')
     y, self.languageSlotsEntry = self:_createField('number', y + PAD_Y, text, item.languageSlots, 0,
         config.MAX_LANGUAGE_SLOTS)
 
-    y = self:_createLabel(y + PAD_Y, getText('UI_OmiChat_ModDataManager_Column_languages'))
+    y = self:_createLabel(y + PAD_Y, getText('UI_OmiChat_PlayerDataManager_Column_languages'))
 
     self.languageListEntry = UI.listEntry {
         parent = self,
@@ -114,7 +110,7 @@ function ModDataEditor:createChildren()
             validate = self.isLanguageValid,
         },
         target = self,
-        onChange = self.onUpdateLanguageList,
+        onChange = self._onUpdateLanguageList,
     }
 
     self.languageSuggestBox = UI.suggestBox {
@@ -123,7 +119,7 @@ function ModDataEditor:createChildren()
         openUpwards = true,
         refocusOverScrollbar = true,
         target = self,
-        populate = self.populateLanguageSuggest,
+        populate = self._populateLanguageSuggest,
     }
 
     self.iconSuggestBox = UI.suggestBox {
@@ -131,7 +127,7 @@ function ModDataEditor:createChildren()
         suggestOnEnter = true,
         refocusOverScrollbar = true,
         target = self,
-        populate = self.populateIconSuggest,
+        populate = self._populateIconSuggest,
     }
 
     self:removeOnDestroy(self.languageSuggestBox)
@@ -168,27 +164,10 @@ function ModDataEditor:createChildren()
     }
 end
 
----Filter function for languages in the language list entry.
-function ModDataEditor:filterLanguages(text)
-    return not self:hasLanguage(text)
-end
-
----Gets the computed value of an entry.
----@param entry omi.ui.TextEntry
----@return string?
-function ModDataEditor:getEntryValue(entry)
-    local value = utils.trim(entry:getInternalText())
-    if #value == 0 then
-        return
-    end
-
-    return value
-end
-
 ---Checks whether the input language list contains the given language.
 ---@param language string
 ---@return boolean
-function ModDataEditor:hasLanguage(language)
+function PlayerDataEditor:hasLanguage(language)
     local langs = self.item.languages
     if not langs then
         return false
@@ -200,7 +179,7 @@ end
 ---Checks whether the given language is a valid entry for the language list.
 ---@param language string
 ---@return boolean valid
-function ModDataEditor:isLanguageValid(language)
+function PlayerDataEditor:isLanguageValid(language)
     language = utils.trim(language)
     if #language == 0 then
         return true
@@ -213,32 +192,26 @@ function ModDataEditor:isLanguageValid(language)
         return false
     end
 
-    return self:validateLanguageText(language, entry, false)
-end
-
----Called when the language list entry is updated.
----@param entry omi.ui.ListEntry
-function ModDataEditor:onUpdateLanguageList(entry)
-    self.item.languages = entry:getValue()
+    return self:_validateLanguageText(language, entry, false)
 end
 
 ---Called when the save button is clicked.
-function ModDataEditor:onSave()
+function PlayerDataEditor:onSave()
     if not self:canSubmit() then
         self:destroy()
         return
     end
 
     local item = self.saveItem
-    local icon = self:getEntryValue(self.iconEntry)
-    local slots = self:getEntryValue(self.languageSlotsEntry)
+    local icon = self:_getEntryValue(self.iconEntry)
+    local slots = self:_getEntryValue(self.languageSlotsEntry)
     if icon and not getTexture(icon) then
         icon = utils.getTextureNameFromIcon(icon)
     end
 
     local username
     if self.isAdd then
-        username = self:getEntryValue(self.usernameEntry)
+        username = self:_getEntryValue(self.usernameEntry)
         if not username then
             return
         end
@@ -249,99 +222,30 @@ function ModDataEditor:onSave()
     end
 
     item.icon = icon
-    item.currentLanguage = self:getEntryValue(self.currentLangEntry)
+    item.currentLanguage = self:_getEntryValue(self.currentLangEntry)
     item.languageSlots = slots and tonumber(slots)
-    item.nickname = self:getEntryValue(self.nicknameEntry)
-    item.status = self:getEntryValue(self.statusEntry)
+    item.nickname = self:_getEntryValue(self.nicknameEntry)
+    item.status = self:_getEntryValue(self.statusEntry)
     item.languages = self.languageListEntry:getValue()
 
     API.request.setPlayerData(username, item)
 
-    if self.onsave then
-        self.onsave(self.target)
-    end
+    utils.callback.invoke(self.callbacks.onSave)
 
     self:destroy()
 end
 
----Populates suggestions for the icon auto-suggest box.
----@param suggestBox omi.ui.SuggestBox
----@param text string
-function ModDataEditor:populateIconSuggest(suggestBox, text)
-    local search = API.search.icons {
-        search = text,
-        terminateOnExact = true,
-        maxResults = 50,
-    }
-
-    API.search.populateSuggestions(suggestBox, search)
-end
-
----Populates suggestions for the language auto-suggest box.
----@param suggestBox omi.ui.SuggestBox
----@param text string
-function ModDataEditor:populateLanguageSuggest(suggestBox, text)
-    local search = API.search.languages {
-        search = text,
-        terminateOnExact = true,
-        maxResults = 50,
-        filter = self.languageFilter,
-    }
-
-    API.search.populateSuggestions(suggestBox, search)
+---Sets a callback to be called when the save button is pressed.
+---@param target unknown?
+---@param callback function?
+---@param ... unknown
+function PlayerDataEditor:setOnSave(target, callback, ...)
+    self.callbacks.onSave = utils.callback(target, callback, ...)
 end
 
 ---Updates the validation state of the save button.
-function ModDataEditor:update()
+function PlayerDataEditor:update()
     self.saveBtn:setEnable(self:canSubmit())
-end
-
----Text entry validator for icons.
----@param text string
----@param entry omi.ui.TextEntry
----@return boolean
-function ModDataEditor:validateIconText(text, entry)
-    if #text == 0 then
-        return true
-    end
-
-    local texture = getTexture(text)
-    if texture then
-        return true
-    end
-
-    local iconTexture = utils.getTextureNameFromIcon(text)
-    if iconTexture then
-        return true
-    end
-
-    entry:setValidateTooltipText(getText('UI_OmiChat_Info_IconUnknown', text))
-    return false
-end
-
----Text entry validator for roleplay language names.
----@param text string
----@param entry omi.ui.TextEntry
----@param expectKnown boolean?
----@return boolean
-function ModDataEditor:validateLanguageText(text, entry, expectKnown)
-    if #text == 0 then
-        return true
-    end
-
-    if not API.language.exists(text) then
-        entry:setValidateTooltipText(getText('UI_OmiChat_Error_AddLanguageNotConfigured', text))
-        return false
-    end
-
-    if expectKnown ~= nil and self:hasLanguage(text) ~= expectKnown then
-        local username = self.usernameEntry:getInternalText()
-        local err = expectKnown and 'UI_OmiChat_Error_LanguageUnknown' or 'UI_OmiChat_Error_AddLanguageKnown'
-        entry:setValidateTooltipText(getText(err, username, text))
-        return false
-    end
-
-    return true
 end
 
 
@@ -354,8 +258,8 @@ end
 ---@param max number?
 ---@return number
 ---@return unknown
----@protected
-function ModDataEditor:_createField(type, y, labelText, default, min, max)
+---@private
+function PlayerDataEditor:_createField(type, y, labelText, default, min, max)
     local controlW = self.width - FIELD_X * 2
     y = self:_createLabel(y, labelText)
 
@@ -380,9 +284,9 @@ end
 ---@param y number
 ---@param labelText string
 ---@return number
----@return ISLabel
----@protected
-function ModDataEditor:_createLabel(y, labelText)
+---@return omi.ui.Label
+---@private
+function PlayerDataEditor:_createLabel(y, labelText)
     local label = UI.label {
         parent = self,
         x = FIELD_X,
@@ -392,36 +296,135 @@ function ModDataEditor:_createLabel(y, labelText)
         font = FIELD_FONT,
     }
 
-    return label.y + label.height, label
+    return label:getBottom(), label
+end
+
+---Filter function for languages in the language list entry.
+---@private
+function PlayerDataEditor:_filterLanguages(text)
+    return not self:hasLanguage(text)
+end
+
+---Gets the computed value of an entry.
+---@param entry omi.ui.TextEntry
+---@return string?
+---@private
+function PlayerDataEditor:_getEntryValue(entry)
+    local value = utils.trim(entry:getInternalText())
+    if #value == 0 then
+        return
+    end
+
+    return value
+end
+
+---Called when the language list entry is updated.
+---@param entry omi.ui.ListEntry
+---@private
+function PlayerDataEditor:_onUpdateLanguageList(entry)
+    self.item.languages = entry:getValue()
+end
+
+---Populates suggestions for the icon auto-suggest box.
+---@param suggestBox omi.ui.SuggestBox
+---@param text string
+---@private
+function PlayerDataEditor:_populateIconSuggest(suggestBox, text)
+    local search = API.search.icons {
+        search = text,
+        terminateOnExact = true,
+        maxResults = 50,
+    }
+
+    API.search.populateSuggestions(suggestBox, search)
+end
+
+---Populates suggestions for the language auto-suggest box.
+---@param suggestBox omi.ui.SuggestBox
+---@param text string
+---@private
+function PlayerDataEditor:_populateLanguageSuggest(suggestBox, text)
+    local search = API.search.languages {
+        search = text,
+        terminateOnExact = true,
+        maxResults = 50,
+        filter = self.languageFilter,
+    }
+
+    API.search.populateSuggestions(suggestBox, search)
+end
+
+---Text entry validator for icons.
+---@param text string
+---@param entry omi.ui.TextEntry
+---@return boolean
+---@private
+function PlayerDataEditor:_validateIconText(text, entry)
+    if #text == 0 then
+        return true
+    end
+
+    local texture = getTexture(text)
+    if texture then
+        return true
+    end
+
+    local iconTexture = utils.getTextureNameFromIcon(text)
+    if iconTexture then
+        return true
+    end
+
+    entry:setValidateTooltipText(getText('UI_OmiChat_Info_IconUnknown', text))
+    return false
+end
+
+---Text entry validator for roleplay language names.
+---@param text string
+---@param entry omi.ui.TextEntry
+---@param expectKnown boolean?
+---@return boolean
+---@private
+function PlayerDataEditor:_validateLanguageText(text, entry, expectKnown)
+    if #text == 0 then
+        return true
+    end
+
+    if not API.language.exists(text) then
+        entry:setValidateTooltipText(getText('UI_OmiChat_Error_AddLanguageNotConfigured', text))
+        return false
+    end
+
+    if expectKnown ~= nil and self:hasLanguage(text) ~= expectKnown then
+        local username = self.usernameEntry:getInternalText()
+        local err = expectKnown and 'UI_OmiChat_Error_LanguageUnknown' or 'UI_OmiChat_Error_AddLanguageKnown'
+        entry:setValidateTooltipText(getText(err, username, text))
+        return false
+    end
+
+    return true
 end
 
 
 ---Creates a new mod data editor popup.
----@param args omichat.Args.ModDataEditor
----@return omichat.ModDataEditor
-function ModDataEditor:new(args)
-    local x = args.x or 0
-    local y = args.y or 0
-    local width = args.w or 0
-    local height = args.h or 0
-    local this = ISPanelJoypad.new(self, x, y, width, height)
+---@param args omichat.Args.PlayerDataEditor
+---@return omichat.PlayerDataEditor
+function PlayerDataEditor:new(args)
+    local this = UI.Panel.new(self, args) --[[@as omichat.PlayerDataEditor]]
 
     local itemCopy = utils.copy(args.item)
     itemCopy.languages = itemCopy.languages and utils.copy(itemCopy.languages) or nil
 
-    ---@cast this omichat.ModDataEditor
     this.saveItem = args.item
     this.item = itemCopy
     this.moveWithMouse = true
-    this.target = args.target
     this.buttonBorderColor = { r = 0.7, g = 0.7, b = 0.7, a = 0.5 }
-    this.onsave = args.onSave
-    this.languageFilter = utils.bind(this.filterLanguages, this)
+    this.languageFilter = utils.bind(this._filterLanguages, this)
     this.isAdd = args.isAdd or false
     this.backgroundColor.a = 0.9
 
+    this:setOnSave(args.onSaveTarget or args.target, args.onSave, unpack(args.onSaveArgs or {}))
     return this
 end
 
 
-return ModDataEditor
+return PlayerDataEditor

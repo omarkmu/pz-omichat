@@ -93,7 +93,7 @@ end
 
 ---Callback for confirming adding a roleplay language.
 ---@param target omichat.ISChat
----@param button ISButton
+---@param button omi.ui.Button
 ---@param language string
 function Callback.onConfirmAddLanguage(target, button, language)
     if button.internal ~= 'YES' then
@@ -252,19 +252,19 @@ function Callback.openLanguageConfirmation(target, language)
     }
 end
 
----Callback for clicking the manage mod data admin context option.
+---Callback for clicking the view player data admin context option.
 ---@param target omichat.ISChat
-function Callback.openModDataManager(target)
-    if target.activeModDataPanel then
-        target.activeModDataPanel:destroy()
+function Callback.openPlayerDataManager(target)
+    if target.activePlayerDataPanel then
+        target.activePlayerDataPanel:destroy()
     end
 
     local x, y = UI.getScreenCenter(1200, 650)
-    local panel = API.ModDataManager:new({ x = x, y = y, w = 1200, h = 650 })
+    local panel = API.PlayerDataManager:new({ x = x, y = y, w = 1200, h = 650 })
     panel:initialise()
     panel:addToUIManager()
 
-    target.activeModDataPanel = panel
+    target.activePlayerDataPanel = panel
 end
 
 ---Callback for clicking the manage profiles context option.
@@ -275,7 +275,14 @@ function Callback.openProfileManager(target)
     end
 
     local x, y = UI.getScreenCenter(800, 600)
-    local panel = API.ProfileManager:new(x, y, 800, 600, API.preferences.getProfiles())
+    local panel = API.ProfileManager:new({
+        x = x,
+        y = y,
+        w = 800,
+        h = 600,
+        profiles = API.preferences.getProfiles(),
+    })
+
     panel:initialise()
     panel:addToUIManager()
     target.activeProfilesPanel = panel

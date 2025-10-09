@@ -166,7 +166,7 @@ Request.TOPIC.DATA_LIST = dispatch:topic('DATA_LIST', {
     ---@param args omichat.request.ModDataListResponse
     onClientReceive = function(_, args)
         local instance = ISChat.instance --[[@as omichat.ISChat]]
-        local panel = instance and instance.activeModDataPanel
+        local panel = instance and instance.activePlayerDataPanel
         if not panel then
             return
         end
