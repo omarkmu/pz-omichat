@@ -356,7 +356,7 @@ function ISChat:onCommandEntered()
     if callbackStream and useCallback then
         useCallback {
             text = command,
-            stream = callbackStream,
+            stream = callbackStream --[[@as omichat.ChatStream]],
             playSignedEmote = not playedEmote,
         }
     end

@@ -14,10 +14,6 @@ local getTexture = getTexture
 local instanceof = instanceof
 local getZomboidRadio = getZomboidRadio
 
-local INVISIBLE_PATTERN = '['
-    .. string.char(128) .. '-' .. string.char(159) .. ']?'
-    .. string.char(65535) .. '?'
-
 
 ---@class omichat.MessageInfo : omi.Class
 local MessageInfo = utils.lib.class()
@@ -978,9 +974,7 @@ end
 ---Avoids empty messages by checking for invisible character-only messages.
 ---@protected
 function MessageInfo:_avoidEmptyMessages()
-    local text = self.content or self.rawText
-
-    text = utils.trim(text:gsub(INVISIBLE_PATTERN, ''))
+    local text = utils.trim(utils.removeInvisible(self.content or self.rawText))
     if #text == 0 then
         self:hide()
     end

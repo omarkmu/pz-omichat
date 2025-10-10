@@ -150,9 +150,12 @@ function Chat.send(args)
         return
     end
 
-    ---@cast stream omichat.ChatStream
+    local text = args.text or ''
+    if not args.allowInvisible then
+        text = utils.removeInvisible(text)
+    end
 
-    local text = utils.trim(args.text or '')
+    text = utils.trim(text)
 
     local prefix = ''
     local chatType = stream:getChatType()

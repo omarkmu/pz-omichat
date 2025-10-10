@@ -64,7 +64,7 @@
 ---@field lastUpdate integer
 
 ---@class omichat.Args.Send : omichat.Args.Send.Partial
----@field stream omichat.Stream
+---@field stream omichat.ChatStream
 
 ---@class omichat.Args.Send.Partial
 ---@field text string
@@ -74,6 +74,7 @@
 ---@field formatter omichat.MetaFormatter?
 ---@field tokens table?
 ---@field extraTags string[]?
+---@field allowInvisible boolean?
 
 ---@class omichat.ISChat : ISChat
 ---@field instance omichat.ISChat? The ISChat instance.

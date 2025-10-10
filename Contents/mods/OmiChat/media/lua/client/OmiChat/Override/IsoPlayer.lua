@@ -64,7 +64,7 @@ function _IsoPlayer:Callout(playEmote)
     end
 
     API.chat.send {
-        stream = stream,
+        stream = stream --[[@as omichat.ChatStream]],
         text = shout,
         formatter = API.format.get(formatterName),
         playSignedEmote = not playEmote,

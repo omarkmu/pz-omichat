@@ -259,6 +259,7 @@ Request.TOPIC.DRAW_CARD = dispatch:topic('DRAW_CARD', {
         local encoded = COMMAND_ARGS_START .. result
 
         API_C.chat.send {
+            allowInvisible = true,
             stream = targetStream,
             formatStream = commandStream,
             text = encoded .. content,
@@ -315,6 +316,7 @@ Request.TOPIC.FLIP_COIN = dispatch:topic('FLIP_COIN', {
         local encoded = COMMAND_ARGS_START .. result
 
         API_C.chat.send {
+            allowInvisible = true,
             stream = targetStream,
             formatStream = commandStream,
             text = encoded .. content,
@@ -474,6 +476,7 @@ Request.TOPIC.ROLL_DICE = dispatch:topic('ROLL_DICE', {
         local encoded = COMMAND_ARGS_START .. result
 
         API_C.chat.send {
+            allowInvisible = true,
             stream = targetStream,
             formatStream = commandStream,
             text = encoded .. content,

@@ -48,6 +48,10 @@ local cards = {
     'King',
 }
 
+local INVISIBLE_PATTERN = '['
+    .. string.char(128) .. '-' .. string.char(159) .. ']?'
+    .. string.char(65535) .. '?'
+
 
 ---Checks whether a player has permission to execute a command for the given target username.
 ---@param player IsoPlayer
@@ -601,6 +605,13 @@ function utils.parseCommandArgs(text)
     end
 
     return args, inQuote
+end
+
+---Removes invisible signal characters from text.
+---@param text string
+---@return string
+function utils.removeInvisible(text)
+    return (text:gsub(INVISIBLE_PATTERN, ''))
 end
 
 ---Matches on text wrapped in invisible characters.
