@@ -5,6 +5,7 @@ local vanillaCommands = require 'OmiChat/Definition/VanillaCommandList'
 
 local utils = API.utils
 local getTexture = getTexture
+local ISChat = ISChat
 
 
 ---@class omichat.api.client.search
@@ -221,9 +222,9 @@ function Search.streams(argsOrSearch)
                 end
             end
         else
-            ---@cast stream omichat.VanillaCommand
-            ctx.caseSensitive = false
-            Search._internal(ctx, '/' .. stream.name .. ' ', stream)
+            ---@cast stream omichat.VanillaCommand | omichat.StreamTable
+            ctx.caseSensitive = stream.tabID == nil
+            Search._internal(ctx, stream.command or ('/' .. stream.name .. ' '), stream)
         end
 
         if ctx.isTerminated then
@@ -346,7 +347,7 @@ end
 
 ---Builds a list of streams to search.
 ---@param options omichat.StreamSearchOptions
----@return (omichat.Stream | omichat.VanillaCommand)[]
+---@return (omichat.Stream | omichat.VanillaCommand | omichat.StreamTable)[]
 ---@private
 function Search._buildStreamList(options)
     local list = {}
@@ -365,6 +366,15 @@ function Search._buildStreamList(options)
     if options.includeVanillaCommandStreams then
         for i = 1, #vanillaCommands do
             list[#list + 1] = vanillaCommands[i]
+        end
+    end
+
+    if options.includeUnmanagedChatStreams then
+        for i = 1, #ISChat.allChatStreams do
+            local stream = ISChat.allChatStreams[i]
+            if not utils.isinstance(stream, API.Stream) then
+                list[#list + 1] = stream
+            end
         end
     end
 

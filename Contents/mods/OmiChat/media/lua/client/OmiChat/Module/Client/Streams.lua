@@ -5,11 +5,22 @@ local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
 local utils = API.utils
 local config = API.Configuration
 local MetaFormatter = API.MetaFormatter
+local ISChat = ISChat
 
 
 ---@class omichat.api.client.streams
 local Streams = {}
 Streams._tagToChatStreams = {}
+
+local DEFAULT_STREAMS = {
+    say = true,
+    yell = true,
+    whisper = true,
+    faction = true,
+    safehouse = true,
+    general = true,
+    admin = true,
+}
 
 
 ---Determines stream information given a chat command.
@@ -481,6 +492,15 @@ function Streams._updateChatStreams()
         stream:setFormatter(formatter)
     end
 
+    -- keep unknown streams for compatibility with other mods that add commands
+    local unmanagedStreams = {} ---@type omichat.StreamTable[]
+    for i = 1, #ISChat.allChatStreams do
+        local stream = ISChat.allChatStreams[i]
+        if not seen[stream.name] and not DEFAULT_STREAMS[stream.name] and not utils.isinstance(stream, API.Stream) then
+            unmanagedStreams[#unmanagedStreams + 1] = stream
+        end
+    end
+
     -- clear chat tables
     table.wipe(ISChat.allChatStreams)
     table.wipe(ISChat.defaultTabStream)
@@ -504,6 +524,17 @@ function Streams._updateChatStreams()
         local tab = tabs[tabID]
         if tab then
             tab.chatStreams[#tab.chatStreams + 1] = stream
+        end
+    end
+
+    -- add back unmanaged streams
+    for i = 1, #unmanagedStreams do
+        local stream = unmanagedStreams[i]
+        ISChat.allChatStreams[#ISChat.allChatStreams + 1] = stream
+
+        if stream.tabID and tabs[stream.tabID] then
+            local tabStreams = tabs[stream.tabID].chatStreams
+            tabStreams[#tabStreams + 1] = unmanagedStreams
         end
     end
 

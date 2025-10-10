@@ -393,6 +393,7 @@
 ---@class omichat.StreamSearchOptions
 ---@field excludeChatStreams boolean? Whether to exclude chat streams from the search.
 ---@field excludeCommandStreams boolean? Whether to exclude custom command streams from the search.
+---@field includeUnmanagedChatStreams boolean? Whether to include unmanaged stream tables in the search.
 ---@field includeVanillaCommandStreams boolean? Whether to include vanilla command streams in the search.
 
 ---@class omichat.Args.StreamSearch : omichat.StreamSearchOptions, omichat.SearchContext

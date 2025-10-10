@@ -40,6 +40,7 @@ return {
                 maxSearch = MAX_SEARCH,
                 maxResults = MAX_RESULTS,
                 includeVanillaCommandStreams = true,
+                includeUnmanagedChatStreams = true,
             })
 
             for i = 1, #search.results do
