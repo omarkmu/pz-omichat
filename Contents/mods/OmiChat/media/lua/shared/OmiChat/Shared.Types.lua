@@ -425,6 +425,7 @@
 ---@field Range integer?
 ---@field VerticalRange integer?
 ---@field PerceptionRange integer?
+---@field PerceptionRangeSigned integer?
 ---@field AllowBuffs boolean?
 ---@field AllowEmotes boolean?
 ---@field AllowLanguages boolean?

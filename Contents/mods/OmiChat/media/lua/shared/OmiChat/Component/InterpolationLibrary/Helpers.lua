@@ -665,16 +665,24 @@ end
 
 ---Gets the string to display when an out-of-range chat is perceived.
 ---@param name string
+---@param interpolator omichat.Interpolator
 ---@param tags omi.SimpleSet
 ---@return string
-function Helpers.getPerceivedChatString(name, tags)
+function Helpers.getPerceivedChatString(name, interpolator, tags)
+    local language = interpolator:token('languageRaw')
+    local isSigned = language and API.language.isSigned(language)
+
     local stringID = 'UI_OmiChat_PerceivedChat'
+    if isSigned then
+        stringID = stringID .. 'Signed'
+    end
+
     if tags.Whisper then
-        stringID = 'UI_OmiChat_PerceivedChat_Whisper'
+        stringID = stringID .. '_Whisper'
     elseif tags.Quiet then
-        stringID = 'UI_OmiChat_PerceivedChat_Quiet'
+        stringID = stringID .. '_Quiet'
     elseif tags.Loud then
-        stringID = 'UI_OmiChat_PerceivedChat_Loud'
+        stringID = stringID .. '_Loud'
     end
 
     return getText(stringID, name)

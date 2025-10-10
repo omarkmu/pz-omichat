@@ -114,6 +114,11 @@ UI_FR = {
     UI_OmiChat_PerceivedChat_Quiet = "%1 says something quietly.",
     UI_OmiChat_PerceivedChat_Loud = "%1 shouts something.",
 
+    UI_OmiChat_PerceivedChatSigned = "%1 signs something.",
+    UI_OmiChat_PerceivedChatSigned_Whisper = "%1 subtly signs something.",
+    UI_OmiChat_PerceivedChatSigned_Quiet = "%1 signs something quietly.",
+    UI_OmiChat_PerceivedChatSigned_Loud = "%1 energetically signs something.",
+
     --[[ Languages ]]--
     UI_OmiChat_Language_Arabic = "Arabe",
     UI_OmiChat_Language_ASL = "Langage des Signes Américain",

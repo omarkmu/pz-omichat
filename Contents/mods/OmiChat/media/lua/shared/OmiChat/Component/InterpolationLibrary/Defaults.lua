@@ -767,7 +767,7 @@ function Library.Defaults.PerceptionRangeChat(interpolator)
 
     name = name .. ' <SPACE> '
 
-    return Helpers.wrapActionChat(Helpers.getPerceivedChatString(name, tags), tags)
+    return Helpers.wrapActionChat(Helpers.getPerceivedChatString(name, interpolator, tags), tags)
 end
 
 ---Default overhead format for out-of-range, perceived messages.
@@ -781,7 +781,7 @@ function Library.Defaults.PerceptionRangeOverhead(interpolator)
         return
     end
 
-    return Helpers.wrapActionOverhead(Helpers.getPerceivedChatString(name, tags), tags)
+    return Helpers.wrapActionOverhead(Helpers.getPerceivedChatString(name, interpolator, tags), tags)
 end
 
 ---Default format for chat tags in a message prefix.

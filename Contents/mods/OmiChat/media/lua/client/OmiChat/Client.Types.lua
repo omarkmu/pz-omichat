@@ -479,6 +479,7 @@
 ---@field protected useNarrativeStyle boolean Whether the stream should apply narrative style if it's enabled.
 ---@field protected verticalRange integer The vertical range of the chat stream.
 ---@field protected perceptionRange integer The perception range of the chat stream.
+---@field protected perceptionRangeSigned integer The perception range of the chat stream, for signed languages.
 
 ---@class omichat.Args.ChatStream : omichat.Args.Stream
 ---@field defaultColor omi.ColorTable? The default color for messages on the stream.
@@ -492,6 +493,7 @@
 ---@field range integer? The range of the chat stream.
 ---@field verticalRange integer? The vertical range of the chat stream.
 ---@field perceptionRange integer? The perception range of the chat stream.
+---@field perceptionRangeSigned integer? The perception range of the chat stream, for signed languages.
 ---@field tabID integer? The tab ID of the tab in which this stream is available (1-indexed).
 
 

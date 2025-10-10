@@ -419,8 +419,10 @@ return {
             local cached = info.meta.rangeResult
             if cached == 'out-of-range' then
                 info:hide()
+                return
             elseif cached == 'in-perception-range' then
                 info:setUsePerceivedText(true)
+                return
             elseif cached then
                 return
             end
@@ -472,7 +474,10 @@ return {
                 return
             end
 
-            local perceptionRange = stream.perceptionRange
+            local language = info.tokens.languageRaw
+            local isSigned = language and API.language.isSigned(language)
+
+            local perceptionRange = isSigned and stream.perceptionRangeSigned or stream.perceptionRange
             if not info.tags.Action and dist and dist <= perceptionRange then
                 info:setUsePerceivedText(true)
                 info:setMetadataRangeResult('in-perception-range')

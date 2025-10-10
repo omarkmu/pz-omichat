@@ -100,6 +100,7 @@ return Preset:new {
                     Enable = true,
                     Range = 4,
                     PerceptionRange = 8,
+                    PerceptionRangeSigned = 10,
                     DefaultColor = { r = 177, g = 210, b = 187 },
                     Tags = {
                         'AutoCapitalize',
@@ -115,6 +116,7 @@ return Preset:new {
                     Enable = true,
                     Range = 2,
                     PerceptionRange = 6,
+                    PerceptionRangeSigned = 8,
                     DefaultColor = { r = 177, g = 210, b = 187 },
                     Tags = {
                         'AutoCapitalize',

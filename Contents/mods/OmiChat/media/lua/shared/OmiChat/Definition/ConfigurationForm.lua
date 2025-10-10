@@ -405,7 +405,7 @@ return {
                     Enable = PAD_BOTTOM,
                     ShortCommand = PAD_BOTTOM,
                     Aliases = PAD_BOTTOM,
-                    PerceptionRange = PAD_BOTTOM,
+                    PerceptionRangeSigned = PAD_BOTTOM,
                     OverheadFormat = PAD_BOTTOM,
                     UseNarrativeStyle = PAD_BOTTOM,
                     Tags = NO_REORDER,
@@ -482,14 +482,13 @@ return {
                         maxRange = 60
                     end
 
-                    local rangeControl = form:getFieldControl({ 'Streams', 'List', 'Range' }) ---@cast rangeControl omi.ui.TextEntry?
-                    if rangeControl then
-                        rangeControl:setMaxValue(maxRange)
-                    end
-
-                    local perceiveRangeControl = form:getFieldControl({ 'Streams', 'List', 'PerceptionRange' }) ---@cast perceiveRangeControl omi.ui.TextEntry?
-                    if perceiveRangeControl then
-                        perceiveRangeControl:setMaxValue(maxRange)
+                    local rangeControlNames = { 'Range', 'PerceptionRange', 'PerceptionRangeSigned' }
+                    for i = 1, #rangeControlNames do
+                        local name = rangeControlNames[i]
+                        local rangeControl = form:getFieldControl({ 'Streams', 'List', name }) --[[@as omi.ui.TextEntry?]]
+                        if rangeControl then
+                            rangeControl:setMaxValue(maxRange)
+                        end
                     end
 
                     -- enable range & overhead fields only for ranged stream types
@@ -499,6 +498,7 @@ return {
                             { form:getFieldInfo({ 'Streams', 'List', 'Range' }) },
                             { form:getFieldInfo({ 'Streams', 'List', 'VerticalRange' }) },
                             { form:getFieldInfo({ 'Streams', 'List', 'PerceptionRange' }) },
+                            { form:getFieldInfo({ 'Streams', 'List', 'PerceptionRangeSigned' }) },
                             { form:getFieldInfo({ 'Streams', 'List', 'OverheadFormat' }) },
                             { form:getFieldInfo({ 'Streams', 'List', 'AttractZombies' }), false },
                         }

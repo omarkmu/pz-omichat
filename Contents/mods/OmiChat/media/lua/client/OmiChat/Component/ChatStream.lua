@@ -82,6 +82,7 @@ function ChatStream.fromDefinition(def, additionalTags)
         range = def.Range,
         verticalRange = def.VerticalRange,
         perceptionRange = def.PerceptionRange,
+        perceptionRangeSigned = def.PerceptionRangeSigned,
         allowBuffs = def.AllowBuffs,
         allowEmotes = def.AllowEmotes,
         allowLanguages = def.AllowLanguages,
@@ -192,6 +193,16 @@ function ChatStream:getRange()
     return self.range
 end
 
+---Returns the signed perception range of the stream if it's a ranged stream.
+---@return integer?
+function ChatStream:getSignedPerceptionRange()
+    if not self:isRanged() then
+        return
+    end
+
+    return self.perceptionRangeSigned
+end
+
 ---Gets the 1-indexed tab ID of the stream.
 ---@return integer
 function ChatStream:getTabID()
@@ -238,6 +249,7 @@ function ChatStream:new(args)
     this.tabID = args.tabID or 1
     this.verticalRange = args.verticalRange or 2
     this.perceptionRange = args.perceptionRange or 0
+    this.perceptionRangeSigned = args.perceptionRangeSigned or 0
     this.defaultColor = args.defaultColor and utils.copy(args.defaultColor) or { r = 255, g = 255, b = 255 }
 
     return this

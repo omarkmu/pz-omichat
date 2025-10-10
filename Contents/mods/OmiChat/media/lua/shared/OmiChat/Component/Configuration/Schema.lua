@@ -361,6 +361,7 @@ return Schema:new {
                         Range = int(30, 1, 60), -- maximum is dependent on chat type
                         VerticalRange = int(2, 1, 32),
                         PerceptionRange = int(0, 0, 60),
+                        PerceptionRangeSigned = int(0, 0, 60),
 
                         ChatFormat = str(DEFAULT),
                         OverheadFormat = str(DEFAULT),
