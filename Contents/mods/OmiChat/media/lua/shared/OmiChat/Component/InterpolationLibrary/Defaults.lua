@@ -143,7 +143,6 @@ function Library.Defaults.Chat(interpolator, args)
         hasInternalQuote = tags.IsNarrativeStyle,
     }
 
-
     if name == '' then
         name = nil
     end
@@ -193,7 +192,7 @@ function Library.Defaults.ChatFinal(interpolator, args)
         prefix = prefix .. ' <SPACE> '
     end
 
-    return prefix .. interpolator:tokenString('input')
+    return prefix .. optionOrToken(interpolator, options, 'input')
 end
 
 ---Default format for the chat text prefix.
@@ -268,7 +267,7 @@ function Library.Defaults.EmbeddedAction(interpolator, args)
     local options = Helpers.readOptions(args)
     local tags = Helpers.readTags(interpolator)
 
-    local input = tostring(options:get('input') or interpolator:tokenString('input'))
+    local input = optionOrToken(interpolator, options, 'input')
     if utils.trim(input) == '' then
         return
     end
@@ -299,7 +298,7 @@ function Library.Defaults.EmbeddedQuote(interpolator, args)
     local options = Helpers.readOptions(args)
     local tags = Helpers.readTags(interpolator)
 
-    local input = tostring(options:get('input') or interpolator:tokenString('input'))
+    local input = optionOrToken(interpolator, options, 'input')
     if utils.trim(input) == '' then
         return
     end
@@ -566,9 +565,8 @@ function Library.Defaults.NarrativeChatContent(interpolator, args)
 
     local comma = options:getBoolean('noComma') and '' or ', '
     input = Helpers.ensureWrapped(input, startQuote, endQuote)
-    dialogueTag = dialogueTag:lower()
 
-    return dialogueTag .. comma .. input
+    return dialogueTag:lower() .. comma .. input
 end
 
 ---Default overhead content format for narrative style.
@@ -658,7 +656,7 @@ function Library.Defaults.Overhead(interpolator, args)
         return
     end
 
-    local name = tostring(options:get('name') or interpolator:token('name'))
+    local name = optionOrToken(interpolator, options, 'name')
     local input = optionOrTokenWrapped(interpolator, options, 'input')
 
     local autoCapitalize = tags.AutoCapitalize or tags.AutoCapitalizeOverhead
@@ -719,7 +717,7 @@ function Library.Defaults.OverheadFinal(interpolator, args)
         prefix = prefix .. ' '
     end
 
-    return prefix .. interpolator:tokenString('input')
+    return prefix .. optionOrToken(interpolator, options, 'input')
 end
 
 ---Default format for the overhead prefix.

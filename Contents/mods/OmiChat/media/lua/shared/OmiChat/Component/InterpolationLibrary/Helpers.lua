@@ -175,7 +175,7 @@ end
 ---@param tags omi.SimpleSet?
 function Helpers.colorActions(segments, options, tags)
     tags = tags or {}
-    local color = Helpers.getColorTarget('ActionColorTarget', options, tags)
+    local color = Helpers.getColorFromTarget('ActionColorTarget', options, tags)
     if color == '' then
         return
     end
@@ -204,7 +204,7 @@ end
 ---@param options omi.MultiMap?
 ---@param tags omi.SimpleSet?
 function Helpers.colorQuotes(segments, options, tags)
-    local color = Helpers.getColorTarget('QuoteColorTarget', options, tags)
+    local color = Helpers.getColorFromTarget('QuoteColorTarget', options, tags)
     if color == '' then
         return
     end
@@ -481,7 +481,7 @@ end
 ---@param options omi.MultiMap?
 ---@param tags omi.SimpleSet?
 ---@return string
-function Helpers.getColorTarget(colorTag, options, tags)
+function Helpers.getColorFromTarget(colorTag, options, tags)
     if not IS_CLIENT then
         return ''
     end
