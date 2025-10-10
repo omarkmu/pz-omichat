@@ -15,6 +15,7 @@ local IS_CLIENT = not isServer()
 
 local ASTERISK_CHAR = utils.encodeInvisibleCharacter(config.ID_ASTERISK_SIGNAL)
 local ASTERISK_PREFIX_PATTERN = '^(%s*[*' .. ASTERISK_CHAR .. '])(.+)'
+local ASTERISK_DELIM_PATTERN = '^"%s*[*' .. ASTERISK_CHAR .. ']'
 
 
 ---@class omichat.InterpolationLibrary.Helpers
@@ -87,6 +88,7 @@ function Helpers.applySharedFormatting(args)
     local segments, prefix, suffix = Helpers.getMessageSegments(input, {
         startInAction = tags.Action,
         optionalActionAsterisk = tags.OptionalActionAsterisk,
+        hasInternalQuote = args.hasInternalQuote,
     })
 
     local doBasicFormatting = args.applyCase or args.doCapitalize or args.doPunctuate
@@ -599,9 +601,13 @@ function Helpers.getMessageSegments(input, options)
     local start = 1
     local pos = 1
     local prefix, suffix
-
     input, prefix, suffix = utils.getInternalText(utils.trim(input))
-    local asteriskDelimPattern = '^"%s*[*' .. ASTERISK_CHAR .. ']'
+
+    -- avoid triggering actions with an initial asterisk in narrative style
+    if not inAction and options.hasInternalQuote then
+        local firstQuote = input:find('"')
+        pos = firstQuote and (firstQuote + 1) or pos
+    end
 
     local segments = {} ---@type omichat.MessageSegment[]
     while pos <= #input do
@@ -615,7 +621,7 @@ function Helpers.getMessageSegments(input, options)
 
                     start = pos
                     inAction = not inAction
-                elseif not requireAsterisk or input:match(asteriskDelimPattern, pos) then
+                elseif not requireAsterisk or input:match(ASTERISK_DELIM_PATTERN, pos) then
                     segments[#segments + 1] = {
                         type = 'quote',
                         text = input:sub(start, pos),

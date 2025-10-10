@@ -106,6 +106,7 @@
 
 ---@class omichat.Args.GetMessageSegments
 ---@field startInAction boolean? If `true`, start reading as an action instead of a quote.
+---@field hasInternalQuote boolean? If `true`, the message has an internal quote. This makes the first quote encountered not end an initial quote segment.
 ---@field optionalActionAsterisk boolean? If `true`, the asterisk for actions will be considered optional.
 ---@field onlyFirstSegment boolean? If `true`, only the first segment will be returned.
 
@@ -124,6 +125,7 @@
 ---@field doColorQuotes boolean?
 ---@field doReplaceAsterisks boolean?
 ---@field doAutoQuotes boolean?
+---@field hasInternalQuote boolean?
 
 --#endregion
 

@@ -139,6 +139,7 @@ function Library.Defaults.Chat(interpolator, args)
         doPunctuate = tags.AutoPunctuate or tags.AutoPunctuateChat or (tags.IsNarrativeStyle and tags.AutoPunctuateNarrative),
         doColorActions = tags.AutoColorActions and tags.IsNarrativeStyle,
         doColorQuotes = tags.AutoColorQuotes,
+        hasInternalQuote = tags.IsNarrativeStyle,
     }
 
 
