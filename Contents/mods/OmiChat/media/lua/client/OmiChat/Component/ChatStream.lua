@@ -33,7 +33,6 @@ local otherReservedNames = {
 ---Returns whether a string is the name of a built-in stream.
 ---@param name string
 ---@return boolean
----@static
 function ChatStream.isReservedName(name)
     if defaultStreamData[name] or otherReservedNames[name] then
         return true
@@ -45,7 +44,6 @@ end
 ---Checks whether a stream definition is valid.
 ---@param def omichat.Configuration.StreamDefinition
 ---@return boolean
----@static
 function ChatStream.isValidDefinition(def)
     if not def.Stream or def.Stream == 'custom' then
         local name = def.Name and def.Name:lower() or ''
@@ -59,7 +57,6 @@ end
 ---@param def omichat.Configuration.StreamDefinition
 ---@param additionalTags string[]?
 ---@return omichat.ChatStream?
----@static
 function ChatStream.fromDefinition(def, additionalTags)
     if not ChatStream.isValidDefinition(def) then
         return

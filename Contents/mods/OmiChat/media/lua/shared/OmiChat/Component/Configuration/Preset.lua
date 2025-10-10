@@ -12,7 +12,6 @@ local Preset = utils.lib.class()
 ---Creates a table for configuration of buffs based on the defaults.
 ---@param options omichat.Args.ConfigurationPreset.Buffs? Options for creation of the table.
 ---@return omichat.Configuration.Buffs
----@static
 function Preset.buffs(options)
     options = options or {}
 
@@ -32,7 +31,6 @@ end
 ---Creates a table for callout configuration based on the defaults.
 ---@param options omichat.Args.ConfigurationPreset.Callouts?
 ---@return omichat.Configuration.Callouts
----@static
 function Preset.callouts(options)
     options = options or {}
 
@@ -47,7 +45,6 @@ end
 
 ---Returns the default set for information to clear on player character death.
 ---@return omichat.Configuration.General.ClearOnDeath
----@static
 function Preset.clearOnDeath()
     return set {
         'Icon',
@@ -60,7 +57,6 @@ end
 ---Creates a table for command configuration based on the defaults.
 ---@param options omichat.Args.ConfigurationPreset.Commands?
 ---@return omichat.Configuration.Commands
----@static
 function Preset.commands(options)
     options = options or {}
 
@@ -131,7 +127,6 @@ end
 ---Creates a table for customization configuration based on the defaults.
 ---@param options omichat.Args.ConfigurationPreset.Customization?
 ---@return omichat.Configuration.Customization
----@static
 function Preset.customization(options)
     options = options or {}
 
@@ -149,7 +144,6 @@ end
 ---Creates a table for Discord configuration based on the defaults.
 ---@param options omichat.Args.ConfigurationPreset.Discord?
 ---@return omichat.Configuration.Discord
----@static
 function Preset.discord(options)
     options = options or {}
 
@@ -165,7 +159,6 @@ end
 ---Creates a table for echo message configuration based on the defaults.
 ---@param options omichat.Args.ConfigurationPreset.Echo?
 ---@return omichat.Configuration.EchoMessages
----@static
 function Preset.echo(options)
     options = options or {}
 
@@ -180,7 +173,6 @@ end
 
 ---Returns the default format configuration.
 ---@return omichat.Configuration.Format
----@static
 function Preset.format()
     ---@type omichat.Configuration.Format
     return {
@@ -219,7 +211,6 @@ end
 ---Creates a table for general configuration based on the defaults.
 ---@param options omichat.Args.ConfigurationPreset.General
 ---@return omichat.Configuration.General
----@static
 function Preset.general(options)
     ---@type omichat.Configuration.General
     return {
@@ -237,7 +228,6 @@ end
 ---Returns the default language configuration.
 ---@param options omichat.Args.ConfigurationPreset.Language?
 ---@return omichat.Configuration.Language
----@static
 function Preset.languages(options)
     options = options or {}
 
@@ -259,7 +249,6 @@ end
 ---Returns the default macro configuration.
 ---@param options omichat.Args.ConfigurationPreset.Macros?
 ---@return omichat.Configuration.Macros
----@static
 function Preset.macros(options)
     options = options or {}
 
@@ -272,7 +261,6 @@ end
 ---Returns the default narrative style configuration.
 ---@param options omichat.Args.ConfigurationPreset.NarrativeStyle?
 ---@return omichat.Configuration.NarrativeStyle
----@static
 function Preset.narrative(options)
     options = options or {}
 
@@ -289,7 +277,6 @@ end
 ---Creates a table for radio configuration based on the defaults.
 ---@param options omichat.Args.ConfigurationPreset.Radio?
 ---@return omichat.Configuration.Radio
----@static
 function Preset.radio(options)
     options = options or {}
 
@@ -304,7 +291,6 @@ end
 ---Creates a table for server message configuration based on the defaults.
 ---@param options omichat.Args.ConfigurationPreset.ServerMessages?
 ---@return omichat.Configuration.ServerMessages
----@static
 function Preset.server(options)
     options = options or {}
 
@@ -319,7 +305,6 @@ end
 ---Creates a table for typing indicator configuration based on the defaults.
 ---@param options omichat.Args.ConfigurationPreset.TypingIndicator?
 ---@return omichat.Configuration.TypingIndicator
----@static
 function Preset.typing(options)
     options = options or {}
 
@@ -333,7 +318,6 @@ end
 ---Creates a table for zombie attraction configuration based on the defaults.
 ---@param options omichat.Args.ConfigurationPreset.ZombieAttraction?
 ---@return omichat.Configuration.ZombieAttraction
----@static
 function Preset.zombies(options)
     options = options or {}
 

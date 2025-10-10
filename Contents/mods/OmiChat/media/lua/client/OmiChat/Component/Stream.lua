@@ -15,7 +15,6 @@ local Stream = utils.lib.class()
 ---@param str string
 ---@return string
 ---@private
----@static
 function Stream._stringToCommand(str)
     str = utils.trim(str)
     if not utils.startsWith(str, '/') then

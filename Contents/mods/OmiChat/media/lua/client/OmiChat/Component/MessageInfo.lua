@@ -31,7 +31,6 @@ local _getTextWithPrefix = _ChatMessage.getTextWithPrefix
 ---@param tag string The message tag to decode.
 ---@param metadata table? The table to populate with metadata.
 ---@return omichat.MessageInfo.Metadata
----@static
 function MessageInfo.decodeMessageTag(tag, metadata)
     metadata = metadata or {} ---@type omichat.MessageInfo.Metadata
     table.wipe(metadata)
@@ -63,7 +62,6 @@ end
 
 ---Encodes message information including chat name and colors into a message's metadata.
 ---@param message omichat.Message The message to encode.
----@static
 function MessageInfo.encodeMessageTag(message)
     local author = message:getAuthor() ---@type string?
     if author == '' then
@@ -89,7 +87,6 @@ end
 ---Returns the chat type of a chat message.
 ---@param message omichat.Message
 ---@return string
----@static
 function MessageInfo.getMessageChatType(message)
     if utils.isinstance(message, MimicMessage) then
         ---@cast message omi.chat.MimicMessage
@@ -105,7 +102,6 @@ end
 ---@param chatType omichat.ChatTypeString
 ---@param excludeRadio boolean?
 ---@return omichat.Stream?
----@static
 function MessageInfo.getMessageStream(message, chatType, excludeRadio)
     if chatType == 'server' then
         return API.streams.getServerStream()
@@ -135,7 +131,6 @@ end
 ---Returns whether name colors should be used for a stream.
 ---@param stream omichat.Stream?
 ---@return boolean
----@static
 function MessageInfo.shouldUseNameColors(stream)
     if not config.Customization.EnableNameColors then
         return false

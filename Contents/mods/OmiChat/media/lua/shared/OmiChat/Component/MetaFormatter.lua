@@ -18,7 +18,6 @@ local formatters = {}
 
 ---Returns the next free ID for a formatter.
 ---@return integer?
----@static
 function MetaFormatter.getNextFreeID()
     for i = 101, 1024 do
         if not formatters[i] then

@@ -22,7 +22,6 @@ local TILE_FIELD_INDEX = 2
 ---Gets a set of objects the mouse is hovering over.
 ---This uses the same logic as the name hovering functionality.
 ---@return table<IsoMovingObject, boolean>
----@static
 function StatusManager.getHoveringObjects()
     local square = StatusManager.getPickedSquare()
     if not square then
@@ -55,7 +54,6 @@ end
 
 ---Gets the square of the currently hovered object.
 ---@return IsoGridSquare?
----@static
 function StatusManager.getPickedSquare()
     local picked = getPicked()
     if not picked then
@@ -127,6 +125,7 @@ function StatusManager.update()
         displayCache[username] = nil
     end
 end
+
 
 utils.setIntervalUI(StatusManager.update)
 

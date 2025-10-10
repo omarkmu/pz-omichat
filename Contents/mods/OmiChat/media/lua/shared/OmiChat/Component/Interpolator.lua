@@ -38,7 +38,6 @@ end
 ---@param text string
 ---@param noEntities boolean?
 ---@return omichat.Interpolator
----@static
 function Interpolator.getOrCreate(text, noEntities)
     local cache = noEntities and Interpolator._noEntityCache or Interpolator._cache
     local item = cache:get(text) --[[@as omichat.utils.InterpolatorCacheData]]
@@ -48,7 +47,6 @@ end
 ---Registers an interpolator function.
 ---@param name string
 ---@param f fun(interpolator: omichat.Interpolator, ...: unknown)
----@static
 function Interpolator.register(name, f)
     Interpolator._registered[name] = f
 end
