@@ -311,7 +311,7 @@ function Format._applyNarrativeStyle(input, stream, tokens)
 
     local err = utils.extractError(tokens)
     if err or input == '' then
-        return original, nil, err
+        return input == '' and input or original, nil, err
     end
 
     -- inject tag
