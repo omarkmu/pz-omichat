@@ -20,6 +20,7 @@ local Helpers = Library.Helpers
 local readTags = Helpers.readTags
 local readOptions = Helpers.readOptions
 local optionOrToken = Helpers.optionOrToken
+local optionOrTokenWrapped = Helpers.optionOrTokenWrapped
 
 
 ---Default forwarding function for format strings.
@@ -577,7 +578,7 @@ end
 function Library.Defaults.NarrativeOverheadContent(interpolator, args)
     local options = readOptions(args)
     local tags = readTags(interpolator)
-    local input = optionOrToken(interpolator, options, 'input')
+    local input = optionOrTokenWrapped(interpolator, options, 'input')
     local dialogueTag = optionOrToken(interpolator, options, 'dialogueTag')
 
     local autoCapitalize = tags.AutoCapitalize or tags.AutoCapitalizeOverhead or tags.AutoCapitalizeNarrative
@@ -658,7 +659,7 @@ function Library.Defaults.Overhead(interpolator, args)
     end
 
     local name = tostring(options:get('name') or interpolator:token('name'))
-    local input = tostring(options:get('input') or interpolator:tokenString('input'))
+    local input = optionOrTokenWrapped(interpolator, options, 'input')
 
     local autoCapitalize = tags.AutoCapitalize or tags.AutoCapitalizeOverhead
     if tags.IsSneakCallout then

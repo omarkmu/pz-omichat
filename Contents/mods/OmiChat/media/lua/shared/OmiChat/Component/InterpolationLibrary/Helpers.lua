@@ -749,6 +749,35 @@ function Helpers.optionOrToken(interpolator, options, key, token)
     return options:getString(key, interpolator:tokenString(token or key))
 end
 
+---Gets the value of an option, or a token as a fallback.
+---If neither are defined, this will return the empty string.
+---If there's both an option and a token, the value of the option is wrapped in the same characters from the token.
+---@param interpolator omichat.Interpolator
+---@param options omi.MultiMap
+---@param key string
+---@param token string?
+---@return string
+function Helpers.optionOrTokenWrapped(interpolator, options, key, token)
+    local tokenValue = interpolator:tokenString(token or key)
+    local optionValue = options:get(key)
+
+    if not optionValue then
+        return tokenValue
+    end
+
+    optionValue = tostring(optionValue)
+
+    local _, prefix, suffix = utils.getInternalText(tokenValue)
+    local _, optPrefix, optSuffix = utils.getInternalText(optionValue)
+
+    if optPrefix == prefix and optSuffix == suffix then
+        -- already wrapped
+        return optionValue
+    end
+
+    return prefix .. optionValue .. suffix
+end
+
 ---Adds punctuation to a string if it isn't already present.
 ---Handles encoded invisible characters and trailing spaces.
 ---@param input string
