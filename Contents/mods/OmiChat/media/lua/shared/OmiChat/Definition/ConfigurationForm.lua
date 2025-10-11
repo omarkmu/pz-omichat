@@ -75,7 +75,6 @@ return {
                         inverseToggleFields = {
                             { 'Commands', 'Card', 'Format' },
                             { 'Commands', 'Card', 'OverheadFormat' },
-                            { 'Commands', 'Card', 'ChatFormat' },
                             { 'Commands', 'Card', 'Tags' },
                         },
                     },
@@ -93,7 +92,6 @@ return {
                         inverseToggleFields = {
                             { 'Commands', 'Roll', 'Format' },
                             { 'Commands', 'Roll', 'OverheadFormat' },
-                            { 'Commands', 'Roll', 'ChatFormat' },
                             { 'Commands', 'Roll', 'Tags' },
                         },
                     },
@@ -111,7 +109,6 @@ return {
                         inverseToggleFields = {
                             { 'Commands', 'Flip', 'Format' },
                             { 'Commands', 'Flip', 'OverheadFormat' },
-                            { 'Commands', 'Flip', 'ChatFormat' },
                             { 'Commands', 'Flip', 'Tags' },
                         },
                     },

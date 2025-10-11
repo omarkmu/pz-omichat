@@ -58,7 +58,6 @@ Sandbox_EN = {
     Sandbox_OmiChat_Commands_Command_Global = "Global",
     Sandbox_OmiChat_Commands_Command_Format = "Command Result Format",
     Sandbox_OmiChat_Commands_Command_OverheadFormat = "Overhead Format",
-    Sandbox_OmiChat_Commands_Command_ChatFormat = "Chat Format",
     Sandbox_OmiChat_Commands_Command_Tags = "Tags",
 
     Sandbox_OmiChat_Compatibility = "Compatibility",
@@ -252,7 +251,6 @@ Sandbox_EN = {
     Sandbox_OmiChat_Commands_Command_Global_tooltip = "Controls whether the command should be global, similar to vanilla commands. This disables formatting options.",
     Sandbox_OmiChat_Commands_Command_Format_tooltip = "Defines the value of the <SPACE> <PUSHRGB:0,0.5,1> $input <POPRGB> <SPACE> token in the overhead format for the command.",
     Sandbox_OmiChat_Commands_Command_OverheadFormat_tooltip = "Defines the format of overhead speech bubbles for the command.",
-    Sandbox_OmiChat_Commands_Command_ChatFormat_tooltip = "Defines how messages associated with the command appear in chat.",
     Sandbox_OmiChat_Commands_Command_Tags_tooltip = "Tags that modify the appearance and behavior of messages associated with the command.",
 
     Sandbox_OmiChat_Compatibility_ApplyOverrides_tooltip = "If enabled, chat functions called by other mods will be intercepted by this mod." ..

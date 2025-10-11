@@ -94,7 +94,6 @@ return Schema:new {
                 Global = bool(false),
                 Format = str(DEFAULT),
                 OverheadFormat = str(DEFAULT),
-                ChatFormat = str(DEFAULT),
                 Items = array {
                     items = str(),
                     default = { 'CardDeck' },
@@ -105,7 +104,6 @@ return Schema:new {
                 Global = bool(false),
                 Format = str(DEFAULT),
                 OverheadFormat = str(DEFAULT),
-                ChatFormat = str(DEFAULT),
                 Items = array {
                     items = str(),
                     default = {
@@ -125,7 +123,6 @@ return Schema:new {
                 Global = bool(false),
                 Format = str(DEFAULT),
                 OverheadFormat = str(DEFAULT),
-                ChatFormat = str(DEFAULT),
                 Items = array { items = str() },
                 Tags = array { items = str() },
             },

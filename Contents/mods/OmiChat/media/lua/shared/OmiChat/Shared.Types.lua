@@ -296,7 +296,6 @@
 ---@field Global boolean
 ---@field Format string
 ---@field OverheadFormat string
----@field ChatFormat string
 ---@field Items string[]
 ---@field Tags string[]
 
