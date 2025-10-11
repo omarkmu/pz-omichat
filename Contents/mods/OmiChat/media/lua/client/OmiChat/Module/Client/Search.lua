@@ -13,6 +13,28 @@ local Search = {}
 Search._customSuggesterTypes = {}
 
 
+---Converts search results to a list of suggestions to use for a suggest box.
+---@param search omichat.SearchResults
+---@param allowExact boolean?
+---@return omi.ui.SuggestBox.Suggestion[]
+function Search.getSuggestions(search, allowExact)
+    if search.exact and not allowExact then
+        return {}
+    end
+
+    local suggestions = {} ---@type omi.ui.SuggestBox.Suggestion[]
+    for i = 1, #search.results do
+        local result = search.results[i]
+        suggestions[#suggestions + 1] = {
+            text = result.display,
+            content = result.value,
+            texture = result.texture,
+        }
+    end
+
+    return suggestions
+end
+
 ---Reads an arguments spec from a suggestion spec.
 ---@param spec omichat.SuggestSpec
 ---@param idx integer
@@ -178,22 +200,7 @@ end
 ---@param search omichat.SearchResults
 ---@param allowExact boolean?
 function Search.populateSuggestions(suggestBox, search, allowExact)
-    if search.exact and not allowExact then
-        suggestBox:setSuggestions({})
-        return
-    end
-
-    local suggestions = {} ---@type omi.ui.SuggestBox.Suggestion[]
-    for i = 1, #search.results do
-        local result = search.results[i]
-        suggestions[#suggestions + 1] = {
-            text = result.display,
-            content = result.value,
-            texture = result.texture,
-        }
-    end
-
-    suggestBox:setSuggestions(suggestions)
+    suggestBox:setSuggestions(Search.getSuggestions(search, allowExact))
 end
 
 ---Collects commands based on a search string.

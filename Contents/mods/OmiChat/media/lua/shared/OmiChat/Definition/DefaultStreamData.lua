@@ -3,7 +3,7 @@
 local DEFAULT = '$Default()'
 
 
----@type omichat.Configuration.StreamDefinition[]
+---@type table<string, omichat.Configuration.StreamDefinition>
 return {
     admin = {
         ChatType = 'admin',

@@ -43,7 +43,11 @@ return Preset:new {
         NarrativeStyle = Preset.narrative {
             Enable = true,
         },
-        Radio = Preset.radio(),
+        Radio = Preset.radio {
+            Tags = {
+                'IncludeColon',
+            },
+        },
         ServerMessages = Preset.server {
             Tags = {
                 'NoTimestamp',
@@ -55,7 +59,7 @@ return Preset:new {
         Streams = {
             UseDefaultList = false,
             GlobalTags = {
-                'UseActionAsterisks',
+                'ActionAsterisks',
                 'IncludeName',
                 'IncludeAdminIndicator',
             },

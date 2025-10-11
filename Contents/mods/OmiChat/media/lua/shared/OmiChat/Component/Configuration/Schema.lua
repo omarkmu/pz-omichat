@@ -276,7 +276,10 @@ return Schema:new {
             DefaultColor = color {
                 default = { r = 178, g = 178, b = 178 },
             },
-            Tags = array { items = str() },
+            Tags = array {
+                items = str(),
+                default = { 'IncludeColon' },
+            },
         },
 
         ServerMessages = container {

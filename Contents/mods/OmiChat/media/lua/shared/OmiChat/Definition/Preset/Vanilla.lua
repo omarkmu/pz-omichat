@@ -38,6 +38,7 @@ return Preset:new {
         },
         Radio = Preset.radio {
             Tags = {
+                'IncludeColon',
                 'UseAuthorUsername',
             },
         },
@@ -101,7 +102,6 @@ return Preset:new {
                         'FlipCommandTarget',
                         'RollCommandTarget',
                         'BuffyRPGTarget',
-                        'UseNameColor',
                     },
                 },
                 {

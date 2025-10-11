@@ -389,4 +389,123 @@ Sandbox_EN = {
         " <BR> If this is zero, non-callout chat messages will not attract zombies.",
     Sandbox_OmiChat_ZombieAttraction_CalloutRange_tooltip = "The maximum distance for callouts to attract zombies.",
     Sandbox_OmiChat_ZombieAttraction_SneakCalloutRange_tooltip = "The maximum distance for sneak callouts to attract zombies.",
+
+    /* Tag Tooltips */
+    Sandbox_OmiChat_tag_unknown = "Unrecognized tag.",
+    Sandbox_OmiChat_tag_Action = "Indicates that a stream is a roleplay action (e.g., <SPACE> <PUSHRGB:0,1,0> /me <POPRGB> )." ..
+        " <LINE> This controls various defaults for formatting.",
+    Sandbox_OmiChat_tag_ActionAsterisks = "Indicates that an action should be prefixed by two asterisks and a space.",
+    Sandbox_OmiChat_tag_ActionAsterisksChat = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> ActionAsterisks <POPRGB> , but only applies to chat formatting.",
+    Sandbox_OmiChat_tag_ActionAsterisksOverhead = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> ActionAsterisks <POPRGB> , but only applies to overhead formatting.",
+    Sandbox_OmiChat_tag_ActionColorTarget = "Indicates the stream that should be used to determine the color of embedded actions." ..
+        " <LINE> If this is included on multiple streams, the stream with tags that match the volume (Loud, Whisper, Quiet) of the message will be preferred.",
+    Sandbox_OmiChat_tag_ActionPlain = "Indicates that an action should not be surrounded by guillemets." ..
+        " <LINE> This has no effect if <SPACE> <PUSHRGB:0,0.5,1> ActionAsterisks <POPRGB> <SPACE> is specified.",
+    Sandbox_OmiChat_tag_ActionPlainChat = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> ActionPlain <POPRGB> , but only applies to chat formatting.",
+    Sandbox_OmiChat_tag_ActionPlainOverhead = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> ActionPlain <POPRGB> , but only applies to overhead formatting.",
+    Sandbox_OmiChat_tag_AutoCapitalize = "Indicates that messages sent on a stream should automatically have their first letter capitalized." ..
+        " <LINE> This does not have an effect for sneak callouts." ..
+        " <LINE> To apply capitalization to those, use <SPACE> <PUSHRGB:0,0.5,1> AutoCapitalizeSneakCallout <POPRGB> .",
+    Sandbox_OmiChat_tag_AutoCapitalizeChat = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> AutoCapitalize <POPRGB> , but only applies to chat formatting.",
+    Sandbox_OmiChat_tag_AutoCapitalizeEmbeddedActions = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> AutoCapitalize <POPRGB> , but only applies to embedded actions.",
+    Sandbox_OmiChat_tag_AutoCapitalizeEmbeddedQuotes = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> AutoCapitalize <POPRGB> , but only applies to embedded quotes.",
+    Sandbox_OmiChat_tag_AutoCapitalizeNarrative = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> AutoCapitalize <POPRGB> , but only applies to narrative style formatting.",
+    Sandbox_OmiChat_tag_AutoCapitalizeNonInitialSegments = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> AutoCapitalize <POPRGB> , but only applies after the initial quote or action segment of a message.",
+    Sandbox_OmiChat_tag_AutoCapitalizeOverhead = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> AutoCapitalize <POPRGB> , but only applies to overhead formatting.",
+    Sandbox_OmiChat_tag_AutoCapitalizeSneakCallout = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> AutoCapitalize <POPRGB> , but only applies to sneak callouts.",
+    Sandbox_OmiChat_tag_AutoColorActions = "Indicates that embedded actions should use action colors.",
+    Sandbox_OmiChat_tag_AutoColorQuotes = "Indicates that embedded quotes should use quote colors in an action message.",
+    Sandbox_OmiChat_tag_AutoPunctuate = "Indicates that a message should automatically include a punctuation mark if one wasn't included." ..
+        " <LINE> For streams tagged with <SPACE> <PUSHRGB:0,0.5,1> Loud <POPRGB> , excluding actions and sneak callouts, an exclamation mark will be used." ..
+        " <LINE> Otherwise, the mark will be a period.",
+    Sandbox_OmiChat_tag_AutoPunctuateChat = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> AutoPunctuate <POPRGB> , but only applies to chat formatting.",
+    Sandbox_OmiChat_tag_AutoPunctuateEmbeddedActions = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> AutoPunctuate <POPRGB> , but only applies to embedded actions.",
+    Sandbox_OmiChat_tag_AutoPunctuateEmbeddedQuotes = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> AutoPunctuate <POPRGB> , but only applies to embedded quotes.",
+    Sandbox_OmiChat_tag_AutoPunctuateNarrative = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> AutoPunctuate <POPRGB> , but only applies to narrative style formatting.",
+    Sandbox_OmiChat_tag_AutoPunctuateOverhead = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> AutoPunctuate <POPRGB> , but only applies to overhead formatting.",
+    Sandbox_OmiChat_tag_BracketedNames = "Indicates that names should be surrounded by square brackets.",
+    Sandbox_OmiChat_tag_BuffyRPGTarget = "Indicates the stream that should be used for formatting messages from the <SPACE> <PUSHRGB:0,0.5,1> Buffy's Tabletop RPG System <POPRGB> <SPACE> mod." ..
+        " <LINE> This has no effect if the compatibility option is not enabled.",
+    Sandbox_OmiChat_tag_Callout = "Indicates the stream that should be used for formatting callout messages.",
+    Sandbox_OmiChat_tag_CardCommandTarget = "Indicates the stream that should be used for formatting messages from the <SPACE> <PUSHRGB:0,1,0> /card <POPRGB> <SPACE> command.",
+    Sandbox_OmiChat_tag_EchoTarget = "Indicates the stream that echo messages should be sent on.",
+    Sandbox_OmiChat_tag_EmbeddedActions = "Indicates that embedded actions should be formatted." ..
+        " <LINE> This is the default for non-actions unless <SPACE> <PUSHRGB:0,0.5,1> NoEmbeddedActions <POPRGB> <SPACE> is specified." ..
+        " <LINE> It is also assumed to be true in narrative style if <SPACE> <PUSHRGB:0,0.5,1> AutoColorActions <POPRGB> <SPACE> is specified.",
+    Sandbox_OmiChat_tag_EmbeddedQuotes = "Indicates that embedded quotes should be formatted." ..
+        " <LINE> This is the default for actions unless <SPACE> <PUSHRGB:0,0.5,1> NoEmbeddedQuotes <POPRGB> <SPACE> is specified." ..
+        " <LINE> It is also assumed to be true if <SPACE> <PUSHRGB:0,0.5,1> AutoColorQuotes <POPRGB> <SPACE> is specified.",
+    Sandbox_OmiChat_tag_FlipCommandTarget = "Indicates the stream that should be used for formatting messages from the <SPACE> <PUSHRGB:0,1,0> /flip <POPRGB> <SPACE> command.",
+    Sandbox_OmiChat_tag_HideOverhead = "Indicates that messages should not be shown in overhead speech bubbles.",
+    Sandbox_OmiChat_tag_IncludeColon = "Indicates that a colon should be added after names." ..
+        " <LINE> This is the default behavior unless in narrative style or on the server message stream." ..
+        " <LINE> Takes precedence over <SPACE> <PUSHRGB:0,0.5,1> NoColon <POPRGB> .",
+    Sandbox_OmiChat_tag_IncludeAdminIndicator = "Indicates that a parenthesized prefix should be included when a message is sent from an admin.",
+    Sandbox_OmiChat_tag_IncludeName = "Indicates that names should be included in messages." ..
+        " <LINE> This is the default behavior unless on the server message stream.",
+    Sandbox_OmiChat_tag_IncludeNameChat = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> IncludeName <POPRGB> , but only applies to chat formatting.",
+    Sandbox_OmiChat_tag_IncludeNameOverhead = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> IncludeName <POPRGB> , but only applies to overhead formatting.",
+    Sandbox_OmiChat_tag_KeepActionAsterisk = "Indicates that embedded actions should keep a visible signal asterisk.",
+    Sandbox_OmiChat_tag_Loud = "Indicates that a stream should be treated as the loud volume.",
+    Sandbox_OmiChat_tag_Lowercase = "Indicates that text should be converted to all lowercase.",
+    Sandbox_OmiChat_tag_NoAdminIndicator = "Indicates that a parenthesized prefix should be included when a message is sent from an admin." ..
+        " <LINE> This is the default behavior." ..
+        " <LINE> Takes precedence over <SPACE> <PUSHRGB:0,0.5,1> IncludeAdminIndicator <POPRGB> .",
+    Sandbox_OmiChat_tag_NoColon = "Indicates that a colon should not be added after names." ..
+        " <LINE> This is the default behavior in narrative style and on the server message stream.",
+    Sandbox_OmiChat_tag_NoColonChat = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> NoColon <POPRGB> , but only applies to chat formatting.",
+    Sandbox_OmiChat_tag_NoColonOverhead = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> NoColon <POPRGB> , but only applies to overhead formatting.",
+    Sandbox_OmiChat_tag_NoCommandIcon = "Indicates that an icon should not be included in a command message (e.g., <SPACE> <PUSHRGB:0,1,0> /card <POPRGB> ).",
+    Sandbox_OmiChat_tag_NoEmbeddedActions = "Indicates that embedded actions should not be formatted.",
+    Sandbox_OmiChat_tag_NoEmbeddedQuotes = "Indicates that embedded quotes should not be formatted.",
+    Sandbox_OmiChat_tag_NoIcon = "Indicates that an icon should not be included in a message." ..
+        " <LINE> Icons for commands will still be included if this is specified." ..
+        " <LINE> To disable them, use <SPACE> <PUSHRGB:0,0.5,1> NoCommandIcon <POPRGB> .",
+    Sandbox_OmiChat_tag_NoLanguage = "Indicates that the language indicator prefix should not be included.",
+    Sandbox_OmiChat_tag_NoLanguageChat = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> NoLanguage <POPRGB> , but only applies to chat formatting.",
+    Sandbox_OmiChat_tag_NoLanguageOverhead = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> NoLanguage <POPRGB> , but only applies to overhead formatting.",
+    Sandbox_OmiChat_tag_NoName = "Indicates that names should not be included in messages." ..
+        " <LINE> Takes precedence over <SPACE> <PUSHRGB:0,0.5,1> IncludeName <POPRGB> .",
+    Sandbox_OmiChat_tag_NoNameChat = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> NoName <POPRGB> , but only applies to chat formatting.",
+    Sandbox_OmiChat_tag_NoNameOverhead = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> NoName <POPRGB> , but only applies to overhead formatting.",
+    Sandbox_OmiChat_tag_NoOutOfRangeIndicator = "Indicates that the out-of-range indicator prefix should not be included.",
+    Sandbox_OmiChat_tag_NoOutOfRangeIndicatorChat = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> NoOutOfRangeIndicator <POPRGB> , but only applies to chat formatting.",
+    Sandbox_OmiChat_tag_NoOutOfRangeIndicatorOverhead = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> NoOutOfRangeIndicator <POPRGB> , but only applies to overhead formatting.",
+    Sandbox_OmiChat_tag_NoPrefixSpace = "Indicates that a space should not be included between the prefix and the content in a final format.",
+    Sandbox_OmiChat_tag_NoPrefixSpaceChat = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> NoPrefixSpace <POPRGB> , but only applies to chat formatting.",
+    Sandbox_OmiChat_tag_NoPrefixSpaceOverhead = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> NoPrefixSpace <POPRGB> , but only applies to overhead formatting.",
+    Sandbox_OmiChat_tag_NoSignedOverRadio = "Indicates that an error message should be shown when attempting to send a message on this stream in a signed language." ..
+        " <LINE> The error message notifies the player that signed message cannot be sent over radio.",
+    Sandbox_OmiChat_tag_NoTagColon = "Indicates that a colon should not be included after a chat tag." ..
+        " <LINE> This is the default behavior unless on the server message stream.",
+    Sandbox_OmiChat_tag_NoTimestamp = "Indicates that a timestamp should not be included, even if the option is enabled.",
+    Sandbox_OmiChat_tag_NoTransmitOverRadio = "Indicates that messages from a stream should be hidden if transmitted over radio." ..
+        " <LINE> This is the default behavior for actions and OOC messages.",
+    Sandbox_OmiChat_tag_NoVolumeIndicator = "Indicates that the volume indicator prefix should not be included.",
+    Sandbox_OmiChat_tag_NoVolumeIndicatorChat = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> NoVolumeIndicator <POPRGB> , but only applies to chat formatting.",
+    Sandbox_OmiChat_tag_NoVolumeIndicatorOverhead = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> NoVolumeIndicator <POPRGB> , but only applies to overhead formatting.",
+    Sandbox_OmiChat_tag_OOC = "Indicates that messages on a stream are out-of-character." ..
+        " <LINE> This wraps the message in two pairs of parentheses.",
+    Sandbox_OmiChat_tag_OptionalActionAsterisk = "Indicates that an asterisk is not required to switch from a quote segment to an action segment.",
+    Sandbox_OmiChat_tag_OverRadio = "Indicates that messages should include a parenthesized prefix showing that the message was sent over radio.",
+    Sandbox_OmiChat_tag_OverRadioChat = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> OverRadio <POPRGB> , but only applies to chat formatting.",
+    Sandbox_OmiChat_tag_OverRadioOverhead = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> OverRadio <POPRGB> , but only applies to overhead formatting.",
+    Sandbox_OmiChat_tag_Quiet = "Indicates that a stream should be treated as the quiet volume.",
+    Sandbox_OmiChat_tag_QuoteColorTarget = "Indicates the stream that should be used to determine the color of embedded quotes." ..
+        " <LINE> If this is included on multiple streams, the stream with tags that match the volume (Loud, Whisper, Quiet) of the message will be preferred.",
+    Sandbox_OmiChat_tag_RollCommandTarget = "Indicates the stream that should be used for formatting messages from the <SPACE> <PUSHRGB:0,1,0> /roll <POPRGB> <SPACE> command.",
+    Sandbox_OmiChat_tag_SneakCallout = "Indicates the stream that should be used for formatting sneak callout messages.",
+    Sandbox_OmiChat_tag_TagColon = "Indicates that a colon should be included after a chat tag." ..
+        " <LINE> This is the default behavior on the server message stream.",
+    Sandbox_OmiChat_tag_TransmitOverRadio = "Indicates that messages from a stream should not be hidden if transmitted over radio." ..
+        " <LINE> This is the default behavior unless the message is an action or OOC message.",
+    Sandbox_OmiChat_tag_Uppercase = "Indicates that text should be converted to all uppercase." ..
+        " <LINE> This does not have an effect for sneak callouts." ..
+        " <LINE> To apply uppercase formatting to those, use <SPACE> <PUSHRGB:0,0.5,1> UppercaseSneakCallout <POPRGB> ." ..
+        " <LINE> Takes precedence over <SPACE> <PUSHRGB:0,0.5,1> Lowercase <POPRGB> .",
+    Sandbox_OmiChat_tag_UppercaseSneakCallout = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> Uppercase <POPRGB> , but only applies to sneak callouts.",
+    Sandbox_OmiChat_tag_UseAuthorUsername = "Indicates that the author's username should be used as the message name, rather than the name determined by the name format.",
+    Sandbox_OmiChat_tag_UseNameColor = "Indicates that a stream should use speech colors as name colors.",
+    Sandbox_OmiChat_tag_UseVanillaPM = "Indicates that a PM stream should be formatted like the vanilla PM.",
+    Sandbox_OmiChat_tag_Whisper = "Indicates that a stream should be treated as the whisper volume.",
 }

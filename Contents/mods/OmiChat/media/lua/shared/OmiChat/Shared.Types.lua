@@ -518,6 +518,10 @@
 ---@field SneakCalloutRange integer?
 
 
+---@class omichat.ConfigurationFormState
+---@field activePresetDialog omi.ui.Dialog?
+
+
 ---@alias omichat.PresetString 'Default' | 'Buffy' | 'Vanilla'
 
 ---@alias omichat.Callback.ConfigurationPreset.GetStreams fun(self: omichat.ConfigurationPreset, schema: omichat.ConfigurationSchema): omichat.Configuration.StreamDefinition[]

@@ -52,11 +52,7 @@ function Helpers.applySharedFormatting(args)
     -- if we don't need to process segments, don't bother splitting the string
     if not doSegments then
         if args.applyCase then
-            if tags.Uppercase then
-                input = input:upper()
-            elseif tags.Lowercase then
-                input = input:lower()
-            end
+            input = Helpers.case(input, tags)
         end
 
         local isAction = not tags.IsEmbeddedQuote and (tags.Action or tags.IsEmbeddedAction)
@@ -148,6 +144,30 @@ function Helpers.capitalize(input)
     return prefix .. spaces .. input .. suffix
 end
 
+---Modifies the case of the input depending on the tags.
+---@param input string
+---@param tags omi.SimpleSet
+---@return string
+function Helpers.case(input, tags)
+    local doUppercase = tags.Uppercase
+    local doLowercase = tags.Lowercase
+    if tags.IsNarrativeStyle then
+        doUppercase = false
+        doLowercase = false
+    elseif tags.IsSneakCallout then
+        doUppercase = tags.UppercaseSneakCallout
+        doLowercase = false
+    end
+
+    if doUppercase then
+        input = input:upper()
+    elseif doLowercase then
+        input = input:lower()
+    end
+
+    return input
+end
+
 ---Checks whether the language being sent is signed and returns an error ID if it is.
 ---The translation of the error assumes the stream is intended to be a "radio" channel for RP purposes.
 ---@param interpolator omichat.Interpolator
@@ -180,11 +200,7 @@ function Helpers.colorActions(segments, options, tags)
         return
     end
 
-    local keepAsterisk = false
-    if options then
-        keepAsterisk = options:get('keepActionAsterisk') or false
-    end
-
+    local keepAsterisk = tags.KeepActionAsterisk
     for i = 1, #segments do
         local part = segments[i]
         if part.type == 'action' then
@@ -290,11 +306,7 @@ function Helpers.formatActionSegments(segments, tags, args, onlyFirst)
             end
 
             if args.applyCase then
-                if tags.Uppercase then
-                    text = text:upper()
-                elseif tags.Lowercase then
-                    text = text:lower()
-                end
+                text = Helpers.case(text, tags)
             end
 
             if args.doPunctuate then
@@ -330,11 +342,7 @@ function Helpers.formatQuoteSegments(segments, tags, args, onlyFirst)
             end
 
             if args.applyCase then
-                if tags.Uppercase then
-                    text = text:upper()
-                elseif tags.Lowercase then
-                    text = text:lower()
-                end
+                text = Helpers.case(text, tags)
             end
 
             if args.doPunctuate then
@@ -697,12 +705,12 @@ function Helpers.getRadioPrefix(interpolator, tags)
     if tags.IsRadioStream then
         prefix = getText('UI_OmiChat_Radio', tostring(interpolator:token('frequency') or '???'))
 
-        if tags.IncludeColon or not (tags.NoColon or tags.NoColonChat or tags.IsNarrativeStyle or tags.IsBuffyRoll) then
+        if tags.IncludeColon or not (tags.NoColon or tags.IsNarrativeStyle or tags.IsBuffyRoll) then
             prefix = prefix .. ':'
         end
 
         prefix = prefix .. ' <SPACE> '
-    elseif tags.OverRadio or tags.IsEchoMessage then
+    elseif tags.OverRadio or tags.OverRadioChat or tags.IsEchoMessage then
         prefix = Helpers.getOverRadioText(interpolator:token('chatType')) .. ' <SPACE> '
     end
 
@@ -729,7 +737,7 @@ function Helpers.getVolumeIndicator(options, tags, shouldTranslate)
     end
 
     if shouldTranslate then
-        indicator = getTextOrNull('UI_OmiChat_VolumeIndicator_' .. indicator) or indicator
+        indicator = getTextOrNull('UI_OmiChat_VolumeIndicator_' .. indicator:gsub('%s', '_')) or indicator
     end
 
     return '[' .. indicator .. ']'
@@ -915,9 +923,9 @@ end
 ---@param tags omi.SimpleSet
 ---@return string
 function Helpers.wrapActionChat(text, tags)
-    if tags.UseActionAsterisks or tags.UseActionAsterisksChat then
+    if tags.ActionAsterisks or tags.ActionAsterisksChat then
         return '** <SPACE> ' .. text
-    elseif not (tags.UseActionPlain or tags.UseActionPlainChat) then
+    elseif not (tags.ActionPlain or tags.ActionPlainChat) then
         return getText('UI_OmiChat_RPEmote', ' <SPACE> ' .. text .. ' <SPACE> ')
     end
 
@@ -929,9 +937,9 @@ end
 ---@param tags omi.SimpleSet
 ---@return string
 function Helpers.wrapActionOverhead(text, tags)
-    if tags.UseActionAsterisks or tags.UseActionAsterisksOverhead then
+    if tags.ActionAsterisks or tags.ActionAsterisksOverhead then
         return '** ' .. text
-    elseif not (tags.UseActionPlain or tags.UseActionPlainOverhead) then
+    elseif not (tags.ActionPlain or tags.ActionPlainOverhead) then
         return '( ' .. text .. ' )'
     end
 

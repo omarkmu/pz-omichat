@@ -53,7 +53,7 @@ function Library.Defaults.Chat(interpolator, args)
     local options = readOptions(args)
     local tags = readTags(interpolator)
 
-    local defaultNoColon = tags.IsNarrativeStyle or tags.IsBuffyRoll or tags.IsServerStream
+    local defaultNoColon = tags.IsNarrativeStyle or tags.IsBuffyRoll or tags.IsServerStream or tags.Action
     local noColon = tags.IsRadioStream or (not tags.IncludeColon and (tags.NoColon or defaultNoColon))
 
     local name = '' ---@type string?
@@ -133,7 +133,7 @@ function Library.Defaults.Chat(interpolator, args)
         options = options,
         tags = tags,
         input = message,
-        applyCase = not tags.IsNarrativeStyle,
+        applyCase = true,
         applyEmbeddedQuotes = true,
         applyEmbeddedActions = true,
         doCapitalize = not tags.IsNarrativeStyle and autoCapitalize,
@@ -171,7 +171,7 @@ function Library.Defaults.Chat(interpolator, args)
         return prefix .. message
     end
 
-    if tags.BracketedNames and not tags.NoBracketedNames then
+    if tags.BracketedNames then
         name = '[' .. name .. ']'
     end
 
@@ -187,7 +187,7 @@ function Library.Defaults.ChatFinal(interpolator, args)
     local tags = readTags(interpolator)
     local prefix = optionOrToken(interpolator, options, 'prefix')
 
-    local prefixSpace = not tags.NoPrefixSpace and not tags.NoPrefixSpaceChat and not options:getBoolean('noPrefixSpace')
+    local prefixSpace = not tags.NoPrefixSpace and not tags.NoPrefixSpaceChat
     if prefixSpace and prefix ~= '' then
         prefix = prefix .. ' <SPACE> '
     end
@@ -217,7 +217,7 @@ function Library.Defaults.ChatPrefix(interpolator, args)
         end
     end
 
-    if tags.IsPerceptionRange and not tags.NoPerceptionRangeIndicator and not tags.NoPerceptionRangeIndicatorChat then
+    if tags.IsPerceptionRange and not tags.NoOutOfRangeIndicator and not tags.NoOutOfRangeIndicatorChat then
         result[#result + 1] = '[' .. getText('UI_OmiChat_OutOfRange') .. ']'
     end
 
@@ -231,7 +231,7 @@ function Library.Defaults.ChatPrefix(interpolator, args)
         result[#result + 1] = buffyCrit
     end
 
-    if tags.OverRadio and not tags.IsPerceptionRange and not tags.IsUnknownLanguage then
+    if (tags.OverRadio or tags.OverRadioChat) and not tags.IsUnknownLanguage then
         result[#result + 1] = ' <SPACE> '
         result[#result + 1] = Helpers.getOverRadioText(interpolator:token('chatType'))
     end
@@ -669,7 +669,7 @@ function Library.Defaults.Overhead(interpolator, args)
         options = options,
         tags = tags,
         input = input,
-        applyCase = not tags.IsNarrativeStyle,
+        applyCase = true,
         applyEmbeddedQuotes = true,
         applyEmbeddedActions = true,
         doCapitalize = not tags.IsNarrativeStyle and autoCapitalize,
@@ -684,7 +684,7 @@ function Library.Defaults.Overhead(interpolator, args)
     local includeName = tags.IncludeName or tags.IncludeNameOverhead or tags.IsNarrativeStyle
 
     if name and includeName and not noName then
-        local defaultNoColon = tags.NoColonOverhead or tags.IsNarrativeStyle or tags.Action
+        local defaultNoColon = tags.IsNarrativeStyle or tags.Action
         local noColon = not tags.IncludeColon and (tags.NoColon or defaultNoColon)
 
         input = tostring(name) .. (noColon and ' ' or ': ') .. input
@@ -694,7 +694,7 @@ function Library.Defaults.Overhead(interpolator, args)
         input = Helpers.wrapActionOverhead(input, tags)
     end
 
-    if tags.OverRadio and not tags.IsPerceptionRange and not tags.IsUnknownLanguage then
+    if (tags.OverRadio or tags.OverRadioOverhead) and not tags.IsUnknownLanguage then
         input = Helpers.getOverRadioText(interpolator:token('chatType')) .. ' ' .. input
     end
 
@@ -710,9 +710,7 @@ function Library.Defaults.OverheadFinal(interpolator, args)
     local tags = readTags(interpolator)
     local prefix = optionOrToken(interpolator, options, 'prefix')
 
-    local prefixSpace = not tags.NoPrefixSpace and not tags.NoPrefixSpaceOverhead and
-        not options:getBoolean('noPrefixSpace')
-
+    local prefixSpace = not tags.NoPrefixSpace and not tags.NoPrefixSpaceOverhead
     if prefixSpace and prefix ~= '' then
         prefix = prefix .. ' '
     end
@@ -736,7 +734,7 @@ function Library.Defaults.OverheadPrefix(interpolator, args)
         end
     end
 
-    if tags.IsPerceptionRange and not tags.NoPerceptionRangeIndicator and not tags.NoPerceptionRangeIndicatorOverhead then
+    if tags.IsPerceptionRange and not tags.NoOutOfRangeIndicator and not tags.NoOutOfRangeIndicatorOverhead then
         result[#result + 1] = '[Out of Range]'
     end
 
