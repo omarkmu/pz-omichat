@@ -14,6 +14,24 @@ local Library = require 'OmiChat/Component/InterpolationLibrary/Core'
 local Helpers = Library.Helpers
 
 
+---Adds a tag to `tags` token.
+---This fails if there is no `tags` token or it is not a multimap.
+---@param interpolator omichat.Interpolator
+---@param tag unknown
+function Library.AddTag(interpolator, tag)
+    tag = tag and tostring(tag)
+    if not tag or #tag == 0 then
+        return
+    end
+
+    local tags = interpolator:token('tags') --[[@as omi.MultiMap]]
+    if not utils.isinstance(tags, MultiMap) then
+        return
+    end
+
+    interpolator:setToken('tags', tags:withSetValue(tag))
+end
+
 ---Capitalizes the first non-invisible character of a string.
 ---@param interpolator omichat.Interpolator
 ---@param ... unknown
@@ -114,6 +132,25 @@ function Library.Fragmented(interpolator, message)
     return Helpers.getFragmentedMessage(interpolator, tostring(message or ''))
 end
 
+---Checks the `tags` token for a tag.
+---This returns `false` if there is no `tags` token or it is not a multimap.
+---@param interpolator omichat.Interpolator
+---@param tag unknown
+---@return boolean
+function Library.HasTag(interpolator, tag)
+    tag = tag and tostring(tag)
+    if not tag or #tag == 0 then
+        return false
+    end
+
+    local tags = interpolator:token('tags') --[[@as omi.MultiMap]]
+    if not utils.isinstance(tags, MultiMap) then
+        return false
+    end
+
+    return tags:has(tag)
+end
+
 ---Returns text without invisible wrapping characters used for mod functionality.
 ---@param interpolator omichat.Interpolator
 ---@param ... unknown
@@ -172,4 +209,25 @@ end
 function Library.StripColors(interpolator, s)
     s = tostring(s or ''):gsub('<RGB:[%d,.]*>', '')
     return s
+end
+
+---Removes a tag from the `tags` token.
+---This fails if there is no `tags` token or it is not a multimap.
+---@param interpolator omichat.Interpolator
+---@param tag unknown
+function Library.RemoveTag(interpolator, tag)
+    tag = tag and tostring(tag)
+    if not tag or #tag == 0 then
+        return
+    end
+
+    local tags = interpolator:token('tags') --[[@as omi.MultiMap]]
+    if not utils.isinstance(tags, MultiMap) then
+        return
+    end
+
+    local set = tags:toValueSet()
+    set[tag] = nil
+
+    interpolator:setToken('tags', MultiMap.fromSet(set))
 end
