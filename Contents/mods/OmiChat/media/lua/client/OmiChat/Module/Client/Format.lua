@@ -336,6 +336,7 @@ function Format._applyNarrativeStyle(input, stream, tokens)
     dialogueTag = utils.wrapStringArgument(dialogueTag, config.ID_NARRATIVE_TAG)
 
     tokens.input = input
+    tokens.narrativeStyle = '1'
     tokens.dialogueTag = dialogueTag
 
     local content = utils.interpolateNamed(

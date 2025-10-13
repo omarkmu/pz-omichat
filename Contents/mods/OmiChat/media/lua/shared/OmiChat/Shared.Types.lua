@@ -519,6 +519,18 @@
 
 ---@class omichat.ConfigurationFormState
 ---@field activePresetDialog omi.ui.Dialog?
+---@field activeFormatStringDialog omi.ui.Dialog?
+
+---@class omichat.FormatData
+---@field tokenDescription string?
+---@field optionDescription string?
+---@field tokens (omichat.FormatDataTranslation | string)[]?
+---@field options (omichat.FormatDataTranslation | string)[]?
+---@field canSetError boolean?
+
+---@class omichat.FormatDataTranslation
+---@field name string
+---@field id string
 
 
 ---@alias omichat.PresetString 'Default' | 'Buffy' | 'Vanilla'

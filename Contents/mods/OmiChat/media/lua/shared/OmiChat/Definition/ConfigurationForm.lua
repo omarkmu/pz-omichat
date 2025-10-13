@@ -8,7 +8,12 @@ local PAD_N = 10
 local PAD_TOP = { paddingTop = PAD_N }
 local PAD_BOTTOM = { paddingBottom = PAD_N }
 local NO_REORDER = { noReorderButtons = true }
+
 local TAGS = { noReorderButtons = true, onChange = Helpers.onTagChange }
+local FORMAT = { init = Helpers.initFormatOption, onInfoClick = Helpers.onFormatInfoClick }
+
+local FORMAT_PAD_TOP = utils.extendCopy(FORMAT, PAD_TOP)
+local FORMAT_PAD_BOTTOM = utils.extendCopy(FORMAT, PAD_BOTTOM)
 
 
 ---@type omi.forms.Args.Generator.Partial
@@ -57,6 +62,11 @@ return {
             Cooldown = PAD_BOTTOM,
         },
 
+        Callouts = rules {
+            Format = FORMAT,
+            SneakFormat = FORMAT,
+        },
+
         Commands = rules {
             Name = rules {
                 Mode = { noLabel = true },
@@ -82,6 +92,8 @@ return {
                         noReorderButtons = true,
                         prefix = 'Sandbox_OmiChat_Commands_Card_Items',
                     },
+                    Format = FORMAT,
+                    OverheadFormat = FORMAT,
                     Tags = TAGS,
                 },
             },
@@ -99,6 +111,8 @@ return {
                         noReorderButtons = true,
                         prefix = 'Sandbox_OmiChat_Commands_Roll_Items',
                     },
+                    Format = FORMAT,
+                    OverheadFormat = FORMAT,
                     Tags = TAGS,
                 },
             },
@@ -116,6 +130,8 @@ return {
                         noReorderButtons = true,
                         prefix = 'Sandbox_OmiChat_Commands_Flip_Items',
                     },
+                    Format = FORMAT,
+                    OverheadFormat = FORMAT,
                     Tags = TAGS,
                 },
             },
@@ -129,6 +145,7 @@ return {
         },
 
         Discord = rules {
+            ChatFormat = FORMAT,
             ShowColorOption = PAD_TOP,
             Tags = TAGS,
         },
@@ -141,12 +158,46 @@ return {
                     { 'EchoMessages', 'Tags' },
                 },
             },
+            ChatFormat = FORMAT,
+            OverheadFormat = FORMAT,
             Tags = TAGS,
         },
 
         Format = rules {
+            Chat = rules {
+                Prefix = FORMAT,
+                Final = FORMAT,
+            },
+            Overhead = rules {
+                Prefix = FORMAT,
+                Final = FORMAT,
+            },
+            PerceptionRange = rules {
+                Chat = FORMAT,
+                Overhead = FORMAT,
+            },
             Component = rules {
-                EmbeddedQuote = PAD_TOP,
+                Name = FORMAT,
+                Tag = FORMAT,
+                Timestamp = FORMAT,
+                Icon = FORMAT,
+                Language = FORMAT,
+
+                EmbeddedQuote = FORMAT_PAD_TOP,
+                EmbeddedAction = FORMAT,
+            },
+            Filter = rules {
+                ChatInput = FORMAT,
+                Name = FORMAT,
+                Status = FORMAT,
+            },
+            MenuName = rules {
+                Default = FORMAT,
+                Trade = FORMAT,
+                Medical = FORMAT,
+                SearchPlayer = FORMAT,
+                Typing = FORMAT,
+                MiniScoreboard = FORMAT,
             },
         },
 
@@ -192,7 +243,10 @@ return {
             SelfAddBlocklist = NO_REORDER,
 
             InterpretationChance = PAD_BOTTOM,
-            UnknownLanguageRadio = PAD_BOTTOM,
+
+            UnknownLanguageChat = FORMAT,
+            UnknownLanguageOverhead = FORMAT,
+            UnknownLanguageRadio = FORMAT_PAD_BOTTOM,
         },
 
         NarrativeStyle = rules {
@@ -205,14 +259,20 @@ return {
                 },
             },
 
-            ChatContentFormat = PAD_BOTTOM,
+            OverheadContentFormat = FORMAT,
+            ChatContentFormat = FORMAT_PAD_BOTTOM,
+
+            DialogueTagFormat = FORMAT,
+            InputFilter = FORMAT,
         },
 
         Radio = rules {
+            ChatFormat = FORMAT,
             Tags = TAGS,
         },
 
         ServerMessages = rules {
+            ChatFormat = FORMAT,
             Tags = TAGS,
         },
 
@@ -230,7 +290,8 @@ return {
                     ShortCommand = PAD_BOTTOM,
                     Aliases = PAD_BOTTOM,
                     PerceptionRangeSigned = PAD_BOTTOM,
-                    OverheadFormat = PAD_BOTTOM,
+                    ChatFormat = FORMAT,
+                    OverheadFormat = FORMAT_PAD_BOTTOM,
                     UseNarrativeStyle = PAD_BOTTOM,
                     Tags = TAGS,
                 },
@@ -345,6 +406,8 @@ return {
             Enable = {
                 toggleFields = { { 'TypingIndicator', 'Format' } },
             },
+
+            Format = FORMAT,
         },
     },
 }

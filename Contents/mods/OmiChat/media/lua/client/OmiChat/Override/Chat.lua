@@ -394,25 +394,19 @@ function ISChat:onInfo()
 
     if not infoDialog then
         local instance = ISChat.instance
-        local screenW, screenH = UI.getScreenCenter(400, 300)
         infoDialog = UI.dialog {
-            x = screenW,
-            y = screenH,
             w = 600,
             h = 600,
-            richText = true,
             text = self.infoText,
+            richText = true,
             alwaysOnTop = true,
             moveWithMouse = false,
+            setHeightToContents = true,
             backgroundColor = { r = 0, g = 0, b = 0, a = 0.8 },
         }
 
         infoDialog.chatText:setOnAction(instance, API.callback.onInfoPanelAction)
         infoDialog.chatText:setOnUpdate(instance, API.callback.onInfoPanelUpdate)
-        infoDialog:setHeightToContents()
-        infoDialog:ignoreHeightChange()
-
-        infoDialog:setY(getPlayerScreenTop(0) + (getPlayerScreenHeight(0) - infoDialog:getHeight()) * 0.5)
 
         self.infoRichText = infoDialog
         return

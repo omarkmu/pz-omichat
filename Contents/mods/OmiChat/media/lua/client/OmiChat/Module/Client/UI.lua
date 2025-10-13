@@ -220,7 +220,7 @@ end
 function UI.getTypingDisplay(maxWidth)
     local display = UI._typingDisplay
     if display and maxWidth and textManager:MeasureStringX(UIFont.Small, display) > maxWidth then
-        display = utils.interpolateNamed('TypingIndicator', config.TypingIndicator.Format, { alt = true })
+        display = utils.interpolateNamed('TypingIndicator', config.TypingIndicator.Format, { alt = '1' })
     end
 
     return display

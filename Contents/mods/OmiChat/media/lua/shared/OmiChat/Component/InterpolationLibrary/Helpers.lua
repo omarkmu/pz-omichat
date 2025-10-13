@@ -732,7 +732,7 @@ function Helpers.getVolumeIndicator(options, tags, shouldTranslate)
         indicator = options:getString('whisperIndicator', config:getVariable('VolumeIndicatorWhisper') or 'Whisper')
     end
 
-    if not indicator or type(indicator) ~= 'string' then
+    if not indicator or indicator == '' then
         return
     end
 

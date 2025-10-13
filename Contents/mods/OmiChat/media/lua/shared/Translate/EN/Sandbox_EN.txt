@@ -2,6 +2,7 @@ Sandbox_EN = {
     Sandbox_OmiChat_title = "OmiChat Settings",
     Sandbox_OmiChat_status_preset = "Applied values from the %1 preset.",
 
+    --[[ Options ]]--
     Sandbox_OmiChat_General = "General",
     Sandbox_OmiChat_General_title = "General Settings",
     Sandbox_OmiChat_General_Preset = "Preset",
@@ -199,7 +200,8 @@ Sandbox_EN = {
     Sandbox_OmiChat_ZombieAttraction_CalloutRange = "Callout Range",
     Sandbox_OmiChat_ZombieAttraction_SneakCalloutRange = "Sneak Callout Range",
 
-    /* Tooltips */
+
+    --[[ Tooltips ]]--
     Sandbox_OmiChat_General_Preset_tooltip = "Presets that can be applied to update all settings.",
     Sandbox_OmiChat_General_Preset_action_tooltip1 = " <PUSHRGB:1,0,0> This will replace all current settings. <POPRGB>" ..
         " <LINE> Apply the settings of the preset.",
@@ -209,7 +211,7 @@ Sandbox_EN = {
     Sandbox_OmiChat_General_CaseInsensitiveChatStreams_tooltip = "If enabled, chat streams will be case-insensitive." ..
         " <BR> This means that <SPACE> <PUSHRGB:0,1,0> /say <POPRGB> <SPACE> and <SPACE> <PUSHRGB:0,1,0> /SAY <POPRGB> <SPACE> will be treated equivalently.",
     Sandbox_OmiChat_General_MinimumCommandAccessLevel_tooltip = "The minimum access level required to execute admin commands added by the mod.",
-    Sandbox_OmiChat_General_AdminIcon_tooltip = "Defines the value of the <SPACE> <PUSHRGB:0,0.5,1> $adminIcon <POPRGB> <SPACE> token in the icon format. This expects a valid texture name.",
+    Sandbox_OmiChat_General_AdminIcon_tooltip = "Defines the value of the <SPACE> <PUSHRGB:0,0.5,1> adminIcon <POPRGB> <SPACE> token in the icon format. This expects a valid texture name.",
     Sandbox_OmiChat_General_ClearOnDeath_tooltip = "Determines the information that is cleared when a player's character dies.",
     Sandbox_OmiChat_General_ClearOnDeath_Icon_tooltip = "If enabled, chat icons will be cleared on death.",
     Sandbox_OmiChat_General_ClearOnDeath_Languages_tooltip = "If enabled, roleplay languages will be cleared on death.",
@@ -249,7 +251,7 @@ Sandbox_EN = {
     Sandbox_OmiChat_Commands_Flip_Items_tooltip = "List of items that players can use for the <SPACE> <PUSHRGB:0,1,0> /flip <POPRGB> <SPACE> command." ..
         " <BR> If a player doesn't have any of the items in the list, the command will fail. If this is blank, the command won't require an item.",
     Sandbox_OmiChat_Commands_Command_Global_tooltip = "Controls whether the command should be global, similar to vanilla commands. This disables formatting options.",
-    Sandbox_OmiChat_Commands_Command_Format_tooltip = "Defines the value of the <SPACE> <PUSHRGB:0,0.5,1> $input <POPRGB> <SPACE> token in the overhead format for the command.",
+    Sandbox_OmiChat_Commands_Command_Format_tooltip = "Defines the value of the <SPACE> <PUSHRGB:0,0.5,1> input <POPRGB> <SPACE> token in the overhead format for the command.",
     Sandbox_OmiChat_Commands_Command_OverheadFormat_tooltip = "Defines the format of overhead speech bubbles for the command.",
     Sandbox_OmiChat_Commands_Command_Tags_tooltip = "Tags that modify the appearance and behavior of messages associated with the command.",
 
@@ -286,21 +288,21 @@ Sandbox_EN = {
 
     Sandbox_OmiChat_Format_Chat_tooltip = "Format strings used to control how messages appear in chat.",
     Sandbox_OmiChat_Format_Chat_Final_tooltip = "Format used for the final chat message, after all other format strings have been applied.",
-    Sandbox_OmiChat_Format_Chat_Prefix_tooltip = "Defines the value of the <SPACE> <PUSHRGB:0,0.5,1> $prefix <POPRGB> <SPACE> token in the final chat format.",
+    Sandbox_OmiChat_Format_Chat_Prefix_tooltip = "Defines the value of the <SPACE> <PUSHRGB:0,0.5,1> prefix <POPRGB> <SPACE> token in the final chat format.",
     Sandbox_OmiChat_Format_Overhead_tooltip = "Format strings used to control how ranged messages appear over characters' heads.",
     Sandbox_OmiChat_Format_Overhead_Final_tooltip = "Format used for the final overhead message, after all other format strings have been applied.",
-    Sandbox_OmiChat_Format_Overhead_Prefix_tooltip = "Defines the value of the <SPACE> <PUSHRGB:0,0.5,1> $prefix <POPRGB> <SPACE> token in the final overhead format.",
+    Sandbox_OmiChat_Format_Overhead_Prefix_tooltip = "Defines the value of the <SPACE> <PUSHRGB:0,0.5,1> prefix <POPRGB> <SPACE> token in the final overhead format.",
     Sandbox_OmiChat_Format_PerceptionRange_tooltip = "Format strings for text to display when a message is out of range, but within range for perceiving that something was said.",
     Sandbox_OmiChat_Format_PerceptionRange_Chat_tooltip = "Defines how out-of-range perceived messages display in chat.",
     Sandbox_OmiChat_Format_PerceptionRange_Overhead_tooltip = "Defines how out-of-range perceived messages display overhead.",
     Sandbox_OmiChat_Format_Component_tooltip = "Format strings used to define specific values in other format strings.",
-    Sandbox_OmiChat_Format_Component_Name_tooltip = "Defines the values of the <SPACE> <PUSHRGB:0,0.5,1> $name <POPRGB> <SPACE> and <SPACE> <PUSHRGB:0,0.5,1> $nameRaw <POPRGB> <SPACE> tokens in other format strings.",
+    Sandbox_OmiChat_Format_Component_Name_tooltip = "Defines the values of the <SPACE> <PUSHRGB:0,0.5,1> name <POPRGB> <SPACE> and <SPACE> <PUSHRGB:0,0.5,1> nameRaw <POPRGB> <SPACE> tokens in other format strings.",
     Sandbox_OmiChat_Format_Component_Tag_tooltip = "Defines the format used for chat tags when a player enables the relevant option." ..
-        " This controls the value of the <SPACE> <PUSHRGB:0,0.5,1> $tag <POPRGB> <SPACE> token in other format strings.",
+        " This controls the value of the <SPACE> <PUSHRGB:0,0.5,1> tag <POPRGB> <SPACE> token in other format strings.",
     Sandbox_OmiChat_Format_Component_Timestamp_tooltip = "Determines the format used for timestamps when a player enables the relevant option." ..
-        " This controls the value of the <SPACE> <PUSHRGB:0,0.5,1> $timestamp <POPRGB> <SPACE> token in other format strings.",
-    Sandbox_OmiChat_Format_Component_Icon_tooltip = "Defines the value of the <SPACE> <PUSHRGB:0,0.5,1> $icon <POPRGB> <SPACE> token in other format strings.",
-    Sandbox_OmiChat_Format_Component_Language_tooltip = "Defines the value of the <SPACE> <PUSHRGB:0,0.5,1> $language <POPRGB> <SPACE> token in the final chat format.",
+        " This controls the value of the <SPACE> <PUSHRGB:0,0.5,1> timestamp <POPRGB> <SPACE> token in other format strings.",
+    Sandbox_OmiChat_Format_Component_Icon_tooltip = "Defines the value of the <SPACE> <PUSHRGB:0,0.5,1> icon <POPRGB> <SPACE> token in other format strings.",
+    Sandbox_OmiChat_Format_Component_Language_tooltip = "Defines the value of the <SPACE> <PUSHRGB:0,0.5,1> language <POPRGB> <SPACE> token in the final chat format.",
     Sandbox_OmiChat_Format_Component_EmbeddedQuote_tooltip = "Defines the format used for quotes embedded in actions.",
     Sandbox_OmiChat_Format_Component_EmbeddedAction_tooltip = "Defines the format used for actions embedded in text.",
     Sandbox_OmiChat_Format_Filter_tooltip = "Format strings used to control whether an input is allowed.",
@@ -388,7 +390,8 @@ Sandbox_EN = {
     Sandbox_OmiChat_ZombieAttraction_CalloutRange_tooltip = "The maximum distance for callouts to attract zombies.",
     Sandbox_OmiChat_ZombieAttraction_SneakCalloutRange_tooltip = "The maximum distance for sneak callouts to attract zombies.",
 
-    /* Tag Tooltips */
+
+    --[[ Tags ]]--
     Sandbox_OmiChat_tag_unknown = "Unrecognized tag.",
     Sandbox_OmiChat_tag_Action = "Indicates that a stream is a roleplay action (e.g., <SPACE> <PUSHRGB:0,1,0> /me <POPRGB> )." ..
         " <LINE> This controls various defaults for formatting.",
@@ -403,7 +406,7 @@ Sandbox_EN = {
     Sandbox_OmiChat_tag_ActionPlainOverhead = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> ActionPlain <POPRGB> , but only applies to overhead formatting.",
     Sandbox_OmiChat_tag_AutoCapitalize = "Indicates that messages sent on a stream should automatically have their first letter capitalized." ..
         " <LINE> This does not have an effect for sneak callouts." ..
-        " <LINE> To apply capitalization to those, use <SPACE> <PUSHRGB:0,0.5,1> AutoCapitalizeSneakCallout <POPRGB> .",
+        " To apply capitalization to those, use <SPACE> <PUSHRGB:0,0.5,1> AutoCapitalizeSneakCallout <POPRGB> .",
     Sandbox_OmiChat_tag_AutoCapitalizeChat = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> AutoCapitalize <POPRGB> , but only applies to chat formatting.",
     Sandbox_OmiChat_tag_AutoCapitalizeEmbeddedActions = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> AutoCapitalize <POPRGB> , but only applies to embedded actions.",
     Sandbox_OmiChat_tag_AutoCapitalizeEmbeddedQuotes = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> AutoCapitalize <POPRGB> , but only applies to embedded quotes.",
@@ -499,11 +502,171 @@ Sandbox_EN = {
         " <LINE> This is the default behavior unless the message is an action or OOC message.",
     Sandbox_OmiChat_tag_Uppercase = "Indicates that text should be converted to all uppercase." ..
         " <LINE> This does not have an effect for sneak callouts." ..
-        " <LINE> To apply uppercase formatting to those, use <SPACE> <PUSHRGB:0,0.5,1> UppercaseSneakCallout <POPRGB> ." ..
+        " To apply uppercase formatting to those, use <SPACE> <PUSHRGB:0,0.5,1> UppercaseSneakCallout <POPRGB> ." ..
         " <LINE> Takes precedence over <SPACE> <PUSHRGB:0,0.5,1> Lowercase <POPRGB> .",
     Sandbox_OmiChat_tag_UppercaseSneakCallout = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> Uppercase <POPRGB> , but only applies to sneak callouts.",
     Sandbox_OmiChat_tag_UseAuthorUsername = "Indicates that the author's username should be used as the message name, rather than the name determined by the name format.",
     Sandbox_OmiChat_tag_UseNameColor = "Indicates that a stream should use speech colors as name colors.",
     Sandbox_OmiChat_tag_UseVanillaPM = "Indicates that a PM stream should be formatted like the vanilla PM.",
     Sandbox_OmiChat_tag_Whisper = "Indicates that a stream should be treated as the whisper volume.",
+
+
+    --[[ Tokens & Options ]]--
+    Sandbox_OmiChat_format_option_heading = "This setting is a <SPACE> <PUSHRGB:0,0.5,1> format string <POPRGB> . Click for an overview of the format string syntax.",
+    Sandbox_OmiChat_tokens = "Available tokens:",
+    Sandbox_OmiChat_options = "Available options for the default function (provided with a multimap):",
+
+    Sandbox_OmiChat_tokendesc_Embedded = "The tokens for this setting differ depending on the context in which it is used." ..
+        " <LINE> The following are guaranteed.",
+
+    Sandbox_OmiChat_token_admin = "Set to '1' if the message should display as coming from an admin. Not given otherwise.",
+    Sandbox_OmiChat_token_adminIcon = "The admin icon to use for the message. Not given unless applicable.",
+    Sandbox_OmiChat_token_alt_typing = "Set to '1' if the 'several people are typing' message should be used for the typing indicator.",
+    Sandbox_OmiChat_token_ampm = "Depending on the timestamp, 'am' or 'pm'.",
+    Sandbox_OmiChat_token_AMPM = "Depending on the timestamp, 'AM' or 'PM'.",
+    Sandbox_OmiChat_token_author = "The message author (usually a username). This may include rich text for the name color.",
+    Sandbox_OmiChat_token_authorRaw = "The message author (usually a username), without any rich text.",
+    Sandbox_OmiChat_token_buffyCrit = "Formatted text for critical success or failure of a roll." ..
+        " <LINE> This is only included for rolls if the compatibility patch for <SPACE> <PUSHRGB:0,0.5,1> Buffy's Tabletop RPG System <POPRGB> <SPACE> is enabled.",
+    Sandbox_OmiChat_token_buffyCritRaw = "Set to 'success' or 'failure' for critical rolls." ..
+        " <LINE> This is only included for rolls if the compatibility patch for <SPACE> <PUSHRGB:0,0.5,1> Buffy's Tabletop RPG System <POPRGB> <SPACE> is enabled.",
+    Sandbox_OmiChat_token_buffyRoll = "Set to the roll text (e.g., 'rolled X: 5+1=6)." ..
+        " <LINE> This is only included for rolls if the compatibility patch for <SPACE> <PUSHRGB:0,0.5,1> Buffy's Tabletop RPG System <POPRGB> <SPACE> is enabled.",
+    Sandbox_OmiChat_token_callout = "Set to '1' if the message was a callout, including sneak callouts.",
+    Sandbox_OmiChat_token_card = "The translated name of the drawn card.",
+    Sandbox_OmiChat_token_card_untranslated = "The name of the drawn card, in English.",
+    Sandbox_OmiChat_token_dialogueTag = "The dialogue tag for a message using narrative style.",
+    Sandbox_OmiChat_token_echo = "Set to '1' if this is an echo message.",
+    Sandbox_OmiChat_token_error = "Set to the empty string. This can be set to display as an error to the player.",
+    Sandbox_OmiChat_token_errorID = "Set to the empty string. This can be set to a translation ID to display a translated error to the player.",
+    Sandbox_OmiChat_token_faction = "The faction for this stream. Not given unless the stream has the faction chat type.",
+    Sandbox_OmiChat_token_forename = "The relevant player character's forename.",
+    Sandbox_OmiChat_token_frequency = "The frequency of a radio message.",
+    Sandbox_OmiChat_token_h = "The unpadded hour in 12-hour format.",
+    Sandbox_OmiChat_token_H = "The unpadded hour in 24-hour format.",
+    Sandbox_OmiChat_token_hh = "The hour in 12-hour format, zero-padded to two digits.",
+    Sandbox_OmiChat_token_HH = "The hour in 24-hour format, zero-padded to two digits.",
+    Sandbox_OmiChat_token_heads = "Set to '1' if the result of a coin flip was heads. Not given otherwise.",
+    Sandbox_OmiChat_token_hourFormat = "Set to '12' or '24' depending on the player's hour format preference.",
+    Sandbox_OmiChat_token_icon = "The icon to use for the message.",
+    Sandbox_OmiChat_token_iconRaw = "The name of the icon used for the <SPACE> <PUSHRGB:0,0.5,1> icon <POPRGB> <SPACE> token.",
+    Sandbox_OmiChat_token_icon_processed = "The &lt;IMAGE&gt; tag for a chat icon, with leading and trailing spaces.",
+    Sandbox_OmiChat_token_incomingPM = "Set to '1' for incoming private messages. Not given otherwise.",
+    Sandbox_OmiChat_token_input = "The input text.",
+    Sandbox_OmiChat_token_input_processed = "The input text, after all prior processing.",
+    Sandbox_OmiChat_token_language = "The roleplay language of a message, translated into the current locale.",
+    Sandbox_OmiChat_token_languageRaw = "The untranslated roleplay language of a message.",
+    Sandbox_OmiChat_token_language_processed = "The result of the language component format.",
+    Sandbox_OmiChat_token_m = "The unpadded minute.",
+    Sandbox_OmiChat_token_mm = "The minute, zero-padded to two digits.",
+    Sandbox_OmiChat_token_menuType = "The type of menu in which the name will appear." ..
+        " <LINE> Possible values: medical, mini_scoreboard, search_player, trade, typing.",
+    Sandbox_OmiChat_token_name = "The chat name of the relevant player. This may include rich text for the name color.",
+    Sandbox_OmiChat_token_nameRaw = "The chat name of the relevant player, without rich text.",
+    Sandbox_OmiChat_token_name_component = "The player's configured nickname.",
+    Sandbox_OmiChat_token_names_typing = "A list-style multimap with names to include in the typing list.",
+    Sandbox_OmiChat_token_narrativeStyle = "Set to '1' if narrative style was used for the message. Not given otherwise.",
+    Sandbox_OmiChat_token_number = "The number of the card, from 1 to 13. Ace is 1, Jack is 11, Queen is 12, and King is 13.",
+    Sandbox_OmiChat_token_originalStream = "The original stream that a radio message was sent over. Not given for non-radio messages.",
+    Sandbox_OmiChat_token_originalTags = "The tags of the original stream that a radio message was sent over. Not given for non-radio messages.",
+    Sandbox_OmiChat_token_outgoingPM = "Set to '1' for outgoing private messages. Not given otherwise.",
+    Sandbox_OmiChat_token_P = "The unpadded hour, in the player's preferred hour format.",
+    Sandbox_OmiChat_token_PP = "The hour in the player's preferred hour format, zero-padded to two digits.",
+    Sandbox_OmiChat_token_prefix_chat_final = "The prefix determined by the chat prefix format.",
+    Sandbox_OmiChat_token_prefix_overhead_final = "The prefix determined by the overhead prefix format.",
+    Sandbox_OmiChat_token_recipient = "The username of the recipient of a PM. This may include rich text for the name color.",
+    Sandbox_OmiChat_token_recipientRaw = "The username of the recipient of a PM, without rich text.",
+    Sandbox_OmiChat_token_recipientName = "The chat name of the recipient of a PM. This may include rich text for the name color.",
+    Sandbox_OmiChat_token_recipientNameRaw = "The chat name of the recipient of a PM, without rich text.",
+    Sandbox_OmiChat_token_roll = "The number that was rolled.",
+    Sandbox_OmiChat_token_s = "The unpadded seconds.",
+    Sandbox_OmiChat_token_ss = "The seconds, zero-padded to two digits.",
+    Sandbox_OmiChat_token_sides = "The number of sides on the die that was rolled.",
+    Sandbox_OmiChat_token_sneakCallout = "Set to '1' if the message was a callout sent while sneaking.",
+    Sandbox_OmiChat_token_stream = "The name of the chat stream on which the message was sent or will be sent.",
+    Sandbox_OmiChat_token_suit = "The suit of the card, as a number from 1 to 4. Clubs is 1, Diamonds is 2, Hearts is 3, and Spades is 4.",
+    Sandbox_OmiChat_token_surname = "The relevant player character's surname.",
+    Sandbox_OmiChat_token_tag = "The result of the tag component format.",
+    Sandbox_OmiChat_token_tag_component = "The title of the chat type associated with the message.",
+    Sandbox_OmiChat_token_tags = "The tags on the stream for the message.",
+    Sandbox_OmiChat_token_target_filter_name = "Set to 'name' if the name being set is the character name. Otherwise, set to 'nickname'.",
+    Sandbox_OmiChat_token_timestamp = "The result of the timestamp component format.",
+    Sandbox_OmiChat_token_unknownLanguage = "The untranslated name of the message's roleplay language." ..
+        " <LINE> Not given unless the message was sent in a language the player character does not know.",
+    Sandbox_OmiChat_token_unstyled = "The original content of a message sent in narrative style.",
+    Sandbox_OmiChat_token_username = "The username of the relevant player.",
+    Sandbox_OmiChat_token_chatType = "The chat type of the stream." ..
+        " <LINE> Possible values: general, whisper, say, shout, faction, safehouse, radio, admin, server.",
+
+    Sandbox_OmiChat_option_cardIcon = "The icon to use for messages. Defaults to 'Item_CardDeck'.",
+    Sandbox_OmiChat_option_colorTargetTag = "The tag to use for narrowing if multiple streams <LINE> include <SPACE> <PUSHRGB:0,0.5,1> ActionColorTarget <POPRGB> / <PUSHRGB:0,0.5,1> QuoteColorTarget <POPRGB> .",
+    Sandbox_OmiChat_option_defaultName = "The name to use by default if other options are not available.",
+    Sandbox_OmiChat_option_dialogueTag = "The narrative style dialogue tag (e.g., 'says,').",
+    Sandbox_OmiChat_option_exclamationTag = "The default dialogue tag for an exclamation. Defaults to 'exclaims'.",
+    Sandbox_OmiChat_option_flipIcon = "The icon to use for messages. Defaults to 'Item_Plate'.",
+    Sandbox_OmiChat_option_input = "Used instead of the value of the <SPACE> <PUSHRGB:0,0.5,1> input <POPRGB> <SPACE> token if given.",
+    Sandbox_OmiChat_option_language = "Used instead of the value of the <SPACE> <PUSHRGB:0,0.5,1> languageRaw <POPRGB> <SPACE> token if given.",
+    Sandbox_OmiChat_option_loudIndicator = "The volume indicator to use for a loud message." ..
+        " <LINE> Defaults to the 'VolumeIndicatorLoud' configuration variable, or 'Loud'.",
+    Sandbox_OmiChat_option_loudTag = "The default dialogue tag to use for a loud message. Defaults to 'shouts'.",
+    Sandbox_OmiChat_option_maxLength = "The maximum length of the input. Produces a relevant error if exceeded.",
+    Sandbox_OmiChat_option_maxLength_filter_status = "The maximum length of the input. Produces a relevant error if exceeded. Defaults to 64.",
+    Sandbox_OmiChat_option_minLength = "The minimum length of the input. Produces a relevant error if not met.",
+    Sandbox_OmiChat_option_minLength_filter_status = "The minimum length of the input. Produces a relevant error if not met. Defaults to 8.",
+    Sandbox_OmiChat_option_mode = "The mode to use for the name display." ..
+        " <LINE> This can be 'username', 'name', or 'both' to include both separated by a slash.",
+    Sandbox_OmiChat_option_name = "Used instead of the value of the <SPACE> <PUSHRGB:0,0.5,1> name <POPRGB> <SPACE> token if given.",
+    Sandbox_OmiChat_option_names_typing = "A list-style multimap to use for the typing message.",
+    Sandbox_OmiChat_option_noComma = "If given, a comma will not be included after the dialogue tag.",
+    Sandbox_OmiChat_option_prefix = "Used instead of the value of the <SPACE> <PUSHRGB:0,0.5,1> prefix <POPRGB> <SPACE> token if given.",
+    Sandbox_OmiChat_option_questionTag = "The default dialogue tag for a question. Defaults to 'asks'.",
+    Sandbox_OmiChat_option_quietIndicator = "The volume indicator to use for a quiet message." ..
+        " <LINE> Defaults to the 'VolumeIndicatorQuiet' configuration variable, or 'Low'.",
+    Sandbox_OmiChat_option_recipientName = "Used instead of the value of the <SPACE> <PUSHRGB:0,0.5,1> recipientName <POPRGB> <SPACE> token if given.",
+    Sandbox_OmiChat_option_rollIcon = "The icon to use for messages. Defaults to 'Item_Dice'.",
+    Sandbox_OmiChat_option_shortStatementTag = "The default dialogue tag for a short statement. Defaults to 'states'.",
+    Sandbox_OmiChat_option_sneakCalloutTag = "The default dialogue tag to use for sneak callouts. Defaults to 'whisper shouts'.",
+    Sandbox_OmiChat_option_statementTag = "The default dialogue tag for a statement. Defaults to 'says'.",
+    Sandbox_OmiChat_option_truncateTo = "A numeric character limit, after which the input will be cut off.",
+    Sandbox_OmiChat_option_truncateTo_filter_chat_input = "A numeric character limit, after which the input will be cut off. Defaults to 2000.",
+    Sandbox_OmiChat_option_truncateTo_filter_name = "A numeric character limit, after which the input will be cut off. Defaults to 40.",
+    Sandbox_OmiChat_option_whisperIndicator = "The volume indicator to use for a whispered message." ..
+        " <LINE> Defaults to the 'VolumeIndicatorWhisper' configuration variable, or 'Whisper'.",
+    Sandbox_OmiChat_option_whisperTag = "The default dialogue tag to use for a whispered message. Defaults to 'whispers'.",
+
+    --[[ Format String Overview ]]--
+    Sandbox_OmiChat_format_strings = "<CENTRE> <SIZE:large> Format Strings <LINE> <SIZE:small> " ..
+        " The style of format strings is designed to be fairly simple to modify but flexible enough to satisfy most servers' needs for customization." ..
+        " They can utilize a few features, which are described below." ..
+        "" ..
+        " <BR> <SIZE:medium> Tokens <LINE> <SIZE:small> " ..
+        " Tokens are case-sensitive placeholder values that are replaced with the relevant value when the format is processed." ..
+        " They are specified with a dollar sign followed by the name of the token." ..
+        " For example, <SPACE> <PUSHRGB:0,0.5,1> $input <POPRGB> <SPACE> is used for the input text in various format options." ..
+        " Tokens can take on different meanings depending on the option; the info button hover bubble explains the use of any available tokens." ..
+        "" ..
+        " <BR> <SIZE:medium> Functions <LINE> <SIZE:small> " ..
+        " Functions are specified using a dollar sign before the function name, followed by a set of parentheses to enclose arguments (e.g., <SPACE> <PUSHRGB:0,0.5,1> $Capitalize($input) <POPRGB> <SPACE>)." ..
+        " Like tokens, functions are case-sensitive. Function arguments are separated by spaces." ..
+        " To include a space in a single argument, enclose text in backticks (e.g., `text with spaces`)." ..
+        " <BR> For a list of built-in functions and their behavior, see the online documentation (linked on the mod page)." ..
+        "" ..
+        " <BR> <SIZE:medium> Multimaps <LINE> <SIZE:small> " ..
+        " Multimaps (or 'at-maps') can be declared using an <SPACE> <PUSHRGB:0,0.5,1> @ <POPRGB> <SPACE> symbol followed by parenthesized elements." ..
+        " Elements are separated using semicolons, and key-value pairs are delimited with a colon." ..
+        " For example, <SPACE> <PUSHRGB:0,0.5,1> @(key:value;other) <POPRGB> <SPACE> is a multimap with two keys: " ..
+        " <SPACE> <PUSHRGB:0,0.5,1> key <POPRGB> <SPACE> is set to <SPACE> <PUSHRGB:0,0.5,1> value <POPRGB> ," ..
+        " and <SPACE> <PUSHRGB:0,0.5,1> other <POPRGB> <SPACE> is set to 'other' (when no value is specified, a key is mapped to itself)." ..
+        " <BR> Other than advanced usage of format strings, these will only be used to provide options to default functions; e.g., " ..
+        " <SPACE> <PUSHRGB:0,0.5,1> $Default(@(maxLength:100)) <POPRGB> <SPACE> sets a <SPACE> <PUSHRGB:0,0.5,1> maxLength <POPRGB> <SPACE> option to 100." ..
+        "" ..
+        " <BR> <SIZE:medium> Escapes <LINE> <SIZE:small> " ..
+        " The characters <SPACE> <PUSHRGB:0,0.5,1> $, @, (, ), ;, :, and ` <POPRGB> <SPACE> can be escaped by prefixing the character with a dollar sign." ..
+        " For example, <SPACE> <PUSHRGB:0,0.5,1> $$PI() <POPRGB> <SPACE> resolves to the text '$PI()', rather than the value of PI." ..
+        " This is useful to avoid using a function or token or creating a multimap where you don't intend to." ..
+        "" ..
+        " <BR> <SIZE:medium> Character References <LINE> <SIZE:small> " ..
+        " As a convenience feature to avoid having to use <SPACE> <PUSHRGB:0,0.5,1> $Char() <POPRGB> , named references and numeric references can be included in format strings." ..
+        " For example, to produce text enclosed by guillemets, <PUSHRGB:0,0.5,1> &amp;#171; $input &amp;#187; <POPRGB> <SPACE> or <SPACE> <PUSHRGB:0,0.5,1> &amp;laquo; $input &amp;raquo; <POPRGB> <SPACE> can be used." ..
+        " The available characters for named references are limited to those in the ISO-8559-1 character set.",
 }

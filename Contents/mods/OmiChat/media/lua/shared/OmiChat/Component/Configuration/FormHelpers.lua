@@ -2,11 +2,15 @@
 
 local utils = require 'OmiChat/utils'
 local TagList = require 'OmiChat/Definition/TagList'
+local FormatData = require 'OmiChat/Definition/NamedFormatData'
 
-local API_C ---@type omichat.api.client?
-
+local sort = table.sort
+local concat = table.concat
 local PATH_PRESET = { 'General', 'Preset' }
 local PATH_INFO = { 'General', 'InfoText' }
+local MIDDOT = string.char(183) .. ' <SPACE> '
+
+local API_C ---@type omichat.api.client?
 
 
 ---@class omichat.ConfigurationFormHelpers
@@ -62,8 +66,8 @@ function Helpers.deletePreset(form, state, value)
         w = 400,
         h = 100,
         text = getText('UI_OmiChat_DeletePreset_Confirm', name),
-        onClick = function(_, _args)
-            if _args.internal ~= 'YES' then
+        onClick = function(_, args)
+            if args.internal ~= 'YES' then
                 return
             end
 
@@ -82,6 +86,44 @@ function Helpers.deletePreset(form, state, value)
 
     form:removeOnDestroy(dialog)
     state.activePresetDialog = dialog
+end
+
+---Gets a final list of format data translations.
+---@param list (string | omichat.FormatDataTranslation)[]?
+---@param prefix string
+---@return omichat.FormatDataTranslation[]
+function Helpers.getFormatDataTranslations(list, prefix)
+    if not list or #list == 0 then
+        return {}
+    end
+
+    local index = {}
+    local result = {}
+    for i = 1, #list do
+        local data = list[i]
+        if type(data) == 'string' then
+            data = {
+                name = data,
+                id = prefix .. data,
+            }
+        end
+
+        local replaceIdx = index[data.name]
+        if replaceIdx then
+            -- overwrite previous instance of the token if already seen
+            result[replaceIdx] = data
+        else
+            result[#result + 1] = data
+        end
+
+        index[data.name] = i
+    end
+
+    sort(result, function(a, b)
+        return a.name:upper() < b.name:upper()
+    end)
+
+    return result
 end
 
 ---Gets a list of options for the preset configuration value.
@@ -118,12 +160,101 @@ function Helpers.getTagTooltip(tag)
     return color .. tag .. ' <POPRGB> <LINE> ' .. desc, isKnown
 end
 
+---Called to initialize format options in the configuration form.
+---@param args omi.forms.Args.Callback.Item
+function Helpers.initFormatOption(args)
+    local info = args.info
+    local button = info.infoButton
+    if not button then
+        return
+    end
+
+    local key = concat(info.path, '_')
+    local data = FormatData[key]
+    if not data then
+        data = {}
+        utils.log.error('Missing format data for option %s', key)
+    end
+
+    local rope = {
+        getText('Sandbox_OmiChat_format_option_heading'),
+    }
+
+    local tokens = {}
+    if data.tokens then
+        tokens = utils.copyList(data.tokens)
+    end
+
+    if data.canSetError then
+        tokens[#tokens + 1] = 'error'
+        tokens[#tokens + 1] = 'errorID'
+    end
+
+    Helpers.writeFormatDataTranslations(
+        getText('Sandbox_OmiChat_tokens'),
+        Helpers.getFormatDataTranslations(tokens, 'Sandbox_OmiChat_token_'),
+        data.tokenDescription,
+        rope
+    )
+
+    Helpers.writeFormatDataTranslations(
+        getText('Sandbox_OmiChat_options'),
+        Helpers.getFormatDataTranslations(data.options, 'Sandbox_OmiChat_option_'),
+        data.optionDescription,
+        rope
+    )
+
+    if #rope > 1 then
+        rope[#rope + 1] = '\n'
+    end
+
+    button.tooltip = concat(rope)
+end
+
+---Called when the info button on a format option is clicked.
+---@param args omi.forms.Args.Callback.ButtonClick
+function Helpers.onFormatInfoClick(args)
+    local form = args.form
+    local state = args.state --[[@as omichat.ConfigurationFormState]]
+
+    if state.activeFormatStringDialog then
+        local isVisible = state.activeFormatStringDialog:isReallyVisible()
+        state.activeFormatStringDialog:destroy()
+        state.activeFormatStringDialog = nil
+
+        if isVisible then
+            return
+        end
+    end
+
+    local w = 600
+    local x = form:getRight()
+    if x + w > getPlayerScreenWidth(0) then
+        x = form:getX() - w
+    end
+
+    local lib = utils.lib --[[@as omi.client]]
+    local dialog = lib.ui.okDialog {
+        x = x,
+        y = form:getY(),
+        w = 600,
+        h = 200,
+        richText = true,
+        moveWithMouse = true,
+        setHeightToContents = true,
+        text = getText('Sandbox_OmiChat_format_strings'),
+    }
+
+    form:removeOnDestroy(dialog)
+    state.activeFormatStringDialog = dialog
+end
+
 ---Called when a preset action button is clicked.
 ---@param args omi.forms.Args.Callback.ButtonClick
 function Helpers.onPresetAction(args)
-    API_C = API_C or utils.getAPI()
-
     if args.buttonIndex == 1 then
+        API_C = API_C or utils.getAPI()
+
         local config = API_C.Configuration
         local preset = config:getPreset(args.value)
         if preset then
@@ -247,12 +378,12 @@ function Helpers.savePreset(form, state, values)
         text = getText('UI_OmiChat_SavePreset_Prompt'),
         minLength = 1,
         maxLength = 50,
-        onClick = function(_, _args)
-            if _args.internal ~= 'OK' then
+        onClick = function(_, args)
+            if args.internal ~= 'OK' then
                 return
             end
 
-            local name = utils.trim(_args.text)
+            local name = utils.trim(args.text)
             if #name == 0 then
                 return
             end
@@ -274,6 +405,43 @@ function Helpers.savePreset(form, state, values)
 
     form:removeOnDestroy(dialog)
     state.activePresetDialog = dialog
+end
+
+---Writes a list of format data elements to a string list.
+---@param heading string
+---@param list omichat.FormatDataTranslation[]?
+---@param descID string?
+---@param out string[]
+function Helpers.writeFormatDataTranslations(heading, list, descID, out)
+    if not descID and (not list or #list == 0) then
+        return
+    end
+
+    out[#out + 1] = '\n\n'
+    out[#out + 1] = heading
+
+    if descID then
+        out[#out + 1] = '\n'
+        out[#out + 1] = getText(descID)
+    end
+
+    if not list or #list == 0 then
+        return
+    end
+
+    out[#out + 1] = ' <INDENT:18> '
+
+    for i = 1, #list do
+        local data = list[i]
+        out[#out + 1] = '\n <SETX:10> '
+        out[#out + 1] = MIDDOT
+        out[#out + 1] = ' <PUSHRGB:0,0.5,1> '
+        out[#out + 1] = data.name
+        out[#out + 1] = ' <POPRGB> : '
+        out[#out + 1] = getText(data.id)
+    end
+
+    out[#out + 1] = ' <INDENT:0> '
 end
 
 

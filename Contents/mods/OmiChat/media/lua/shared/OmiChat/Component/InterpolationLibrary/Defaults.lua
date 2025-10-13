@@ -336,13 +336,20 @@ function Library.Defaults.FilterChatInput(interpolator, args)
     end
 
     local options = readOptions(args)
-    local text = utils.trim(optionOrToken(interpolator, options, 'input'))
-    local maxLen = options:getNumber('maxLength')
-    if maxLen > 0 then
-        text = text:sub(1, maxLen)
+    local input = utils.trim(optionOrToken(interpolator, options, 'input'))
+
+    local maxLength = options:getNumber('maxLength')
+    if maxLength > 0 and #input > maxLength then
+        interpolator:setToken('error', getText('UI_OmiLibrary_Error_LengthMax', tostring(maxLength)))
+        return
     end
 
-    return text
+    local truncateLength = options:getNumber('truncateTo', 2000)
+    if truncateLength > 0 then
+        input = input:sub(1, truncateLength)
+    end
+
+    return input
 end
 
 ---Default filter for names.
@@ -353,12 +360,12 @@ function Library.Defaults.FilterName(interpolator, args)
     local options = readOptions(args)
     local input = utils.trim(optionOrToken(interpolator, options, 'input'))
 
-    local maxLength = tonumber(options:get('maxLength'))
-    local minLength = tonumber(options:get('minLength'))
-    if maxLength and #input > maxLength then
+    local maxLength = options:getNumber('maxLength')
+    local minLength = options:getNumber('minLength')
+    if maxLength > 0 and #input > maxLength then
         interpolator:setToken('error', getText('UI_OmiLibrary_Error_LengthMax', tostring(maxLength)))
         return
-    elseif minLength and #input < minLength then
+    elseif minLength > 0 and #input < minLength then
         interpolator:setToken('error', getText('UI_OmiLibrary_Error_LengthMin', tostring(minLength)))
         return
     end
@@ -398,12 +405,12 @@ function Library.Defaults.FilterStatus(interpolator, args)
     local options = readOptions(args)
     local input = utils.trim(optionOrToken(interpolator, options, 'input'))
 
-    local maxLength = tonumber(options:get('maxLength', 64))
-    local minLength = tonumber(options:get('minLength', 8))
-    if maxLength and #input > maxLength then
+    local maxLength = options:getNumber('maxLength', 64)
+    local minLength = options:getNumber('minLength', 8)
+    if maxLength > 0 and #input > maxLength then
         interpolator:setToken('error', getText('UI_OmiLibrary_Error_LengthMax', tostring(maxLength)))
         return
-    elseif minLength and #input < minLength then
+    elseif minLength > 0 and #input < minLength then
         interpolator:setToken('error', getText('UI_OmiLibrary_Error_LengthMin', tostring(minLength)))
         return
     end
@@ -754,11 +761,13 @@ end
 
 ---Default chat format for out-of-range, perceived messages.
 ---@param interpolator omichat.Interpolator
+---@param args unknown?
 ---@return string?
-function Library.Defaults.PerceptionRangeChat(interpolator)
-    local tags = Helpers.readTags(interpolator)
+function Library.Defaults.PerceptionRangeChat(interpolator, args)
+    local tags = readTags(interpolator)
+    local options = readOptions(args)
 
-    local name = interpolator:tokenString('name')
+    local name = optionOrToken(interpolator, options, 'name')
     if name == '' then
         return
     end
@@ -770,11 +779,13 @@ end
 
 ---Default overhead format for out-of-range, perceived messages.
 ---@param interpolator omichat.Interpolator
+---@param args unknown?
 ---@return string?
-function Library.Defaults.PerceptionRangeOverhead(interpolator)
-    local tags = Helpers.readTags(interpolator)
+function Library.Defaults.PerceptionRangeOverhead(interpolator, args)
+    local tags = readTags(interpolator)
+    local options = readOptions(args)
 
-    local name = interpolator:tokenString('name')
+    local name = optionOrToken(interpolator, options, 'name')
     if name == '' then
         return
     end
