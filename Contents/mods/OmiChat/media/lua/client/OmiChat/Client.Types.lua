@@ -582,7 +582,6 @@
 ---@field typingFontHgt integer The height of the font used for the typing indicator.
 ---@field private _customButtons ISButton[] A list of custom buttons added to the chat window.
 ---@field private _actionHandlers table<string, omichat.RichTextAction> Handlers for rich text actions.
----@field private _leftmostBtn ISButton? The leftmost button on the chat window.
 ---@field private _typingDisplay string? The current display text for the typing indicator.
 ---@field private _settingHandlers table<omichat.SettingCategory, omichat.SettingHandler[]> Handlers for setting sections.
 

@@ -23,6 +23,7 @@ local _onTabRemoved = ISChat.onTabRemoved
 local _update = ISChat.update
 local _render = ISChat.render
 local _setDrawFrame = ISChat.setDrawFrame
+local _onActivateView = ISChat.onActivateView
 
 local _ChatMessage = __classmetatables[ChatMessage.class].__index
 local _ServerChatMessage = __classmetatables[ServerChatMessage.class].__index
@@ -192,6 +193,12 @@ function ISChat:logChatCommand(command)
     end
 
     _logChatCommand(self, command)
+end
+
+---Override to correct info text on tab panel activation.
+function ISChat:onActivateView()
+    _onActivateView(self)
+    API.ui.updateInfoText()
 end
 
 ---Override to support custom commands and emote shortcuts.
@@ -588,11 +595,12 @@ function ISChat:unfocus()
     API.ui.hideSuggestBox()
 end
 
----Override to process typing indicators.
+---Override to process typing indicators and update custom buttons.
 function ISChat:update()
     _update(self)
     API.ui.updateTypingDisplay()
     API.chat.updateTypingStatus()
+    API.ui.updateButtons()
 end
 
 ---Override to improve performance of text refresh.

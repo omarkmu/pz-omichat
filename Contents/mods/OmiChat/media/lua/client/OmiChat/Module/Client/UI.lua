@@ -230,19 +230,6 @@ function UI.getInfoRichText(player)
     return utils.interpolateNoEntities(config.General.InfoText, tokens, player:getUsername())
 end
 
----Returns the current leftmost chat button.
----@return ISButton?
-function UI.getLeftmostButton()
-    if UI._leftmostBtn then
-        return UI._leftmostBtn
-    end
-
-    local instance = ISChat.instance
-    if instance then
-        return instance.gearButton
-    end
-end
-
 ---Returns the current display string for the typing indicator.
 ---@param maxWidth integer?
 ---@return string?
@@ -350,12 +337,10 @@ function UI.updateButtons()
 
         if btn:isVisible() then
             local pad = max(lastBtn:getWidth(), th)
-            btn:setX(lastBtn:getX() - pad - pad / 2)
+            btn:setX(lastBtn:getX() - pad * 1.5)
             lastBtn = btn
         end
     end
-
-    UI._leftmostBtn = lastBtn
 end
 
 ---Updates the chat panel size based on the configured options.
