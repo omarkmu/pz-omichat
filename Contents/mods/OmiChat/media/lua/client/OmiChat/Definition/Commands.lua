@@ -5,8 +5,9 @@ require 'OmiChat/Module/Client/Player'
 local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
 local vanillaCommands = require 'OmiChat/Definition/VanillaCommandList'
 
-
 local concat = table.concat
+local IS_DEBUG = getDebug()
+
 local utils = API.utils
 local config = API.Configuration
 local CommandStream = API.CommandStream
@@ -294,7 +295,7 @@ return {
         onUse = function()
             API.ui.clear()
 
-            if not getDebug() then
+            if not IS_DEBUG then
                 API.chat.addInfoMessage(getText('UI_OmiChat_Info_Clear'))
             end
         end,

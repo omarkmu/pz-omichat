@@ -12,12 +12,13 @@ local format = string.format
 local getTimestampMs = getTimestampMs
 local getOnlinePlayers = getOnlinePlayers
 
+local IS_DEBUG = getDebug()
 local COMMAND_ARGS_START = utils.encodeInvisibleCharacter(config.ID_COMMAND_ARGS)
 
 local dispatch = utils.dispatch {
     module = API._key,
     logger = utils.log,
-    enableLogs = getDebug(),
+    enableLogs = IS_DEBUG,
 }
 
 
@@ -532,7 +533,7 @@ Request.TOPIC.TYPING = dispatch:topic('TYPING', {
         for i = 0, onlinePlayers:size() - 1 do
             local otherPlayer = onlinePlayers:get(i)
 
-            if player ~= otherPlayer or getDebug() then
+            if player ~= otherPlayer or IS_DEBUG then
                 ---@type omichat.request.UpdateTyping
                 local replyArgs = {
                     username = otherPlayer:getUsername(),
