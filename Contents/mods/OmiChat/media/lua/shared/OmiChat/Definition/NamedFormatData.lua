@@ -330,9 +330,6 @@ return {
             },
         },
     },
-    Format_MenuName_Default = {
-        tokens = TOKENS_MENU_NAME,
-    },
     Format_MenuName_Medical = {
         tokens = TOKENS_MENU_NAME,
     },

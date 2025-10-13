@@ -352,12 +352,11 @@
 ---@field ChatInput string
 
 ---@class omichat.Configuration.Format.MenuName
----@field Default string
----@field Trade string?
----@field Medical string?
----@field SearchPlayer string?
----@field Typing string?
----@field MiniScoreboard string?
+---@field Trade string
+---@field Medical string
+---@field SearchPlayer string
+---@field Typing string
+---@field MiniScoreboard string
 
 ---@class omichat.Configuration.Format.PerceptionRange
 ---@field Chat string

@@ -215,12 +215,11 @@ return Schema:new {
             },
 
             MenuName = container {
-                Default = str(DEFAULT),
-                Trade = str(),
-                Medical = str(),
-                SearchPlayer = str(),
-                Typing = str(),
-                MiniScoreboard = str(),
+                Trade = str(DEFAULT),
+                Medical = str(DEFAULT),
+                SearchPlayer = str(DEFAULT),
+                Typing = str(DEFAULT),
+                MiniScoreboard = str(DEFAULT),
             },
         },
 

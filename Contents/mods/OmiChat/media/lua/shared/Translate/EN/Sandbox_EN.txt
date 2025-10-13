@@ -116,7 +116,6 @@ Sandbox_EN = {
     Sandbox_OmiChat_Format_Filter_Name = "Name Filter",
     Sandbox_OmiChat_Format_Filter_Status = "Status Filter",
     Sandbox_OmiChat_Format_MenuName = "In-Game Names",
-    Sandbox_OmiChat_Format_MenuName_Default = "Default",
     Sandbox_OmiChat_Format_MenuName_Trade = "Trade Window",
     Sandbox_OmiChat_Format_MenuName_Medical = "Medical Window",
     Sandbox_OmiChat_Format_MenuName_SearchPlayer = "Search Player",
@@ -312,7 +311,6 @@ Sandbox_EN = {
     Sandbox_OmiChat_Format_Filter_Status_tooltip = "Filters statuses set with the <SPACE> <PUSHRGB:0,1,0> /status <POPRGB> <SPACE> command." ..
         " If this results in the empty string or sets an error token, the command will fail.",
     Sandbox_OmiChat_Format_MenuName_tooltip = "Options that control how character names are displayed within in-game menus.",
-    Sandbox_OmiChat_Format_MenuName_Default_tooltip = "The default format used when any of the options below are empty. If this and the format for a given menu is blank, that menu will not be affected.",
     Sandbox_OmiChat_Format_MenuName_Trade_tooltip = "The format used for names in the item trading UI.",
     Sandbox_OmiChat_Format_MenuName_Medical_tooltip = "The format used for names in the medical check UI.",
     Sandbox_OmiChat_Format_MenuName_SearchPlayer_tooltip = "The format used for names in menus from <SPACE> <PUSHRGB:0,0.5,1> Search Players For Weapons <POPRGB> ." ..

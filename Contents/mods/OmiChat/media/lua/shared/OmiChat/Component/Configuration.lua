@@ -349,11 +349,7 @@ function Configuration:getMenuNameFormat(menuType)
         format = option.Typing
     end
 
-    if format == '' then
-        format = nil
-    end
-
-    return format or option.Default or ''
+    return format or ''
 end
 
 ---Gets a preset by name.

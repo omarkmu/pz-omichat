@@ -203,7 +203,11 @@ function Preset.format()
             ChatInput = DEFAULT,
         },
         MenuName = {
-            Default = DEFAULT,
+            Trade = DEFAULT,
+            Medical = DEFAULT,
+            MiniScoreboard = DEFAULT,
+            SearchPlayer = DEFAULT,
+            Typing = DEFAULT,
         },
     }
 end
