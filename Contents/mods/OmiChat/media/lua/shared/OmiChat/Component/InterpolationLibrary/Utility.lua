@@ -14,13 +14,6 @@ local Library = require 'OmiChat/Component/InterpolationLibrary/Core'
 local Helpers = Library.Helpers
 
 
----Returns the access level of player 1.
----@return string
-function Library.AccessLevel()
-    local player = getSpecificPlayer(0)
-    return player and player:getAccessLevel() or 'none'
-end
-
 ---Capitalizes the first non-invisible character of a string.
 ---@param interpolator omichat.Interpolator
 ---@param ... unknown
@@ -100,14 +93,6 @@ function Library.DisallowSignedOverRadio(interpolator, options)
     return false
 end
 
----Escapes rich text in a string.
----@param interpolator omichat.Interpolator
----@param ... unknown
----@return string
-function Library.EscapeRichText(interpolator, ...)
-    return utils.escapeRichText(Helpers.stringify(...))
-end
-
 ---Formats text that indicates the radio channel a message was sent over.
 ---@param interpolator omichat.Interpolator
 ---@param ... unknown
@@ -135,18 +120,6 @@ end
 ---@return string
 function Library.Internal(interpolator, ...)
     return (utils.getInternalText(Helpers.stringify(...)))
-end
-
----Returns whether the local player is an admin.
----@return boolean
-function Library.IsAdmin()
-    return isAdmin()
-end
-
----Returns whether the local player is the co-op host.
----@return boolean
-function Library.IsCoopHost()
-    return isCoopHost()
 end
 
 ---Returns whether the given language is signed.
