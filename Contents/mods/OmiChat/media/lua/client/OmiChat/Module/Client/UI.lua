@@ -16,6 +16,8 @@ local UI_LIB = utils.lib.ui
 local config = API.Configuration
 local MultiMap = utils.MultiMap
 
+local CONFIG_PANEL ---@type omi.forms.Form?
+
 
 ---@class omichat.api.client.ui
 local UI = {}
@@ -144,6 +146,33 @@ function UI.hideSuggestBox()
     if UI.suggestBox then
         UI.suggestBox:setVisible(false)
     end
+end
+
+---Generates the admin configuration menu.
+---@return omi.forms.Form
+function UI.generateConfigPanel()
+    if CONFIG_PANEL then
+        return CONFIG_PANEL
+    end
+
+    local x, y = UI_LIB.getScreenCenter(800, 600)
+    local generator = config:getSchema():getFormGenerator()
+    local panel = generator:generate {
+        x = x,
+        y = y,
+        w = 800,
+        h = 600,
+        destroyOnClose = false,
+        values = config:getValuesForSave(),
+        onSave = API.callback.onConfigurationSave,
+        onClose = API.callback.onConfigurationClose,
+    }
+
+    panel:initialise()
+    panel:setVisible(false)
+    CONFIG_PANEL = panel
+
+    return panel
 end
 
 ---Determines the color options that should be enabled based on the server configuration.

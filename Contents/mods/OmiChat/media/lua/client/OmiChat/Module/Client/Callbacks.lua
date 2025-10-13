@@ -2,6 +2,7 @@
 ---@diagnostic disable: unused-local
 
 local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
+local FormHelpers = require 'OmiChat/Component/Configuration/FormHelpers'
 
 local utils = API.utils
 local config = API.Configuration
@@ -9,9 +10,12 @@ local UI = API.utils.ui
 local getText = getText
 local max = math.max
 local concat = table.concat
+local wipe = table.wipe
+
 local BloodBodyPartType = BloodBodyPartType
 local getCoveredParts = BloodClothingType.getCoveredParts
 local ISChat = ISChat ---@cast ISChat omichat.ISChat
+
 local textManager = getTextManager()
 
 
@@ -135,24 +139,29 @@ end
 ---Callback for clicking the update configuration admin context option.
 ---@param target omichat.ISChat
 function Callback.openConfiguration(target)
-    if target.activeConfigurationPanel then
-        target.activeConfigurationPanel:destroy()
+    local form = target.activeConfigurationPanel
+    if not form then
+        form = API.ui.generateConfigPanel()
+        target.activeConfigurationPanel = form
     end
 
-    local x, y = UI.getScreenCenter(800, 600)
-    local generator = config:getSchema():getFormGenerator()
-    local panel = generator:generate {
-        x = x,
-        y = y,
-        w = 800,
-        h = 600,
-        values = config:getValuesForSave(),
-        onSave = Callback.onConfigurationSave,
-    }
+    FormHelpers.refreshPresetsList(form)
 
-    panel:initialise()
-    panel:addToUIManager()
-    target.activeConfigurationPanel = panel
+    local x, y = UI.getScreenCenter(800, 600)
+    form:setX(x)
+    form:setY(y)
+
+    if form:isVisible() then
+        form:bringToTop()
+        return
+    end
+
+    wipe(form:getState())
+    form.values = config:getValuesForSave()
+    form:refresh()
+
+    form:setVisible(true)
+    form:addToUIManager()
 end
 
 ---Callback for hair color customization menu initialization.
@@ -286,6 +295,17 @@ function Callback.openProfileManager(target)
     panel:initialise()
     panel:addToUIManager()
     target.activeProfilesPanel = panel
+end
+
+---Called when the configuration menu is closed.
+---@param args omi.forms.Args.Callback.Close
+function Callback.onConfigurationClose(args)
+    local form = args.form
+    for el in pairs(form:getRemoveOnDestroy()) do
+        el:removeFromUIManager()
+    end
+
+    form:clearRemoveOnDestroy()
 end
 
 ---Called when configuration is saved from the editor form.
