@@ -45,6 +45,24 @@ function Helpers.applyPreset(form, preset)
     form:setStatusMessage(getText('Sandbox_OmiChat_status_preset', preset:getName()))
 end
 
+---Creates a new item for the stream list.
+---@return omichat.Configuration.StreamDefinition
+function Helpers.createStreamItem()
+    ---@type omichat.Configuration.StreamDefinition
+    local item = {
+        Enable = true,
+        Stream = 'custom',
+        ChatType = 'say',
+        CommandType = 'chat',
+        OverheadFormat = '$Default()',
+        ChatFormat = '$Default()',
+        Range = 30,
+        VerticalRange = 2,
+    }
+
+    return item
+end
+
 ---Deletes a custom user-defined preset.
 ---@param form omi.forms.Form
 ---@param state omichat.ConfigurationFormState
@@ -126,6 +144,19 @@ function Helpers.getFormatDataTranslations(list, prefix)
     return result
 end
 
+---Gets the display string to use for an item in the language listbox.
+---@param args omi.forms.Args.Callback.Item
+---@return string
+function Helpers.getLanguageListDisplay(args)
+    local item = args.value or {} ---@type omichat.Configuration.LanguageDefinition
+
+    if not utils.isNilOrWhitespace(item.Name) then
+        return item.Name
+    end
+
+    return getText('Sandbox_OmiChat_Language_untitled')
+end
+
 ---Gets a list of options for the preset configuration value.
 ---@return omi.ui.Dropdown.OptionOrString[]
 function Helpers.getPresetOptions()
@@ -144,6 +175,18 @@ function Helpers.getPresetOptions()
     end
 
     return list
+end
+
+---Gets a display string for an item in the stream listbox.
+---@param args omi.forms.Args.Callback.Item
+---@return string
+function Helpers.getStreamDisplay(args)
+    local item = args.value or {} ---@type omichat.Configuration.StreamDefinition
+    if not item.Stream or item.Stream == 'custom' then
+        return not utils.isNilOrWhitespace(item.Name) and item.Name or 'custom'
+    end
+
+    return item.Stream
 end
 
 ---Gets the tooltip to use for a tag.
@@ -211,9 +254,155 @@ function Helpers.initFormatOption(args)
     button.tooltip = concat(rope)
 end
 
+---Called when a language name changes in the language listbox.
+---@param args omi.forms.Args.Callback.Item
+function Helpers.onChangeLanguageName(args)
+    local control = args.form:getFieldControl({ 'Language', 'List', 'Name' }) --[[@as omi.ui.TextEntry?]]
+    if not control then
+        return
+    end
+
+    -- only show required input error after edit
+    local oldText = control:getText()
+    local currentText = control:getInternalText():trim()
+    if #oldText > 0 and #currentText == 0 then
+        control:setRequireValue(true)
+    end
+end
+
+---Called when the preset option dropdown changes.
+---@param args omi.forms.Args.Callback.Item
+function Helpers.onChangePreset(args)
+    local deleteBtn = args.info.actionButtons[3]
+    if not deleteBtn then
+        return
+    end
+
+    deleteBtn:setEnabled(utils.startsWith(args.value, 'custom:'))
+end
+
+---Called when a value in a stream changes.
+---@param args omi.forms.Args.Callback.Item
+function Helpers.onChangeStream(args)
+    local form = args.form
+    local schema = args.schema --[[@as omichat.ConfigurationSchema]]
+    local item = args.parent ---@type omichat.Configuration.StreamDefinition?
+    local index = args.index
+    if not item or not index then
+        return
+    end
+
+    -- enable/disable all fields
+    local allDisabled = not utils.default(item.Enable, true)
+    local parent = form:getFieldRecord({ 'Streams', 'List' })
+    local childFields = parent and parent.children or {}
+
+    for key, childRec in pairs(childFields) do
+        if key ~= 'Enable' then
+            form:setFieldControlEnabled(childRec.info, not allDisabled)
+        end
+    end
+
+    -- disable fields incompatible with built-in streams
+    if not allDisabled then
+        local isCustomStream = not item.Stream or item.Stream == 'custom'
+        local nameField = form:getFieldInfo({ 'Streams', 'List', 'Name' })
+        local chatTypeField = form:getFieldInfo({ 'Streams', 'List', 'ChatType' })
+        local commandTypeField = form:getFieldInfo({ 'Streams', 'List', 'CommandType' })
+        form:setFieldControlEnabled(nameField, isCustomStream)
+        form:setFieldControlEnabled(chatTypeField, isCustomStream)
+        form:setFieldControlEnabled(commandTypeField, isCustomStream)
+
+        if not isCustomStream then
+            item.Name = nil
+            item.ChatType = schema:getStreamChatType(item.Stream) or 'say'
+            item.CommandType = schema:getStreamCommandType(item.Stream) or 'chat'
+
+            form:setFieldControlValue(nameField, '')
+            form:setFieldControlValue(chatTypeField, item.ChatType)
+            form:setFieldControlValue(commandTypeField, item.CommandType)
+        end
+    end
+
+    -- update max range based on stream/chat type
+    local chatType = item.ChatType or schema:getStreamChatType(item.Stream)
+    local maxRange = 30
+    if chatType == 'shout' or item.Stream == 'yell' then
+        maxRange = 60
+    end
+
+    local rangeControlNames = { 'Range', 'PerceptionRange', 'PerceptionRangeSigned' }
+    for i = 1, #rangeControlNames do
+        local name = rangeControlNames[i]
+        local rangeControl = form:getFieldControl({ 'Streams', 'List', name }) --[[@as omi.ui.TextEntry?]]
+        if rangeControl then
+            rangeControl:setMaxValue(maxRange)
+        end
+    end
+
+    -- enable range & overhead fields only for ranged stream types
+    if not allDisabled then
+        local isRanged = chatType == 'say' or chatType == 'shout'
+        local dependentFields = {
+            { form:getFieldInfo({ 'Streams', 'List', 'Range' }) },
+            { form:getFieldInfo({ 'Streams', 'List', 'VerticalRange' }) },
+            { form:getFieldInfo({ 'Streams', 'List', 'PerceptionRange' }) },
+            { form:getFieldInfo({ 'Streams', 'List', 'PerceptionRangeSigned' }) },
+            { form:getFieldInfo({ 'Streams', 'List', 'OverheadFormat' }) },
+            { form:getFieldInfo({ 'Streams', 'List', 'AttractZombies' }), false },
+        }
+
+        for _, depFieldInfo in pairs(dependentFields) do
+            local depField = depFieldInfo[1]
+            form:setFieldControlEnabled(depField, isRanged)
+
+            if not isRanged then
+                form:setFieldControlValue(depField, depFieldInfo[2])
+            end
+        end
+    end
+end
+
+---Called when a tag list entry changes.
+---@param args omi.forms.Args.Callback.Item
+function Helpers.onChangeTag(args)
+    local control = args.info.control --[[@as omi.ui.ListEntry]]
+    local entry = control.entry
+    local listbox = control.listbox
+    if not entry or not listbox then
+        return
+    end
+
+    local items = listbox.items
+    for i = 1, #items do
+        local item = items[i]
+        if not item.tooltip then
+            local isKnown
+            item.tooltip, isKnown = Helpers.getTagTooltip(item.text)
+
+            if not isKnown then
+                item.textColor = { r = 0.94, g = 0.824, b = 0, a = 1 }
+            end
+        end
+    end
+
+    if entry:getSuggestBox() then
+        return
+    end
+
+    API_C = API_C or utils.getAPI()
+    API_C.utils.ui.suggestBox {
+        entry = entry,
+        font = UIFont.Small,
+        refocusOverScrollbar = true,
+        target = control,
+        populate = Helpers.populateTagSuggest,
+    }
+end
+
 ---Called when the info button on a format option is clicked.
 ---@param args omi.forms.Args.Callback.ButtonClick
-function Helpers.onFormatInfoClick(args)
+function Helpers.onClickFormatInfo(args)
     local form = args.form
     local state = args.state --[[@as omichat.ConfigurationFormState]]
 
@@ -251,7 +440,7 @@ end
 
 ---Called when a preset action button is clicked.
 ---@param args omi.forms.Args.Callback.ButtonClick
-function Helpers.onPresetAction(args)
+function Helpers.onClickPresetAction(args)
     if args.buttonIndex == 1 then
         API_C = API_C or utils.getAPI()
 
@@ -265,43 +454,6 @@ function Helpers.onPresetAction(args)
     else
         Helpers.deletePreset(args.form, args.state, args.value)
     end
-end
-
----Called when a tag list entry changes.
----@param args omi.forms.Args.Callback.Item
-function Helpers.onTagChange(args)
-    local control = args.info.control --[[@as omi.ui.ListEntry]]
-    local entry = control.entry
-    local listbox = control.listbox
-    if not entry or not listbox then
-        return
-    end
-
-    local items = listbox.items
-    for i = 1, #items do
-        local item = items[i]
-        if not item.tooltip then
-            local isKnown
-            item.tooltip, isKnown = Helpers.getTagTooltip(item.text)
-
-            if not isKnown then
-                item.textColor = { r = 0.94, g = 0.824, b = 0, a = 1 }
-            end
-        end
-    end
-
-    if entry:getSuggestBox() then
-        return
-    end
-
-    API_C = API_C or utils.getAPI()
-    API_C.utils.ui.suggestBox {
-        entry = entry,
-        font = UIFont.Small,
-        refocusOverScrollbar = true,
-        target = control,
-        populate = Helpers.populateTagSuggest,
-    }
 end
 
 ---Populates a tag suggest box with tags.

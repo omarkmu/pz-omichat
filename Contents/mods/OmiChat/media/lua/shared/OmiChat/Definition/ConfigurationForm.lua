@@ -9,8 +9,8 @@ local PAD_TOP = { paddingTop = PAD_N }
 local PAD_BOTTOM = { paddingBottom = PAD_N }
 local NO_REORDER = { noReorderButtons = true }
 
-local TAGS = { noReorderButtons = true, onChange = Helpers.onTagChange }
-local FORMAT = { init = Helpers.initFormatOption, onInfoClick = Helpers.onFormatInfoClick }
+local TAGS = { noReorderButtons = true, onChange = Helpers.onChangeTag }
+local FORMAT = { init = Helpers.initFormatOption, onInfoClick = Helpers.onClickFormatInfo }
 
 local FORMAT_PAD_TOP = utils.extendCopy(FORMAT, PAD_TOP)
 local FORMAT_PAD_BOTTOM = utils.extendCopy(FORMAT, PAD_BOTTOM)
@@ -23,14 +23,11 @@ return {
     rules = {
         General = rules {
             Preset = {
-                paddingBottom = 16,
                 actionCount = 3,
+                paddingBottom = 16,
                 getEnumOptions = Helpers.getPresetOptions,
-                onActionClick = Helpers.onPresetAction,
-                onChange = function(args)
-                    local deleteBtn = args.info.actionButtons[3]
-                    deleteBtn:setEnabled(utils.startsWith(args.value, 'custom:'))
-                end,
+                onActionClick = Helpers.onClickPresetAction,
+                onChange = Helpers.onChangePreset,
             },
 
             CaseInsensitiveChatStreams = PAD_BOTTOM,
@@ -49,15 +46,7 @@ return {
 
         Buffs = rules {
             Enable = {
-                toggleFields = {
-                    { 'Buffs', 'Cooldown' },
-                    { 'Buffs', 'Boredom' },
-                    { 'Buffs', 'Unhappiness' },
-                    { 'Buffs', 'Hunger' },
-                    { 'Buffs', 'Thirst' },
-                    { 'Buffs', 'Fatigue' },
-                    { 'Buffs', 'CigaretteStress' },
-                },
+                togglePageFields = true,
             },
             Cooldown = PAD_BOTTOM,
         },
@@ -152,11 +141,7 @@ return {
 
         EchoMessages = rules {
             Enable = {
-                toggleFields = {
-                    { 'EchoMessages', 'ChatFormat' },
-                    { 'EchoMessages', 'OverheadFormat' },
-                    { 'EchoMessages', 'Tags' },
-                },
+                togglePageFields = true,
             },
             ChatFormat = FORMAT,
             OverheadFormat = FORMAT,
@@ -203,38 +188,20 @@ return {
 
         Language = rules {
             UseDefaultList = {
-                inverseToggleFields = { { 'Language', 'List' } },
+                inverseToggleFields = {
+                    { 'Language', 'List' },
+                },
             },
             List = {
                 noLabel = true,
                 useFullPage = true,
                 paddingBottom = 16,
                 arrayDisplayField = 'Name',
-                getItemDisplay = function(args)
-                    local item = args.value or {} ---@type omichat.Configuration.LanguageDefinition
-
-                    if not utils.isNilOrWhitespace(item.Name) then
-                        return item.Name
-                    end
-
-                    return getText('Sandbox_OmiChat_Language_untitled')
-                end,
+                getItemDisplay = Helpers.getLanguageListDisplay,
 
                 children = {
                     Name = {
-                        onChange = function(args)
-                            local control = args.form:getFieldControl({ 'Language', 'List', 'Name' }) --[[@as omi.ui.TextEntry?]]
-                            if not control then
-                                return
-                            end
-
-                            -- only show required input error after edit
-                            local oldText = control:getText()
-                            local currentText = control:getInternalText():trim()
-                            if #oldText > 0 and #currentText == 0 then
-                                control:setRequireValue(true)
-                            end
-                        end,
+                        onChange = Helpers.onChangeLanguageName,
                     },
                 },
             },
@@ -251,12 +218,7 @@ return {
 
         NarrativeStyle = rules {
             Enable = {
-                toggleFields = {
-                    { 'NarrativeStyle', 'OverheadContentFormat' },
-                    { 'NarrativeStyle', 'ChatContentFormat' },
-                    { 'NarrativeStyle', 'DialogueTagFormat' },
-                    { 'NarrativeStyle', 'InputFilter' },
-                },
+                togglePageFields = true,
             },
 
             OverheadContentFormat = FORMAT,
@@ -278,7 +240,9 @@ return {
 
         Streams = rules {
             UseDefaultList = {
-                inverseToggleFields = { { 'Streams', 'List' } },
+                inverseToggleFields = {
+                    { 'Streams', 'List' },
+                },
             },
             List = {
                 noLabel = true,
@@ -296,115 +260,16 @@ return {
                     Tags = TAGS,
                 },
 
-                createItem = function()
-                    ---@type omichat.Configuration.StreamDefinition
-                    local item = {
-                        Enable = true,
-                        Stream = 'custom',
-                        ChatType = 'say',
-                        CommandType = 'chat',
-                        OverheadFormat = '$Default()',
-                        ChatFormat = '$Default()',
-                        Range = 30,
-                        VerticalRange = 2,
-                    }
-
-                    return item
-                end,
-                getItemDisplay = function(args)
-                    local item = args.value or {} ---@type omichat.Configuration.StreamDefinition
-                    if not item.Stream or item.Stream == 'custom' then
-                        return not utils.isNilOrWhitespace(item.Name) and item.Name or 'custom'
-                    end
-
-                    return item.Stream
-                end,
-                onChange = function(args)
-                    local form = args.form
-                    local schema = args.schema --[[@as omichat.ConfigurationSchema]]
-                    local item = args.parent ---@type omichat.Configuration.StreamDefinition?
-                    local index = args.index
-                    if not item or not index then
-                        return
-                    end
-
-                    -- enable/disable all fields
-                    local allDisabled = not utils.default(item.Enable, true)
-                    local parent = form:getFieldRecord({ 'Streams', 'List' })
-                    local childFields = parent and parent.children or {}
-
-                    for key, childRec in pairs(childFields) do
-                        if key ~= 'Enable' then
-                            form:setFieldControlEnabled(childRec.info, not allDisabled)
-                        end
-                    end
-
-                    -- disable fields incompatible with built-in streams
-                    if not allDisabled then
-                        local isCustomStream = not item.Stream or item.Stream == 'custom'
-                        local nameField = form:getFieldInfo({ 'Streams', 'List', 'Name' })
-                        local chatTypeField = form:getFieldInfo({ 'Streams', 'List', 'ChatType' })
-                        local commandTypeField = form:getFieldInfo({ 'Streams', 'List', 'CommandType' })
-                        form:setFieldControlEnabled(nameField, isCustomStream)
-                        form:setFieldControlEnabled(chatTypeField, isCustomStream)
-                        form:setFieldControlEnabled(commandTypeField, isCustomStream)
-
-                        if not isCustomStream then
-                            item.Name = nil
-                            item.ChatType = schema:getStreamChatType(item.Stream) or 'say'
-                            item.CommandType = schema:getStreamCommandType(item.Stream) or 'chat'
-
-                            form:setFieldControlValue(nameField, '')
-                            form:setFieldControlValue(chatTypeField, item.ChatType)
-                            form:setFieldControlValue(commandTypeField, item.CommandType)
-                        end
-                    end
-
-                    -- update max range based on stream/chat type
-                    local chatType = item.ChatType or schema:getStreamChatType(item.Stream)
-                    local maxRange = 30
-                    if chatType == 'shout' or item.Stream == 'yell' then
-                        maxRange = 60
-                    end
-
-                    local rangeControlNames = { 'Range', 'PerceptionRange', 'PerceptionRangeSigned' }
-                    for i = 1, #rangeControlNames do
-                        local name = rangeControlNames[i]
-                        local rangeControl = form:getFieldControl({ 'Streams', 'List', name }) --[[@as omi.ui.TextEntry?]]
-                        if rangeControl then
-                            rangeControl:setMaxValue(maxRange)
-                        end
-                    end
-
-                    -- enable range & overhead fields only for ranged stream types
-                    if not allDisabled then
-                        local isRanged = chatType == 'say' or chatType == 'shout'
-                        local dependentFields = {
-                            { form:getFieldInfo({ 'Streams', 'List', 'Range' }) },
-                            { form:getFieldInfo({ 'Streams', 'List', 'VerticalRange' }) },
-                            { form:getFieldInfo({ 'Streams', 'List', 'PerceptionRange' }) },
-                            { form:getFieldInfo({ 'Streams', 'List', 'PerceptionRangeSigned' }) },
-                            { form:getFieldInfo({ 'Streams', 'List', 'OverheadFormat' }) },
-                            { form:getFieldInfo({ 'Streams', 'List', 'AttractZombies' }), false },
-                        }
-
-                        for _, depFieldInfo in pairs(dependentFields) do
-                            local depField = depFieldInfo[1]
-                            form:setFieldControlEnabled(depField, isRanged)
-
-                            if not isRanged then
-                                form:setFieldControlValue(depField, depFieldInfo[2])
-                            end
-                        end
-                    end
-                end,
+                createItem = Helpers.createStreamItem,
+                getItemDisplay = Helpers.getStreamDisplay,
+                onChange = Helpers.onChangeStream,
             },
             GlobalTags = TAGS,
         },
 
         TypingIndicator = rules {
             Enable = {
-                toggleFields = { { 'TypingIndicator', 'Format' } },
+                togglePageFields = true,
             },
 
             Format = FORMAT,
