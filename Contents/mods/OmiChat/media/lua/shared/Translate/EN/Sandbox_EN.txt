@@ -119,7 +119,6 @@ Sandbox_EN = {
     Sandbox_OmiChat_Format_MenuName_Trade = "Trade Window",
     Sandbox_OmiChat_Format_MenuName_Medical = "Medical Window",
     Sandbox_OmiChat_Format_MenuName_SearchPlayer = "Search Player",
-    Sandbox_OmiChat_Format_MenuName_Typing = "Typing",
     Sandbox_OmiChat_Format_MenuName_MiniScoreboard = "Mini-Scoreboard",
 
     Sandbox_OmiChat_Language = "Languages",
@@ -201,6 +200,7 @@ Sandbox_EN = {
     Sandbox_OmiChat_TypingIndicator = "Typing Indicator",
     Sandbox_OmiChat_TypingIndicator_Enable = "Enabled",
     Sandbox_OmiChat_TypingIndicator_Format = "Typing Format",
+    Sandbox_OmiChat_TypingIndicator_NameFormat = "Name Format",
 
     Sandbox_OmiChat_ZombieAttraction = "Zombie Attraction",
     Sandbox_OmiChat_ZombieAttraction_ChatRangeMultiplier = "Chat Range Multiplier",
@@ -323,7 +323,6 @@ Sandbox_EN = {
     Sandbox_OmiChat_Format_MenuName_Medical_tooltip = "The format used for names in the medical check UI.",
     Sandbox_OmiChat_Format_MenuName_SearchPlayer_tooltip = "The format used for names in menus from <SPACE> <PUSHRGB:0,0.5,1> Search Players For Weapons <POPRGB> ." ..
         " <BR> This has no effect unless the relevant compatibility option is enabled.",
-    Sandbox_OmiChat_Format_MenuName_Typing_tooltip = "The format used for names in the typing indicator message.",
     Sandbox_OmiChat_Format_MenuName_MiniScoreboard_tooltip = "The format used for names in the admin mini-scoreboard.",
 
     Sandbox_OmiChat_Language_UseDefaultList_tooltip = "If this is enabled, the languages configured below will be ignored in favor of the default languages.",
@@ -397,7 +396,8 @@ Sandbox_EN = {
     Sandbox_OmiChat_Streams_List_UseNameColor_tooltip = "If this is enabled and name colors are enabled, messages on this stream will use name colors.",
 
     Sandbox_OmiChat_TypingIndicator_Enable_tooltip = "Controls whether the typing indicator is enabled on streams that allow it.",
-    Sandbox_OmiChat_TypingIndicator_Format_tooltip = "Defines the format of the typing message when the typing indicator is enabled.",
+    Sandbox_OmiChat_TypingIndicator_Format_tooltip = "Defines the format of the typing indicator message when the typing indicator is enabled.",
+    Sandbox_OmiChat_TypingIndicator_NameFormat_tooltip = "Defines the format of names in the typing indicator message.",
 
     Sandbox_OmiChat_ZombieAttraction_ChatRangeMultiplier_tooltip = "A multiplier that will be applied to chat ranges to determine zombie attraction range." ..
         " <BR> If this is zero, non-callout chat messages will not attract zombies.",

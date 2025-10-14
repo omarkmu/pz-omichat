@@ -181,7 +181,6 @@ return {
                 Trade = FORMAT,
                 Medical = FORMAT,
                 SearchPlayer = FORMAT,
-                Typing = FORMAT,
                 MiniScoreboard = FORMAT,
             },
         },
@@ -283,6 +282,7 @@ return {
             },
 
             Format = FORMAT,
+            NameFormat = FORMAT,
         },
     },
 }

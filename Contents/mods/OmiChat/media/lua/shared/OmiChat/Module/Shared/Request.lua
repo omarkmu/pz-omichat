@@ -513,7 +513,7 @@ Request.TOPIC.TYPING = dispatch:topic('TYPING', {
         local typingInfo ---@type omichat.TypingInformation?
 
         local player = args.typing and API.data.getPlayerInfoByUsername(args.username)
-        local display = player and API.data.getPlayerMenuName(player, 'typing')
+        local display = player and API.data.getPlayerTypingName(player)
         if display then
             typingInfo = {
                 display = display,

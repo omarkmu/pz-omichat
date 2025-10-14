@@ -218,7 +218,6 @@ return Schema:new {
                 Trade = str(DEFAULT),
                 Medical = str(DEFAULT),
                 SearchPlayer = str(DEFAULT),
-                Typing = str(DEFAULT),
                 MiniScoreboard = str(DEFAULT),
             },
         },
@@ -394,6 +393,7 @@ return Schema:new {
         TypingIndicator = container {
             Enable = bool(true),
             Format = str(DEFAULT),
+            NameFormat = str(DEFAULT),
         },
 
         ZombieAttraction = container {

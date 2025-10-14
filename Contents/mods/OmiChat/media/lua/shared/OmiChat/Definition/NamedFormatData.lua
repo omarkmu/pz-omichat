@@ -11,6 +11,9 @@ local TOKENS_NARRATIVE = {
 
 local TOKENS_MENU_NAME = {
     'name',
+    'forename',
+    'surname',
+    'username',
     'menuType',
 }
 
@@ -342,9 +345,6 @@ return {
     Format_MenuName_Trade = {
         tokens = TOKENS_MENU_NAME,
     },
-    Format_MenuName_Typing = {
-        tokens = TOKENS_MENU_NAME,
-    },
     Format_Overhead_Final = {
         tokens = utils.appendCopy(TOKENS_OVERHEAD, {
             {
@@ -470,6 +470,14 @@ return {
                 name = 'names',
                 id = 'Sandbox_OmiChat_option_names_typing',
             },
+        },
+    },
+    TypingIndicator_NameFormat = {
+        tokens = {
+            'name',
+            'forename',
+            'surname',
+            'username',
         },
     },
 }

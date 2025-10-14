@@ -73,7 +73,6 @@
 ---| 'medical'
 ---| 'mini_scoreboard'
 ---| 'search_player'
----| 'typing'
 
 ---@alias omichat.CalloutCategory
 ---| 'callouts'
@@ -357,7 +356,6 @@
 ---@field Trade string
 ---@field Medical string
 ---@field SearchPlayer string
----@field Typing string
 ---@field MiniScoreboard string
 
 ---@class omichat.Configuration.Format.PerceptionRange
@@ -443,6 +441,7 @@
 
 ---@class omichat.Configuration.TypingIndicator
 ---@field Enable boolean
+---@field NameFormat string
 ---@field Format string
 
 ---@class omichat.Configuration.ZombieAttraction

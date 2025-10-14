@@ -892,6 +892,13 @@ function Library.Defaults.TypingIndicator(interpolator, args)
     end
 end
 
+---Default format for names in the typing indicator display.
+---@param interpolator omichat.Interpolator
+---@return string?
+function Library.Defaults.TypingName(interpolator)
+    return interpolator:tokenString('name')
+end
+
 ---Default format for the content of a message indicating that a language is unknown.
 ---@param interpolator omichat.Interpolator
 ---@param args unknown?

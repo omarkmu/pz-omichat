@@ -196,6 +196,33 @@ function Data.getPlayerSubstitutions(player)
     }
 end
 
+---Retrieves the name that should be used in the typing indicator for a player.
+---If the name should not be affected or retrieving the name fails, this returns `nil`.
+---@param player IsoPlayer | omichat.PlayerCacheData
+---@return string?
+function Data.getPlayerTypingName(player)
+    local format = config.TypingIndicator.NameFormat
+    if not player or format == '' then
+        return
+    end
+
+    local chatName = Data.getPlayerNameInChat(player, 'say')
+    local tokens = chatName and Data.getPlayerSubstitutions(player)
+    if not chatName or not tokens then
+        return
+    end
+
+    tokens.name = utils.unescapeRichText(chatName)
+
+    local username = Data._getPlayerUsername(player)
+    local result = utils.interpolateNamed('TypingName', format, tokens, username)
+    if result == '' then
+        return
+    end
+
+    return result
+end
+
 ---Gets the speech color of the player with the given username, or `nil` if unset.
 ---@param username string
 ---@return omi.ColorTable?

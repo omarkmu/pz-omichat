@@ -350,8 +350,6 @@ function Configuration:getMenuNameFormat(menuType)
         format = option.MiniScoreboard
     elseif menuType == 'search_player' then
         format = option.SearchPlayer
-    elseif menuType == 'typing' then
-        format = option.Typing
     end
 
     return format or ''

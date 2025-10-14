@@ -207,7 +207,6 @@ function Preset.format()
             Medical = DEFAULT,
             MiniScoreboard = DEFAULT,
             SearchPlayer = DEFAULT,
-            Typing = DEFAULT,
         },
     }
 end
@@ -332,6 +331,7 @@ function Preset.typing(options)
     return {
         Enable = utils.default(options.Enable, true),
         Format = DEFAULT,
+        NameFormat = DEFAULT,
     }
 end
 
