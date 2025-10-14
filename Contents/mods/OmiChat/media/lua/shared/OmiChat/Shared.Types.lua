@@ -89,6 +89,7 @@
 ---| 'narrative'
 ---| 'onlineID'
 ---| 'echo'
+---| 'mention'
 
 ---@alias omichat.ModDataField
 ---| 'all'
@@ -231,6 +232,7 @@
 ---@field EchoMessages omichat.Configuration.EchoMessages
 ---@field Language omichat.Configuration.Language
 ---@field Macros omichat.Configuration.Macros
+---@field Mentions omichat.Configuration.Mentions
 ---@field NarrativeStyle omichat.Configuration.NarrativeStyle
 ---@field Radio omichat.Configuration.Radio
 ---@field ServerMessages omichat.Configuration.ServerMessages
@@ -385,6 +387,13 @@
 ---@class omichat.Configuration.Macros
 ---@field AllowEmotes boolean
 
+---@class omichat.Configuration.Mentions
+---@field Enable boolean
+---@field AlwaysUseNameColors boolean
+---@field Range integer
+---@field Format string
+---@field ChatFormat string
+
 ---@class omichat.Configuration.NarrativeStyle
 ---@field Enable boolean
 ---@field OverheadContentFormat string
@@ -426,6 +435,7 @@
 ---@field PerceptionRangeSigned integer?
 ---@field AllowBuffs boolean?
 ---@field AllowEmotes boolean?
+---@field AllowMentions boolean?
 ---@field AllowLanguages boolean?
 ---@field AllowTypingIndicator boolean?
 ---@field AttractZombies boolean?
@@ -497,6 +507,10 @@
 
 ---@class omichat.Args.ConfigurationPreset.Macros
 ---@field AllowEmotes boolean?
+
+---@class omichat.Args.ConfigurationPreset.Mentions
+---@field Enable boolean?
+---@field Range integer?
 
 ---@class omichat.Args.ConfigurationPreset.NarrativeStyle
 ---@field Enable boolean?

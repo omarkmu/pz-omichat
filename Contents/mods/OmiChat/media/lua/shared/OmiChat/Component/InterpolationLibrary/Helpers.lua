@@ -601,6 +601,7 @@ end
 ---@return string suffix
 function Helpers.getMessageSegments(input, options)
     options = options or {}
+    input = utils.trim(input)
 
     local inAction = options.startInAction or false
     local onlyFirstSegment = options.onlyFirstSegment
@@ -609,7 +610,7 @@ function Helpers.getMessageSegments(input, options)
     local start = 1
     local pos = 1
     local prefix, suffix
-    input, prefix, suffix = utils.getInternalText(utils.trim(input))
+    input, prefix, suffix = utils.getInternalText(input)
 
     -- avoid triggering actions with an initial asterisk in narrative style
     if not inAction and options.hasInternalQuote then
@@ -642,6 +643,12 @@ function Helpers.getMessageSegments(input, options)
 
             if onlyFirstSegment and #segments > 0 then
                 return segments, prefix, suffix
+            end
+        else
+            -- skip mentions
+            local _, mentionEnd = input:find('^<@%d+:.->', pos)
+            if mentionEnd then
+                pos = mentionEnd
             end
         end
 
@@ -743,17 +750,6 @@ function Helpers.getVolumeIndicator(options, tags, shouldTranslate)
     return '[' .. indicator .. ']'
 end
 
----Wraps a function so that it gets the internal value before being applied, then reapplies the invisible characters.
----@param f function
----@return fun(interpolator: omi.Interpolator, ...: unknown): string
-function Helpers.internalWrap(f)
-    return function(interpolator, s, ...)
-        local text, prefix, suffix = utils.getInternalText(tostring(s or ''))
-        local result = f(interpolator, text, ...)
-        return prefix .. tostring(result) .. suffix
-    end
-end
-
 ---Gets the value of an option, or a token as a fallback.
 ---If neither are defined, this will return the empty string.
 ---@param interpolator omichat.Interpolator
@@ -808,6 +804,11 @@ function Helpers.punctuate(input, punctuation, characters)
     spaces = spaces or ''
     if last then
         input = input:sub(1, last - 1)
+    end
+
+    -- if it ends with a mention, always punctuate
+    if input:match('<@%d+:.->$') then
+        return prefix .. input .. (punctuation or '.') .. spaces .. suffix
     end
 
     -- doesn't actually use the interpolator

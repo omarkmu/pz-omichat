@@ -5,6 +5,7 @@ local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
 local utils = API.utils
 local config = API.Configuration
 local concat = table.concat
+local sqrt = math.sqrt
 local getText = getText
 
 
@@ -121,6 +122,26 @@ function Player.getDefaultShouts(isSneaking)
     end
 
     return result
+end
+
+---Gets the local player's distance from another player.
+---Returns `nil` if either player is not available.
+---@param otherPlayer IsoPlayer?
+---@return number?
+function Player.getDistanceFrom(otherPlayer)
+    if not otherPlayer then
+        return
+    end
+
+    local player = getSpecificPlayer(0)
+    if not player then
+        return
+    end
+
+    local xDiff = otherPlayer:getX() - player:getX()
+    local yDiff = otherPlayer:getY() - player:getY()
+
+    return sqrt(xDiff * xDiff + yDiff * yDiff)
 end
 
 ---Gets a list of the local player's known roleplay languages.

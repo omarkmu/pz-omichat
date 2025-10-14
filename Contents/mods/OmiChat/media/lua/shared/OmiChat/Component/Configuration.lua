@@ -5,6 +5,7 @@ local MetaFormatter = require 'OmiChat/Component/MetaFormatter'
 local Preset = require 'OmiChat/Component/Configuration/Preset'
 local base = utils.configuration.ConfigurationHelper
 local sort = table.sort
+local isempty = table.isempty
 
 
 ---@class omichat.ConfigurationHelper : omi.ConfigurationHelper, omichat.Configuration
@@ -56,7 +57,7 @@ Configuration.MAX_CHAT_ID = 64
 Configuration.MIN_META_ID = 81
 
 ---Constant for the number at which metadata format IDs end.
-Configuration.MAX_META_ID = 88
+Configuration.MAX_META_ID = 89
 
 ---Constant for the maximum number of configured chat streams.
 Configuration.MAX_CHAT_STREAMS = 32
@@ -127,6 +128,9 @@ Configuration.ID_ONLINE_ID = 87
 ---Constant for the format ID for echo messages.
 Configuration.ID_ECHO = 88
 
+---Constant for the format ID for mentions.
+Configuration.ID_MENTION = 89
+
 ---Associates metadata format IDs with names for those formatters.
 Configuration.FORMAT_NAMES = {
     [Configuration.ID_OVERHEAD_FINAL] = 'overheadFinal',
@@ -137,6 +141,7 @@ Configuration.FORMAT_NAMES = {
     [Configuration.ID_NARRATIVE_STYLE] = 'narrative',
     [Configuration.ID_ONLINE_ID] = 'onlineID',
     [Configuration.ID_ECHO] = 'echo',
+    [Configuration.ID_MENTION] = 'mention',
 }
 
 --#endregion
@@ -148,7 +153,7 @@ Configuration.FORMAT_NAMES = {
 ---@return boolean
 ---@see omichat.api.shared.language.exists
 function Configuration:canAddLanguage(language)
-    if not table.isempty(self._languageAllowSet) and not self._languageAllowSet[language] then
+    if not isempty(self._languageAllowSet) and not self._languageAllowSet[language] then
         return false
     end
 
@@ -438,7 +443,7 @@ end
 ---This does not check for whether the character customization feature is enabled.
 ---@return boolean
 function Configuration:isCleanCustomizationEnabled()
-    return not table.isempty(self.Customization.CleanEffects)
+    return not isempty(self.Customization.CleanEffects)
 end
 
 ---Returns whether custom shouts are enabled.

@@ -262,6 +262,22 @@ function Preset.macros(options)
     }
 end
 
+---Returns the default mentions configuration.
+---@param options omichat.Args.ConfigurationPreset.Mentions?
+---@return omichat.Configuration.Mentions
+function Preset.mentions(options)
+    options = options or {}
+
+    ---@type omichat.Configuration.Mentions
+    return {
+        Enable = utils.default(options.Enable, true),
+        AlwaysUseNameColors = true,
+        Range = options.Range or 10,
+        Format = DEFAULT,
+        ChatFormat = DEFAULT,
+    }
+end
+
 ---Returns the default narrative style configuration.
 ---@param options omichat.Args.ConfigurationPreset.NarrativeStyle?
 ---@return omichat.Configuration.NarrativeStyle

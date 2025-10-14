@@ -56,6 +56,7 @@ function MessageInfo.decodeMessageTag(tag, metadata)
     metadata.stream = decoded.stream
     metadata.originalStream = decoded.originalStream
     metadata.displayedOverhead = decoded.displayedOverhead
+    metadata.mentions = decoded.mentions
 
     return metadata
 end
@@ -126,6 +127,25 @@ end
 ---@return boolean
 function MessageInfo.hasEncodedMetadata(message)
     return not isempty(MessageInfo.decodeMessageTag(message:getCustomTag()))
+end
+
+---Returns whether name colors should be used for mentions on a stream.
+---@param stream omichat.Stream?
+---@return boolean
+function MessageInfo.shouldUseMentionColors(stream)
+    if not config.Customization.EnableNameColors then
+        return false
+    end
+
+    if not API.preferences.getNameColorsEnabled() then
+        return false
+    end
+
+    if config.Mentions.AlwaysUseNameColors then
+        return true
+    end
+
+    return not stream or stream:canUseNameColors()
 end
 
 ---Returns whether name colors should be used for a stream.
@@ -718,6 +738,12 @@ end
 ---@return boolean success
 function MessageInfo:setMetadataLanguageResult(result)
     return self:_setMetadataValue('languageResult', result)
+end
+
+---Sets the results of formatting mentions in the message.
+---@param mentions omichat.MessageInfo.Metadata.Mention[]
+function MessageInfo:setMetadataMentions(mentions)
+    self:_setMetadataValue('mentions', mentions)
 end
 
 ---Sets the color to use for the author name in the message metadata.

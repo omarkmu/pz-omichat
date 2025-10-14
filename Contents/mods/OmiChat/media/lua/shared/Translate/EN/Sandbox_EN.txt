@@ -141,6 +141,13 @@ Sandbox_EN = {
     Sandbox_OmiChat_Macros_title = "Macro Settings",
     Sandbox_OmiChat_Macros_AllowEmotes = "Enable Emote Shortcuts",
 
+    Sandbox_OmiChat_Mentions = "Mentions",
+    Sandbox_OmiChat_Mentions_Enable = "Enabled",
+    Sandbox_OmiChat_Mentions_AlwaysUseNameColors = "Always Use Name Colors",
+    Sandbox_OmiChat_Mentions_Range = "Mention Suggestion Range",
+    Sandbox_OmiChat_Mentions_Format = "Content Format",
+    Sandbox_OmiChat_Mentions_ChatFormat = "Chat Format",
+
     Sandbox_OmiChat_NarrativeStyle = "Narrative Style",
     Sandbox_OmiChat_NarrativeStyle_Enable = "Enabled",
     Sandbox_OmiChat_NarrativeStyle_OverheadContentFormat = "Overhead Content Format",
@@ -183,6 +190,7 @@ Sandbox_EN = {
     Sandbox_OmiChat_Streams_List_PerceptionRangeSigned = "Perception Range (Signed)",
     Sandbox_OmiChat_Streams_List_AllowBuffs = "Allow Buffs",
     Sandbox_OmiChat_Streams_List_AllowEmotes = "Allow Emotes",
+    Sandbox_OmiChat_Streams_List_AllowMentions = "Allow Mentions",
     Sandbox_OmiChat_Streams_List_AllowLanguages = "Allow RP Languages",
     Sandbox_OmiChat_Streams_List_AllowTypingIndicator = "Allow Typing Indicator",
     Sandbox_OmiChat_Streams_List_AttractZombies = "Attract Zombies",
@@ -334,6 +342,13 @@ Sandbox_EN = {
 
     Sandbox_OmiChat_Macros_AllowEmotes_tooltip = "Controls whether emote shortcuts can be used in chat to trigger animations.",
 
+    Sandbox_OmiChat_Mentions_Enable_tooltip = "Controls whether players can use @ to mention other players, which includes their name color in chat.",
+    Sandbox_OmiChat_Mentions_AlwaysUseNameColors_tooltip = "If this is enabled, the name color option on streams will be ignored for mentions.",
+    Sandbox_OmiChat_Mentions_Range_tooltip = "The range a player has to be on a ranged stream within to have another player suggested for a mention." ..
+        " This has no effect on non-ranged streams and is ignored if set to 0.",
+    Sandbox_OmiChat_Mentions_Format_tooltip = "Defines the format of mentions before sending.",
+    Sandbox_OmiChat_Mentions_ChatFormat_tooltip = "Defines the format of mentions in the chat.",
+
     Sandbox_OmiChat_NarrativeStyle_Enable_tooltip = "Controls whether narrative style is enabled for streams that allow it.",
     Sandbox_OmiChat_NarrativeStyle_ChatContentFormat_tooltip = "Defines the format of the narrative style tag and quote in the chat",
     Sandbox_OmiChat_NarrativeStyle_OverheadContentFormat_tooltip = "Defines the format of the narrative style tag and quote in the overhead text.",
@@ -374,6 +389,7 @@ Sandbox_EN = {
     Sandbox_OmiChat_Streams_List_PerceptionRangeSigned_tooltip = "The range in which an indicator that something was said out-of-range will send, when sent in a signed roleplay language.",
     Sandbox_OmiChat_Streams_List_AllowBuffs_tooltip = "If this is enabled and buffs are turned on, sending a message on this stream will apply a buff.",
     Sandbox_OmiChat_Streams_List_AllowEmotes_tooltip = "If this is enabled, emote macros will be processed on this stream.",
+    Sandbox_OmiChat_Streams_List_AllowMentions_tooltip = "If this is enabled, mentions will be allowed on this stream.",
     Sandbox_OmiChat_Streams_List_AllowLanguages_tooltip = "If this is enabled, this stream will use the player's current language when sending messages.",
     Sandbox_OmiChat_Streams_List_AllowTypingIndicator_tooltip = "If this is enabled, typing on the stream will trigger the typing indicator.",
     Sandbox_OmiChat_Streams_List_AttractZombies_tooltip = "If this is enabled and zombie attraction is enabled, messages on this stream can attract zombies.",
@@ -440,6 +456,8 @@ Sandbox_EN = {
         " <LINE> This is the default behavior unless in narrative style or on the server message stream." ..
         " <LINE> Takes precedence over <SPACE> <PUSHRGB:0,0.5,1> NoColon <POPRGB> .",
     Sandbox_OmiChat_tag_IncludeAdminIndicator = "Indicates that a parenthesized prefix should be included when a message is sent from an admin.",
+    Sandbox_OmiChat_tag_IncludeMentionAtSign = "Indicates that mentions should be prefixed with an at-sign.",
+    Sandbox_OmiChat_tag_IncludeMentionAtSignChat = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> IncludeMentionAtSign <POPRGB> , but only applies to chat formatting.",
     Sandbox_OmiChat_tag_IncludeName = "Indicates that names should be included in messages." ..
         " <LINE> This is the default behavior unless on the server message stream.",
     Sandbox_OmiChat_tag_IncludeNameChat = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> IncludeName <POPRGB> , but only applies to chat formatting.",
@@ -565,6 +583,7 @@ Sandbox_EN = {
     Sandbox_OmiChat_token_names_typing = "A list-style multimap with names to include in the typing list.",
     Sandbox_OmiChat_token_narrativeStyle = "Set to '1' if narrative style was used for the message. Not given otherwise.",
     Sandbox_OmiChat_token_number = "The number of the card, from 1 to 13. Ace is 1, Jack is 11, Queen is 12, and King is 13.",
+    Sandbox_OmiChat_token_onlineID = "The online ID of the relevant player.",
     Sandbox_OmiChat_token_originalStream = "The original stream that a radio message was sent over. Not given for non-radio messages.",
     Sandbox_OmiChat_token_originalTags = "The tags of the original stream that a radio message was sent over. Not given for non-radio messages.",
     Sandbox_OmiChat_token_outgoingPM = "Set to '1' for outgoing private messages. Not given otherwise.",

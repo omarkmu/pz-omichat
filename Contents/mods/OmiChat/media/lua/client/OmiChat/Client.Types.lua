@@ -205,7 +205,11 @@
 ---@field languageResult omichat.MessageInfo.Metadata.LanguageResult? The result of language checking.
 ---@field attractedZombies boolean? Whether the message has already attracted zombies.
 ---@field displayedOverhead boolean? Whether the replacement overhead text has already displayed.
+---@field mentions omichat.MessageInfo.Metadata.Mention[]? The results of formatting mentions.
 
+---@class omichat.MessageInfo.Metadata.Mention
+---@field color string
+---@field name string?
 
 ---@class omichat.Args.MessageInfo.SetStream
 ---@field chatType omichat.ChatTypeString? The chat type to set alongside the stream. Defaults to the stream's chat type.
@@ -390,6 +394,10 @@
 ---@field name string
 ---@field alias string
 
+---@class omichat.search.PlayerInfo
+---@field name string
+---@field username string
+
 ---@class omichat.StreamSearchOptions
 ---@field excludeChatStreams boolean? Whether to exclude chat streams from the search.
 ---@field excludeCommandStreams boolean? Whether to exclude custom command streams from the search.
@@ -435,6 +443,7 @@
 ---@field protected overheadFormat string? The format to use for overhead messages sent from this stream.
 ---@field protected formatter omichat.MetaFormatter? The formatter to use for this stream.
 ---@field protected allowEmotes boolean Whether to allow emotes on this stream.
+---@field protected allowMentions boolean Whether to allow mentions on this stream.
 ---@field protected suggestSpec omichat.SuggestSpec? Spec to use for suggestions.
 ---@field protected tags omi.SimpleSet A set of tags for the stream.
 ---@field protected autoTags omi.SimpleSet A set of tags to always include on the stream.
@@ -460,6 +469,7 @@
 ---@field onUse omichat.Stream.Callback.OnUse? Invoked when the stream is used.
 ---@field onUseDisabled omichat.Stream.Callback.OnUseDisabled? Invoked when the stream is used while disabled.
 ---@field allowEmotes boolean? Whether to allow emotes on this stream.
+---@field allowMentions boolean? Whether to allow mentions on this stream.
 ---@field suggestSpec omichat.SuggestSpec? Spec to use for suggestions.
 ---@field formatter omichat.MetaFormatter? The formatter to use for this stream.
 ---@field tags string[]? Tags for the stream.

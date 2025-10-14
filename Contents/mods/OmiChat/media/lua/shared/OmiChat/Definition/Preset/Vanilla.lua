@@ -33,6 +33,9 @@ return Preset:new {
         Macros = Preset.macros {
             AllowEmotes = false,
         },
+        Mentions = Preset.mentions {
+            Enable = false,
+        },
         NarrativeStyle = Preset.narrative {
             Enable = false,
         },
@@ -58,6 +61,7 @@ return Preset:new {
                 'BracketedNames',
                 'NoPrefixSpaceChat',
                 'NoIcon',
+                'IncludeMentionAtSign',
             },
             List = {
                 {
@@ -156,6 +160,7 @@ return Preset:new {
                 {
                     Stream = 'general',
                     Enable = true,
+                    Tags = {},
                 },
             },
         },

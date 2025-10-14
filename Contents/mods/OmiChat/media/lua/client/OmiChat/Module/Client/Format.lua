@@ -150,6 +150,9 @@ function Format.chat(args)
         tokens.input = overheadFormatter:format(tokens.input, tokens)
     end
 
+    -- format mentions
+    tokens.input = Format._applyMentions(tokens.input, stream, tokens)
+
     -- encode online ID for radio
     local player = getSpecificPlayer(0)
     if player then
@@ -279,6 +282,49 @@ function Format.validateStatus(entry, text)
 end
 
 
+---Formats mentions for overhead text.
+---@param input string
+---@param stream omichat.ChatStream
+---@param tokens table
+---@return string
+---@private
+function Format._applyMentions(input, stream, tokens)
+    if not config.Mentions.Enable then
+        return input
+    end
+
+    local formatter = API._metadataFormatters.mention
+    return (input:gsub('<@(%d+:.-)>', function(match)
+        local colon = match and match:find(':')
+        if not colon then
+            return
+        end
+
+        -- avoid breaking segment detection
+        local name = utils.trim(match:sub(colon + 1)):gsub('"', "''")
+
+        local onlineID = tonumber(match:sub(1, colon - 1))
+        if not onlineID then
+            return name
+        end
+
+        local wrapped = formatter:wrap(utils.encodeInvisibleInt(onlineID) .. name)
+
+        local mentionTokens = utils.copy(tokens)
+        mentionTokens.input = wrapped
+        mentionTokens.onlineID = tostring(onlineID)
+        mentionTokens.chatType = mentionTokens.chatType or stream:getChatType()
+        mentionTokens.stream = mentionTokens.stream or stream:getName()
+
+        local result = utils.interpolateNamed('MentionText', config.Mentions.Format, mentionTokens)
+        if utils.trim(result) == '' then
+            return name
+        end
+
+        return result
+    end))
+end
+
 ---Applies the narrative style given an input and stream.
 ---@param input string
 ---@param stream omichat.ChatStream
@@ -299,7 +345,7 @@ function Format._applyNarrativeStyle(input, stream, tokens)
 
     local original = input
     local inputTokens = tokens
-    tokens = tokens and utils.copy(tokens) or {}
+    tokens = utils.copy(tokens)
     tokens.input = tokens.input or input
     tokens.chatType = tokens.chatType or stream:getChatType()
     tokens.stream = tokens.stream or stream:getName()

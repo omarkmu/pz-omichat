@@ -90,27 +90,33 @@ function Data.getPlayerData(username)
 end
 
 ---Retrieves player information given an online ID.
----@param onlineID number
+---@param onlineID number The online ID of the player.
+---@param noUpdate boolean? If `true`, the cache won't be updated with new data if the player is available.
 ---@return omichat.PlayerCacheData?
-function Data.getPlayerInfoByOnlineID(onlineID)
-    local player = getPlayerByOnlineID(onlineID)
-    if player then
-        return Data._playerCache:updatePlayer(player)
+function Data.getPlayerInfoByOnlineID(onlineID, noUpdate)
+    if not noUpdate then
+        local player = getPlayerByOnlineID(onlineID)
+        if player then
+            return Data._playerCache:updatePlayer(player)
+        end
     end
 
-    return Data._playerCache:getByIndex('onlineID', onlineID)
+    return Data._playerCache:getByIndex('onlineID', onlineID, not noUpdate)
 end
 
 ---Retrieves player information given a username.
----@param username string
+---@param username string The username of the player.
+---@param noUpdate boolean? If `true`, the cache won't be updated with new data if the player is available.
 ---@return omichat.PlayerCacheData?
-function Data.getPlayerInfoByUsername(username)
-    local player = utils.getPlayerByUsername(username)
-    if player then
-        return Data._playerCache:updatePlayer(player)
+function Data.getPlayerInfoByUsername(username, noUpdate)
+    if not noUpdate then
+        local player = utils.getPlayerByUsername(username)
+        if player then
+            return Data._playerCache:updatePlayer(player)
+        end
     end
 
-    return Data._playerCache:get(username)
+    return Data._playerCache:get(username, not noUpdate)
 end
 
 ---Retrieves the name that should be used in chat for the given menu type.

@@ -43,6 +43,7 @@ function CommandStream:new(args)
     local this = Stream.new(self, args) ---@cast this omichat.CommandStream
 
     this.isCommand = true
+    this.allowMentions = args.allowMentions or false
     this.helpTextID = args.helpTextID
     this.callbacks.onHelp = args.onHelp
 

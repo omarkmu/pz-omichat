@@ -82,6 +82,7 @@ function ChatStream.fromDefinition(def, additionalTags)
         perceptionRangeSigned = def.PerceptionRangeSigned,
         allowBuffs = def.AllowBuffs,
         allowEmotes = def.AllowEmotes,
+        allowMentions = def.AllowMentions,
         allowLanguages = def.AllowLanguages,
         allowTypingIndicator = def.AllowTypingIndicator,
         attractZombies = def.AttractZombies,
@@ -127,12 +128,6 @@ end
 ---@return boolean
 function ChatStream:isAllowBuffs()
     return self.allowBuffs
-end
-
----Returns whether the stream allows emote macros.
----@return boolean
-function ChatStream:isAllowEmotes()
-    return self.allowEmotes
 end
 
 ---Returns whether the stream allows messages to be sent using roleplay languages.

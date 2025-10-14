@@ -157,7 +157,7 @@ end
 
 ---Collects online usernames based on a search string.
 ---@param ctxOrSearch omichat.SearchContext | string Context for the search.
----@param includeSelf boolean? If true, player 1's username will be included in the search.
+---@param includeSelf boolean? If `true`, player 1's username will be included in the search.
 ---@return omichat.SearchResults
 function Search.onlineUsernames(ctxOrSearch, includeSelf)
     local ctx = Search._buildContext(ctxOrSearch)
@@ -166,6 +166,33 @@ function Search.onlineUsernames(ctxOrSearch, includeSelf)
 
     for _, item in API.data.iteratePlayerCache() do
         Search._playerUsername(item, ctx, ownUsername, includeSelf)
+
+        if ctx.isTerminated then
+            break
+        end
+    end
+
+    return Search._collectResults(ctx)
+end
+
+---Collects usernames based on a search string by matching chat names.
+---@param ctxOrSearch omichat.SearchContext | string Context for the search.
+---@param chatType string? The chat type to use names from. Defaults to `say`.
+---@param includeSelf boolean? If `true`, player 1's username will be included in the search.
+---@param searchUsernames boolean? If `true`, usernames will also be matched on.
+---@return omichat.SearchResults
+function Search.onlineUsernamesByChatName(ctxOrSearch, chatType, includeSelf, searchUsernames)
+    local ctx = Search._buildContext(ctxOrSearch)
+    ctx.display = ctx.display or Search._mapPlayerInfoToName
+    ctx.mapValue = ctx.mapValue or Search._mapPlayerInfoToUsername
+
+    local player = getSpecificPlayer(0)
+    local ownUsername = player and player:getUsername()
+    chatType = chatType or 'say'
+
+    for _, item in API.data.iteratePlayerCache() do
+        Search._playerChatName(item, chatType, ctx, ownUsername, includeSelf, searchUsernames)
+
         if ctx.isTerminated then
             break
         end
@@ -634,7 +661,7 @@ function Search._getStreamDisplay(stream, command)
     return command
 end
 
----Search map function that returns the string value.
+---Search map function that returns the search string value.
 ---@param _ unknown
 ---@param command string
 ---@return string
@@ -649,6 +676,53 @@ end
 ---@private
 function Search._mapPerkToId(perk)
     return perk:getId()
+end
+
+---Returns the name of a player given an info table.
+---@param player omichat.search.PlayerInfo
+---@return string
+function Search._mapPlayerInfoToName(player)
+    return player.name
+end
+
+---Returns the username of a player given an info table.
+---@param player omichat.search.PlayerInfo
+---@return string
+function Search._mapPlayerInfoToUsername(player)
+    return player.username
+end
+
+---Searches a player username for a string, if it should be included.
+---@param player IsoPlayer | omichat.PlayerCacheData
+---@param chatType string
+---@param ctx omichat.search.InternalSearchContext
+---@param ownUsername string
+---@param includeSelf boolean?
+---@param searchUsernames boolean?
+---@return omichat.search.InternalSearchResult?
+---@private
+function Search._playerChatName(player, chatType, ctx, ownUsername, includeSelf, searchUsernames)
+    local username
+    if player.getUsername then
+        ---@cast player IsoPlayer
+        username = player:getUsername()
+    else
+        username = player.username
+    end
+
+    if not includeSelf and username == ownUsername then
+        return
+    end
+
+    local name = API.data.getPlayerNameInChat(player, chatType) or username
+
+    ---@type omichat.search.PlayerInfo
+    local info = {
+        name = name,
+        username = username,
+    }
+
+    return Search._internal(ctx, name, info, searchUsernames and username or nil)
 end
 
 ---Searches a player username for a string, if it should be included.

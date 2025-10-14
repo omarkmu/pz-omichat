@@ -1,4 +1,6 @@
 ---Message transformer definitions.
+---@diagnostic disable: invisible
+
 
 local API = require 'OmiChat/Module/Client/Core'
 local utils = API.utils
@@ -6,12 +8,10 @@ local config = API.Configuration
 
 local isAdmin = isAdmin
 local getText = getText
+local format = string.format
 
 
 local COMMAND_ARGS_START = utils.encodeInvisibleCharacter(config.ID_COMMAND_ARGS)
-
--- accessing fields directly where possible to avoid function call overhead
----@diagnostic disable: invisible
 
 
 ---@type omichat.MessageTransformer[]
@@ -104,6 +104,24 @@ return {
             if match then
                 info.content = match
             end
+        end,
+    },
+    {
+        name = 'decode-mentions',
+        priority = 95,
+        transform = function(_, info)
+            local text = info.content or info.rawText
+            local formatter = API._metadataFormatters.mention
+            local pattern = formatter:getPattern(false, true)
+
+            info.content = text:gsub(pattern, function(match)
+                local onlineID, name = utils.decodeInvisibleInt(match)
+                if not onlineID or not name then
+                    return match
+                end
+
+                return format('<@%03d:%s>', onlineID, name)
+            end)
         end,
     },
     {
@@ -403,8 +421,87 @@ return {
         end,
     },
     {
+        name = 'handle-mentions',
+        priority = 30,
+        transform = function(_, info)
+            if not config.Mentions.Enable then
+                return
+            end
+
+            local text = info.content or info.rawText
+            local cached = info.meta.mentions
+            local useColors = info.shouldUseMentionColors(info.stream)
+
+            local i = 1
+            local mentions = {} ---@type omichat.MessageInfo.Metadata.Mention[]
+
+            info.content = text:gsub('%s*<@%d+:.->%s*', function(match)
+                local leading, onlineID, name, trailing = match:match('(%s*)<@(%d+):(.-)>(%s*)')
+                onlineID = tonumber(onlineID)
+
+                if not onlineID or not name then
+                    return match
+                end
+
+                local color = { r = 255, g = 255, b = 255 }
+                local hoverName
+                if cached then
+                    local item = cached[i] or {}
+                    hoverName = item.name
+                    if item and item.color then
+                        color = utils.color.fromString(item.color) or color
+                    end
+
+                    i = i + 1
+                else
+                    local playerData = onlineID and API.data.getPlayerInfoByOnlineID(onlineID)
+                    color = playerData and playerData.speechColor or color
+                    hoverName = playerData and API.data.getPlayerNameInChat(playerData, info.chatType)
+                end
+
+                local tokens = utils.copy(info.tokens)
+                tokens.input = name
+                tokens.onlineID = tostring(onlineID)
+
+                local result = utils.interpolateNamed('MentionChat', config.Mentions.ChatFormat, tokens)
+
+                if useColors then
+                    result = utils.color.toRichText(color, true) .. result .. ' <POPRGB> '
+                end
+
+                -- avoid breaking segment detection
+                hoverName = hoverName and hoverName:gsub('"', "''")
+
+                if hoverName and name ~= hoverName then
+                    result = ' <HOVER:' .. utils.escapeRichText(hoverName) .. '> ' .. result .. ' </HOVER> '
+                end
+
+                if #leading > 0 then
+                    result = ' <SPACE> ' .. result
+                end
+
+                if #trailing > 0 then
+                    result = result .. ' <SPACE> '
+                end
+
+                if not cached then
+                    mentions[#mentions + 1] = {
+                        name = hoverName,
+                        color = utils.color.toHexString(color),
+                    }
+                end
+
+                return result
+            end)
+
+            if not cached then
+                info:setMetadataMentions(mentions)
+            end
+        end,
+    },
+    {
         name = 'check-range',
-        priority = 10,
+        priority = 20,
         transform = function(_, info)
             local stream = info.stream
             if not stream or not stream.isChat then

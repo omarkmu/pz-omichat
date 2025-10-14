@@ -56,8 +56,11 @@ function Helpers.createStreamItem()
         CommandType = 'chat',
         OverheadFormat = '$Default()',
         ChatFormat = '$Default()',
+        DefaultColor = { r = 255, g = 255, b = 255 },
         Range = 30,
         VerticalRange = 2,
+        PerceptionRange = 0,
+        PerceptionRangeSigned = 0,
     }
 
     return item

@@ -101,6 +101,12 @@ function Stream:isAllowEmotes()
     return self.allowEmotes
 end
 
+---Returns whether the stream allows mentions.
+---@return boolean
+function Stream:isAllowMentions()
+    return self.allowMentions
+end
+
 ---Returns whether the stream should be treated as case-insensitive.
 ---@return boolean
 function Stream:isCaseInsensitive()
@@ -361,6 +367,7 @@ function Stream:new(args)
 
     this.name = args.name
     this.allowEmotes = args.allowEmotes or false
+    this.allowMentions = utils.default(args.allowMentions, true)
     this.disabled = args.disabled or false
     this.commandType = 'other'
     this.aliasesList = utils.map(Stream._stringToCommand, args.aliases or {})

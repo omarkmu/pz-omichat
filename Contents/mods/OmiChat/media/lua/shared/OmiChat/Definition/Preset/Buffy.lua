@@ -40,6 +40,7 @@ return Preset:new {
         Format = Preset.format(),
         Language = Preset.languages(),
         Macros = Preset.macros(),
+        Mentions = Preset.mentions(),
         NarrativeStyle = Preset.narrative {
             Enable = true,
         },

@@ -392,6 +392,22 @@ return {
         tokens = TOKENS_CHAT,
         options = OPTIONS_CHAT,
     },
+    Mentions_ChatFormat = {
+        tokens = {
+            'input',
+            'onlineID',
+            'stream',
+            'chatType',
+        },
+    },
+    Mentions_Format = {
+        tokens = {
+            'input',
+            'onlineID',
+            'stream',
+            'chatType',
+        },
+    },
     NarrativeStyle_ChatContentFormat = {
         tokens = TOKENS_CHAT,
         options = {

@@ -76,6 +76,29 @@ function utils.canAccessTarget(player, target, minAccessLevel, fromCommand)
     return true
 end
 
+---Replaces invisible text with indicators for debugging.
+---@param text string
+---@return string
+function utils.debugText(text)
+    text = text:gsub(INVISIBLE_PATTERN, function(chars)
+        local result = ''
+        for i = 1, #chars do
+            local c = chars:sub(i, i):byte()
+            if c == 65535 then
+                c = 0
+            else
+                c = c - 127
+            end
+
+            result = result .. '\\' .. c
+        end
+
+        return result
+    end)
+
+    return text
+end
+
 ---Decodes an encoded character.
 ---@param text string
 ---@param index integer?

@@ -36,6 +36,8 @@ return {
     'HideOverhead',
     'IncludeAdminIndicator',
     'IncludeColon',
+    'IncludeMentionAtSign',
+    'IncludeMentionAtSignChat',
     'IncludeName',
     'IncludeNameChat',
     'IncludeNameOverhead',

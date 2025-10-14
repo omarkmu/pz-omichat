@@ -120,7 +120,7 @@ function Library.Defaults.Chat(interpolator, args)
     end
 
     if tags.OOC then
-        message = '(( ' .. message .. ' ))'
+        message = '(( <SPACE> ' .. message .. ' <SPACE> ))'
     end
 
     local autoCapitalize = tags.AutoCapitalize or tags.AutoCapitalizeChat
@@ -489,6 +489,39 @@ function Library.Defaults.Language(interpolator)
     return '[' .. language .. ']'
 end
 
+---Default format for a mention in chat text.
+---@param interpolator omichat.Interpolator
+---@param args unknown?
+---@return string
+function Library.Defaults.MentionChat(interpolator, args)
+    local options = readOptions(args)
+    local tags = readTags(interpolator)
+    local input = optionOrToken(interpolator, options, 'input')
+
+    -- don't include if already included in mention text
+    if tags.IncludeMentionAtSignChat and not tags.IncludeMentionAtSign then
+        return '@' .. input
+    end
+
+    return input
+end
+
+---Default format for mention text.
+---@param interpolator omichat.Interpolator
+---@param args unknown?
+---@return string
+function Library.Defaults.MentionText(interpolator, args)
+    local options = readOptions(args)
+    local tags = readTags(interpolator)
+    local input = optionOrToken(interpolator, options, 'input')
+
+    if tags.IncludeMentionAtSign then
+        return '@' .. input
+    end
+
+    return input
+end
+
 ---Default format for menu names.
 ---@param interpolator omichat.Interpolator
 ---@return string
@@ -626,20 +659,23 @@ function Library.Defaults.NarrativeTag(interpolator, args)
         return options:getString('loudTag', 'shouts')
     end
 
+    if config.Mentions.Enable then
+        input = input:gsub('<@%d+:(.-)>', '%1')
+    end
+
     -- only use the first dialogue segment to determine the punctuation-based narrative tag
-    local testInput = utils.getInternalText(input)
-    local segments = Helpers.getMessageSegments(testInput, {
+    local segments = Helpers.getMessageSegments(input, {
         onlyFirstSegment = true,
         optionalActionAsterisk = tags.OptionalActionAsterisk,
     })
 
-    if #segments > 0 and segments[1].type == 'quote' then
-        testInput = Helpers.ensureUnwrapped(segments[1].text, '"')
-    else
-        testInput = ''
+    if #segments == 0 or segments[1].type ~= 'quote' then
+        return options:getString('statementTag', 'says')
     end
 
-    testInput = utils.trim(testInput)
+    local testInput = Helpers.ensureUnwrapped(segments[1].text, '"')
+    testInput = utils.trim(utils.removeInvisible(testInput))
+
     if utils.endsWith(testInput, '?') then
         return options:getString('questionTag', 'asks')
     elseif utils.endsWith(testInput, '!') then

@@ -259,6 +259,14 @@ return Schema:new {
             AllowEmotes = bool(true),
         },
 
+        Mentions = container {
+            Enable = bool(true),
+            AlwaysUseNameColors = bool(true),
+            Range = int(20, 0, 60),
+            Format = str(DEFAULT),
+            ChatFormat = str(DEFAULT),
+        },
+
         NarrativeStyle = container {
             Enable = bool(false),
             OverheadContentFormat = str(DEFAULT),
@@ -367,6 +375,7 @@ return Schema:new {
 
                         AllowBuffs = bool(false),
                         AllowEmotes = bool(false),
+                        AllowMentions = bool(true),
                         AllowLanguages = bool(false),
                         AllowTypingIndicator = bool(false),
                         AttractZombies = bool(false),

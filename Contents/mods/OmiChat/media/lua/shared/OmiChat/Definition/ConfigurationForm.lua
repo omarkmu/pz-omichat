@@ -216,6 +216,16 @@ return {
             UnknownLanguageRadio = FORMAT_PAD_BOTTOM,
         },
 
+        Mentions = rules {
+            Enable = {
+                togglePageFields = true,
+            },
+
+            Range = PAD_TOP,
+            Format = FORMAT,
+            ChatFormat = FORMAT,
+        },
+
         NarrativeStyle = rules {
             Enable = {
                 togglePageFields = true,

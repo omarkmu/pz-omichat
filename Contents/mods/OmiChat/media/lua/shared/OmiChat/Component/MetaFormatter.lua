@@ -94,14 +94,15 @@ function MetaFormatter:getFormatString()
 end
 
 ---Returns the formatter's string pattern.
----@param exact boolean? If true, an exact match will be required. Defaults to false.
+---@param exact boolean? If `true`, an exact match will be required. Defaults to `false`.
+---@param minimal boolean? If `true`, a minimal match will be used instead of maximal. Defaults to `false`.
 ---@return string
-function MetaFormatter:getPattern(exact)
+function MetaFormatter:getPattern(exact, minimal)
     exact = utils.default(exact, false)
     return concat {
         exact and '^' or '',
         self._idPrefix,
-        '(.+)',
+        minimal and '(.-)' or '(.+)',
         self._idSuffix,
         exact and '$' or '',
     }
