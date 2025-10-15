@@ -203,7 +203,7 @@ function UI.getColorOptions(all)
     end
 
     for stream in API.streams.chatStreams() do
-        if all or stream:checkPlayerCanUse() then
+        if all or stream:isEnabled() then
             colorOpts[#colorOpts + 1] = stream:getName()
         end
     end

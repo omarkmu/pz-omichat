@@ -123,7 +123,7 @@ function Streams.cycle(target)
         if utils.isinstance(stream, API.ChatStream) then
             ---@cast stream omichat.ChatStream
             if not target or stream:getName() == target then
-                if stream:checkPlayerCanUse() then
+                if stream:isEnabled() then
                     targetID = streamID
                     break
                 end
@@ -560,7 +560,7 @@ function Streams._updateChatStreams()
     local chatText = instance and instance.chatText
     if chatText then
         local lastStream = Streams.chatCommandToStream(chatText.lastChatCommand)
-        if not lastStream or not lastStream:checkPlayerCanUse() then
+        if not lastStream or not lastStream:isEnabled() then
             chatText.lastChatCommand = Streams.cycle()
         end
     end

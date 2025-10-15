@@ -88,10 +88,6 @@ end
 ---Checks whether the local player can use this stream.
 ---@return boolean
 function Stream:checkPlayerCanUse()
-    if not self:isEnabled() then
-        return false
-    end
-
     return true
 end
 
@@ -134,7 +130,7 @@ end
 ---Returns whether the stream is enabled.
 ---@return boolean
 function Stream:isEnabled()
-    if self.disabled then
+    if self.disabled or not self:checkPlayerCanUse() then
         return false
     end
 
