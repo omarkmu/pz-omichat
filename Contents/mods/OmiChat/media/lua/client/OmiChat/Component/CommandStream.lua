@@ -1,24 +1,20 @@
 ---Stream for sending commands in chat.
 
 local Stream = require 'OmiChat/Component/Stream'
+local utils = require 'OmiChat/utils'
+
+local API ---@type omichat.api.client?
 
 
 ---@class omichat.CommandStream : omichat.Stream
 local CommandStream = Stream:derive()
 
 
----Returns the callback to use when `/help` is used on the stream.
----@return omichat.Stream.Callback.OnHelp?
-function CommandStream:getHelpCallback()
-    return self.callbacks.onHelp
-end
-
 ---Retrieves help text for the stream, or `nil` if none is defined.
 ---@return string?
 function CommandStream:getHelpText()
-    local id = self:getHelpTextStringID()
-    if id then
-        return getText(id)
+    if self.helpTextID then
+        return getText(self.helpTextID)
     end
 end
 
@@ -29,11 +25,22 @@ function CommandStream:getHelpTextStringID()
 end
 
 ---Handler for when `/help` is used on the stream.
+---@return boolean success Indicates whether the command was handled.
 function CommandStream:onHelp()
-    local helpCallback = self:getHelpCallback()
-    if helpCallback then
-        helpCallback(self)
+    local cb = self.callbacks.onHelp
+    if cb then
+        cb(self)
+        return true
     end
+
+    local helpText = self:getHelpText()
+    if helpText then
+        API = API or utils.getAPI()
+        API.chat.addInfoMessage(helpText)
+        return true
+    end
+
+    return false
 end
 
 ---Creates a new command stream.
@@ -45,6 +52,7 @@ function CommandStream:new(args)
     this.isCommand = true
     this.allowMentions = args.allowMentions or false
     this.helpTextID = args.helpTextID
+
     this.callbacks.onHelp = args.onHelp
 
     return this

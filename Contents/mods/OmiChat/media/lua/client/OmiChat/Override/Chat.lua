@@ -213,8 +213,7 @@ function ISChat:onCommandEntered()
     ---@type omichat.Stream?
     local stream, command, chatCommand, disabledStream = API.streams.chatCommandToStream(input, { enabledOnly = true })
 
-    local useCallback
-    local callbackStream
+    local streamToUse ---@type omichat.Stream?
 
     local commandType = 'other'
     local shouldHandle = false
@@ -245,14 +244,9 @@ function ISChat:onCommandEntered()
             stream = nil
             allowEmotes = false
         else
-            callbackStream = stream
+            streamToUse = stream
             allowEmotes = not isDefault and stream:isAllowEmotes() or allowEmotes
             commandType = stream:getCommandType()
-
-            useCallback = stream:getUseCallback()
-            if not useCallback and stream:isChatStream() then
-                useCallback = API.chat.send
-            end
         end
 
         if isDefault then
@@ -288,26 +282,20 @@ function ISChat:onCommandEntered()
         API.streams.cycle(stream:getName())
     end
 
-    if callbackStream then
-        ---@cast callbackStream omichat.Stream
-        local success, err = callbackStream:validate(command)
+    if streamToUse then
+        local success, err = streamToUse:validate(command)
         if err then
             API.chat.addInfoMessage(err)
         end
 
         if not success then
             shouldHandle = true
-            callbackStream = nil
+            streamToUse = nil
         end
     end
 
     if disabledStream then
-        local onUseDisabled = disabledStream:getUseDisabledCallback()
-        if onUseDisabled then
-            onUseDisabled(disabledStream)
-        elseif disabledStream:getCommandType() ~= 'chat' then
-            API.chat.addInfoMessage('Unknown command ' .. command:sub(2))
-        else
+        if not disabledStream:onUseDisabled(command) then
             local msg = { getText('UI_chat_chat_disabled_msg', utils.trim(disabledStream:getCommand())) }
             for i = 1, #ISChat.allChatStreams do
                 local availableStream = ISChat.allChatStreams[i]
@@ -360,12 +348,11 @@ function ISChat:onCommandEntered()
         end
     end
 
-    if callbackStream and useCallback then
-        useCallback {
+    if streamToUse then
+        streamToUse:onUse({
             text = command,
-            stream = callbackStream --[[@as omichat.ChatStream]],
             playSignedEmote = not playedEmote,
-        }
+        })
     end
 
     doKeyPress(false)

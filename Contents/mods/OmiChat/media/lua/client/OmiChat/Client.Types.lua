@@ -64,7 +64,7 @@
 ---@field lastUpdate integer
 
 ---@class omichat.Args.Send : omichat.Args.Send.Partial
----@field stream omichat.ChatStream
+---@field stream omichat.Stream
 
 ---@class omichat.Args.Send.Partial
 ---@field text string
@@ -450,6 +450,7 @@
 ---@field protected isChat boolean Whether this is a chat stream.
 ---@field protected isCommand boolean Whether this is a command stream.
 ---@field protected noTags boolean True if the stream has an empty tags table.
+---@field protected defaultOnDisabled boolean Whether the stream should defer to default handling when disabled.
 
 ---@class omichat.Stream.Callbacks
 ---@field isEnabled omichat.Stream.Callback.IsEnabled? Invoked to check whether the stream should be treated as enabled.
@@ -474,6 +475,7 @@
 ---@field formatter omichat.MetaFormatter? The formatter to use for this stream.
 ---@field tags string[]? Tags for the stream.
 ---@field autoTags string[]? Tags which should always be included on the stream.
+---@field defaultOnDisabled boolean? Whether the stream should defer to default handling when disabled. Defaults to `true`.
 
 
 ---@class omichat.ChatStream
@@ -538,7 +540,7 @@
 
 ---@alias omichat.Stream.Callback.OnUse fun(ctx: omichat.Args.Send) Callback triggered when the stream is used.
 
----@alias omichat.Stream.Callback.OnUseDisabled fun(self: omichat.Stream) Callback triggered when attempting to use a disabled stream.
+---@alias omichat.Stream.Callback.OnUseDisabled fun(self: omichat.Stream, command: string) Callback triggered when attempting to use a disabled stream.
 
 ---@alias omichat.Stream.Callback.OnHelp fun(self: omichat.Stream) Callback triggered when /help is used.
 

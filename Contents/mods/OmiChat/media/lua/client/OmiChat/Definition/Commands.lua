@@ -106,6 +106,7 @@ return {
         command = '/clearnames ',
         helpTextID = 'UI_OmiChat_HelpText_ClearNames',
         isEnabled = API.player.canUseAdminCommands,
+        defaultOnDisabled = false,
         onUse = function() API.request.executeCommand('clearNames') end,
     },
     CommandStream:new {
@@ -114,6 +115,7 @@ return {
         helpTextID = 'UI_OmiChat_HelpText_SetName',
         suggestSpec = { 'online-username' },
         isEnabled = API.player.canUseAdminCommands,
+        defaultOnDisabled = false,
         onUse = function(ctx) API.request.executeCommand('setName', ctx.text) end,
     },
     CommandStream:new {
@@ -122,6 +124,7 @@ return {
         helpTextID = 'UI_OmiChat_HelpText_IconInfo',
         suggestSpec = { 'icon' },
         isEnabled = API.player.canUseAdminCommands,
+        defaultOnDisabled = false,
         onUse = function(ctx)
             local command = utils.trim(ctx.text)
             if #command == 0 then
@@ -151,6 +154,7 @@ return {
         helpTextID = 'UI_OmiChat_HelpText_SetIcon',
         suggestSpec = { 'online-username-with-self', 'icon' },
         isEnabled = API.player.canUseAdminCommands,
+        defaultOnDisabled = false,
         onUse = function(ctx)
             if not API.request.executeCommand('setIcon', ctx.text) then
                 local args = utils.parseCommandArgs(ctx.text)
@@ -169,6 +173,7 @@ return {
         helpTextID = 'UI_OmiChat_HelpText_ResetName',
         suggestSpec = { 'online-username' },
         isEnabled = API.player.canUseAdminCommands,
+        defaultOnDisabled = false,
         onUse = function(ctx)
             API.request.executeCommand('resetName', ctx.text)
         end,
@@ -179,6 +184,7 @@ return {
         helpTextID = 'UI_OmiChat_HelpText_ResetIcon',
         suggestSpec = { 'online-username-with-self' },
         isEnabled = API.player.canUseAdminCommands,
+        defaultOnDisabled = false,
         onUse = function(ctx)
             API.request.executeCommand('resetIcon', ctx.text)
         end,
@@ -206,6 +212,7 @@ return {
             },
         },
         isEnabled = API.player.canUseAdminCommands,
+        defaultOnDisabled = false,
         onUse = function(ctx)
             API.request.executeCommand('addLanguage', ctx.text)
         end,
@@ -216,6 +223,7 @@ return {
         helpTextID = 'UI_OmiChat_HelpText_ResetLanguages',
         suggestSpec = { 'online-username-with-self' },
         isEnabled = API.player.canUseAdminCommands,
+        defaultOnDisabled = false,
         onUse = function(ctx)
             API.request.executeCommand('resetLanguages', ctx.text)
         end,
@@ -226,6 +234,7 @@ return {
         helpTextID = 'UI_OmiChat_HelpText_SetLanguageSlots',
         suggestSpec = { 'online-username-with-self' },
         isEnabled = API.player.canUseAdminCommands,
+        defaultOnDisabled = false,
         onUse = function(ctx)
             API.request.executeCommand('setLanguageSlots', ctx.text)
         end,
@@ -316,28 +325,11 @@ return {
 
             -- specific command help
             if #command > 0 then
-                local helpStream ---@type omichat.CommandStream?
-                local helpCallback ---@type omichat.Stream.Callback.OnHelp?
-                local helpText ---@type string?
-
                 for i = 1, #API._commandStreams do
                     local stream = API._commandStreams[i]
-                    if stream:getName() == command and stream:isEnabled() then
-                        helpCallback = stream:getHelpCallback()
-                        helpText = stream:getHelpText()
-                        if helpCallback or helpText then
-                            helpStream = stream
-                            break
-                        end
+                    if stream:getName() == command and stream:isEnabled() and stream:onHelp() then
+                        return
                     end
-                end
-
-                if helpStream and helpCallback then
-                    helpCallback(helpStream)
-                    return
-                elseif helpText then
-                    API.chat.addInfoMessage(helpText)
-                    return
                 end
 
                 for i = 1, #vanillaCommands do
@@ -360,10 +352,13 @@ return {
             for i = 1, #API._commandStreams do
                 local stream = API._commandStreams[i]
                 local name = stream:getName()
-                local helpText = stream:getHelpTextStringID()
-                if not seen[name] and helpText and stream:isEnabled() then
+                if not seen[name] and stream:isEnabled() then
                     seen[name] = true
-                    commands[#commands + 1] = { name = name, helpText = helpText, access = 0 }
+
+                    local helpText = stream:getHelpTextStringID()
+                    if helpText then
+                        commands[#commands + 1] = { name = name, helpText = helpText, access = 0 }
+                    end
                 end
             end
 

@@ -145,7 +145,7 @@ end
 ---@param args omichat.Args.Send?
 ---@return string?
 function Chat.send(args)
-    local stream = args and args.stream
+    local stream = args and args.stream --[[@as omichat.ChatStream]]
     if not args or not stream or not utils.isinstance(stream, API.ChatStream) then
         return
     end
@@ -237,14 +237,12 @@ function Chat.send(args)
             return processResult
         end
 
-        local useCallback = echoStream:getUseCallback() or Chat.send
-        useCallback {
+        echoStream:onUse({
             echoType = echoType,
-            stream = echoStream,
             text = initialText,
             formatter = API._metadataFormatters.echo,
             extraTags = config.EchoMessages.Tags,
-        }
+        })
     end
 
     return processResult

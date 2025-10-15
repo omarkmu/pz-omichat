@@ -252,18 +252,6 @@ function Stream:getTags()
     return utils.copy(self.tags)
 end
 
----Returns the callback to invoke when the stream is used.
----@return omichat.Stream.Callback.OnUse?
-function Stream:getUseCallback()
-    return self.callbacks.onUse
-end
-
----Returns the callback to invoke when the stream is used.
----@return omichat.Stream.Callback.OnUseDisabled?
-function Stream:getUseDisabledCallback()
-    return self.callbacks.onUseDisabled
-end
-
 ---Returns the vertical range of the stream if it's a ranged stream.
 ---@return integer?
 function Stream:getVerticalRange() end
@@ -307,7 +295,53 @@ function Stream:hasTags(tags)
 end
 
 ---Handler for when `/help` is used on the stream.
-function Stream:onHelp() end
+---@return boolean success Indicates whether the command was handled.
+function Stream:onHelp()
+    return false
+end
+
+---Handler for when the stream is used.
+---@param ctx omichat.Args.Send.Partial
+---@return boolean success Indicates whether the command was handled.
+function Stream:onUse(ctx)
+    ---@cast ctx omichat.Args.Send
+    if not ctx.stream then
+        ctx.stream = self
+    end
+
+    local cb = self.callbacks.onUse
+    if cb then
+        cb(ctx)
+        return true
+    end
+
+    if self.isChat then
+        API = API or utils.getAPI()
+        API.chat.send(ctx)
+        return true
+    end
+
+    return false
+end
+
+---Handler for when the stream is used while disabled.
+---@param command string
+---@return boolean success Indicates whether the command was handled.
+function Stream:onUseDisabled(command)
+    local cb = self.callbacks.onUseDisabled
+    if cb then
+        cb(self, command)
+        return true
+    end
+
+    if not self.defaultOnDisabled then
+        API = API or utils.getAPI()
+        API.chat.addInfoMessage('Unknown command ' .. command:sub(2))
+        return true
+    end
+
+    return false
+end
 
 ---Sets the formatter used for the stream.
 ---@param formatter omichat.MetaFormatter
@@ -319,10 +353,7 @@ end
 function Stream:showHelpText()
     local helpText = self:getHelpText()
     if helpText then
-        if not API then
-            API = require 'OmiChat/Client'
-        end
-
+        API = API or utils.getAPI()
         API.chat.addInfoMessage(helpText)
     end
 end
@@ -367,7 +398,7 @@ function Stream:new(args)
 
     this.name = args.name
     this.allowEmotes = args.allowEmotes or false
-    this.allowMentions = utils.default(args.allowMentions, true)
+    this.allowMentions = args.allowMentions ~= false
     this.disabled = args.disabled or false
     this.commandType = 'other'
     this.aliasesList = utils.map(Stream._stringToCommand, args.aliases or {})
@@ -375,6 +406,7 @@ function Stream:new(args)
     this.formatter = args.formatter
     this.isChat = false
     this.isCommand = false
+    this.defaultOnDisabled = args.defaultOnDisabled ~= false
     this.autoTags = utils.set.simple(args.autoTags)
     this:_setTags(args.tags or {})
 
