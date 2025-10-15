@@ -648,6 +648,11 @@ function MessageInfo:hide()
     self.hidden = true
 end
 
+---Sets the message to not show in chat.
+function MessageInfo:hideInChat()
+    self.message:setShowInChat(false)
+end
+
 ---Sets the message to not show overhead.
 function MessageInfo:hideOverhead()
     self.message:setOverHeadSpeech(false)

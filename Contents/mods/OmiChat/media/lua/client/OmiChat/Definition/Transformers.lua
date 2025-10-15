@@ -227,7 +227,7 @@ return {
             local username = player and player:getUsername()
             local author = info:getAuthor()
             if author == username then
-                info:hide()
+                info:hideInChat()
                 return
             end
 
@@ -235,7 +235,7 @@ return {
                 return
             end
 
-            -- suppress echo messages if the player would have seen the original
+            -- hide echo messages in chat if the player would have seen the original
             local shouldSuppress = false
             local echoType = utils.decodeInvisibleInt(utils.unwrapStringArgument(matched, config.ID_ECHO_TYPE))
             if echoType == 1 then -- faction
@@ -247,7 +247,7 @@ return {
             end
 
             if shouldSuppress then
-                info:hide()
+                info:hideInChat()
             end
         end,
     },
