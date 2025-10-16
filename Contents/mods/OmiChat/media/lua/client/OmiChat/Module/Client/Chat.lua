@@ -142,7 +142,7 @@ function Chat.isTyping()
 end
 
 ---Sends a message on the given stream.
----@param args omichat.Args.Send?
+---@param args omichat.Args.UseStream?
 ---@return string?
 function Chat.send(args)
     local stream = args and args.stream --[[@as omichat.ChatStream]]
@@ -249,44 +249,44 @@ function Chat.send(args)
 end
 
 ---Sends an /admin message, formatted according to configuration.
----@param args string | omichat.Args.Send.Partial
+---@param args string | omichat.Args.UseStream.Partial
 function Chat.sendAdmin(args)
     Chat.send(Chat._transformSendArgs(args, 'admin'))
 end
 
 ---Sends a /faction message, formatted according to configuration.
----@param args string | omichat.Args.Send.Partial
+---@param args string | omichat.Args.UseStream.Partial
 function Chat.sendFaction(args)
     Chat.send(Chat._transformSendArgs(args, 'faction'))
 end
 
 ---Sends an /all message, formatted according to configuration.
----@param args string | omichat.Args.Send.Partial
+---@param args string | omichat.Args.UseStream.Partial
 function Chat.sendGeneral(args)
     Chat.send(Chat._transformSendArgs(args, 'general'))
 end
 
 ---Sends a /pm message, formatted according to configuration.
----@param args string | omichat.Args.Send.Partial
+---@param args string | omichat.Args.UseStream.Partial
 ---@return string
 function Chat.sendPM(args)
     return Chat.send(Chat._transformSendArgs(args, 'private')) or ''
 end
 
 ---Sends a /safehouse message, formatted according to configuration.
----@param args string | omichat.Args.Send.Partial
+---@param args string | omichat.Args.UseStream.Partial
 function Chat.sendSafehouse(args)
     Chat.send(Chat._transformSendArgs(args, 'safehouse'))
 end
 
 ---Sends a /say message, formatted according to configuration.
----@param args string | omichat.Args.Send.Partial
+---@param args string | omichat.Args.UseStream.Partial
 function Chat.sendSay(args)
     Chat.send(Chat._transformSendArgs(args, 'say'))
 end
 
 ---Sends a /yell message, formatted according to configuration.
----@param args string | omichat.Args.Send.Partial
+---@param args string | omichat.Args.UseStream.Partial
 function Chat.sendShout(args)
     Chat.send(Chat._transformSendArgs(args, 'yell'))
 end
@@ -407,9 +407,9 @@ function Chat._checkLastCommand(tab)
 end
 
 ---Builds send arguments for the given stream.
----@param args string | omichat.Args.Send.Partial
+---@param args string | omichat.Args.UseStream.Partial
 ---@param streamName string
----@return omichat.Args.Send?
+---@return omichat.Args.UseStream?
 ---@private
 function Chat._transformSendArgs(args, streamName)
     local stream = API.streams.getChatStream(streamName)
@@ -428,7 +428,7 @@ function Chat._transformSendArgs(args, streamName)
         return
     end
 
-    args = utils.copy(args) ---@cast args omichat.Args.Send
+    args = utils.copy(args) --[[@as omichat.Args.UseStream]]
     args.stream = stream
 
     return args

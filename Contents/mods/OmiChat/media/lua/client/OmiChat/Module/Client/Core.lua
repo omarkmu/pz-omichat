@@ -90,6 +90,10 @@ API._cardCommand = API.CommandStream:new {
     helpTextID = 'UI_ServerOptionDesc_Card',
     autoTags = { 'IsCardCommand' },
     onUse = function(ctx)
+        if API.hooks.has.cardCommand and API.hooks.cardCommand(ctx) then
+            return
+        end
+
         if not API.request.drawCard() then
             ctx.stream:showHelpText()
         end
@@ -98,6 +102,13 @@ API._cardCommand = API.CommandStream:new {
         local player = getSpecificPlayer(0)
         if not player then
             return false
+        end
+
+        if API.hooks.has.cardCommandEnabled then
+            local result = API.hooks.cardCommandEnabled()
+            if result ~= nil then
+                return result
+            end
         end
 
         if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, config:getCardItems()) then
@@ -127,6 +138,10 @@ API._flipCommand = API.CommandStream:new {
     helpTextID = 'UI_OmiChat_HelpText_Flip',
     autoTags = { 'IsFlipCommand' },
     onUse = function(ctx)
+        if API.hooks.has.flipCommand and API.hooks.flipCommand(ctx) then
+            return
+        end
+
         if not API.request.flipCoin() then
             ctx.stream:showHelpText()
         end
@@ -135,6 +150,13 @@ API._flipCommand = API.CommandStream:new {
         local player = getSpecificPlayer(0)
         if not player then
             return false
+        end
+
+        if API.hooks.has.flipCommandEnabled then
+            local result = API.hooks.flipCommandEnabled()
+            if result ~= nil then
+                return result
+            end
         end
 
         if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, config:getCoinItems()) then
@@ -164,6 +186,10 @@ API._rollCommand = API.CommandStream:new {
     helpTextID = 'UI_ServerOptionDesc_Roll',
     autoTags = { 'IsRollCommand' },
     onUse = function(ctx)
+        if API.hooks.has.rollCommand and API.hooks.rollCommand(ctx) then
+            return
+        end
+
         local command = utils.trim(ctx.text)
         local first = command:split(' ')[1]
         local sides = first and tonumber(first)
@@ -182,6 +208,13 @@ API._rollCommand = API.CommandStream:new {
         local player = getSpecificPlayer(0)
         if not player then
             return false
+        end
+
+        if API.hooks.has.rollCommandEnabled then
+            local result = API.hooks.rollCommandEnabled()
+            if result ~= nil then
+                return result
+            end
         end
 
         if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, config:getDiceItems()) then

@@ -14,6 +14,7 @@ require 'OmiChat/Module/Client/Player'
 require 'OmiChat/Module/Client/Preferences'
 require 'OmiChat/Module/Client/Request'
 require 'OmiChat/Module/Client/Search'
+require 'OmiChat/Module/Client/Streams'
 require 'OmiChat/Module/Client/UI'
 require 'OmiChat/Module/Client/ClientEvents'
 

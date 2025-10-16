@@ -110,6 +110,54 @@
 
 --#endregion
 
+--#region Hooks
+
+---@class omichat.api.shared.hooks
+---@field has table<omichat.HookType, boolean?>
+---@field protected _callbacks omichat.Hooks.Callbacks
+
+---@class omichat.Hooks.Callbacks
+---@field cardCommand omichat.Callback.Hook.Command[]
+---@field cardCommandEnabled omichat.Callback.Hook.CommandEnabled[]
+---@field flipCommand omichat.Callback.Hook.Command[]
+---@field flipCommandEnabled omichat.Callback.Hook.CommandEnabled[]
+---@field perceptionRange omichat.Callback.Hook.PerceptionRange[]
+---@field rollCommand omichat.Callback.Hook.Command[]
+---@field rollCommandEnabled omichat.Callback.Hook.CommandEnabled[]
+
+
+---@class omichat.Args.ApplyHook.PerceptionRange
+---@field range integer The current value for the range.
+---@field player IsoPlayer The local player.
+---@field distance number The distance between the players.
+---@field author IsoPlayer The author of the message being tested for perception.
+---@field isSigned boolean Whether the message was sent in a signed language.
+
+---@class omichat.Args.Hook.PerceptionRange : omichat.Args.ApplyHook.PerceptionRange
+---@field originalRange integer The original value, before applying any hooks.
+
+
+---@alias omichat.HookType
+---| 'cardCommand'
+---| 'cardCommandEnabled'
+---| 'flipCommand'
+---| 'flipCommandEnabled'
+---| 'perceptionRange'
+---| 'rollCommand'
+---| 'rollCommandEnabled'
+
+
+---Hook for a command's functionality. If this returns `true`, the original command handling will be skipped.
+---@alias omichat.Callback.Hook.Command fun(args: omichat.Args.UseStream): boolean?
+
+---Hook for whether a command is enabled. If this returns `nil`, the original checking will be used. Otherwise, the result will be used.
+---@alias omichat.Callback.Hook.CommandEnabled fun(): boolean?
+
+---Hook for determining the perception range for a message. Returns the new range after transformation.
+---@alias omichat.Callback.Hook.PerceptionRange fun(args: omichat.Args.Hook.PerceptionRange): integer?
+
+--#endregion
+
 --#region Requests
 
 ---Request to add or remove a user-defined configuration preset.

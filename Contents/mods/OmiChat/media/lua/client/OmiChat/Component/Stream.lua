@@ -297,10 +297,10 @@ function Stream:onHelp()
 end
 
 ---Handler for when the stream is used.
----@param ctx omichat.Args.Send.Partial
+---@param ctx omichat.Args.UseStream.Partial
 ---@return boolean success Indicates whether the command was handled.
 function Stream:onUse(ctx)
-    ---@cast ctx omichat.Args.Send
+    ---@cast ctx omichat.Args.UseStream
     if not ctx.stream then
         ctx.stream = self
     end

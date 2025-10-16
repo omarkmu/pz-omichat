@@ -543,9 +543,9 @@ return {
                 return
             end
 
-            local authorPlayer = utils.getPlayerByUsername(info.author)
-            local localPlayer = getSpecificPlayer(0)
-            if not authorPlayer or not localPlayer or authorPlayer == localPlayer then
+            local author = utils.getPlayerByUsername(info.author)
+            local player = getSpecificPlayer(0)
+            if not author or not player or author == player then
                 -- players can hear themselves
                 return
             end
@@ -554,13 +554,13 @@ return {
             local zMax = stream.verticalRange or 2
 
             local dist
-            if zMax and math.abs(authorPlayer:getZ() - localPlayer:getZ()) >= zMax then
+            if zMax > 0 and math.abs(author:getZ() - player:getZ()) >= zMax then
                 outOfRange = true
             elseif range ~= maxRange then
                 -- calculating distance using the distance formula like ChatUtility
                 -- assuming players are synced it works equivalently
-                local xDiff = authorPlayer:getX() - localPlayer:getX()
-                local yDiff = authorPlayer:getY() - localPlayer:getY()
+                local xDiff = author:getX() - player:getX()
+                local yDiff = author:getY() - player:getY()
 
                 dist = math.sqrt(xDiff * xDiff + yDiff * yDiff)
                 outOfRange = dist > range
@@ -574,11 +574,23 @@ return {
             local language = info.tokens.languageRaw
             local isSigned = language and API.language.isSigned(language)
 
-            local perceptionRange = isSigned and stream.perceptionRangeSigned or stream.perceptionRange
-            if not info.tags.Action and dist and dist <= perceptionRange then
-                info:setUsePerceivedText(true)
-                info:setMetadataRangeResult('in-perception-range')
-                return
+            if dist and not info.tags.Action then
+                range = isSigned and stream.perceptionRangeSigned or stream.perceptionRange
+                if API.hooks.has.perceptionRange then
+                    range = API.hooks.perceptionRange({
+                        range = range,
+                        distance = dist,
+                        player = player,
+                        author = author,
+                        isSigned = isSigned or false,
+                    })
+                end
+
+                if dist <= range then
+                    info:setUsePerceivedText(true)
+                    info:setMetadataRangeResult('in-perception-range')
+                    return
+                end
             end
 
             info:hide()

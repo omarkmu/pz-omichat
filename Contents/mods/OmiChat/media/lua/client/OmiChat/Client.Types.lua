@@ -63,10 +63,10 @@
 ---@field display string
 ---@field lastUpdate integer
 
----@class omichat.Args.Send : omichat.Args.Send.Partial
+---@class omichat.Args.UseStream : omichat.Args.UseStream.Partial
 ---@field stream omichat.Stream
 
----@class omichat.Args.Send.Partial
+---@class omichat.Args.UseStream.Partial
 ---@field text string
 ---@field formatStream omichat.Stream?
 ---@field playSignedEmote boolean?
@@ -538,7 +538,7 @@
 
 ---@alias omichat.Stream.Callback.IsEnabled fun(self: omichat.Stream): boolean
 
----@alias omichat.Stream.Callback.OnUse fun(ctx: omichat.Args.Send) Callback triggered when the stream is used.
+---@alias omichat.Stream.Callback.OnUse fun(ctx: omichat.Args.UseStream) Callback triggered when the stream is used.
 
 ---@alias omichat.Stream.Callback.OnUseDisabled fun(self: omichat.Stream, command: string) Callback triggered when attempting to use a disabled stream.
 

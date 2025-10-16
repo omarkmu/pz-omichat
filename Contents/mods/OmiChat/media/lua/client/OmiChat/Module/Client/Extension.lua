@@ -7,6 +7,7 @@ local sort = table.sort
 ---@class omichat.api.client
 local API = require 'OmiChat/Module/Client/Core'
 
+local utils = API.utils
 
 ---@class omichat.api.client.extension : omichat.api.shared.extension
 local Extension = API.extension
@@ -37,6 +38,26 @@ function Extension.addEmote(name, emote)
     end
 
     API._emotes[name] = emote
+end
+
+---Adds a hook of the given type.
+---@param type omichat.HookType
+---@param callback function
+---@overload fun(type: 'cardCommand', callback: omichat.Callback.Hook.Command)
+---@overload fun(type: 'cardCommandEnabled', callback: omichat.Callback.Hook.CommandEnabled)
+---@overload fun(type: 'flipCommand', callback: omichat.Callback.Hook.Command)
+---@overload fun(type: 'flipCommandEnabled', callback: omichat.Callback.Hook.CommandEnabled)
+---@overload fun(type: 'perceptionRange', callback: omichat.Callback.Hook.PerceptionRange)
+---@overload fun(type: 'rollCommand', callback: omichat.Callback.Hook.Command)
+---@overload fun(type: 'rollCommandEnabled', callback: omichat.Callback.Hook.CommandEnabled)
+function Extension.addHook(type, callback)
+    local cbList = API.hooks._callbacks[type]
+    if not cbList or utils.includes(cbList, callback) then
+        return
+    end
+
+    cbList[#cbList + 1] = callback
+    API.hooks.has[type] = true
 end
 
 ---Adds a message transformer which can act on message information to modify display or behavior.
@@ -134,6 +155,21 @@ end
 ---@param name string
 function Extension.removeEmote(name)
     API._emotes[name] = nil
+end
+
+---Removes a hook of the given type.
+---@param type omichat.HookType
+---@param callback function
+function Extension.removeHook(type, callback)
+    local cbList = API.hooks._callbacks[type]
+    if not cbList then
+        return
+    end
+
+    Extension._remove(cbList, callback)
+    if #cbList == 0 then
+        API.hooks.has[type] = nil
+    end
 end
 
 ---Removes a message transformer.
