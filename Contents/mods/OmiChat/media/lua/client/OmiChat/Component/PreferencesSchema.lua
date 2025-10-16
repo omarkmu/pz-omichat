@@ -8,6 +8,77 @@ local int = utils.schema.int
 local str = utils.schema.string
 local container = utils.schema.container
 
+---Upgrades player preferences from V1 to V2.
+---@param values table
+---@return omichat.PlayerPreferences
+local function transformToV2(values)
+    if type(values.VERSION) ~= 'number' or values.VERSION ~= 1 then
+        return values
+    end
+
+    local prefs = {
+        settings = {
+            showNameColors = utils.default(values.showNameColors, true),
+            useSuggester = utils.default(values.useSuggester, true),
+            useSignEmotes = utils.default(values.useSignEmotes, true),
+            retainChatInput = utils.default(values.retainChatInput, true),
+            retainRPInput = utils.default(values.retainRPInput, false),
+            retainOtherInput = utils.default(values.retainOtherInput, false),
+            adminShowIcon = utils.default(values.adminShowIcon, true),
+            adminKnowLanguages = utils.default(values.adminKnowLanguages, true),
+            adminIgnoreRange = utils.default(values.adminIgnoreRange, true),
+        },
+    }
+
+    local callouts
+    if type(values.callouts) == 'table' then
+        callouts = utils.mapList(tostring, values.callouts)
+        if #callouts == 0 then
+            callouts = nil
+        end
+    end
+
+    local sneakcallouts
+    if type(values.sneakcallouts) == 'table' then
+        sneakcallouts = utils.mapList(tostring, values.sneakcallouts)
+        if #sneakcallouts == 0 then
+            sneakcallouts = nil
+        end
+    end
+
+    local colors
+    if type(values.colors) == 'table' then
+        colors = {}
+
+        local hasColor
+        for k, v in pairs(values.colors) do
+            local colorTable = utils.color.fromString(v)
+            if colorTable then
+                hasColor = true
+                colors[k] = colorTable
+            end
+        end
+
+        if not hasColor then
+            colors = nil
+        end
+    end
+
+    if callouts or sneakcallouts or colors then
+        prefs.profileIndex = 1
+        prefs.profiles = {
+            {
+                name = getText('UI_OmiChat_ProfileManager_DefaultProfileName', '1'),
+                colors = colors or {},
+                callouts = callouts or {},
+                sneakcallouts = sneakcallouts or {},
+            },
+        }
+    end
+
+    return prefs
+end
+
 return utils.schema {
     properties = {
         VERSION = int(2),
@@ -45,72 +116,6 @@ return utils.schema {
     },
 
     transforms = {
-        function(values)
-            if type(values.VERSION) ~= 'number' or values.VERSION ~= 1 then
-                return values
-            end
-
-            local prefs = {
-                settings = {
-                    showNameColors = utils.default(values.showNameColors, true),
-                    useSuggester = utils.default(values.useSuggester, true),
-                    useSignEmotes = utils.default(values.useSignEmotes, true),
-                    retainChatInput = utils.default(values.retainChatInput, true),
-                    retainRPInput = utils.default(values.retainRPInput, false),
-                    retainOtherInput = utils.default(values.retainOtherInput, false),
-                    adminShowIcon = utils.default(values.adminShowIcon, true),
-                    adminKnowLanguages = utils.default(values.adminKnowLanguages, true),
-                    adminIgnoreRange = utils.default(values.adminIgnoreRange, true),
-                },
-            }
-
-            local callouts
-            if type(values.callouts) == 'table' then
-                callouts = utils.mapList(tostring, values.callouts)
-                if #callouts == 0 then
-                    callouts = nil
-                end
-            end
-
-            local sneakcallouts
-            if type(values.sneakcallouts) == 'table' then
-                sneakcallouts = utils.mapList(tostring, values.sneakcallouts)
-                if #sneakcallouts == 0 then
-                    sneakcallouts = nil
-                end
-            end
-
-            local colors
-            if type(values.colors) == 'table' then
-                colors = {}
-
-                local hasColor
-                for k, v in pairs(values.colors) do
-                    local colorTable = utils.color.fromString(v)
-                    if colorTable then
-                        hasColor = true
-                        colors[k] = colorTable
-                    end
-                end
-
-                if not hasColor then
-                    colors = nil
-                end
-            end
-
-            if callouts or sneakcallouts or colors then
-                prefs.profileIndex = 1
-                prefs.profiles = {
-                    {
-                        name = getText('UI_OmiChat_ProfileManager_DefaultProfileName', '1'),
-                        colors = colors or {},
-                        callouts = callouts or {},
-                        sneakcallouts = sneakcallouts or {},
-                    },
-                }
-            end
-
-            return prefs
-        end,
+        transformToV2,
     },
 }

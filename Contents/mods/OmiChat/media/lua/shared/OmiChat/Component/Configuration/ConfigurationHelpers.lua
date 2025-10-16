@@ -1,8 +1,12 @@
----Helper functions for the configuration form layout.
+---Helper functions for the configuration form and schema.
 
 local utils = require 'OmiChat/utils'
+
 local TagList = require 'OmiChat/Definition/TagList'
 local FormatData = require 'OmiChat/Definition/NamedFormatData'
+local DefaultLanguages = require 'OmiChat/Definition/DefaultLanguageList'
+local DefaultStreams = require 'OmiChat/Definition/DefaultStreamList'
+local DefaultStreamData = require 'OmiChat/Definition/DefaultStreamData'
 
 local sort = table.sort
 local concat = table.concat
@@ -13,7 +17,6 @@ local MIDDOT = string.char(183) .. ' <SPACE> '
 local API_C ---@type omichat.api.client?
 
 
----@class omichat.ConfigurationFormHelpers
 local Helpers = {}
 
 
@@ -22,14 +25,13 @@ local Helpers = {}
 ---@param preset omichat.ConfigurationPreset
 function Helpers.applyPreset(form, preset)
     local values = form.values
-    local schema = form:getSchema() --[[@as omichat.ConfigurationSchema]]
     local id = preset:getID()
 
     -- get info text value before setting values
     local infoText = form:getValue(PATH_INFO)
 
     -- ensure ID matches expected preset ID
-    local presetValues = preset:getValues(schema)
+    local presetValues = preset:getValues()
     presetValues.General = presetValues.General or {}
     presetValues.General.Preset = id
 
@@ -109,6 +111,24 @@ function Helpers.deletePreset(form, state, value)
     state.activePresetDialog = dialog
 end
 
+---Returns a list of default language definition objects.
+---@return omichat.Configuration.LanguageDefinition[]
+function Helpers.getDefaultLanguages()
+    return utils.copyList(DefaultLanguages)
+end
+
+---Returns a list of default stream objects.
+---@return omichat.Configuration.StreamDefinition[]
+function Helpers.getDefaultStreams()
+    return utils.copyList(DefaultStreams)
+end
+
+---Returns a list of default stream objects, populated with required data.
+---@return omichat.Configuration.StreamDefinition[]
+function Helpers.getDefaultStreamsPopulated()
+    return Helpers.processStreams(utils.copyList(DefaultStreams))
+end
+
 ---Gets a final list of format data translations.
 ---@param list (string | omichat.FormatDataTranslation)[]?
 ---@param prefix string
@@ -178,6 +198,30 @@ function Helpers.getPresetOptions()
     end
 
     return list
+end
+
+---Gets the chat type associated with a built-in stream.
+---@param stream string
+---@return omichat.ChatTypeString?
+function Helpers.getStreamChatType(stream)
+    if not stream then
+        return
+    end
+
+    local data = DefaultStreamData[stream]
+    return data and data.ChatType
+end
+
+---Gets the command type associated with a built-in stream.
+---@param stream string
+---@return string?
+function Helpers.getStreamCommandType(stream)
+    if not stream then
+        return
+    end
+
+    local data = DefaultStreamData[stream]
+    return data and data.CommandType
 end
 
 ---Gets a display string for an item in the stream listbox.
@@ -288,7 +332,6 @@ end
 ---@param args omi.forms.Args.Callback.Item
 function Helpers.onChangeStream(args)
     local form = args.form
-    local schema = args.schema --[[@as omichat.ConfigurationSchema]]
     local item = args.parent ---@type omichat.Configuration.StreamDefinition?
     local index = args.index
     if not item or not index then
@@ -318,8 +361,8 @@ function Helpers.onChangeStream(args)
 
         if not isCustomStream then
             item.Name = nil
-            item.ChatType = schema:getStreamChatType(item.Stream) or 'say'
-            item.CommandType = schema:getStreamCommandType(item.Stream) or 'chat'
+            item.ChatType = Helpers.getStreamChatType(item.Stream) or 'say'
+            item.CommandType = Helpers.getStreamCommandType(item.Stream) or 'chat'
 
             form:setFieldControlValue(nameField, '')
             form:setFieldControlValue(chatTypeField, item.ChatType)
@@ -328,7 +371,7 @@ function Helpers.onChangeStream(args)
     end
 
     -- update max range based on stream/chat type
-    local chatType = item.ChatType or schema:getStreamChatType(item.Stream)
+    local chatType = item.ChatType or Helpers.getStreamChatType(item.Stream)
     local maxRange = 30
     if chatType == 'shout' or item.Stream == 'yell' then
         maxRange = 60
@@ -479,6 +522,62 @@ function Helpers.populateTagSuggest(listEntry, suggestBox, text)
     end
 
     suggestBox:setSuggestions(list)
+end
+
+---Transforms configured streams to include required data and fix incompatible fields.
+---@param streams omichat.Configuration.StreamDefinition[]
+---@return omichat.Configuration.StreamDefinition[]
+function Helpers.processStreams(streams)
+    local seen = { [''] = true }
+    local processed = {}
+
+    for i = 1, #streams do
+        local stream = streams[i]
+        local streamType = utils.trim(stream.Stream or '')
+        local streamName = utils.trim(stream.Name or '')
+        local isCustom = streamType == '' or streamType == 'custom'
+
+        local compareKey = isCustom and streamName or streamType
+        if not seen[compareKey] then
+            seen[compareKey] = true
+            local data = DefaultStreamData[streamType]
+            if not data then
+                data = {}
+                if not isCustom then
+                    utils.log.error('Missing defaults for built-in stream `%s`', tostring(streamType))
+                end
+            end
+
+            for k, v in pairs(data) do
+                local vType = type(v)
+                if not isCustom and (k == 'ChatType' or k == 'CommandType') then
+                    -- always copy these keys for built-in streams
+                    stream[k] = v
+                elseif type(stream[k]) ~= vType then
+                    -- use defaults for invalid values
+                    stream[k] = vType == 'table' and utils.copy(v) or v
+                end
+            end
+
+            if isCustom then
+                stream.Stream = 'custom'
+                stream.Name = streamName
+                stream.ChatType = utils.isNilOrWhitespace(stream.ChatType) and 'say' or stream.ChatType
+                stream.CommandType = utils.isNilOrWhitespace(stream.CommandType) and 'chat' or stream.CommandType
+            else
+                stream.Stream = streamType
+                stream.Name = nil
+            end
+
+            local isValidBuiltin = stream.Stream ~= 'custom' and not utils.isNilOrWhitespace(stream.Stream)
+            local isValidCustom = stream.Stream == 'custom' and not utils.isNilOrWhitespace(stream.Name)
+            if isValidBuiltin or isValidCustom then
+                processed[#processed + 1] = stream
+            end
+        end
+    end
+
+    return processed
 end
 
 ---Refreshes the list of presets to match the current custom presets.

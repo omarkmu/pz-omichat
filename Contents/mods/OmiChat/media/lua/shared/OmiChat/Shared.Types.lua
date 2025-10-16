@@ -547,10 +547,10 @@
 
 ---@alias omichat.PresetString 'Default' | 'Buffy' | 'Vanilla'
 
----@alias omichat.Callback.ConfigurationPreset.GetStreams fun(self: omichat.ConfigurationPreset, schema: omichat.ConfigurationSchema): omichat.Configuration.StreamDefinition[]
+---@alias omichat.Callback.ConfigurationPreset.GetStreams fun(self: omichat.ConfigurationPreset): omichat.Configuration.StreamDefinition[]
 
----@alias omichat.Callback.ConfigurationPreset.GetLanguages fun(self: omichat.ConfigurationPreset, schema: omichat.ConfigurationSchema): omichat.Configuration.LanguageDefinition[]
+---@alias omichat.Callback.ConfigurationPreset.GetLanguages fun(self: omichat.ConfigurationPreset): omichat.Configuration.LanguageDefinition[]
 
----@alias omichat.Callback.ConfigurationPreset.GetValues fun(self: omichat.ConfigurationPreset, schema: omichat.ConfigurationSchema): omichat.Configuration
+---@alias omichat.Callback.ConfigurationPreset.GetValues fun(self: omichat.ConfigurationPreset): omichat.Configuration
 
 --#endregion

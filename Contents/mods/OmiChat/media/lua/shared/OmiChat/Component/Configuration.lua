@@ -10,7 +10,7 @@ local isempty = table.isempty
 
 ---@class omichat.ConfigurationHelper : omi.ConfigurationHelper, omichat.Configuration
 local Configuration = utils.configuration {
-    schema = require 'OmiChat/Component/Configuration/Schema',
+    schema = require 'OmiChat/Component/Configuration/ConfigurationSchema',
     modDataKey = 'omichat.settings',
     logger = utils.log,
 
@@ -254,7 +254,7 @@ function Configuration:getCustomPresetsSimple()
     for i = 1, #self._presetList do
         local preset = self._presetList[i]
         if preset:isCustom() then
-            local values = preset:getValues(schema)
+            local values = preset:getValues()
             list[#list + 1] = {
                 name = preset:getName(),
                 values = schema:sanitize(values),
@@ -376,13 +376,6 @@ end
 ---@return omichat.ConfigurationPreset[]
 function Configuration:getPresetList()
     return utils.copyList(self._presetList)
-end
-
----Returns the schema of the configuration.
----@return omichat.ConfigurationSchema
-function Configuration:getSchema()
-    local schema = base.getSchema(self) ---@cast schema omichat.ConfigurationSchema
-    return schema
 end
 
 ---Returns the current configuration as a simple table.

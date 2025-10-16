@@ -2,7 +2,7 @@
 ---@diagnostic disable: unused-local
 
 local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
-local FormHelpers = require 'OmiChat/Component/Configuration/FormHelpers'
+local ConfigurationHelpers = require 'OmiChat/Component/Configuration/ConfigurationHelpers'
 
 local utils = API.utils
 local config = API.Configuration
@@ -145,7 +145,7 @@ function Callback.openConfiguration(target)
         target.activeConfigurationPanel = form
     end
 
-    FormHelpers.refreshPresetsList(form)
+    ConfigurationHelpers.refreshPresetsList(form)
 
     local x, y = UI.getScreenCenter(800, 600)
     form:setX(x)

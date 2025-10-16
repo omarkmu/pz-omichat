@@ -374,22 +374,21 @@ function Preset:getName()
 end
 
 ---Gets the values associated with the preset.
----@param schema omichat.ConfigurationSchema
 ---@return omichat.Configuration
-function Preset:getValues(schema)
+function Preset:getValues()
     local values
     if self._getValues then
-        values = self:_getValues(schema) or {}
+        values = self:_getValues() or {}
     else
         values = utils.deepcopy(self._values)
     end
 
     if self._getLanguages then
-        values.Language.List = self:_getLanguages(schema)
+        values.Language.List = self:_getLanguages()
     end
 
     if self._getStreams then
-        values.Streams.List = self:_getStreams(schema)
+        values.Streams.List = self:_getStreams()
     end
 
     return values

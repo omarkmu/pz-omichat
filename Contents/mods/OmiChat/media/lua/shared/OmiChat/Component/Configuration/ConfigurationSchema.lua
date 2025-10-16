@@ -1,8 +1,7 @@
 ---Information about the mod's configuration options.
 
 local utils = require 'OmiChat/utils'
-local Schema = require 'OmiChat/Component/Configuration/SchemaClass'
-local FormDefinition = require 'OmiChat/Definition/ConfigurationForm'
+local Helpers = require 'OmiChat/Component/Configuration/ConfigurationHelpers'
 
 local array = utils.schema.array
 local bool = utils.schema.bool
@@ -18,8 +17,8 @@ local str = utils.schema.string
 local DEFAULT = '$Default()'
 
 
-return Schema:new {
-    form = FormDefinition,
+return utils.schema {
+    form = require 'OmiChat/Component/Configuration/ConfigurationForm',
 
     properties = {
         VERSION = int(1),
@@ -227,11 +226,7 @@ return Schema:new {
             List = array {
                 maxItems = 1000, -- Configuration.MAX_LANGUAGES
 
-                ---@param schema omichat.ConfigurationSchema
-                ---@return table
-                getDefault = function(_, schema)
-                    return schema:getDefaultLanguages()
-                end,
+                getDefault = Helpers.getDefaultLanguages,
 
                 items = object {
                     skipMissing = true,
@@ -301,11 +296,7 @@ return Schema:new {
             List = array {
                 maxItems = 32, -- Configuration.MAX_CHAT_STREAMS
 
-                ---@param schema omichat.ConfigurationSchema
-                ---@return table
-                getDefault = function(_, schema)
-                    return schema:processStreams(schema:getDefaultStreams())
-                end,
+                getDefault = Helpers.getDefaultStreamsPopulated,
 
                 items = object {
                     skipMissing = true,
@@ -403,39 +394,40 @@ return Schema:new {
         },
     },
 
-    ---@param self omichat.ConfigurationSchema
+    ---@diagnostic disable: inject-field
     ---@param values omichat.Configuration
-    onRead = function(self, values)
+    onRead = function(values)
         -- read default languages
         local languages = values.Language.List
-        values._Languages = languages ---@diagnostic disable-line: inject-field
+        values._Languages = languages
 
         if type(languages) ~= 'table' or values.Language.UseDefaultList then
-            languages = self:getDefaultLanguages()
+            languages = Helpers.getDefaultLanguages()
         end
 
         -- read default stream data
         local streams = values.Streams.List
-        values._Streams = streams ---@diagnostic disable-line: inject-field
+        values._Streams = streams
 
         if type(streams) ~= 'table' or #streams == 0 or values.Streams.UseDefaultList then
-            streams = self:getDefaultStreams()
+            streams = Helpers.getDefaultStreams()
         else
             streams = utils.deepcopy(streams)
         end
 
         values.Language.List = languages
-        values.Streams.List = self:processStreams(streams)
+        values.Streams.List = Helpers.processStreams(streams)
     end,
 
     ---@param values omichat.Configuration
-    sanitize = function(_, values)
+    sanitize = function(values)
         values.Streams = values.Streams or {}
         values.Language = values.Language or {}
 
         values.Streams.List = values._Streams
         values.Language.List = values._Languages
-        values._Streams = nil ---@diagnostic disable-line: inject-field
-        values._Languages = nil ---@diagnostic disable-line: inject-field
+        values._Streams = nil
+        values._Languages = nil
     end,
+    ---@diagnostic enable: inject-field
 }

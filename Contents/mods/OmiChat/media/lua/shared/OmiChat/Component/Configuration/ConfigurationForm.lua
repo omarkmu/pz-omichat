@@ -1,7 +1,7 @@
----Information about the configuration form layout.
+---Configuration form layout.
 
 local utils = require 'OmiChat/utils'
-local Helpers = require 'OmiChat/Component/Configuration/FormHelpers'
+local Helpers = require 'OmiChat/Component/Configuration/ConfigurationHelpers'
 local rules = Helpers.rules
 
 local PAD_N = 10
