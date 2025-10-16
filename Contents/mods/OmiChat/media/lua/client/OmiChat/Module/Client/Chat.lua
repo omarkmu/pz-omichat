@@ -4,8 +4,11 @@ local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
 
 local utils = API.utils
 local config = API.Configuration
+
+local concat = table.concat
+local getText = getText
 local getTimestampMs = getTimestampMs
-local ISChat = ISChat ---@cast ISChat omichat.ISChat
+local ISChat = ISChat --[[@as omichat.ISChat]]
 
 
 ---@class omichat.api.client.chat
@@ -139,6 +142,143 @@ end
 ---@return boolean
 function Chat.isTyping()
     return Chat._isTyping
+end
+
+---Processes a chat command.
+---@param args omichat.Args.ProcessCommand
+---@return boolean handled
+---@return boolean? shouldRetainText
+function Chat.processCommand(args)
+    local input = args.input
+    local instance = ISChat.instance
+
+    if not instance or not input then
+        return false
+    end
+
+    local stream, command, chatCommand, disabledStream = API.streams.chatCommandToStream(input, { enabledOnly = true })
+    local streamToUse ---@type omichat.Stream?
+
+    local commandType = 'other'
+    local isHandled = false
+    local allowEmotes = false
+    local isDefault = false
+
+    if not stream then
+        -- process emotes for streamless messages unless there's a leading slash
+        local isCommand = utils.startsWith(input, '/')
+        allowEmotes = not isCommand
+        command = input
+
+        local default = API.streams.getDefaultTabStream(instance.currentTabID)
+        if not isCommand and default then
+            stream = default
+            allowEmotes = not isCommand and default:isAllowEmotes()
+            isDefault = true
+        end
+    end
+
+    if stream then
+        isHandled = true
+
+        if not stream:isTabID(instance.currentTabID) then
+            -- wrong chat tab
+            showWrongChatTabMessage(instance.currentTabID - 1, stream:getTabID() - 1, chatCommand or '')
+            stream = nil
+            allowEmotes = false
+        else
+            streamToUse = stream
+            allowEmotes = not isDefault and stream:isAllowEmotes() or allowEmotes
+            commandType = stream:getCommandType()
+        end
+
+        if isDefault then
+            stream = nil
+        end
+    end
+
+    -- handle emotes specified with .emote
+    local playedEmote
+    if allowEmotes and config:isEmoteMacroEnabled() then
+        local emoteToPlay, start, finish, emote = API.chat.getEmoteFromCommand(command)
+        if emoteToPlay then
+            -- remove the emote text
+            isHandled = true
+            playedEmote = true
+            command = utils.trim(command:sub(1, start - 1) .. command:sub(finish + 1))
+
+            local player = getSpecificPlayer(0)
+            if player then
+                if type(emoteToPlay) == 'string' then
+                    player:playEmote(emoteToPlay)
+                else
+                    ---@cast emote string
+                    emoteToPlay(player, emote)
+                end
+            end
+        end
+    end
+
+    -- fix the switching functionality by updating to the used stream
+    local shouldRetain = API.preferences.getRetainCommand(commandType)
+    if shouldRetain and stream then
+        API.streams.cycle(stream:getName())
+    end
+
+    if streamToUse then
+        local success, err = streamToUse:validate(command)
+        if err then
+            API.chat.addInfoMessage(err)
+        end
+
+        if not success then
+            isHandled = true
+            streamToUse = nil
+        end
+    end
+
+    -- not handled and no stream → signal not handled
+    if not isHandled and not disabledStream then
+        return false, shouldRetain
+    end
+
+    if disabledStream and not disabledStream:onUseDisabled(command) then
+        if disabledStream:isChatStream() then
+            -- show default disabled message for chat streams, if not handled
+            Chat._addDisabledStreamMessage(disabledStream)
+        elseif not isHandled then
+            -- no `onUseDisabled` handler for command → default handling
+            return false, shouldRetain
+        end
+    end
+
+    instance:unfocus()
+    instance:logChatCommand(input)
+    API.ui.scrollToBottom()
+
+    if stream then
+        if shouldRetain then
+            instance.chatText.lastChatCommand = chatCommand or ''
+        else
+            -- if the used stream shouldn't be set as the last, cycle to the previous command
+            local lastChatStream = API.streams.chatCommandToStreamName(instance.chatText.lastChatCommand)
+            if lastChatStream then
+                API.streams.cycle(lastChatStream)
+            end
+        end
+    end
+
+    if streamToUse then
+        streamToUse:onUse({
+            text = command,
+            playSignedEmote = not playedEmote,
+        })
+    end
+
+    doKeyPress(false)
+    instance.timerTextEntry = 20
+
+    return true
 end
 
 ---Sends a message on the given stream.
@@ -389,6 +529,40 @@ function Chat.updateTypingStatus(skipTimer)
     end
 end
 
+
+---Adds an info message to chat that displays the available streams, when an unavailable stream is used.
+---@param stream omichat.Stream
+---@private
+function Chat._addDisabledStreamMessage(stream)
+    local disabledCommand = utils.trim(stream:getCommand())
+    local msg = { getText('UI_chat_chat_disabled_msg', disabledCommand) }
+
+    for i = 1, #ISChat.allChatStreams do
+        local availableStream = ISChat.allChatStreams[i]
+
+        local availableCommand
+        if utils.isinstance(availableStream, API.ChatStream) then
+            ---@cast availableStream omichat.ChatStream
+            if availableStream:isEnabled() then
+                availableCommand = availableStream:getCommand()
+            end
+        else
+            ---@cast availableStream omichat.StreamTable
+            availableCommand = availableStream.command
+        end
+
+        if availableCommand then
+            msg[#msg + 1] = '* '
+            msg[#msg + 1] = utils.trim(availableCommand)
+            msg[#msg + 1] = ' <LINE> '
+        end
+    end
+
+    if #msg > 1 then
+        msg[#msg] = nil
+        API.chat.addInfoMessage(concat(msg))
+    end
+end
 
 ---Clears the last chat command for a tab based on retain options.
 ---@param tab omichat.ChatTab

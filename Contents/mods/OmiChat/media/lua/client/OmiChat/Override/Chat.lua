@@ -7,8 +7,6 @@ local ISChat = ISChat ---@class omichat.ISChat
 local utils = API.utils
 local config = API.Configuration
 local UI = utils.ui
-local getText = getText
-local concat = table.concat
 
 local _addLineInChat = ISChat.addLineInChat
 local _onCommandEntered = ISChat.onCommandEntered
@@ -207,156 +205,19 @@ function ISChat:onCommandEntered()
         return
     end
 
-    local instance = ISChat.instance ---@cast instance omichat.ISChat
+    local instance = ISChat.instance --[[@as omichat.ISChat]]
     local input = instance.textEntry:getText()
 
-    ---@type omichat.Stream?
-    local stream, command, chatCommand, disabledStream = API.streams.chatCommandToStream(input, { enabledOnly = true })
-
-    local streamToUse ---@type omichat.Stream?
-
-    local commandType = 'other'
-    local shouldHandle = false
-    local allowEmotes = false
-    local isDefault = false
-
-    if not stream then
-        -- process emotes for streamless messages unless there's a leading slash
-        local isCommand = utils.startsWith(input, '/')
-        allowEmotes = not isCommand
-        command = input
-
-        local default = API.streams.getDefaultTabStream(instance.currentTabID)
-        if not isCommand and default then
-            stream = default
-            allowEmotes = not isCommand and default:isAllowEmotes()
-            isDefault = true
-        end
-    end
-
-    if stream then
-        ---@cast stream omichat.Stream
-        shouldHandle = true
-
-        if not stream:isTabID(instance.currentTabID) then
-            -- wrong chat tab
-            showWrongChatTabMessage(instance.currentTabID - 1, stream:getTabID() - 1, chatCommand or '')
-            stream = nil
-            allowEmotes = false
-        else
-            streamToUse = stream
-            allowEmotes = not isDefault and stream:isAllowEmotes() or allowEmotes
-            commandType = stream:getCommandType()
-        end
-
-        if isDefault then
-            stream = nil
-        end
-    end
-
-    -- handle emotes specified with .emote
-    local playedEmote
-    if allowEmotes and config:isEmoteMacroEnabled() then
-        local emoteToPlay, start, finish, emote = API.chat.getEmoteFromCommand(command)
-        if emoteToPlay then
-            -- remove the emote text
-            shouldHandle = true
-            playedEmote = true
-            command = utils.trim(command:sub(1, start - 1) .. command:sub(finish + 1))
-
-            local player = getSpecificPlayer(0)
-            if player then
-                if type(emoteToPlay) == 'string' then
-                    player:playEmote(emoteToPlay)
-                else
-                    ---@cast emote string
-                    emoteToPlay(player, emote)
-                end
-            end
-        end
-    end
-
-    local shouldRetain = API.preferences.getRetainCommand(commandType)
-    if shouldRetain and stream then
-        -- fix the switching functionality by updating to the used stream
-        API.streams.cycle(stream:getName())
-    end
-
-    if streamToUse then
-        local success, err = streamToUse:validate(command)
-        if err then
-            API.chat.addInfoMessage(err)
-        end
-
-        if not success then
-            shouldHandle = true
-            streamToUse = nil
-        end
-    end
-
-    if disabledStream then
-        if not disabledStream:onUseDisabled(command) then
-            local msg = { getText('UI_chat_chat_disabled_msg', utils.trim(disabledStream:getCommand())) }
-            for i = 1, #ISChat.allChatStreams do
-                local availableStream = ISChat.allChatStreams[i]
-
-                local availableCommand
-                if utils.isinstance(availableStream, API.ChatStream) then
-                    ---@cast availableStream omichat.ChatStream
-                    if availableStream:isEnabled() then
-                        availableCommand = availableStream:getCommand()
-                    end
-                else
-                    ---@cast availableStream omichat.StreamTable
-                    availableCommand = availableStream.command
-                end
-
-                if availableCommand then
-                    msg[#msg + 1] = '* '
-                    msg[#msg + 1] = utils.trim(availableCommand)
-                    msg[#msg + 1] = ' <LINE> '
-                end
-            end
-
-            if #msg > 1 then
-                msg[#msg] = nil
-                API.chat.addInfoMessage(concat(msg))
-            end
-        end
-    elseif not shouldHandle then
-        -- no special handling, pass to original function
-        _onCommandEntered(self)
-
-        if shouldRetain then
-            instance.chatText.lastChatCommand = command:sub(1, command:find(' ') or #command)
-        end
-
+    local handled, shouldRetain = API.chat.processCommand({ input = input })
+    if handled then
         return
     end
 
-    instance:unfocus()
-    instance:logChatCommand(input)
-    API.ui.scrollToBottom()
+    _onCommandEntered(self)
 
-    if shouldRetain and stream then
-        instance.chatText.lastChatCommand = chatCommand or ''
-    elseif stream then
-        -- if the used stream shouldn't be set as the last, cycle to the previous command
-        local lastChatStream = API.streams.chatCommandToStreamName(instance.chatText.lastChatCommand)
-        if lastChatStream then
-            API.streams.cycle(lastChatStream)
-        end
+    if shouldRetain then
+        instance.chatText.lastChatCommand = input:sub(1, input:find(' ') or #input)
     end
-
-    if streamToUse then
-        streamToUse:onUse({
-            text = command,
-            playSignedEmote = not playedEmote,
-        })
-    end
-
-    doKeyPress(false)
-    instance.timerTextEntry = 20
 end
 
 ---Override to add additional settings and reorganize existing ones.

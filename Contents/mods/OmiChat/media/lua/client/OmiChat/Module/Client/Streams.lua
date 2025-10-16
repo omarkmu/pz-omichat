@@ -24,14 +24,14 @@ local DEFAULT_STREAMS = {
 
 
 ---Determines stream information given a chat command.
----@param command string The input text.
+---@param input string The input text.
 ---@param options omichat.Args.ChatCommandToStream? Options for retrieving the stream.
 ---@return omichat.Stream? stream
----@return string #The text following the command in the input.
----@return string? #The command or short command that was used.
----@return omichat.Stream? #Information about the disabled stream.
-function Streams.chatCommandToStream(command, options)
-    if not command or command == '' then
+---@return string remainder The text following the command in the input.
+---@return string? command The command or short command that was used.
+---@return omichat.Stream? disabledStream Information about the disabled stream, if one was found.
+function Streams.chatCommandToStream(input, options)
+    if not input or input == '' then
         return nil, ''
     end
 
@@ -53,18 +53,19 @@ function Streams.chatCommandToStream(command, options)
     end
 
     for stream in iterator do
-        chatCommand, remainder = stream:checkMatch(command)
-        if chatCommand and (not enabledOnly or stream:isEnabled()) then
+        local matchedCommand, remainderText = stream:checkMatch(input)
+        if matchedCommand and (not enabledOnly or stream:isEnabled()) then
             foundStream = stream
-            command = remainder
+            remainder = remainderText
+            chatCommand = matchedCommand
             disabledCommand = nil
             break
-        elseif chatCommand then
+        elseif matchedCommand then
             disabledCommand = stream
         end
     end
 
-    return foundStream, command, chatCommand, disabledCommand
+    return foundStream, remainder, chatCommand, disabledCommand
 end
 
 ---Retrieves a stream name given a chat command.

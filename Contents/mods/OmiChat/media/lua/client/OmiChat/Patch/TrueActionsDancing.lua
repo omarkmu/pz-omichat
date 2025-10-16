@@ -536,10 +536,6 @@ local danceStream = API.CommandStream:new {
             API.chat.addInfoMessage(feedback)
         end
     end,
-    onUseDisabled = function()
-        -- the easter egg should still be available when this is disabled
-        SendCommandToServer('/dance')
-    end,
 }
 
 ---Applies the TAD patch.

@@ -63,6 +63,9 @@
 ---@field display string
 ---@field lastUpdate integer
 
+---@class omichat.Args.ProcessCommand
+---@field input string
+
 ---@class omichat.Args.UseStream : omichat.Args.UseStream.Partial
 ---@field stream omichat.Stream
 
