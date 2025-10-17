@@ -528,19 +528,20 @@ Request.TOPIC.TYPING = dispatch:topic('TYPING', {
     ---@param req omi.ClientRequest
     ---@param args omichat.request.Typing
     onServerReceive = function(req, args)
-        local player = req:getPlayer()
+        local sender = req:getPlayer()
+        local senderUsername = sender:getUsername()
         local onlinePlayers = getOnlinePlayers()
         for i = 0, onlinePlayers:size() - 1 do
-            local otherPlayer = onlinePlayers:get(i)
+            local receiver = onlinePlayers:get(i)
 
-            if player ~= otherPlayer or IS_DEBUG then
-                ---@type omichat.request.UpdateTyping
+            if sender ~= receiver or IS_DEBUG then
+                ---@type omichat.request.Args.UpdateTyping
                 local replyArgs = {
-                    username = otherPlayer:getUsername(),
-                    typing = args.typing and Request._shouldSendTyping(player, otherPlayer, args.range, args.chatType),
+                    username = senderUsername,
+                    typing = args.typing and Request._shouldSendTyping(sender, receiver, args.range, args.chatType),
                 }
 
-                req:replyWith(Topic.TYPING, replyArgs)
+                Topic.TYPING:toPlayer(receiver, replyArgs, req)
             end
         end
     end,
