@@ -3,29 +3,33 @@
 
 local insert = table.insert
 local sort = table.sort
+local ISChat = ISChat --[[@as omichat.ISChat]]
 
 ---@class omichat.api.client
 local API = require 'OmiChat/Module/Client/Core'
 
-local utils = API.utils
 
+---Contains functions for extending mod functionality.
 ---@class omichat.api.client.extension : omichat.api.shared.extension
 local Extension = API.extension
 
 
----Adds information about a command that can be triggered from chat.
+---Adds a command that can be triggered from chat.
 ---@param stream omichat.CommandStream
+---@return omichat.CommandStream stream
 function Extension.addCommand(stream)
     API._commandStreams[#API._commandStreams + 1] = stream
+    return stream
 end
 
 ---Registers a new button for the chat.
+---The button will be automatically added to the chat window, to the left of other buttons.
 ---@param button ISButton
 ---@return ISButton
 function Extension.addCustomButton(button)
     API.ui._customButtons[#API.ui._customButtons + 1] = button
-
     API.ui.updateButtons()
+
     return button
 end
 
@@ -40,43 +44,26 @@ function Extension.addEmote(name, emote)
     API._emotes[name] = emote
 end
 
----Adds a hook of the given type.
----@param type omichat.HookType
----@param callback function
----@overload fun(type: 'cardCommand', callback: omichat.Callback.Hook.Command)
----@overload fun(type: 'cardCommandEnabled', callback: omichat.Callback.Hook.CommandEnabled)
----@overload fun(type: 'flipCommand', callback: omichat.Callback.Hook.Command)
----@overload fun(type: 'flipCommandEnabled', callback: omichat.Callback.Hook.CommandEnabled)
----@overload fun(type: 'perceptionRange', callback: omichat.Callback.Hook.PerceptionRange)
----@overload fun(type: 'rollCommand', callback: omichat.Callback.Hook.Command)
----@overload fun(type: 'rollCommandEnabled', callback: omichat.Callback.Hook.CommandEnabled)
-function Extension.addHook(type, callback)
-    local cbList = API.hooks._callbacks[type]
-    if not cbList or utils.includes(cbList, callback) then
-        return
-    end
-
-    cbList[#cbList + 1] = callback
-    API.hooks.has[type] = true
-end
-
 ---Adds a message transformer which can act on message information to modify display or behavior.
----@param transformer omichat.MessageTransformer
+---@param transformer omichat.MessageTransformer The transformer to add.
+---@return omichat.MessageTransformer transformer
 function Extension.addMessageTransformer(transformer)
     API._transformers[#API._transformers + 1] = transformer
     sort(API._transformers, Extension._prioritySort)
+
+    return transformer
 end
 
 ---Adds a callback that can be triggered by clicking an action in a rich text panel.
----@param name string
----@param callback omichat.RichTextAction
+---@param name string The name of the action.
+---@param callback omichat.RichTextAction the action callback.
 function Extension.addRichTextAction(name, callback)
     API.ui._actionHandlers[name] = callback
 end
 
 ---Adds a handler for adding setting context menu options.
----@param category omichat.SettingCategory
----@param callback omichat.SettingHandler
+---@param category omichat.SettingCategory The setting category to add to.
+---@param callback omichat.SettingHandler The setting handler callback.
 function Extension.addSettingHandler(category, callback)
     local tab = API.ui._settingHandlers[category]
     if tab then
@@ -85,8 +72,8 @@ function Extension.addSettingHandler(category, callback)
 end
 
 ---Adds a chat stream.
----@param stream omichat.ChatStream
----@return omichat.ChatStream
+---@param stream omichat.ChatStream The stream to add.
+---@return omichat.ChatStream stream
 function Extension.addStream(stream)
     ISChat.allChatStreams[#ISChat.allChatStreams + 1] = stream
     API.streams.updateTagCache()
@@ -109,8 +96,8 @@ end
 ---Adds a chat stream after an existing stream.
 ---If no stream is provided or it isn't found, the stream is added at the end.
 ---@param stream omichat.ChatStream The stream to add.
----@param otherStream omichat.ChatStream?
----@return omichat.ChatStream
+---@param otherStream omichat.ChatStream? The comparison stream.
+---@return omichat.ChatStream stream
 function Extension.addStreamAfter(stream, otherStream)
     return Extension._insertStreamRelative(stream, otherStream, 1)
 end
@@ -118,90 +105,78 @@ end
 ---Adds a chat stream before an existing stream.
 ---If no stream is provided or it isn't found, the stream is added at the end.
 ---@param stream omichat.ChatStream The stream to add.
----@param otherStream omichat.ChatStream?
----@return omichat.ChatStream
+---@param otherStream omichat.ChatStream? The comparison stream.
+---@return omichat.ChatStream stream
 function Extension.addStreamBefore(stream, otherStream)
     return Extension._insertStreamRelative(stream, otherStream, 0)
 end
 
 ---Adds a suggester which can suggest inputs to the player.
----@param suggester omichat.Suggester
+---@param suggester omichat.Suggester The suggester to add.
+---@return omichat.Suggester suggester
 function Extension.addSuggester(suggester)
     API._suggesters[#API._suggesters + 1] = suggester
     sort(API._suggesters, Extension._prioritySort)
+
+    return suggester
 end
 
 ---Registers an argument type for suggester specs.
----@param argType string
----@param callback omichat.SuggestSearchCallback
+---@param argType string The argument type.
+---@param callback omichat.SuggestSearchCallback The suggestion callback.
 function Extension.addSuggesterType(argType, callback)
     API.search._customSuggesterTypes[argType] = callback
 end
 
 ---Removes a registered custom button.
 ---This does not remove the button from the chat.
----@param button ISButton
+---@param button ISButton The button to remove.
 function Extension.removeCustomButton(button)
     Extension._remove(API.ui._customButtons, button)
 end
 
 ---Removes a stream from the list of available chat commands.
----@param stream omichat.CommandStream
+---@param stream omichat.CommandStream The stream to remove.
 function Extension.removeCommand(stream)
     Extension._remove(API._commandStreams, stream)
 end
 
 ---Removes an emote from the registry.
----@param name string
+---@param name string The name of the emote to remove.
 function Extension.removeEmote(name)
     API._emotes[name] = nil
 end
 
----Removes a hook of the given type.
----@param type omichat.HookType
----@param callback function
-function Extension.removeHook(type, callback)
-    local cbList = API.hooks._callbacks[type]
-    if not cbList then
-        return
-    end
-
-    Extension._remove(cbList, callback)
-    if #cbList == 0 then
-        API.hooks.has[type] = nil
-    end
-end
-
 ---Removes a message transformer.
----@param transformer omichat.MessageTransformer
+---@param transformer omichat.MessageTransformer The transformer to remove.
 function Extension.removeMessageTransformer(transformer)
     Extension._remove(API._transformers, transformer)
 end
 
 ---Removes the first message transformer with the provided name.
----@param name string
+---@param name string The name of the transformer to remove.
 function Extension.removeMessageTransformerByName(name)
     Extension._removeByName(API._transformers, name)
 end
 
 ---Removes a rich text action handler.
----@param name string
+---@param name string The name of the action to remove.
 function Extension.removeRichTextAction(name)
     API.ui._actionHandlers[name] = nil
 end
 
 ---Removes a handler for adding setting context menu options.
----@param category omichat.SettingCategory
----@param callback omichat.SettingHandler
+---@param category omichat.SettingCategory The setting category to remove from.
+---@param callback omichat.SettingHandler The setting handler callback to remove.
 function Extension.removeSettingHandler(category, callback)
-    local tab = API.ui._settingHandlers[category]
-    if tab then
-        Extension._remove(tab, callback)
+    local list = API.ui._settingHandlers[category]
+    if list then
+        Extension._remove(list, callback)
     end
 end
 
 ---Removes a stream from the list of available chat streams.
----@param stream omichat.ChatStream
+---@param stream omichat.ChatStream The stream to remove.
 function Extension.removeStream(stream)
     if not stream then
         return
@@ -213,24 +188,26 @@ function Extension.removeStream(stream)
     -- remove from tab streams
     local tabs = ISChat.instance and ISChat.instance.tabs
     if tabs then
-        Extension._remove(tabs, stream)
+        for i = 1, #tabs do
+            Extension._remove(tabs[i].chatStreams, stream)
+        end
     end
 end
 
 ---Removes a suggester.
----@param suggester omichat.Suggester
+---@param suggester omichat.Suggester The suggester to remove.
 function Extension.removeSuggester(suggester)
     Extension._remove(API._suggesters, suggester)
 end
 
 ---Removes the first suggester with the provided name.
----@param name string
+---@param name string The name of the suggester to remove.
 function Extension.removeSuggesterByName(name)
     Extension._removeByName(API._suggesters, name)
 end
 
 ---Removes an argument type for suggester specs.
----@param argType string
+---@param argType string The argument type to remove.
 function Extension.removeSuggesterType(argType)
     API.search._customSuggesterTypes[argType] = nil
 end
@@ -295,64 +272,13 @@ function Extension._prioritySort(a, b)
     return aPri > bPri
 end
 
----Removes an element from a table, shifting subsequent elements.
----@param tab table
----@param target unknown
----@return boolean
----@private
-function Extension._remove(tab, target)
-    if target == nil then
-        return false
-    end
-
-    local i = 1
-    local found = false
-    while i <= #tab and not found do
-        found = tab[i] == target
-        i = i + 1
-    end
-
-    if found then
-        while i <= #tab do
-            tab[i - 1] = tab[i]
-            i = i + 1
-        end
-
-        tab[#tab] = nil
-    end
-
-    return found
-end
-
----Removes an element from a table by name, shifting subsequent elements.
----@param tab table[]
----@param name string
----@return boolean
----@private
-function Extension._removeByName(tab, name)
-    if name == nil then
-        return false
-    end
-
-    local i = 1
-    local found = false
-    while i <= #tab and not found do
-        found = tab[i].name == name
-        i = i + 1
-    end
-
-    if found then
-        while i <= #tab do
-            tab[i - 1] = tab[i]
-            i = i + 1
-        end
-
-        tab[#tab] = nil
-    end
-
-    return found
-end
-
 
 API.extension = Extension
 return Extension
+
+
+--#region Type Definitions
+
+---@alias omichat.EmoteHandler fun(player: IsoPlayer, emote: string)
+
+--#endregion

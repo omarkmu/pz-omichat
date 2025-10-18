@@ -1,5 +1,4 @@
 ---Contains callbacks for chat UI controls.
----@diagnostic disable: unused-local
 
 local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
 local ConfigurationHelpers = require 'OmiChat/Component/Configuration/ConfigurationHelpers'
@@ -7,26 +6,30 @@ local ConfigurationHelpers = require 'OmiChat/Component/Configuration/Configurat
 local utils = API.utils
 local config = API.Configuration
 local UI = API.utils.ui
+local ISChat = ISChat --[[@as omichat.ISChat]]
+
+local BloodBodyPartType = BloodBodyPartType
+local getCoveredParts = BloodClothingType.getCoveredParts
+
 local getText = getText
 local max = math.max
 local concat = table.concat
 local wipe = table.wipe
-
-local BloodBodyPartType = BloodBodyPartType
-local getCoveredParts = BloodClothingType.getCoveredParts
-local ISChat = ISChat ---@cast ISChat omichat.ISChat
-
 local textManager = getTextManager()
 
 
+---Contains callbacks for UI controls.
 ---@class omichat.api.client.callbacks
 local Callback = {}
+
+---Counter for skipping info panel updates.
+---@protected
 Callback._infoUpdateCounter = 0
 
 
 ---Callback for the clean character customization option.
----@param target omichat.ISChat
-function Callback.cleanCharacter(target)
+---@param _ omichat.ISChat Unused.
+function Callback.cleanCharacter(_)
     local player = getSpecificPlayer(0)
     local visual = player and player:getHumanVisual()
     if not visual then
@@ -73,8 +76,8 @@ function Callback.cleanCharacter(target)
 end
 
 ---Callback for the grow beard customization option.
----@param target omichat.ISChat
-function Callback.growBeard(target)
+---@param _ omichat.ISChat Unused.
+function Callback.growBeard(_)
     local player = getSpecificPlayer(0)
     if not player then
         return
@@ -84,8 +87,8 @@ function Callback.growBeard(target)
 end
 
 ---Callback for the grow hair customization option.
----@param target omichat.ISChat
-function Callback.growHair(target)
+---@param _ omichat.ISChat Unused.
+function Callback.growHair(_)
     local player = getSpecificPlayer(0)
     if not player then
         return
@@ -95,12 +98,12 @@ function Callback.growHair(target)
     ISTimedActionQueue.add(ISCutHair:new(player, hairStyle, nil, 1))
 end
 
----Callback for confirming adding a roleplay language.
----@param target omichat.ISChat
----@param button omi.ui.Button
----@param language string
-function Callback.onConfirmAddLanguage(target, button, language)
-    if button.internal ~= 'YES' then
+---Callback for adding a roleplay language.
+---@param _ omichat.ISChat Unused.
+---@param args omi.ui.Args.Dialog.Click Click arguments.
+---@param language string The language to add.
+function Callback.onConfirmAddLanguage(_, args, language)
+    if args.internal ~= 'YES' then
         return
     end
 
@@ -108,9 +111,9 @@ function Callback.onConfirmAddLanguage(target, button, language)
 end
 
 ---Callback for hair color menu selection.
----@param target omichat.ISChat
----@param args omi.ui.Args.ColorDialog.Click
-function Callback.onHairColorMenuClick(target, args)
+---@param _ omichat.ISChat Unused.
+---@param args omi.ui.Args.ColorDialog.Click Click arguments.
+function Callback.onHairColorMenuClick(_, args)
     if args.internal ~= 'OK' then
         return
     end
@@ -137,11 +140,11 @@ function Callback.onHairColorMenuClick(target, args)
 end
 
 ---Callback for clicking the update configuration admin context option.
----@param target omichat.ISChat
+---@param target omichat.ISChat The chat instance.
 function Callback.openConfiguration(target)
     local form = target.activeConfigurationPanel
     if not form then
-        form = API.ui.generateConfigPanel()
+        form = API.ui.getConfigPanel()
         target.activeConfigurationPanel = form
     end
 
@@ -165,7 +168,7 @@ function Callback.openConfiguration(target)
 end
 
 ---Callback for hair color customization menu initialization.
----@param target omichat.ISChat
+---@param target omichat.ISChat The chat instance.
 function Callback.openHairColorDialog(target)
     local player = getSpecificPlayer(0)
     local visual = player and player:getHumanVisual()
@@ -173,8 +176,8 @@ function Callback.openHairColorDialog(target)
         return
     end
 
-    if target.activeColorModal then
-        target.activeColorModal:destroy()
+    if target.activeColorDialog then
+        target.activeColorDialog:destroy()
     end
 
     local currentHairColor = visual:getHairColor()
@@ -191,7 +194,7 @@ function Callback.openHairColorDialog(target)
     }
 
     local text = getText('UI_OmiChat_ContextHairColorDesc')
-    target.activeColorModal = UI.colorDialog {
+    target.activeColorDialog = UI.colorDialog {
         w = max(450, textManager:MeasureStringX(UIFont.Small, text) + 60),
         h = 250,
         text = text,
@@ -203,11 +206,11 @@ function Callback.openHairColorDialog(target)
 end
 
 ---Called when an action is clicked in the info panel.
----@param target omichat.ISChat
----@param name string
----@param action omi.RichTextActionType
----@param ... string
-function Callback.onInfoPanelAction(target, name, action, ...)
+---@param _ omichat.ISChat Unused.
+---@param name string The name of the action.
+---@param action omi.RichTextActionType The type of the action.
+---@param ... string Additional arguments to pass to the handler.
+function Callback.onInfoPanelAction(_, name, action, ...)
     local cb = API.ui._actionHandlers[name] ---@diagnostic disable-line: invisible
     if not cb then
         local args = { ... }
@@ -224,8 +227,8 @@ function Callback.onInfoPanelAction(target, name, action, ...)
 end
 
 ---Called every 100ms while the info text panel is visible.
----Updates info text with the latest token values every second.
----@param target omichat.ISChat
+---Updates info text with the latest token values approximately every second.
+---@param target omichat.ISChat The chat instance.
 function Callback.onInfoPanelUpdate(target)
     local counter = Callback._infoUpdateCounter
     if counter < 9 then
@@ -245,15 +248,15 @@ function Callback.onInfoPanelUpdate(target)
     end
 end
 
----Callback for adding a roleplay language.
----@param target omichat.ISChat
----@param language string
+---Callback for attempting to add a roleplay language.
+---@param target omichat.ISChat The chat instance.
+---@param language string The language to add.
 function Callback.openLanguageConfirmation(target, language)
-    if target.activeLanguageModal then
-        target.activeLanguageModal:destroy()
+    if target.activeLanguageDialog then
+        target.activeLanguageDialog:destroy()
     end
 
-    target.activeLanguageModal = UI.yesNoDialog {
+    target.activeLanguageDialog = UI.yesNoDialog {
         text = getText('UI_OmiChat_ContextConfirmAddLanguage', utils.getTranslatedLanguageName(language)),
         target = target,
         onClick = Callback.onConfirmAddLanguage,
@@ -262,7 +265,7 @@ function Callback.openLanguageConfirmation(target, language)
 end
 
 ---Callback for clicking the view player data admin context option.
----@param target omichat.ISChat
+---@param target omichat.ISChat The chat instance.
 function Callback.openPlayerDataManager(target)
     if target.activePlayerDataPanel then
         target.activePlayerDataPanel:destroy()
@@ -277,7 +280,7 @@ function Callback.openPlayerDataManager(target)
 end
 
 ---Callback for clicking the manage profiles context option.
----@param target omichat.ISChat
+---@param target omichat.ISChat The chat instance.
 function Callback.openProfileManager(target)
     if target.activeProfilesPanel then
         target.activeProfilesPanel:destroy()
@@ -298,7 +301,7 @@ function Callback.openProfileManager(target)
 end
 
 ---Called when the configuration menu is closed.
----@param args omi.forms.Args.Callback.Close
+---@param args omi.forms.Args.Callback.Close Callback arguments.
 function Callback.onConfigurationClose(args)
     local form = args.form
     for el in pairs(form:getRemoveOnDestroy()) do
@@ -309,17 +312,17 @@ function Callback.onConfigurationClose(args)
 end
 
 ---Called when configuration is saved from the editor form.
----@param args omi.forms.Args.Callback.Save
+---@param args omi.forms.Args.Callback.Save Callback arguments.
 function Callback.onConfigurationSave(args)
     config:load(args.values)
     API.request.updateConfiguration()
 end
 
 ---Populates the auto-suggest box with relevant suggestions.
----@param target ISChat?
----@param suggestBox omi.ui.SuggestBox
----@param text string?
-function Callback.populateSuggestBox(target, suggestBox, text)
+---@param target omichat.ISChat? The chat instance.
+---@param suggestBox omi.ui.SuggestBox The suggest box to populate.
+---@param text string? The search text. Defaults to the chat entry's text.
+function Callback.populateChatSuggestBox(target, suggestBox, text)
     target = target or ISChat.instance
     if not target then
         return
@@ -335,32 +338,32 @@ function Callback.populateSuggestBox(target, suggestBox, text)
 end
 
 ---Callback for selecting the current roleplay language.
----@param target omichat.ISChat
----@param language string
-function Callback.switchLanguage(target, language)
+---@param _ omichat.ISChat Unused.
+---@param language string The language to switch to.
+function Callback.switchLanguage(_, language)
     API.player.setCurrentLanguage(language)
 end
 
 ---Callback for switching a chat profile.
----@param target omichat.ISChat
+---@param _ omichat.ISChat Unused.
 ---@param idx integer
-function Callback.switchProfile(target, idx)
+function Callback.switchProfile(_, idx)
     API.preferences.switchProfile(idx)
     API.ui.redraw()
 end
 
 ---Callback for toggling admin options.
----@param target omichat.ISChat
----@param option omichat.AdminOption
-function Callback.toggleAdminOption(target, option)
+---@param _ omichat.ISChat Unused.
+---@param option omichat.AdminOption The option to toggle.
+function Callback.toggleAdminOption(_, option)
     local value = API.preferences.getAdminOption(option)
     API.preferences.setAdminOption(option, not value)
 end
 
 ---Callback for toggling command retaining.
----@param target omichat.ISChat
----@param type omichat.ChatCommandCategory
-function Callback.toggleRetainCommand(target, type)
+---@param _ omichat.ISChat Unused.
+---@param type omichat.StreamCategory The category to toggle.
+function Callback.toggleRetainCommand(_, type)
     local instance = ISChat.instance
     if not instance then
         return
@@ -375,29 +378,28 @@ function Callback.toggleRetainCommand(target, type)
     end
 
     for i = 1, #instance.tabs do
-        ---@diagnostic disable-next-line: invisible
-        API.chat._checkLastCommand(instance.tabs[i])
+        API.chat._checkLastCommand(instance.tabs[i]) ---@diagnostic disable-line: invisible
     end
 end
 
 ---Callback for toggling showing name colors.
----@param target omichat.ISChat
-function Callback.toggleShowNameColor(target)
+---@param _ omichat.ISChat Unused.
+function Callback.toggleShowNameColor(_)
     API.preferences.setNameColorsEnabled(not API.preferences.getNameColorsEnabled())
     API.ui.redraw()
 end
 
 ---Callback for toggling showing typing indicators.
----@param target omichat.ISChat
-function Callback.toggleShowTyping(target)
+---@param _ omichat.ISChat Unused.
+function Callback.toggleShowTyping(_)
     API.preferences.setShowTyping(not API.preferences.getShowTyping())
     API.ui.updateTypingDisplay()
     API.ui.updateChatPanelSize()
 end
 
----Callback for toggling applying suggestions on Enter.
----@param target omichat.ISChat
-function Callback.toggleSuggestOnEnter(target)
+---Callback for toggling applying suggestions on `Enter`.
+---@param _ omichat.ISChat Unused.
+function Callback.toggleSuggestOnEnter(_)
     local value = not API.preferences.getSuggestOnEnter()
     API.preferences.setSuggestOnEnter(value)
 
@@ -406,21 +408,21 @@ function Callback.toggleSuggestOnEnter(target)
     end
 end
 
----Callback for toggling applying suggestions on Tab.
----@param target omichat.ISChat
-function Callback.toggleSuggestOnTab(target)
+---Callback for toggling applying suggestions on `Tab`.
+---@param _ omichat.ISChat Unused.
+function Callback.toggleSuggestOnTab(_)
     API.preferences.setSuggestOnTab(not API.preferences.getSuggestOnTab())
 end
 
 ---Callback for toggling sign language emotes.
----@param target omichat.ISChat
-function Callback.toggleUseSignEmotes(target)
+---@param _ omichat.ISChat Unused.
+function Callback.toggleUseSignEmotes(_)
     API.preferences.setSignEmotesEnabled(not API.preferences.getSignEmotesEnabled())
 end
 
 ---Callback for toggling using the auto-suggest box.
----@param target omichat.ISChat
-function Callback.toggleUseSuggester(target)
+---@param _ omichat.ISChat Unused.
+function Callback.toggleUseSuggester(_)
     API.preferences.setUseSuggester(not API.preferences.getUseSuggester())
     API.ui.updateSuggesterComponent()
 end

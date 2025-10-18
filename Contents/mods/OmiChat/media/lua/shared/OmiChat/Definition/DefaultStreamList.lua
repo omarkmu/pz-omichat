@@ -1,7 +1,6 @@
 ---List of default stream configuration objects without default data.
-
 ---@type omichat.Configuration.StreamDefinition[]
-return {
+local DefaultStreamList = {
     { Stream = 'admin', Enable = true },
     { Stream = 'say', Enable = true },
     { Stream = 'yell', Enable = true },
@@ -21,3 +20,5 @@ return {
     { Stream = 'safehouse', Enable = true },
     { Stream = 'general', Enable = true },
 }
+
+return DefaultStreamList

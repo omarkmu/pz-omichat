@@ -3,11 +3,12 @@
 local DEFAULT = '$Default()'
 
 
+---Contains default configuration data for built-in streams.
 ---@type table<string, omichat.Configuration.StreamDefinition>
-return {
+local DefaultStreamData = {
     admin = {
         ChatType = 'admin',
-        CommandType = 'chat',
+        Category = 'chat',
         Command = '/admin',
         ShortCommand = '/a',
         AllowMentions = true,
@@ -20,7 +21,7 @@ return {
     },
     say = {
         ChatType = 'say',
-        CommandType = 'chat',
+        Category = 'chat',
         Command = '/say',
         ShortCommand = '/s',
         DefaultColor = { r = 210, g = 210, b = 210 },
@@ -46,7 +47,7 @@ return {
     },
     yell = {
         ChatType = 'shout',
-        CommandType = 'chat',
+        Category = 'chat',
         Command = '/yell',
         ShortCommand = '/y',
         Aliases = { 'shout' },
@@ -74,7 +75,7 @@ return {
     },
     low = {
         ChatType = 'say',
-        CommandType = 'chat',
+        Category = 'chat',
         Command = '/low',
         ShortCommand = '/l',
         DefaultColor = { r = 85, g = 48, b = 139 },
@@ -99,7 +100,7 @@ return {
     },
     whisper = {
         ChatType = 'say',
-        CommandType = 'chat',
+        Category = 'chat',
         Command = '/whisper',
         ShortCommand = '/w',
         DefaultColor = { r = 85, g = 48, b = 139 },
@@ -123,7 +124,7 @@ return {
     },
     me = {
         ChatType = 'say',
-        CommandType = 'rp',
+        Category = 'rp',
         Command = '/me',
         ShortCommand = '/m',
         DefaultColor = { r = 130, g = 130, b = 130 },
@@ -155,7 +156,7 @@ return {
     },
     meloud = {
         ChatType = 'shout',
-        CommandType = 'rp',
+        Category = 'rp',
         Command = '/meloud',
         ShortCommand = '/ml',
         DefaultColor = { r = 130, g = 130, b = 130 },
@@ -184,7 +185,7 @@ return {
     },
     mequiet = {
         ChatType = 'say',
-        CommandType = 'rp',
+        Category = 'rp',
         Command = '/mequiet',
         ShortCommand = '/mq',
         DefaultColor = { r = 130, g = 130, b = 130 },
@@ -212,7 +213,7 @@ return {
     },
     mewhisper = {
         ChatType = 'say',
-        CommandType = 'rp',
+        Category = 'rp',
         Command = '/mewhisper',
         ShortCommand = '/mw',
         DefaultColor = { r = 130, g = 130, b = 130 },
@@ -240,7 +241,7 @@ return {
     },
     ['do'] = {
         ChatType = 'say',
-        CommandType = 'rp',
+        Category = 'rp',
         Command = '/do',
         ShortCommand = '/d',
         DefaultColor = { r = 130, g = 130, b = 130 },
@@ -265,7 +266,7 @@ return {
     },
     doloud = {
         ChatType = 'shout',
-        CommandType = 'rp',
+        Category = 'rp',
         Command = '/doloud',
         ShortCommand = '/dl',
         DefaultColor = { r = 130, g = 130, b = 130 },
@@ -292,7 +293,7 @@ return {
     },
     doquiet = {
         ChatType = 'say',
-        CommandType = 'rp',
+        Category = 'rp',
         Command = '/doquiet',
         ShortCommand = '/dq',
         DefaultColor = { r = 130, g = 130, b = 130 },
@@ -318,7 +319,7 @@ return {
     },
     dowhisper = {
         ChatType = 'say',
-        CommandType = 'rp',
+        Category = 'rp',
         Command = '/dowhisper',
         ShortCommand = '/dw',
         DefaultColor = { r = 130, g = 130, b = 130 },
@@ -345,7 +346,7 @@ return {
     },
     ooc = {
         ChatType = 'say',
-        CommandType = 'chat',
+        Category = 'chat',
         Command = '/ooc',
         ShortCommand = '/o',
         DefaultColor = { r = 48, g = 128, b = 128 },
@@ -365,7 +366,7 @@ return {
     },
     private = {
         ChatType = 'whisper',
-        CommandType = 'chat',
+        Category = 'chat',
         Command = '/pm',
         DefaultColor = { r = 85, g = 26, b = 139 },
         AllowMentions = false,
@@ -373,7 +374,7 @@ return {
     },
     faction = {
         ChatType = 'faction',
-        CommandType = 'chat',
+        Category = 'chat',
         Command = '/faction',
         ShortCommand = '/f',
         DefaultColor = { r = 22, g = 113, b = 20 },
@@ -388,7 +389,7 @@ return {
     },
     safehouse = {
         ChatType = 'safehouse',
-        CommandType = 'chat',
+        Category = 'chat',
         Command = '/safehouse',
         ShortCommand = '/sh',
         DefaultColor = { r = 55, g = 148, b = 53 },
@@ -403,7 +404,7 @@ return {
     },
     general = {
         ChatType = 'general',
-        CommandType = 'chat',
+        Category = 'chat',
         Command = '/all',
         DefaultColor = { r = 255, g = 165, b = 0 },
         AllowMentions = true,
@@ -413,3 +414,5 @@ return {
         },
     },
 }
+
+return DefaultStreamData

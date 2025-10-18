@@ -1,6 +1,4 @@
 ---Interpolation function library.
-
-
 ---@class omichat.InterpolationLibrary
 local Library = {}
 
@@ -8,7 +6,7 @@ local Library = {}
 Library.Defaults = {}
 
 
-Library.Helpers = require 'OmiChat/Component/InterpolationLibrary/Helpers'
+Library.Helpers = require 'OmiChat/Module/InterpolationLibrary/Helpers'
 
 
 return Library

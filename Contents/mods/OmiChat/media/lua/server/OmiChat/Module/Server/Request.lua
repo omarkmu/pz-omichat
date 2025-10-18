@@ -5,6 +5,7 @@ if isClient() then return end
 local API = require 'OmiChat/Module/Server/Core' ---@class omichat.api.server
 
 
+---Contains functions for sending requests to the client.
 ---@class omichat.api.server.request : omichat.api.shared.request
 local Request = API.request
 local Topic = Request.TOPIC
@@ -31,7 +32,7 @@ function Request.sendPresets(player) return Topic.CONFIGURATION_PRESETS:toPlayer
 ---@return boolean success
 ---@return string? error
 function Request.sendTyping(player, target, isTyping)
-    ---@type omichat.request.UpdateTyping
+    ---@type omichat.request.Args.UpdateTyping
     local args = { username = target:getUsername(), typing = isTyping }
 
     return Topic.TYPING:toPlayer(player, args)
@@ -44,7 +45,7 @@ end
 ---@return boolean success
 ---@return string? error
 function Request.sendInfoMessage(player, text, serverAlert)
-    ---@type omichat.request.ShowMessage
+    ---@type omichat.request.Args.ShowMessage
     local args = { text = text, serverAlert = serverAlert }
 
     return Topic.SHOW_MESSAGE:toPlayer(player, args)
@@ -56,7 +57,7 @@ end
 ---@return boolean success
 ---@return string? error
 function Request.sendServerMessage(text, serverAlert)
-    ---@type omichat.request.ShowMessage
+    ---@type omichat.request.Args.ShowMessage
     local args = { text = text, serverAlert = serverAlert }
 
     return Topic.SHOW_MESSAGE:broadcast(args)
@@ -70,7 +71,7 @@ end
 ---@return boolean success
 ---@return string? error
 function Request.sendTranslatedInfoMessage(player, stringID, stringArgs, serverAlert)
-    ---@type omichat.request.ShowMessage
+    ---@type omichat.request.Args.ShowMessage
     local args = { stringID = stringID, args = stringArgs, serverAlert = serverAlert }
 
     return Topic.SHOW_MESSAGE:toPlayer(player, args)
@@ -83,7 +84,7 @@ end
 ---@return boolean success
 ---@return string? error
 function Request.sendTranslatedServerMessage(stringID, stringArgs, serverAlert)
-    ---@type omichat.request.ShowMessage
+    ---@type omichat.request.Args.ShowMessage
     local args = { stringID = stringID, args = stringArgs, serverAlert = serverAlert }
 
     return Topic.SHOW_MESSAGE:broadcast(args)

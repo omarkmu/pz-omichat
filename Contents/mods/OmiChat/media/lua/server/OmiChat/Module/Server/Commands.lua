@@ -1,4 +1,4 @@
----Handlers for processing chat commands on the server.
+---Handlers for processing commands on the server.
 
 if isClient() then return end
 
@@ -7,13 +7,14 @@ local config = API.Configuration
 local utils = API.utils
 
 
+---Contains server handlers for chat commands.
 ---@class omichat.api.server.commands
 local Command = {}
 
 
----Handles the /addlanguage command.
----@param player IsoPlayer
----@param args omichat.request.Command
+---Handles the `/addlanguage` command.
+---@param player IsoPlayer The requesting player.
+---@param args omichat.request.Args.Command Arguments with command information.
 function Command.addLanguage(player, args)
     args = utils.parseCommandArgs(args.text)
     local username = args[1]
@@ -50,8 +51,8 @@ function Command.addLanguage(player, args)
     API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_AddLanguageOther', { username, language })
 end
 
----Handles the /clearnames command.
----@param player IsoPlayer
+---Handles the `/clearnames` command.
+---@param player IsoPlayer The requesting player.
 function Command.clearNames(player)
     local access = utils.getNumericAccessLevel(player:getAccessLevel())
     if access < config.General.MinimumCommandAccessLevel then
@@ -63,9 +64,9 @@ function Command.clearNames(player)
     API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ClearNames')
 end
 
----Handles the /reseticon command.
----@param player IsoPlayer
----@param args omichat.request.Command
+---Handles the `/reseticon` command.
+---@param player IsoPlayer The requesting player.
+---@param args omichat.request.Args.Command Arguments with command information.
 function Command.resetIcon(player, args)
     args = utils.parseCommandArgs(args.text)
     local username = args[1]
@@ -94,9 +95,9 @@ function Command.resetIcon(player, args)
     API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ResetIconOther', { username })
 end
 
----Handles the /resetlanguages command.
----@param player IsoPlayer
----@param args omichat.request.Command
+---Handles the `/resetlanguages` command.
+---@param player IsoPlayer The requesting player.
+---@param args omichat.request.Args.Command Arguments with command information.
 function Command.resetLanguages(player, args)
     args = utils.parseCommandArgs(args.text)
     local username = args[1]
@@ -125,9 +126,9 @@ function Command.resetLanguages(player, args)
     API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ResetLanguagesOther', { username })
 end
 
----Handles the /resetname command.
----@param player IsoPlayer
----@param args omichat.request.Command
+---Handles the `/resetname` command.
+---@param player IsoPlayer The requesting player.
+---@param args omichat.request.Args.Command Arguments with command information.
 function Command.resetName(player, args)
     args = utils.parseCommandArgs(args.text)
     local username = args[1]
@@ -156,9 +157,9 @@ function Command.resetName(player, args)
     API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ResetNameOther', { username })
 end
 
----Handles the /seticon command.
----@param player IsoPlayer
----@param args omichat.request.Command
+---Handles the `/seticon` command.
+---@param player IsoPlayer The requesting player.
+---@param args omichat.request.Args.Command Arguments with command information.
 function Command.setIcon(player, args)
     args = utils.parseCommandArgs(args.text)
     local username = args[1]
@@ -189,9 +190,9 @@ function Command.setIcon(player, args)
     API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_SetIconOther', { username })
 end
 
----Handles the /setlanguageslots command.
----@param player IsoPlayer
----@param args omichat.request.Command
+---Handles the `/setlanguageslots` command.
+---@param player IsoPlayer The requesting player.
+---@param args omichat.request.Args.Command Arguments with command information.
 function Command.setLanguageSlots(player, args)
     args = utils.parseCommandArgs(args.text)
     local username = args[1]
@@ -222,9 +223,9 @@ function Command.setLanguageSlots(player, args)
     API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_SetLanguageSlotsOther', { username, slots })
 end
 
----Handles the /setname command.
----@param player IsoPlayer
----@param args omichat.request.Command
+---Handles the `/setname` command.
+---@param player IsoPlayer The requesting player.
+---@param args omichat.request.Args.Command Arguments with command information.
 function Command.setName(player, args)
     args = utils.parseCommandArgs(args.text)
     local username = args[1]
@@ -259,3 +260,18 @@ end
 
 API.commands = Command
 return Command
+
+
+--#region Type Definitions
+
+---@alias omichat.request.CommandName
+---| 'addLanguage'
+---| 'clearNames'
+---| 'resetIcon'
+---| 'resetLanguages'
+---| 'resetName'
+---| 'setIcon'
+---| 'setLanguageSlots'
+---| 'setName'
+
+--#endregion

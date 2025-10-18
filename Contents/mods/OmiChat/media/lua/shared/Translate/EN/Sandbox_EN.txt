@@ -178,7 +178,7 @@ Sandbox_EN = {
     Sandbox_OmiChat_Streams_List_Command = "Command",
     Sandbox_OmiChat_Streams_List_ShortCommand = "Short Command",
     Sandbox_OmiChat_Streams_List_ChatType = "Chat Type",
-    Sandbox_OmiChat_Streams_List_CommandType = "Category",
+    Sandbox_OmiChat_Streams_List_Category = "Category",
     Sandbox_OmiChat_Streams_List_DefaultColor = "Default Message Color",
     Sandbox_OmiChat_Streams_List_Aliases = "Aliases",
     Sandbox_OmiChat_Streams_List_OverheadFormat = "Overhead Format",
@@ -244,7 +244,7 @@ Sandbox_EN = {
 
     Sandbox_OmiChat_Commands_Name_tooltip = "Options related to commands to set character names."
     Sandbox_OmiChat_Commands_Name_Mode_tooltip = "Controls the behavior of the <SPACE> <PUSHRGB:0,1,0> /name <POPRGB> <SPACE> and <SPACE> <PUSHRGB:0,1,0> /nickname <POPRGB> <SPACE> commands." ..
-        " <BR> If this is set to an option that sets the character's forename or fullname, players will not be able to reset their name with the <SPACE> <PUSHRGB:0,1,0> /name <POPRGB> <SPACE> command.",
+        " <BR> If this is set to an option that sets the character's forename or full name, players will not be able to reset their name with the <SPACE> <PUSHRGB:0,1,0> /name <POPRGB> <SPACE> command.",
     Sandbox_OmiChat_Commands_Status_tooltip = "Options related to the <SPACE> <PUSHRGB:0,1,0> /status <POPRGB> <SPACE> command.",
     Sandbox_OmiChat_Commands_Status_Enable_tooltip = "If enabled, players will be able to set a status message visible to other players with the <SPACE> <PUSHRGB:0,1,0> /status <POPRGB> <SPACE> command.",
     Sandbox_OmiChat_Commands_Status_Range_tooltip = "The range a player will have to be within to see another player's status.",
@@ -376,7 +376,7 @@ Sandbox_EN = {
     Sandbox_OmiChat_Streams_List_Command_tooltip = "The primary command to use to send a message on the stream. Defaults to the name of the stream.",
     Sandbox_OmiChat_Streams_List_ShortCommand_tooltip = "A short command that can be used to send a message on the stream.",
     Sandbox_OmiChat_Streams_List_ChatType_tooltip = "The type of chat this stream sends messages over.",
-    Sandbox_OmiChat_Streams_List_CommandType_tooltip = "The category of this stream. <BR> This is used to categorize streams for retaining options.",
+    Sandbox_OmiChat_Streams_List_Category_tooltip = "The category of this stream. <BR> This is used to categorize streams for retaining options.",
     Sandbox_OmiChat_Streams_List_Tags_tooltip = "Tags that modify the appearance and behavior of the stream.",
     Sandbox_OmiChat_Streams_List_DefaultColor_tooltip = "The default color used for messages sent over this stream.",
     Sandbox_OmiChat_Streams_List_Aliases_tooltip = "List of additional aliases that can be used to send messages on the stream.",

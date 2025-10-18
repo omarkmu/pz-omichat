@@ -9,10 +9,18 @@ local floor = math.floor
 local char = string.char
 local concat = table.concat
 
+local INVISIBLE_PATTERN = '['
+    .. char(128) .. '-' .. char(159) .. ']?'
+    .. char(65535) .. '?'
 
+
+---Contains various utility functions.
 ---@class omichat.utils : omi.proxy
 local utils = lib.proxy({ name = 'OmiChat' })
+
+---Reference to library functions.
 utils.lib = lib
+
 utils.Interpolator = Interpolator
 
 
@@ -48,17 +56,13 @@ local cards = {
     'King',
 }
 
-local INVISIBLE_PATTERN = '['
-    .. string.char(128) .. '-' .. string.char(159) .. ']?'
-    .. string.char(65535) .. '?'
 
-
----Checks whether a player has permission to execute a command for the given target username.
----@param player IsoPlayer
----@param target string
----@param minAccessLevel integer
----@param fromCommand boolean?
----@return boolean
+---Checks whether a player has permission to execute a command.
+---@param player IsoPlayer The player to check for permissions.
+---@param target string The username of the target player.
+---@param minAccessLevel integer The minimum command access level.
+---@param fromCommand boolean? Flag for whether the request came from a command.
+---@return boolean canAccess
 function utils.canAccessTarget(player, target, minAccessLevel, fromCommand)
     if not target then
         return false
@@ -77,8 +81,8 @@ function utils.canAccessTarget(player, target, minAccessLevel, fromCommand)
 end
 
 ---Replaces invisible text with indicators for debugging.
----@param text string
----@return string
+---@param text string The text to replace invisible characters in.
+---@return string debugText
 function utils.debugText(text)
     text = text:gsub(INVISIBLE_PATTERN, function(chars)
         local result = ''
@@ -100,8 +104,8 @@ function utils.debugText(text)
 end
 
 ---Decodes an encoded character.
----@param text string
----@param index integer?
+---@param text string The text to decode an invisible character from.
+---@param index integer? The index of the invisible character in the text. Defaults to `1`.
 ---@return integer
 function utils.decodeInvisibleCharacter(text, index)
     text = text or ''
@@ -117,7 +121,7 @@ function utils.decodeInvisibleCharacter(text, index)
 end
 
 ---Decodes an encoded invisible integer value.
----@param text string
+---@param text string The text to decode an integer value from.
 ---@return integer? value The decoded integer value.
 ---@return string? remaining The remaining text after the integer.
 function utils.decodeInvisibleInt(text)
@@ -141,8 +145,8 @@ function utils.decodeInvisibleInt(text)
 end
 
 ---Decodes a sequence of encoded invisible integers.
----@param text string
----@param amount integer
+---@param text string The text to encode an integer sequence from.
+---@param amount integer The expected number of encoded integers.
 ---@return integer[]? sequence The decoded integer sequence.
 ---@return string? remaining The remaining text after the sequence.
 function utils.decodeInvisibleIntSequence(text, amount)
@@ -163,44 +167,16 @@ function utils.decodeInvisibleIntSequence(text, amount)
     return results, text
 end
 
----Decodes an encoded invisible string.
----@param text any
----@return string? result The decoded string.
----@return string? remaining The remaining text after the string.
-function utils.decodeInvisibleString(text)
-    local seq
-    local length
-    local remaining
-
-    length, remaining = utils.decodeInvisibleInt(text)
-    if not length then
-        return
-    end
-
-    ---@cast remaining string
-    seq, remaining = utils.decodeInvisibleIntSequence(remaining, length)
-    if not seq then
-        return
-    end
-
-    local chars = {}
-    for i = 1, #seq do
-        chars[#chars + 1] = char(seq[i])
-    end
-
-    return concat(chars), remaining
-end
-
----Encodes an integer value in [1, 32] into a character.
----@param n integer
----@return string
-function utils.encodeInvisibleCharacter(n)
-    return string.char(n + 127)
+---Encodes an integer value as a character.
+---@param value integer The integer to encode, in [1, 32].
+---@return string encoded
+function utils.encodeInvisibleCharacter(value)
+    return char(value + 127)
 end
 
 ---Encodes a non-negative integer value as an invisible representation of its digits.
----@param value integer
----@return string
+---@param value integer The integer value to encode.
+---@return string encoded
 function utils.encodeInvisibleInt(value)
     value = floor(value)
     if value < 0 then
@@ -228,41 +204,29 @@ function utils.encodeInvisibleInt(value)
     return len .. concat(result)
 end
 
----Encodes a string as a sequence of invisible encoded integers.
----@param text string
----@return string
-function utils.encodeInvisibleString(text)
-    local chars = {}
-    for i = 1, #text do
-        chars[#chars + 1] = utils.encodeInvisibleInt(text:sub(i, i):byte())
-    end
-
-    return utils.encodeInvisibleInt(#chars) .. concat(chars)
-end
-
 ---Gets an error from the error tokens, if one is set, and unsets the tokens.
----@param tokens table
----@return string?
+---@param tokens table The table of tokens that an error should be extracted from.
+---@return string? error The error string, or `nil` if none was found.
 function utils.extractError(tokens)
-    local err
+    local result
     local error = tostring(tokens.error or '')
     local errorID = tostring(tokens.errorID or '')
 
     if error ~= '' then
-        err = tostring(error or '')
+        result = error
     elseif errorID ~= '' then
-        err = getText(errorID)
+        result = getText(errorID)
     end
 
     tokens.error = ''
     tokens.errorID = ''
 
-    return err
+    return result
 end
 
 ---Helper for requiring the client API in a shared context.
 ---Should only be used client-side.
----@return omichat.api.client
+---@return omichat.api.client API
 function utils.getAPI()
     if not clientAPI then
         clientAPI = require 'OmiChat/Shared' --[[@as omichat.api.client]]
@@ -271,23 +235,10 @@ function utils.getAPI()
     return clientAPI
 end
 
----Gets the base color picker class given a class object.
----For compatibility with More Everything Colors.
----@param cls ISColorPicker
----@return ISColorPicker
-function utils.getBaseColorPicker(cls)
-    local mt = getmetatable(cls)
-    if mt and mt.Type == 'ISColorPicker' then
-        return mt
-    end
-
-    return cls
-end
-
 ---Gets the name of a playing card in English.
 ---@param card integer The card value, in [1, 13].
 ---@param suit integer The suit value, in [1, 4].
----@return string
+---@return string name
 function utils.getCardName(card, suit)
     local cardName = cards[card]
     local suitName = suits[suit]
@@ -307,7 +258,7 @@ end
 
 ---Returns the player's current access level.
 ---If the connection is a coop host, returns `admin`.
----@return string
+---@return string accessLevel
 function utils.getEffectiveAccessLevel()
     if isCoopHost() then
         return 'admin'
@@ -319,10 +270,10 @@ end
 
 ---Gets the text within invisible character wrapping.
 ---Returns the text and the invisible character prefix & suffix.
----@param text string
----@return string internal
----@return string prefix
----@return string suffix
+---@param text string The text to extract invisible characters from.
+---@return string internal The internal text.
+---@return string prefix The invisible characters from the start of the text.
+---@return string suffix The invisible characters from the end of the text.
 function utils.getInternalText(text)
     -- first non-invisible pos
     local start = 1
@@ -365,9 +316,9 @@ end
 
 ---Returns the non-empty lines of a string.
 ---If there are no non-empty lines, returns `nil`.
----@param text string
----@param maxLen integer?
----@return string[]?
+---@param text string The text to get lines from.
+---@param maxLen integer? The maximum length of each line. Truncates lines if given.
+---@return string[]? lines
 function utils.getLines(text, maxLen)
     if not text then
         return
@@ -391,8 +342,8 @@ function utils.getLines(text, maxLen)
 end
 
 ---Gets a numeric access level given an access level string.
----@param access string
----@return integer
+---@param access string The access level.
+---@return integer accessLevel The numeric access level associated with the access level.
 function utils.getNumericAccessLevel(access)
     if not access then
         return 1
@@ -402,8 +353,8 @@ function utils.getNumericAccessLevel(access)
 end
 
 ---Retrieves a texture name given a chat icon name.
----@param icon string
----@return string?
+---@param icon string A chat icon alias.
+---@return string? textureName The name of a texture, or `nil` if not found.
 function utils.getTextureNameFromIcon(icon)
     if not loadedIcons then
         utils._loadIcons()
@@ -415,7 +366,7 @@ end
 ---Gets the translation for a card name.
 ---@param card integer The card value, in [1, 13].
 ---@param suit integer The suit value, in [1, 4].
----@return string
+---@return string cardName The card name, translated into the local player's language.
 function utils.getTranslatedCardName(card, suit)
     if not cards[card] or not suits[suit] then
         return ''
@@ -426,18 +377,17 @@ function utils.getTranslatedCardName(card, suit)
     return getText('UI_OmiChat_CardName', cardTranslated, suitTranslated)
 end
 
----Returns the translation of the given language.
----If no translation exists, returns the same string.
----@param language string
----@return string
+---Returns the translation of the given language name.
+---@param language string The untranslated language name.
+---@return string translated The translated language name, or `language` if no translation was found.
 function utils.getTranslatedLanguageName(language)
     return getTextOrNull('UI_OmiChat_Language_' .. language:gsub('%s', '_')) or language
 end
 
 ---Checks whether a given access level should have access based on provided flags.
----@param flags integer?
----@param accessLevel string
----@return boolean
+---@param flags integer? Bit flags for the access level.
+---@param accessLevel string The access level string.
+---@return boolean hasAccess
 function utils.hasAccess(flags, accessLevel)
     if not flags then
         return true
@@ -489,10 +439,9 @@ function utils.hasAccess(flags, accessLevel)
 end
 
 ---Checks whether the player has any of the item types in the list.
----If the item list is empty, returns `true`.
----@param player IsoPlayer?
----@param list string[]
----@return boolean
+---@param player IsoPlayer? The player to check. If not given, player 1 is used.
+---@param list string[] The list of valid items. If this is empty, the result will be `true`.
+---@return boolean hasItem
 function utils.hasAnyItemType(player, list)
     if #list == 0 then
         return true
@@ -521,7 +470,7 @@ end
 ---@param text string The format string.
 ---@param tokens table A table of format substitution strings.
 ---@param seed unknown? Seed value for random functions.
----@return string
+---@return string interpolated
 function utils.interpolate(text, tokens, seed)
     return tostring(utils.interpolateRaw(text, tokens, seed))
 end
@@ -532,7 +481,7 @@ end
 ---@param text string The format string.
 ---@param tokens table A table of format substitution strings.
 ---@param seed unknown? Seed value for random functions.
----@return string
+---@return string interpolated
 function utils.interpolateNamed(name, text, tokens, seed)
     tokens.DEFAULT = name
     return utils.interpolate(text, tokens, seed)
@@ -543,7 +492,7 @@ end
 ---@param text string The format string.
 ---@param tokens table A table of format substitution strings.
 ---@param seed unknown? Seed value for random functions.
----@return string
+---@return string interpolated
 function utils.interpolateNoEntities(text, tokens, seed)
     return tostring(utils.interpolateRaw(text, tokens, seed, true))
 end
@@ -554,7 +503,7 @@ end
 ---@param tokens table A table of format substitution strings.
 ---@param seed unknown? Seed value for random functions.
 ---@param noEntities boolean? If given, character entities will be disallowed.
----@return unknown
+---@return unknown interpolated
 function utils.interpolateRaw(text, tokens, seed, noEntities)
     if not text or text == '' then
         return ''
@@ -567,15 +516,15 @@ function utils.interpolateRaw(text, tokens, seed, noEntities)
 end
 
 ---Checks whether a byte value is an invisible character used for encoding mod information.
----@param byte integer
----@return boolean
+---@param byte integer The byte to check.
+---@return boolean isInvisible
 function utils.isInvisibleByte(byte)
     return (byte >= 128 and byte <= 159) or byte == 65535
 end
 
 ---Returns an iterator over an icon-to-texture name map.
----@return fun(): string?, string?
----@return table<string, string>
+---@return fun(): string?, string? iterator
+---@return table<string, string> state
 function utils.iterateIcons()
     if not loadedIcons then
         utils._loadIcons()
@@ -585,7 +534,7 @@ function utils.iterateIcons()
 end
 
 ---Parses arguments for a chat command.
----@param text string?
+---@param text string? The text to parse arguments from. If this is `nil`, and empty table is returned.
 ---@return string[] args
 ---@return boolean hasOpenQuote
 function utils.parseCommandArgs(text)
@@ -631,8 +580,8 @@ function utils.parseCommandArgs(text)
 end
 
 ---Removes invisible signal characters from text.
----@param text string
----@return string
+---@param text string The text to remove invisible characters from.
+---@return string modified The `text`, without invisible characters.
 function utils.removeInvisible(text)
     return (text:gsub(INVISIBLE_PATTERN, ''))
 end
@@ -651,7 +600,7 @@ end
 ---Encodes `n` as an invisible character and wraps text with it.
 ---@param text string The string to wrap.
 ---@param n integer A number in [1, 32].
----@return string
+---@return string wrapped
 function utils.wrapStringArgument(text, n)
     local c = utils.encodeInvisibleCharacter(n)
     return c .. text .. c

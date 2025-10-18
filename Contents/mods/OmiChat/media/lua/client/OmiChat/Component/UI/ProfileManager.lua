@@ -24,8 +24,8 @@ local SECTION_PAD_Y = 20
 
 
 ---Creates a copy of a player profile.
----@param profile omichat.PlayerProfile
----@return omichat.PlayerProfile
+---@param profile omichat.PlayerProfile The profile to clone.
+---@return omichat.PlayerProfile clone
 ---@private
 function ProfileManager._cloneProfile(profile)
     ---@type omichat.PlayerProfile
@@ -41,9 +41,9 @@ function ProfileManager._cloneProfile(profile)
 end
 
 ---Clones a list of player profiles.
----@param profiles omichat.PlayerProfile[]
----@param markIndices boolean?
----@return omichat.PlayerProfile[]
+---@param profiles omichat.PlayerProfile[] The profiles to clone.
+---@param markIndices boolean? Flag for whether the original indices of the profiles should be marked.
+---@return omichat.PlayerProfile[] cloneList
 ---@private
 function ProfileManager._cloneProfiles(profiles, markIndices)
     local result = {}
@@ -59,9 +59,9 @@ function ProfileManager._cloneProfiles(profiles, markIndices)
 end
 
 ---Validation function for custom callout text.
----@param entry omi.ui.TextEntry
----@param text string
----@return boolean
+---@param entry omi.ui.TextEntry The text entry to validate.
+---@param text string The text to validate.
+---@return boolean valid
 ---@private
 function ProfileManager._validateCustomCalloutText(entry, text)
     local lines = utils.getLines(text)
@@ -269,8 +269,8 @@ function ProfileManager:duplicateProfile()
 end
 
 ---Callback for callout update.
----@param entry omi.ui.TextEntry
----@param category omichat.CalloutCategory
+---@param entry omi.ui.TextEntry The custom callout text entry.
+---@param category omichat.CalloutCategory The callout category of the entry.
 function ProfileManager:onCalloutsChange(entry, category)
     local profile = self.current
     if not profile then
@@ -288,20 +288,20 @@ function ProfileManager:onCalloutsChange(entry, category)
 end
 
 ---Callback for color update.
----@param entry omi.ui.ColorEntry
----@param category string
-function ProfileManager:onColorChange(entry, category)
+---@param entry omi.ui.ColorEntry The color entry that was updated.
+---@param name string The name of the stream to update the color for.
+function ProfileManager:onColorChange(entry, name)
     local profile = self.current
     local color = entry:getColor()
     if profile and color then
-        profile.colors[category] = utils.copy(color)
+        profile.colors[name] = utils.copy(color)
     elseif profile then
-        profile.colors[category] = nil
+        profile.colors[name] = nil
     end
 end
 
 ---Callback for nickname update.
----@param entry omi.ui.TextEntry
+---@param entry omi.ui.TextEntry The nickname entry.
 function ProfileManager:onNicknameChange(entry)
     local text = entry:getInternalText()
     text = utils.trim(text)
@@ -323,7 +323,7 @@ function ProfileManager:onNicknameChange(entry)
 end
 
 ---Callback for profile name update.
----@param entry omi.ui.TextEntry
+---@param entry omi.ui.TextEntry The profile name entry.
 function ProfileManager:onProfileNameChange(entry)
     local text = entry:getInternalText()
     text = utils.trim(text)
@@ -342,7 +342,7 @@ function ProfileManager:onProfileNameChange(entry)
     self:_updateUIState()
 end
 
----Callback for apply changes button.
+---Callback for the apply changes button.
 function ProfileManager:onSave()
     API.preferences.setProfiles(ProfileManager._cloneProfiles(self.profiles))
 
@@ -358,7 +358,7 @@ end
 
 
 ---Adds the label and control elements.
----@protected
+---@private
 function ProfileManager:_addControls()
     local panel = self.contentPanel
     local controlW = panel.width * 0.5 - CONTENT_PAD_X * 2
@@ -433,14 +433,14 @@ end
 
 ---Adds a profile to the listbox.
 ---@param profile omichat.PlayerProfile
----@protected
+---@private
 function ProfileManager:_addListboxItem(profile)
     local item = self.listbox:addItem(profile.name, profile)
     self:_updateListboxText(item.itemindex, profile.name)
 end
 
 ---Adds buttons to the content panel.
----@protected
+---@private
 function ProfileManager:_createButtons()
     local panel = self.contentPanel
     local btnX = panel.width * 0.5
@@ -481,8 +481,8 @@ end
 ---Creates the labels and controls for callout text.
 ---@param startY number
 ---@return table<string, omi.ui.TextEntry> controls
----@return number maxY
----@protected
+---@return number newY
+---@private
 function ProfileManager:_createCalloutControls(startY)
     local panel = self.contentPanel
     local numLines = config.MAX_CUSTOM_SHOUTS * 0.5
@@ -534,8 +534,8 @@ end
 ---Creates the labels and controls for chat colors.
 ---@param startY number
 ---@return table<string, omi.ui.ColorEntry> controls
----@return number maxY
----@protected
+---@return number newY
+---@private
 function ProfileManager:_createColorControls(startY)
     local panel = self.contentPanel
     local controls = {}
@@ -600,7 +600,7 @@ function ProfileManager:_createColorControls(startY)
 end
 
 ---Updates the state of controls.
----@protected
+---@private
 function ProfileManager:_updateControlState()
     local selectedProfile = self.profiles[self.listbox.selected]
     if not selectedProfile then
@@ -635,7 +635,7 @@ end
 ---Updates the listbox item at the given index to use the given text.
 ---@param idx integer
 ---@param text string
----@protected
+---@private
 function ProfileManager:_updateListboxText(idx, text)
     text = utils.trim(text)
     local item = self.listbox.items[idx]
@@ -655,7 +655,7 @@ end
 ---Updates the state of the UI based on the number of available profiles.
 ---@param resetItems boolean?
 ---@param selectIdx integer?
----@protected
+---@private
 function ProfileManager:_updateUIState(resetItems, selectIdx)
     local panel = self.contentPanel
     local listbox = self.listbox
@@ -705,8 +705,8 @@ end
 
 
 ---Creates a new panel for managing profiles.
----@param args omichat.Args.ProfileManager
----@return omichat.ProfileManager
+---@param args omichat.Args.ProfileManager Arguments for creation of the profile manager.
+---@return omichat.ProfileManager manager
 function ProfileManager:new(args)
     local this = UI.Panel.new(self, args) --[[@as omichat.ProfileManager]]
 
@@ -727,3 +727,25 @@ end
 
 API.ProfileManager = ProfileManager
 return ProfileManager
+
+
+--#region Type Definitions
+
+---@class omichat.ProfileManager
+---@field current omichat.PlayerProfile? The profile being edited.
+---@field profiles omichat.PlayerProfile[] The list of profiles.
+---@field profileNameControl omi.ui.TextEntry The control for setting a profile name.
+---@field nicknameControl omi.ui.TextEntry? The control for setting a nickname to use when switching to a profile.
+---@field colorControls table<string, omi.ui.ColorEntry> Associates color options to controls.
+---@field calloutControls table<string, omi.ui.TextEntry> Associates callout types to controls.
+---@field createBtn omi.ui.Button The button to add a new profile.
+---@field deleteBtn omi.ui.Button The button to delete the current profile.
+---@field duplicateBtn omi.ui.Button The button to duplicate the current profile.
+---@field emptyLabel omi.ui.Label The label to display when there are no profiles.
+---@field addText string The text for the create button in the non-empty state.
+---@field createText string The text for the create button in the empty state.
+
+---@class omichat.Args.ProfileManager : omi.ui.Args.Panel
+---@field profiles omichat.PlayerProfile[] The current profiles.
+
+--#endregion

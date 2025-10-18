@@ -9,24 +9,35 @@ local concat = table.concat
 local getTimestampMs = getTimestampMs
 local getServerOptions = getServerOptions
 local textManager = getTextManager()
-local ISChat = ISChat ---@cast ISChat omichat.ISChat
+local ISChat = ISChat --[[@as omichat.ISChat]]
 
 local utils = API.utils
 local UI_LIB = utils.lib.ui
 local config = API.Configuration
 local MultiMap = utils.MultiMap
 
-local CONFIG_PANEL ---@type omi.forms.Form?
-
-
+---Contains functions for controlling the chat window and related UI components.
 ---@class omichat.api.client.ui
+---@field suggestBox omi.ui.SuggestBox? The auto-suggest box for the chat input.
+---@field private _actionHandlers table<string, omichat.RichTextAction> Handlers for rich text actions.
+---@field private _configPanel omi.forms.Form? The configuration panel.
+---@field private _customButtons ISButton[] A list of custom buttons added to the chat window.
+---@field private _typingDisplay string? The current display text for the typing indicator.
+---@field private _settingHandlers table<omichat.SettingCategory, omichat.SettingHandler[]> Handlers for setting sections.
 local UI = {}
 
+--#region Static Fields
+
+---The font used for the typing indicator.
 UI.typingFont = UIFont.Small
+
+---The height of the font used for the typing indicator.
 UI.typingFontHgt = textManager:getFontHeight(UI.typingFont)
 
 UI._actionHandlers = {}
+
 UI._customButtons = {}
+
 UI._settingHandlers = {
     admin = {},
     basic = {},
@@ -36,8 +47,8 @@ UI._settingHandlers = {
     main = {},
 }
 
-
-local chatTypeTitleIDs = {
+---Associates chat types to title string IDs.
+UI._chatTypeTitleIDs = {
     general = 'UI_chat_general_chat_title_id',
     whisper = 'UI_chat_private_chat_title_id',
     say = 'UI_chat_local_chat_title_id',
@@ -49,135 +60,19 @@ local chatTypeTitleIDs = {
     server = 'UI_chat_server_chat_title_id',
 }
 
+--#endregion
+
 
 ---Returns the associated title ID for a chat type.
----@param chatType omichat.ChatTypeString
----@return string
+---@param chatType omi.ChatTypeString The chat type to retrieve the title for.
+---@return string stringID
 function UI.chatTypeToTitleID(chatType)
-    return chatTypeTitleIDs[chatType]
-end
-
----Clears the current chat messages.
----@param tabID integer? The 0-indexed ID of the tab to clear. If `nil`, all tabs are cleared.
-function UI.clear(tabID)
-    local tabs = ISChat.instance and ISChat.instance.tabs
-    if not tabs then
-        return
-    end
-
-    for i = 1, #tabs do
-        local chatText = tabs[i]
-
-        if not tabID or chatText.tabID == tabID then
-            chatText.chatMessages = {}
-            chatText.chatTextLines = {}
-            chatText.text = ''
-            chatText:paginate()
-        end
-    end
-end
-
----Creates additional children for the chat.
----@param instance omichat.ISChat
-function UI.createChildren(instance)
-    local th = instance:titleBarHeight()
-
-    instance.infoButton = UI_LIB.button {
-        parent = instance,
-        x = instance.gearButton:getX() - th / 2 - th,
-        w = th,
-        h = th,
-        anchorRight = true,
-        anchorLeft = false,
-        borderColor = { r = 0.7, g = 0.7, b = 0.7, a = 0 },
-        backgroundColor = { r = 0, g = 0, b = 0, a = 0 },
-        backgroundColorMouseOver = { r = 0.3, g = 0.3, b = 0.3, a = 0 },
-        image = instance.infoBtn,
-        uiName = 'chat info button',
-        visible = false,
-        target = instance,
-        onClick = instance.onInfo,
-    }
-
-    API.extension.addCustomButton(instance.infoButton)
-
-    -- replace the text entry so we can add the suggest box
-    instance:removeChild(instance.textEntry)
-
-    local inset, EdgeSize, fontHgt = instance.inset, 5, instance.fontHgt
-    local height = EdgeSize * 2 + fontHgt
-    instance.textEntry = UI_LIB.textEntry {
-        parent = instance,
-        uiName = ISChat.textEntryName,
-        x = inset,
-        y = instance:getHeight() - 8 - inset - height,
-        w = instance:getWidth() - inset * inset,
-        h = height,
-        font = UIFont.Medium,
-        backgroundColor = { r = 0, g = 0, b = 0, a = 0.5 },
-        borderColor = { r = 1, g = 1, b = 1, a = 0.0 },
-        hasFrame = true,
-        anchorTop = false,
-        anchorBottom = true,
-        anchorRight = true,
-        target = instance,
-        onCommand = ISChat.onCommandEntered,
-        onChange = ISChat.onTextChange,
-        onPressDown = ISChat.onPressDown,
-        onPressUp = ISChat.onPressUp,
-        onOtherKey = ISChat.onOtherKey,
-        onClick = ISChat.onMouseDown,
-        editable = false,
-    }
-
-    UI.suggestBox = UI_LIB.suggestBox {
-        entry = instance.textEntry,
-        openUpwards = true,
-        populateAfterInsert = true,
-        suggestOnTab = false, -- handled in `onSwitchStream`
-        suggestOnEnter = API.preferences.getSuggestOnEnter(),
-        target = instance,
-        populate = API.callback.populateSuggestBox,
-    }
-end
-
----Hides the auto-suggest box if it's currently visible.
-function UI.hideSuggestBox()
-    if UI.suggestBox then
-        UI.suggestBox:setVisible(false)
-    end
-end
-
----Generates the admin configuration menu.
----@return omi.forms.Form
-function UI.generateConfigPanel()
-    if CONFIG_PANEL then
-        return CONFIG_PANEL
-    end
-
-    local x, y = UI_LIB.getScreenCenter(800, 600)
-    local generator = config:getSchema():getFormGenerator()
-    local panel = generator:generate {
-        x = x,
-        y = y,
-        w = 800,
-        h = 600,
-        destroyOnClose = false,
-        values = config:getValuesForSave(),
-        onSave = API.callback.onConfigurationSave,
-        onClose = API.callback.onConfigurationClose,
-    }
-
-    panel:initialise()
-    panel:setVisible(false)
-    CONFIG_PANEL = panel
-
-    return panel
+    return UI._chatTypeTitleIDs[chatType]
 end
 
 ---Determines the color options that should be enabled based on the server configuration.
 ---@param all boolean? If given, all possible color options will be returned instead.
----@return string[]
+---@return string[] idList List of color option names. These are stream names, or `speech` for the speech color.
 function UI.getColorOptions(all)
     local colorOpts = {}
 
@@ -211,9 +106,37 @@ function UI.getColorOptions(all)
     return colorOpts
 end
 
+---Generates the admin configuration menu, or returns an already generated menu.
+---@return omi.forms.Form panel
+function UI.getConfigPanel()
+    if UI._configPanel then
+        return UI._configPanel
+    end
+
+    local w, h = 800, 600
+    local x, y = UI_LIB.getScreenCenter(w, h)
+    local generator = config:getSchema():getFormGenerator()
+    local panel = generator:generate {
+        x = x,
+        y = y,
+        w = w,
+        h = h,
+        destroyOnClose = false,
+        values = config:getValuesForSave(),
+        onSave = API.callback.onConfigurationSave,
+        onClose = API.callback.onConfigurationClose,
+    }
+
+    panel:initialise()
+    panel:setVisible(false)
+    UI._configPanel = panel
+
+    return panel
+end
+
 ---Gets the text that should display when clicking the info button.
----@param player IsoPlayer? The player to use to populate token values. If `nil`, this will be player 1.
----@return string
+---@param player IsoPlayer? The player to use to populate token values. If this is `nil`, player 1 will be used.
+---@return string richText
 function UI.getInfoRichText(player)
     player = player or getSpecificPlayer(0)
     if not player then
@@ -227,12 +150,12 @@ function UI.getInfoRichText(player)
 
     local name = API.data.getPlayerNameInChat(player, 'say')
     tokens.name = name and utils.escapeRichText(name) or ''
-    return utils.interpolateNoEntities(config.General.InfoText, tokens, player:getUsername())
+    return utils.trim(utils.interpolateNoEntities(config.General.InfoText, tokens, player:getUsername()))
 end
 
 ---Returns the current display string for the typing indicator.
----@param maxWidth integer?
----@return string?
+---@param maxWidth integer? The maximum width of the text.
+---@return string? display
 function UI.getTypingDisplay(maxWidth)
     local display = UI._typingDisplay
     if display and maxWidth and textManager:MeasureStringX(UIFont.Small, display) > maxWidth then
@@ -242,8 +165,15 @@ function UI.getTypingDisplay(maxWidth)
     return display
 end
 
+---Hides the auto-suggest box if it's currently visible.
+function UI.hideSuggestBox()
+    if UI.suggestBox then
+        UI.suggestBox:setVisible(false)
+    end
+end
+
 ---Redraws the current chat messages.
----@param doScroll boolean? Whether the chat should also be scrolled to the bottom. Defaults to `true`.
+---@param doScroll boolean? Flag for whether the chat should also be scrolled to the bottom. Defaults to `true`.
 function UI.redraw(doScroll)
     if not ISChat.instance then
         return
@@ -320,6 +250,53 @@ function UI.showSettingsContextMenu()
     return context
 end
 
+---Toggles visibility of the info dialog.
+---If no info text is set, or it resolves to the empty string, this hides the info dialog.
+function UI.toggleInfo()
+    local instance = ISChat.instance
+    if not instance then
+        return
+    end
+
+    local text = UI.getInfoRichText()
+    instance:setInfo(text)
+
+    local infoDialog = instance.infoRichText
+    if text == '' then
+        if infoDialog then
+            infoDialog:removeFromUIManager()
+        end
+
+        return
+    end
+
+    if not infoDialog then
+        infoDialog = UI_LIB.dialog {
+            w = 600,
+            h = 600,
+            text = instance.infoText,
+            richText = true,
+            alwaysOnTop = true,
+            moveWithMouse = false,
+            setHeightToContents = true,
+            backgroundColor = { r = 0, g = 0, b = 0, a = 0.8 },
+        }
+
+        infoDialog.chatText:setOnAction(instance, API.callback.onInfoPanelAction)
+        infoDialog.chatText:setOnUpdate(instance, API.callback.onInfoPanelUpdate)
+
+        instance.infoRichText = infoDialog
+        return
+    end
+
+    if infoDialog:isReallyVisible() then
+        infoDialog:removeFromUIManager()
+    else
+        infoDialog:setVisible(true)
+        infoDialog:addToUIManager()
+    end
+end
+
 ---Updates the positions of custom buttons.
 function UI.updateButtons()
     local instance = ISChat.instance
@@ -372,21 +349,13 @@ function UI.updateChatPanelSize()
     end
 end
 
----Updates the suggester box based on the current input text.
----@param text string? The current text entry text. If omitted, the current text will be retrieved.
-function UI.updateCustomComponents(text)
-    local instance = ISChat.instance
-    if not instance then
-        return
-    end
-
-    text = text or instance.textEntry:getInternalText()
-
+---Updates the suggester box.
+function UI.updateComponents()
     UI.updateSuggesterComponent()
 end
 
 ---Updates the info text to the configured value.
----@param player IsoPlayer?
+---@param player IsoPlayer? The player to use to populate token values. If this is `nil`, player 1 will be used.
 function UI.updateInfoText(player)
     local instance = ISChat.instance
     if not instance then
@@ -397,7 +366,7 @@ function UI.updateInfoText(player)
 end
 
 ---Updates UI elements to match configuration.
----@param redraw boolean? If true, chat messages will be redrawn.
+---@param redraw boolean? Flag for whether the chat messages should be redrawn.
 function UI.updateState(redraw)
     if not ISChat.instance then
         return
@@ -604,20 +573,6 @@ function UI._addCustomizationSettings(context)
     UI._runSettingsHandlers(submenu, 'customization')
 end
 
----Runs settings handlers on a context menu or submenu.
----@param context ISContextMenu
----@param category omichat.SettingCategory
-function UI._runSettingsHandlers(context, category)
-    local handlers = UI._settingHandlers[category]
-    if not handlers then
-        return
-    end
-
-    for i = 1, #handlers do
-        handlers[i](context)
-    end
-end
-
 ---Adds the context menu options for roleplay languages.
 ---@param context ISContextMenu
 ---@private
@@ -740,7 +695,7 @@ function UI._addRetainOptions(context)
     end
 end
 
----Adds the context menu option for enabling/disabling sign language emote animations.
+---Adds the context menu option for enabling or disabling sign language emote animations.
 ---@param context ISContextMenu
 ---@private
 function UI._addSignEmoteOption(context)
@@ -880,6 +835,86 @@ function UI._addVanillaSubmenuOptions(context)
     opaqueOnFocusSubmenu:setOptionChecked(opaqueOnFocusSubmenu.options[instance.opaqueOnFocus and 2 or 1], true)
 end
 
+---Creates additional children for the chat.
+---@param instance omichat.ISChat
+---@private
+function UI._createChildren(instance)
+    local th = instance:titleBarHeight()
+
+    instance.infoButton = UI_LIB.button {
+        parent = instance,
+        x = instance.gearButton:getX() - th / 2 - th,
+        w = th,
+        h = th,
+        anchorRight = true,
+        anchorLeft = false,
+        borderColor = { r = 0.7, g = 0.7, b = 0.7, a = 0 },
+        backgroundColor = { r = 0, g = 0, b = 0, a = 0 },
+        backgroundColorMouseOver = { r = 0.3, g = 0.3, b = 0.3, a = 0 },
+        image = instance.infoBtn,
+        uiName = 'chat info button',
+        visible = false,
+        target = instance,
+        onClick = instance.onInfo,
+    }
+
+    API.extension.addCustomButton(instance.infoButton)
+
+    -- replace the text entry so we can add the suggest box
+    instance:removeChild(instance.textEntry)
+
+    local inset, EdgeSize, fontHgt = instance.inset, 5, instance.fontHgt
+    local height = EdgeSize * 2 + fontHgt
+    instance.textEntry = UI_LIB.textEntry {
+        parent = instance,
+        uiName = ISChat.textEntryName,
+        x = inset,
+        y = instance:getHeight() - 8 - inset - height,
+        w = instance:getWidth() - inset * inset,
+        h = height,
+        font = UIFont.Medium,
+        backgroundColor = { r = 0, g = 0, b = 0, a = 0.5 },
+        borderColor = { r = 1, g = 1, b = 1, a = 0.0 },
+        hasFrame = true,
+        anchorTop = false,
+        anchorBottom = true,
+        anchorRight = true,
+        target = instance,
+        onCommand = ISChat.onCommandEntered,
+        onChange = ISChat.onTextChange,
+        onPressDown = ISChat.onPressDown,
+        onPressUp = ISChat.onPressUp,
+        onOtherKey = ISChat.onOtherKey,
+        onClick = ISChat.onMouseDown,
+        editable = false,
+    }
+
+    UI.suggestBox = UI_LIB.suggestBox {
+        entry = instance.textEntry,
+        openUpwards = true,
+        populateAfterInsert = true,
+        suggestOnTab = false, -- handled in `onSwitchStream`
+        suggestOnEnter = API.preferences.getSuggestOnEnter(),
+        target = instance,
+        populate = API.callback.populateChatSuggestBox,
+    }
+end
+
+---Runs settings handlers on a context menu or submenu.
+---@param context ISContextMenu
+---@param category omichat.SettingCategory
+---@private
+function UI._runSettingsHandlers(context, category)
+    local handlers = UI._settingHandlers[category]
+    if not handlers then
+        return
+    end
+
+    for i = 1, #handlers do
+        handlers[i](context)
+    end
+end
+
 ---Updates the visibility of the chat and close button based on the `Always Show Chat` option.
 ---@private
 function UI._updateChatVisibility()
@@ -902,3 +937,19 @@ end
 
 API.ui = UI
 return UI
+
+--#region Type Definitions
+
+---@alias omichat.RichTextAction fun(name: string, action: omi.RichTextActionType, ...: string)
+
+---@alias omichat.SettingHandler fun(submenu: ISContextMenu)
+
+---@alias omichat.SettingCategory
+---| 'basic'
+---| 'customization'
+---| 'language'
+---| 'admin'
+---| 'suggestions'
+---| 'main'
+
+--#endregion

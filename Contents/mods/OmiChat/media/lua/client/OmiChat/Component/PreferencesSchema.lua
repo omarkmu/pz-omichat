@@ -1,4 +1,4 @@
-local utils = require 'OmiChat/utils'
+local utils = require 'OmiChat/Utils'
 
 local array = utils.schema.array
 local bool = utils.schema.bool
@@ -119,3 +119,32 @@ return utils.schema {
         transformToV2,
     },
 }
+
+
+--#region Type Definitions
+
+---@class omichat.PlayerPreferences
+---@field HIGHER_VERSION boolean? Flag which is set when the preferences file had a higher verson than the current version, to avoid bad overwrites.
+---@field showNameColors boolean Flag for whether name colors are enabled.
+---@field useSuggester boolean Flag for whether suggestions are enabled.
+---@field useSignEmotes boolean Flag for whether signed roleplay languages should play a random emote.
+---@field showTyping boolean Flag for whether typing indicators should be shown and sent.
+---@field suggestOnEnter boolean Flag for whether suggestions should be entered when pressing `Enter`.
+---@field suggestOnTab boolean Flag for whether suggestions should be entered when pressing `Tab`.
+---@field retainChatInput boolean Flag for whether to retain chat input for chat streams.
+---@field retainRPInput boolean Flag for whether to retain chat input for roleplay streams (e.g., `/me`).
+---@field retainOtherInput boolean Flag for whether to retain other chat input.
+---@field adminShowIcon boolean Flag for whether the admin icon should display in chat.
+---@field adminKnowLanguages boolean Flag for whether all languages should be treated as known.
+---@field adminIgnoreRange boolean Flag for whether message range should be ignored.
+---@field profileIndex integer The index of the current profile.
+---@field profiles omichat.PlayerProfile[] List of chat profiles.
+
+---@class omichat.PlayerProfile
+---@field name string The name of the profile.
+---@field chatNickname string? Nickname to use in chat when switching to a profile.
+---@field callouts string[] Custom callouts.
+---@field sneakcallouts string[] Custom sneak callouts.
+---@field colors table<string, omi.ColorTable> Associates stream names to custom colors.
+
+--#endregion

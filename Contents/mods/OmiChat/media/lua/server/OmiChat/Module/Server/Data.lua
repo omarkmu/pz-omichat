@@ -7,14 +7,15 @@ local config = API.Configuration
 local utils = API.utils
 
 
+---Contains functions for handling player data.
 ---@class omichat.api.server.data : omichat.api.shared.data
 local Data = API.data
 
 
----Adds a roleplay language for a given player.
+---Adds a roleplay language for a player.
 ---This does not broadcast changes to clients.
----@param username string
----@param language string
+---@param username string The player's username.
+---@param language string The language to add.
 ---@return boolean success
 ---@return ('UNKNOWN' | 'FULL' | 'ALREADY_KNOW')? error
 function Data.addLanguage(username, language)
@@ -38,8 +39,8 @@ function Data.addLanguage(username, language)
     return true
 end
 
----Clears mod data for a given username.
----@param username string
+---Clears data for a player.
+---@param username string The player's username.
 function Data.clear(username)
     local modData = Data._get()
     modData.players[username] = nil
@@ -55,9 +56,9 @@ function Data.clearNicknames()
     end
 end
 
----Gets a list of known roleplay languages for the player with the given username.
----@param username string
----@return string[]
+---Gets a mutable list of known roleplay languages for a player.
+---@param username string The player's username.
+---@return string[] languages The player's known roleplay languages.
 function Data.getLanguages(username)
     local playerData = Data._getOrCreatePlayerData(username)
     if not playerData.languages then
@@ -67,26 +68,30 @@ function Data.getLanguages(username)
     return playerData.languages
 end
 
----Gets the number of roleplay language slots for the player with the given username.
----@param username string
----@return integer
+---Gets the number of roleplay language slots for a player.
+---@param username string The player's username.
+---@return integer slots The total number of slots.
 function Data.getLanguageSlots(username)
-    local playerData = Data._getOrCreatePlayerData(username)
+    local playerData = Data.getPlayerData(username)
     return playerData and playerData.languageSlots or config.Language.DefaultSlots
 end
 
----Retrieves mod data for a given player.
----@param username string
----@return omichat.PlayerModData
-function Data.getPlayerData(username)
-    local playerData = utils.copy(Data._getOrCreatePlayerData(username))
-    playerData.languages = utils.copyList(playerData.languages)
-
-    return playerData
+---Retrieves data for a given player, creating it if it doesn't exist.
+---@param username string The player's username.
+---@return omichat.PlayerData data The player's data.
+function Data.getOrCreatePlayerData(username)
+    return Data._getOrCreatePlayerData(username)
 end
 
----Gets player data as a list associated with usernames.
----@return omichat.PlayerModData[] data
+---Retrieves data for a given player.
+---@param username string The player's username.
+---@return omichat.PlayerData? data The player's data.
+function Data.getPlayerData(username)
+    return Data._get().players[username]
+end
+
+---Gets a list of all player data.
+---@return omichat.PlayerData[] list
 function Data.getPlayerDataList()
     local list = {}
 
@@ -102,7 +107,7 @@ end
 
 ---Resets roleplay languages for a given player.
 ---This does not broadcast changes to clients.
----@param username string
+---@param username string The player's username.
 function Data.resetLanguages(username)
     local playerData = Data._getOrCreatePlayerData(username)
     playerData.languages = { API.language.getDefault() }
@@ -111,7 +116,7 @@ function Data.resetLanguages(username)
 end
 
 ---Refreshes roleplay language information for the given username.
----@param username string
+---@param username string The player's username.
 function Data.refreshLanguageInfo(username)
     local playerData = Data._getOrCreatePlayerData(username)
     local currentLang = playerData.currentLanguage
@@ -140,7 +145,7 @@ function Data.refreshLanguageInfo(username)
 end
 
 ---Refreshes the cache with information from the currently online players.
----@return omichat.PlayerCacheData[]
+---@return omichat.PlayerCacheData[] items
 function Data.refreshPlayerCache()
     local items = {}
 
@@ -155,19 +160,19 @@ function Data.refreshPlayerCache()
     return items
 end
 
----Sets the chat icon for the player with the given username.
+---Sets the chat icon for a player.
 ---This does not broadcast changes to clients.
----@param username string
----@param icon string?
+---@param username string The player's username.
+---@param icon string? The name of the texture to use as the icon, or `nil` to remove.
 function Data.setChatIcon(username, icon)
     local playerData = Data._getOrCreatePlayerData(username)
     playerData.icon = icon
 end
 
----Sets the current roleplay language for the player with the given username.
+---Sets the current roleplay language for a player.
 ---This does not broadcast changes to clients.
----@param username string
----@param language string?
+---@param username string The player's username.
+---@param language string? The current language.
 ---@return boolean success
 function Data.setCurrentLanguage(username, language)
     if language and not API.language.exists(language) then
@@ -181,10 +186,10 @@ function Data.setCurrentLanguage(username, language)
     return true
 end
 
----Sets the roleplay languages for the player with the given username.
+---Sets the roleplay languages for a player.
 ---This does not broadcast changes to clients.
----@param username string
----@param languages string[]?
+---@param username string The player's username.
+---@param languages string[]? The new list of languages.
 function Data.setLanguages(username, languages)
     local playerData = Data._getOrCreatePlayerData(username)
     playerData.languages = languages
@@ -192,10 +197,10 @@ function Data.setLanguages(username, languages)
     Data.refreshLanguageInfo(username)
 end
 
----Sets the number of roleplay language slots for the player with the given username.
+---Sets the number of roleplay language slots for a player.
 ---This does not broadcast changes to clients.
----@param username string
----@param slots integer?
+---@param username string The player's username.
+---@param slots integer? The new slot count, or `nil` to unset.
 ---@return boolean success
 function Data.setLanguageSlots(username, slots)
     if slots and (slots < 1 or slots > config.MAX_LANGUAGE_SLOTS) then
@@ -208,21 +213,24 @@ function Data.setLanguageSlots(username, slots)
     return true
 end
 
----Sets the nickname for the player with the given username.
+---Sets the nickname for a player.
 ---This does not broadcast changes to clients.
----@param username string
----@param nickname string?
+---@param username string The player's username.
+---@param nickname string? The new nickname.
 function Data.setNickname(username, nickname)
     local playerData = Data._getOrCreatePlayerData(username)
     playerData.nickname = nickname
 end
 
----Sets the mod data for a given player.
+---Sets the data for a player.
 ---This does not broadcast changes to clients.
----@param username string
----@param data omichat.PlayerModData?
+---@param username string The player's username.
+---@param data omichat.PlayerData The new data to set.
 function Data.setPlayerData(username, data)
-    data = data or {}
+    if not data then
+        return
+    end
+
     Data.setNickname(username, data.nickname)
     Data.setChatIcon(username, data.icon)
     Data.setLanguageSlots(username, data.languageSlots)
@@ -231,10 +239,10 @@ function Data.setPlayerData(username, data)
     Data.setStatus(username, data.status)
 end
 
----Sets the status for the player with the given username.
+---Sets the status for a player.
 ---This does not broadcast changes to clients.
----@param username string
----@param status string?
+---@param username string The player's username.
+---@param status string? The new status, or `nil` to unset.
 function Data.setStatus(username, status)
     local playerData = Data._getOrCreatePlayerData(username)
     playerData.status = status
@@ -242,8 +250,8 @@ end
 
 ---Attempts to update data as the given player.
 ---@param player IsoPlayer The player to perform the update as.
----@param args omichat.request.ModDataUpdate The data for the update.
----@param broadcast boolean? Whether the update should be broadcast. Defaults to `true`.
+---@param args omichat.request.Args.PlayerDataUpdate The data for the update.
+---@param broadcast boolean? Flag for whether the update should be broadcast. Defaults to `true`.
 ---@return boolean success
 ---@return string? errorID
 function Data.tryUpdate(player, args, broadcast)
@@ -270,14 +278,14 @@ function Data.tryUpdate(player, args, broadcast)
     return success, err
 end
 
----Updates a mod data field.
----@param field omichat.ModDataField
----@param target string
----@param value unknown?
----@param fromCommand boolean?
+---Updates a player data field.
+---@param field omichat.PlayerDataField The field to update.
+---@param target string The target username.
+---@param value unknown? The new field value.
+---@param fromCommand boolean? Flag for whether this request comes from a command.
 ---@return boolean success
 ---@return string? errorID
----@protected
+---@private
 function Data._updateField(field, target, value, fromCommand)
     if field == 'all' then
         if not value then
@@ -328,3 +336,17 @@ end
 
 API.data = Data
 return Data
+
+
+--#region Type Definitions
+
+---@alias omichat.PlayerDataField
+---| 'all'
+---| 'nickname'
+---| 'languages'
+---| 'languageSlots'
+---| 'currentLanguage'
+---| 'icon'
+---| 'status'
+
+--#endregion

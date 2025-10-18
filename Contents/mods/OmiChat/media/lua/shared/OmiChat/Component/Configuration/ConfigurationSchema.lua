@@ -1,6 +1,6 @@
 ---Information about the mod's configuration options.
 
-local utils = require 'OmiChat/utils'
+local utils = require 'OmiChat/Utils'
 local Helpers = require 'OmiChat/Component/Configuration/ConfigurationHelpers'
 
 local array = utils.schema.array
@@ -345,7 +345,7 @@ return utils.schema {
                             },
                         },
 
-                        CommandType = enum {
+                        Category = enum {
                             default = 'chat',
                             values = {
                                 'chat',
@@ -431,3 +431,231 @@ return utils.schema {
     end,
     ---@diagnostic enable: inject-field
 }
+
+
+--#region Type Definitions
+
+---@class omichat.Configuration
+---@field General omichat.Configuration.General
+---@field Buffs omichat.Configuration.Buffs
+---@field Callouts omichat.Configuration.Callouts
+---@field Commands omichat.Configuration.Commands
+---@field Compatibility omichat.Configuration.Compatibility
+---@field Customization omichat.Configuration.Customization
+---@field Discord omichat.Configuration.Discord
+---@field Format omichat.Configuration.Format
+---@field EchoMessages omichat.Configuration.EchoMessages
+---@field Language omichat.Configuration.Language
+---@field Macros omichat.Configuration.Macros
+---@field Mentions omichat.Configuration.Mentions
+---@field NarrativeStyle omichat.Configuration.NarrativeStyle
+---@field Radio omichat.Configuration.Radio
+---@field ServerMessages omichat.Configuration.ServerMessages
+---@field Streams omichat.Configuration.Streams
+---@field TypingIndicator omichat.Configuration.TypingIndicator
+---@field ZombieAttraction omichat.Configuration.ZombieAttraction
+
+---@class omichat.Configuration.General
+---@field Preset string
+---@field AlwaysShowChat boolean
+---@field CaseInsensitiveChatStreams boolean
+---@field MinimumCommandAccessLevel integer
+---@field AdminIcon string
+---@field ClearOnDeath omichat.Configuration.General.ClearOnDeath
+---@field InfoText string
+---@field Variables string[]
+
+---@class omichat.Configuration.General.ClearOnDeath
+---@field Icon boolean?
+---@field Languages boolean?
+---@field Nickname boolean?
+---@field Status boolean?
+
+---@class omichat.Configuration.Buffs
+---@field Enable boolean
+---@field Cooldown integer
+---@field Boredom number
+---@field Unhappiness number
+---@field Hunger number
+---@field Thirst number
+---@field Fatigue number
+---@field CigaretteStress number
+
+---@class omichat.Configuration.Callouts
+---@field Range integer
+---@field SneakRange integer
+---@field Format string
+---@field SneakFormat string
+
+---@class omichat.Configuration.Commands
+---@field Name omichat.Configuration.Commands.Name
+---@field Status omichat.Configuration.Commands.Status
+---@field Card omichat.Configuration.Commands.ItemCommand
+---@field Roll omichat.Configuration.Commands.ItemCommand
+---@field Flip omichat.Configuration.Commands.ItemCommand
+
+---@class omichat.Configuration.Commands.Name
+---@field Mode omichat.Configuration.Commands.Name.Mode
+
+---@class omichat.Configuration.Commands.Status
+---@field Enable boolean
+---@field Range number
+
+---@class omichat.Configuration.Commands.ItemCommand
+---@field Global boolean
+---@field Format string
+---@field OverheadFormat string
+---@field Items string[]
+---@field Tags string[]
+
+---@class omichat.Configuration.Compatibility
+---@field ApplyOverrides boolean
+---@field BuffyCharacterBios omi.schema.CompatibilityValue
+---@field BuffyRPGSystem omi.schema.CompatibilityValue
+---@field ChatBubble omi.schema.CompatibilityValue
+---@field SearchPlayers omi.schema.CompatibilityValue
+---@field TrueActionsDancing omi.schema.CompatibilityValue
+
+---@class omichat.Configuration.Customization
+---@field AllowCustomShouts boolean
+---@field EnableNameColors boolean
+---@field EnableCharacterCustomization boolean
+---@field CleanEffects omi.SimpleSet
+
+---@class omichat.Configuration.Discord
+---@field ShowColorOption 'Yes' | 'No' | 'Respect_Server_Setting'
+---@field ChatFormat string
+---@field DefaultColor omi.ColorTable
+---@field Tags string[]
+
+---@class omichat.Configuration.EchoMessages
+---@field Enable boolean
+---@field ChatFormat string
+---@field OverheadFormat string
+---@field Tags string[]
+
+---@class omichat.Configuration.Format
+---@field Chat omichat.Configuration.Format.Chat
+---@field Component omichat.Configuration.Format.Component
+---@field Filter omichat.Configuration.Format.Filter
+---@field MenuName omichat.Configuration.Format.MenuName
+---@field PerceptionRange omichat.Configuration.Format.PerceptionRange
+---@field Overhead omichat.Configuration.Format.Overhead
+
+---@class omichat.Configuration.Format.Chat
+---@field Final string
+---@field Prefix string
+
+---@class omichat.Configuration.Format.Component
+---@field Name string
+---@field Tag string
+---@field Timestamp string
+---@field Icon string
+---@field Language string
+---@field EmbeddedAction string
+---@field EmbeddedQuote string
+
+---@class omichat.Configuration.Format.Filter
+---@field Name string
+---@field Status string
+---@field ChatInput string
+
+---@class omichat.Configuration.Format.MenuName
+---@field Trade string
+---@field Medical string
+---@field SearchPlayer string
+---@field MiniScoreboard string
+
+---@class omichat.Configuration.Format.PerceptionRange
+---@field Chat string
+---@field Overhead string
+
+---@class omichat.Configuration.Format.Overhead
+---@field Final string
+---@field Prefix string
+
+---@class omichat.Configuration.Language
+---@field DefaultSlots integer
+---@field InterpretationRolls integer
+---@field InterpretationChance integer
+---@field SelfAddAllowlist string[]
+---@field SelfAddBlocklist string[]
+---@field UnknownLanguageChat string
+---@field UnknownLanguageRadio string
+---@field UnknownLanguageOverhead string
+---@field UseDefaultList boolean
+---@field List omichat.Configuration.LanguageDefinition[]
+
+---@class omichat.Configuration.Macros
+---@field AllowEmotes boolean
+
+---@class omichat.Configuration.Mentions
+---@field Enable boolean
+---@field AlwaysUseNameColors boolean
+---@field Range integer
+---@field Format string
+---@field ChatFormat string
+
+---@class omichat.Configuration.NarrativeStyle
+---@field Enable boolean
+---@field OverheadContentFormat string
+---@field ChatContentFormat string
+---@field DialogueTagFormat string
+---@field InputFilter string
+
+---@class omichat.Configuration.Radio
+---@field ChatFormat string
+---@field DefaultColor omi.ColorTable
+---@field Tags string[]
+
+---@class omichat.Configuration.ServerMessages
+---@field ChatFormat string
+---@field DefaultColor omi.ColorTable
+---@field Tags string[]
+
+---@class omichat.Configuration.Streams
+---@field UseDefaultList boolean
+---@field GlobalTags string[]
+---@field List omichat.Configuration.StreamDefinition[]
+
+---@class omichat.Configuration.TypingIndicator
+---@field Enable boolean
+---@field NameFormat string
+---@field Format string
+
+---@class omichat.Configuration.ZombieAttraction
+---@field ChatRangeMultiplier number
+---@field CalloutRange integer
+---@field SneakCalloutRange integer
+
+
+---@class omichat.Configuration.LanguageDefinition
+---@field Name string The name of the language.
+---@field Signed boolean? Flag for whether the language should be treated as signed.
+
+---@class omichat.Configuration.StreamDefinition
+---@field Enable boolean?
+---@field Stream string?
+---@field ChatType string?
+---@field Category string?
+---@field Name string?
+---@field Command string?
+---@field ShortCommand string?
+---@field DefaultColor omi.ColorTable?
+---@field Aliases string[]?
+---@field Tags string[]?
+---@field OverheadFormat string?
+---@field ChatFormat string?
+---@field Range integer?
+---@field VerticalRange integer?
+---@field PerceptionRange integer?
+---@field PerceptionRangeSigned integer?
+---@field AllowBuffs boolean?
+---@field AllowEmotes boolean?
+---@field AllowMentions boolean?
+---@field AllowLanguages boolean?
+---@field AllowTypingIndicator boolean?
+---@field AttractZombies boolean?
+---@field UseNarrativeStyle boolean?
+
+--#endregion

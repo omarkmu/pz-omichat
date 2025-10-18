@@ -10,8 +10,13 @@ local isAdmin = isAdmin
 local getText = getText
 local format = string.format
 
-
 local COMMAND_ARGS_START = utils.encodeInvisibleCharacter(config.ID_COMMAND_ARGS)
+
+
+---@class omichat.MessageTransformer
+---@field name string? The name of the transformer.
+---@field transform fun(self: table, info: omichat.MessageInfo): true? Performs message transformation.
+---@field priority integer? The priority of the transformer. Higher numbers will run first.
 
 
 ---@type omichat.MessageTransformer[]
@@ -329,8 +334,9 @@ return {
             local language = info.meta.language
             if not language and isRadio then
                 -- radio messages don't have language metadata, so we need to read the language from the text
-                if formatter:isMatch(text) then
-                    text = formatter:read(text)
+                local matchText = formatter:read(text)
+                if matchText then
+                    text = matchText
                     language = API.format.decodeLanguage(text)
 
                     if language then
@@ -361,6 +367,8 @@ return {
 
             local cached = info.meta.languageResult
             if cached == 'unknown-language' then
+                info.tokens.unknownLanguage = language
+                info.tags.IsUnknownLanguage = true
                 info:setUseUnknownLanguageText(true)
                 return
             elseif cached then
@@ -430,7 +438,7 @@ return {
 
             local text = info.content or info.rawText
             local cached = info.meta.mentions
-            local useColors = info.shouldUseMentionColors(info.stream)
+            local useColors = info:shouldUseMentionColors()
 
             local i = 1
             local mentions = {} ---@type omichat.MessageInfo.Metadata.Mention[]
@@ -557,12 +565,7 @@ return {
             if zMax > 0 and math.abs(author:getZ() - player:getZ()) >= zMax then
                 outOfRange = true
             elseif range ~= maxRange then
-                -- calculating distance using the distance formula like ChatUtility
-                -- assuming players are synced it works equivalently
-                local xDiff = author:getX() - player:getX()
-                local yDiff = author:getY() - player:getY()
-
-                dist = math.sqrt(xDiff * xDiff + yDiff * yDiff)
+                dist = API.player.getDistanceFrom(author, player)
                 outOfRange = dist > range
             end
 

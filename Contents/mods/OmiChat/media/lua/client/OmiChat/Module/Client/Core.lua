@@ -1,28 +1,37 @@
----Core client API definition.
+---API functionality exclusive to the client.
+---@class omichat.api.client : omichat.api.shared
+---@field utils omichat.utils.client
+---@field private _chatFormatters table<integer, omichat.MetaFormatter> Associates formatter IDs to MetaFormatters for chat streams.
+---@field private _emotes table<string, string | omichat.EmoteHandler> Associates emote names to emotes or handler functions.
+---@field private _metadataFormatters table<omichat.FormatterName, omichat.MetaFormatter> Associates formatter names to formatters for metadata.
+---@field private _typingInfo table<string, omichat.TypingInformation> Associates usernames to information about typing status.
+local API = require 'OmiChat/Shared'
 
 require 'Chat/ISChat'
 local lib = require 'OmiLibrary/Client'
 
 
----@class omichat.api.client : omichat.api.shared
-local API = require 'OmiChat/Shared'
-
 local config = API.Configuration
 local MetaFormatter = API.MetaFormatter
 
-local utils = API.utils
-utils.lib = lib
-utils.ui = lib.ui
 
 API.MimicMessage = lib.chat.MimicMessage
 API.Stream = require 'OmiChat/Component/Stream'
 API.ChatStream = require 'OmiChat/Component/ChatStream'
 API.CommandStream = require 'OmiChat/Component/CommandStream'
 
+---Contains various utility functions.
+---@class omichat.utils.client : omichat.utils
+local utils = API.utils
+utils.lib = lib
+utils.ui = lib.ui
+
+
+--#region Static Fields
+
 API._chatFormatters = {}
 API._metadataFormatters = {}
 API._typingInfo = {}
-
 API._emotes = {
     yes = 'yes',
     no = 'no',
@@ -56,6 +65,12 @@ API._emotes = {
     fire = 'signalfire',
 }
 
+--#endregion
+
+--#region Streams
+
+---Chat stream used for messages from Discord.
+---@private
 API._discordStream = API.ChatStream:new {
     name = 'discord',
     chatType = 'general',
@@ -65,6 +80,8 @@ API._discordStream = API.ChatStream:new {
     autoTags = { 'IsDiscordStream' },
 }
 
+---Chat stream used for radio messages.
+---@private
 API._radioStream = API.ChatStream:new {
     name = 'radio',
     chatType = 'radio',
@@ -74,6 +91,8 @@ API._radioStream = API.ChatStream:new {
     autoTags = { 'IsRadioStream' },
 }
 
+---Chat stream used for server messages.
+---@private
 API._serverStream = API.ChatStream:new {
     name = 'server',
     chatType = 'server',
@@ -83,6 +102,8 @@ API._serverStream = API.ChatStream:new {
     autoTags = { 'IsServerStream' },
 }
 
+---Command stream for the `/card` command.
+---@private
 API._cardCommand = API.CommandStream:new {
     name = 'card',
     command = '/card ',
@@ -131,6 +152,8 @@ API._cardCommand = API.CommandStream:new {
     end,
 }
 
+---Command stream for the `/flip` command.
+---@private
 API._flipCommand = API.CommandStream:new {
     name = 'flip',
     command = '/flip ',
@@ -179,6 +202,8 @@ API._flipCommand = API.CommandStream:new {
     end,
 }
 
+---Command stream for the `/roll` command.
+---@private
 API._rollCommand = API.CommandStream:new {
     name = 'roll',
     command = '/roll ',
@@ -236,6 +261,8 @@ API._rollCommand = API.CommandStream:new {
         end
     end,
 }
+
+--#endregion
 
 
 return API

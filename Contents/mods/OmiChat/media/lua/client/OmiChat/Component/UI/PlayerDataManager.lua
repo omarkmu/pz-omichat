@@ -10,7 +10,33 @@ local min = math.min
 local isAdmin = isAdmin
 local textManager = getTextManager()
 
-local COLUMNS = {
+
+---@class omichat.PlayerDataManager : omi.ui.Panel
+---@field listbox omi.ui.ListBox The listbox used to display player data rows.
+---@field elements omichat.PlayerData[] The player data received from the server.
+---@field columnList string[] The list of columns to display.
+---@field columnDisplay table<string, string> Associates column names to display strings for column headers.
+---@field columnWidth table<string, integer> Associates column names to computed column widths.
+---@field columnSizes table<string, integer> Associates column names to the base column sizes.
+---@field headerH integer The height of the header font.
+---@field titleW integer The width of the title text.
+---@field buttonBorderColor omi.ColorTableRGBA The color used for button borders.
+---@field listHeaderColor omi.ColorTableRGBA The color used for the list header text.
+---@field headerFont UIFont The font used for list header text.
+---@field listFont UIFont The font used for list items.
+---@field titleText string The text displayed as the manager title.
+---@field activeEditorPanel omichat.PlayerDataEditor? The active data editor element.
+---@field activeDialog omi.ui.Dialog? The active dialog.
+---@field addBtn omi.ui.Button The button used to add a new data item.
+---@field closeBtn omi.ui.Button The button used to close the panel.
+---@field deleteBtn omi.ui.Button The button used to delete a data item.
+---@field refreshBtn omi.ui.Button The button used to request a refresh items from the server.
+---@field modifyBtn omi.ui.Button The button used to open an editor panel.
+local PlayerDataManager = UI.Panel:derive('PlayerDataManager')
+
+---List of player data columns to display.
+---@private
+PlayerDataManager._COLUMNS = {
     'username',
     'nickname',
     'status',
@@ -21,11 +47,7 @@ local COLUMNS = {
 }
 
 
----@class omichat.PlayerDataManager : omi.ui.Panel
-local PlayerDataManager = UI.Panel:derive('PlayerDataManager')
-
-
----Creates the children of the mod data manager.
+---Creates the children of the player data manager.
 function PlayerDataManager:createChildren()
     self.headerH = textManager:getFontHeight(self.headerFont)
 
@@ -119,11 +141,11 @@ function PlayerDataManager:createChildren()
 end
 
 ---Renders an item in the data list.
----@param listbox omi.ui.ListBox
----@param y number
----@param item table
----@param alt boolean
----@return number
+---@param listbox omi.ui.ListBox The listbox to render an item within.
+---@param y number The current Y position.
+---@param item omi.ui.ListBoxItem The item to render.
+---@param alt boolean Flag for whether the alternating color should be used.
+---@return number newY The new Y position.
 function PlayerDataManager:drawItem(y, item, alt, listbox)
     local borderColor = listbox.borderColor
     local width = listbox:getWidth()
@@ -177,9 +199,9 @@ function PlayerDataManager:drawItem(y, item, alt, listbox)
     return y + listbox.itemheight
 end
 
----Returns the currently selected item, or `nil`.
----@return omichat.PlayerModData? item
----@return integer? index
+---Returns the currently selected item.
+---@return omichat.PlayerData? item The data associated with the currently selected, or `nil` if there's no selection.
+---@return integer? index The currently selected index.
 function PlayerDataManager:getSelectedItem()
     local listbox = self.listbox
     local item = listbox:getSelectedItem()
@@ -195,13 +217,13 @@ function PlayerDataManager:onAddClick()
     self:openEditPanel({ username = '' }, true)
 end
 
----Performs deletion of a mod data row.
+---Performs deletion of a player data row.
 ---Called after clicking yes on the deletion confirmation prompt.
----@param button omi.ui.Args.Dialog.Click
----@param item omichat.PlayerModData
----@param idx integer
-function PlayerDataManager:onConfirmDelete(button, item, idx)
-    if button.internal ~= 'YES' then
+---@param args omi.ui.Args.Dialog.Click Arguments for dialog button click.
+---@param item omichat.PlayerData The player data item.
+---@param idx integer The index of the item to remove.
+function PlayerDataManager:onConfirmDelete(args, item, idx)
+    if args.internal ~= 'YES' then
         return
     end
 
@@ -217,7 +239,7 @@ function PlayerDataManager:onConfirmDelete(button, item, idx)
 end
 
 ---Called when the delete button is clicked.
----Prompts for confirmation.
+---Creates a deletion confirmation prompt.
 function PlayerDataManager:onDeleteClick()
     local item, idx = self:getSelectedItem()
     if not item then
@@ -244,10 +266,10 @@ function PlayerDataManager:onModifyClick()
     self:openEditPanel(item)
 end
 
----Called when a new mod data list is returned from the server.
----@param list omichat.PlayerModData[]
+---Called when a new data list is returned from the server.
+---@param list omichat.PlayerData[] The data received from the server.
 function PlayerDataManager:onUpdateList(list)
-    if #self.elements == 0 and #list > 0 then
+    if #self.elements == 0 then
         self:setVisible(true)
     end
 
@@ -267,8 +289,8 @@ function PlayerDataManager:onUpdateList(list)
         local el = list[i]
         local display = {}
         local empty = {}
-        for j = 1, #COLUMNS do
-            local colName = COLUMNS[j]
+        for j = 1, #PlayerDataManager._COLUMNS do
+            local colName = PlayerDataManager._COLUMNS[j]
             local colValue = el[colName]
 
             local colType = type(colValue)
@@ -302,8 +324,8 @@ function PlayerDataManager:onUpdateList(list)
 end
 
 ---Opens the edit panel with the given item.
----@param item omichat.PlayerModData? The item to edit.
----@param isAdd boolean? Whether this should be treated as an add rather than an edit.
+---@param item omichat.PlayerData? The item to edit.
+---@param isAdd boolean? Flag for whether this should be treated as an add rather than an edit.
 function PlayerDataManager:openEditPanel(item, isAdd)
     if not item then
         return
@@ -329,7 +351,7 @@ function PlayerDataManager:openEditPanel(item, isAdd)
     self:removeOnDestroy(self.activeEditorPanel)
 end
 
----Requests a refresh of the list of mod data.
+---Requests a refresh of the list of player data.
 function PlayerDataManager:refresh()
     -- hide the menu before the initial refresh
     if #self.elements == 0 then
@@ -337,7 +359,7 @@ function PlayerDataManager:refresh()
     end
 
     self.refreshBtn.enable = false
-    API.request.getDataList()
+    API.request.getPlayerDataList()
 end
 
 ---Renders the table for the listbox items.
@@ -381,9 +403,9 @@ function PlayerDataManager:update()
 end
 
 
----Creates a new panel for managing mod data.
----@param args omichat.Args.PlayerDataManager
----@return omichat.PlayerDataManager
+---Creates a new panel for managing player data.
+---@param args omi.ui.Args.Panel Args for creating the element.
+---@return omichat.PlayerDataManager manager
 function PlayerDataManager:new(args)
     local this = UI.Panel.new(self, args) --[[@as omichat.PlayerDataManager]]
 
@@ -400,14 +422,14 @@ function PlayerDataManager:new(args)
     this.listHeaderColor = { r = 0.4, g = 0.4, b = 0.4, a = 0.4 }
     this.backgroundColor = { r = 0, g = 0, b = 0, a = 0.8 }
 
-    this.columnList = COLUMNS
+    this.columnList = PlayerDataManager._COLUMNS
     this.columnDisplay = {}
     this.columnSizes = {}
     this.columnWidth = {}
     this.elements = {}
 
-    for i = 1, #COLUMNS do
-        local colName = COLUMNS[i]
+    for i = 1, #PlayerDataManager._COLUMNS do
+        local colName = PlayerDataManager._COLUMNS[i]
         local colDisplay = getText('UI_OmiChat_PlayerDataManager_Column_' .. colName)
 
         this.columnDisplay[colName] = colDisplay

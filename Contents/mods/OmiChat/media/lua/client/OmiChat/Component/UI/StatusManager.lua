@@ -10,9 +10,15 @@ local getClassFieldVal = getClassFieldVal
 
 
 ---@class omichat.StatusManager
+---@field private _displayByUsername table<string, omichat.StatusDisplay> Associates usernames to display UI elements.
 local StatusManager = {}
-StatusManager._enabled = false
+
 StatusManager._displayByUsername = {}
+
+---Flag for whether statuses are enabled.
+---@private
+StatusManager._enabled = false
+
 
 
 local TILE_FIELD ---@type Field?

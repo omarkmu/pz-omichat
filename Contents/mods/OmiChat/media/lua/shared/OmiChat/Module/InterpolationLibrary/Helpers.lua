@@ -18,12 +18,13 @@ local ASTERISK_PREFIX_PATTERN = '^(%s*[*' .. ASTERISK_CHAR .. '])(.+)'
 local ASTERISK_DELIM_PATTERN = '^"%s*[*' .. ASTERISK_CHAR .. ']'
 
 
+---Contains helper functions for the interpolation library.
 ---@class omichat.InterpolationLibrary.Helpers
 local Helpers = {}
 
 
----Adds quotes to quote segments if they're not already present.
----@param segments omichat.MessageSegment[]
+---Adds quote characters to quote segments if they're not already present.
+---@param segments omichat.MessageSegment[] The message segments list.
 function Helpers.applyAutoQuotes(segments)
     for i = 1, #segments do
         local quote = segments[i]
@@ -34,8 +35,8 @@ function Helpers.applyAutoQuotes(segments)
 end
 
 ---Performs formatting shared between multiple default formats.
----@param args omichat.Args.PerformSharedOperations
----@return string
+---@param args omichat.Args.PerformSharedOperations Arguments for formatting.
+---@return string result The result of applying the formatting.
 function Helpers.applySharedFormatting(args)
     local input = args.input
     local tags = args.tags
@@ -125,8 +126,8 @@ function Helpers.applySharedFormatting(args)
 end
 
 ---Capitalizes the first non-invisible character of a string. Handles leading spaces.
----@param input string
----@return string
+---@param input string The input text.
+---@return string capitalized The capitalized text.
 function Helpers.capitalize(input)
     local prefix, suffix
     input, prefix, suffix = utils.getInternalText(input)
@@ -145,9 +146,9 @@ function Helpers.capitalize(input)
 end
 
 ---Modifies the case of the input depending on the tags.
----@param input string
----@param tags omi.SimpleSet
----@return string
+---@param input string The input text.
+---@param tags omi.SimpleSet A set of tags.
+---@return string text The input string with modifications based on the tags.
 function Helpers.case(input, tags)
     local doUppercase = tags.Uppercase
     local doLowercase = tags.Lowercase
@@ -170,8 +171,8 @@ end
 
 ---Checks whether the language being sent is signed and returns an error ID if it is.
 ---The translation of the error assumes the stream is intended to be a "radio" channel for RP purposes.
----@param interpolator omichat.Interpolator
----@return string? errorID
+---@param interpolator omichat.Interpolator The interpolator in use.
+---@return string? errorID The string ID of the error message.
 function Helpers.checkSignedOverRadio(interpolator)
     local language = interpolator:token('languageRaw')
     if not language or not API.language.isSigned(language) then
@@ -190,9 +191,9 @@ function Helpers.checkSignedOverRadio(interpolator)
 end
 
 ---Colors actions based on the stream tagged with `ActionColorTarget`.
----@param segments omichat.MessageSegment[]
----@param options omi.MultiMap?
----@param tags omi.SimpleSet?
+---@param segments omichat.MessageSegment[] The message segments list.
+---@param options omi.MultiMap? A multimap of options.
+---@param tags omi.SimpleSet? A set of tags.
 function Helpers.colorActions(segments, options, tags)
     tags = tags or {}
     local color = Helpers.getColorFromTarget('ActionColorTarget', options, tags)
@@ -216,9 +217,9 @@ function Helpers.colorActions(segments, options, tags)
 end
 
 ---Colors quotes based on the stream tagged with `QuoteColorTarget`.
----@param segments omichat.MessageSegment[]
----@param options omi.MultiMap?
----@param tags omi.SimpleSet?
+---@param segments omichat.MessageSegment[] The message segments list.
+---@param options omi.MultiMap? A multimap of options.
+---@param tags omi.SimpleSet? A set of tags.
 function Helpers.colorQuotes(segments, options, tags)
     local color = Helpers.getColorFromTarget('QuoteColorTarget', options, tags)
     if color == '' then
@@ -234,8 +235,8 @@ function Helpers.colorQuotes(segments, options, tags)
 end
 
 ---Concatenates message segments into a string.
----@param segments omichat.MessageSegment[]
----@return string
+---@param segments omichat.MessageSegment[] The message segments list.
+---@return string combined A single string containing the merged segments.
 function Helpers.combineSegments(segments)
     local result = {}
 
@@ -246,48 +247,47 @@ function Helpers.combineSegments(segments)
     return concat(result)
 end
 
----Gets the text wrapped in a prefix and suffix.
----@param text string
----@param prefix string
----@param suffix string?
----@return string
-function Helpers.ensureUnwrapped(text, prefix, suffix)
+---Removes the given prefix and suffix from the text, if present.
+---@param input string The input text.
+---@param prefix string The prefix to remove.
+---@param suffix string? The suffix to remove. Defaults to `prefix`.
+---@return string unwrapped The unwrapped text.
+function Helpers.ensureUnwrapped(input, prefix, suffix)
     suffix = suffix or prefix
-    if utils.startsWith(text, prefix) then
-        text = text:sub(2)
+    if utils.startsWith(input, prefix) then
+        input = input:sub(2)
     end
 
-    if utils.endsWith(text, suffix) then
-        text = text:sub(1, #text - 1)
+    if utils.endsWith(input, suffix) then
+        input = input:sub(1, #input - 1)
     end
 
-    return text
+    return input
 end
 
 ---Wraps text in characters, if it's not already wrapped.
----@param text string
----@param prefix string
----@param suffix string?
----@return string
-function Helpers.ensureWrapped(text, prefix, suffix)
+---@param input string The input text.
+---@param prefix string The prefix to add.
+---@param suffix string? The suffix to add. Defaults to `prefix`.
+---@return string wrapped The wrapped text.
+function Helpers.ensureWrapped(input, prefix, suffix)
     suffix = suffix or prefix
-    if not utils.startsWith(text, prefix) then
-        text = prefix .. text
+    if not utils.startsWith(input, prefix) then
+        input = prefix .. input
     end
 
-    if not utils.endsWith(text, suffix) then
-        text = text .. suffix
+    if not utils.endsWith(input, suffix) then
+        input = input .. suffix
     end
 
-    return text
+    return input
 end
 
 ---Formats segments that have been tagged as actions.
----@param segments omichat.MessageSegment[]
----@param tags omi.SimpleSet
----@param args omichat.Args.PerformSharedOperations
----@param onlyFirst boolean?
-function Helpers.formatActionSegments(segments, tags, args, onlyFirst)
+---@param segments omichat.MessageSegment[] The message segments list.
+---@param tags omi.SimpleSet A set of tags.
+---@param args omichat.Args.PerformSharedOperations Arguments for the formatting.
+function Helpers.formatActionSegments(segments, tags, args)
     local skipCapitalize = tags.AutoCapitalizeNonInitialSegments
     local shouldCapitalize = args.doCapitalize or skipCapitalize
 
@@ -315,20 +315,15 @@ function Helpers.formatActionSegments(segments, tags, args, onlyFirst)
 
             action.text = text
             skipCapitalize = false
-
-            if onlyFirst then
-                break
-            end
         end
     end
 end
 
 ---Formats segments that have been tagged as quotes.
----@param segments omichat.MessageSegment[]
----@param tags omi.SimpleSet
----@param args omichat.Args.PerformSharedOperations
----@param onlyFirst boolean?
-function Helpers.formatQuoteSegments(segments, tags, args, onlyFirst)
+---@param segments omichat.MessageSegment[] The message segments list.
+---@param tags omi.SimpleSet A set of tags.
+---@param args omichat.Args.PerformSharedOperations Arguments for the formatting.
+function Helpers.formatQuoteSegments(segments, tags, args)
     local skipCapitalize = tags.AutoCapitalizeNonInitialSegments
     local shouldCapitalize = args.doCapitalize or skipCapitalize
     local isFirstPunctuate = true
@@ -353,17 +348,13 @@ function Helpers.formatQuoteSegments(segments, tags, args, onlyFirst)
 
             action.text = prefix .. text .. suffix
             skipCapitalize = false
-
-            if onlyFirst then
-                break
-            end
         end
     end
 end
 
 ---Formats actions based on the embedded action format.
----@param segments omichat.MessageSegment[]
----@param interpolator omichat.Interpolator
+---@param segments omichat.MessageSegment[] The message segments list.
+---@param interpolator omichat.Interpolator The interpolator in use.
 function Helpers.formatEmbeddedActions(segments, interpolator)
     local tokens = interpolator:getTokens()
 
@@ -387,8 +378,8 @@ function Helpers.formatEmbeddedActions(segments, interpolator)
 end
 
 ---Formats quotes based on the embedded quote format.
----@param segments omichat.MessageSegment[]
----@param interpolator omichat.Interpolator
+---@param segments omichat.MessageSegment[] The message segments list.
+---@param interpolator omichat.Interpolator The interpolator in use.
 function Helpers.formatEmbeddedQuotes(segments, interpolator)
     local tokens = interpolator:getTokens()
 
@@ -417,12 +408,12 @@ function Helpers.formatEmbeddedQuotes(segments, interpolator)
 end
 
 ---Gets a string for the base unknown language string, without a message fragment.
----@param tags omi.SimpleSet
----@param language string?
----@param author string?
----@param dialogueTag string?
----@param overhead boolean?
----@return string?
+---@param tags omi.SimpleSet A set of tags.
+---@param language string? The untranslated roleplay language name.
+---@param author string? The author of the message.
+---@param dialogueTag string? The dialogue tag, if narrative style was used for the message.
+---@param overhead boolean? Flag for whether the string should be formatted for overhead text instead of chat.
+---@return string? text A translated string used to indicate that a language is unknown.
 function Helpers.getBaseUnknownLanguageString(tags, language, author, dialogueTag, overhead)
     language = tostring(language or '')
     if language == '' then
@@ -485,10 +476,10 @@ function Helpers.getBaseUnknownLanguageString(tags, language, author, dialogueTa
 end
 
 ---Gets a color to use given a target tag.
----@param colorTag string
----@param options omi.MultiMap?
----@param tags omi.SimpleSet?
----@return string
+---@param colorTag string The tag to match against streams to find one to use the color from.
+---@param options omi.MultiMap? A multimap of options.
+---@param tags omi.SimpleSet? A set of tags.
+---@return string color A color, formatted in rich text.
 function Helpers.getColorFromTarget(colorTag, options, tags)
     if not IS_CLIENT then
         return ''
@@ -528,9 +519,9 @@ function Helpers.getColorFromTarget(colorTag, options, tags)
 end
 
 ---Returns a partial quote representing a fragment of what a player character understood.
----@param interpolator omichat.Interpolator
----@param message string
----@return string?
+---@param interpolator omichat.Interpolator The interpolator in use.
+---@param message string The message text.
+---@return string? fragmented The message text, fragmented to only include some words.
 function Helpers.getFragmentedMessage(interpolator, message)
     local parts = message:split('\\s+')
     if #parts <= 1 then
@@ -594,11 +585,11 @@ function Helpers.getFragmentedMessage(interpolator, message)
 end
 
 ---Gets the segments in a message, tagging them as actions or quotes.
----@param input string
----@param options omichat.Args.GetMessageSegments?
----@return omichat.MessageSegment[]
----@return string prefix
----@return string suffix
+---@param input string The input text.
+---@param options omichat.Args.GetMessageSegments? Options for retrieving segments.
+---@return omichat.MessageSegment[] segments A list of message segments.
+---@return string prefix Invisible characters that preceded the text.
+---@return string suffix Invisible characters that followed the text.
 function Helpers.getMessageSegments(input, options)
     options = options or {}
     input = utils.trim(input)
@@ -665,10 +656,10 @@ function Helpers.getMessageSegments(input, options)
     return segments, prefix, suffix
 end
 
----Gets the text to use for an "over radio" indicator based on the chat type.
----@param chatType omichat.ChatTypeString?
----@return string
-function Helpers.getOverRadioText(chatType)
+---Gets the text to use for an "over radio" indicator.
+---@param chatType omi.ChatTypeString? The chat type of the message.
+---@return string indicator A translated string representing that a message was sent over radio.
+function Helpers.getOverRadioIndicator(chatType)
     if chatType == 'faction' then
         return getText('UI_OmiChat_FactionRadio')
     elseif chatType == 'safehouse' then
@@ -679,11 +670,11 @@ function Helpers.getOverRadioText(chatType)
 end
 
 ---Gets the string to display when an out-of-range chat is perceived.
----@param name string
----@param interpolator omichat.Interpolator
----@param tags omi.SimpleSet
----@return string
-function Helpers.getPerceivedChatString(name, interpolator, tags)
+---@param author string The author of the message.
+---@param interpolator omichat.Interpolator The interpolator in use.
+---@param tags omi.SimpleSet A set of tags.
+---@return string text A translated string indicating that a message was out-of-range, but perceived.
+function Helpers.getPerceivedChatString(author, interpolator, tags)
     local language = interpolator:token('languageRaw')
     local isSigned = language and API.language.isSigned(language)
 
@@ -700,13 +691,13 @@ function Helpers.getPerceivedChatString(name, interpolator, tags)
         stringID = stringID .. '_Loud'
     end
 
-    return getText(stringID, name)
+    return getText(stringID, author)
 end
 
 ---Gets the prefix to use for a message to indicate that it was sent over the radio.
----@param interpolator omichat.Interpolator
----@param tags omi.SimpleSet
----@return string
+---@param interpolator omichat.Interpolator The interpolator in use.
+---@param tags omi.SimpleSet A set of tags.
+---@return string prefix A translated string indicating a radio message and its frequency, or an "over radio" indicator.
 function Helpers.getRadioPrefix(interpolator, tags)
     local prefix = ''
     if tags.IsRadioStream then
@@ -718,17 +709,17 @@ function Helpers.getRadioPrefix(interpolator, tags)
 
         prefix = prefix .. ' <SPACE> '
     elseif tags.OverRadio or tags.OverRadioChat or tags.IsEchoMessage then
-        prefix = Helpers.getOverRadioText(interpolator:token('chatType')) .. ' <SPACE> '
+        prefix = Helpers.getOverRadioIndicator(interpolator:token('chatType')) .. ' <SPACE> '
     end
 
     return prefix
 end
 
 ---Gets a volume indicator based on tags.
----@param options omi.MultiMap
----@param tags omi.SimpleSet
----@param shouldTranslate boolean?
----@return string?
+---@param options omi.MultiMap A multimap of options.
+---@param tags omi.SimpleSet A set of tags.
+---@param shouldTranslate boolean? Flag for whether translation should be attempted.
+---@return string? indicator A translated or untranslated string indicating the volume of a message.
 function Helpers.getVolumeIndicator(options, tags, shouldTranslate)
     local indicator
     if not tags.IsSneakCallout and (tags.Loud or tags.IsCallout) then
@@ -751,24 +742,27 @@ function Helpers.getVolumeIndicator(options, tags, shouldTranslate)
 end
 
 ---Gets the value of an option, or a token as a fallback.
----If neither are defined, this will return the empty string.
----@param interpolator omichat.Interpolator
----@param options omi.MultiMap
----@param key string
----@param token string?
----@return string
+---@param interpolator omichat.Interpolator The interpolator in use.
+---@param options omi.MultiMap A multimap of options.
+---@param key string The key to use to retrieve the option.
+---@param token string? The token to retrieve from the interpolator. Defaults to `key`.
+---@return string value The option or token, or the empty string if neither exist.
 function Helpers.optionOrToken(interpolator, options, key, token)
-    return options:getString(key, interpolator:tokenString(token or key))
+    local opt = options:get(key)
+    if opt ~= nil then
+        return tostring(opt)
+    end
+
+    return interpolator:tokenString(token or key)
 end
 
 ---Gets the value of an option, or a token as a fallback.
----If neither are defined, this will return the empty string.
 ---If there's both an option and a token, the value of the option is wrapped in the same characters from the token.
----@param interpolator omichat.Interpolator
----@param options omi.MultiMap
----@param key string
----@param token string?
----@return string
+---@param interpolator omichat.Interpolator The interpolator in use.
+---@param options omi.MultiMap A multimap of options.
+---@param key string The key to use to retrieve the option.
+---@param token string? The token to retrieve from the interpolator. Defaults to `key`.
+---@return string value The option or token, or the empty string if neither exist.
 function Helpers.optionOrTokenWrapped(interpolator, options, key, token)
     local tokenValue = interpolator:tokenString(token or key)
     local optionValue = options:get(key)
@@ -792,10 +786,10 @@ end
 
 ---Adds punctuation to a string if it isn't already present.
 ---Handles encoded invisible characters and trailing spaces.
----@param input string
----@param punctuation string?
----@param characters string?
----@return string
+---@param input string The string to punctuate.
+---@param punctuation string? The punctuation character to use. Defaults to `.`.
+---@param characters string? Characters to treat as punctuation. Defaults to using the punctuation string pattern.
+---@return string punctuated Text with punctuation added.
 function Helpers.punctuate(input, punctuation, characters)
     local prefix, suffix
     input, prefix, suffix = utils.getInternalText(input)
@@ -819,8 +813,8 @@ function Helpers.punctuate(input, punctuation, characters)
 end
 
 ---Reads at-function options.
----@param args unknown?
----@return omi.MultiMap options
+---@param args unknown? An argument to an interpolator function.
+---@return omi.MultiMap options The multimap from the argument, or an empty multimap.
 function Helpers.readOptions(args)
     if type(args) == 'table' and utils.isinstance(args, MultiMap) then
         ---@cast args omi.MultiMap
@@ -831,8 +825,8 @@ function Helpers.readOptions(args)
 end
 
 ---Reads tags from an interpolator.
----@param interpolator omichat.Interpolator
----@return omi.SimpleSet tags
+---@param interpolator omichat.Interpolator The interpolator in use.
+---@return omi.SimpleSet tags A set of tags.
 function Helpers.readTags(interpolator)
     local tags
     local originalTags
@@ -860,7 +854,7 @@ end
 
 ---Replaces asterisks intended for coloring actions with invisible characters.
 ---This prevents them from displaying overhead while still allowing the action coloring to handle them properly.
----@param segments omichat.MessageSegment[]
+---@param segments omichat.MessageSegment[] The message segments list.
 function Helpers.replaceColorActionsAsterisks(segments)
     for i = 1, #segments do
         local action = segments[i]
@@ -874,7 +868,7 @@ function Helpers.replaceColorActionsAsterisks(segments)
 end
 
 ---Checks whether embedded actions should be processed.
----@param tags omi.SimpleSet
+---@param tags omi.SimpleSet A set of tags.
 ---@return boolean
 function Helpers.shouldFormatEmbeddedActions(tags)
     if tags.NoEmbeddedActions then
@@ -889,7 +883,7 @@ function Helpers.shouldFormatEmbeddedActions(tags)
 end
 
 ---Checks whether embedded quotes should be processed.
----@param tags omi.SimpleSet
+---@param tags omi.SimpleSet A set of tags.
 ---@return boolean
 function Helpers.shouldFormatEmbeddedQuotes(tags)
     if tags.NoEmbeddedQuotes then
@@ -900,16 +894,16 @@ function Helpers.shouldFormatEmbeddedQuotes(tags)
 end
 
 ---Stringifies inputs into a single string.
----@param ... unknown
----@return string
+---@param ... unknown Arbitary inputs.
+---@return string stringified The inputs combined into a single string.
 function Helpers.stringify(...)
     return Helpers.stringifySep('', ...)
 end
 
 ---Stringifies inputs into a single delimited string.
----@param sep string
----@param ... unknown
----@return string
+---@param sep string The separator to use.
+---@param ... unknown Arbitary inputs.
+---@return string stringified The inputs combined into a single string.
 function Helpers.stringifySep(sep, ...)
     local t = {}
     for i = 1, select('#', ...) do
@@ -920,9 +914,9 @@ function Helpers.stringifySep(sep, ...)
 end
 
 ---Wraps an action for chat based on the provided tags.
----@param text string
----@param tags omi.SimpleSet
----@return string
+---@param text string The text to wrap.
+---@param tags omi.SimpleSet A set of tags.
+---@return string wrapped The text, wrapped in action indicators for chat.
 function Helpers.wrapActionChat(text, tags)
     if tags.ActionAsterisks or tags.ActionAsterisksChat then
         return '** <SPACE> ' .. text
@@ -934,9 +928,9 @@ function Helpers.wrapActionChat(text, tags)
 end
 
 ---Wraps an action for an overhead message based on the provided tags.
----@param text string
----@param tags omi.SimpleSet
----@return string
+---@param text string The text to wrap.
+---@param tags omi.SimpleSet A set of tags.
+---@return string wrapped The text, wrapped in action indicators for an overhead speech bubble.
 function Helpers.wrapActionOverhead(text, tags)
     if tags.ActionAsterisks or tags.ActionAsterisksOverhead then
         return '** ' .. text
@@ -949,3 +943,34 @@ end
 
 
 return Helpers
+
+
+--#region Type Definitions
+
+---@class omichat.MessageSegment
+---@field type 'quote' | 'action' The type of the segment, which dictates its styling.
+---@field text string The text of the segment.
+
+---@class omichat.Args.GetMessageSegments
+---@field startInAction boolean? Flag for whether the text should start as an action instead of a quote.
+---@field hasInternalQuote boolean? Flag for whether the message has an internal quote. This makes the first quote encountered not end an initial quote segment.
+---@field optionalActionAsterisk boolean? Flag for whether the asterisk for actions should be considered optional.
+---@field onlyFirstSegment boolean? Flag for whether only the first segment should be returned.
+
+---@class omichat.Args.PerformSharedOperations
+---@field interpolator omichat.Interpolator The interpolator in use.
+---@field options omi.MultiMap A multimap of options.
+---@field tags omi.SimpleSet A set of tags.
+---@field input string The input text.
+---@field doCapitalize boolean? Flag for whether the text should be capitalized.
+---@field doPunctuate boolean? Flag for whether the text should be punctuated.
+---@field applyCase boolean? Flag for whether the case should be updated based on the tags.
+---@field applyEmbeddedActions boolean? Flag for whether embedded actions should be styled.
+---@field applyEmbeddedQuotes boolean? Flag for whether embedded quotes should be styled.
+---@field doColorActions boolean? Flag for whether action segments should be set to use an action color.
+---@field doColorQuotes boolean? Flag for whether quote segments should be set to use a quote color.
+---@field doReplaceAsterisks boolean? Flag for whether asterisks should be replaced with an invisible signal.
+---@field doAutoQuotes boolean? Flag for whether the text should be wrapped in quotes.
+---@field hasInternalQuote boolean? Flag for whether the text has an expected internal quote (i.e., is narrative style).
+
+--#endregion

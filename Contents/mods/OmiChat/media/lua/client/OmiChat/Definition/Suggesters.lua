@@ -6,10 +6,16 @@ local utils = API.utils
 local config = API.Configuration
 local concat = table.concat
 local format = string.format
-local ISChat = ISChat ---@cast ISChat omichat.ISChat
+local ISChat = ISChat --[[@as omichat.ISChat]]
 
 local MAX_RESULTS = 30
 local MAX_SEARCH = 100
+
+
+---@class omichat.Suggester
+---@field name string? The name of the suggester.
+---@field suggest fun(self: table, info: omichat.SuggestionInfo) Performs suggestion.
+---@field priority integer? The priority of the suggester. Higher numbers will run first.
 
 
 ---Gets the current stream from the chat input.
@@ -22,21 +28,21 @@ local function getStreamFromInput(input)
     end
 
     local currentTabID = instance.currentTabID
-    local stream = API.streams.chatCommandToStream(input)
+    local stream = API.streams.chatCommandToStream(input, { enabledOnly = true })
     if not stream then
         if utils.startsWith(input, '/') then
             return
         end
 
         local default = API.streams.getDefaultTabStream(currentTabID)
-        if not default then
+        if not default or not default:isEnabled() then
             return
         end
 
         stream = default
     end
 
-    if not stream:isTabID(currentTabID) or not stream:isEnabled() then
+    if not stream:isTabID(currentTabID) then
         return
     end
 

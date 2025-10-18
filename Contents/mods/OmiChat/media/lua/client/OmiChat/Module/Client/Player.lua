@@ -9,30 +9,30 @@ local sqrt = math.sqrt
 local getText = getText
 
 
+---Contains functions for getting and setting data related to the local player.
 ---@class omichat.api.client.player
 local Player = {}
 
 
 ---Adds a roleplay language to the local player's list.
----@param language string
----@return boolean
+---@param language string The language to add.
+---@return boolean success
+---@return string? error
 function Player.addLanguage(language)
     local username = Player.getUsername()
     if not username then
-        return false
+        return false, 'Unable to retrieve local player'
     end
 
-    API.request.updateData({
+    return API.request.updateData({
         target = username,
         field = 'languages',
         value = language,
     })
-
-    return true
 end
 
----Applies a buff to the player, if the cooldown period has expired.
----@param ignoreCooldown boolean? If `true`, the buff will be applied even if the cooldown has not expired.
+---Applies a buff to the player if the cooldown period has expired.
+---@param ignoreCooldown boolean? Flag for whether the buff should be applied even if the cooldown has not expired.
 function Player.applyBuff(ignoreCooldown)
     local player = getSpecificPlayer(0)
     local modData = player and player:getModData()
@@ -62,17 +62,17 @@ function Player.applyBuff(ignoreCooldown)
     modData.ocLastBuff = now
 end
 
----Checks whether the current player can use custom admin commands.
----@return boolean
+---Checks whether the current player can use admin commands added by the mod.
+---@return boolean isAllowed
 function Player.canUseAdminCommands()
     local player = getSpecificPlayer(0)
     local access = player and player:getAccessLevel()
     return utils.getNumericAccessLevel(access) >= config.General.MinimumCommandAccessLevel
 end
 
----Gets a color table for the local player, or `nil` if unset.
----@param id string
----@return omi.ColorTable?
+---Returns a color table preferred by the local player.
+---@param id string The color identifier. This is the name of a stream, or `speech` for the speech color.
+---@return omi.ColorTable? color The color table, or `nil` if the color is unset.
 function Player.getColor(id)
     if id == 'speech' then
         return Player.getSpeechColor()
@@ -82,14 +82,14 @@ function Player.getColor(id)
 end
 
 ---Returns a color table preferred by the local player, or the default color table if there isn't one.
----@param id string
----@return omi.ColorTable
+---@param id string The color identifier. This is the name of a stream, or `speech` for the speech color.
+---@return omi.ColorTable color The color table to use.
 function Player.getColorOrDefault(id)
     return Player.getColor(id) or Player.getDefaultColor(id)
 end
 
 ---Gets the player's currently active roleplay language.
----@return string?
+---@return string? currentLanguage
 function Player.getCurrentLanguage()
     local username = Player.getUsername()
     if not username then
@@ -100,21 +100,20 @@ function Player.getCurrentLanguage()
 end
 
 ---Gets the default color associated with a stream or speech color.
----If the default could not be retrieved or there is no default, this returns white.
----@param category string
----@return omi.ColorTable
-function Player.getDefaultColor(category)
-    if category == 'speech' then
+---@param id string The color identifier. This is the name of a stream, or `speech` for the speech color.
+---@return omi.ColorTable color The default color table. If the default could not be retrieved or there is no default, this returns white.
+function Player.getDefaultColor(id)
+    if id == 'speech' then
         return Player.getSpeechColor() or { r = 255, g = 255, b = 255 }
     end
 
-    local stream = API.streams.getChatStream(category)
+    local stream = API.streams.getChatStream(id)
     return stream and stream:getDefaultColor() or { r = 255, g = 255, b = 255 }
 end
 
----Gets the default shouts to use when custom shouts aren't set.
----@param isSneaking boolean
----@return string[]
+---Gets a list of default shouts to use when custom shouts aren't set.
+---@param isSneaking boolean Flag for whether strings for sneak shouts should be retrieved.
+---@return string[] shouts A list of translated shout strings.
 function Player.getDefaultShouts(isSneaking)
     local result = {}
     for i = 1, 3 do
@@ -126,14 +125,15 @@ end
 
 ---Gets the local player's distance from another player.
 ---Returns `nil` if either player is not available.
----@param otherPlayer IsoPlayer?
----@return number?
-function Player.getDistanceFrom(otherPlayer)
+---@param otherPlayer IsoPlayer? The player to compare with. If this is `nil`, the return value will be `nil`.
+---@param player IsoPlayer? The local player. Will be retrieved if not given.
+---@return number? distance The distance between the players. If either player is unavailable, `nil`.
+function Player.getDistanceFrom(otherPlayer, player)
     if not otherPlayer then
         return
     end
 
-    local player = getSpecificPlayer(0)
+    player = player or getSpecificPlayer(0)
     if not player then
         return
     end
@@ -145,7 +145,7 @@ function Player.getDistanceFrom(otherPlayer)
 end
 
 ---Gets a list of the local player's known roleplay languages.
----@return string[]
+---@return string[] languages
 function Player.getLanguages()
     local username = Player.getUsername()
     if not username then
@@ -161,7 +161,7 @@ function Player.getLanguages()
 end
 
 ---Gets the number of available roleplay language slots for the local player.
----@return integer
+---@return integer slots
 function Player.getLanguageSlots()
     local default = config.Language.DefaultSlots
     local username = Player.getUsername()
@@ -173,8 +173,8 @@ function Player.getLanguageSlots()
     return playerData and playerData.languageSlots or default
 end
 
----Gets the nickname for the local player, or `nil` if unset.
----@return string?
+---Gets the nickname for the local player.
+---@return string? nickname The player's chosen nickname, or `nil` if unset.
 function Player.getNickname()
     local username = Player.getUsername()
     if not username then
@@ -185,7 +185,7 @@ function Player.getNickname()
 end
 
 ---Returns a color table for the local player's speech color.
----@return omi.ColorTable?
+---@return omi.ColorTable? color
 function Player.getSpeechColor()
     local player = getSpecificPlayer(0)
     if not player then
@@ -205,7 +205,7 @@ function Player.getSpeechColor()
 end
 
 ---Gets the username of the local player.
----@return string?
+---@return string? username The player's username, or `nil` if the player is unavailable.
 function Player.getUsername()
     local player = getSpecificPlayer(0)
     local username = player and player:getUsername()
@@ -215,15 +215,15 @@ function Player.getUsername()
 end
 
 ---Checks whether the player is dead or unable to be retrieved.
----@return boolean
+---@return boolean isDeadOrUnavailable
 function Player.isDeadOrUnavailable()
     local player = getSpecificPlayer(0)
     return not player or player:isDead()
 end
 
 ---Checks whether the local player knows a given roleplay language.
----@param language string
----@return boolean
+---@param language string The untranslated name of the language to check.
+---@return boolean isKnown
 function Player.knowsLanguage(language)
     local username = Player.getUsername()
     if not username then
@@ -234,15 +234,15 @@ function Player.knowsLanguage(language)
 end
 
 ---Sets the color associated with a given stream or identifier for the local player.
----@param category string
----@param color omi.ColorTable?
-function Player.setColor(category, color)
-    if category == 'speech' then
+---@param id string The color identifier. This is the name of a stream, or `speech` for the speech color.
+---@param color omi.ColorTable? The color to set, or `nil` to unset it.
+function Player.setColor(id, color)
+    if id == 'speech' then
         Player.setSpeechColor(color)
         return
     end
 
-    API.preferences.setColor(category, color)
+    API.preferences.setColor(id, color)
 end
 
 ---Sets the player's current roleplay language.
@@ -287,8 +287,8 @@ end
 
 ---Sets the nickname of the current player.
 ---@param nickname string? The nickname to set. A `nil` or empty value will unset the nickname.
----@return boolean success
----@return string? status
+---@return boolean success Flag for whether the nickname was successfully updated.
+---@return string? feedback A status message to report to the player.
 function Player.setNickname(nickname)
     nickname = utils.trim(nickname or '')
 
@@ -332,9 +332,9 @@ end
 ---Sets the color used for overhead chat bubbles.
 ---This will set the speech color in-game option.
 ---@param color omi.ColorTable? The new speech color.
----@param requestCacheUpdate boolean? Whether a request to update the cache should be made. Defaults to `true`.
+---@param doRequest boolean? Flag for whether a request to update the cache should be made. Defaults to `true`.
 ---@return boolean success
-function Player.setSpeechColor(color, requestCacheUpdate)
+function Player.setSpeechColor(color, doRequest)
     local player = getSpecificPlayer(0)
     if not player then
         return false
@@ -355,7 +355,7 @@ function Player.setSpeechColor(color, requestCacheUpdate)
     player:setSpeakColourInfo(core:getMpTextColor())
     sendPersonalColor(player)
 
-    if requestCacheUpdate ~= false then
+    if doRequest ~= false then
         API.request.updatePlayerCache()
     end
 
@@ -364,8 +364,8 @@ end
 
 ---Sets the status of the current player.
 ---@param status string? The status to set. A `nil` or empty value will unset the status.
----@return boolean success
----@return string? message
+---@return boolean success Flag for whether the status was successfully set.
+---@return string? message A status message to report to the player.
 function Player.setStatus(status)
     status = utils.trim(status or ''):gsub('[\r\n]', '')
 
@@ -407,9 +407,9 @@ end
 
 ---Updates the current player's character name.
 ---@param name string The new name of the character.
----@param updateSurname boolean? Whether the name should be split into forename and surname. Defaults to `false`.
----@return boolean success
----@return string? message
+---@param updateSurname boolean? Flag for whether the name should be split into forename and surname.
+---@return boolean success Flag for whether the name was successfully updated.
+---@return string? message A status message to report to the player.
 function Player.updateCharacterName(name, updateSurname)
     name = utils.trim(name)
     if #name == 0 then

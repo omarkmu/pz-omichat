@@ -1,6 +1,6 @@
 ---Contains mod configuration and enables updating it.
 
-local utils = require 'OmiChat/utils'
+local utils = require 'OmiChat/Utils'
 local MetaFormatter = require 'OmiChat/Component/MetaFormatter'
 local Preset = require 'OmiChat/Component/Configuration/Preset'
 local base = utils.configuration.ConfigurationHelper
@@ -8,7 +8,18 @@ local sort = table.sort
 local isempty = table.isempty
 
 
+---Helper for managing and retrieving mod configuration.
 ---@class omichat.ConfigurationHelper : omi.ConfigurationHelper, omichat.Configuration
+---@field private _enabledMods table<string, boolean?> Cache of enabled mods.
+---@field private _languageAllowSet omi.SimpleSet Set of languages that should be allowed for self-adding.
+---@field private _languageBlockSet omi.SimpleSet Set of languages that should be disallowed for self-adding.
+---@field private _languageNameList string[] List of configured language names.
+---@field private _idToLanguage table<integer, omichat.LanguageRecord> Associates language IDs to information about languages.
+---@field private _nameToLanguage table<string, omichat.LanguageRecord> Associates language names to information about languages.
+---@field private _formatterInfo table<integer, omichat.FormatterInfo> Associates formatter IDs to information about formatters used for encoding metadata.
+---@field private _presetList omichat.ConfigurationPreset[] List containing presets in presentation order. Contains both built-in and custom presets.
+---@field private _customPresets table<string, omichat.ConfigurationPreset> Associates preset names to custom user-defined presets.
+---@field private _variables table<string, string> Contains arbitary variables.
 local Configuration = utils.configuration {
     schema = require 'OmiChat/Component/Configuration/ConfigurationSchema',
     modDataKey = 'omichat.settings',
@@ -27,15 +38,32 @@ local Configuration = utils.configuration {
 
 Configuration.Preset = Preset
 
+--#region Static Fields
+
+---Filename used for storing presets on the server.
+---@private
 Configuration._presetFilename = 'omichat_presets.json'
-Configuration._presetList = {}
-Configuration._customPresets = {}
+
+---Table containing built-in presets.
+---@private
 Configuration._presets = {
     Default = require 'OmiChat/Definition/Preset/Default',
     Buffy = require 'OmiChat/Definition/Preset/Buffy',
     Vanilla = require 'OmiChat/Definition/Preset/Vanilla',
 }
 
+Configuration._enabledMods = {}
+Configuration._languageAllowSet = {}
+Configuration._languageBlockSet = {}
+Configuration._languageNameList = {}
+Configuration._idToLanguage = {}
+Configuration._nameToLanguage = {}
+Configuration._formatterInfo = {}
+Configuration._presetList = {}
+Configuration._customPresets = {}
+Configuration._variables = {}
+
+--#endregion
 
 --#region Constants
 
@@ -149,8 +177,8 @@ Configuration.FORMAT_NAMES = {
 
 ---Checks the language against the add language allow/block list.
 ---This does not check whether the language is a valid roleplay language.
----@param language string
----@return boolean
+---@param language string The language to check.
+---@return boolean canAdd
 ---@see omichat.api.shared.language.exists
 function Configuration:canAddLanguage(language)
     if not isempty(self._languageAllowSet) and not self._languageAllowSet[language] then
@@ -161,7 +189,7 @@ function Configuration:canAddLanguage(language)
 end
 
 ---Returns whether the Discord color option should be shown.
----@return boolean
+---@return boolean canShow
 function Configuration:canShowDiscordColorOption()
     local opt = self.Discord.ShowColorOption
     if opt == 'Respect_Server_Setting' then
@@ -172,7 +200,7 @@ function Configuration:canShowDiscordColorOption()
 end
 
 ---Returns an iterator over configured streams.
----@return fun(): omichat.Configuration.StreamDefinition?
+---@return fun(): omichat.Configuration.StreamDefinition? iterator
 function Configuration:chatStreams()
     local list = self.Streams.List
     local i = 0
@@ -183,35 +211,37 @@ function Configuration:chatStreams()
 end
 
 ---Returns whether the Buffy's Character Bios compatibility patch is enabled.
+---@return boolean enabled
 function Configuration:compatBuffyCharacterBiosEnabled()
     return self:_isCompatEnabled(self.Compatibility.BuffyCharacterBios, 'CharacterBio')
 end
 
 ---Returns whether the Buffy's Tabletop RPG System compatibility patch is enabled.
+---@return boolean enabled
 function Configuration:compatBuffyRPGSystemEnabled()
     return self:_isCompatEnabled(self.Compatibility.BuffyRPGSystem, 'roleplaydnd_update15')
 end
 
 ---Returns whether the Chat Bubble compatibility patch is enabled.
----@return boolean
+---@return boolean enabled
 function Configuration:compatChatBubbleEnabled()
     return self:_isCompatEnabled(self.Compatibility.ChatBubble, 'ChatBubble')
 end
 
 ---Returns whether the Search Players For Weapons compatibility patch is enabled.
----@return boolean
+---@return boolean enabled
 function Configuration:compatSearchPlayersEnabled()
     return self:_isCompatEnabled(self.Compatibility.SearchPlayers, 'SearchPlayersForWeapons')
 end
 
 ---Returns whether the True Actions Dancing compatibility patch is enabled.
----@return boolean
+---@return boolean enabled
 function Configuration:compatTADEnabled()
     return self:_isCompatEnabled(self.Compatibility.TrueActionsDancing, 'TrueActionsDancing')
 end
 
 ---Returns an iterator over metadata formatter information.
----@return fun(): omichat.FormatterInfo?
+---@return fun(): omichat.FormatterInfo? iterator
 function Configuration:formatters()
     local i = self.MIN_META_ID - 1
     return function()
@@ -224,20 +254,20 @@ function Configuration:formatters()
 end
 
 ---Returns a table of valid items for /card.
----@return string[]
+---@return string[] items
 function Configuration:getCardItems()
     return utils.copy(self.Commands.Card.Items)
 end
 
 ---Returns a table of valid items for /flip.
----@return table
+---@return string[] items
 function Configuration:getCoinItems()
     return utils.copy(self.Commands.Flip.Items)
 end
 
 ---Gets a user-defined custom preset by name.
----@param name string
----@return omichat.ConfigurationPreset?
+---@param name string The name of the preset to retrieve.
+---@return omichat.ConfigurationPreset? preset
 function Configuration:getCustomPreset(name)
     if not name then
         return
@@ -246,9 +276,9 @@ function Configuration:getCustomPreset(name)
     return Configuration._customPresets[name]
 end
 
----Returns a list of user-defined custom presets as simple tables.
----@return omichat.Configuration.PresetTable[]
-function Configuration:getCustomPresetsSimple()
+---Returns a list of custom presets as simple tables.
+---@return omichat.Configuration.PresetTable[] presets
+function Configuration:getCustomPresetsForSave()
     local list = {}
     local schema = self:getSchema()
     for i = 1, #self._presetList do
@@ -265,21 +295,15 @@ function Configuration:getCustomPresetsSimple()
     return list
 end
 
----Gets the default built-in preset.
----@return omichat.ConfigurationPreset
-function Configuration:getDefaultPreset()
-    return Configuration._presets.Default
-end
-
 ---Returns a table of valid items for /roll.
----@return table
+---@return string[] items
 function Configuration:getDiceItems()
     return utils.copy(self.Commands.Roll.Items)
 end
 
 ---Retrieves information about a roleplay language given its id.
----@param id integer
----@return omichat.LanguageRecord?
+---@param id integer The ID of the language to retrieve.
+---@return omichat.LanguageRecord? language
 function Configuration:getLanguageById(id)
     local rec = self._idToLanguage[id]
     if rec then
@@ -288,8 +312,8 @@ function Configuration:getLanguageById(id)
 end
 
 ---Retrieves information about a roleplay language given its name.
----@param name string
----@return omichat.LanguageRecord?
+---@param name string The name of the language to retrieve.
+---@return omichat.LanguageRecord? language
 function Configuration:getLanguageByName(name)
     local rec = self._nameToLanguage[name]
     if rec then
@@ -304,8 +328,8 @@ function Configuration:getLanguageCount()
 end
 
 ---Gets the id of a language given its name.
----@param name string
----@return integer?
+---@param name string The name of the language.
+---@return integer? id
 function Configuration:getLanguageIDFromName(name)
     local rec = self._nameToLanguage[name]
     if rec then
@@ -314,14 +338,14 @@ function Configuration:getLanguageIDFromName(name)
 end
 
 ---Retrieves the list of configured roleplay languages.
----@return omichat.LanguageRecord[]
+---@return omichat.LanguageRecord[] languages
 function Configuration:getLanguageList()
     return utils.mapList(utils.copy, self._idToLanguage)
 end
 
 ---Gets the name of a language given its id.
----@param id integer
----@return string?
+---@param id integer The ID of the language.
+---@return string? name
 function Configuration:getLanguageNameFromId(id)
     local rec = self._idToLanguage[id]
     if rec then
@@ -330,14 +354,14 @@ function Configuration:getLanguageNameFromId(id)
 end
 
 ---Retrieves the list of configured roleplay languages' names.
----@return string[]
+---@return string[] names
 function Configuration:getLanguageNameList()
     return utils.copyList(self._languageNameList)
 end
 
 ---Returns the format to use for a given menu type.
----@param menuType omichat.MenuTypeString
----@return string
+---@param menuType omichat.MenuTypeString The menu type.
+---@return string format
 function Configuration:getMenuNameFormat(menuType)
     local option = self.Format.MenuName
 
@@ -355,51 +379,51 @@ function Configuration:getMenuNameFormat(menuType)
     return format or ''
 end
 
----Gets a preset by name.
----If the name is prefixed by `custom:`, this will get a custom preset.
+---Gets a preset by ID.
+---If the ID is prefixed with `custom:`, this will get a custom preset.
 ---Otherwise, a built-in preset will be returned.
----@param name string
----@return omichat.ConfigurationPreset?
-function Configuration:getPreset(name)
-    if not name then
+---@param id string The ID of the preset to retrieve.
+---@return omichat.ConfigurationPreset? preset
+function Configuration:getPreset(id)
+    if not id then
         return
     end
 
-    if utils.startsWith(name, 'custom:') then
-        return Configuration._customPresets[name:sub(8)]
+    if utils.startsWith(id, 'custom:') then
+        return Configuration._customPresets[id:sub(8)]
     end
 
-    return Configuration._presets[name]
+    return Configuration._presets[id]
 end
 
 ---Gets a list of all presets, including built-in and user defined.
----@return omichat.ConfigurationPreset[]
+---@return omichat.ConfigurationPreset[] presets
 function Configuration:getPresetList()
     return utils.copyList(self._presetList)
 end
 
 ---Returns the current configuration as a simple table.
----@return omichat.Configuration
+---@return omichat.Configuration values
 function Configuration:getValues()
     return base.getValues(self)
 end
 
 ---Gets sanitized configuration values that are prepared for saving.
----@return omichat.Configuration
+---@return omichat.Configuration sanitized
 function Configuration:getValuesForSave()
     return base.getValuesForSave(self)
 end
 
 ---Gets the string value of a variable. Returns `nil` if the variable doesn't exist.
----@param key string
----@return string?
+---@param key string The key to retrieve.
+---@return string? value
 function Configuration:getVariable(key)
     return self._variables[key]
 end
 
 ---Gets the boolean value of a variable. Returns `nil` if the variable doesn't exist.
----@param key string
----@return boolean?
+---@param key string The key to retrieve.
+---@return boolean? value
 function Configuration:getVariableAsBool(key)
     local value = self._variables[key]
     if not value then
@@ -410,88 +434,88 @@ function Configuration:getVariableAsBool(key)
 end
 
 ---Gets the number value of a variable. Returns `nil` if the variable doesn't exist or is not a number.
----@param key string
----@return number?
+---@param key string The key to retrieve.
+---@return number? value
 function Configuration:getVariableAsNumber(key)
     return tonumber(self._variables[key])
 end
 
 ---Returns whether the clean character option is set to clean the body.
 ---This does not check for whether the character customization feature is enabled.
----@return boolean
+---@return boolean enabled
 function Configuration:isCleanBodyEnabled()
     return not not self.Customization.CleanEffects.Body
 end
 
 ---Returns whether the clean character option is set to clean clothing.
 ---This does not check for whether the character customization feature is enabled.
----@return boolean
+---@return boolean enabled
 function Configuration:isCleanClothingEnabled()
     return not not self.Customization.CleanEffects.Clothing
 end
 
 ---Returns whether the clean character option is enabled.
 ---This does not check for whether the character customization feature is enabled.
----@return boolean
+---@return boolean enabled
 function Configuration:isCleanCustomizationEnabled()
     return not isempty(self.Customization.CleanEffects)
 end
 
 ---Returns whether custom shouts are enabled.
----@return boolean
+---@return boolean enabled
 function Configuration:isCustomShoutsEnabled()
     return self.Customization.AllowCustomShouts
 end
 
 ---Returns whether emote shortcut macros are enabled.
----@return boolean
+---@return boolean enabled
 function Configuration:isEmoteMacroEnabled()
     return self.Macros.AllowEmotes
 end
 
 ---Returns `true` if a given language exists and is signed.
----@param name string
----@return boolean
+---@param name string The name of the language to check.
+---@return boolean signed
 function Configuration:isLanguageSigned(name)
     local rec = self._nameToLanguage[name]
     return rec ~= nil and rec.Signed == true
 end
 
----Returns whether the /name command should be enabled.
----@return boolean
+---Returns whether the `/name` command should be enabled.
+---@return boolean enabled
 function Configuration:isNameCommandEnabled()
     return self.Commands.Name.Mode ~= 'Disable'
 end
 
----Returns whether /name should set characters' forenames.
----@return boolean
+---Returns whether `/name` should set characters' forenames.
+---@return boolean enabled
 function Configuration:isNameCommandSetForename()
     local mode = self.Commands.Name.Mode
     return mode == 'Forename' or mode == 'Forename_Plus_Nickname'
 end
 
----Returns whether /name should set characters' full names.
----@return boolean
+---Returns whether `/name` should set characters' full names.
+---@return boolean enabled
 function Configuration:isNameCommandSetFullName()
     local mode = self.Commands.Name.Mode
     return mode == 'Fullname' or mode == 'Fullname_Plus_Nickname'
 end
 
----Returns whether /name should set characters' nicknames.
----@return boolean
+---Returns whether `/name` should set characters' nicknames.
+---@return boolean enabled
 function Configuration:isNameCommandSetNickname()
     return self.Commands.Name.Mode == 'Nickname'
 end
 
----Returns whether the /nickname command should be enabled.
----@return boolean
+---Returns whether the `/nickname` command should be enabled.
+---@return boolean enabled
 function Configuration:isNicknameCommandEnabled()
     local mode = self.Commands.Name.Mode
     return mode == 'Forename_Plus_Nickname' or mode == 'Fullname_Plus_Nickname'
 end
 
----Returns whether the /nickname command is enabled, or /name sets nicknames.
----@return boolean
+---Returns `true` if the `/nickname` command is enabled or `/name` sets nicknames.
+---@return boolean nicknamesEnabled
 function Configuration:isNicknameEnabled()
     return self:isNicknameCommandEnabled() or self.Commands.Name.Mode == 'Nickname'
 end
@@ -537,19 +561,19 @@ function Configuration:refreshValueCaches()
 end
 
 ---Checks whether an item is required for /card.
----@return boolean
+---@return boolean required
 function Configuration:requireCardItem()
     return #self.Commands.Card.Items > 0
 end
 
 ---Checks whether an item is required for /flip.
----@return boolean
+---@return boolean required
 function Configuration:requireCoinItem()
     return #self.Commands.Flip.Items > 0
 end
 
 ---Checks whether an item is required for /roll.
----@return boolean
+---@return boolean required
 function Configuration:requireDiceItem()
     return #self.Commands.Roll.Items > 0
 end
@@ -599,14 +623,14 @@ end
 
 ---Adds a custom preset to the configuration.
 ---@param preset omichat.ConfigurationPreset
----@protected
+---@private
 function Configuration:_addCustomPreset(preset)
     self._customPresets[preset:getName()] = preset
     self:_cachePresetList()
 end
 
 ---Caches the configured languages and information about them.
----@protected
+---@private
 function Configuration:_cacheLanguages()
     local languages = self.Language.List
 
@@ -617,7 +641,7 @@ function Configuration:_cacheLanguages()
     for i = 1, #languages do
         local lang = languages[i]
         if not self._nameToLanguage[lang.Name] and not utils.isNilOrWhitespace(lang.Name) then
-            local rec = utils.copy(lang) ---@cast rec omichat.LanguageRecord
+            local rec = utils.copy(lang) --[[@as omichat.LanguageRecord]]
             rec.ID = #self._idToLanguage + 1
 
             self._nameToLanguage[rec.Name] = rec
@@ -636,7 +660,7 @@ function Configuration:_cacheLanguages()
 end
 
 ---Caches the variables and stores them as a map.
----@protected
+---@private
 function Configuration:_cacheVariables()
     local varList = self.General.Variables
 
@@ -653,7 +677,7 @@ function Configuration:_cacheVariables()
 end
 
 ---Caches the list of presets.
----@protected
+---@private
 function Configuration:_cachePresetList()
     local list = { Configuration._presets.Default }
 
@@ -676,8 +700,8 @@ end
 ---Checks whether a mod compatibility option is enabled.
 ---@param value omi.schema.CompatibilityValue The value of the option.
 ---@param modId string The mod ID of the relevant mod.
----@return boolean
----@protected
+---@return boolean enabled
+---@private
 function Configuration:_isCompatEnabled(value, modId)
     if value ~= 'Auto' then
         return value == 'Enable'
@@ -688,7 +712,7 @@ end
 
 ---Removes a custom preset from the configuration.
 ---@param name string
----@protected
+---@private
 function Configuration:_removeCustomPreset(name)
     self._customPresets[name] = nil
     self:_cachePresetList()
@@ -696,7 +720,7 @@ end
 
 ---Replaces the custom presets list with the given list.
 ---@param list omichat.Configuration.PresetTable[]
----@protected
+---@private
 function Configuration:_setCustomPresets(list)
     self._customPresets = {}
     for i = 1, #list do
@@ -717,7 +741,7 @@ end
 ---@param a omichat.ConfigurationPreset
 ---@param b omichat.ConfigurationPreset
 ---@return boolean
----@protected
+---@private
 function Configuration._sortPresets(a, b)
     local aIsCustom = a:isCustom()
     local bIsCustom = b:isCustom()
@@ -732,3 +756,50 @@ end
 
 Configuration:init()
 return Configuration
+
+
+--#region Type Definitions
+
+---@class omichat.LanguageRecord : omichat.Configuration.LanguageDefinition
+---@field ID integer The ID of the language.
+
+---@class omichat.FormatterInfo
+---@field name string The name of the formatter.
+---@field id integer The formatter's ID.
+---@field formatter omichat.MetaFormatter The formatter.
+
+---@class omichat.ConfigurationFormState
+---@field activePresetDialog omi.ui.Dialog? The active dialog related to presets.
+---@field activeFormatStringDialog omi.ui.Dialog? The active dialog with an overview of format strings.
+
+---@class omichat.FormatDataTranslation
+---@field name string The name of the token or option.
+---@field id string The string ID for the description of the token or option.
+
+
+---@alias omichat.Configuration.Commands.Name.Mode
+---| 'Disable'
+---| 'Nickname'
+---| 'Forename'
+---| 'Fullname'
+---| 'Forename_Plus_Nickname'
+---| 'Fullname_Plus_Nickname'
+
+---@alias omichat.FormatterName
+---| 'callout'
+---| 'sneakCallout'
+---| 'language'
+---| 'overheadFinal'
+---| 'adminIcon'
+---| 'narrative'
+---| 'onlineID'
+---| 'echo'
+---| 'mention'
+
+---@alias omichat.MenuTypeString
+---| 'trade'
+---| 'medical'
+---| 'mini_scoreboard'
+---| 'search_player'
+
+--#endregion

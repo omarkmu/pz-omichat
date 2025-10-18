@@ -1,7 +1,6 @@
 ---Default list of roleplay languages.
-
 ---@type omichat.Configuration.LanguageDefinition[]
-return {
+local DefaultLanguageList = {
     { Name = 'English' },
     { Name = 'French' },
     { Name = 'Italian' },
@@ -23,3 +22,5 @@ return {
     { Name = 'Ukrainian' },
     { Name = 'ASL', Signed = true },
 }
+
+return DefaultLanguageList

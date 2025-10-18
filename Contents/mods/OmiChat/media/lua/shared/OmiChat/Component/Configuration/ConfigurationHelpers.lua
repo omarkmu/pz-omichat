@@ -1,6 +1,6 @@
 ---Helper functions for the configuration form and schema.
 
-local utils = require 'OmiChat/utils'
+local utils = require 'OmiChat/Utils'
 
 local TagList = require 'OmiChat/Definition/TagList'
 local FormatData = require 'OmiChat/Definition/NamedFormatData'
@@ -21,8 +21,8 @@ local Helpers = {}
 
 
 ---Applies values from a preset to the form.
----@param form omi.forms.Form
----@param preset omichat.ConfigurationPreset
+---@param form omi.forms.Form The current form.
+---@param preset omichat.ConfigurationPreset The preset to apply.
 function Helpers.applyPreset(form, preset)
     local values = form.values
     local id = preset:getID()
@@ -48,14 +48,14 @@ function Helpers.applyPreset(form, preset)
 end
 
 ---Creates a new item for the stream list.
----@return omichat.Configuration.StreamDefinition
+---@return omichat.Configuration.StreamDefinition item The new item.
 function Helpers.createStreamItem()
     ---@type omichat.Configuration.StreamDefinition
     local item = {
         Enable = true,
         Stream = 'custom',
         ChatType = 'say',
-        CommandType = 'chat',
+        Category = 'chat',
         OverheadFormat = '$Default()',
         ChatFormat = '$Default()',
         DefaultColor = { r = 255, g = 255, b = 255 },
@@ -69,9 +69,9 @@ function Helpers.createStreamItem()
 end
 
 ---Deletes a custom user-defined preset.
----@param form omi.forms.Form
----@param state omichat.ConfigurationFormState
----@param value string
+---@param form omi.forms.Form The current form.
+---@param state omichat.ConfigurationFormState The current form state.
+---@param value string The current preset name.
 function Helpers.deletePreset(form, state, value)
     if not utils.startsWith(value, 'custom:') then
         return
@@ -202,7 +202,7 @@ end
 
 ---Gets the chat type associated with a built-in stream.
 ---@param stream string
----@return omichat.ChatTypeString?
+---@return omi.ChatTypeString?
 function Helpers.getStreamChatType(stream)
     if not stream then
         return
@@ -215,13 +215,13 @@ end
 ---Gets the command type associated with a built-in stream.
 ---@param stream string
 ---@return string?
-function Helpers.getStreamCommandType(stream)
+function Helpers.getStreamCategory(stream)
     if not stream then
         return
     end
 
     local data = DefaultStreamData[stream]
-    return data and data.CommandType
+    return data and data.Category
 end
 
 ---Gets a display string for an item in the stream listbox.
@@ -354,7 +354,7 @@ function Helpers.onChangeStream(args)
         local isCustomStream = not item.Stream or item.Stream == 'custom'
         local nameField = form:getFieldInfo({ 'Streams', 'List', 'Name' })
         local chatTypeField = form:getFieldInfo({ 'Streams', 'List', 'ChatType' })
-        local commandTypeField = form:getFieldInfo({ 'Streams', 'List', 'CommandType' })
+        local commandTypeField = form:getFieldInfo({ 'Streams', 'List', 'Category' })
         form:setFieldControlEnabled(nameField, isCustomStream)
         form:setFieldControlEnabled(chatTypeField, isCustomStream)
         form:setFieldControlEnabled(commandTypeField, isCustomStream)
@@ -362,11 +362,11 @@ function Helpers.onChangeStream(args)
         if not isCustomStream then
             item.Name = nil
             item.ChatType = Helpers.getStreamChatType(item.Stream) or 'say'
-            item.CommandType = Helpers.getStreamCommandType(item.Stream) or 'chat'
+            item.Category = Helpers.getStreamCategory(item.Stream) or 'chat'
 
             form:setFieldControlValue(nameField, '')
             form:setFieldControlValue(chatTypeField, item.ChatType)
-            form:setFieldControlValue(commandTypeField, item.CommandType)
+            form:setFieldControlValue(commandTypeField, item.Category)
         end
     end
 
@@ -496,16 +496,16 @@ function Helpers.onClickPresetAction(args)
             Helpers.applyPreset(args.form, preset)
         end
     elseif args.buttonIndex == 2 then
-        Helpers.savePreset(args.form, args.state, args.values)
+        Helpers.savePreset(args.form, args.state)
     else
         Helpers.deletePreset(args.form, args.state, args.value)
     end
 end
 
----Populates a tag suggest box with tags.
----@param listEntry omi.ui.ListEntry
----@param suggestBox omi.ui.SuggestBox
----@param text string
+---Populates a tag suggest box and list entry with tags.
+---@param listEntry omi.ui.ListEntry The list entry to populate with tooltips.
+---@param suggestBox omi.ui.SuggestBox The suggest box to populate with suggestions.
+---@param text string The search text.
 function Helpers.populateTagSuggest(listEntry, suggestBox, text)
     API_C = API_C or utils.getAPI()
 
@@ -525,8 +525,8 @@ function Helpers.populateTagSuggest(listEntry, suggestBox, text)
 end
 
 ---Transforms configured streams to include required data and fix incompatible fields.
----@param streams omichat.Configuration.StreamDefinition[]
----@return omichat.Configuration.StreamDefinition[]
+---@param streams omichat.Configuration.StreamDefinition[] The streams to process.
+---@return omichat.Configuration.StreamDefinition[] processed The processed streams.
 function Helpers.processStreams(streams)
     local seen = { [''] = true }
     local processed = {}
@@ -550,7 +550,7 @@ function Helpers.processStreams(streams)
 
             for k, v in pairs(data) do
                 local vType = type(v)
-                if not isCustom and (k == 'ChatType' or k == 'CommandType') then
+                if not isCustom and (k == 'ChatType' or k == 'Category') then
                     -- always copy these keys for built-in streams
                     stream[k] = v
                 elseif type(stream[k]) ~= vType then
@@ -563,7 +563,7 @@ function Helpers.processStreams(streams)
                 stream.Stream = 'custom'
                 stream.Name = streamName
                 stream.ChatType = utils.isNilOrWhitespace(stream.ChatType) and 'say' or stream.ChatType
-                stream.CommandType = utils.isNilOrWhitespace(stream.CommandType) and 'chat' or stream.CommandType
+                stream.Category = utils.isNilOrWhitespace(stream.Category) and 'chat' or stream.Category
             else
                 stream.Stream = streamType
                 stream.Name = nil
@@ -581,7 +581,7 @@ function Helpers.processStreams(streams)
 end
 
 ---Refreshes the list of presets to match the current custom presets.
----@param form omi.forms.Form
+---@param form omi.forms.Form The form with the field to update.
 function Helpers.refreshPresetsList(form)
     local dropdown = form:getFieldControl(PATH_PRESET) --[[@as omi.ui.Dropdown?]]
     if not dropdown then
@@ -602,20 +602,20 @@ end
 
 ---Helper to create a rules table containing only rules for children.
 ---Wraps the given table in an outer table with a `children` key.
----@param ruleTable table<string, omi.forms.Rules>
----@return omi.forms.Rules
-function Helpers.rules(ruleTable)
-    return { children = ruleTable }
+---@param childRules table<string, omi.forms.Rules> Table of child rules.
+---@return omi.forms.Rules rules Table of rules with the given child rules.
+function Helpers.rules(childRules)
+    return { children = childRules }
 end
 
 ---Saves a custom user-defined preset.
----@param form omi.forms.Form
----@param state omichat.ConfigurationFormState
----@param values table
-function Helpers.savePreset(form, state, values)
+---@param form omi.forms.Form The current form.
+---@param state omichat.ConfigurationFormState The current form state.
+function Helpers.savePreset(form, state)
     API_C = API_C or utils.getAPI()
     local lib = utils.lib --[[@as omi.client]]
     local config = API_C.Configuration
+    local values = form.values
 
     if state.activePresetDialog then
         state.activePresetDialog:destroy()
@@ -662,10 +662,10 @@ function Helpers.savePreset(form, state, values)
 end
 
 ---Writes a list of format data elements to a string list.
----@param heading string
----@param list omichat.FormatDataTranslation[]?
----@param descID string?
----@param out string[]
+---@param heading string A heading string to write at the top.
+---@param list omichat.FormatDataTranslation[]? The list of format data elements.
+---@param descID string? An optional string ID for description text.
+---@param out string[] The string array to write to.
 function Helpers.writeFormatDataTranslations(heading, list, descID, out)
     if not descID and (not list or #list == 0) then
         return

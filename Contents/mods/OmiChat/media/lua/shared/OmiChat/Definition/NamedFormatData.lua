@@ -1,7 +1,9 @@
 ---Information about the tokens and options that format strings accept.
 
-local utils = require 'OmiChat/utils'
+local utils = require 'OmiChat/Utils'
 
+
+--#region Locals
 
 local TOKENS_NARRATIVE = {
     'narrativeStyle',
@@ -109,6 +111,16 @@ local OPTIONS_PREFIX = {
 
 local TOKENS_CHAT = utils.appendCopy(TOKENS_CHAT_NO_NARRATIVE, TOKENS_NARRATIVE)
 local TOKENS_OVERHEAD = utils.appendCopy(TOKENS_OVERHEAD_NO_NARRATIVE, TOKENS_NARRATIVE)
+
+--#endregion
+
+
+---@class omichat.FormatData
+---@field tokenDescription string? A string ID for the description of a format's tokens.
+---@field optionDescription string? A string ID for the description of a format's options.
+---@field tokens (omichat.FormatDataTranslation | string)[]? A list of token names or translation tables.
+---@field options (omichat.FormatDataTranslation | string)[]? A list of option names or translation tables.
+---@field canSetError boolean? Flag for whether the format can set the error tokens.
 
 
 ---@type table<string, omichat.FormatData>

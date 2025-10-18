@@ -302,7 +302,7 @@ return {
         command = '/clear ',
         isEnabled = function() return isAdmin() or isCoopHost() end,
         onUse = function()
-            API.ui.clear()
+            API.chat.clear()
 
             if not IS_DEBUG then
                 API.chat.addInfoMessage(getText('UI_OmiChat_Info_Clear'))

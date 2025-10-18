@@ -17,7 +17,7 @@ end
 ---Pregenerates the configuration UI.
 ---@private
 function API._onGameBoot()
-    API.ui.generateConfigPanel()
+    API.ui.getConfigPanel()
 end
 
 ---Called on game start.

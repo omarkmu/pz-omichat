@@ -1,6 +1,6 @@
 ---Base stream type.
 
-local utils = require 'OmiChat/utils'
+local utils = require 'OmiChat/Utils'
 local config = require 'OmiChat/Component/Configuration'
 local API ---@type omichat.api.client?
 
@@ -8,12 +8,31 @@ local isempty = table.isempty
 
 
 ---@class omichat.Stream : omi.Class
+---@field protected callbacks omichat.Stream.Callbacks Container for callbacks.
+---@field protected name string The name of the stream.
+---@field protected command string The stream command, with a trailing space.
+---@field protected shortCommand string? An optional short stream command, with a trailing space.
+---@field protected disabled boolean? Flag for whether the stream should always be treated as not enabled.
+---@field protected aliasesList string[] Additional aliases for the stream.
+---@field protected category omichat.StreamCategory The stream category, used to determine whether input should be retained.
+---@field protected chatFormat string? The format to use for chat messages sent from this stream.
+---@field protected overheadFormat string? The format to use for overhead messages sent from this stream.
+---@field protected formatter omichat.MetaFormatter? The formatter to use for this stream.
+---@field protected allowEmotes boolean Flag for whether to allow emotes on this stream.
+---@field protected allowMentions boolean Flag for whether to allow mentions on this stream.
+---@field protected suggestSpec omichat.SuggestArgSpec[]? Spec to use for suggestions.
+---@field protected tags omi.SimpleSet A set of tags for the stream.
+---@field protected autoTags omi.SimpleSet A set of tags to always include on the stream.
+---@field protected isChat boolean Flag for whether this is a chat stream.
+---@field protected isCommand boolean Flag for whether this is a command stream.
+---@field protected noTags boolean Flag for whether the stream has an empty tags table.
+---@field protected defaultOnDisabled boolean Flag for whether the stream should defer to default handling when disabled.
 local Stream = utils.lib.class()
 
 
 ---Converts a string into a command by ensuring it starts with `/` and has a trailing whitespace.
----@param str string
----@return string
+---@param str string The string to convert.
+---@return string command
 ---@private
 function Stream._stringToCommand(str)
     str = utils.trim(str)
@@ -30,7 +49,7 @@ end
 
 
 ---Returns an iterator over the stream's aliases.
----@return fun(): string?
+---@return fun(): string? iterator
 function Stream:aliases()
     local aliases = self.aliasesList
     local i = 0
@@ -41,94 +60,93 @@ function Stream:aliases()
 end
 
 ---Returns whether the chat stream uses name colors when available.
----@return boolean
+---@return boolean canUse
 function Stream:canUseNameColors()
     return self.tags.UseNameColor == true
 end
 
 ---Returns the chat command and command remainder if the stream is a match.
----@param command string
----@return string?
----@return string
-function Stream:checkMatch(command)
-    local isCmdStream = self:isCommandStream()
+---Checks whether the input text matches one of the stream commands.
+---@param input string The input text.
+---@return string? chatCommand The command that matched the input.
+---@return string remainder The remaining input, without the command.
+function Stream:checkMatch(input)
     local fullCommand = self:getCommand()
     local shortCommand = self:getShortCommand()
 
-    local commandCompare = command
+    local commandCompare = input
     local fullCompare = fullCommand
     local shortCompare = shortCommand
     local isCaseInsensitive = self:isCaseInsensitive()
     if isCaseInsensitive then
-        -- case-insensitive matching
-        commandCompare = command:lower()
+        commandCompare = input:lower()
         fullCompare = fullCommand:lower()
         shortCompare = shortCommand and shortCommand:lower()
     end
 
     if utils.startsWith(commandCompare, fullCompare) then
-        return fullCommand, command:sub(#fullCommand)
+        return fullCommand, input:sub(#fullCommand)
     elseif shortCompare and utils.startsWith(commandCompare, shortCompare) then
-        return shortCommand, command:sub(#shortCommand)
-    elseif isCmdStream and commandCompare == utils.trim(fullCompare) then
+        return shortCommand, input:sub(#shortCommand)
+    elseif self:isCommandStream() and commandCompare == utils.trim(fullCompare) then
         -- commands can be entered with no trailing space
-        return command, ' '
+        return input, ' '
     end
 
     for alias in self:aliases() do
         local aliasCompare = isCaseInsensitive and alias:lower() or alias
         if utils.startsWith(commandCompare, aliasCompare) then
-            return alias, command:sub(#alias)
+            return alias, input:sub(#alias)
         end
     end
 
-    return nil, command
+    return nil, input
 end
 
 ---Checks whether the local player can use this stream.
----@return boolean
+---@return boolean canUse
 function Stream:checkPlayerCanUse()
     return true
 end
 
 ---Returns whether the stream allows emote macros.
----@return boolean
+---@return boolean isAllowed
 function Stream:isAllowEmotes()
     return self.allowEmotes
 end
 
 ---Returns whether the stream allows mentions.
----@return boolean
+---@return boolean isAllowed
 function Stream:isAllowMentions()
     return self.allowMentions
 end
 
 ---Returns whether the stream should be treated as case-insensitive.
----@return boolean
+---@return boolean isCaseInsensitive
 function Stream:isCaseInsensitive()
     return config.General.CaseInsensitiveChatStreams or self:isCommandStream()
 end
 
 ---Returns whether this is a chat stream.
----@return boolean
+---@return boolean isChat
 function Stream:isChatStream()
     return self.isChat
 end
 
 ---Returns whether this is a command stream.
----@return boolean
+---@return boolean isCommand
 function Stream:isCommandStream()
     return self.isCommand
 end
 
 ---Returns `true` if this is a special stream representing Discord messages.
----@return boolean
+---@return boolean isDiscord
 function Stream:isDiscordStream()
     return self:isChatStream() and self.name == 'discord'
 end
 
 ---Returns whether the stream is enabled.
----@return boolean
+---@return boolean enabled
 function Stream:isEnabled()
     if self.disabled or not self:checkPlayerCanUse() then
         return false
@@ -142,18 +160,19 @@ function Stream:isEnabled()
 end
 
 ---Returns `true` if this is a special stream representing radio messages.
----@return boolean
+---@return boolean isRadio
 function Stream:isRadioStream()
     return self:isChatStream() and self.name == 'radio'
 end
 
 ---Returns `true` if this is a special stream representing server messages.
----@return boolean
+---@return boolean isServer
 function Stream:isServerStream()
     return self:isChatStream() and self.name == 'server'
 end
 
 ---Returns `true` if this is one of the special streams representing server, radio, or Discord messages.
+---@return boolean isSpecial
 function Stream:isSpecialStream()
     if not self:isChatStream() then
         return false
@@ -163,9 +182,8 @@ function Stream:isSpecialStream()
 end
 
 ---Checks the stream's tab ID against a given tab ID.
----If the stream has no tab ID, returns `true`.
----@param otherTabID integer
----@return boolean
+---@param otherTabID integer The tab ID to match against.
+---@return boolean isMatch `True` if the tab ID is a match, or if the stream has no tab ID. Otherwise, `false`.
 function Stream:isTabID(otherTabID)
     local tabID = self:getTabID()
     if not tabID then
@@ -175,86 +193,85 @@ function Stream:isTabID(otherTabID)
     return tabID == otherTabID
 end
 
----Returns the format string used for chat content from the stream.
----@return string?
+---Returns the category of the stream.
+---Used to determine whether input should be retained.
+---@return omichat.StreamCategory category
+function Stream:getCategory()
+    return self.category
+end
+
+---Returns the format string used for chat content on the stream.
+---@return string? formatString
 function Stream:getChatFormat()
     return self.chatFormat
 end
 
 ---Returns the chat type that stream messages are sent over.
----For command streams, this returns `nil`.
----@return omichat.ChatTypeString?
+---@return omi.ChatTypeString? chatType The chat type of the stream. For command streams, `nil`.
 function Stream:getChatType() end
 
 ---Returns the primary command of the stream.
----@return string
+---@return string command
 function Stream:getCommand()
     return self.command
 end
 
----Returns the command type of the stream.
----@return omichat.ChatCommandCategory
-function Stream:getCommandType()
-    return self.commandType
-end
-
 ---Returns the formatter used to format the overhead text for messages sent on the stream.
----@return omichat.MetaFormatter?
+---@return omichat.MetaFormatter? formatter
 function Stream:getFormatter()
     return self.formatter
 end
 
----Retrieves help text for the stream, or `nil` if none is defined.
----Returns `nil` for chat streams.
----@return string?
+---Returns help text for the stream.
+---@return string? helpText The help text, or `nil` if none is defined. For chat streams, this is always `nil`.
 function Stream:getHelpText() end
 
 ---Returns the name of the stream.
----@return string
+---@return string name
 function Stream:getName()
     return self.name
 end
 
 ---Returns the format string used for overhead content from the stream.
----@return string?
+---@return string? formatString
 function Stream:getOverheadFormat()
     return self.overheadFormat
 end
 
 ---Returns the range of the stream if it's a ranged stream.
----@return integer?
+---@return integer? range
 function Stream:getRange() end
 
 ---Returns the short command of the stream.
----@return string?
+---@return string? shortCommand
 function Stream:getShortCommand()
     return self.shortCommand
 end
 
 ---Returns the suggest spec for the stream.
----@return omichat.SuggestSpec?
+---@return omichat.SuggestArgSpec[]? argSpecList
 function Stream:getSuggestSpec()
     return self.suggestSpec
 end
 
 ---Gets the 1-indexed tab ID of the stream.
 ---For non-chat streams, this returns `nil`.
----@return integer?
+---@return integer? tabID The tab ID. For command streams, this is always `nil`.
 function Stream:getTabID() end
 
 ---Gets the set of tags for the stream.
----@return omi.SimpleSet
+---@return omi.SimpleSet tags
 function Stream:getTags()
     return utils.copy(self.tags)
 end
 
 ---Returns the vertical range of the stream if it's a ranged stream.
----@return integer?
+---@return integer? verticalRange
 function Stream:getVerticalRange() end
 
 ---Returns whether the stream is tagged with any of the given tags.
----@param tags string[]
----@return boolean
+---@param tags string[] The list of tags to check for.
+---@return boolean hasAnyTag
 function Stream:hasAnyTags(tags)
     for i = 1, #tags do
         if self.tags[tags[i]] then
@@ -265,21 +282,22 @@ function Stream:hasAnyTags(tags)
     return false
 end
 
----Returns true if the stream has no tags.
+---Returns whether the stream has no tags.
+---@return boolean noTags
 function Stream:hasNoTags()
     return self.noTags
 end
 
 ---Returns whether the stream is tagged with the given tag.
----@param tag string
----@return boolean
+---@param tag string The tag to check for.
+---@return boolean hasTag
 function Stream:hasTag(tag)
     return self.tags[tag] ~= nil
 end
 
 ---Returns whether the stream is tagged with all of the given tags.
 ---@param tags string[]
----@return boolean
+---@return boolean hasAllTags
 function Stream:hasTags(tags)
     for i = 1, #tags do
         if not self.tags[tags[i]] then
@@ -291,29 +309,29 @@ function Stream:hasTags(tags)
 end
 
 ---Handler for when `/help` is used on the stream.
----@return boolean success Indicates whether the command was handled.
+---@return boolean handled Indicates whether the command was handled.
 function Stream:onHelp()
     return false
 end
 
 ---Handler for when the stream is used.
----@param ctx omichat.Args.UseStream.Partial
----@return boolean success Indicates whether the command was handled.
-function Stream:onUse(ctx)
-    ---@cast ctx omichat.Args.UseStream
-    if not ctx.stream then
-        ctx.stream = self
+---@param args omichat.Args.UseStream.Partial | omichat.Args.Send.Partial Arguments for using the stream.
+---@return boolean handled Indicates whether the command was handled.
+function Stream:onUse(args)
+    ---@cast args omichat.Args.Send
+    if not args.stream then
+        args.stream = self
     end
 
     local cb = self.callbacks.onUse
     if cb then
-        cb(ctx)
+        cb(args)
         return true
     end
 
     if self.isChat then
         API = API or utils.getAPI()
-        API.chat.send(ctx)
+        API.chat.send(args)
         return true
     end
 
@@ -321,8 +339,8 @@ function Stream:onUse(ctx)
 end
 
 ---Handler for when the stream is used while disabled.
----@param command string
----@return boolean success Indicates whether the command was handled.
+---@param command string The remainder text that was sent with the command.
+---@return boolean handled Indicates whether the command was handled.
 function Stream:onUseDisabled(command)
     local cb = self.callbacks.onUseDisabled
     if cb then
@@ -339,8 +357,8 @@ function Stream:onUseDisabled(command)
     return false
 end
 
----Sets the formatter used for the stream.
----@param formatter omichat.MetaFormatter
+---Sets the formatter used to format overhead text sent on the stream.
+---@param formatter omichat.MetaFormatter The formatter to use for overhead text.
 function Stream:setFormatter(formatter)
     self.formatter = formatter
 end
@@ -355,9 +373,9 @@ function Stream:showHelpText()
 end
 
 ---Validates stream input.
----@param input string
----@return boolean success
----@return string? message
+---@param input string The input text.
+---@return boolean valid Flag for whether the input text is valid for the stream.
+---@return string? message A translated error message to report to the player.
 function Stream:validate(input)
     if self:getChatType() ~= 'whisper' then
         return true
@@ -371,8 +389,9 @@ function Stream:validate(input)
     return false, getText('IGUI_Commands_Whisper')
 end
 
+
 ---Sets the tags included on the stream.
----@param tags string[]
+---@param tags string[] The new tags for the stream.
 ---@protected
 function Stream:_setTags(tags)
     self.tags = utils.set.simple(tags)
@@ -387,16 +406,16 @@ end
 
 
 ---Creates a new stream.
----@param args omichat.Args.Stream
----@return omichat.Stream
+---@param args omichat.Args.Stream Arguments for creation of the stream.
+---@return omichat.Stream stream
 function Stream:new(args)
-    local this = setmetatable({}, self) ---@cast this omichat.Stream
+    local this = setmetatable({}, self) --[[@as omichat.Stream]]
 
     this.name = args.name
     this.allowEmotes = args.allowEmotes or false
     this.allowMentions = args.allowMentions ~= false
     this.disabled = args.disabled or false
-    this.commandType = 'other'
+    this.category = args.category or 'other'
     this.aliasesList = utils.map(Stream._stringToCommand, args.aliases or {})
     this.suggestSpec = args.suggestSpec
     this.formatter = args.formatter
@@ -405,10 +424,6 @@ function Stream:new(args)
     this.defaultOnDisabled = args.defaultOnDisabled ~= false
     this.autoTags = utils.set.simple(args.autoTags)
     this:_setTags(args.tags or {})
-
-    if args.commandType then
-        this.commandType = args.commandType
-    end
 
     if not utils.isNilOrWhitespace(args.command) then
         this.command = Stream._stringToCommand(args.command)
@@ -439,3 +454,42 @@ end
 
 
 return Stream
+
+
+--#region Type Definitions
+
+---@class omichat.Stream.Callbacks
+---@field isEnabled omichat.Stream.Callback.IsEnabled? Invoked to check whether the stream should be treated as enabled.
+---@field onUse omichat.Stream.Callback.OnUse? Invoked when the stream is used.
+---@field onUseDisabled omichat.Stream.Callback.OnUseDisabled? Invoked when the stream is used while disabled.
+
+---@class omichat.Args.Stream
+---@field name string The name of the stream.
+---@field command string? The stream command, with a trailing space. Defaults to `/` + `name`.
+---@field shortCommand string? An optional short stream command, with a trailing space.
+---@field aliases string[]? Additional aliases for the stream.
+---@field disabled boolean? Flag for whtehr the stream should always be treated as not enabled. Defaults to `false`.
+---@field category omichat.StreamCategory? The stream category, used to determine whether input should be retained.
+---@field isEnabled omichat.Stream.Callback.IsEnabled? Invoked to check whether the stream should be treated as enabled.
+---@field overheadFormat string? The overhead format to use for the stream.
+---@field chatFormat string? The format to use for the stream in chat.
+---@field onUse omichat.Stream.Callback.OnUse? Invoked when the stream is used.
+---@field onUseDisabled omichat.Stream.Callback.OnUseDisabled? Invoked when the stream is used while disabled.
+---@field allowEmotes boolean? Flag for whether emotes should be allowed on this stream. Defaults to `false`.
+---@field allowMentions boolean? Flag for whether mentions should be allowed on this stream. Defaults to `true`.
+---@field suggestSpec omichat.SuggestArgSpec[]? Spec to use for suggestions.
+---@field formatter omichat.MetaFormatter? The formatter to use for this stream.
+---@field tags string[]? Tags for the stream.
+---@field autoTags string[]? Tags which should always be included on the stream.
+---@field defaultOnDisabled boolean? Flag for whether the stream should defer to default handling when disabled. Defaults to `true`.
+
+
+---@alias omichat.Stream.Callback.IsEnabled fun(stream: omichat.Stream): boolean
+
+---@alias omichat.Stream.Callback.OnUse fun(ctx: omichat.Args.UseStream)
+
+---@alias omichat.Stream.Callback.OnUseDisabled fun(stream: omichat.Stream, command: string)
+
+---@alias omichat.StreamCategory 'chat' | 'rp' | 'other'
+
+--#endregion

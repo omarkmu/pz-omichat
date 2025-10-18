@@ -2,33 +2,42 @@
 
 local API = require 'OmiChat/Module/Shared/Core' ---@class omichat.api.shared
 
-local IS_CLIENT = isClient()
+local IS_CLIENT = not isServer()
 
 local config = API.Configuration
 local utils = API.utils
 local ModData = ModData
 
 
+---Contains functions for handling player data.
+---On the client, these functions can only retrieve information for online players.
 ---@class omichat.api.shared.data
+---@field protected _modData omichat.ModData? The cached mod data table. This is only present on the server.
 local Data = {}
+
+---The current mod data version.
+---@protected
 Data._version = 1
-Data._playerCache = utils.lib.cache.player({
+
+---The player cache.
+---On the client, this is received from the server on interval and when a player joins.
+---@protected
+Data._playerCache = utils.lib.cache.player {
     onCreatePlayerData = function(_, player) return Data._createPlayerCacheData(player) end,
-})
+}
 
 
-
----Returns the chat icon for a given username.
----@param username string
----@return string?
+---Returns the chat icon for a player.
+---@param username string The player's username.
+---@return string? icon The texture name of the player's icon.
 function Data.getChatIcon(username)
     local playerData = Data.getPlayerData(username)
     return playerData and playerData.icon
 end
 
----Gets the currently active roleplay language for the player with the given username.
----@param username string
----@return string?
+---Gets the currently active roleplay language for a player.
+---@param username string The player's username.
+---@return string? language The untranslated name of the player's current roleplay language.
 function Data.getCurrentLanguage(username)
     local playerData = Data.getPlayerData(username)
     local language = playerData and playerData.currentLanguage
@@ -39,16 +48,12 @@ function Data.getCurrentLanguage(username)
     return language
 end
 
----Retrieves the name that should be used in chat for a given username.
----@param username string?
----@param chatType omichat.ChatTypeString The chat type to use in format string interpolation.
+---Retrieves the name that should be used in chat for a player.
+---@param username string The player's username.
+---@param chatType omi.ChatTypeString The chat type to use in format string interpolation.
 ---@return string? name The name to use in chat, or `nil` if unable to retrieve information about the player.
 function Data.getNameInChat(username, chatType)
-    if not username then
-        return
-    end
-
-    local player = Data.getPlayerInfoByUsername(username)
+    local player = username and Data.getPlayerInfoByUsername(username)
     if not player then
         return
     end
@@ -56,9 +61,9 @@ function Data.getNameInChat(username, chatType)
     return Data.getPlayerNameInChat(player, chatType)
 end
 
----Retrieves the name that should be used in chat for a given username, escaped for rich text.
----@param username string?
----@param chatType omichat.ChatTypeString The chat type to use in format string interpolation.
+---Retrieves the name that should be used in chat for a player, escaped for rich text.
+---@param username string The player's username.
+---@param chatType omi.ChatTypeString The chat type to use in format string interpolation.
 ---@return string? name The name to use in chat, or `nil` if unable to retrieve information about the player.
 function Data.getNameInChatRichText(username, chatType)
     local name = Data.getNameInChat(username, chatType)
@@ -67,20 +72,19 @@ function Data.getNameInChatRichText(username, chatType)
     end
 end
 
----Gets the nickname for the player with the given username.
----If no nickname is set for the given username, returns `nil`.
----@param username string
----@return string?
+---Gets the nickname for a player.
+---@param username string The player's username.
+---@return string? nickname The player's set nickname. If no nickname is set, `nil`.
 function Data.getNickname(username)
     local playerData = Data.getPlayerData(username)
     return playerData and playerData.nickname
 end
 
 ---Gets player data on the client or server.
----On the server, this retrieves information from mod data.
+---On the server, this retrieves information directly from mod data.
 ---On the client, it returns a player from the cache.
----@param username string
----@return omichat.PlayerModData?
+---@param username string The player's username.
+---@return (omichat.PlayerData | omichat.PlayerCacheData)? data The player mod data or cache data.
 function Data.getPlayerData(username)
     if IS_CLIENT then
         return Data._playerCache:get(username, false)
@@ -91,8 +95,8 @@ end
 
 ---Retrieves player information given an online ID.
 ---@param onlineID number The online ID of the player.
----@param noUpdate boolean? If `true`, the cache won't be updated with new data if the player is available.
----@return omichat.PlayerCacheData?
+---@param noUpdate boolean? Flag for whether the cache should not be updated with new data if the player is available.
+---@return omichat.PlayerCacheData? data Table containing cached player data.
 function Data.getPlayerInfoByOnlineID(onlineID, noUpdate)
     if not noUpdate then
         local player = getPlayerByOnlineID(onlineID)
@@ -106,8 +110,8 @@ end
 
 ---Retrieves player information given a username.
 ---@param username string The username of the player.
----@param noUpdate boolean? If `true`, the cache won't be updated with new data if the player is available.
----@return omichat.PlayerCacheData?
+---@param noUpdate boolean? Flag for whether the cache should not be updated with new data if the player is available.
+---@return omichat.PlayerCacheData? data Table containing cached player data.
 function Data.getPlayerInfoByUsername(username, noUpdate)
     if not noUpdate then
         local player = utils.getPlayerByUsername(username)
@@ -120,10 +124,9 @@ function Data.getPlayerInfoByUsername(username, noUpdate)
 end
 
 ---Retrieves the name that should be used in chat for the given menu type.
----If the menu name should not be affected or retrieving the name fails, this returns `nil`.
----@param player IsoPlayer | omichat.PlayerCacheData
----@param menuType omichat.MenuTypeString
----@return string?
+---@param player IsoPlayer | omichat.PlayerCacheData The player whose name should be retrieved.
+---@param menuType omichat.MenuTypeString The menu type to retrieve a name for.
+---@return string? name The name to use in chat. This is `nil` if the menu should not be affected or retrieval fails.
 function Data.getPlayerMenuName(player, menuType)
     if not player then
         return
@@ -152,8 +155,8 @@ function Data.getPlayerMenuName(player, menuType)
 end
 
 ---Retrieves the name that should be used in chat for a given player.
----@param player IsoPlayer | omichat.PlayerCacheData
----@param chatType omichat.ChatTypeString The chat type to use in format string interpolation.
+---@param player IsoPlayer | omichat.PlayerCacheData The player whose name should be retrieved.
+---@param chatType omi.ChatTypeString The chat type to use in format string interpolation.
 ---@return string? name The name to use in chat, or `nil` if unable to retrieve information about the player.
 function Data.getPlayerNameInChat(player, chatType)
     local tokens = player and Data.getPlayerSubstitutions(player)
@@ -169,10 +172,9 @@ function Data.getPlayerNameInChat(player, chatType)
     return utils.interpolateNamed('Name', config.Format.Component.Name, tokens, username)
 end
 
----Gets substitution tokens to use in interpolation for a given player.
----If the player information could not be obtained, returns `nil`.
----@param player (IsoPlayer | omichat.PlayerCacheData)?
----@return table?
+---Gets substitution tokens to use in interpolation for a player.
+---@param player (IsoPlayer | omichat.PlayerCacheData)? The player to get tokens for.
+---@return table? tokens Tokens containing the username, forename, and surname of the player. If information could not be obtained, `nil`.
 function Data.getPlayerSubstitutions(player)
     if player and not player.getUsername then
         ---@cast player omichat.PlayerCacheData
@@ -198,8 +200,8 @@ end
 
 ---Retrieves the name that should be used in the typing indicator for a player.
 ---If the name should not be affected or retrieving the name fails, this returns `nil`.
----@param player IsoPlayer | omichat.PlayerCacheData
----@return string?
+---@param player IsoPlayer | omichat.PlayerCacheData The player whose name should be retrieved.
+---@return string? name The name to use for typing, or `nil` the name should not be displayed or information could not be retrieved.
 function Data.getPlayerTypingName(player)
     local format = config.TypingIndicator.NameFormat
     if not player or format == '' then
@@ -223,9 +225,9 @@ function Data.getPlayerTypingName(player)
     return result
 end
 
----Gets the speech color of the player with the given username, or `nil` if unset.
----@param username string
----@return omi.ColorTable?
+---Gets the speech color of a player.
+---@param username string The player's username.
+---@return omi.ColorTable? speechColor The player's speech color. If the color is unset, `nil`.
 function Data.getSpeechColor(username)
     local player = username and Data.getPlayerInfoByUsername(username)
     local speechColor = player and player.speechColor
@@ -235,9 +237,9 @@ function Data.getSpeechColor(username)
     end
 end
 
----Gets the status for the player with the given username, or `nil` if unset.
----@param username string
----@return string?
+---Gets the status for a player.
+---@param username string The player's username.
+---@return string? status The player's status. If the status is unset, `nil`.
 function Data.getStatus(username)
     local playerData = Data.getPlayerData(username)
     return playerData and playerData.status
@@ -249,8 +251,8 @@ function Data.iteratePlayerCache()
     return Data._playerCache:iterate()
 end
 
----Resets the player cache with the data from the given list.
----@param items omichat.PlayerCacheData[]?
+---Clears the player cache then populates it with the data from the given list.
+---@param items omichat.PlayerCacheData[]? The new cache items.
 function Data.setPlayerCache(items)
     Data._playerCache:fromList(items or {})
 end
@@ -283,7 +285,7 @@ function Data._createPlayerCacheData(player)
 end
 
 ---Gets or creates the global mod data table for player data.
----This should only be used on the server.
+---This cannot be used on the client.
 ---@return omichat.ModData
 ---@protected
 function Data._get()
@@ -292,7 +294,7 @@ function Data._get()
     end
 
     if IS_CLIENT then
-        error('Data.get cannot be used on the client')
+        error('Data._get cannot be used on the client')
     end
 
     ---@type omichat.ModData
@@ -306,9 +308,9 @@ function Data._get()
 end
 
 ---Gets or creates the player data for a player with the given username.
----This should only be used on the server.
+---This cannot be used on the client.
 ---@param username string
----@return omichat.PlayerModData
+---@return omichat.PlayerData
 ---@protected
 function Data._getOrCreatePlayerData(username)
     local modData = Data._get()
@@ -321,9 +323,9 @@ function Data._getOrCreatePlayerData(username)
 end
 
 ---Gets the player data for a player with the given username. Returns `nil` if no data for the player exists.
----This should only be used on the server.
+---This cannot be used on the client.
 ---@param username string
----@return omichat.PlayerModData?
+---@return omichat.PlayerData?
 ---@protected
 function Data._getPlayerData(username)
     local modData = Data._get()
@@ -349,6 +351,25 @@ function Data._getPlayerUsername(player)
 end
 
 
-
 API.data = Data
 return Data
+
+
+--#region Type Definitions
+
+---@class omichat.ModData
+---@field version integer The version of the mod data structure.
+---@field players table<string, omichat.PlayerData> Associates usernames to player mod data.
+
+---@class omichat.PlayerData
+---@field username string The player's username.
+---@field nickname string? The player's chosen nickname to use in chat.
+---@field icon string? The name of a texture to display as an icon for the player in chat.
+---@field languages string[]? List of the player's known roleplay languages.
+---@field languageSlots integer? Total slots that the player has for selecting languages.
+---@field currentLanguage string? The player's currently selected roleplay language.
+---@field status string? The player's chosen status message.
+
+---@class omichat.PlayerCacheData : omi.PlayerCacheData, omichat.PlayerData
+
+--#endregion

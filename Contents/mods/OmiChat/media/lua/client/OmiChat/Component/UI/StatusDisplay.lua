@@ -12,7 +12,16 @@ local tileScale = Core.getTileScale()
 
 
 ---@class omichat.StatusDisplay : omi.ui.Base
-local StatusDisplay = UI.class('OmiStatusDisplay')
+---@field target IsoPlayer The player to display the status over.
+---@field mouseOver boolean Flag for whether the mouse is over the player.
+---@field protected text string? The text of the display.
+---@field protected font UIFont The font to use for the display.
+---@field protected targetUsername string The username of the target player.
+---@field protected drawObject TextDrawObject The draw object used to render the text.
+---@field protected shouldHide boolean Flag for whether the display should be hidden.
+---@field protected player IsoPlayer? The local player.
+local StatusDisplay = UI.class('StatusDisplay')
+
 
 ---Initializes the display element.
 function StatusDisplay:initialise()
@@ -62,15 +71,18 @@ function StatusDisplay:update()
     self.shouldHide = self:_getShouldHide()
 end
 
+
 ---Determines whether the display should be hidden.
----@protected
+---@private
 function StatusDisplay:_getShouldHide()
     if not self.mouseOver then
         return true
     end
 
+    self.player = self.player or getSpecificPlayer(0)
+
     local target = self.target
-    local player = getSpecificPlayer(0)
+    local player = self.player
 
     if not target or not player then
         return true
@@ -95,8 +107,8 @@ end
 
 
 ---Creates a new status display element.
----@param target IsoPlayer
----@return omichat.StatusDisplay
+---@param target IsoPlayer The player to display the status over.
+---@return omichat.StatusDisplay element
 function StatusDisplay:new(target)
     local this = StatusDisplay.__base.new(self, 0, 0, 0, 0) --[[@as omichat.StatusDisplay]]
 
@@ -106,6 +118,7 @@ function StatusDisplay:new(target)
     this.text = API.data.getStatus(this.targetUsername)
     this.mouseOver = false
     this.shouldHide = true
+    this.player = getSpecificPlayer(0)
 
     return this
 end

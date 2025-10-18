@@ -3,29 +3,32 @@
 local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
 
 
+---Contains functions for sending requests to the server.
 ---@class omichat.api.client.request : omichat.api.shared.request
 local Request = API.request
 local Topic = Request.TOPIC
 
 
 ---Requests adding a user-defined configuration preset to the list.
----@param name string
----@param values table
+---Fails if the local player is not an admin.
+---@param name string The name of the preset.
+---@param values table The configuration values.
 ---@return boolean success
 ---@return string? error
 function Request.addPreset(name, values)
-    ---@type omichat.request.AddOrRemovePreset
+    ---@type omichat.request.Args.AddOrRemovePreset
     local args = { type = 'ADD', name = name, values = values }
 
     return Topic.CONFIGURATION_PRESETS:toServer(args)
 end
 
----Requests clearing mod data for a given username.
----@param username string
+---Requests clearing all player data for a username.
+---Fails if the local player is not an admin.
+---@param username string The username to clear data for.
 ---@return boolean success
 ---@return string? error
 function Request.clearData(username)
-    ---@type omichat.request.ClearModData
+    ---@type omichat.request.Args.ClearPlayerData
     local args = { username = username }
 
     return Topic.DATA_CLEAR:toServer(args)
@@ -37,12 +40,12 @@ end
 function Request.drawCard() return Topic.DRAW_CARD:toServer() end
 
 ---Sends a request to execute a chat command.
----@param command omichat.request.CommandName
----@param text string?
+---@param command omichat.request.CommandName The name of the command to execute.
+---@param text string? The command text, excluding the command. Defaults to the empty string.
 ---@return boolean success
 ---@return string? error
 function Request.executeCommand(command, text)
-    ---@type omichat.request.Command
+    ---@type omichat.request.Args.Command
     local args = { name = command, text = text or '' }
 
     return Topic.COMMAND:toServer(args)
@@ -53,47 +56,39 @@ end
 ---@return string? error
 function Request.flipCoin() return Topic.FLIP_COIN:toServer() end
 
----Requests a list of player mod data.
+---Requests a list of player data.
+---Fails if the local player is not an admin.
 ---@return boolean success
 ---@return string? error
-function Request.getDataList() return Topic.DATA_LIST:toServer() end
+function Request.getPlayerDataList() return Topic.DATA_LIST:toServer() end
 
 ---Requests rolling dice.
----@param sides integer
+---@param sides integer The number of sides on the die.
 ---@return boolean success
 ---@return string? error
 function Request.rollDice(sides)
-    ---@type omichat.request.RollDice
+    ---@type omichat.request.Args.RollDice
     local args = { sides = sides }
 
     return Topic.ROLL_DICE:toServer(args)
 end
 
----Requests an update to global mod data.
----@param updates omichat.request.ModDataUpdate
----@return boolean success
----@return string? error
-function Request.updateData(updates) return Topic.DATA_UPDATE:toServer(updates) end
-
----Requests that the server updates the player cache.
----@return boolean success
----@return string? error
-function Request.updatePlayerCache() return Topic.PLAYER_CACHE:toServer() end
-
----Requests removing a user-defined configuration preset to the list.
----@param name string
+---Requests deleting a user-defined configuration preset.
+---Fails if the local player is not an admin.
+---@param name string The name of the preset to remove.
 ---@return boolean success
 ---@return string? error
 function Request.removePreset(name)
-    ---@type omichat.request.AddOrRemovePreset
+    ---@type omichat.request.Args.AddOrRemovePreset
     local args = { type = 'DELETE', name = name }
 
     return Topic.CONFIGURATION_PRESETS:toServer(args)
 end
 
----Sets the mod data for the given username.
----@param username string
----@param data omichat.PlayerModData?
+---Requests setting player data to a given table.
+---Fails if the local player is not an admin.
+---@param username string The username of the player to update data for.
+---@param data omichat.PlayerData The new player data.
 ---@return boolean success
 ---@return string? error
 function Request.setPlayerData(username, data)
@@ -105,17 +100,29 @@ function Request.setPlayerData(username, data)
 end
 
 ---Sends updated configuration values to the server.
+---Fails if the local player is not an admin.
 ---@return boolean success
 ---@return string? error
 function Request.updateConfiguration() return Topic.CONFIGURATION:toServer() end
 
+---Requests an update to player data.
+---@param args omichat.request.Args.PlayerDataUpdate Arguments for the update.
+---@return boolean success
+---@return string? error
+function Request.updateData(args) return Topic.DATA_UPDATE:toServer(args) end
+
+---Requests that the server broadcasts a player cache update.
+---@return boolean success
+---@return string? error
+function Request.updatePlayerCache() return Topic.PLAYER_CACHE:toServer() end
+
 ---Sends the current typing status to the server.
----@param range integer?
----@param chatType omichat.ChatTypeString?
+---@param range integer? The range of the current chat stream.
+---@param chatType omi.ChatTypeString? The chat type of the current chat stream.
 ---@return boolean success
 ---@return string? error
 function Request.updateTypingStatus(range, chatType)
-    ---@type omichat.request.Typing
+    ---@type omichat.request.Args.Typing
     local args = { range = range, chatType = chatType, typing = API.chat.isTyping() }
 
     return Topic.TYPING:toServer(args)

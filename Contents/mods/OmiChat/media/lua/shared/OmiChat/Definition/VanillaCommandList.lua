@@ -1,17 +1,8 @@
----Vanilla command list. This is used for the rewritten `/help` command.
----Excludes disabled commands and commands without help text.
-
-
-local debugTypes = {}; do
-    local list = DebugLog.getDebugTypes()
-    for i = 0, list:size() - 1 do
-        debugTypes[#debugTypes + 1] = list:get(i):name()
-    end
-end
-
-
+---Vanilla command list.
+---Used for the rewritten `/help` command.
+---This excludes disabled commands and commands without help text.
 ---@type omichat.VanillaCommand[]
-return {
+local VanillaCommandList = {
     {
         name = 'additem',
         helpText = 'UI_ServerOptionDesc_AddItem',
@@ -117,7 +108,15 @@ return {
         suggestSpec = {
             {
                 type = 'option',
-                options = debugTypes,
+                options = (function()
+                    local options = {} ---@type string[]
+                    local list = DebugLog.getDebugTypes()
+                    for i = 0, list:size() - 1 do
+                        options[#options + 1] = list:get(i):name()
+                    end
+
+                    return options
+                end)(),
             },
             {
                 type = 'option',
@@ -278,3 +277,17 @@ return {
         access = 48,
     },
 }
+
+return VanillaCommandList
+
+
+--#region Type Definitions
+
+---@class omichat.VanillaCommand
+---@field name string The name of the command.
+---@field helpText string The string ID of the command's help text.
+---@field access integer Access requirements to use the command.
+---@field helpTextArgs string[]? Arguments to supply to the command's help text.
+---@field suggestSpec omichat.SuggestArgSpec[]? Spec for suggestions.
+
+--#endregion

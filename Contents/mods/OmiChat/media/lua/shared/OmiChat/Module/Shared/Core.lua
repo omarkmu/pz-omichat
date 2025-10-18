@@ -1,18 +1,16 @@
----Base shared API.
-
-local utils = require 'OmiChat/utils'
-local config = require 'OmiChat/Component/Configuration'
-local MetaFormatter = require 'OmiChat/Component/MetaFormatter'
-
-
+---API functionality available on both the client and server.
 ---@class omichat.api.shared
 local API = {}
-API._key = 'omichat'
-API._configKey = 'omichat.settings'
 
-API.Configuration = config
-API.MetaFormatter = MetaFormatter
-API.utils = utils
+---The mod identifier key.
+---Used for mod data and the request dispatcher.
+---@protected
+API._key = 'omichat'
+
+
+API.utils = require 'OmiChat/Utils'
+API.Configuration = require 'OmiChat/Component/Configuration'
+API.MetaFormatter = require 'OmiChat/Component/MetaFormatter'
 
 
 return API

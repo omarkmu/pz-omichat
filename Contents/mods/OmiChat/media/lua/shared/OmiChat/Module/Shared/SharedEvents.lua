@@ -1,7 +1,7 @@
 ---Shared event handlers.
 
 local API = require 'OmiChat/Module/Shared/Core' ---@class omichat.api.shared
-local API_S = API --[[@as omichat.api.server]]
+local API_S = API ---@class omichat.api.server
 
 
 ---Event handler for initializing global mod data.

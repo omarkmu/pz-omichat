@@ -8,7 +8,7 @@ require 'OmiChat/Module/Shared/Extension'
 require 'OmiChat/Module/Shared/Hooks'
 require 'OmiChat/Module/Shared/Languages'
 require 'OmiChat/Module/Shared/Request'
-require 'OmiChat/Component/InterpolationLibrary'
+require 'OmiChat/InterpolationLibrary'
 
 require 'OmiChat/Module/Shared/SharedEvents'
 

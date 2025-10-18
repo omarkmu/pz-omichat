@@ -6,16 +6,17 @@ local MessageInfo = require 'OmiChat/Component/MessageInfo'
 local utils = API.utils
 local config = API.Configuration
 local MultiMap = utils.MultiMap
+local isempty = table.isempty
 
 
+---Contains functions for formatting messages and validating the format of commands.
 ---@class omichat.api.client.format
 local Format = {}
 
 
 ---Applies message transforms and format options to a message.
----@see omichat.api.client.format.buildMessageText
----@param message omichat.Message
----@param skipFormatting boolean?
+---@param message omichat.Message The message to build information for.
+---@param skipFormatting boolean? Flag for whether the formatting step should be skipped.
 ---@return omichat.MessageInfo? info The processed message information. If building fails, this is `nil`.
 ---@return string original The original message text.
 function Format.buildMessageInfo(message, skipFormatting)
@@ -33,8 +34,8 @@ function Format.buildMessageInfo(message, skipFormatting)
 end
 
 ---Builds the prefixed text for a message.
----@param message omichat.Message
----@return string
+---@param message omichat.Message The message to retrieve text for.
+---@return string text The built text. If text could not be built, this returns the original text.
 function Format.buildMessageText(message)
     local info, original = Format.buildMessageInfo(message)
     local result = info and info:buildMessageText()
@@ -42,11 +43,11 @@ function Format.buildMessageText(message)
 end
 
 ---Prepares text for sending to chat.
----@param args omichat.Args.FormatChat
----@return omichat.FormatResult
+---@param args omichat.Args.FormatChat Options for formatting.
+---@return omichat.FormatResult result The results of formatting.
 function Format.chat(args)
     local username = args.username or API.player.getUsername()
-    local name = args.name or API.data.getNameInChat(username, args.chatType)
+    local name = args.name or username and API.data.getNameInChat(username, args.chatType)
     local text, before, after = utils.getInternalText(args.text)
     local stream = args.stream
     local formatStream = args.formatStream
@@ -163,15 +164,81 @@ function Format.chat(args)
         end
     end
 
+    ---@type omichat.FormatResult
     return {
         text = tokens.input,
         allowLanguage = allowLanguage,
     }
 end
 
+---Decodes information encoded in a message's tag.
+---@param message omichat.Message The message with the tag to decode.
+---@param metadata table? A table to populate with the metadata. This will be cleared before populating.
+---@return omichat.MessageInfo.Metadata metadata
+function Format.decodeMessageMetadata(message, metadata)
+    local tag = message:getCustomTag()
+
+    metadata = metadata or {} ---@type omichat.MessageInfo.Metadata
+    table.wipe(metadata)
+    if not tag or tag == '' then
+        return metadata
+    end
+
+    local _, decoded = utils.json.tryDecode(tag)
+    if type(decoded) ~= 'table' then
+        return metadata
+    end
+
+    metadata.faction = decoded.faction
+    metadata.rangeResult = decoded.rangeResult
+    metadata.suppressedRadio = decoded.suppressedRadio
+    metadata.attractedZombies = decoded.attractedZombies
+    metadata.language = decoded.language
+    metadata.name = decoded.name
+    metadata.nameColor = utils.color.fromString(decoded.nameColor)
+    metadata.recipientNameColor = utils.color.fromString(decoded.recipientNameColor)
+    metadata.icon = decoded.icon
+    metadata.adminIcon = decoded.adminIcon
+    metadata.stream = decoded.stream
+    metadata.originalStream = decoded.originalStream
+    metadata.displayedOverhead = decoded.displayedOverhead
+    metadata.mentions = decoded.mentions
+
+    return metadata
+end
+
+---Encodes message information including chat name and colors into a message's metadata.
+---This has no effect if the message already has an encoded tag.
+---@param message omichat.Message The message to encode.
+function Format.encodeMessageMetadata(message)
+    if Format.hasEncodedMetadata(message) then
+        return
+    end
+
+    local author = message:getAuthor() ---@type string?
+    if author == '' then
+        author = nil
+    end
+
+    local text = message:getText()
+    local adminFormatter = API.format.get('adminIcon')
+    local useAdminIcon = adminFormatter and adminFormatter:isMatch(text)
+
+    local color = author and API.data.getSpeechColor(author)
+    local encoded = utils.json.tryEncode {
+        language = API.format.decodeLanguage(message),
+        name = author and API.data.getNameInChatRichText(author, API.chat.getMessageChatType(message)),
+        nameColor = color and utils.color.toHexString(color) or nil,
+        icon = author and API.data.getChatIcon(author) or nil,
+        adminIcon = useAdminIcon and config.General.AdminIcon or nil,
+    }
+
+    message:setCustomTag(encoded or '')
+end
+
 ---Returns the roleplay language encoded in message content.
----@param message omichat.Message | string? A message object or string to read.
----@return string?
+---@param message string | omichat.Message A message object or string to read.
+---@return string? language The untranslated language name, or `nil` if no language was found.
 function Format.decodeLanguage(message)
     if not message then
         return
@@ -182,12 +249,12 @@ function Format.decodeLanguage(message)
     end
 
     local formatter = API._metadataFormatters.language
-    message = formatter and formatter:read(message)
-    if not message then
+    local decodedMessage = formatter and formatter:read(message)
+    if not decodedMessage then
         return
     end
 
-    local languageId = utils.decodeInvisibleInt(message)
+    local languageId = utils.decodeInvisibleInt(decodedMessage)
     if not languageId or languageId < 1 or languageId > config.MAX_LANGUAGES then
         return
     end
@@ -196,10 +263,9 @@ function Format.decodeLanguage(message)
 end
 
 ---Encodes the provided text with information about the given roleplay language.
----@param text string The text to encode.
----@param language string The language to encode.
----@return string text
----@return string? language
+---@param text string The text to encode. If this is empty or whitespace, the language will not be encoded.
+---@param language string The untranslated name of the language to encode.
+---@return string text The text with the language encoded, or the original text if the language could not be found.
 function Format.encodeLanguage(text, language)
     local formatter = API._metadataFormatters.language
     local langId = API.language.getID(language)
@@ -211,18 +277,25 @@ function Format.encodeLanguage(text, language)
     return formatter:format(encoded)
 end
 
----Gets a named formatter.
----@param name omichat.FormatterName
----@return omichat.MetaFormatter?
+---Gets a built-in named formatter.
+---@param name omichat.FormatterName The name of the formatter to retrieve.
+---@return omichat.MetaFormatter? formatter
 function Format.get(name)
     return API._metadataFormatters[name]
 end
 
+---Checks whether a message has metadata encoded into its tag.
+---@param message omichat.Message The message to check.
+---@return boolean hasMetadata
+function Format.hasEncodedMetadata(message)
+    return not isempty(Format.decodeMessageMetadata(message))
+end
+
 ---Text entry validator that validates against the nickname filter.
----@param entry omi.ui.TextEntry
----@param text string?
----@return boolean
----@return string? nickname
+---@param entry omi.ui.TextEntry The entry to validate.
+---@param text string? The text to validate. Defaults to the entry text.
+---@return boolean valid Flag for whether the name is valid.
+---@return string? nickname The filtered name. Guaranteed if `valid` is `true`.
 function Format.validateName(entry, text)
     if not text then
         text = entry:getInternalText()
@@ -251,10 +324,10 @@ function Format.validateName(entry, text)
 end
 
 ---Text entry validator that validates against the status filter.
----@param entry omi.ui.TextEntry
----@param text string?
----@return boolean
----@return string? status
+---@param entry omi.ui.TextEntry The entry to validate.
+---@param text string? The text to validate. Defaults to the entry text.
+---@return boolean valid Flag for whether the text is valid.
+---@return string? status The filtered status. Guaranteed if `valid` is `true`.
 function Format.validateStatus(entry, text)
     if not text then
         text = entry:getInternalText()
@@ -405,3 +478,26 @@ end
 
 API.format = Format
 return Format
+
+
+--#region Type Definitions
+
+---@class omichat.Args.FormatChat
+---@field text string The input text.
+---@field stream omichat.ChatStream The stream to format the text for.
+---@field formatStream omichat.Stream? An additional stream to use to format the input. Tags from this stream will also be added to the tags token.
+---@field formatter omichat.MetaFormatter? A formatter to use to format the input. If not given, the formatter from `formatStream` or `stream` is used.
+---@field chatType omi.ChatTypeString The chat type.
+---@field language string? The untranslated name of the roleplay language to use for the message.
+---@field echoType integer? The echo type identifier, if this is an echo message.
+---@field name string? The name to use. Defaults to the resolved chat name for the `username`.
+---@field username string? The username of the sending player. Defaults to player 1's username.
+---@field tokens table? Initial tokens to pass to interpolation strings.
+---@field extraTags string[]? Additional tags to include in the tags token.
+
+---@class omichat.FormatResult
+---@field text string The formatted text. If formatting fails, this is the empty string.
+---@field error string? An error to report to the player.
+---@field allowLanguage boolean? Flag for whether roleplay language processing should be allowed.
+
+--#endregion

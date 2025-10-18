@@ -7,14 +7,21 @@ local utils = API.utils
 local config = API.Configuration
 
 
+---Contains functions for getting and setting player preferences.
 ---@class omichat.api.client.preferences
+---@field private _adminOptionMap table<omichat.AdminOption, string> Associates admin options to setting names.
+---@field private _prefs omichat.PlayerPreferences? The loaded player preferences.
 local Preferences = {}
-Preferences._filename = 'omichat.json'
+
+---The current preferences file version.
+---@private
 Preferences._version = 2
 
+---The filename from which preferences are loaded.
+---@private
+Preferences._filename = 'omichat.json'
 
----@type table<omichat.AdminOption, string>
-local adminOptionMap = {
+Preferences._adminOptionMap = {
     ShowIcon = 'adminShowIcon',
     KnowAllLanguages = 'adminKnowLanguages',
     IgnoreMessageRange = 'adminIgnoreRange',
@@ -22,7 +29,7 @@ local adminOptionMap = {
 
 
 ---Gets or creates the player preferences table.
----@return omichat.PlayerPreferences
+---@return omichat.PlayerPreferences preferences
 function Preferences.get()
     if Preferences._prefs then
         return Preferences._prefs
@@ -56,29 +63,29 @@ function Preferences.get()
 end
 
 ---Gets the value of a given admin option preference.
----@param option omichat.AdminOption
----@return boolean
+---@param option omichat.AdminOption The option to retrieve.
+---@return boolean enabled
 function Preferences.getAdminOption(option)
     local prefs = Preferences.get()
-    local mappedPref = adminOptionMap[option]
+    local mappedPref = Preferences._adminOptionMap[option]
     return prefs[mappedPref] or false
 end
 
----Gets a color table for the current player's preference for a stream, or `nil` if unset.
----@param id string
----@return omi.ColorTable?
-function Preferences.getColor(id)
+---Gets a color table matching the player's preference.
+---@param name string The name of a stream.
+---@return omi.ColorTable? color The player's preferred color for a stream, or `nil` if unset.
+function Preferences.getColor(name)
     local profile = Preferences.getCurrentProfile()
     if not profile then
         return
     end
 
-    return profile.colors[id]
+    return profile.colors[name]
 end
 
 ---Retrieves the player's custom shouts for the current profile.
 ---@param shoutType omichat.CalloutCategory The type of shouts to retrieve.
----@return string[]?
+---@return string[]? shouts The table of shouts. If custom shouts are disabled or no profile is set, `nil`.
 function Preferences.getCustomShouts(shoutType)
     if not config:isCustomShoutsEnabled() then
         return
@@ -93,16 +100,14 @@ function Preferences.getCustomShouts(shoutType)
 end
 
 ---Returns the current player profile.
----@return omichat.PlayerProfile?
+---@return omichat.PlayerProfile? profile
 function Preferences.getCurrentProfile()
     local prefs = Preferences.get()
-    local idx = prefs.profileIndex
-    local profile = prefs.profiles[idx]
-    return profile
+    return prefs.profiles[prefs.profileIndex]
 end
 
 ---Returns the index of the current player profile.
----@return integer?
+---@return integer? index
 function Preferences.getCurrentProfileIndex()
     local prefs = Preferences.get()
     if prefs.profileIndex < 1 then
@@ -113,7 +118,7 @@ function Preferences.getCurrentProfileIndex()
 end
 
 ---Gets a table with the default player preferences.
----@return omichat.PlayerPreferences
+---@return omichat.PlayerPreferences defaultPreferences
 function Preferences.getDefaultPlayerPreferences()
     return {
         HIGHER_VERSION = false,
@@ -136,29 +141,29 @@ end
 
 ---Retrieves whether the player has the admin option to ignore message range enabled.
 ---This does not check for admin permissions.
----@return boolean
+---@return boolean shouldIgnore
 function Preferences.getIgnoreMessageRange()
     local prefs = Preferences.get()
     return prefs.adminIgnoreRange
 end
 
 ---Retrieves a boolean for whether the current player has name colors enabled.
----@return boolean
+---@return boolean enabled
 function Preferences.getNameColorsEnabled()
     local prefs = Preferences.get()
     return prefs.showNameColors
 end
 
 ---Returns the configured player profiles.
----@return omichat.PlayerProfile[]
+---@return omichat.PlayerProfile[] profiles
 function Preferences.getProfiles()
     local prefs = Preferences.get()
     return prefs.profiles
 end
 
 ---Gets whether a command category is set to retain commands.
----@param category omichat.ChatCommandCategory
----@return boolean
+---@param category omichat.StreamCategory
+---@return boolean shouldRetain
 function Preferences.getRetainCommand(category)
     local prefs = Preferences.get()
     if category == 'chat' then
@@ -173,7 +178,7 @@ function Preferences.getRetainCommand(category)
 end
 
 ---Retrieves a boolean for whether the current player has sign language emotes enabled.
----@return boolean
+---@return boolean enabled
 function Preferences.getSignEmotesEnabled()
     local prefs = Preferences.get()
     return prefs.useSignEmotes
@@ -181,27 +186,28 @@ end
 
 ---Retrieves whether the player has the admin option to display a chat icon enabled.
 ---This does not check for admin permissions.
----@return boolean
+---@return boolean shouldDisplay
 function Preferences.getShowAdminIcon()
     local prefs = Preferences.get()
     return prefs.adminShowIcon
 end
 
 ---Retrieves whether the player has the option to show typing indicators enabled.
+---@return boolean showTyping
 function Preferences.getShowTyping()
     local prefs = Preferences.get()
     return prefs.showTyping
 end
 
----Retrieves whether suggestions should be applied on Enter.
----@return boolean
+---Retrieves whether suggestions should be applied on `Enter`.
+---@return boolean suggestOnEnter
 function Preferences.getSuggestOnEnter()
     local prefs = Preferences.get()
     return prefs.suggestOnEnter
 end
 
----Retrieves whether suggestions should be applied on Tab.
----@return boolean
+---Retrieves whether suggestions should be applied on `Tab`.
+---@return boolean suggestOnTab
 function Preferences.getSuggestOnTab()
     local prefs = Preferences.get()
     return prefs.suggestOnTab
@@ -209,14 +215,14 @@ end
 
 ---Retrieves whether the player has the admin option to understand all roleplay languages enabled.
 ---This does not check for admin permissions.
----@return boolean
+---@return boolean shouldUnderstandAll
 function Preferences.getUnderstandAllLanguages()
     local prefs = Preferences.get()
     return prefs.adminKnowLanguages
 end
 
 ---Gets whether the current player wants to use chat suggestions.
----@return boolean
+---@return boolean useSuggester
 function Preferences.getUseSuggester()
     local prefs = Preferences.get()
     return prefs.useSuggester
@@ -226,18 +232,17 @@ end
 ---If no profile is set, this switches to the default profile.
 function Preferences.refreshProfile()
     local prefs = Preferences.get()
-
     Preferences.switchProfile(prefs.profileIndex or 0)
 end
 
 ---Saves the current player preferences to a file.
 ---@return boolean success
 function Preferences.save()
-    if not Preferences._prefs or Preferences._prefs.HIGHER_VERSION then
+    local prefs = Preferences._prefs
+    if not prefs or prefs.HIGHER_VERSION then
         return false
     end
 
-    local prefs = Preferences._prefs
     local encoded, err = utils.json.tryEncode {
         VERSION = Preferences._version,
         profileIndex = prefs.profileIndex,
@@ -273,11 +278,11 @@ function Preferences.save()
 end
 
 ---Sets the value of a given admin option preference.
----@param option omichat.AdminOption
----@param value boolean
+---@param option omichat.AdminOption The option to update.
+---@param value boolean The new value.
 function Preferences.setAdminOption(option, value)
     local prefs = Preferences.get()
-    local mappedPref = adminOptionMap[option]
+    local mappedPref = Preferences._adminOptionMap[option]
     if prefs[mappedPref] == nil then
         return
     end
@@ -292,22 +297,22 @@ end
 
 ---Sets a color table for the current player's preference for a stream.
 ---This sets the value in the current profile.
----@param category string
----@param color omi.ColorTable?
-function Preferences.setColor(category, color)
+---@param name string The name of the stream to set a color for.
+---@param color omi.ColorTable? The color table to set, or `nil` to unset the value.
+function Preferences.setColor(name, color)
     local profile = Preferences.getCurrentProfile()
     if not profile then
         return
     end
 
-    profile.colors[category] = color
+    profile.colors[name] = color
 end
 
 ---Sets the player's custom shouts.
----@param shouts string[]?
 ---@param shoutType omichat.CalloutCategory The type of shouts to set.
+---@param shouts string[]? The list of shouts to set.
 ---@return boolean success
-function Preferences.setCustomShouts(shouts, shoutType)
+function Preferences.setCustomShouts(shoutType, shouts)
     local profile = Preferences.getCurrentProfile()
     if not profile then
         return false
@@ -319,7 +324,7 @@ function Preferences.setCustomShouts(shouts, shoutType)
 end
 
 ---Sets whether the current player has name colors enabled.
----@param enabled boolean True to enable, false to disable.
+---@param enabled boolean Flag for whether name colors should be shown.
 function Preferences.setNameColorsEnabled(enabled)
     local prefs = Preferences.get()
     prefs.showNameColors = not not enabled
@@ -327,8 +332,7 @@ function Preferences.setNameColorsEnabled(enabled)
 end
 
 ---Sets the list of player profiles.
----This assumes the input is a valid list of `PlayerProfile` tables.
----@param profiles omichat.PlayerProfile[]
+---@param profiles omichat.PlayerProfile[] A list of profiles. This is assumed to be valid.
 function Preferences.setProfiles(profiles)
     local prefs = Preferences.get()
     prefs.profiles = profiles
@@ -337,8 +341,8 @@ function Preferences.setProfiles(profiles)
 end
 
 ---Sets whether a retain command category will retain commands.
----@param category omichat.ChatCommandCategory
----@param value boolean
+---@param category omichat.StreamCategory The command category to update.
+---@param value boolean Flag for whether commands should be retained.
 function Preferences.setRetainCommand(category, value)
     local prefs = Preferences.get()
     if category == 'chat' then
@@ -353,31 +357,31 @@ function Preferences.setRetainCommand(category, value)
 end
 
 ---Sets whether typing indicators should be shown for the current player.
----@param enable boolean
-function Preferences.setShowTyping(enable)
+---@param showTyping boolean Flag for whether typing indicators should be shown.
+function Preferences.setShowTyping(showTyping)
     local prefs = Preferences.get()
-    prefs.showTyping = not not enable
+    prefs.showTyping = not not showTyping
     Preferences.save()
 end
 
 ---Sets whether sign language emotes are enabled for the current player.
----@param enable boolean
+---@param enable boolean Flag for whether sign language emotes should play when using a signed language.
 function Preferences.setSignEmotesEnabled(enable)
     local prefs = Preferences.get()
     prefs.useSignEmotes = not not enable
     Preferences.save()
 end
 
----Sets whether suggestions should be applied on Enter.
----@param enable boolean
+---Sets whether suggestions should be applied on `Enter`.
+---@param enable boolean Flag for whether suggestions should be entered when pressing `Enter`.
 function Preferences.setSuggestOnEnter(enable)
     local prefs = Preferences.get()
     prefs.suggestOnEnter = enable
     Preferences.save()
 end
 
----Sets whether suggestions should be applied on Tab.
----@param enable boolean
+---Sets whether suggestions should be applied on `Tab`.
+---@param enable boolean Flag for whether suggestions should be entered when pressing `Tab`.
 function Preferences.setSuggestOnTab(enable)
     local prefs = Preferences.get()
     prefs.suggestOnTab = enable
@@ -385,7 +389,7 @@ function Preferences.setSuggestOnTab(enable)
 end
 
 ---Sets whether the current player wants to use chat suggestions.
----@param useSuggester boolean
+---@param useSuggester boolean Flag for whether suggestions should be shown.
 function Preferences.setUseSuggester(useSuggester)
     local prefs = Preferences.get()
     prefs.useSuggester = not not useSuggester
@@ -393,7 +397,7 @@ function Preferences.setUseSuggester(useSuggester)
 end
 
 ---Switches to a player preference profile.
----@param idx integer
+---@param idx integer The profile index, or `0` for the default profile.
 ---@return boolean success
 function Preferences.switchProfile(idx)
     local prefs = Preferences.get()
@@ -446,3 +450,17 @@ end
 
 API.preferences = Preferences
 return Preferences
+
+
+--#region Type Definitions
+
+---@alias omichat.AdminOption
+---| 'ShowIcon'
+---| 'KnowAllLanguages'
+---| 'IgnoreMessageRange'
+
+---@alias omichat.CalloutCategory
+---| 'callouts'
+---| 'sneakcallouts'
+
+--#endregion

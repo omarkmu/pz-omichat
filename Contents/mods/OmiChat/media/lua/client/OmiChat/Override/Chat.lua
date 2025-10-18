@@ -47,7 +47,7 @@ function ISChat.addLineInChat(message, tabID)
     local mtIndex = (getmetatable(message) or {}).__index
     if mtIndex == _ChatMessage or mtIndex == _ServerChatMessage or utils.isinstance(message, API.MimicMessage) then
         local username = player and player:getUsername()
-        local chatType = API.MessageInfo.getMessageChatType(message)
+        local chatType = API.chat.getMessageChatType(message)
 
         if chatType == 'radio' then
             local formatter = API.format.get('onlineID')
@@ -68,9 +68,7 @@ function ISChat.addLineInChat(message, tabID)
             return
         end
 
-        if not API.MessageInfo.hasEncodedMetadata(message) then
-            API.MessageInfo.encodeMessageTag(message)
-        end
+        API.format.encodeMessageMetadata(message)
 
         -- necessary to process transforms so we know whether this message should be added to chat
         info = API.format.buildMessageInfo(message, true)
@@ -117,7 +115,7 @@ end
 ---Override to add custom components.
 function ISChat:createChildren()
     _createChildren(self)
-    API.ui.createChildren(self)
+    API.ui._createChildren(self) ---@diagnostic disable-line: invisible
     API.chat.updateState()
 end
 
@@ -166,16 +164,17 @@ end
 
 ---Override to correct the chat stream and enable the icon button on focus.
 function ISChat:focus()
-    if API.player.isDeadOrUnavailable() then
+    local instance = ISChat.instance
+    if not instance or API.player.isDeadOrUnavailable() then
         return
     end
 
     _focus(self)
 
-    local text = ISChat.instance.textEntry:getInternalText()
-    API.ui.updateCustomComponents(text)
+    API.ui.updateComponents()
 
     -- correct the stream ID to the current stream
+    local text = instance.textEntry:getInternalText()
     local currentStreamName = API.streams.chatCommandToStreamName(text)
     if currentStreamName then
         API.streams.cycle(currentStreamName)
@@ -183,7 +182,7 @@ function ISChat:focus()
 end
 
 ---Override to avoid adding sequential duplicates to the history log.
----@param command string
+---@param command string The command to add to the history log.
 function ISChat:logChatCommand(command)
     if self.chatText.log[1] == command then
         self.chatText.logIndex = 0
@@ -201,13 +200,12 @@ end
 
 ---Override to support custom commands and emote shortcuts.
 function ISChat:onCommandEntered()
-    if API.player.isDeadOrUnavailable() then
+    local instance = ISChat.instance
+    if not instance or API.player.isDeadOrUnavailable() then
         return
     end
 
-    local instance = ISChat.instance --[[@as omichat.ISChat]]
     local input = instance.textEntry:getText()
-
     local handled, shouldRetain = API.chat.processCommand({ input = input })
     if handled then
         return
@@ -234,52 +232,14 @@ end
 ---Override to handle custom info text.
 function ISChat:onInfo()
     API.ui.hideSuggestBox()
-
-    local text = API.ui.getInfoRichText()
-    self:setInfo(text)
-
-    local infoDialog = self.infoRichText
-    if text == '' then
-        if infoDialog then
-            infoDialog:removeFromUIManager()
-        end
-
-        return
-    end
-
-    if not infoDialog then
-        local instance = ISChat.instance
-        infoDialog = UI.dialog {
-            w = 600,
-            h = 600,
-            text = self.infoText,
-            richText = true,
-            alwaysOnTop = true,
-            moveWithMouse = false,
-            setHeightToContents = true,
-            backgroundColor = { r = 0, g = 0, b = 0, a = 0.8 },
-        }
-
-        infoDialog.chatText:setOnAction(instance, API.callback.onInfoPanelAction)
-        infoDialog.chatText:setOnUpdate(instance, API.callback.onInfoPanelUpdate)
-
-        self.infoRichText = infoDialog
-        return
-    end
-
-    if infoDialog:isReallyVisible() then
-        infoDialog:removeFromUIManager()
-    else
-        infoDialog:setVisible(true)
-        infoDialog:addToUIManager()
-    end
+    API.ui.toggleInfo()
 end
 
 ---Override to hide components on text panel or entry click.
----@param target ISUIElement
----@param x number
----@param y number
----@return boolean
+---@param target ISUIElement The target element.
+---@param x number The X position of the click.
+---@param y number The Y position of the click.
+---@return boolean handled
 function ISChat.onMouseDown(target, x, y)
     local handled = _onMouseDown(target, x, y)
     API.ui.hideSuggestBox()
@@ -288,23 +248,23 @@ end
 
 ---Override to control custom components and allow switching to custom streams.
 function ISChat.onSwitchStream()
-    if not ISChat.focused or not ISChat.instance then
+    local instance = ISChat.instance
+    if not ISChat.focused or not instance then
         return
     end
 
-    local text
-    if not (API.preferences.getSuggestOnTab() and API.chat.tryInputSuggestion()) then
-        text = API.streams.cycle()
-        local entry = ISChat.instance.textEntry
+    if not API.preferences.getSuggestOnTab() or not API.chat.tryInputSuggestion() then
+        local text = API.streams.cycle()
+        local entry = instance.textEntry
         entry:setText(text)
     end
 
-    API.ui.updateCustomComponents(text)
+    API.ui.updateComponents()
 end
 
 ---Override to respect retain options when creating chat tabs.
----@param tabTitle string
----@param tabID integer
+---@param tabTitle string The translated title of the tab.
+---@param tabID integer 0-indexed tab ID.
 function ISChat.onTabAdded(tabTitle, tabID)
     _onTabAdded(tabTitle, tabID)
     local instance = ISChat.instance
@@ -329,8 +289,8 @@ function ISChat.onTabAdded(tabTitle, tabID)
 end
 
 ---Override to correct the chat panel sizes after removing a tab.
----@param tabTitle string
----@param tabID integer
+---@param tabTitle string The translated title of the tab.
+---@param tabID integer 0-indexed tab ID.
 function ISChat.onTabRemoved(tabTitle, tabID)
     _onTabRemoved(tabTitle, tabID)
     API.ui.updateChatPanelSize()
@@ -341,25 +301,23 @@ function ISChat.onTextChange()
     local instance = ISChat.instance
     local chatText = instance and instance.chatText
     if not instance or not chatText or not chatText.lastChatCommand then
-        API.ui.updateCustomComponents()
+        API.ui.updateComponents()
         return
     end
 
     local entry = ISChat.instance.textEntry
     local internalText = entry:getInternalText()
     if not utils.endsWith(internalText, '/') then
-        API.ui.updateCustomComponents()
+        API.ui.updateComponents()
         return
     end
 
     local text = entry:getText()
     if #text <= 6 then
         entry:setText('/')
-        API.ui.updateCustomComponents()
+        API.ui.updateComponents()
         return
     end
-
-    local shouldResetText = API.chat.shouldResetText
 
     for i = 1, #chatText.chatStreams do
         local prefix
@@ -368,18 +326,18 @@ function ISChat.onTextChange()
             ---@cast stream omichat.ChatStream
 
             local command = stream:getCommand()
-            local shortCommand = stream:getCommand()
             if command then
-                prefix = shouldResetText(command, text, internalText)
+                prefix = API.chat.shouldResetText(command, text, internalText)
             end
 
-            if not prefix and shortCommand then
-                prefix = shouldResetText(shortCommand, text, internalText)
+            local shortCommand = not prefix and stream:getShortCommand()
+            if shortCommand then
+                prefix = API.chat.shouldResetText(shortCommand, text, internalText)
             end
 
             if not prefix then
                 for alias in stream:aliases() do
-                    prefix = shouldResetText(alias, text, internalText)
+                    prefix = API.chat.shouldResetText(alias, text, internalText)
                     if prefix then
                         break
                     end
@@ -393,7 +351,7 @@ function ISChat.onTextChange()
         end
     end
 
-    API.ui.updateCustomComponents()
+    API.ui.updateComponents()
 end
 
 ---Override to render the typing indicator.
@@ -418,15 +376,15 @@ function ISChat:render()
 end
 
 ---Override to use the extended rich text panel rendering.
----@param self omichat.ChatTab
-function ISChat.render_chatText(self)
-    self:setStencilRect(0, 0, self.width, self.height)
-    API.ChatTab.render(self)
-    self:clearStencilRect()
+---@param tab omichat.ChatTab The chat tab to render.
+function ISChat.render_chatText(tab)
+    tab:setStencilRect(0, 0, tab.width, tab.height)
+    API.ChatTab.render(tab)
+    tab:clearStencilRect()
 end
 
 ---Override to keep the close button hidden if the always show chat option is enabled.
----@param visible boolean
+---@param visible boolean Flag for whether the frame should be drawn.
 function ISChat:setDrawFrame(visible)
     if not config.General.AlwaysShowChat then
         _setDrawFrame(self, visible)

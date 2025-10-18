@@ -5,14 +5,19 @@ local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
 local utils = API.utils
 local config = API.Configuration
 local MetaFormatter = API.MetaFormatter
-local ISChat = ISChat
+local ISChat = ISChat --[[@as omichat.ISChat]]
 
 
+---Contains functions for retrieving and operating on streams.
 ---@class omichat.api.client.streams
+---@field private _tagToChatStreams table<string, omichat.ChatStream[]> Associates tags to chat streams that include them.
 local Streams = {}
+
 Streams._tagToChatStreams = {}
 
-local DEFAULT_STREAMS = {
+---Set of default streams included in vanilla.
+---@private
+Streams._DEFAULT_STREAMS = {
     say = true,
     yell = true,
     whisper = true,
@@ -23,13 +28,13 @@ local DEFAULT_STREAMS = {
 }
 
 
----Determines stream information given a chat command.
+---Retrieves a stream given a chat command.
 ---@param input string The input text.
 ---@param options omichat.Args.ChatCommandToStream? Options for retrieving the stream.
----@return omichat.Stream? stream
+---@return omichat.Stream? stream The stream matching the input.
 ---@return string remainder The text following the command in the input.
 ---@return string? command The command or short command that was used.
----@return omichat.Stream? disabledStream Information about the disabled stream, if one was found.
+---@return omichat.Stream? disabledStream The disabled stream, if one was found.
 function Streams.chatCommandToStream(input, options)
     if not input or input == '' then
         return nil, ''
@@ -69,9 +74,9 @@ function Streams.chatCommandToStream(input, options)
 end
 
 ---Retrieves a stream name given a chat command.
----@param command string A chat stream's command, with the leading slash.
+---@param command string A chat stream's command, including a leading slash.
 ---@param options omichat.Args.ChatCommandToStream? Options for retrieving the stream.
----@return string? #The name of the chat stream, or `nil` if not found.
+---@return string? name The name of the chat stream, or `nil` if not found.
 function Streams.chatCommandToStreamName(command, options)
     local stream = Streams.chatCommandToStream(command, options)
     if stream then
@@ -80,7 +85,7 @@ function Streams.chatCommandToStreamName(command, options)
 end
 
 ---Returns an iterator over chat streams.
----@return fun(): omichat.ChatStream?
+---@return fun(): omichat.ChatStream? iterator
 function Streams.chatStreams()
     local i = 0
     return function()
@@ -96,7 +101,7 @@ function Streams.chatStreams()
 end
 
 ---Returns an iterator over command streams.
----@return fun(): omichat.CommandStream?
+---@return fun(): omichat.CommandStream? iterator
 function Streams.commandStreams()
     local i = 0
     return function()
@@ -108,9 +113,9 @@ function Streams.commandStreams()
 end
 
 ---Cycles to the next chat stream.
----This is used with onSwitchStream.
+---This is used with `onSwitchStream`.
 ---@param target string? The name of a target stream to switch to instead of the next stream.
----@return string #The command of the new current stream.
+---@return string command The command of the new current stream.
 function Streams.cycle(target)
     local curChatText = ISChat.instance.chatText
     local chatStreams = curChatText.chatStreams
@@ -147,9 +152,9 @@ function Streams.cycle(target)
 end
 
 ---Returns the first enabled chat stream with the given tag.
----@param tag string
----@param excludeTags string[]?
----@return omichat.ChatStream?
+---@param tag string The tag to query for.
+---@param excludeTags string[]? Tags to exclude. If a stream includes one of these tags, it will not be returned.
+---@return omichat.ChatStream? stream
 function Streams.firstChatStreamWithTag(tag, excludeTags)
     local list = Streams._tagToChatStreams[tag]
     if not list then
@@ -169,9 +174,9 @@ function Streams.firstChatStreamWithTag(tag, excludeTags)
 end
 
 ---Returns the first enabled chat stream with all of the given tags.
----@param tags string[]
----@param excludeTags string[]?
----@return omichat.ChatStream?
+---@param tags string[] Tags to query for.
+---@param excludeTags string[]? Tags to exclude. If a stream includes one of these tags, it will not be returned.
+---@return omichat.ChatStream? stream
 function Streams.firstChatStreamWithTags(tags, excludeTags)
     excludeTags = excludeTags or {}
     for stream in Streams.chatStreams() do
@@ -181,23 +186,9 @@ function Streams.firstChatStreamWithTags(tags, excludeTags)
     end
 end
 
----Returns the first enabled chat stream without the given tag.
----@param excludeTag string
----@return omichat.ChatStream?
-function Streams.firstChatStreamWithoutTag(excludeTag)
-    return Streams.firstChatStreamWithTags({}, { excludeTag })
-end
-
----Returns the first enabled chat stream without any of the given tags.
----@param excludeTags string[]
----@return omichat.ChatStream?
-function Streams.firstChatStreamWithoutTags(excludeTags)
-    return Streams.firstChatStreamWithTags({}, excludeTags)
-end
-
 ---Retrieves a chat or command stream given its name.
----@param name string
----@return omichat.Stream?
+---@param name string The name of the stream to retrieve.
+---@return omichat.Stream? stream
 function Streams.get(name)
     for stream in Streams.iter() do
         if name == stream:getName() then
@@ -207,9 +198,9 @@ function Streams.get(name)
 end
 
 ---Retrieves a chat stream given its name.
----@param name string
----@param options omichat.Args.StreamRetrieval?
----@return omichat.ChatStream?
+---@param name string The name of the stream to retrieve.
+---@param options omichat.Args.StreamRetrieval? Options for retrieving the stream.
+---@return omichat.ChatStream? stream
 function Streams.getChatStream(name, options)
     if name == 'server' then
         return API._serverStream
@@ -228,9 +219,9 @@ function Streams.getChatStream(name, options)
 end
 
 ---Returns enabled chat streams with the given tag.
----@param tag string
----@param excludeTags string[]?
----@return omichat.ChatStream[]
+---@param tag string The tag to query for.
+---@param excludeTags string[]? Tags to exclude. If a stream includes one of these tags, it will not be included.
+---@return omichat.ChatStream[] streams
 function Streams.getChatStreamsWithTag(tag, excludeTags)
     local list = Streams._tagToChatStreams[tag]
     if not list then
@@ -253,9 +244,9 @@ function Streams.getChatStreamsWithTag(tag, excludeTags)
 end
 
 ---Returns enabled chat streams with all of the given tags.
----@param tags string[]
----@param excludeTags string[]?
----@return omichat.ChatStream[]
+---@param tags string[] Tags to query for.
+---@param excludeTags string[]? Tags to exclude. If a stream includes one of these tags, it will not be included.
+---@return omichat.ChatStream[] streams
 function Streams.getChatStreamsWithTags(tags, excludeTags)
     excludeTags = excludeTags or {}
     local streams = {}
@@ -269,23 +260,9 @@ function Streams.getChatStreamsWithTags(tags, excludeTags)
     return streams
 end
 
----Returns enabled chat streams without the given tag.
----@param excludeTag string
----@return omichat.ChatStream[]
-function Streams.getChatStreamsWithoutTag(excludeTag)
-    return Streams.getChatStreamsWithTags({}, { excludeTag })
-end
-
----Returns enabled chat streams without any of the given tags.
----@param excludeTags string[]
----@return omichat.ChatStream[]
-function Streams.getChatStreamsWithoutTags(excludeTags)
-    return Streams.getChatStreamsWithTags({}, excludeTags)
-end
-
 ---Retrieves a command stream given its name.
----@param name string
----@return omichat.CommandStream?
+---@param name string The name of the stream to retrieve.
+---@return omichat.CommandStream? stream
 function Streams.getCommandStream(name)
     for i = 1, #API._commandStreams do
         local stream = API._commandStreams[i]
@@ -295,9 +272,9 @@ function Streams.getCommandStream(name)
     end
 end
 
----Returns information about the default stream for a given tab ID.
----@param tabID integer
----@return omichat.ChatStream?
+---Returns the default chat stream for a given tab ID.
+---@param tabID integer The 1-indexed tab ID to retrieve a default stream for.
+---@return omichat.ChatStream? stream
 function Streams.getDefaultTabStream(tabID)
     local default = ISChat.defaultTabStream[tabID]
     if default and utils.isinstance(default, API.ChatStream) then
@@ -305,16 +282,17 @@ function Streams.getDefaultTabStream(tabID)
     end
 end
 
----Gets a special stream intended to represent Discord messages.
+---Gets the special stream for incoming Discord messages.
 ---This stream should not be used for sending messages.
+---@return omichat.ChatStream stream
 function Streams.getDiscordStream()
     return API._discordStream
 end
 
 ---Gets the display command associated with a chat stream.
 ---If the stream does not exist, this defaults to prefixing a forward slash.
----@param name string
----@return string
+---@param name string The name of the stream.
+---@return string command
 function Streams.getDisplayCommand(name)
     local stream = Streams.getChatStream(name)
     if stream then
@@ -324,20 +302,22 @@ function Streams.getDisplayCommand(name)
     return '/' .. name
 end
 
----Gets a special stream intended to represent radio messages.
+---Gets the special stream for incoming radio messages.
 ---This stream should not be used for sending messages.
+---@return omichat.ChatStream
 function Streams.getRadioStream()
     return API._radioStream
 end
 
----Gets a special stream intended to represent server messages.
+---Gets the special stream for imcoming server messages.
 ---This stream should not be used for sending messages.
+---@return omichat.ChatStream
 function Streams.getServerStream()
     return API._serverStream
 end
 
 ---Returns an iterator over chat and command streams.
----@return fun(): omichat.Stream?
+---@return fun(): omichat.Stream? iterator
 function Streams.iter()
     local i = 0
     local numChat = #ISChat.allChatStreams
@@ -386,35 +366,6 @@ function Streams.updateTagCache()
     end
 end
 
-
----Creates or updates metadata formatters.
----@private
-function Streams._updateFormatters()
-    config:updateFormatters()
-
-    table.wipe(API._metadataFormatters)
-    for info in config:formatters() do
-        API._metadataFormatters[info.name] = info.formatter
-    end
-
-    local cmdConfig = config.Commands
-    local commandsToUpdate = {
-        { API._cardCommand, cmdConfig.Card.OverheadFormat, cmdConfig.Card.Tags },
-        { API._flipCommand, cmdConfig.Flip.OverheadFormat, cmdConfig.Flip.Tags },
-        { API._rollCommand, cmdConfig.Roll.OverheadFormat, cmdConfig.Roll.Tags },
-    }
-
-    for i = 1, #commandsToUpdate do
-        local info = commandsToUpdate[i]
-        local stream = info[1]
-        local formatter = stream:getFormatter()
-
-        stream:_setTags(info[3]) ---@diagnostic disable-line:invisible
-        if formatter then
-            formatter:setFormatString(info[2])
-        end
-    end
-end
 
 ---Updates chat streams based on configuration options.
 ---@private
@@ -471,7 +422,7 @@ function Streams._updateChatStreams()
         utils.log.info('Recycling chat streams')
 
         toCreate = streams -- update all streams' formatters
-        API.ui.clear()     -- clear so old messages don't use the wrong format
+        API.chat.clear()   -- clear so old messages don't use the wrong format
 
         for i = 1, #toCreate do
             toCreateIDs[i] = config.MIN_CHAT_ID + i - 1
@@ -496,8 +447,8 @@ function Streams._updateChatStreams()
     -- keep unknown streams for compatibility with other mods that add commands
     local unmanagedStreams = {} ---@type omichat.StreamTable[]
     for i = 1, #ISChat.allChatStreams do
-        local stream = ISChat.allChatStreams[i]
-        if not seen[stream.name] and not DEFAULT_STREAMS[stream.name] and not utils.isinstance(stream, API.Stream) then
+        local stream = ISChat.allChatStreams[i] --[[@as omichat.StreamTable]]
+        if not seen[stream.name] and not Streams._DEFAULT_STREAMS[stream.name] and not utils.isinstance(stream, API.Stream) then
             unmanagedStreams[#unmanagedStreams + 1] = stream
         end
     end
@@ -569,6 +520,35 @@ function Streams._updateChatStreams()
     Streams.updateTagCache()
 end
 
+---Creates or updates metadata formatters.
+---@private
+function Streams._updateFormatters()
+    config:updateFormatters()
+
+    table.wipe(API._metadataFormatters)
+    for info in config:formatters() do
+        API._metadataFormatters[info.name] = info.formatter
+    end
+
+    local cmdConfig = config.Commands
+    local commandsToUpdate = {
+        { API._cardCommand, cmdConfig.Card.OverheadFormat, cmdConfig.Card.Tags },
+        { API._flipCommand, cmdConfig.Flip.OverheadFormat, cmdConfig.Flip.Tags },
+        { API._rollCommand, cmdConfig.Roll.OverheadFormat, cmdConfig.Roll.Tags },
+    }
+
+    for i = 1, #commandsToUpdate do
+        local info = commandsToUpdate[i]
+        local stream = info[1]
+        local formatter = stream:getFormatter()
+
+        stream:_setTags(info[3]) ---@diagnostic disable-line:invisible
+        if formatter then
+            formatter:setFormatString(info[2])
+        end
+    end
+end
+
 ---Updates overrides to chat functions based on configuration options.
 ---@private
 function Streams._updateOverrides()
@@ -610,3 +590,22 @@ end
 
 API.streams = Streams
 return Streams
+
+
+--#region Type Definitions
+
+---@class omichat.Args.StreamRetrieval
+---@field enabledOnly boolean? Flag for whether only enabled streams should be returned.
+
+---@class omichat.Args.ChatCommandToStream : omichat.Args.StreamRetrieval
+---@field commandsOnly boolean? Flag for whether only command streams should be checked.
+---@field chatsOnly boolean? Flag for whether only chat streams should be checked.
+
+
+---@class omichat.StreamTable
+---@field name string The name of the stream.
+---@field command string The stream command, with a trailing space.
+---@field tabID integer The tab ID of the tab in which this stream is available (1-indexed).
+---@field shortCommand string? An optional short stream command, with a trailing space.
+
+--#endregion

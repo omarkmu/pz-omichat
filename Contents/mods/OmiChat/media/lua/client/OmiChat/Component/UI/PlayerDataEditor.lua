@@ -16,11 +16,28 @@ local LABEL_H = FONT_H_MEDIUM + 4
 
 
 ---@class omichat.PlayerDataEditor : omi.ui.Panel
+---@field item omichat.PlayerData The player data for editing.
+---@field saveItem omichat.PlayerData The input player data item.
+---@field nicknameEntry omi.ui.TextEntry The entry for the player nickname.
+---@field usernameEntry omi.ui.TextEntry The entry for the player username.
+---@field iconEntry omi.ui.TextEntry The entry for the player icon.
+---@field currentLangEntry omi.ui.TextEntry The entry for the player's current language.
+---@field languageListEntry omi.ui.ListEntry The list entry for the player's known languages.
+---@field statusEntry omi.ui.TextEntry The entry for the player's status.
+---@field languageSlotsEntry omi.ui.TextEntry The entry for the player's language slots.
+---@field languageSuggestBox omi.ui.SuggestBox The suggest box for languages, for the language list entry.
+---@field iconSuggestBox omi.ui.SuggestBox The icon suggest box, for the icon entry.
+---@field buttonBorderColor omi.ColorTableRGBA The border color used for buttons.
+---@field saveBtn omi.ui.Button The save button.
+---@field closeBtn omi.ui.Button The close button.
+---@field isAdd boolean Flag for whether the editor is for adding new data, rather than editing existing data.
+---@field languageFilter function? Filter function for the language suggest box.
+---@field protected callbacks omichat.PlayerDataEditor.Callbacks Container for callbacks.
 local PlayerDataEditor = UI.Panel:derive('PlayerDataEditor')
 
 
 ---Checks all fields for validity.
----@return boolean
+---@return boolean canSubmit
 function PlayerDataEditor:canSubmit()
     local fields = {
         self.usernameEntry,
@@ -40,7 +57,7 @@ function PlayerDataEditor:canSubmit()
     return true
 end
 
----Adds the children of the mod data editor.
+---Adds the children of the editor.
 function PlayerDataEditor:createChildren()
     local btnW = 100
 
@@ -64,7 +81,7 @@ function PlayerDataEditor:createChildren()
     local y
     local item = self.item
     local text = getText('UI_OmiChat_PlayerDataManager_Column_username')
-    y, self.usernameEntry = self:_createField('text', titleH + 20, text, item.username)
+    y, self.usernameEntry = self:_createEntry('text', titleH + 20, text, item.username)
 
     if self.isAdd then
         self.usernameEntry:setRequireValue(true)
@@ -73,23 +90,23 @@ function PlayerDataEditor:createChildren()
     end
 
     text = getText('UI_OmiChat_PlayerDataManager_Column_nickname')
-    y, self.nicknameEntry = self:_createField('text', y + PAD_Y, text, item.nickname)
+    y, self.nicknameEntry = self:_createEntry('text', y + PAD_Y, text, item.nickname)
     self.nicknameEntry:setValidateFunction(self.nicknameEntry, API.format.validateName)
 
     text = getText('UI_OmiChat_PlayerDataManager_Column_status')
-    y, self.statusEntry = self:_createField('text', y + PAD_Y, text, item.status)
+    y, self.statusEntry = self:_createEntry('text', y + PAD_Y, text, item.status)
     self.statusEntry:setValidateFunction(self.statusEntry, API.format.validateStatus)
 
     text = getText('UI_OmiChat_PlayerDataManager_Column_icon')
-    y, self.iconEntry = self:_createField('text', y + PAD_Y, text, item.icon)
+    y, self.iconEntry = self:_createEntry('text', y + PAD_Y, text, item.icon)
     self.iconEntry:setValidateFunction(self, self._validateIconText, self.iconEntry)
 
     text = getText('UI_OmiChat_PlayerDataManager_Column_currentLanguage')
-    y, self.currentLangEntry = self:_createField('text', y + PAD_Y, text, item.currentLanguage)
+    y, self.currentLangEntry = self:_createEntry('text', y + PAD_Y, text, item.currentLanguage)
     self.currentLangEntry:setValidateFunction(self, self._validateLanguageText, self.currentLangEntry, true)
 
     text = getText('UI_OmiChat_PlayerDataManager_Column_languageSlots')
-    y, self.languageSlotsEntry = self:_createField('number', y + PAD_Y, text, item.languageSlots, 0,
+    y, self.languageSlotsEntry = self:_createEntry('number', y + PAD_Y, text, item.languageSlots, 0,
         config.MAX_LANGUAGE_SLOTS)
 
     y = self:_createLabel(y + PAD_Y, getText('UI_OmiChat_PlayerDataManager_Column_languages'))
@@ -165,8 +182,8 @@ function PlayerDataEditor:createChildren()
 end
 
 ---Checks whether the input language list contains the given language.
----@param language string
----@return boolean
+---@param language string The name of the language to check.
+---@return boolean hasLanguage
 function PlayerDataEditor:hasLanguage(language)
     local langs = self.item.languages
     if not langs then
@@ -177,7 +194,7 @@ function PlayerDataEditor:hasLanguage(language)
 end
 
 ---Checks whether the given language is a valid entry for the language list.
----@param language string
+---@param language string The name of the language to check.
 ---@return boolean valid
 function PlayerDataEditor:isLanguageValid(language)
     language = utils.trim(language)
@@ -236,9 +253,9 @@ function PlayerDataEditor:onSave()
 end
 
 ---Sets a callback to be called when the save button is pressed.
----@param target unknown?
----@param callback function?
----@param ... unknown
+---@param target unknown? The first argument to pass to the `callback` functon.
+---@param callback function? The callback function.
+---@param ... unknown Additional arguments for the `callback` function.
 function PlayerDataEditor:setOnSave(target, callback, ...)
     self.callbacks.onSave = utils.callback(target, callback, ...)
 end
@@ -249,17 +266,17 @@ function PlayerDataEditor:update()
 end
 
 
----Helper for creating an editor field.
----@param type 'text' | 'list' | 'number'
+---Helper for creating an editor entry field.
+---@param type 'text' | 'number'
 ---@param y number
 ---@param labelText string
 ---@param default unknown?
 ---@param min number?
 ---@param max number?
----@return number
----@return unknown
+---@return number newY
+---@return omi.ui.TextEntry entry
 ---@private
-function PlayerDataEditor:_createField(type, y, labelText, default, min, max)
+function PlayerDataEditor:_createEntry(type, y, labelText, default, min, max)
     local controlW = self.width - FIELD_X * 2
     y = self:_createLabel(y, labelText)
 
@@ -283,8 +300,8 @@ end
 ---Helper for creating an editor label.
 ---@param y number
 ---@param labelText string
----@return number
----@return omi.ui.Label
+---@return number newY
+---@return omi.ui.Label label
 ---@private
 function PlayerDataEditor:_createLabel(y, labelText)
     local label = UI.label {
@@ -307,7 +324,7 @@ end
 
 ---Gets the computed value of an entry.
 ---@param entry omi.ui.TextEntry
----@return string?
+---@return string? value
 ---@private
 function PlayerDataEditor:_getEntryValue(entry)
     local value = utils.trim(entry:getInternalText())
@@ -357,20 +374,14 @@ end
 ---Text entry validator for icons.
 ---@param text string
 ---@param entry omi.ui.TextEntry
----@return boolean
+---@return boolean valid
 ---@private
 function PlayerDataEditor:_validateIconText(text, entry)
     if #text == 0 then
         return true
     end
 
-    local texture = getTexture(text)
-    if texture then
-        return true
-    end
-
-    local iconTexture = utils.getTextureNameFromIcon(text)
-    if iconTexture then
+    if utils.getTextureNameFromIcon(text) or getTexture(text) then
         return true
     end
 
@@ -382,7 +393,7 @@ end
 ---@param text string
 ---@param entry omi.ui.TextEntry
 ---@param expectKnown boolean?
----@return boolean
+---@return boolean valid
 ---@private
 function PlayerDataEditor:_validateLanguageText(text, entry, expectKnown)
     if #text == 0 then
@@ -405,9 +416,9 @@ function PlayerDataEditor:_validateLanguageText(text, entry, expectKnown)
 end
 
 
----Creates a new mod data editor popup.
----@param args omichat.Args.PlayerDataEditor
----@return omichat.PlayerDataEditor
+---Creates a new player data editor popup.
+---@param args omichat.Args.PlayerDataEditor Arguments for creation of the editor.
+---@return omichat.PlayerDataEditor editor
 function PlayerDataEditor:new(args)
     local this = UI.Panel.new(self, args) --[[@as omichat.PlayerDataEditor]]
 
@@ -428,3 +439,18 @@ end
 
 
 return PlayerDataEditor
+
+
+--#region Type Definitions
+
+---@class omichat.PlayerDataEditor.Callbacks : omi.ui.Panel.Callbacks
+---@field onSave omi.CallbackInfo? Invoked when saving the player data.
+
+---@class omichat.Args.PlayerDataEditor : omi.ui.Args.Panel
+---@field item omichat.PlayerData The original data to be edited.
+---@field isAdd boolean? Flag for whether the editor is for adding user data, rather than editing existing data.
+---@field onSave omi.ui.Callback? Invoked when saving the player data.
+---@field onSaveArgs table? Arguments for `onSave`.
+---@field onSaveTarget unknown? The first argument to pass to the `onSave` callback.
+
+--#endregion

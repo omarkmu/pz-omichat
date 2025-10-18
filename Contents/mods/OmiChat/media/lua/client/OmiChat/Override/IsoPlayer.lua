@@ -36,10 +36,7 @@ function _IsoPlayer:Callout(playEmote)
     local zombieConfig = config.ZombieAttraction
     local range = isSneaking and zombieConfig.SneakCalloutRange or zombieConfig.CalloutRange
 
-    local shouts
-    if config:isCustomShoutsEnabled() then
-        shouts = API.preferences.getCustomShouts(isSneaking and 'sneakcallouts' or 'callouts')
-    end
+    local shouts = API.preferences.getCustomShouts(isSneaking and 'sneakcallouts' or 'callouts')
 
     -- this can't set .callOut, so minor boredom reduction will occur from shouting
     -- already possible to use chat for that purpose, so this isn't really problematic

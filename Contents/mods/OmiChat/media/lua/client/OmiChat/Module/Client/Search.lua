@@ -4,19 +4,25 @@ local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
 local vanillaCommands = require 'OmiChat/Definition/VanillaCommandList'
 
 local utils = API.utils
+local sort = table.sort
 local getTexture = getTexture
 local ISChat = ISChat
 
 
+---Contains functions for performing searches.
 ---@class omichat.api.client.search
+---@field private _customSuggesterTypes table<string, omichat.SuggestSearchCallback> Associates names to custom suggestion spec argument type handlers.
+---@field private _perkList omichat.search.PerkInfo[]? Lazy-loaded list with information about perks.
+---@field private _iconList omichat.search.IconInfo[]? Lazy-loaded list with information about icons.
 local Search = {}
+
 Search._customSuggesterTypes = {}
 
 
 ---Converts search results to a list of suggestions to use for a suggest box.
----@param search omichat.SearchResults
----@param allowExact boolean?
----@return omi.ui.SuggestBox.Suggestion[]
+---@param search omichat.SearchResults The results of the search.
+---@param allowExact boolean? Flag for whether an exact match should be ignored. Unless this is `true`, an empty table will be returned if there's an exact match.
+---@return omi.ui.SuggestBox.Suggestion[] suggestions
 function Search.getSuggestions(search, allowExact)
     if search.exact and not allowExact then
         return {}
@@ -35,10 +41,10 @@ function Search.getSuggestions(search, allowExact)
     return suggestions
 end
 
----Reads an arguments spec from a suggestion spec.
----@param spec omichat.SuggestSpec
----@param idx integer
----@return omichat.SuggestArgSpecTable?
+---Gets an argument spec table from a list of argument specs.
+---@param spec omichat.SuggestArgSpec[] The list of argument specs.
+---@param idx integer The index of the spec to retrieve.
+---@return omichat.SuggestArgSpecTable? argSpec
 function Search.getSuggestionArgumentSpec(spec, idx)
     local argSpec = spec[idx]
     if type(argSpec) == 'string' then
@@ -53,15 +59,15 @@ function Search.getSuggestionArgumentSpec(spec, idx)
 end
 
 ---Retrieves the search callback for a suggester argument type.
----@param argType string
----@return omichat.SuggestSearchCallback?
+---@param argType string The name of the suggester argument type.
+---@return omichat.SuggestSearchCallback? callback
 function Search.getSuggestionTypeCallback(argType)
     return Search._customSuggesterTypes[argType]
 end
 
 ---Retrieves a suggestion spec given the current input.
----@param input string
----@return omichat.SuggestSpec?
+---@param input string The input text.
+---@return omichat.SuggestArgSpec[]? spec A list of argument specs, or `nil` if no spec matches the input.
 function Search.getSuggestionSpec(input)
     local stream = API.streams.chatCommandToStream(input, { enabledOnly = true })
     if stream then
@@ -86,8 +92,8 @@ function Search.getSuggestionSpec(input)
 end
 
 ---Searches for an icon by texture name or chat alias.
----@param ctxOrSearch omichat.SearchContext | string
----@return omichat.SearchResults
+---@param ctxOrSearch omichat.SearchContext | string A search string or a table with options for the search.
+---@return omichat.SearchResults results
 function Search.icons(ctxOrSearch)
     local ctx = Search._buildContext(ctxOrSearch)
     ctx.display = ctx.display or Search._getIconDisplay
@@ -108,9 +114,9 @@ function Search.icons(ctxOrSearch)
 end
 
 ---Searches either the language list or the current player's known languages for a string.
----@param ctxOrSearch omichat.SearchContext | string
----@param onlyKnown boolean? If `true`, only the current player's known languages will be searched.
----@return omichat.SearchResults
+---@param ctxOrSearch omichat.SearchContext | string A search string or a table with options for the search.
+---@param onlyKnown boolean? Flag for whether only the current player's known languages should be searched.
+---@return omichat.SearchResults results
 function Search.languages(ctxOrSearch, onlyKnown)
     local ctx = Search._buildContext(ctxOrSearch)
     ctx.display = ctx.display or utils.getTranslatedLanguageName
@@ -132,7 +138,7 @@ end
 ---Searches for a roleplay language with loose matching.
 ---@param input string The input search string.
 ---@param languages string[]? The languages to search. Defaults to the current player's known languages.
----@return string?
+---@return string? match The untranslated language name that matches the input.
 function Search.matchLanguage(input, languages)
     languages = languages or API.player.getLanguages()
 
@@ -156,9 +162,9 @@ function Search.matchLanguage(input, languages)
 end
 
 ---Collects online usernames based on a search string.
----@param ctxOrSearch omichat.SearchContext | string Context for the search.
----@param includeSelf boolean? If `true`, player 1's username will be included in the search.
----@return omichat.SearchResults
+---@param ctxOrSearch omichat.SearchContext | string A search string or a table with options for the search.
+---@param includeSelf boolean? Flag for whether player 1's username should be included in the search.
+---@return omichat.SearchResults results
 function Search.onlineUsernames(ctxOrSearch, includeSelf)
     local ctx = Search._buildContext(ctxOrSearch)
     local player = getSpecificPlayer(0)
@@ -175,12 +181,12 @@ function Search.onlineUsernames(ctxOrSearch, includeSelf)
     return Search._collectResults(ctx)
 end
 
----Collects usernames based on a search string by matching chat names.
----@param ctxOrSearch omichat.SearchContext | string Context for the search.
+---Collects usernames based on a search string by matching on chat names.
+---@param ctxOrSearch omichat.SearchContext | string A search string or a table with options for the search.
 ---@param chatType string? The chat type to use names from. Defaults to `say`.
----@param includeSelf boolean? If `true`, player 1's username will be included in the search.
----@param searchUsernames boolean? If `true`, usernames will also be matched on.
----@return omichat.SearchResults
+---@param includeSelf boolean? Flag for whether player 1's username should be included in the search.
+---@param searchUsernames boolean? Flag for whether usernames should also be matched on.
+---@return omichat.SearchResults results
 function Search.onlineUsernamesByChatName(ctxOrSearch, chatType, includeSelf, searchUsernames)
     local ctx = Search._buildContext(ctxOrSearch)
     ctx.display = ctx.display or Search._mapPlayerInfoToName
@@ -202,8 +208,8 @@ function Search.onlineUsernamesByChatName(ctxOrSearch, chatType, includeSelf, se
 end
 
 ---Collects perk IDs based on a search string.
----@param ctxOrSearch omichat.SearchContext | string
----@return omichat.SearchResults
+---@param ctxOrSearch omichat.SearchContext | string A search string or a table with options for the search.
+---@return omichat.SearchResults results
 function Search.perks(ctxOrSearch)
     local ctx = Search._buildContext(ctxOrSearch)
     ctx.display = ctx.display or Search._getPerkDisplay
@@ -223,22 +229,22 @@ function Search.perks(ctxOrSearch)
 end
 
 ---Populates a suggest box with search results.
----@param suggestBox omi.ui.SuggestBox
----@param search omichat.SearchResults
----@param allowExact boolean?
+---@param suggestBox omi.ui.SuggestBox The suggest box to populate.
+---@param search omichat.SearchResults The results of the search.
+---@param allowExact boolean? Flag for whether an exact match should be ignored. Unless this is `true`, suggestions will be cleared for an exact match.
 function Search.populateSuggestions(suggestBox, search, allowExact)
     suggestBox:setSuggestions(Search.getSuggestions(search, allowExact))
 end
 
----Collects commands based on a search string.
----@param argsOrSearch omichat.Args.StreamSearch | string
----@return omichat.SearchResults
+---Collects stream commands based on a search string.
+---@param argsOrSearch omichat.Args.StreamSearch | string A search string or a table with options for the search.
+---@return omichat.SearchResults results
 function Search.streams(argsOrSearch)
     local ctx = Search._buildContext(argsOrSearch)
     local options = type(argsOrSearch) == 'table' and argsOrSearch or {} --[[@as omichat.StreamSearchOptions]]
 
     ctx.searchForStartsWith = '/' .. ctx.search
-    ctx.display = ctx.display or Search._mapToSearchString
+    ctx.display = ctx.display or Search._mapToCompareString
     ctx.filter = ctx.filter or Search._filterStream
 
     local streamList = Search._buildStreamList(options)
@@ -288,9 +294,9 @@ function Search.streams(argsOrSearch)
 end
 
 ---Collects results from a list of strings based on a search string.
----@param ctxOrSearch omichat.SearchContext | string Context for the search.
+---@param ctxOrSearch omichat.SearchContext | string A search string or a table with options for the search.
 ---@param list string[] The list of strings to search.
----@return omichat.SearchResults
+---@return omichat.SearchResults results
 function Search.strings(ctxOrSearch, list)
     local ctx = Search._buildContext(ctxOrSearch)
 
@@ -307,8 +313,8 @@ end
 
 
 ---Builds internal search context.
----@param ctx omichat.SearchContext | string The search context, or a search string to use defaults.
----@return omichat.search.InternalSearchContext
+---@param ctx omichat.SearchContext | string A search string or a table with options for the search.
+---@return omichat.search.InternalSearchContext ctx
 ---@private
 function Search._buildContext(ctx)
     if type(ctx) == 'string' then
@@ -331,7 +337,7 @@ function Search._buildContext(ctx)
 end
 
 ---Builds a list of icons, or returns the cached list if already built.
----@return omichat.search.IconInfo[]
+---@return omichat.search.IconInfo[] iconList
 ---@private
 function Search._buildIconList()
     if Search._iconList then
@@ -346,14 +352,14 @@ function Search._buildIconList()
         }
     end
 
-    table.sort(iconList, function(a, b) return not string.sort(a.alias, b.alias) end)
+    sort(iconList, function(a, b) return not string.sort(a.alias, b.alias) end)
 
     Search._iconList = iconList
     return iconList
 end
 
 ---Builds a list of perks, or returns the cached list if already built.
----@return omichat.search.PerkInfo[]
+---@return omichat.search.PerkInfo[] perkList
 ---@private
 function Search._buildPerkList()
     if Search._perkList then
@@ -373,7 +379,7 @@ function Search._buildPerkList()
         end
     end
 
-    table.sort(perkList, function(a, b) return not string.sort(a.name, b.name) end)
+    sort(perkList, function(a, b) return not string.sort(a.name, b.name) end)
 
     Search._perkList = perkList
     return perkList
@@ -381,7 +387,7 @@ end
 
 ---Builds a list of streams to search.
 ---@param options omichat.StreamSearchOptions
----@return (omichat.Stream | omichat.VanillaCommand | omichat.StreamTable)[]
+---@return (omichat.Stream | omichat.VanillaCommand | omichat.StreamTable)[] streamList
 ---@private
 function Search._buildStreamList(options)
     local list = {}
@@ -415,9 +421,9 @@ function Search._buildStreamList(options)
     return list
 end
 
----Creates the search results table.
+---Collects the search results.
 ---@param ctx omichat.search.InternalSearchContext
----@return omichat.SearchResults
+---@return omichat.SearchResults search
 ---@private
 function Search._collectResults(ctx)
     local mergedResults = utils.append(ctx.startsWith, ctx.contains)
@@ -435,7 +441,7 @@ function Search._collectResults(ctx)
     for i = 1, #mergedResults do
         local internal = mergedResults[i]
         local raw = internal.raw
-        local str = internal.searchString
+        local str = internal.compareString
 
         ---@type omichat.SearchResult
         local result = {
@@ -459,12 +465,77 @@ function Search._collectResults(ctx)
     }
 end
 
+---Filter function for streams.
+---@param stream omichat.Stream | omichat.VanillaCommand
+---@return boolean match
+---@private
+function Search._filterStream(stream)
+    if utils.isinstance(stream, API.Stream) then
+        ---@cast stream omichat.Stream
+        local tabID = ISChat.instance.currentTabID
+        return stream:isTabID(tabID) and stream:isEnabled()
+    end
+
+    local accessLevel = utils.getEffectiveAccessLevel()
+    if not accessLevel then
+        return false
+    end
+
+    ---@cast stream omichat.VanillaCommand
+    return utils.hasAccess(stream.access, accessLevel)
+end
+
+---Display function for icons.
+---@param icon omichat.search.IconInfo
+---@return string alias
+---@private
+function Search._getIconDisplay(icon)
+    return icon.alias
+end
+
+---Returns the texture of an icon.
+---@param icon omichat.search.PerkInfo
+---@return Texture texture
+---@private
+function Search._getIconTexture(icon)
+    return getTexture(icon.name)
+end
+
+---Display function for perks.
+---@param perk Perk
+---@return string display
+---@private
+function Search._getPerkDisplay(perk)
+    return perk:getName() .. ' (' .. perk:getParent():getName() .. ')'
+end
+
+---Display function for streams.
+---@param stream omichat.Stream | omichat.VanillaCommand
+---@param command string
+---@return string display
+---@private
+function Search._getStreamDisplay(stream, command)
+    if not utils.isinstance(stream, API.Stream) then
+        return command
+    end
+
+    ---@cast stream omichat.Stream
+    local streamCommand = utils.trim(stream:getCommand())
+
+    command = utils.trim(command)
+    if command ~= streamCommand then
+        return command .. ' [' .. streamCommand .. ']'
+    end
+
+    return command
+end
+
 ---Performs a string search.
 ---@param ctx omichat.search.InternalSearchContext Search context.
 ---@param primary string Primary string to search.
 ---@param value unknown? Object to use as the result value instead of `primary`.
 ---@param ... string Secondary strings to search.
----@return omichat.search.InternalSearchResult?
+---@return omichat.search.InternalSearchResult? result
 ---@private
 function Search._internal(ctx, primary, value, ...)
     if value == nil then
@@ -484,8 +555,7 @@ function Search._internal(ctx, primary, value, ...)
         search = search:lower()
     end
 
-    ---@type omichat.search.InternalSearchResult?
-    local result
+    local result ---@type omichat.search.InternalSearchResult?
 
     -- check for exact match
     if #search > 0 then
@@ -509,7 +579,7 @@ function Search._internal(ctx, primary, value, ...)
 
                 result = {
                     raw = value,
-                    searchString = str,
+                    compareString = str,
                     display = display,
                     exact = true,
                 }
@@ -533,7 +603,7 @@ function Search._internal(ctx, primary, value, ...)
         -- no search → include all
         result = {
             raw = value,
-            searchString = primary,
+            compareString = primary,
             exact = false,
         }
 
@@ -558,7 +628,7 @@ function Search._internal(ctx, primary, value, ...)
         if match then
             result = {
                 raw = value,
-                searchString = str,
+                compareString = str,
                 display = display,
                 exact = false,
             }
@@ -585,7 +655,7 @@ function Search._internal(ctx, primary, value, ...)
         if match then
             result = {
                 raw = value,
-                searchString = str,
+                compareString = str,
                 display = display,
                 exact = false,
             }
@@ -596,83 +666,9 @@ function Search._internal(ctx, primary, value, ...)
     end
 end
 
----Filter function for streams.
----@param stream omichat.Stream | omichat.VanillaCommand
----@return boolean
----@private
-function Search._filterStream(stream)
-    if utils.isinstance(stream, API.Stream) then
-        ---@cast stream omichat.Stream
-        local tabID = ISChat.instance.currentTabID
-        return stream:isTabID(tabID) and stream:isEnabled()
-    end
-
-    local accessLevel = utils.getEffectiveAccessLevel()
-    if not accessLevel then
-        return false
-    end
-
-    ---@cast stream omichat.VanillaCommand
-    return utils.hasAccess(stream.access, accessLevel)
-end
-
----Display function for icons.
----@param icon omichat.search.IconInfo
----@return string
----@private
-function Search._getIconDisplay(icon)
-    return icon.alias
-end
-
----Returns the texture of an icon.
----@param icon omichat.search.PerkInfo
----@return Texture
----@private
-function Search._getIconTexture(icon)
-    return getTexture(icon.name)
-end
-
----Display function for perks.
----@param perk Perk
----@return string
----@private
-function Search._getPerkDisplay(perk)
-    return perk:getName() .. ' (' .. perk:getParent():getName() .. ')'
-end
-
----Display function for streams.
----@param stream omichat.Stream | omichat.VanillaCommand
----@param command string
----@return string
----@private
-function Search._getStreamDisplay(stream, command)
-    if not utils.isinstance(stream, API.Stream) then
-        return command
-    end
-
-    ---@cast stream omichat.Stream
-    local streamCommand = utils.trim(stream:getCommand())
-
-    command = utils.trim(command)
-    if command ~= streamCommand then
-        return command .. ' [' .. streamCommand .. ']'
-    end
-
-    return command
-end
-
----Search map function that returns the search string value.
----@param _ unknown
----@param command string
----@return string
----@private
-function Search._mapToSearchString(_, command)
-    return command
-end
-
 ---Returns the ID of a perk.
 ---@param perk Perk
----@return string
+---@return string id
 ---@private
 function Search._mapPerkToId(perk)
     return perk:getId()
@@ -680,16 +676,27 @@ end
 
 ---Returns the name of a player given an info table.
 ---@param player omichat.search.PlayerInfo
----@return string
+---@return string name
+---@private
 function Search._mapPlayerInfoToName(player)
     return player.name
 end
 
 ---Returns the username of a player given an info table.
 ---@param player omichat.search.PlayerInfo
----@return string
+---@return string username
+---@private
 function Search._mapPlayerInfoToUsername(player)
     return player.username
+end
+
+---Search map function that returns the comparison value.
+---@param _ unknown
+---@param command string
+---@return string command
+---@private
+function Search._mapToCompareString(_, command)
+    return command
 end
 
 ---Searches a player username for a string, if it should be included.
@@ -699,7 +706,7 @@ end
 ---@param ownUsername string
 ---@param includeSelf boolean?
 ---@param searchUsernames boolean?
----@return omichat.search.InternalSearchResult?
+---@return omichat.search.InternalSearchResult? result
 ---@private
 function Search._playerChatName(player, chatType, ctx, ownUsername, includeSelf, searchUsernames)
     local username
@@ -730,7 +737,7 @@ end
 ---@param ctx omichat.search.InternalSearchContext
 ---@param ownUsername string
 ---@param includeSelf boolean?
----@return omichat.search.InternalSearchResult?
+---@return omichat.search.InternalSearchResult? result
 ---@private
 function Search._playerUsername(player, ctx, ownUsername, includeSelf)
     local username
@@ -749,3 +756,107 @@ end
 
 API.search = Search
 return Search
+
+
+--#region Type Definitions
+
+---@class omichat.SearchResult
+---@field value string The string result of the search.
+---@field exact boolean Whether the result is an exact match of the search text.
+---@field display string? The display string to use for the search result.
+---@field texture Texture? A texture to display alongside the search result.
+
+---@class omichat.SearchResults
+---@field results omichat.SearchResult[] The list of results.
+---@field exact omichat.SearchResult? An exact match, if one was found.
+
+---@class omichat.search.InternalSearchResult
+---@field exact boolean Flag for whether the search result is an exact match.
+---@field raw unknown The raw search result value.
+---@field compareString string The comparison string that was matched on.
+---@field display string? The display string to use for the search result.
+
+
+---@class omichat.StreamSearchOptions
+---@field excludeChatStreams boolean? Flag for whether to exclude chat streams from the search.
+---@field excludeCommandStreams boolean? Flag for whether to exclude custom command streams from the search.
+---@field includeUnmanagedChatStreams boolean? Flag for whether to include unmanaged stream tables in the search.
+---@field includeVanillaCommandStreams boolean? Flag for whether to include vanilla command streams in the search.
+
+---@class omichat.Args.StreamSearch : omichat.StreamSearchOptions, omichat.SearchContext
+
+
+---@class omichat.SearchContext
+---@field search string The string to search for.
+---@field terminateOnExact boolean? If true, exact matches will terminate the search.
+---@field maxResults integer? The maximum number of search results to return.
+---@field maxSearch integer? The maximum number of elements to search before terminating.
+---@field searchDisplay boolean? If true, the display string will be searched as well.
+---@field filter omichat.SearchContext.Filter? Filter function for results.
+---@field display omichat.SearchContext.MapString? Function to retrieve display strings for results.
+---@field args string[]? Arguments for the `filter` function.
+---@field isTerminated boolean? Flag for terminating the search.
+---@field exact omichat.SearchResult? The last exact match for the search.
+
+---@class omichat.search.InternalSearchContext : omichat.SearchContext
+---@field searchForStartsWith string? The search to use for 'starts with' comparison. Defaults to the same string as `search`.
+---@field searchForContains string? The search to use for 'contains' comparison. Defaults to the same string as `search`.
+---@field startsWith omichat.search.InternalSearchResult[] Search results that start with the search text.
+---@field contains omichat.search.InternalSearchResult[] Search results that contain the search text, but don't start with it.
+---@field mapValue omichat.SearchContext.MapString? Callback to map search result values to strings.
+---@field mapTexture omichat.SearchContext.MapTexture? Callback to map search result values to textures.
+---@field caseSensitive boolean? Flag for whether the search should be case-sensitive. Defaults to `false`.
+---@field exactInternal omichat.search.InternalSearchResult? The last exact match for the internal search.
+---@field args string[] Arguments for the `filter` function.
+
+
+---@class omichat.search.PerkInfo
+---@field perk Perk The perk object.
+---@field name string The name of the perk.
+---@field id string The perk ID.
+
+---@class omichat.search.IconInfo
+---@field name string The texture name of the icon.
+---@field alias string The chat alias of the icon.
+
+---@class omichat.search.PlayerInfo
+---@field name string The player's name in chat.
+---@field username string The player's username.
+
+
+---@class omichat.SuggestArgSpecTable
+---@field type omichat.SuggestionType | string The type of the argument.
+---@field prefix string? A prefix to apply to the suggestion result.
+---@field suffix string? A suffix to apply to the suggestion result.
+---@field options string[]? String options for the `option` suggestion type.
+---@field searchDisplay boolean? If true, the display string will be used for determining suggestions.
+---@field filter omichat.SuggestArgSpec.Filter? Filter function for results.
+---@field display omichat.SuggestArgSpec.Display? Function to retrieve display strings for results.
+
+
+---@alias omichat.SearchContext.MapString fun(value: unknown, comparisonString: string): string?
+
+---@alias omichat.SearchContext.MapTexture fun(value: unknown, comparisonString: string): Texture?
+
+---@alias omichat.SearchContext.Filter fun(value: unknown, args: string[]): boolean
+
+---@alias omichat.SuggestArgSpec.Display fun(value: unknown, str: string): string?
+
+---@alias omichat.SuggestArgSpec.Filter fun(result: unknown, args: string[]): boolean
+
+---@alias omichat.SuggestSearchCallback fun(ctx: omichat.SearchContext | string, spec: omichat.SuggestArgSpec): omichat.SearchResults?
+
+
+---@alias omichat.SuggestArgSpec omichat.SuggestArgSpecTable | omichat.SuggestionType | string
+
+---@alias omichat.SuggestionType
+---| 'online-username'
+---| 'online-username-with-self'
+---| 'language'
+---| 'known-language'
+---| 'icon'
+---| 'perk'
+---| 'option'
+---| '?'
+
+--#endregion

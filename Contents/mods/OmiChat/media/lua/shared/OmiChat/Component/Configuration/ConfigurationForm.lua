@@ -1,6 +1,6 @@
 ---Configuration form layout.
 
-local utils = require 'OmiChat/utils'
+local utils = require 'OmiChat/Utils'
 local Helpers = require 'OmiChat/Component/Configuration/ConfigurationHelpers'
 local rules = Helpers.rules
 
