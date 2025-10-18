@@ -1,6 +1,8 @@
+---@namespace omichat
 ---Helper for building information about a chat message.
 
-local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
+---@class(partial) api.client
+local API = require 'OmiChat/Module/Client/Core'
 
 local utils = API.utils
 local config = API.Configuration
@@ -14,38 +16,38 @@ local instanceof = instanceof
 local getZomboidRadio = getZomboidRadio
 
 
----@class omichat.MessageInfo : omi.Class
----@field message omichat.Message The message object.
----@field tokens table<string, unknown> Token substitution values.
+---@class MessageInfo : omi.Class
+---@field message Message The message object.
+---@field tokens table<string, any> Token substitution values.
 ---@field context table Table for arbitrary context data.
----@field content string? The message content to display in chat. Set by transformers.
+---@field content? string The message content to display in chat. Set by transformers.
 ---@field rawText string The raw text of the message. This should not be modified.
 ---@field chatType omi.ChatTypeString The chat type of the message's chat.
----@field format string? The format string to use for the message. Set by transformers.
----@field default string? The name of the default to use for the `$Default()` function.
----@field stream omichat.Stream? The source stream of the message.
----@field originalStream omichat.Stream? The original stream of a radio message.
+---@field format? string The format string to use for the message. Set by transformers.
+---@field default? string The name of the default to use for the `$Default()` function.
+---@field stream? Stream The source stream of the message.
+---@field originalStream? Stream The original stream of a radio message.
 ---@field author string The username of the message author.
----@field zombieAttractRange integer? The range at which the message will be heard by zombies.
----@field tags omi.SimpleSet A set of tags to add to the message tokens.
----@field private usePerceivedText boolean? Flag for whether the message text should be replaced by the "perception range" text.
----@field private useUnknownLanguageText boolean? Flag for whether the message text should be replaced by the unknown language text.
----@field private overheadText string? The text to show overhead instead of the message text.
----@field private doFullOverhead boolean? Flag for whether the replacement overhead text should also use the overhead prefix and final formats.
+---@field zombieAttractRange? number The range at which the message will be heard by zombies.
+---@field tags omi.SetTable<string> A set of tags to add to the message tokens.
+---@field private usePerceivedText? boolean Flag for whether the message text should be replaced by the "perception range" text.
+---@field private useUnknownLanguageText? boolean Flag for whether the message text should be replaced by the unknown language text.
+---@field private overheadText? string The text to show overhead instead of the message text.
+---@field private doFullOverhead? boolean Flag for whether the replacement overhead text should also use the overhead prefix and final formats.
 ---@field private hidden boolean Flag for whether the message has been hidden both in chat and overhead.
 ---@field private loudCallout boolean Flag for whether the message is a regular callout.
 ---@field private sneakCallout boolean Flag for whether the message is a sneak callout.
 ---@field private datetime string A string representing the date and time the message was sent.
 ---@field private skipLanguage boolean Flag for whether language processing should skipped.
----@field private tag string? The result of the `FormatTag` option.
----@field private timestamp string? The result of the `FormatTimestamp` option.
----@field private language string? The result of the `FormatLanguage` option.
+---@field private tag? string The result of the `FormatTag` option.
+---@field private timestamp? string The result of the `FormatTimestamp` option.
+---@field private language? string The result of the `FormatLanguage` option.
 ---@field private titleID string The string ID of the chat type's tag.
 ---@field private showTitle boolean Flag for whether the message will include the chat type tag.
 ---@field private showTimestamp boolean Flag for whether the message will include a timestamp.
----@field private font omichat.ChatFont The font size of the message.
----@field private color omi.ColorTable? The message color.
----@field private meta omichat.MessageInfo.Metadata Metadata attached to the message.
+---@field private font ChatFont The font size of the message.
+---@field private color? omi.ColorTable<integer> The message color.
+---@field private meta MessageInfo.Metadata Metadata attached to the message.
 local MessageInfo = utils.lib.class()
 
 
@@ -170,7 +172,7 @@ function MessageInfo:applyFormatting()
 
     if self:shouldUseNameColors() then
         local encodedColor = self.meta.nameColor
-        local nameColor = encodedColor or API.data.getSpeechColor(self.author) or { r = 255, g = 255, b = 255 }
+        local nameColor = utils.color.default(encodedColor or API.data.getSpeechColor(self.author), 255, 255, 255)
         local nameColorTag = utils.color.toRichText(nameColor, true)
 
         if nameColorTag ~= '' then
@@ -185,7 +187,7 @@ function MessageInfo:applyFormatting()
         local recip = self.tokens.recipient
         if recip then
             local encodedRecipColor = self.meta.recipientNameColor
-            local recipColor = encodedRecipColor or API.data.getSpeechColor(recip) or { r = 255, g = 255, b = 255 }
+            local recipColor = utils.color.default(encodedRecipColor or API.data.getSpeechColor(recip), 255, 255, 255)
 
             local recipColorTag = utils.color.toRichText(recipColor, true)
 
@@ -215,7 +217,7 @@ function MessageInfo:applyFormatting()
 end
 
 ---Runs transformers on the message.
----@param transformers omichat.MessageTransformer[]
+---@param transformers MessageTransformer[]
 function MessageInfo:applyTransforms(transformers)
     for i = 1, #transformers do
         local transformer = transformers[i]
@@ -343,7 +345,7 @@ end
 
 ---Returns the explicitly set color for the message to use.
 ---If a format color was not set, returns `nil`.
----@return omi.ColorTable?
+---@return omi.ColorTable<integer>?
 function MessageInfo:getColor()
     return self.color
 end
@@ -385,7 +387,7 @@ function MessageInfo:getLanguageText()
 end
 
 ---Returns metadata about the message.
----@return omichat.MessageInfo.Metadata
+---@return MessageInfo.Metadata
 function MessageInfo:getMetadata()
     return self.meta
 end
@@ -397,25 +399,25 @@ function MessageInfo:getMetadataLanguage()
 end
 
 ---Gets the result of language checking stored in the message metadata.
----@return omichat.MessageInfo.Metadata.LanguageResult?
+---@return MessageInfo.Metadata.LanguageResult?
 function MessageInfo:getMetadataLanguageResult()
     return self.meta.languageResult
 end
 
 ---Gets the result of range checking stored in the message metadata.
----@return omichat.MessageInfo.Metadata.RangeResult?
+---@return MessageInfo.Metadata.RangeResult?
 function MessageInfo:getMetadataRangeResult()
     return self.meta.rangeResult
 end
 
 ---Gets the name color encoded in the message.
----@return omi.ColorTable?
+---@return omi.ColorTable<integer>?
 function MessageInfo:getNameColor()
     return self.meta.nameColor
 end
 
 ---Gets the original text color of the message.
----@return omi.ColorTable
+---@return omi.ColorTable<integer>
 function MessageInfo:getOriginalColor()
     local textColor = self.message:getTextColor()
     return {
@@ -426,7 +428,7 @@ function MessageInfo:getOriginalColor()
 end
 
 ---Gets the original stream a radio message was sent over, if it was able to be decoded.
----@return omichat.Stream?
+---@return Stream?
 function MessageInfo:getOriginalStream()
     return self.originalStream
 end
@@ -451,13 +453,13 @@ function MessageInfo:getRawText()
 end
 
 ---Gets the recipient name color encoded in the message.
----@return omi.ColorTable?
+---@return omi.ColorTable<integer>?
 function MessageInfo:getRecipientNameColor()
     return self.meta.recipientNameColor
 end
 
 ---Gets the stream the message was sent over, if it was able to be decoded.
----@return omichat.Stream?
+---@return Stream?
 function MessageInfo:getStream()
     return self.stream
 end
@@ -482,7 +484,7 @@ end
 
 ---Gets the range within which the message should attract zombies.
 ---A `nil` value indicates that the message should not attract zombies.
----@return integer?
+---@return number?
 function MessageInfo:getZombieAttractionRange()
     return self.zombieAttractRange
 end
@@ -543,7 +545,7 @@ function MessageInfo:isChatType(chatType)
 end
 
 ---Sets the color to use for the message.
----@param color omi.ColorTable
+---@param color omi.ColorTable<integer>
 function MessageInfo:setColor(color)
     self.color = color
 end
@@ -604,20 +606,20 @@ function MessageInfo:setMetadataLanguage(language)
 end
 
 ---Sets a value in the message metadata to indicate the result of language checking.
----@param result omichat.MessageInfo.Metadata.LanguageResult
+---@param result MessageInfo.Metadata.LanguageResult
 ---@return boolean success
 function MessageInfo:setMetadataLanguageResult(result)
     return self:_setMetadataValue('languageResult', result)
 end
 
 ---Sets the results of formatting mentions in the message.
----@param mentions omichat.MessageInfo.Metadata.Mention[]
+---@param mentions MessageInfo.Metadata.Mention[]
 function MessageInfo:setMetadataMentions(mentions)
     self:_setMetadataValue('mentions', mentions)
 end
 
 ---Sets the color to use for the author name in the message metadata.
----@param color omi.ColorTable
+---@param color omi.ColorTable<integer>
 function MessageInfo:setMetadataNameColor(color)
     self:_setMetadataValue('nameColor', utils.color.toHexString(color))
 end
@@ -630,14 +632,14 @@ function MessageInfo:setMetadataRadioSuppressed(suppressed)
 end
 
 ---Sets a value in the message metadata to indicate the result of range checking.
----@param result omichat.MessageInfo.Metadata.RangeResult
+---@param result MessageInfo.Metadata.RangeResult
 ---@return boolean success
 function MessageInfo:setMetadataRangeResult(result)
     return self:_setMetadataValue('rangeResult', result)
 end
 
 ---Sets the color to use for the recipient name in the message metadata.
----@param color omi.ColorTable
+---@param color omi.ColorTable<integer>
 function MessageInfo:setMetadataRecipientNameColor(color)
     self:_setMetadataValue('recipientNameColor', utils.color.toHexString(color))
 end
@@ -655,8 +657,8 @@ function MessageInfo:setOverheadText(text, doFullFormatting)
 end
 
 ---Updates the stream and associated information to act as if the message was sent on another stream.
----@param stream omichat.Stream
----@param options omichat.Args.MessageInfo.SetStream?
+---@param stream Stream
+---@param options Args.MessageInfo.SetStream?
 function MessageInfo:setStream(stream, options)
     options = options or {}
 
@@ -780,7 +782,6 @@ function MessageInfo:syncTags()
     local tagSet
     local existingTags = self.tokens.tags
     if utils.isinstance(existingTags, MultiMap) then
-        ---@cast existingTags omi.MultiMap
         tagSet = existingTags:toValueSet()
     else
         tagSet = {}
@@ -904,14 +905,14 @@ function MessageInfo:_avoidEmptyMessages()
 end
 
 ---Decodes information encoded in the message's tag.
----@return omichat.MessageInfo.Metadata
+---@return MessageInfo.Metadata
 ---@private
 function MessageInfo:_decodeMetadata()
     return API.format.decodeMessageMetadata(self.message, self.meta)
 end
 
 ---Gets the best action stream to use for displaying a message.
----@return omichat.ChatStream? stream
+---@return ChatStream? stream
 ---@private
 function MessageInfo:_getActionStream()
     local targetTags
@@ -939,7 +940,7 @@ end
 
 ---Determines the source stream of a message based on encoded information.
 ---@param skipRadio boolean?
----@return omichat.Stream? stream
+---@return Stream? stream
 ---@private
 function MessageInfo:_getMessageStream(skipRadio)
     if self.chatType == 'server' then
@@ -962,7 +963,7 @@ end
 
 ---Sets a key in the message's metadata.
 ---@param key string
----@param value unknown
+---@param value any
 ---@return boolean success
 ---@private
 function MessageInfo:_setMetadataValue(key, value)
@@ -1108,10 +1109,10 @@ end
 
 
 ---Creates a new message information object.
----@param message omichat.Message The message to create an information object for.
----@return omichat.MessageInfo info
+---@param message Message The message to create an information object for.
+---@return MessageInfo info
 function MessageInfo:new(message)
-    local this = setmetatable({}, self) ---@cast this omichat.MessageInfo
+    local this = setmetatable({}, self) --[[@as MessageInfo]]
     local instance = ISChat.instance
 
     this.meta = {}
@@ -1130,13 +1131,11 @@ function MessageInfo:new(message)
     this:_decodeMetadata()
 
     if utils.isinstance(message, MimicMessage) then
-        ---@cast message omi.MimicMessage
         this.rawText = message:getTextWithPrefixBase()
         this.titleID = message:getTitleID()
     else
         -- `getText` doesn't handle color & image formatting.
         -- would just use that otherwise
-        ---@cast message ChatMessage
         local chat = message:getChat()
         this.rawText = _getTextWithPrefix(message)
         this.titleID = _getChatTitleID(chat)
@@ -1166,40 +1165,39 @@ end
 API.MessageInfo = MessageInfo
 return MessageInfo
 
-
 --#region Type Definitions
 
----@class omichat.MessageInfo.Metadata
----@field language string? The roleplay language in which the message was sent.
----@field name string? The name of the author when this message was sent.
----@field icon string? The user's icon when this message was sent.
----@field adminIcon string? The admin icon when this message was sent, if it was enabled.
----@field nameColor omi.ColorTable? The name color of the author when this message was sent.
----@field recipientNameColor omi.ColorTable? The name color of the recipient when this message was sent.
----@field suppressedRadio boolean? Flag for whether the overhead text for this message has already been suppressed on radio.
----@field stream string? The name of the stream the message was sent over.
----@field originalStream string? The name of the original stream a radio message was sent over.
----@field faction string? The name of the faction to which the message was sent.
----@field rangeResult omichat.MessageInfo.Metadata.RangeResult? The result of range checking.
----@field languageResult omichat.MessageInfo.Metadata.LanguageResult? The result of language checking.
----@field attractedZombies boolean? Flag for whether the message has already attracted zombies.
----@field displayedOverhead boolean? Flag for whether the replacement overhead text has already displayed.
----@field mentions omichat.MessageInfo.Metadata.Mention[]? The results of formatting mentions.
+---@class Args.MessageInfo.SetStream
+---@field chatType? omi.ChatTypeString The chat type to set alongside the stream. Defaults to the stream's chat type.
+---@field forceFormat? boolean Flag for if the format should be set to the chat's format regardless of whether it's already set.
+---@field noTagUpdate? boolean Flag for whether the tags shouldn't be updated to include the target stream's tags.
+---@field overwriteTags? boolean Flag for whether the previous tags should be overwritten with the tags from the target stream, instead of merging.
 
----@class omichat.MessageInfo.Metadata.Mention
+
+---@class MessageInfo.Metadata
+---@field language? string The roleplay language in which the message was sent.
+---@field name? string The name of the author when this message was sent.
+---@field icon? string The user's icon when this message was sent.
+---@field adminIcon? string The admin icon when this message was sent, if it was enabled.
+---@field nameColor? omi.ColorTable<integer> The name color of the author when this message was sent.
+---@field recipientNameColor? omi.ColorTable<integer> The name color of the recipient when this message was sent.
+---@field suppressedRadio? boolean Flag for whether the overhead text for this message has already been suppressed on radio.
+---@field stream? string The name of the stream the message was sent over.
+---@field originalStream? string The name of the original stream a radio message was sent over.
+---@field faction? string The name of the faction to which the message was sent.
+---@field rangeResult? MessageInfo.Metadata.RangeResult The result of range checking.
+---@field languageResult? MessageInfo.Metadata.LanguageResult The result of language checking.
+---@field attractedZombies? boolean Flag for whether the message has already attracted zombies.
+---@field displayedOverhead? boolean Flag for whether the replacement overhead text has already displayed.
+---@field mentions? MessageInfo.Metadata.Mention[] The results of formatting mentions.
+
+---@class MessageInfo.Metadata.Mention
 ---@field color string The color of the mention text.
----@field name string? The name to display in hover text for the mention.
+---@field name? string The name to display in hover text for the mention.
 
 
----@class omichat.Args.MessageInfo.SetStream
----@field chatType omi.ChatTypeString? The chat type to set alongside the stream. Defaults to the stream's chat type.
----@field forceFormat boolean? Flag for if the format should be set to the chat's format regardless of whether it's already set.
----@field noTagUpdate boolean? Flag for whether the tags shouldn't be updated to include the target stream's tags.
----@field overwriteTags boolean? Flag for whether the previous tags should be overwritten with the tags from the target stream, instead of merging.
+---@alias MessageInfo.Metadata.LanguageResult 'known-language' | 'unknown-language'
 
-
----@alias omichat.MessageInfo.Metadata.LanguageResult 'known-language' | 'unknown-language'
-
----@alias omichat.MessageInfo.Metadata.RangeResult 'in-range' | 'out-of-range' | 'in-perception-range'
+---@alias MessageInfo.Metadata.RangeResult 'in-range' | 'out-of-range' | 'in-perception-range'
 
 --#endregion

@@ -1,16 +1,19 @@
+---@namespace omichat
 ---Handles getting and setting data about the local player.
 
-local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
+---@class(partial) api.client
+local API = require 'OmiChat/Module/Client/Core'
 
 local utils = API.utils
 local config = API.Configuration
 local concat = table.concat
 local sqrt = math.sqrt
 local getText = getText
+local ISChat = ISChat ---@type ISChat
 
 
 ---Contains functions for getting and setting data related to the local player.
----@class omichat.api.client.player
+---@class api.client.player
 local Player = {}
 
 
@@ -72,7 +75,7 @@ end
 
 ---Returns a color table preferred by the local player.
 ---@param id string The color identifier. This is the name of a stream, or `speech` for the speech color.
----@return omi.ColorTable? color The color table, or `nil` if the color is unset.
+---@return omi.ColorTable<integer>? color The color table, or `nil` if the color is unset.
 function Player.getColor(id)
     if id == 'speech' then
         return Player.getSpeechColor()
@@ -83,7 +86,7 @@ end
 
 ---Returns a color table preferred by the local player, or the default color table if there isn't one.
 ---@param id string The color identifier. This is the name of a stream, or `speech` for the speech color.
----@return omi.ColorTable color The color table to use.
+---@return omi.ColorTable<integer> color The color table to use.
 function Player.getColorOrDefault(id)
     return Player.getColor(id) or Player.getDefaultColor(id)
 end
@@ -101,14 +104,25 @@ end
 
 ---Gets the default color associated with a stream or speech color.
 ---@param id string The color identifier. This is the name of a stream, or `speech` for the speech color.
----@return omi.ColorTable color The default color table. If the default could not be retrieved or there is no default, this returns white.
+---@return omi.ColorTable<integer> color The default color table. If the default could not be retrieved or there is no default, this returns white.
 function Player.getDefaultColor(id)
     if id == 'speech' then
-        return Player.getSpeechColor() or { r = 255, g = 255, b = 255 }
+        local speechColor = Player.getSpeechColor()
+        if not speechColor then
+            return { r = 255, g = 255, b = 255 }
+        end
+
+        return speechColor
     end
 
     local stream = API.streams.getChatStream(id)
-    return stream and stream:getDefaultColor() or { r = 255, g = 255, b = 255 }
+
+    local defaultColor = stream and stream:getDefaultColor()
+    if not defaultColor then
+        return { r = 255, g = 255, b = 255 }
+    end
+
+    return defaultColor
 end
 
 ---Gets a list of default shouts to use when custom shouts aren't set.
@@ -185,7 +199,7 @@ function Player.getNickname()
 end
 
 ---Returns a color table for the local player's speech color.
----@return omi.ColorTable? color
+---@return omi.ColorTable<integer>? color
 function Player.getSpeechColor()
     local player = getSpecificPlayer(0)
     if not player then
@@ -235,7 +249,7 @@ end
 
 ---Sets the color associated with a given stream or identifier for the local player.
 ---@param id string The color identifier. This is the name of a stream, or `speech` for the speech color.
----@param color omi.ColorTable? The color to set, or `nil` to unset it.
+---@param color omi.ColorTable<integer>? The color to set, or `nil` to unset it.
 function Player.setColor(id, color)
     if id == 'speech' then
         Player.setSpeechColor(color)
@@ -331,7 +345,7 @@ end
 
 ---Sets the color used for overhead chat bubbles.
 ---This will set the speech color in-game option.
----@param color omi.ColorTable? The new speech color.
+---@param color omi.ColorTable<integer>? The new speech color.
 ---@param doRequest boolean? Flag for whether a request to update the cache should be made. Defaults to `true`.
 ---@return boolean success
 function Player.setSpeechColor(color, doRequest)
@@ -344,7 +358,6 @@ function Player.setSpeechColor(color, doRequest)
         return false
     end
 
-    ---@cast color omi.ColorTable
     local r = color.r / 255
     local g = color.g / 255
     local b = color.b / 255
@@ -444,13 +457,15 @@ function Player.updateCharacterName(name, updateSurname)
         local parts = name:split(' ')
         if #parts > 1 then
             forename = utils.trim(concat(parts, ' ', 1, #parts - 1))
-            surname = utils.trim(parts[#parts])
+            surname = utils.trim(parts[#parts] --[[@as string]])
         end
     end
 
     desc:setForename(forename)
+
+    -- fix incompatibility with buffy's character bios
     if ISChat.instance and config:compatBuffyCharacterBiosEnabled() then
-        -- fix incompatibility with buffy's character bios
+        ---@diagnostic disable-next-line: inject-field
         ISChat.instance.rpName = forename
     end
 

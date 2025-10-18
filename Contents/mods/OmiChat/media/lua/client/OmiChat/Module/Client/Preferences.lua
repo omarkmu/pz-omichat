@@ -1,6 +1,8 @@
+---@namespace omichat
 ---Handles player preferences.
 
-local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
+---@class(partial) api.client
+local API = require 'OmiChat/Module/Client/Core'
 local schema = require 'OmiChat/Component/PreferencesSchema'
 
 local utils = API.utils
@@ -8,9 +10,8 @@ local config = API.Configuration
 
 
 ---Contains functions for getting and setting player preferences.
----@class omichat.api.client.preferences
----@field private _adminOptionMap table<omichat.AdminOption, string> Associates admin options to setting names.
----@field private _prefs omichat.PlayerPreferences? The loaded player preferences.
+---@class api.client.preferences
+---@field private _prefs? PlayerPreferences The loaded player preferences.
 local Preferences = {}
 
 ---The current preferences file version.
@@ -21,6 +22,9 @@ Preferences._version = 2
 ---@private
 Preferences._filename = 'omichat.json'
 
+---Associates admin options to setting names.
+---@type table<AdminOption, string>
+---@private
 Preferences._adminOptionMap = {
     ShowIcon = 'adminShowIcon',
     KnowAllLanguages = 'adminKnowLanguages',
@@ -29,7 +33,7 @@ Preferences._adminOptionMap = {
 
 
 ---Gets or creates the player preferences table.
----@return omichat.PlayerPreferences preferences
+---@return PlayerPreferences preferences
 function Preferences.get()
     if Preferences._prefs then
         return Preferences._prefs
@@ -63,7 +67,7 @@ function Preferences.get()
 end
 
 ---Gets the value of a given admin option preference.
----@param option omichat.AdminOption The option to retrieve.
+---@param option AdminOption The option to retrieve.
 ---@return boolean enabled
 function Preferences.getAdminOption(option)
     local prefs = Preferences.get()
@@ -73,7 +77,7 @@ end
 
 ---Gets a color table matching the player's preference.
 ---@param name string The name of a stream.
----@return omi.ColorTable? color The player's preferred color for a stream, or `nil` if unset.
+---@return omi.ColorTable<integer>? color The player's preferred color for a stream, or `nil` if unset.
 function Preferences.getColor(name)
     local profile = Preferences.getCurrentProfile()
     if not profile then
@@ -84,7 +88,7 @@ function Preferences.getColor(name)
 end
 
 ---Retrieves the player's custom shouts for the current profile.
----@param shoutType omichat.CalloutCategory The type of shouts to retrieve.
+---@param shoutType CalloutCategory The type of shouts to retrieve.
 ---@return string[]? shouts The table of shouts. If custom shouts are disabled or no profile is set, `nil`.
 function Preferences.getCustomShouts(shoutType)
     if not config:isCustomShoutsEnabled() then
@@ -100,7 +104,7 @@ function Preferences.getCustomShouts(shoutType)
 end
 
 ---Returns the current player profile.
----@return omichat.PlayerProfile? profile
+---@return PlayerProfile? profile
 function Preferences.getCurrentProfile()
     local prefs = Preferences.get()
     return prefs.profiles[prefs.profileIndex]
@@ -118,7 +122,7 @@ function Preferences.getCurrentProfileIndex()
 end
 
 ---Gets a table with the default player preferences.
----@return omichat.PlayerPreferences defaultPreferences
+---@return PlayerPreferences defaultPreferences
 function Preferences.getDefaultPlayerPreferences()
     return {
         HIGHER_VERSION = false,
@@ -155,14 +159,14 @@ function Preferences.getNameColorsEnabled()
 end
 
 ---Returns the configured player profiles.
----@return omichat.PlayerProfile[] profiles
+---@return PlayerProfile[] profiles
 function Preferences.getProfiles()
     local prefs = Preferences.get()
     return prefs.profiles
 end
 
 ---Gets whether a command category is set to retain commands.
----@param category omichat.StreamCategory
+---@param category StreamCategory
 ---@return boolean shouldRetain
 function Preferences.getRetainCommand(category)
     local prefs = Preferences.get()
@@ -278,7 +282,7 @@ function Preferences.save()
 end
 
 ---Sets the value of a given admin option preference.
----@param option omichat.AdminOption The option to update.
+---@param option AdminOption The option to update.
 ---@param value boolean The new value.
 function Preferences.setAdminOption(option, value)
     local prefs = Preferences.get()
@@ -298,7 +302,7 @@ end
 ---Sets a color table for the current player's preference for a stream.
 ---This sets the value in the current profile.
 ---@param name string The name of the stream to set a color for.
----@param color omi.ColorTable? The color table to set, or `nil` to unset the value.
+---@param color omi.ColorTable<integer>? The color table to set, or `nil` to unset the value.
 function Preferences.setColor(name, color)
     local profile = Preferences.getCurrentProfile()
     if not profile then
@@ -309,7 +313,7 @@ function Preferences.setColor(name, color)
 end
 
 ---Sets the player's custom shouts.
----@param shoutType omichat.CalloutCategory The type of shouts to set.
+---@param shoutType CalloutCategory The type of shouts to set.
 ---@param shouts string[]? The list of shouts to set.
 ---@return boolean success
 function Preferences.setCustomShouts(shoutType, shouts)
@@ -332,7 +336,7 @@ function Preferences.setNameColorsEnabled(enabled)
 end
 
 ---Sets the list of player profiles.
----@param profiles omichat.PlayerProfile[] A list of profiles. This is assumed to be valid.
+---@param profiles PlayerProfile[] A list of profiles. This is assumed to be valid.
 function Preferences.setProfiles(profiles)
     local prefs = Preferences.get()
     prefs.profiles = profiles
@@ -341,7 +345,7 @@ function Preferences.setProfiles(profiles)
 end
 
 ---Sets whether a retain command category will retain commands.
----@param category omichat.StreamCategory The command category to update.
+---@param category StreamCategory The command category to update.
 ---@param value boolean Flag for whether commands should be retained.
 function Preferences.setRetainCommand(category, value)
     local prefs = Preferences.get()
@@ -401,7 +405,7 @@ end
 ---@return boolean success
 function Preferences.switchProfile(idx)
     local prefs = Preferences.get()
-    local profile = prefs.profiles[idx] ---@type omichat.PlayerProfile?
+    local profile = prefs.profiles[idx] ---@type PlayerProfile?
     if not profile and idx >= 1 then
         return false
     end
@@ -451,15 +455,14 @@ end
 API.preferences = Preferences
 return Preferences
 
-
 --#region Type Definitions
 
----@alias omichat.AdminOption
+---@alias AdminOption
 ---| 'ShowIcon'
 ---| 'KnowAllLanguages'
 ---| 'IgnoreMessageRange'
 
----@alias omichat.CalloutCategory
+---@alias CalloutCategory
 ---| 'callouts'
 ---| 'sneakcallouts'
 

@@ -1,14 +1,15 @@
+---@namespace omichat
 ---Handles player data.
 
 if isClient() then return end
 
-local API = require 'OmiChat/Module/Server/Core' ---@class omichat.api.server
+---@class(partial) api.server
+local API = require 'OmiChat/Module/Server/Core'
 local config = API.Configuration
 local utils = API.utils
 
-
 ---Contains functions for handling player data.
----@class omichat.api.server.data : omichat.api.shared.data
+---@class api.server.data : api.shared.data
 local Data = API.data
 
 
@@ -65,7 +66,7 @@ function Data.getLanguages(username)
         Data.resetLanguages(username)
     end
 
-    return playerData.languages
+    return playerData.languages --[[@as string[] ]]
 end
 
 ---Gets the number of roleplay language slots for a player.
@@ -78,20 +79,20 @@ end
 
 ---Retrieves data for a given player, creating it if it doesn't exist.
 ---@param username string The player's username.
----@return omichat.PlayerData data The player's data.
+---@return PlayerData data The player's data.
 function Data.getOrCreatePlayerData(username)
     return Data._getOrCreatePlayerData(username)
 end
 
 ---Retrieves data for a given player.
 ---@param username string The player's username.
----@return omichat.PlayerData? data The player's data.
+---@return PlayerData? data The player's data.
 function Data.getPlayerData(username)
     return Data._get().players[username]
 end
 
 ---Gets a list of all player data.
----@return omichat.PlayerData[] list
+---@return PlayerData[] list
 function Data.getPlayerDataList()
     local list = {}
 
@@ -145,7 +146,7 @@ function Data.refreshLanguageInfo(username)
 end
 
 ---Refreshes the cache with information from the currently online players.
----@return omichat.PlayerCacheData[] items
+---@return PlayerCacheData[] items
 function Data.refreshPlayerCache()
     local items = {}
 
@@ -225,7 +226,7 @@ end
 ---Sets the data for a player.
 ---This does not broadcast changes to clients.
 ---@param username string The player's username.
----@param data omichat.PlayerData The new data to set.
+---@param data PlayerData The new data to set.
 function Data.setPlayerData(username, data)
     if not data then
         return
@@ -250,7 +251,7 @@ end
 
 ---Attempts to update data as the given player.
 ---@param player IsoPlayer The player to perform the update as.
----@param args omichat.request.Args.PlayerDataUpdate The data for the update.
+---@param args request.Args.PlayerDataUpdate The data for the update.
 ---@param broadcast boolean? Flag for whether the update should be broadcast. Defaults to `true`.
 ---@return boolean success
 ---@return string? errorID
@@ -279,9 +280,9 @@ function Data.tryUpdate(player, args, broadcast)
 end
 
 ---Updates a player data field.
----@param field omichat.PlayerDataField The field to update.
+---@param field PlayerDataField The field to update.
 ---@param target string The target username.
----@param value unknown? The new field value.
+---@param value any? The new field value.
 ---@param fromCommand boolean? Flag for whether this request comes from a command.
 ---@return boolean success
 ---@return string? errorID
@@ -292,42 +293,42 @@ function Data._updateField(field, target, value, fromCommand)
             return false
         end
 
-        API.data.setPlayerData(target, value)
+        Data.setPlayerData(target, value)
     elseif field == 'currentLanguage' then
         if not value then
             return false
         end
 
-        return API.data.setCurrentLanguage(target, value)
+        return Data.setCurrentLanguage(target, value)
     elseif field == 'icon' then
-        API.data.setChatIcon(target, value and tostring(value) or nil)
+        Data.setChatIcon(target, value and tostring(value) or nil)
         return true
     elseif field == 'languages' then
         if not value then
-            API.data.resetLanguages(target)
+            Data.resetLanguages(target)
             return true
         end
 
-        return API.data.addLanguage(target, value)
+        return Data.addLanguage(target, value)
     elseif field == 'languageSlots' then
-        local slots = tonumber(value)
+        local slots = utils.tointeger(value)
         if not slots then
             return false
         end
 
-        return API.data.setLanguageSlots(target, slots)
+        return Data.setLanguageSlots(target, slots)
     elseif field == 'nickname' then
         if not config:isNicknameEnabled() and not fromCommand then
             return false
         end
 
-        API.data.setNickname(target, value and tostring(value) or nil)
+        Data.setNickname(target, value and tostring(value) or nil)
     elseif field == 'status' then
         if not config.Commands.Status.Enable and not fromCommand then
             return false
         end
 
-        API.data.setStatus(target, value and tostring(value) or nil)
+        Data.setStatus(target, value and tostring(value) or nil)
     end
 
     return true
@@ -337,10 +338,9 @@ end
 API.data = Data
 return Data
 
-
 --#region Type Definitions
 
----@alias omichat.PlayerDataField
+---@alias PlayerDataField
 ---| 'all'
 ---| 'nickname'
 ---| 'languages'

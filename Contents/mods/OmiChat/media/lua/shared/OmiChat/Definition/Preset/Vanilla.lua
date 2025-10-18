@@ -1,3 +1,4 @@
+---@namespace omichat
 ---Vanilla preset.
 
 local Preset = require 'OmiChat/Component/Configuration/Preset'

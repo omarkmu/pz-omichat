@@ -1,3 +1,4 @@
+---@namespace omichat
 ---Contains mod configuration and enables updating it.
 
 local utils = require 'OmiChat/Utils'
@@ -9,30 +10,19 @@ local isempty = table.isempty
 
 
 ---Helper for managing and retrieving mod configuration.
----@class omichat.ConfigurationHelper : omi.ConfigurationHelper, omichat.Configuration
----@field private _enabledMods table<string, boolean?> Cache of enabled mods.
----@field private _languageAllowSet omi.SimpleSet Set of languages that should be allowed for self-adding.
----@field private _languageBlockSet omi.SimpleSet Set of languages that should be disallowed for self-adding.
----@field private _languageNameList string[] List of configured language names.
----@field private _idToLanguage table<integer, omichat.LanguageRecord> Associates language IDs to information about languages.
----@field private _nameToLanguage table<string, omichat.LanguageRecord> Associates language names to information about languages.
----@field private _formatterInfo table<integer, omichat.FormatterInfo> Associates formatter IDs to information about formatters used for encoding metadata.
----@field private _presetList omichat.ConfigurationPreset[] List containing presets in presentation order. Contains both built-in and custom presets.
----@field private _customPresets table<string, omichat.ConfigurationPreset> Associates preset names to custom user-defined presets.
----@field private _variables table<string, string> Contains arbitary variables.
+---@class ConfigurationHelper : omi.ConfigurationHelper, Configuration
 local Configuration = utils.configuration {
     schema = require 'OmiChat/Component/Configuration/ConfigurationSchema',
-    modDataKey = 'omichat.settings',
+    modDataKey = 'settings',
     logger = utils.log,
 
-    ---@param self omichat.ConfigurationHelper
+    ---@param self ConfigurationHelper
     init = function(self)
         self:loadCustomPresets()
-        self:refreshEnabledMods()
         self:loadDefaults()
     end,
 
-    ---@param self omichat.ConfigurationHelper
+    ---@param self ConfigurationHelper
     onLoad = function(self) self:refreshValueCaches() end,
 }
 
@@ -52,15 +42,49 @@ Configuration._presets = {
     Vanilla = require 'OmiChat/Definition/Preset/Vanilla',
 }
 
-Configuration._enabledMods = {}
+---Set of languages that should be allowed for self-adding.
+---@type omi.SetTable<string>
+---@private
 Configuration._languageAllowSet = {}
+
+---Set of languages that should be disallowed for self-adding.
+---@type omi.SetTable<string>
+---@private
 Configuration._languageBlockSet = {}
+
+---List of configured language names.
+---@type string[]
+---@private
 Configuration._languageNameList = {}
+
+---Associates language IDs to information about languages.
+---@type table<integer, LanguageRecord>
+---@private
 Configuration._idToLanguage = {}
+
+---Associates language names to information about languages.
+---@type table<string, LanguageRecord>
+---@private
 Configuration._nameToLanguage = {}
+
+---Associates formatter IDs to information about formatters used for encoding metadata.
+---@type table<integer, FormatterInfo>
+---@private
 Configuration._formatterInfo = {}
+
+---List containing presets in presentation order. Contains built-in and custom presets.
+---@type ConfigurationPreset[]
+---@private
 Configuration._presetList = {}
+
+---Associates preset names to custom user-defined presets.
+---@type table<string, ConfigurationPreset>
+---@private
 Configuration._customPresets = {}
+
+---Contains arbitary variables.
+---@type table<string, string>
+---@private
 Configuration._variables = {}
 
 --#endregion
@@ -76,90 +100,118 @@ Configuration._variables = {}
 
 
 ---Constant for the number at which chat format IDs start.
+---@readonly
 Configuration.MIN_CHAT_ID = 33
 
 ---Constant for the number at which chat format IDs end.
+---@readonly
 Configuration.MAX_CHAT_ID = 64
 
 ---Constant for the number at which metadata format IDs start.
+---@readonly
 Configuration.MIN_META_ID = 81
 
 ---Constant for the number at which metadata format IDs end.
+---@readonly
 Configuration.MAX_META_ID = 89
 
 ---Constant for the maximum number of configured chat streams.
+---@readonly
 Configuration.MAX_CHAT_STREAMS = 32
 
 ---Constant for the maximum number of custom shouts that can be configured.
+---@readonly
 Configuration.MAX_CUSTOM_SHOUTS = 20
 
 ---Constant for the maximum length of a custom shout.
+---@readonly
 Configuration.MAX_CUSTOM_SHOUT_LEN = 200
 
 ---Constant for the maximum number of languages that can be configured.
+---@readonly
 Configuration.MAX_LANGUAGES = 1000
 
 ---Constant for the maximum number of languages that a player character can speak.
+---@readonly
 Configuration.MAX_LANGUAGE_SLOTS = 50
 
 ---Constant for the maximum number of profiles a player can have.
+---@readonly
 Configuration.MAX_PROFILES = 20
 
 
 ---Constant for a narrative style dialogue tag argument.
+---@readonly
 Configuration.ID_NARRATIVE_TAG = 11
 
 ---Constant for a narrative style content argument.
+---@readonly
 Configuration.ID_NARRATIVE_TEXT = 12
 
 ---Constant for echo type argument.
+---@readonly
 Configuration.ID_ECHO_TYPE = 13
 
 ---Constant for an invisible asterisk for coloring actions.
+---@readonly
 Configuration.ID_ASTERISK_SIGNAL = 14
 
 ---Constant for an indicator for the position of encoded command arguments.
+---@readonly
 Configuration.ID_COMMAND_ARGS = 15
 
 
 ---Constant for the format ID for `/card`.
+---@readonly
 Configuration.ID_CARD = 65
 
 ---Constant for the format ID for `/flip`.
+---@readonly
 Configuration.ID_FLIP = 66
 
 ---Constant for the format ID for `/roll`.
+---@readonly
 Configuration.ID_ROLL = 67
 
 
 ---Constant for the format ID for the final overhead text.
+---@readonly
 Configuration.ID_OVERHEAD_FINAL = 81
 
 ---Constant for the format ID for callouts.
+---@readonly
 Configuration.ID_CALLOUT = 82
 
 ---Constant for the format ID for sneak callouts.
+---@readonly
 Configuration.ID_SNEAK_CALLOUT = 83
 
 ---Constant for the format ID for languages.
+---@readonly
 Configuration.ID_LANGUAGE = 84
 
 ---Constant for the format ID for the admin icon.
+---@readonly
 Configuration.ID_ADMIN_ICON = 85
 
 ---Constant for the format ID for narrative style.
+---@readonly
 Configuration.ID_NARRATIVE_STYLE = 86
 
 ---Constant for the format ID for encoded online IDs.
+---@readonly
 Configuration.ID_ONLINE_ID = 87
 
 ---Constant for the format ID for echo messages.
+---@readonly
 Configuration.ID_ECHO = 88
 
 ---Constant for the format ID for mentions.
+---@readonly
 Configuration.ID_MENTION = 89
 
 ---Associates metadata format IDs with names for those formatters.
+---@readonly
 Configuration.FORMAT_NAMES = {
     [Configuration.ID_OVERHEAD_FINAL] = 'overheadFinal',
     [Configuration.ID_CALLOUT] = 'callout',
@@ -179,7 +231,7 @@ Configuration.FORMAT_NAMES = {
 ---This does not check whether the language is a valid roleplay language.
 ---@param language string The language to check.
 ---@return boolean canAdd
----@see omichat.api.shared.language.exists
+---@see api.shared.language.exists
 function Configuration:canAddLanguage(language)
     if not isempty(self._languageAllowSet) and not self._languageAllowSet[language] then
         return false
@@ -200,7 +252,7 @@ function Configuration:canShowDiscordColorOption()
 end
 
 ---Returns an iterator over configured streams.
----@return fun(): omichat.Configuration.StreamDefinition? iterator
+---@return fun(): Configuration.StreamDefinition? iterator
 function Configuration:chatStreams()
     local list = self.Streams.List
     local i = 0
@@ -241,7 +293,7 @@ function Configuration:compatTADEnabled()
 end
 
 ---Returns an iterator over metadata formatter information.
----@return fun(): omichat.FormatterInfo? iterator
+---@return fun(): FormatterInfo? iterator
 function Configuration:formatters()
     local i = self.MIN_META_ID - 1
     return function()
@@ -267,7 +319,7 @@ end
 
 ---Gets a user-defined custom preset by name.
 ---@param name string The name of the preset to retrieve.
----@return omichat.ConfigurationPreset? preset
+---@return ConfigurationPreset? preset
 function Configuration:getCustomPreset(name)
     if not name then
         return
@@ -277,7 +329,7 @@ function Configuration:getCustomPreset(name)
 end
 
 ---Returns a list of custom presets as simple tables.
----@return omichat.Configuration.PresetTable[] presets
+---@return Configuration.PresetTable[] presets
 function Configuration:getCustomPresetsForSave()
     local list = {}
     local schema = self:getSchema()
@@ -303,7 +355,7 @@ end
 
 ---Retrieves information about a roleplay language given its id.
 ---@param id integer The ID of the language to retrieve.
----@return omichat.LanguageRecord? language
+---@return LanguageRecord? language
 function Configuration:getLanguageById(id)
     local rec = self._idToLanguage[id]
     if rec then
@@ -313,7 +365,7 @@ end
 
 ---Retrieves information about a roleplay language given its name.
 ---@param name string The name of the language to retrieve.
----@return omichat.LanguageRecord? language
+---@return LanguageRecord? language
 function Configuration:getLanguageByName(name)
     local rec = self._nameToLanguage[name]
     if rec then
@@ -338,9 +390,9 @@ function Configuration:getLanguageIDFromName(name)
 end
 
 ---Retrieves the list of configured roleplay languages.
----@return omichat.LanguageRecord[] languages
+---@return LanguageRecord[] languages
 function Configuration:getLanguageList()
-    return utils.mapList(utils.copy, self._idToLanguage)
+    return utils.mapList(utils.copy, self._idToLanguage) --[[@as LanguageRecord[] ]]
 end
 
 ---Gets the name of a language given its id.
@@ -360,7 +412,7 @@ function Configuration:getLanguageNameList()
 end
 
 ---Returns the format to use for a given menu type.
----@param menuType omichat.MenuTypeString The menu type.
+---@param menuType MenuTypeString The menu type.
 ---@return string format
 function Configuration:getMenuNameFormat(menuType)
     local option = self.Format.MenuName
@@ -383,7 +435,7 @@ end
 ---If the ID is prefixed with `custom:`, this will get a custom preset.
 ---Otherwise, a built-in preset will be returned.
 ---@param id string The ID of the preset to retrieve.
----@return omichat.ConfigurationPreset? preset
+---@return ConfigurationPreset? preset
 function Configuration:getPreset(id)
     if not id then
         return
@@ -397,21 +449,21 @@ function Configuration:getPreset(id)
 end
 
 ---Gets a list of all presets, including built-in and user defined.
----@return omichat.ConfigurationPreset[] presets
+---@return ConfigurationPreset[] presets
 function Configuration:getPresetList()
     return utils.copyList(self._presetList)
 end
 
 ---Returns the current configuration as a simple table.
----@return omichat.Configuration values
+---@return Configuration values
 function Configuration:getValues()
-    return base.getValues(self)
+    return base.getValues(self) --[[@as Configuration]]
 end
 
 ---Gets sanitized configuration values that are prepared for saving.
----@return omichat.Configuration sanitized
+---@return Configuration sanitized
 function Configuration:getValuesForSave()
-    return base.getValuesForSave(self)
+    return base.getValuesForSave(self) --[[@as Configuration]]
 end
 
 ---Gets the string value of a variable. Returns `nil` if the variable doesn't exist.
@@ -536,24 +588,6 @@ function Configuration:loadCustomPresets()
     self:_setCustomPresets(result.list)
 end
 
----Reads the currently enabled mods to a cache.
-function Configuration:refreshEnabledMods()
-    local enabledMods = {}
-
-    local activatedMods = getActivatedMods()
-    for i = 0, activatedMods:size() - 1 do
-        local id = activatedMods:get(i)
-        local modId = id:match('^%d*\\(.+)$')
-        if not modId then
-            modId = id
-        end
-
-        enabledMods[modId] = true
-    end
-
-    self._enabledMods = enabledMods
-end
-
 ---Refreshes caches associated with configuration values.
 function Configuration:refreshValueCaches()
     self:_cacheLanguages()
@@ -613,7 +647,7 @@ function Configuration:updateFormatters()
         end
 
         if targetFormat then
-            local info = self._formatterInfo[i]
+            local info = self._formatterInfo[i] --[[@as FormatterInfo]]
             info.formatter:setDefaultName(defaultName)
             info.formatter:setFormatString(targetFormat)
         end
@@ -622,10 +656,11 @@ end
 
 
 ---Adds a custom preset to the configuration.
----@param preset omichat.ConfigurationPreset
+---@param preset ConfigurationPreset
 ---@private
 function Configuration:_addCustomPreset(preset)
-    self._customPresets[preset:getName()] = preset
+    local name = preset:getName()
+    self._customPresets[name] = preset
     self:_cachePresetList()
 end
 
@@ -641,7 +676,7 @@ function Configuration:_cacheLanguages()
     for i = 1, #languages do
         local lang = languages[i]
         if not self._nameToLanguage[lang.Name] and not utils.isNilOrWhitespace(lang.Name) then
-            local rec = utils.copy(lang) --[[@as omichat.LanguageRecord]]
+            local rec = utils.copy(lang) --[[@as LanguageRecord]]
             rec.ID = #self._idToLanguage + 1
 
             self._nameToLanguage[rec.Name] = rec
@@ -655,8 +690,8 @@ function Configuration:_cacheLanguages()
         end
     end
 
-    self._languageAllowSet = utils.set.simple(self.Language.SelfAddAllowlist)
-    self._languageBlockSet = utils.set.simple(self.Language.SelfAddBlocklist)
+    self._languageAllowSet = utils.set.table(self.Language.SelfAddAllowlist)
+    self._languageBlockSet = utils.set.table(self.Language.SelfAddBlocklist)
 end
 
 ---Caches the variables and stores them as a map.
@@ -707,7 +742,7 @@ function Configuration:_isCompatEnabled(value, modId)
         return value == 'Enable'
     end
 
-    return self._enabledMods[modId] == true
+    return utils.isModActive(modId)
 end
 
 ---Removes a custom preset from the configuration.
@@ -719,7 +754,7 @@ function Configuration:_removeCustomPreset(name)
 end
 
 ---Replaces the custom presets list with the given list.
----@param list omichat.Configuration.PresetTable[]
+---@param list Configuration.PresetTable[]
 ---@private
 function Configuration:_setCustomPresets(list)
     self._customPresets = {}
@@ -738,8 +773,8 @@ function Configuration:_setCustomPresets(list)
 end
 
 ---Sort function for presets.
----@param a omichat.ConfigurationPreset
----@param b omichat.ConfigurationPreset
+---@param a ConfigurationPreset
+---@param b ConfigurationPreset
 ---@return boolean
 ---@private
 function Configuration._sortPresets(a, b)
@@ -757,35 +792,26 @@ end
 Configuration:init()
 return Configuration
 
-
 --#region Type Definitions
 
----@class omichat.LanguageRecord : omichat.Configuration.LanguageDefinition
+---@class LanguageRecord : Configuration.LanguageDefinition
 ---@field ID integer The ID of the language.
 
----@class omichat.FormatterInfo
----@field name string The name of the formatter.
+---@class FormatterInfo
+---@field name FormatterName The name of the formatter.
 ---@field id integer The formatter's ID.
----@field formatter omichat.MetaFormatter The formatter.
+---@field formatter MetaFormatter The formatter.
 
----@class omichat.ConfigurationFormState
----@field activePresetDialog omi.ui.Dialog? The active dialog related to presets.
----@field activeFormatStringDialog omi.ui.Dialog? The active dialog with an overview of format strings.
+---@class ConfigurationFormState
+---@field activePresetDialog? omi.ui.Dialog The active dialog related to presets.
+---@field activeFormatStringDialog? omi.ui.Dialog The active dialog with an overview of format strings.
 
----@class omichat.FormatDataTranslation
+---@class FormatDataTranslation
 ---@field name string The name of the token or option.
 ---@field id string The string ID for the description of the token or option.
 
 
----@alias omichat.Configuration.Commands.Name.Mode
----| 'Disable'
----| 'Nickname'
----| 'Forename'
----| 'Fullname'
----| 'Forename_Plus_Nickname'
----| 'Fullname_Plus_Nickname'
-
----@alias omichat.FormatterName
+---@alias FormatterName
 ---| 'callout'
 ---| 'sneakCallout'
 ---| 'language'
@@ -796,7 +822,7 @@ return Configuration
 ---| 'echo'
 ---| 'mention'
 
----@alias omichat.MenuTypeString
+---@alias MenuTypeString
 ---| 'trade'
 ---| 'medical'
 ---| 'mini_scoreboard'

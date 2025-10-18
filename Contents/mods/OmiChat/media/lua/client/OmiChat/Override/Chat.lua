@@ -1,14 +1,15 @@
+---@namespace omichat
 ---Handles chat overrides.
 
 local API = require 'OmiChat/Client'
 
-local ISChat = ISChat ---@class omichat.ISChat
+local ISChat = ISChat --[[@as omichat.ISChat]]
 
 local utils = API.utils
 local config = API.Configuration
 local UI = utils.ui
 
-local _addLineInChat = ISChat.addLineInChat
+local _addLineInChat = ISChat.addLineInChat ---@type any
 local _onCommandEntered = ISChat.onCommandEntered
 local _logChatCommand = ISChat.logChatCommand
 local _createChildren = ISChat.createChildren
@@ -33,14 +34,14 @@ _ServerChatMessage.getTextWithPrefix = API.format.buildMessageText
 
 
 ---Override to add information to chat messages and remove blank lines.
----@param message omichat.Message The new chat message.
+---@param message Message The new chat message.
 ---@param tabID integer 0-indexed tab ID.
 function ISChat.addLineInChat(message, tabID)
     if not message then
         return
     end
 
-    local info ---@type omichat.MessageInfo?
+    local info ---@type MessageInfo?
     local soundRange
     local player = getSpecificPlayer(0)
 
@@ -90,6 +91,7 @@ function ISChat.addLineInChat(message, tabID)
     end
 
     if player and soundRange and soundRange > 0 then
+        ---@diagnostic disable-next-line: param-type-not-match
         addSound(player, player:getX(), player:getY(), player:getZ(), soundRange, soundRange)
 
         if info then
@@ -120,7 +122,7 @@ function ISChat:createChildren()
 end
 
 ---Override to use the extended rich text panel.
----@return omichat.ChatTab
+---@return ChatTab
 function ISChat:createTab()
     local y = self:titleBarHeight() + self.btnHeight + self.inset * 2
 
@@ -305,7 +307,7 @@ function ISChat.onTextChange()
         return
     end
 
-    local entry = ISChat.instance.textEntry
+    local entry = instance.textEntry
     local internalText = entry:getInternalText()
     if not utils.endsWith(internalText, '/') then
         API.ui.updateComponents()
@@ -323,8 +325,6 @@ function ISChat.onTextChange()
         local prefix
         local stream = chatText.chatStreams[i]
         if utils.isinstance(stream, API.ChatStream) then
-            ---@cast stream omichat.ChatStream
-
             local command = stream:getCommand()
             if command then
                 prefix = API.chat.shouldResetText(command, text, internalText)
@@ -376,7 +376,7 @@ function ISChat:render()
 end
 
 ---Override to use the extended rich text panel rendering.
----@param tab omichat.ChatTab The chat tab to render.
+---@param tab ChatTab The chat tab to render.
 function ISChat.render_chatText(tab)
     tab:setStencilRect(0, 0, tab.width, tab.height)
     API.ChatTab.render(tab)

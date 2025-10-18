@@ -1,10 +1,11 @@
+---@namespace omichat
 ---Default configuration data for built-in streams.
 
 local DEFAULT = '$Default()'
 
 
 ---Contains default configuration data for built-in streams.
----@type table<string, omichat.Configuration.StreamDefinition>
+---@type table<string, Configuration.StreamDefinition>
 local DefaultStreamData = {
     admin = {
         ChatType = 'admin',

@@ -1,44 +1,46 @@
+---@namespace omichat
 ---Handles operations related to managing hooks of mod functionality.
 
-local API = require 'OmiChat/Module/Shared/Core' ---@class omichat.api.shared
+---@class(partial) api.shared
+local API = require 'OmiChat/Module/Shared/Core'
 
 
 ---Contains functions for handling hooks.
----@class omichat.api.shared.hooks
+---@class(partial) api.shared.hooks
 local Hooks = {}
 
 ---Associates hook types to a boolean indicating whether there are active hooks.
----@type table<omichat.HookType, boolean?>
+---@type omi.SetTable<HookType>
 Hooks.has = {}
 
 ---Associates hook types to lists of callback functions.
 ---@protected
 Hooks._callbacks = {
-    ---@type omichat.Hook.Command[]
+    ---@type Hook.Command[]
     cardCommand = {},
 
-    ---@type omichat.Hook.CommandEnabled[]
+    ---@type Hook.CommandEnabled[]
     cardCommandEnabled = {},
 
-    ---@type omichat.Hook.Command[]
+    ---@type Hook.Command[]
     flipCommand = {},
 
-    ---@type omichat.Hook.CommandEnabled[]
+    ---@type Hook.CommandEnabled[]
     flipCommandEnabled = {},
 
-    ---@type omichat.Hook.PerceptionRange[]
+    ---@type Hook.PerceptionRange[]
     perceptionRange = {},
 
-    ---@type omichat.Hook.Command[]
+    ---@type Hook.Command[]
     rollCommand = {},
 
-    ---@type omichat.Hook.CommandEnabled[]
+    ---@type Hook.CommandEnabled[]
     rollCommandEnabled = {},
 }
 
 
 ---Applies hooks for the `/card` command.
----@param args omichat.Args.UseStream Arguments for the hook callback.
+---@param args Args.UseStream Arguments for the hook callback.
 ---@return boolean handled `True` if the command was handled by a hook. Otherwise, `false`.
 function Hooks.cardCommand(args)
     local list = Hooks._callbacks.cardCommand
@@ -68,7 +70,7 @@ function Hooks.cardCommandEnabled()
 end
 
 ---Applies hooks for the `/flip` command.
----@param args omichat.Args.UseStream Arguments for the hook callback.
+---@param args Args.UseStream Arguments for the hook callback.
 ---@return boolean handled `True` if the command was handled by a hook. Otherwise, `false`.
 function Hooks.flipCommand(args)
     local list = Hooks._callbacks.flipCommand
@@ -98,7 +100,7 @@ function Hooks.flipCommandEnabled()
 end
 
 ---Applies modifications to perception range from hooks.
----@param args omichat.Args.ApplyHook.PerceptionRange Arguments for the hook callback.
+---@param args Args.ApplyHook.PerceptionRange Arguments for the hook callback.
 ---@return integer range The perception range value to use.
 function Hooks.perceptionRange(args)
     local value = args.range
@@ -121,7 +123,7 @@ function Hooks.perceptionRange(args)
 end
 
 ---Applies hooks for the `/roll` command.
----@param args omichat.Args.UseStream Arguments for the hook callback.
+---@param args Args.UseStream Arguments for the hook callback.
 ---@return boolean handled `True` if the command was handled by a hook. Otherwise, `false`.
 function Hooks.rollCommand(args)
     local list = Hooks._callbacks.rollCommand
@@ -157,25 +159,25 @@ return Hooks
 
 --#region Type Definition
 
----@class omichat.Args.ApplyHook.PerceptionRange
+---@class Args.ApplyHook.PerceptionRange
 ---@field range integer The current value for the range.
 ---@field player IsoPlayer The local player.
 ---@field distance number The distance between the players.
 ---@field author IsoPlayer The author of the message being tested for perception.
 ---@field isSigned boolean Flag for whether the message was sent in a signed language.
 
----@class omichat.Args.Hook.PerceptionRange : omichat.Args.ApplyHook.PerceptionRange
+---@class Args.Hook.PerceptionRange : Args.ApplyHook.PerceptionRange
 ---@field originalRange integer The original value, before applying any hooks.
 
 
----@alias omichat.Hook.Command fun(args: omichat.Args.UseStream): boolean?
+---@alias Hook.Command fun(args: Args.UseStream): boolean?
 
----@alias omichat.Hook.CommandEnabled fun(): boolean?
+---@alias Hook.CommandEnabled fun(): boolean?
 
----@alias omichat.Hook.PerceptionRange fun(args: omichat.Args.Hook.PerceptionRange): integer?
+---@alias Hook.PerceptionRange fun(args: Args.Hook.PerceptionRange): integer?
 
 
----@alias omichat.HookType
+---@alias HookType
 ---| 'cardCommand'
 ---| 'cardCommandEnabled'
 ---| 'flipCommand'

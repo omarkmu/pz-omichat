@@ -1,28 +1,29 @@
+---@namespace omichat
 ---Base stream type.
 
 local utils = require 'OmiChat/Utils'
 local config = require 'OmiChat/Component/Configuration'
-local API ---@type omichat.api.client?
+local API ---@type api.client?
 
 local isempty = table.isempty
 
 
----@class omichat.Stream : omi.Class
----@field protected callbacks omichat.Stream.Callbacks Container for callbacks.
+---@class Stream : omi.Class
+---@field protected callbacks Stream.Callbacks Container for callbacks.
 ---@field protected name string The name of the stream.
 ---@field protected command string The stream command, with a trailing space.
----@field protected shortCommand string? An optional short stream command, with a trailing space.
----@field protected disabled boolean? Flag for whether the stream should always be treated as not enabled.
+---@field protected shortCommand? string An optional short stream command, with a trailing space.
+---@field protected disabled? boolean Flag for whether the stream should always be treated as not enabled.
 ---@field protected aliasesList string[] Additional aliases for the stream.
----@field protected category omichat.StreamCategory The stream category, used to determine whether input should be retained.
----@field protected chatFormat string? The format to use for chat messages sent from this stream.
----@field protected overheadFormat string? The format to use for overhead messages sent from this stream.
----@field protected formatter omichat.MetaFormatter? The formatter to use for this stream.
+---@field protected category StreamCategory The stream category, used to determine whether input should be retained.
+---@field protected chatFormat? string The format to use for chat messages sent from this stream.
+---@field protected overheadFormat? string The format to use for overhead messages sent from this stream.
+---@field protected formatter? MetaFormatter The formatter to use for this stream.
 ---@field protected allowEmotes boolean Flag for whether to allow emotes on this stream.
 ---@field protected allowMentions boolean Flag for whether to allow mentions on this stream.
----@field protected suggestSpec omichat.SuggestArgSpec[]? Spec to use for suggestions.
----@field protected tags omi.SimpleSet A set of tags for the stream.
----@field protected autoTags omi.SimpleSet A set of tags to always include on the stream.
+---@field protected suggestSpec? SuggestArgSpec[] Spec to use for suggestions.
+---@field protected tags omi.SetTable<string> A set of tags for the stream.
+---@field protected autoTags omi.SetTable<string> A set of tags to always include on the stream.
 ---@field protected isChat boolean Flag for whether this is a chat stream.
 ---@field protected isCommand boolean Flag for whether this is a command stream.
 ---@field protected noTags boolean Flag for whether the stream has an empty tags table.
@@ -31,11 +32,11 @@ local Stream = utils.lib.class()
 
 
 ---Converts a string into a command by ensuring it starts with `/` and has a trailing whitespace.
----@param str string The string to convert.
+---@param str? string The string to convert.
 ---@return string command
 ---@private
 function Stream._stringToCommand(str)
-    str = utils.trim(str)
+    str = utils.trim(str or '')
     if not utils.startsWith(str, '/') then
         str = '/' .. str
     end
@@ -129,18 +130,21 @@ end
 
 ---Returns whether this is a chat stream.
 ---@return boolean isChat
+---@return_cast self ChatStream
 function Stream:isChatStream()
     return self.isChat
 end
 
 ---Returns whether this is a command stream.
 ---@return boolean isCommand
+---@return_cast self CommandStream
 function Stream:isCommandStream()
     return self.isCommand
 end
 
 ---Returns `true` if this is a special stream representing Discord messages.
 ---@return boolean isDiscord
+---@return_cast self ChatStream
 function Stream:isDiscordStream()
     return self:isChatStream() and self.name == 'discord'
 end
@@ -161,18 +165,21 @@ end
 
 ---Returns `true` if this is a special stream representing radio messages.
 ---@return boolean isRadio
+---@return_cast self ChatStream
 function Stream:isRadioStream()
     return self:isChatStream() and self.name == 'radio'
 end
 
 ---Returns `true` if this is a special stream representing server messages.
 ---@return boolean isServer
+---@return_cast self ChatStream
 function Stream:isServerStream()
     return self:isChatStream() and self.name == 'server'
 end
 
 ---Returns `true` if this is one of the special streams representing server, radio, or Discord messages.
 ---@return boolean isSpecial
+---@return_cast self ChatStream
 function Stream:isSpecialStream()
     if not self:isChatStream() then
         return false
@@ -195,7 +202,7 @@ end
 
 ---Returns the category of the stream.
 ---Used to determine whether input should be retained.
----@return omichat.StreamCategory category
+---@return StreamCategory category
 function Stream:getCategory()
     return self.category
 end
@@ -217,7 +224,7 @@ function Stream:getCommand()
 end
 
 ---Returns the formatter used to format the overhead text for messages sent on the stream.
----@return omichat.MetaFormatter? formatter
+---@return MetaFormatter? formatter
 function Stream:getFormatter()
     return self.formatter
 end
@@ -249,7 +256,7 @@ function Stream:getShortCommand()
 end
 
 ---Returns the suggest spec for the stream.
----@return omichat.SuggestArgSpec[]? argSpecList
+---@return SuggestArgSpec[]? argSpecList
 function Stream:getSuggestSpec()
     return self.suggestSpec
 end
@@ -260,7 +267,7 @@ end
 function Stream:getTabID() end
 
 ---Gets the set of tags for the stream.
----@return omi.SimpleSet tags
+---@return omi.SetTable<string> tags
 function Stream:getTags()
     return utils.copy(self.tags)
 end
@@ -315,14 +322,14 @@ function Stream:onHelp()
 end
 
 ---Handler for when the stream is used.
----@param args omichat.Args.UseStream.Partial | omichat.Args.Send.Partial Arguments for using the stream.
+---@param args Args.UseStream.Partial | Args.Send.Partial Arguments for using the stream.
 ---@return boolean handled Indicates whether the command was handled.
 function Stream:onUse(args)
-    ---@cast args omichat.Args.Send
     if not args.stream then
         args.stream = self
     end
 
+    ---@cast args Args.UseStream
     local cb = self.callbacks.onUse
     if cb then
         cb(args)
@@ -358,7 +365,7 @@ function Stream:onUseDisabled(command)
 end
 
 ---Sets the formatter used to format overhead text sent on the stream.
----@param formatter omichat.MetaFormatter The formatter to use for overhead text.
+---@param formatter MetaFormatter The formatter to use for overhead text.
 function Stream:setFormatter(formatter)
     self.formatter = formatter
 end
@@ -394,7 +401,7 @@ end
 ---@param tags string[] The new tags for the stream.
 ---@protected
 function Stream:_setTags(tags)
-    self.tags = utils.set.simple(tags)
+    self.tags = utils.set.table(tags)
     utils.extend(self.tags, self.autoTags)
 
     if self:isCommandStream() then
@@ -406,23 +413,23 @@ end
 
 
 ---Creates a new stream.
----@param args omichat.Args.Stream Arguments for creation of the stream.
----@return omichat.Stream stream
+---@param args Args.Stream Arguments for creation of the stream.
+---@return Stream stream
 function Stream:new(args)
-    local this = setmetatable({}, self) --[[@as omichat.Stream]]
+    local this = setmetatable({}, self) --[[@as Stream]]
 
     this.name = args.name
     this.allowEmotes = args.allowEmotes or false
     this.allowMentions = args.allowMentions ~= false
     this.disabled = args.disabled or false
     this.category = args.category or 'other'
-    this.aliasesList = utils.map(Stream._stringToCommand, args.aliases or {})
+    this.aliasesList = utils.mapList(Stream._stringToCommand, args.aliases or {})
     this.suggestSpec = args.suggestSpec
     this.formatter = args.formatter
     this.isChat = false
     this.isCommand = false
     this.defaultOnDisabled = args.defaultOnDisabled ~= false
-    this.autoTags = utils.set.simple(args.autoTags)
+    this.autoTags = utils.set.table(args.autoTags)
     this:_setTags(args.tags or {})
 
     if not utils.isNilOrWhitespace(args.command) then
@@ -436,11 +443,11 @@ function Stream:new(args)
     end
 
     if not utils.isNilOrWhitespace(args.overheadFormat) then
-        this.overheadFormat = utils.trim(args.overheadFormat)
+        this.overheadFormat = utils.trim(args.overheadFormat --[[@as string]])
     end
 
     if not utils.isNilOrWhitespace(args.chatFormat) then
-        this.chatFormat = utils.trim(args.chatFormat)
+        this.chatFormat = utils.trim(args.chatFormat --[[@as string]])
     end
 
     this.callbacks = {
@@ -455,41 +462,41 @@ end
 
 return Stream
 
-
 --#region Type Definitions
 
----@class omichat.Stream.Callbacks
----@field isEnabled omichat.Stream.Callback.IsEnabled? Invoked to check whether the stream should be treated as enabled.
----@field onUse omichat.Stream.Callback.OnUse? Invoked when the stream is used.
----@field onUseDisabled omichat.Stream.Callback.OnUseDisabled? Invoked when the stream is used while disabled.
-
----@class omichat.Args.Stream
+---@class Args.Stream
 ---@field name string The name of the stream.
----@field command string? The stream command, with a trailing space. Defaults to `/` + `name`.
----@field shortCommand string? An optional short stream command, with a trailing space.
----@field aliases string[]? Additional aliases for the stream.
----@field disabled boolean? Flag for whtehr the stream should always be treated as not enabled. Defaults to `false`.
----@field category omichat.StreamCategory? The stream category, used to determine whether input should be retained.
----@field isEnabled omichat.Stream.Callback.IsEnabled? Invoked to check whether the stream should be treated as enabled.
----@field overheadFormat string? The overhead format to use for the stream.
----@field chatFormat string? The format to use for the stream in chat.
----@field onUse omichat.Stream.Callback.OnUse? Invoked when the stream is used.
----@field onUseDisabled omichat.Stream.Callback.OnUseDisabled? Invoked when the stream is used while disabled.
----@field allowEmotes boolean? Flag for whether emotes should be allowed on this stream. Defaults to `false`.
----@field allowMentions boolean? Flag for whether mentions should be allowed on this stream. Defaults to `true`.
----@field suggestSpec omichat.SuggestArgSpec[]? Spec to use for suggestions.
----@field formatter omichat.MetaFormatter? The formatter to use for this stream.
----@field tags string[]? Tags for the stream.
----@field autoTags string[]? Tags which should always be included on the stream.
----@field defaultOnDisabled boolean? Flag for whether the stream should defer to default handling when disabled. Defaults to `true`.
+---@field command? string The stream command, with a trailing space. Defaults to `/` + `name`.
+---@field shortCommand? string An optional short stream command, with a trailing space.
+---@field aliases? string[] Additional aliases for the stream.
+---@field disabled? boolean Flag for whtehr the stream should always be treated as not enabled. Defaults to `false`.
+---@field category? StreamCategory The stream category, used to determine whether input should be retained.
+---@field isEnabled? Stream.Callback.IsEnabled Invoked to check whether the stream should be treated as enabled.
+---@field overheadFormat? string The overhead format to use for the stream.
+---@field chatFormat? string The format to use for the stream in chat.
+---@field onUse? Stream.Callback.OnUse Invoked when the stream is used.
+---@field onUseDisabled? Stream.Callback.OnUseDisabled Invoked when the stream is used while disabled.
+---@field allowEmotes? boolean Flag for whether emotes should be allowed on this stream. Defaults to `false`.
+---@field allowMentions? boolean Flag for whether mentions should be allowed on this stream. Defaults to `true`.
+---@field suggestSpec? SuggestArgSpec[] Spec to use for suggestions.
+---@field formatter? MetaFormatter The formatter to use for this stream.
+---@field tags? string[] Tags for the stream.
+---@field autoTags? string[] Tags which should always be included on the stream.
+---@field defaultOnDisabled? boolean Flag for whether the stream should defer to default handling when disabled. Defaults to `true`.
 
 
----@alias omichat.Stream.Callback.IsEnabled fun(stream: omichat.Stream): boolean
+---@class Stream.Callbacks
+---@field isEnabled? Stream.Callback.IsEnabled Invoked to check whether the stream should be treated as enabled.
+---@field onUse? Stream.Callback.OnUse Invoked when the stream is used.
+---@field onUseDisabled? Stream.Callback.OnUseDisabled Invoked when the stream is used while disabled.
 
----@alias omichat.Stream.Callback.OnUse fun(ctx: omichat.Args.UseStream)
 
----@alias omichat.Stream.Callback.OnUseDisabled fun(stream: omichat.Stream, command: string)
+---@alias Stream.Callback.IsEnabled fun(stream: Stream): boolean
 
----@alias omichat.StreamCategory 'chat' | 'rp' | 'other'
+---@alias Stream.Callback.OnUse fun(ctx: Args.UseStream)
+
+---@alias Stream.Callback.OnUseDisabled fun(stream: Stream, command: string)
+
+---@alias StreamCategory 'chat' | 'rp' | 'other'
 
 --#endregion

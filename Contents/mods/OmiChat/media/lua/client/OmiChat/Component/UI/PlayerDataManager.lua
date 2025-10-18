@@ -1,7 +1,11 @@
+---@namespace omichat
 ---UI element for the player data manager admin utility.
 
 local Editor = require 'OmiChat/Component/UI/PlayerDataEditor'
-local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
+
+---@class(partial) api.client
+local API = require 'OmiChat/Module/Client/Core'
+
 local utils = API.utils
 local UI = utils.ui
 
@@ -10,23 +14,26 @@ local min = math.min
 local isAdmin = isAdmin
 local textManager = getTextManager()
 
+local FONT_SMALL = UIFont.Small
+local FONT_MEDIUM = UIFont.Medium
 
----@class omichat.PlayerDataManager : omi.ui.Panel
+
+---@class PlayerDataManager : omi.ui.Panel
 ---@field listbox omi.ui.ListBox The listbox used to display player data rows.
----@field elements omichat.PlayerData[] The player data received from the server.
+---@field elements PlayerData[] The player data received from the server.
 ---@field columnList string[] The list of columns to display.
 ---@field columnDisplay table<string, string> Associates column names to display strings for column headers.
 ---@field columnWidth table<string, integer> Associates column names to computed column widths.
 ---@field columnSizes table<string, integer> Associates column names to the base column sizes.
 ---@field headerH integer The height of the header font.
 ---@field titleW integer The width of the title text.
----@field buttonBorderColor omi.ColorTableRGBA The color used for button borders.
----@field listHeaderColor omi.ColorTableRGBA The color used for the list header text.
+---@field buttonBorderColor omi.ColorTableRGBA<number> The color used for button borders.
+---@field listHeaderColor omi.ColorTableRGBA<number> The color used for the list header text.
 ---@field headerFont UIFont The font used for list header text.
 ---@field listFont UIFont The font used for list items.
 ---@field titleText string The text displayed as the manager title.
----@field activeEditorPanel omichat.PlayerDataEditor? The active data editor element.
----@field activeDialog omi.ui.Dialog? The active dialog.
+---@field activeEditorPanel? PlayerDataEditor The active data editor element.
+---@field activeDialog? omi.ui.Dialog The active dialog.
 ---@field addBtn omi.ui.Button The button used to add a new data item.
 ---@field closeBtn omi.ui.Button The button used to close the panel.
 ---@field deleteBtn omi.ui.Button The button used to delete a data item.
@@ -51,11 +58,11 @@ PlayerDataManager._COLUMNS = {
 function PlayerDataManager:createChildren()
     self.headerH = textManager:getFontHeight(self.headerFont)
 
-    local titleH = textManager:getFontHeight(UIFont.Medium) + 10
+    local titleH = textManager:getFontHeight(FONT_MEDIUM) + 10
     local btnW = 100
     local padBottom = 10
     local padBtn = 5
-    local btnH = max(25, textManager:getFontHeight(UIFont.Small) + 6)
+    local btnH = max(25, textManager:getFontHeight(FONT_SMALL) + 6)
     local btnY = self.height - btnH - padBottom
 
     local listboxY = self.headerH + titleH + 5
@@ -161,12 +168,12 @@ function PlayerDataManager:drawItem(y, item, alt, listbox)
     listbox:drawRectBorder(0, y, width, listbox.itemheight, 0.9, borderColor.r, borderColor.g, borderColor.b)
 
     -- determine stencil for listbox stencil redrawing
-    local borderDelta = listbox.drawBorder and 1 or 0
+    local borderDelta = listbox.drawBorder and 1 or 0 ---@type number
     local stencilX = borderDelta
     local stencilX2 = listbox.width - borderDelta
     local stencilY = borderDelta
     local stencilY2 = listbox.height - borderDelta
-    if listbox:isVScrollBarVisible() then
+    if listbox:isVScrollBarVisible() then ---@cast listbox.vscroll -?
         stencilX2 = listbox.vscroll.x + 3
     end
 
@@ -185,12 +192,15 @@ function PlayerDataManager:drawItem(y, item, alt, listbox)
     for i = 1, #self.columnList do
         local colName = self.columnList[i]
         local colW = self.columnWidth[colName] or 200
-        local textAlpha = item.item.empty[colName] and 0.4 or 0.9
+        local data = item.item
+        if data then
+            local textAlpha = data.empty[colName] and 0.4 or 0.9
 
-        listbox:setStencilRect(x - 10, stencilY, colW - 10, stencilY2 - stencilY)
-        listbox:drawText(item.item.display[colName], x, y + 2, 1, 1, 1, textAlpha, listbox.font)
-        listbox:drawRect(x - 10, y - 1, 1, listbox.itemheight, 1, borderColor.r, borderColor.g, borderColor.b)
-        listbox:clearStencilRect()
+            listbox:setStencilRect(x - 10, stencilY, colW - 10, stencilY2 - stencilY)
+            listbox:drawText(data.display[colName], x, y + 2, 1, 1, 1, textAlpha, listbox.font)
+            listbox:drawRect(x - 10, y - 1, 1, listbox.itemheight, 1, borderColor.r, borderColor.g, borderColor.b)
+            listbox:clearStencilRect()
+        end
 
         x = x + colW
     end
@@ -200,7 +210,7 @@ function PlayerDataManager:drawItem(y, item, alt, listbox)
 end
 
 ---Returns the currently selected item.
----@return omichat.PlayerData? item The data associated with the currently selected, or `nil` if there's no selection.
+---@return PlayerData? item The data associated with the currently selected, or `nil` if there's no selection.
 ---@return integer? index The currently selected index.
 function PlayerDataManager:getSelectedItem()
     local listbox = self.listbox
@@ -220,7 +230,7 @@ end
 ---Performs deletion of a player data row.
 ---Called after clicking yes on the deletion confirmation prompt.
 ---@param args omi.ui.Args.Dialog.Click Arguments for dialog button click.
----@param item omichat.PlayerData The player data item.
+---@param item PlayerData The player data item.
 ---@param idx integer The index of the item to remove.
 function PlayerDataManager:onConfirmDelete(args, item, idx)
     if args.internal ~= 'YES' then
@@ -267,7 +277,7 @@ function PlayerDataManager:onModifyClick()
 end
 
 ---Called when a new data list is returned from the server.
----@param list omichat.PlayerData[] The data received from the server.
+---@param list PlayerData[] The data received from the server.
 function PlayerDataManager:onUpdateList(list)
     if #self.elements == 0 then
         self:setVisible(true)
@@ -279,7 +289,7 @@ function PlayerDataManager:onUpdateList(list)
 
     self.headerH = textManager:getFontHeight(self.headerFont)
     self.listbox.font = self.listFont
-    self.titleW = textManager:MeasureStringX(UIFont.Medium, self.titleText)
+    self.titleW = textManager:MeasureStringX(FONT_MEDIUM, self.titleText)
     self.listbox.itemheight = textManager:getFontHeight(self.listFont) + 4
     self.listbox:clear()
 
@@ -289,12 +299,12 @@ function PlayerDataManager:onUpdateList(list)
         local el = list[i]
         local display = {}
         local empty = {}
-        for j = 1, #PlayerDataManager._COLUMNS do
-            local colName = PlayerDataManager._COLUMNS[j]
+        for j = 1, #self.columnList do
+            local colName = self.columnList[j]
             local colValue = el[colName]
 
             local colType = type(colValue)
-            if colType == 'table' then
+            if colType == 'table' then ---@cast colValue table
                 colType = 'string'
                 colValue = table.concat(colValue, ', ')
             end
@@ -324,7 +334,7 @@ function PlayerDataManager:onUpdateList(list)
 end
 
 ---Opens the edit panel with the given item.
----@param item omichat.PlayerData? The item to edit.
+---@param item PlayerData? The item to edit.
 ---@param isAdd boolean? Flag for whether this should be treated as an add rather than an edit.
 function PlayerDataManager:openEditPanel(item, isAdd)
     if not item then
@@ -366,7 +376,7 @@ end
 function PlayerDataManager:render()
     UI.Panel.render(self)
 
-    self:drawText(self.titleText, (self.width - self.titleW) * 0.5, 10, 1, 1, 1, 1, UIFont.Medium)
+    self:drawText(self.titleText, (self.width - self.titleW) * 0.5, 10, 1, 1, 1, 1, FONT_MEDIUM)
     local listbox = self.listbox
     local borderC = self.borderColor
     local headerC = self.listHeaderColor
@@ -405,9 +415,9 @@ end
 
 ---Creates a new panel for managing player data.
 ---@param args omi.ui.Args.Panel Args for creating the element.
----@return omichat.PlayerDataManager manager
+---@return PlayerDataManager manager
 function PlayerDataManager:new(args)
-    local this = UI.Panel.new(self, args) --[[@as omichat.PlayerDataManager]]
+    local this = UI.Panel.new(self, args) --[[@as PlayerDataManager]]
 
     this.titleText = getText('UI_OmiChat_PlayerDataManager_Title')
     this.anchorLeft = true
@@ -415,8 +425,8 @@ function PlayerDataManager:new(args)
     this.anchorTop = true
     this.anchorBottom = false
     this.moveWithMouse = true
-    this.listFont = UIFont.Small
-    this.headerFont = UIFont.Medium
+    this.listFont = FONT_SMALL
+    this.headerFont = FONT_MEDIUM
     this.buttonBorderColor = { r = 0.7, g = 0.7, b = 0.7, a = 0.5 }
     this.borderColor = { r = 0.4, g = 0.4, b = 0.4, a = 1 }
     this.listHeaderColor = { r = 0.4, g = 0.4, b = 0.4, a = 0.4 }

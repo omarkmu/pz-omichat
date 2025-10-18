@@ -1,3 +1,4 @@
+---@namespace omichat
 ---Compatibility patch for Buffy's Character Bios.
 
 local API = require 'OmiChat/Client'

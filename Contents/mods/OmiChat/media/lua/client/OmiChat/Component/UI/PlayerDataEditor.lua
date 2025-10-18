@@ -1,6 +1,7 @@
+---@namespace omichat
 ---UI element for the player data editor admin utility.
 
-local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
+local API = require 'OmiChat/Module/Client/Core'
 
 local utils = API.utils
 local config = API.Configuration
@@ -15,9 +16,9 @@ local BTN_H = math.max(25, textManager:getFontHeight(UIFont.Small) + 6)
 local LABEL_H = FONT_H_MEDIUM + 4
 
 
----@class omichat.PlayerDataEditor : omi.ui.Panel
----@field item omichat.PlayerData The player data for editing.
----@field saveItem omichat.PlayerData The input player data item.
+---@class PlayerDataEditor : omi.ui.Panel
+---@field item PlayerData The player data for editing.
+---@field saveItem PlayerData The input player data item.
 ---@field nicknameEntry omi.ui.TextEntry The entry for the player nickname.
 ---@field usernameEntry omi.ui.TextEntry The entry for the player username.
 ---@field iconEntry omi.ui.TextEntry The entry for the player icon.
@@ -27,12 +28,12 @@ local LABEL_H = FONT_H_MEDIUM + 4
 ---@field languageSlotsEntry omi.ui.TextEntry The entry for the player's language slots.
 ---@field languageSuggestBox omi.ui.SuggestBox The suggest box for languages, for the language list entry.
 ---@field iconSuggestBox omi.ui.SuggestBox The icon suggest box, for the icon entry.
----@field buttonBorderColor omi.ColorTableRGBA The border color used for buttons.
+---@field buttonBorderColor omi.ColorTableRGBA<number> The border color used for buttons.
 ---@field saveBtn omi.ui.Button The save button.
 ---@field closeBtn omi.ui.Button The close button.
 ---@field isAdd boolean Flag for whether the editor is for adding new data, rather than editing existing data.
----@field languageFilter function? Filter function for the language suggest box.
----@field protected callbacks omichat.PlayerDataEditor.Callbacks Container for callbacks.
+---@field languageFilter? function Filter function for the language suggest box.
+---@field protected callbacks PlayerDataEditor.Callbacks Container for callbacks.
 local PlayerDataEditor = UI.Panel:derive('PlayerDataEditor')
 
 
@@ -253,9 +254,9 @@ function PlayerDataEditor:onSave()
 end
 
 ---Sets a callback to be called when the save button is pressed.
----@param target unknown? The first argument to pass to the `callback` functon.
+---@param target any? The first argument to pass to the `callback` functon.
 ---@param callback function? The callback function.
----@param ... unknown Additional arguments for the `callback` function.
+---@param ...any Additional arguments for the `callback` function.
 function PlayerDataEditor:setOnSave(target, callback, ...)
     self.callbacks.onSave = utils.callback(target, callback, ...)
 end
@@ -270,7 +271,7 @@ end
 ---@param type 'text' | 'number'
 ---@param y number
 ---@param labelText string
----@param default unknown?
+---@param default any?
 ---@param min number?
 ---@param max number?
 ---@return number newY
@@ -417,10 +418,10 @@ end
 
 
 ---Creates a new player data editor popup.
----@param args omichat.Args.PlayerDataEditor Arguments for creation of the editor.
----@return omichat.PlayerDataEditor editor
+---@param args Args.PlayerDataEditor Arguments for creation of the editor.
+---@return PlayerDataEditor editor
 function PlayerDataEditor:new(args)
-    local this = UI.Panel.new(self, args) --[[@as omichat.PlayerDataEditor]]
+    local this = UI.Panel.new(self, args) --[[@as PlayerDataEditor]]
 
     local itemCopy = utils.copy(args.item)
     itemCopy.languages = itemCopy.languages and utils.copy(itemCopy.languages) or nil
@@ -440,17 +441,16 @@ end
 
 return PlayerDataEditor
 
-
 --#region Type Definitions
 
----@class omichat.PlayerDataEditor.Callbacks : omi.ui.Panel.Callbacks
----@field onSave omi.CallbackInfo? Invoked when saving the player data.
+---@class Args.PlayerDataEditor : omi.ui.Args.Panel
+---@field item PlayerData The original data to be edited.
+---@field isAdd? boolean Flag for whether the editor is for adding user data, rather than editing existing data.
+---@field onSave? omi.ui.Callback Invoked when saving the player data.
+---@field onSaveArgs? table Arguments for `onSave`.
+---@field onSaveTarget? any The first argument to pass to the `onSave` callback.
 
----@class omichat.Args.PlayerDataEditor : omi.ui.Args.Panel
----@field item omichat.PlayerData The original data to be edited.
----@field isAdd boolean? Flag for whether the editor is for adding user data, rather than editing existing data.
----@field onSave omi.ui.Callback? Invoked when saving the player data.
----@field onSaveArgs table? Arguments for `onSave`.
----@field onSaveTarget unknown? The first argument to pass to the `onSave` callback.
+---@class PlayerDataEditor.Callbacks : omi.ui.Panel.Callbacks
+---@field onSave? omi.CallbackInfo Invoked when saving the player data.
 
 --#endregion

@@ -1,3 +1,4 @@
+---@namespace omichat
 ---Configuration form layout.
 
 local utils = require 'OmiChat/Utils'

@@ -1,11 +1,13 @@
+---@namespace omichat
 ---Handles operations related to roleplay languages.
 
-local API = require 'OmiChat/Module/Shared/Core' ---@class omichat.api.shared
+---@class(partial) api.shared
+local API = require 'OmiChat/Module/Shared/Core'
 local config = API.Configuration
 
 
 ---Contains functions related to roleplay languages.
----@class omichat.api.shared.language
+---@class(partial) api.shared.language
 local Language = {}
 
 

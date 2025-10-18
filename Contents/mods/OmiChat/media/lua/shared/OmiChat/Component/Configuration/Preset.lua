@@ -1,24 +1,25 @@
+---@namespace omichat
 ---Class for configuration presets.
 
 local utils = require 'OmiChat/Utils'
-local set = utils.set.simple
+local set = utils.set.table
 local DEFAULT = '$Default()'
 
 
----@class omichat.ConfigurationPreset : omi.Class
+---@class ConfigurationPreset : omi.Class
 ---@field protected _name string The name of the preset.
 ---@field protected _isCustom boolean Flag for whether the preset is a custom, user-defined preset.
----@field protected _values omichat.Configuration The preset's configuration values.
+---@field protected _values Configuration The preset's configuration values.
 local Preset = utils.lib.class()
 
 
 ---Creates a table for configuration of buffs based on the defaults.
----@param options omichat.Args.ConfigurationPreset.Buffs? Options for creation of the table.
----@return omichat.Configuration.Buffs
+---@param options Args.ConfigurationPreset.Buffs? Options for creation of the table.
+---@return Configuration.Buffs
 function Preset.buffs(options)
     options = options or {}
 
-    ---@type omichat.Configuration.Buffs
+    ---@type Configuration.Buffs
     return {
         Enable = options.Enable or false,
         Cooldown = 15,
@@ -32,12 +33,12 @@ function Preset.buffs(options)
 end
 
 ---Creates a table for callout configuration based on the defaults.
----@param options omichat.Args.ConfigurationPreset.Callouts? Options for creation of the table.
----@return omichat.Configuration.Callouts
+---@param options Args.ConfigurationPreset.Callouts? Options for creation of the table.
+---@return Configuration.Callouts
 function Preset.callouts(options)
     options = options or {}
 
-    ---@type omichat.Configuration.Callouts
+    ---@type Configuration.Callouts
     return {
         Format = DEFAULT,
         SneakFormat = DEFAULT,
@@ -47,25 +48,25 @@ function Preset.callouts(options)
 end
 
 ---Returns the default set for information to clear on player character death.
----@return omichat.Configuration.General.ClearOnDeath
+---@return Configuration.General.ClearOnDeath
 function Preset.clearOnDeath()
-    return set {
-        'Icon',
-        'Languages',
-        'Nickname',
-        'Status',
+    return {
+        Icon = true,
+        Languages = true,
+        Nickname = true,
+        Status = true,
     }
 end
 
 ---Creates a table for command configuration based on the defaults.
----@param options omichat.Args.ConfigurationPreset.Commands? Options for creation of the table.
----@return omichat.Configuration.Commands
+---@param options Args.ConfigurationPreset.Commands? Options for creation of the table.
+---@return Configuration.Commands
 function Preset.commands(options)
     options = options or {}
 
     local globalCommands = options.GlobalCommands or false
 
-    ---@type omichat.Configuration.Commands
+    ---@type Configuration.Commands
     return {
         Name = {
             Mode = options.NameMode or 'Nickname',
@@ -112,11 +113,11 @@ end
 
 ---Returns the default values for compatibility options.
 ---@param enable boolean? Flag for whether compatibility options should be set to `'Auto'`. Defaults to `true`.
----@return omichat.Configuration.Compatibility
+---@return Configuration.Compatibility
 function Preset.compatibility(enable)
     local value = enable ~= false and 'Auto' or 'Disable'
 
-    ---@type omichat.Configuration.Compatibility
+    ---@type Configuration.Compatibility
     return {
         ApplyOverrides = true,
         BuffyCharacterBios = value,
@@ -128,14 +129,14 @@ function Preset.compatibility(enable)
 end
 
 ---Creates a table for customization configuration based on the defaults.
----@param options omichat.Args.ConfigurationPreset.Customization? Options for creation of the table.
----@return omichat.Configuration.Customization
+---@param options Args.ConfigurationPreset.Customization? Options for creation of the table.
+---@return Configuration.Customization
 function Preset.customization(options)
     options = options or {}
 
     local value = options.Enable ~= false
 
-    ---@type omichat.Configuration.Customization
+    ---@type Configuration.Customization
     return {
         AllowCustomShouts = value,
         EnableNameColors = value,
@@ -145,12 +146,12 @@ function Preset.customization(options)
 end
 
 ---Creates a table for Discord configuration based on the defaults.
----@param options omichat.Args.ConfigurationPreset.Discord? Options for creation of the table.
----@return omichat.Configuration.Discord
+---@param options Args.ConfigurationPreset.Discord? Options for creation of the table.
+---@return Configuration.Discord
 function Preset.discord(options)
     options = options or {}
 
-    ---@type omichat.Configuration.Discord
+    ---@type Configuration.Discord
     return {
         ChatFormat = DEFAULT,
         DefaultColor = { r = 144, g = 137, b = 218 },
@@ -160,12 +161,12 @@ function Preset.discord(options)
 end
 
 ---Creates a table for echo message configuration based on the defaults.
----@param options omichat.Args.ConfigurationPreset.Echo? Options for creation of the table.
----@return omichat.Configuration.EchoMessages
+---@param options Args.ConfigurationPreset.Echo? Options for creation of the table.
+---@return Configuration.EchoMessages
 function Preset.echo(options)
     options = options or {}
 
-    ---@type omichat.Configuration.EchoMessages
+    ---@type Configuration.EchoMessages
     return {
         Enable = options.Enable or false,
         ChatFormat = DEFAULT,
@@ -175,9 +176,9 @@ function Preset.echo(options)
 end
 
 ---Returns the default format configuration.
----@return omichat.Configuration.Format
+---@return Configuration.Format
 function Preset.format()
-    ---@type omichat.Configuration.Format
+    ---@type Configuration.Format
     return {
         Component = {
             Name = DEFAULT,
@@ -215,10 +216,10 @@ function Preset.format()
 end
 
 ---Creates a table for general configuration based on the defaults.
----@param options omichat.Args.ConfigurationPreset.General Options for creation of the table.
----@return omichat.Configuration.General
+---@param options Args.ConfigurationPreset.General Options for creation of the table.
+---@return Configuration.General
 function Preset.general(options)
-    ---@type omichat.Configuration.General
+    ---@type Configuration.General
     return {
         Preset = options.Name,
         AlwaysShowChat = false,
@@ -232,12 +233,12 @@ function Preset.general(options)
 end
 
 ---Creates a table for language configuration based on the defaults.
----@param options omichat.Args.ConfigurationPreset.Language? Options for creation of the table.
----@return omichat.Configuration.Language
+---@param options Args.ConfigurationPreset.Language? Options for creation of the table.
+---@return Configuration.Language
 function Preset.languages(options)
     options = options or {}
 
-    ---@type omichat.Configuration.Language
+    ---@type Configuration.Language
     return {
         UseDefaultList = options.UseDefaultList ~= false,
         List = options.List or {},
@@ -253,24 +254,24 @@ function Preset.languages(options)
 end
 
 ---Creates a table for macro configuration based on the defaults.
----@param options omichat.Args.ConfigurationPreset.Macros? Options for creation of the table.
----@return omichat.Configuration.Macros
+---@param options Args.ConfigurationPreset.Macros? Options for creation of the table.
+---@return Configuration.Macros
 function Preset.macros(options)
     options = options or {}
 
-    ---@type omichat.Configuration.Macros
+    ---@type Configuration.Macros
     return {
         AllowEmotes = options.AllowEmotes ~= false,
     }
 end
 
 ---Creates a table for mention configuration based on the defaults.
----@param options omichat.Args.ConfigurationPreset.Mentions? Options for creation of the table.
----@return omichat.Configuration.Mentions
+---@param options Args.ConfigurationPreset.Mentions? Options for creation of the table.
+---@return Configuration.Mentions
 function Preset.mentions(options)
     options = options or {}
 
-    ---@type omichat.Configuration.Mentions
+    ---@type Configuration.Mentions
     return {
         Enable = options.Enable ~= false,
         AlwaysUseNameColors = true,
@@ -281,12 +282,12 @@ function Preset.mentions(options)
 end
 
 ---Creates a table for narrative style configuration based on the defaults.
----@param options omichat.Args.ConfigurationPreset.NarrativeStyle? Options for creation of the table.
----@return omichat.Configuration.NarrativeStyle
+---@param options Args.ConfigurationPreset.NarrativeStyle? Options for creation of the table.
+---@return Configuration.NarrativeStyle
 function Preset.narrative(options)
     options = options or {}
 
-    ---@type omichat.Configuration.NarrativeStyle
+    ---@type Configuration.NarrativeStyle
     return {
         Enable = options.Enable or false,
         OverheadContentFormat = DEFAULT,
@@ -297,12 +298,12 @@ function Preset.narrative(options)
 end
 
 ---Creates a table for radio configuration based on the defaults.
----@param options omichat.Args.ConfigurationPreset.Radio? Options for creation of the table.
----@return omichat.Configuration.Radio
+---@param options Args.ConfigurationPreset.Radio? Options for creation of the table.
+---@return Configuration.Radio
 function Preset.radio(options)
     options = options or {}
 
-    ---@type omichat.Configuration.Radio
+    ---@type Configuration.Radio
     return {
         ChatFormat = DEFAULT,
         DefaultColor = { r = 178, g = 178, b = 178 },
@@ -311,12 +312,12 @@ function Preset.radio(options)
 end
 
 ---Creates a table for server message configuration based on the defaults.
----@param options omichat.Args.ConfigurationPreset.ServerMessages? Options for creation of the table.
----@return omichat.Configuration.ServerMessages
+---@param options Args.ConfigurationPreset.ServerMessages? Options for creation of the table.
+---@return Configuration.ServerMessages
 function Preset.server(options)
     options = options or {}
 
-    ---@type omichat.Configuration.ServerMessages
+    ---@type Configuration.ServerMessages
     return {
         ChatFormat = DEFAULT,
         DefaultColor = { r = 0, g = 128, b = 255 },
@@ -325,12 +326,12 @@ function Preset.server(options)
 end
 
 ---Creates a table for typing indicator configuration based on the defaults.
----@param options omichat.Args.ConfigurationPreset.TypingIndicator? Options for creation of the table.
----@return omichat.Configuration.TypingIndicator
+---@param options Args.ConfigurationPreset.TypingIndicator? Options for creation of the table.
+---@return Configuration.TypingIndicator
 function Preset.typing(options)
     options = options or {}
 
-    ---@type omichat.Configuration.TypingIndicator
+    ---@type Configuration.TypingIndicator
     return {
         Enable = options.Enable ~= false,
         Format = DEFAULT,
@@ -339,12 +340,12 @@ function Preset.typing(options)
 end
 
 ---Creates a table for zombie attraction configuration based on the defaults.
----@param options omichat.Args.ConfigurationPreset.ZombieAttraction? Options for creation of the table.
----@return omichat.Configuration.ZombieAttraction
+---@param options Args.ConfigurationPreset.ZombieAttraction? Options for creation of the table.
+---@return Configuration.ZombieAttraction
 function Preset.zombies(options)
     options = options or {}
 
-    ---@type omichat.Configuration.ZombieAttraction
+    ---@type Configuration.ZombieAttraction
     return {
         ChatRangeMultiplier = options.ChatRangeMultiplier or 0,
         CalloutRange = options.CalloutRange or 30,
@@ -377,17 +378,17 @@ function Preset:getName()
 end
 
 ---Gets the values associated with the preset.
----@return omichat.Configuration values
+---@return Configuration values
 function Preset:getValues()
     return utils.deepcopy(self._values)
 end
 
 
 ---Creates a new configuration preset.
----@param args omichat.Args.ConfigurationPreset? Arguments for preset creation.
----@return omichat.ConfigurationPreset preset
+---@param args Args.ConfigurationPreset? Arguments for preset creation.
+---@return ConfigurationPreset preset
 function Preset:new(args)
-    local this = setmetatable({}, self) --[[@as omichat.ConfigurationPreset]]
+    local this = setmetatable({}, self) --[[@as ConfigurationPreset]]
 
     args = args or {}
     this._name = args.name
@@ -400,75 +401,74 @@ end
 
 return Preset
 
-
 --#region Type Definitions
 
----@class omichat.Configuration.PresetTable
+---@class Args.ConfigurationPreset
 ---@field name string The name of the preset.
----@field values table The configuration values.
+---@field isCustom? boolean Flag for whether the preset is custom (user-defined).
+---@field values? Configuration The preset's configuration values.
 
----@class omichat.Args.ConfigurationPreset
----@field name string The name of the preset.
----@field isCustom boolean? Flag for whether the preset is custom (user-defined).
----@field values omichat.Configuration? The preset's configuration values.
-
----@class omichat.Args.ConfigurationPreset.Buffs
+---@class Args.ConfigurationPreset.Buffs
 ---@field Enable boolean? Flag for whether buffs should be enabled. Defaults to `false`.
 
----@class omichat.Args.ConfigurationPreset.Callouts
+---@class Args.ConfigurationPreset.Callouts
 ---@field Range integer? The callout range to use. Defaults to `60`.
 ---@field SneakRange integer? The sneak callout range to use. Defaults to `6`.
 
----@class omichat.Args.ConfigurationPreset.Commands
----@field NameMode omichat.Configuration.Commands.Name.Mode? The mode to use for name commands. Defaults to `Nickname`.
+---@class Args.ConfigurationPreset.Commands
+---@field NameMode Configuration.Commands.Name.Mode? The mode to use for name commands. Defaults to `Nickname`.
 ---@field EnableStatus boolean? Flag for whether the `/status` command is enabled. Defaults to `true`.
 ---@field GlobalCommands boolean? Flag for whether the `/card`, `/flip`, and `/roll` commands should be global. Defaults to `false`.
 
----@class omichat.Args.ConfigurationPreset.Customization
+---@class Args.ConfigurationPreset.Customization
 ---@field Enable boolean? Flag for whether customization features should be enabled. Defaults to `true`.
 ---@field CleanEffects string[]? The clean effects to enable. Defaults to `['Body', 'Clothing']`.
 
----@class omichat.Args.ConfigurationPreset.Discord
+---@class Args.ConfigurationPreset.Discord
 ---@field Tags string[]? Tags to include on the Discord stream. Defaults to `['UseAuthorUsername']`.
 
----@class omichat.Args.ConfigurationPreset.Echo
+---@class Args.ConfigurationPreset.Echo
 ---@field Enable boolean? Flag for whether echo messages are enabled. Defaults to `false`.
 ---@field Tags string[]? Tags to include on echo messages. Defaults to `['OverRadio']`.
 
----@class omichat.Args.ConfigurationPreset.General
+---@class Args.ConfigurationPreset.General
 ---@field Name string The name of the preset.
 ---@field AdminIcon string? The texture name to use as the admin icon. Defaults to `Item_Sledgehamer` [sic].
 ---@field CaseInsensitiveChatStreams boolean? Flag for whether chat streams are case-insensitive. Defaults to `true`.
----@field ClearOnDeath omichat.Configuration.General.ClearOnDeath? Information taht should be cleared death.
+---@field ClearOnDeath Configuration.General.ClearOnDeath? Information taht should be cleared death.
 ---@field Variables string[]? Arbitrary key-value pairs for variables.
 
----@class omichat.Args.ConfigurationPreset.Language
+---@class Args.ConfigurationPreset.Language
 ---@field UseDefaultList boolean? Flag for whether the default language list should be used. Defaults to `true`.
----@field List omichat.Configuration.LanguageDefinition[]? A list of languages to use.
+---@field List Configuration.LanguageDefinition[]? A list of languages to use.
 
----@class omichat.Args.ConfigurationPreset.Macros
+---@class Args.ConfigurationPreset.Macros
 ---@field AllowEmotes boolean? Flag for whether emotes should be enabled. Defaults to `true`.
 
----@class omichat.Args.ConfigurationPreset.Mentions
+---@class Args.ConfigurationPreset.Mentions
 ---@field Enable boolean? Flag for whether mentions should be enabled. Defaults to `true`.
 ---@field Range integer? Range for mentions on ranged streams. Defaults to `10`.
 
----@class omichat.Args.ConfigurationPreset.NarrativeStyle
+---@class Args.ConfigurationPreset.NarrativeStyle
 ---@field Enable boolean? Flag for whether narrative style should be enabled.
 
----@class omichat.Args.ConfigurationPreset.Radio
+---@class Args.ConfigurationPreset.Radio
 ---@field Tags string[]? Tags to include on the radio stream. Defaults to no tags.
 
----@class omichat.Args.ConfigurationPreset.ServerMessages
+---@class Args.ConfigurationPreset.ServerMessages
 ---@field Tags string[]? Tags to include on the server message stream. Defaults to `['NoTimestamp', 'NoTagColon']`.
 
----@class omichat.Args.ConfigurationPreset.TypingIndicator
+---@class Args.ConfigurationPreset.TypingIndicator
 ---@field Enable boolean? Flag for whether the typing indicator should be enabled.
 
----@class omichat.Args.ConfigurationPreset.ZombieAttraction
+---@class Args.ConfigurationPreset.ZombieAttraction
 ---@field ChatRangeMultiplier number? The multiplier to use with the chat range to determine the zombie attraction range. Defaults to `0`.
 ---@field CalloutRange integer? The default zombie attraction range for callouts. Defaults to `30`.
 ---@field SneakCalloutRange integer? The default zombie attraction range for sneak callouts. Defaults to `6`.
 
+
+---@class Configuration.PresetTable
+---@field name string The name of the preset.
+---@field values table The configuration values.
 
 --#endregion

@@ -1,5 +1,6 @@
+---@namespace omichat
 ---Default list of roleplay languages.
----@type omichat.Configuration.LanguageDefinition[]
+---@type Configuration.LanguageDefinition[]
 local DefaultLanguageList = {
     { Name = 'English' },
     { Name = 'French' },

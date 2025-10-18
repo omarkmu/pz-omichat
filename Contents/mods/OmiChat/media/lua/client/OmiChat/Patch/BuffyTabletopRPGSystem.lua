@@ -1,3 +1,4 @@
+---@namespace omichat
 ---Compatibility patch for Buffy's Tabletop RPG System.
 
 local API = require 'OmiChat/Client'

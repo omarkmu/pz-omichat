@@ -1,3 +1,4 @@
+---@namespace omichat
 ---Handles overrides to show chat names within in-game menus.
 ---@diagnostic disable: duplicate-set-field
 
@@ -14,7 +15,6 @@ local ISHealthPanel_update = ISHealthPanel.update
 function ISMedicalCheckAction:perform()
     ISMedicalCheckAction_perform(self)
 
-    ---@type ISCollapsableWindow
     local healthWindow = ISMedicalCheckAction.getHealthWindowForPlayer(self.otherPlayer)
     if not healthWindow then
         return
@@ -31,7 +31,11 @@ end
 function ISHealthPanel:update()
     ISHealthPanel_update(self)
 
-    if not self.character or not self.otherPlayer or not self.blockingMessage or not self.parent:getIsVisible() then
+    if not self.character or not self.otherPlayer or not self.blockingMessage then
+        return
+    end
+
+    if not self.parent or not self.parent:getIsVisible() then
         return
     end
 
@@ -61,6 +65,10 @@ local ISWorldObjectContextMenu_onTrade = ISWorldObjectContextMenu.onTrade
 ---@param messageRecord table?
 local function updateHistoryMessage(message, messageRecord)
     local instance = ISTradingUI.instance
+    if not instance then
+        return
+    end
+
     instance.historyMessage = message
 
     if not messageRecord then
@@ -138,6 +146,10 @@ end
 ---@param player IsoPlayer
 ---@param index integer
 function ISTradingUI.RemoveItem(player, index)
+    if not ISTradingUI.instance then
+        return
+    end
+
     local removed = ISTradingUI.instance.hisOfferDatas.items[index]
     ISTradingUI_RemoveItem(player, index)
 
@@ -379,10 +391,10 @@ local function handleContextMenuOption(opt)
 end
 
 ---Override to createMenu to ensure our handling occurs after all event handlers have run.
----@param ... unknown
----@return unknown
+---@param ...any
+---@return any
 function ISWorldObjectContextMenu.createMenu(...)
-    local context = ISWorldObjectContextMenu_createMenu(...)
+    local context = ISWorldObjectContextMenu_createMenu(...) --[[@as ISContextMenu]]
     if type(context) ~= 'table' or not context.options then
         return context
     end

@@ -1,8 +1,12 @@
+---@namespace omichat
 ---Handles extension of mod functionality.
----@diagnostic disable: invisible
+---@diagnostic disable: access-invisible
 
-local API = require 'OmiChat/Module/Shared/Core' ---@class omichat.api.shared
-local API_C = API ---@class omichat.api.client
+---@class(partial) api.shared
+local API = require 'OmiChat/Module/Shared/Core'
+
+---@class(partial) api.client
+local API_C = API
 
 local config = API.Configuration
 local utils = API.utils
@@ -11,7 +15,7 @@ local IS_CLIENT = not isServer()
 
 
 ---Contains functions for extending mod functionality.
----@class omichat.api.shared.extension
+---@class(partial) api.shared.extension
 local Extension = {}
 
 
@@ -19,17 +23,17 @@ local Extension = {}
 ---@param name string The name of the preset.
 ---@param values table The configuration values.
 ---@param doRequest boolean? Flag for whether the preset should be sent to the server. This has no effect if used on the server.
----@return omichat.ConfigurationPreset preset The newly added preset object.
+---@return ConfigurationPreset preset The newly added preset object.
 function Extension.addCustomPreset(name, values, doRequest)
-    local schema = API.Configuration:getSchema()
-    local readValues = schema:read({ source = values })
-    local preset = API.Configuration.Preset:new({
+    local schema = config:getSchema()
+    local readValues = schema:read({ source = values }) ---@type Configuration
+    local preset = config.Preset:new({
         name = name,
         isCustom = true,
         values = readValues,
     })
 
-    API.Configuration:_addCustomPreset(preset)
+    config:_addCustomPreset(preset)
 
     if not IS_CLIENT then
         Extension._writePresets()
@@ -41,7 +45,7 @@ function Extension.addCustomPreset(name, values, doRequest)
 end
 
 ---Adds a hook of the given type.
----@param type omichat.HookType The type of hook to add.
+---@param type HookType The type of hook to add.
 ---@param callback function The hook callback function.
 ---@diagnostic disable-next-line: duplicate-set-field
 function Extension.addHook(type, callback)
@@ -56,7 +60,7 @@ end
 
 ---Adds a function that should be available to all interpolator patterns.
 ---@param name string The name of the new interpolation function.
----@param func omichat.InterpolatorFunction The function to execute when the interpolation function is used.
+---@param func InterpolatorFunction The function to execute when the interpolation function is used.
 function Extension.registerInterpolatorFunction(name, func)
     utils.Interpolator.register(name, func)
 end
@@ -65,7 +69,7 @@ end
 ---@param name string The name of the preset.
 ---@param doRequest boolean? Flag for whether the removal should be sent to the server. This has no effect if used on the server.
 function Extension.removeCustomPreset(name, doRequest)
-    API.Configuration:_removeCustomPreset(name)
+    config:_removeCustomPreset(name)
 
     if not IS_CLIENT then
         Extension._writePresets()
@@ -75,7 +79,7 @@ function Extension.removeCustomPreset(name, doRequest)
 end
 
 ---Removes a hook of the given type.
----@param type omichat.HookType The type of hook to remove.
+---@param type HookType The type of hook to remove.
 ---@param callback function The hook callback function.
 function Extension.removeHook(type, callback)
     local cbList = API.hooks._callbacks[type]
@@ -92,7 +96,7 @@ end
 
 ---Removes an element from a table, shifting subsequent elements.
 ---@param tab table
----@param target unknown
+---@param target any
 ---@return boolean
 ---@protected
 function Extension._remove(tab, target)
@@ -132,7 +136,7 @@ function Extension._removeByName(tab, name)
     local i = 1
     local found = false
     while i <= #tab and not found do
-        found = tab[i].name == name
+        found = tab[i] ~= nil and tab[i].name == name
         i = i + 1
     end
 

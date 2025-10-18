@@ -1,6 +1,8 @@
+---@namespace omichat
 ---Client-side event handlers.
 
-local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
+---@class(partial) api.client
+local API = require 'OmiChat/Module/Client/Core'
 
 
 ---Called when a player is created.

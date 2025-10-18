@@ -1,6 +1,7 @@
+---@namespace omichat
 ---Suggesters for input content.
 
-local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
+local API = require 'OmiChat/Module/Client/Core'
 
 local utils = API.utils
 local config = API.Configuration
@@ -12,15 +13,15 @@ local MAX_RESULTS = 30
 local MAX_SEARCH = 100
 
 
----@class omichat.Suggester
----@field name string? The name of the suggester.
----@field suggest fun(self: table, info: omichat.SuggestionInfo) Performs suggestion.
----@field priority integer? The priority of the suggester. Higher numbers will run first.
+---@class Suggester
+---@field name? string The name of the suggester.
+---@field suggest fun(self: table, info: SuggestionInfo) Performs suggestion.
+---@field priority? integer The priority of the suggester. Higher numbers will run first.
 
 
 ---Gets the current stream from the chat input.
 ---@param input string
----@return omichat.Stream?
+---@return Stream?
 local function getStreamFromInput(input)
     local instance = ISChat.instance
     if not instance then
@@ -50,7 +51,7 @@ local function getStreamFromInput(input)
 end
 
 
----@type omichat.Suggester[]
+---@type Suggester[]
 return {
     {
         -- Provides suggestions for command names.
@@ -131,11 +132,11 @@ return {
                 return
             end
 
-            local search ---@type omichat.SearchResults
+            local search ---@type SearchResults
             local argType = argSpec.type
             local applyQuotes = true
 
-            ---@type omichat.SearchContext
+            ---@type SearchContext
             local ctx = {
                 search = current,
                 terminateOnExact = true,
@@ -217,12 +218,16 @@ return {
             end
 
             local start, _, whitespace, period, text = info.input:find('(%s*)()%.([%w_]*)$')
+            ---@cast period -string, +integer
+            ---@cast text -?
+
             if not start or (start ~= 1 and #whitespace == 0) then
                 -- require whitespace unless the emote is at the start
                 return
             end
 
             local keys = {}
+            ---@diagnostic disable-next-line: access-invisible
             for k in pairs(API._emotes) do
                 keys[#keys + 1] = k
             end
@@ -258,8 +263,8 @@ return {
                 return
             end
 
-            local stream = getStreamFromInput(info.input) --[[@as omichat.ChatStream?]]
-            if not stream or not stream:isAllowMentions() or stream:isCommandStream() then
+            local stream = getStreamFromInput(info.input)
+            if not stream or not stream:isAllowMentions() or not stream:isChatStream() then
                 return
             end
 

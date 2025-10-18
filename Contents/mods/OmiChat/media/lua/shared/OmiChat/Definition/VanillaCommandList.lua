@@ -1,7 +1,8 @@
+---@namespace omichat
 ---Vanilla command list.
 ---Used for the rewritten `/help` command.
 ---This excludes disabled commands and commands without help text.
----@type omichat.VanillaCommand[]
+---@type VanillaCommand[]
 local VanillaCommandList = {
     {
         name = 'additem',
@@ -280,14 +281,13 @@ local VanillaCommandList = {
 
 return VanillaCommandList
 
-
 --#region Type Definitions
 
----@class omichat.VanillaCommand
+---@class VanillaCommand
 ---@field name string The name of the command.
 ---@field helpText string The string ID of the command's help text.
 ---@field access integer Access requirements to use the command.
----@field helpTextArgs string[]? Arguments to supply to the command's help text.
----@field suggestSpec omichat.SuggestArgSpec[]? Spec for suggestions.
+---@field helpTextArgs? string[] Arguments to supply to the command's help text.
+---@field suggestSpec? SuggestArgSpec[] Spec for suggestions.
 
 --#endregion

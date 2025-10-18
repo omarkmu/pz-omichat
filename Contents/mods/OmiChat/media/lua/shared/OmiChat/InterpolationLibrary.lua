@@ -1,6 +1,8 @@
+---@namespace omichat
 ---Interpolation function library.
 
-local Interpolator = require 'OmiChat/Component/Interpolator' ---@class omichat.Interpolator
+---@class(partial) Interpolator
+local Interpolator = require 'OmiChat/Component/Interpolator'
 local Library = require 'OmiChat/Module/InterpolationLibrary/Core'
 
 require 'OmiChat/Module/InterpolationLibrary/Defaults'

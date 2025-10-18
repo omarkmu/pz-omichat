@@ -1,18 +1,19 @@
+---@namespace omichat
 ---Client API.
 
----@class omichat.api.client
+---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
 
 ---List of built-in command streams.
----@type omichat.CommandStream[]
+---@type CommandStream[]
 API._commandStreams = require 'OmiChat/Definition/Commands'
 
 ---List of suggesters, for providing text suggestions.
----@type omichat.Suggester[]
+---@type Suggester[]
 API._suggesters = require 'OmiChat/Definition/Suggesters'
 
 ---List of transformers, for transforming message content.
----@type omichat.MessageTransformer[]
+---@type MessageTransformer[]
 API._transformers = require 'OmiChat/Definition/Transformers'
 
 

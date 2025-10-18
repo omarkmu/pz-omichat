@@ -1,8 +1,9 @@
+---@namespace omichat
 ---Interpolation function library.
----@class omichat.InterpolationLibrary
+---@class(partial) InterpolationLibrary
 local Library = {}
 
----@class omichat.InterpolationLibrary.Defaults
+---@class(partial) InterpolationLibrary.Defaults
 Library.Defaults = {}
 
 

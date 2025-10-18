@@ -1,5 +1,6 @@
+---@namespace omichat
 ---API functionality exclusive to the server.
----@class omichat.api.server : omichat.api.shared
+---@class(partial) api.server : api.shared
 local API = require 'OmiChat/Shared'
 
 

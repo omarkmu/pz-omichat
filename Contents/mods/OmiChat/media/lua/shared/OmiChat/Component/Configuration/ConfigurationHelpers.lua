@@ -1,3 +1,4 @@
+---@namespace omichat
 ---Helper functions for the configuration form and schema.
 
 local utils = require 'OmiChat/Utils'
@@ -10,11 +11,9 @@ local DefaultStreamData = require 'OmiChat/Definition/DefaultStreamData'
 
 local sort = table.sort
 local concat = table.concat
-local PATH_PRESET = { 'General', 'Preset' }
-local PATH_INFO = { 'General', 'InfoText' }
 local MIDDOT = string.char(183) .. ' <SPACE> '
 
-local API_C ---@type omichat.api.client?
+local API_C ---@type api.client?
 
 
 local Helpers = {}
@@ -22,13 +21,13 @@ local Helpers = {}
 
 ---Applies values from a preset to the form.
 ---@param form omi.forms.Form The current form.
----@param preset omichat.ConfigurationPreset The preset to apply.
+---@param preset ConfigurationPreset The preset to apply.
 function Helpers.applyPreset(form, preset)
     local values = form.values
     local id = preset:getID()
 
     -- get info text value before setting values
-    local infoText = form:getValue(PATH_INFO)
+    local infoText = form:getValue('General.InfoText')
 
     -- ensure ID matches expected preset ID
     local presetValues = preset:getValues()
@@ -41,16 +40,16 @@ function Helpers.applyPreset(form, preset)
     if not preset:isCustom() then
         values.General = values.General or {}
         values.General.InfoText = infoText
-        form:setControlValue(PATH_INFO, infoText)
+        form:setControlValue('General.InfoText', infoText)
     end
 
     form:setStatusMessage(getText('Sandbox_OmiChat_status_preset', preset:getName()))
 end
 
 ---Creates a new item for the stream list.
----@return omichat.Configuration.StreamDefinition item The new item.
+---@return Configuration.StreamDefinition item The new item.
 function Helpers.createStreamItem()
-    ---@type omichat.Configuration.StreamDefinition
+    ---@type Configuration.StreamDefinition
     local item = {
         Enable = true,
         Stream = 'custom',
@@ -70,7 +69,7 @@ end
 
 ---Deletes a custom user-defined preset.
 ---@param form omi.forms.Form The current form.
----@param state omichat.ConfigurationFormState The current form state.
+---@param state ConfigurationFormState The current form state.
 ---@param value string The current preset name.
 function Helpers.deletePreset(form, state, value)
     if not utils.startsWith(value, 'custom:') then
@@ -96,13 +95,13 @@ function Helpers.deletePreset(form, state, value)
 
             API_C.extension.removeCustomPreset(name, true)
 
-            local currentValue = form:getValue(PATH_PRESET)
+            local currentValue = form:getValue('General.Preset')
             if currentValue == value then
                 Helpers.refreshPresetsList(form)
 
                 local values = form.values
                 values.General.Preset = 'Default'
-                form:setControlValue(PATH_PRESET, 'Default')
+                form:setControlValue('General.Preset', 'Default')
             end
         end,
     }
@@ -112,27 +111,27 @@ function Helpers.deletePreset(form, state, value)
 end
 
 ---Returns a list of default language definition objects.
----@return omichat.Configuration.LanguageDefinition[]
+---@return Configuration.LanguageDefinition[]
 function Helpers.getDefaultLanguages()
     return utils.copyList(DefaultLanguages)
 end
 
 ---Returns a list of default stream objects.
----@return omichat.Configuration.StreamDefinition[]
+---@return Configuration.StreamDefinition[]
 function Helpers.getDefaultStreams()
     return utils.copyList(DefaultStreams)
 end
 
 ---Returns a list of default stream objects, populated with required data.
----@return omichat.Configuration.StreamDefinition[]
+---@return Configuration.StreamDefinition[]
 function Helpers.getDefaultStreamsPopulated()
     return Helpers.processStreams(utils.copyList(DefaultStreams))
 end
 
 ---Gets a final list of format data translations.
----@param list (string | omichat.FormatDataTranslation)[]?
+---@param list (string | FormatDataTranslation)[]?
 ---@param prefix string
----@return omichat.FormatDataTranslation[]
+---@return FormatDataTranslation[]
 function Helpers.getFormatDataTranslations(list, prefix)
     if not list or #list == 0 then
         return {}
@@ -171,7 +170,7 @@ end
 ---@param args omi.forms.Args.Callback.Item
 ---@return string
 function Helpers.getLanguageListDisplay(args)
-    local item = args.value or {} ---@type omichat.Configuration.LanguageDefinition
+    local item = args.value or {} ---@type Configuration.LanguageDefinition
 
     if not utils.isNilOrWhitespace(item.Name) then
         return item.Name
@@ -181,11 +180,11 @@ function Helpers.getLanguageListDisplay(args)
 end
 
 ---Gets a list of options for the preset configuration value.
----@return omi.ui.Dropdown.OptionOrString[]
+---@return omi.ui.Dropdown.Option[]
 function Helpers.getPresetOptions()
     API_C = API_C or utils.getAPI()
 
-    local list = {} ---@type omi.ui.Dropdown.OptionOrString[]
+    local list = {} ---@type omi.ui.Dropdown.Option[]
     local presetList = API_C.Configuration:getPresetList()
     for i = 1, #presetList do
         local preset = presetList[i]
@@ -201,7 +200,7 @@ function Helpers.getPresetOptions()
 end
 
 ---Gets the chat type associated with a built-in stream.
----@param stream string
+---@param stream string?
 ---@return omi.ChatTypeString?
 function Helpers.getStreamChatType(stream)
     if not stream then
@@ -213,8 +212,8 @@ function Helpers.getStreamChatType(stream)
 end
 
 ---Gets the command type associated with a built-in stream.
----@param stream string
----@return string?
+---@param stream string?
+---@return StreamCategory?
 function Helpers.getStreamCategory(stream)
     if not stream then
         return
@@ -228,7 +227,7 @@ end
 ---@param args omi.forms.Args.Callback.Item
 ---@return string
 function Helpers.getStreamDisplay(args)
-    local item = args.value or {} ---@type omichat.Configuration.StreamDefinition
+    local item = args.value or {} ---@type Configuration.StreamDefinition
     if not item.Stream or item.Stream == 'custom' then
         return not utils.isNilOrWhitespace(item.Name) and item.Name or 'custom'
     end
@@ -304,7 +303,7 @@ end
 ---Called when a language name changes in the language listbox.
 ---@param args omi.forms.Args.Callback.Item
 function Helpers.onChangeLanguageName(args)
-    local control = args.form:getFieldControl({ 'Language', 'List', 'Name' }) --[[@as omi.ui.TextEntry?]]
+    local control = args.form:getFieldControl('Language.List.Name') --[[@as omi.ui.TextEntry?]]
     if not control then
         return
     end
@@ -320,7 +319,8 @@ end
 ---Called when the preset option dropdown changes.
 ---@param args omi.forms.Args.Callback.Item
 function Helpers.onChangePreset(args)
-    local deleteBtn = args.info.actionButtons[3]
+    local info = args.info
+    local deleteBtn = info.actionButtons and info.actionButtons[3]
     if not deleteBtn then
         return
     end
@@ -332,15 +332,15 @@ end
 ---@param args omi.forms.Args.Callback.Item
 function Helpers.onChangeStream(args)
     local form = args.form
-    local item = args.parent ---@type omichat.Configuration.StreamDefinition?
+    local item = args.parent ---@type Configuration.StreamDefinition?
     local index = args.index
     if not item or not index then
         return
     end
 
     -- enable/disable all fields
-    local allDisabled = not utils.default(item.Enable, true)
-    local parent = form:getFieldRecord({ 'Streams', 'List' })
+    local allDisabled = not (item.Enable ~= false)
+    local parent = form:getFieldRecord('Streams.List')
     local childFields = parent and parent.children or {}
 
     for key, childRec in pairs(childFields) do
@@ -352,17 +352,17 @@ function Helpers.onChangeStream(args)
     -- disable fields incompatible with built-in streams
     if not allDisabled then
         local isCustomStream = not item.Stream or item.Stream == 'custom'
-        local nameField = form:getFieldInfo({ 'Streams', 'List', 'Name' })
-        local chatTypeField = form:getFieldInfo({ 'Streams', 'List', 'ChatType' })
-        local commandTypeField = form:getFieldInfo({ 'Streams', 'List', 'Category' })
+        local nameField = form:getFieldInfo('Streams.List.Name')
+        local chatTypeField = form:getFieldInfo('Streams.List.ChatType')
+        local commandTypeField = form:getFieldInfo('Streams.List.Category')
         form:setFieldControlEnabled(nameField, isCustomStream)
         form:setFieldControlEnabled(chatTypeField, isCustomStream)
         form:setFieldControlEnabled(commandTypeField, isCustomStream)
 
         if not isCustomStream then
             item.Name = nil
-            item.ChatType = Helpers.getStreamChatType(item.Stream) or 'say'
-            item.Category = Helpers.getStreamCategory(item.Stream) or 'chat'
+            item.ChatType = item.Stream and Helpers.getStreamChatType(item.Stream) or 'say'
+            item.Category = item.Stream and Helpers.getStreamCategory(item.Stream) or 'chat'
 
             form:setFieldControlValue(nameField, '')
             form:setFieldControlValue(chatTypeField, item.ChatType)
@@ -380,7 +380,7 @@ function Helpers.onChangeStream(args)
     local rangeControlNames = { 'Range', 'PerceptionRange', 'PerceptionRangeSigned' }
     for i = 1, #rangeControlNames do
         local name = rangeControlNames[i]
-        local rangeControl = form:getFieldControl({ 'Streams', 'List', name }) --[[@as omi.ui.TextEntry?]]
+        local rangeControl = form:getFieldControl({ path = { 'Streams', 'List', name } }) --[[@as omi.ui.TextEntry?]]
         if rangeControl then
             rangeControl:setMaxValue(maxRange)
         end
@@ -390,12 +390,12 @@ function Helpers.onChangeStream(args)
     if not allDisabled then
         local isRanged = chatType == 'say' or chatType == 'shout'
         local dependentFields = {
-            { form:getFieldInfo({ 'Streams', 'List', 'Range' }) },
-            { form:getFieldInfo({ 'Streams', 'List', 'VerticalRange' }) },
-            { form:getFieldInfo({ 'Streams', 'List', 'PerceptionRange' }) },
-            { form:getFieldInfo({ 'Streams', 'List', 'PerceptionRangeSigned' }) },
-            { form:getFieldInfo({ 'Streams', 'List', 'OverheadFormat' }) },
-            { form:getFieldInfo({ 'Streams', 'List', 'AttractZombies' }), false },
+            { form:getFieldInfo('Streams.List.Range') },
+            { form:getFieldInfo('Streams.List.VerticalRange') },
+            { form:getFieldInfo('Streams.List.PerceptionRange') },
+            { form:getFieldInfo('Streams.List.PerceptionRangeSigned') },
+            { form:getFieldInfo('Streams.List.OverheadFormat') },
+            { form:getFieldInfo('Streams.List.AttractZombies'), false },
         }
 
         for _, depFieldInfo in pairs(dependentFields) do
@@ -450,7 +450,7 @@ end
 ---@param args omi.forms.Args.Callback.ButtonClick
 function Helpers.onClickFormatInfo(args)
     local form = args.form
-    local state = args.state --[[@as omichat.ConfigurationFormState]]
+    local state = args.state --[[@as ConfigurationFormState]]
 
     if state.activeFormatStringDialog then
         local isVisible = state.activeFormatStringDialog:isReallyVisible()
@@ -509,7 +509,7 @@ end
 function Helpers.populateTagSuggest(listEntry, suggestBox, text)
     API_C = API_C or utils.getAPI()
 
-    local values = utils.set.simple(listEntry:getValue())
+    local values = utils.set.table(listEntry:getValue())
     local search = API_C.search.strings({
         search = text,
         filter = function(value) return not values[value] end,
@@ -525,8 +525,8 @@ function Helpers.populateTagSuggest(listEntry, suggestBox, text)
 end
 
 ---Transforms configured streams to include required data and fix incompatible fields.
----@param streams omichat.Configuration.StreamDefinition[] The streams to process.
----@return omichat.Configuration.StreamDefinition[] processed The processed streams.
+---@param streams Configuration.StreamDefinition[] The streams to process.
+---@return Configuration.StreamDefinition[] processed The processed streams.
 function Helpers.processStreams(streams)
     local seen = { [''] = true }
     local processed = {}
@@ -583,7 +583,7 @@ end
 ---Refreshes the list of presets to match the current custom presets.
 ---@param form omi.forms.Form The form with the field to update.
 function Helpers.refreshPresetsList(form)
-    local dropdown = form:getFieldControl(PATH_PRESET) --[[@as omi.ui.Dropdown?]]
+    local dropdown = form:getFieldControl('General.Preset') --[[@as omi.ui.Dropdown?]]
     if not dropdown then
         return
     end
@@ -595,7 +595,7 @@ function Helpers.refreshPresetsList(form)
         local opt = options[i]
         dropdown:addOptionWithData(opt.text, opt.data)
 
-        local added = dropdown.options[#dropdown.options]
+        local added = dropdown.options[#dropdown.options] --[[@as omi.ui.Dropdown.Option]]
         added.tooltip = opt.tooltip
     end
 end
@@ -610,7 +610,7 @@ end
 
 ---Saves a custom user-defined preset.
 ---@param form omi.forms.Form The current form.
----@param state omichat.ConfigurationFormState The current form state.
+---@param state ConfigurationFormState The current form state.
 function Helpers.savePreset(form, state)
     API_C = API_C or utils.getAPI()
     local lib = utils.lib --[[@as omi.client]]
@@ -663,7 +663,7 @@ end
 
 ---Writes a list of format data elements to a string list.
 ---@param heading string A heading string to write at the top.
----@param list omichat.FormatDataTranslation[]? The list of format data elements.
+---@param list FormatDataTranslation[]? The list of format data elements.
 ---@param descID string? An optional string ID for description text.
 ---@param out string[] The string array to write to.
 function Helpers.writeFormatDataTranslations(heading, list, descID, out)

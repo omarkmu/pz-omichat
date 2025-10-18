@@ -1,3 +1,4 @@
+---@namespace omichat
 ---Compatibility patch for True Actions Act 3 - Dancing.
 
 local API = require 'OmiChat/Client'
@@ -420,15 +421,15 @@ local function processDanceCommand(name, player)
     if #name == 0 then
         local dances, currentDanceIdx = getAvailableDances(player, player:getVariableString('emote'))
 
-        local idx
+        local idx ---@type integer
         if currentDanceIdx then
             -- avoid doing the same dance
-            idx = ZombRand(1, #dances)
+            idx = utils.randInt(1, #dances)
             if idx == currentDanceIdx then
                 idx = #dances
             end
         else
-            idx = ZombRand(1, #dances + 1)
+            idx = utils.randInt(1, #dances + 1)
         end
 
         local dance = dances[idx]
@@ -472,8 +473,8 @@ local function processDanceCommand(name, player)
 end
 
 ---Searches known dances for the input.
----@param ctxOrSearch omichat.SearchContext | string
----@return omichat.SearchResults?
+---@param ctxOrSearch SearchContext | string
+---@return SearchResults?
 local function searchKnownDances(ctxOrSearch)
     if not config:compatTADEnabled() then
         return
@@ -484,7 +485,7 @@ local function searchKnownDances(ctxOrSearch)
         return
     end
 
-    ---@diagnostic disable: invisible
+    ---@diagnostic disable: access-invisible
     local ctx = API.search._buildContext(ctxOrSearch)
     ctx.display = ctx.display or danceDisplay
     ctx.mapValue = mapDanceValue
@@ -501,7 +502,7 @@ local function searchKnownDances(ctxOrSearch)
     end
 
     return API.search._collectResults(ctx)
-    ---@diagnostic enable: invisible
+    ---@diagnostic enable: access-invisible
 end
 
 

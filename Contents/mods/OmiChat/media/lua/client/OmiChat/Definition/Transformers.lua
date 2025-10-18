@@ -1,5 +1,6 @@
+---@namespace omichat
 ---Message transformer definitions.
----@diagnostic disable: invisible
+---@diagnostic disable: access-invisible
 
 
 local API = require 'OmiChat/Module/Client/Core'
@@ -13,13 +14,13 @@ local format = string.format
 local COMMAND_ARGS_START = utils.encodeInvisibleCharacter(config.ID_COMMAND_ARGS)
 
 
----@class omichat.MessageTransformer
----@field name string? The name of the transformer.
----@field transform fun(self: table, info: omichat.MessageInfo): true? Performs message transformation.
----@field priority integer? The priority of the transformer. Higher numbers will run first.
+---@class MessageTransformer
+---@field name? string The name of the transformer.
+---@field transform fun(self: table, info: MessageInfo): true? Performs message transformation.
+---@field priority? integer The priority of the transformer. Higher numbers will run first.
 
 
----@type omichat.MessageTransformer[]
+---@type MessageTransformer[]
 return {
     {
         name = 'setup-chat-info',
@@ -85,7 +86,7 @@ return {
                 local text = info.rawText
                 local _, msgStart, other = text:find('%[to ([^%]]+)%]:')
 
-                if not other then
+                if not msgStart or not other then
                     info.tokens.incomingPM = '1'
                     info.tags.IsIncomingPM = true
                     return
@@ -381,7 +382,7 @@ return {
                 -- everyone understands themselves
                 info:setMetadataLanguageResult('known-language')
                 return
-            elseif API.player.knowsLanguage(language) then
+            elseif language and API.player.knowsLanguage(language) then
                 -- if they understand the language, we're done here
                 info:setMetadataLanguageResult('known-language')
                 return
@@ -441,17 +442,17 @@ return {
             local useColors = info:shouldUseMentionColors()
 
             local i = 1
-            local mentions = {} ---@type omichat.MessageInfo.Metadata.Mention[]
+            local mentions = {} ---@type MessageInfo.Metadata.Mention[]
 
             info.content = text:gsub('%s*<@%d+:.->%s*', function(match)
                 local leading, onlineID, name, trailing = match:match('(%s*)<@(%d+):(.-)>(%s*)')
-                onlineID = tonumber(onlineID)
+                onlineID = utils.tointeger(onlineID)
 
                 if not onlineID or not name then
                     return match
                 end
 
-                local color = { r = 255, g = 255, b = 255 }
+                local color = { r = 255, g = 255, b = 255 } ---@type omi.ColorTable<integer>
                 local hoverName
                 if cached then
                     local item = cached[i] or {}
@@ -516,7 +517,7 @@ return {
                 return
             end
 
-            ---@cast stream omichat.ChatStream
+            ---@cast stream ChatStream
             if stream.chatType ~= 'say' and stream.chatType ~= 'shout' then
                 return
             end

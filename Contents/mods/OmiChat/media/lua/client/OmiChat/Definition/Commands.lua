@@ -1,8 +1,10 @@
+---@namespace omichat
 ---Command stream definitions.
+---@diagnostic disable: access-invisible
 
 require 'OmiChat/Module/Client/Player'
 
-local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
+local API = require 'OmiChat/Module/Client/Core'
 local vanillaCommands = require 'OmiChat/Definition/VanillaCommandList'
 
 local concat = table.concat
@@ -13,7 +15,7 @@ local config = API.Configuration
 local CommandStream = API.CommandStream
 
 
----@type omichat.CommandStream[]
+---@type CommandStream[]
 return {
     API._cardCommand,
     API._flipCommand,
@@ -347,7 +349,7 @@ return {
 
             -- overall help
             local seen = {}
-            local commands = {} ---@type omichat.VanillaCommand[]
+            local commands = {} ---@type VanillaCommand[]
 
             for i = 1, #API._commandStreams do
                 local stream = API._commandStreams[i]

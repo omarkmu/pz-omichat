@@ -1,8 +1,14 @@
+---@namespace omichat
 ---Handles defining topics for client and server requests.
 
-local API = require 'OmiChat/Module/Shared/Core' ---@class omichat.api.shared
-local API_C = API ---@class omichat.api.client
-local API_S = API ---@class omichat.api.server
+---@class(partial) api.shared
+local API = require 'OmiChat/Module/Shared/Core'
+
+---@class(partial) api.client
+local API_C = API
+
+---@class(partial) api.server
+local API_S = API
 
 local utils = API.utils
 local config = API.Configuration
@@ -18,7 +24,7 @@ local COMMAND_ARGS_START = utils.encodeInvisibleCharacter(config.ID_COMMAND_ARGS
 
 
 ---Contains functions for sending server and client commands.
----@class omichat.api.shared.request
+---@class(partial) api.shared.request
 local Request = {}
 
 ---Contains topics for request exchanges between the server and client.
@@ -32,13 +38,13 @@ Request.dispatch = utils.dispatch {
 }
 
 
-local Topic = Request.TOPIC
+local TOPIC = Request.TOPIC
 local dispatch = Request.dispatch
 
 
 ---Client → server: Execute a chat command.
-Request.TOPIC.COMMAND = dispatch:topic('COMMAND', {
-    ---@param args omichat.request.Args.Command
+TOPIC.COMMAND = dispatch:topic('COMMAND', {
+    ---@param args request.Args.Command
     ---@return boolean
     ---@return string?
     onClientValidate = function(_, args)
@@ -58,7 +64,7 @@ Request.TOPIC.COMMAND = dispatch:topic('COMMAND', {
         if not getTexture(icon) then
             local textureName = utils.getTextureNameFromIcon(icon)
             if textureName and getTexture(textureName) then
-                args.text = string.format('%q', username) .. ' ' .. textureName
+                args.text = format('%q', username) .. ' ' .. textureName
             else
                 return false, 'Unknown icon'
             end
@@ -68,7 +74,7 @@ Request.TOPIC.COMMAND = dispatch:topic('COMMAND', {
     end,
 
     ---@param req omi.ClientRequest
-    ---@param args omichat.request.Args.Command
+    ---@param args request.Args.Command
     onServerReceive = function(req, args)
         local handler = API_S.commands[args.name]
         if type(handler) ~= 'function' then
@@ -79,19 +85,19 @@ Request.TOPIC.COMMAND = dispatch:topic('COMMAND', {
     end,
 })
 
----Client → server: update configuration on server (admin only).<br>
+---Client → server: update configuration on server (admin only).
 ---Server → client: update configuration.
-Request.TOPIC.CONFIGURATION = dispatch:topic('CONFIGURATION', {
+TOPIC.CONFIGURATION = dispatch:topic('CONFIGURATION', {
     canLogArgs = false,
     requireAdmin = true,
 
     onSend = function(req)
-        local args = { values = config:getValues() } ---@type omichat.request.Args.UpdateConfiguration
+        local args = { values = config:getValues() } ---@type request.Args.UpdateConfiguration
         req:send(args)
     end,
 
     ---@param req omi.Request
-    ---@param args omichat.request.Args.UpdateConfiguration
+    ---@param args request.Args.UpdateConfiguration
     onReceive = function(req, args)
         config:load(args.values)
 
@@ -104,18 +110,18 @@ Request.TOPIC.CONFIGURATION = dispatch:topic('CONFIGURATION', {
     end,
 })
 
----Client → server: add/remove a preset (admin only).<br>
+---Client → server: add/remove a preset (admin only).
 ---Server → client: update configuration presets.
-Request.TOPIC.CONFIGURATION_PRESETS = dispatch:topic('CONFIGURATION_PRESETS', {
+TOPIC.CONFIGURATION_PRESETS = dispatch:topic('CONFIGURATION_PRESETS', {
     requireAdmin = true,
 
-    ---@param args omichat.request.Args.AddOrRemovePreset
+    ---@param args request.Args.AddOrRemovePreset
     ---@return string?
     onStringifyClientArgs = function(args)
         return format('{"type": %q, "name": %q, "values": {...}}', args.type, args.name)
     end,
 
-    ---@param args omichat.request.Args.UpdatePresets
+    ---@param args request.Args.UpdatePresets
     ---@return string?
     onStringifyServerArgs = function(args)
         if #args.list > 0 then
@@ -124,17 +130,17 @@ Request.TOPIC.CONFIGURATION_PRESETS = dispatch:topic('CONFIGURATION_PRESETS', {
     end,
 
     onServerSend = function(req)
-        local args = { list = config:getCustomPresetsForSave() } ---@type omichat.request.Args.UpdatePresets
+        local args = { list = config:getCustomPresetsForSave() } ---@type request.Args.UpdatePresets
         req:send(args)
     end,
 
-    ---@param args omichat.request.Args.UpdatePresets
+    ---@param args request.Args.UpdatePresets
     onClientReceive = function(_, args)
-        config:_setCustomPresets(args.list) ---@diagnostic disable-line: invisible
+        config:_setCustomPresets(args.list) ---@diagnostic disable-line: access-invisible
     end,
 
     ---@param req omi.ClientRequest
-    ---@param args omichat.request.Args.AddOrRemovePreset
+    ---@param args request.Args.AddOrRemovePreset
     onServerReceive = function(req, args)
         if args.type == 'DELETE' then
             API_S.extension.removeCustomPreset(args.name)
@@ -147,22 +153,22 @@ Request.TOPIC.CONFIGURATION_PRESETS = dispatch:topic('CONFIGURATION_PRESETS', {
 })
 
 ---Client → server: request clearing player data for a username (admin only).
-Request.TOPIC.DATA_CLEAR = dispatch:topic('DATA_CLEAR', {
+TOPIC.DATA_CLEAR = dispatch:topic('DATA_CLEAR', {
     requireAdmin = true,
 
-    ---@param args omichat.request.Args.ClearPlayerData
+    ---@param args request.Args.ClearPlayerData
     onServerReceive = function(_, args)
         API_S.data.clear(args.username)
         API_S.request.updatePlayerCache()
     end,
 })
 
----Client → server: request a list of all data for all players (admin only).<br>
+---Client → server: request a list of all data for all players (admin only).
 ---Server → client: return a list of player data.
-Request.TOPIC.DATA_LIST = dispatch:topic('DATA_LIST', {
+TOPIC.DATA_LIST = dispatch:topic('DATA_LIST', {
     requireAdmin = true,
 
-    ---@param args omichat.request.Args.PlayerDataListResponse
+    ---@param args request.Args.PlayerDataListResponse
     ---@return string?
     onStringifyServerArgs = function(args)
         if #args.list > 0 then
@@ -170,7 +176,7 @@ Request.TOPIC.DATA_LIST = dispatch:topic('DATA_LIST', {
         end
     end,
 
-    ---@param args omichat.request.Args.PlayerDataListResponse
+    ---@param args request.Args.PlayerDataListResponse
     onClientReceive = function(_, args)
         local instance = ISChat.instance --[[@as omichat.ISChat]]
         local panel = instance and instance.activePlayerDataPanel
@@ -182,7 +188,7 @@ Request.TOPIC.DATA_LIST = dispatch:topic('DATA_LIST', {
     end,
 
     onServerReceive = function(req)
-        ---@type omichat.request.Args.PlayerDataListResponse
+        ---@type request.Args.PlayerDataListResponse
         local resp = { list = API_S.data.getPlayerDataList() }
 
         req:reply(resp)
@@ -190,18 +196,18 @@ Request.TOPIC.DATA_LIST = dispatch:topic('DATA_LIST', {
 })
 
 ---Client → server: request updating data for a username.
-Request.TOPIC.DATA_UPDATE = dispatch:topic('DATA_UPDATE', {
+TOPIC.DATA_UPDATE = dispatch:topic('DATA_UPDATE', {
     ---@param req omi.ClientRequest
-    ---@param args omichat.request.Args.PlayerDataUpdate
+    ---@param args request.Args.PlayerDataUpdate
     onServerReceive = function(req, args)
         args.fromCommand = false
         API_S.data.tryUpdate(req:getPlayer(), args)
     end,
 })
 
----Client → server: request that a card is drawn.<br>
+---Client → server: request that a card is drawn.
 ---Server → client: display the result of drawing a card.
-Request.TOPIC.DRAW_CARD = dispatch:topic('DRAW_CARD', {
+TOPIC.DRAW_CARD = dispatch:topic('DRAW_CARD', {
     onClientValidate = function(req)
         local player = req:getPlayer()
         if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, config.Commands.Card.Items) then
@@ -213,28 +219,28 @@ Request.TOPIC.DRAW_CARD = dispatch:topic('DRAW_CARD', {
 
     onServerReceive = function(req)
         local player = req:getPlayer()
-        local suit = 1 + ZombRand(4)
-        local card = 1 + ZombRand(13)
+        local suit = utils.randInt(1, 4)
+        local card = utils.randInt(1, 13)
 
         if config.Commands.Card.Global then
             local name = API.data.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
-            local args = { name = name, card = card, suit = suit } ---@type omichat.request.Args.ReportDrawCard
+            local args = { name = name, card = card, suit = suit } ---@type request.Args.ReportDrawCard
 
             req:broadcast(args)
         else
-            local args = { card = card, suit = suit } ---@type omichat.request.Args.ReportDrawCard
+            local args = { card = card, suit = suit } ---@type request.Args.ReportDrawCard
             req:reply(args)
         end
     end,
 
-    ---@param args omichat.request.Args.ReportDrawCard
+    ---@param args request.Args.ReportDrawCard
     onClientReceive = function(_, args)
-        local card = tonumber(args.card)
+        local card = utils.tointeger(args.card)
         if not card or card < 1 or card > 13 then
             return
         end
 
-        local suit = tonumber(args.suit)
+        local suit = utils.tointeger(args.suit)
         if not suit or suit < 1 or suit > 4 then
             return
         end
@@ -274,9 +280,9 @@ Request.TOPIC.DRAW_CARD = dispatch:topic('DRAW_CARD', {
     end,
 })
 
----Client → server: request that a coin is flipped.<br>
+---Client → server: request that a coin is flipped.
 ---Server → client: display the result of flipping a coin.
-Request.TOPIC.FLIP_COIN = dispatch:topic('FLIP_COIN', {
+TOPIC.FLIP_COIN = dispatch:topic('FLIP_COIN', {
     onClientValidate = function(req)
         local player = req:getPlayer()
         if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, config.Commands.Flip.Items) then
@@ -287,9 +293,9 @@ Request.TOPIC.FLIP_COIN = dispatch:topic('FLIP_COIN', {
     end,
 
     onServerReceive = function(req)
-        local heads = ZombRand(2) == 0
+        local heads = utils.randInt(2) == 1
         if not config.Commands.Flip.Global then
-            local args = { heads = heads } ---@type omichat.request.Args.ReportFlipCoin
+            local args = { heads = heads } ---@type request.Args.ReportFlipCoin
             req:reply(args)
             return
         end
@@ -297,16 +303,16 @@ Request.TOPIC.FLIP_COIN = dispatch:topic('FLIP_COIN', {
         local player = req:getPlayer()
         local name = API.data.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
 
-        ---@type omichat.request.Args.ShowMessage
+        ---@type request.Args.ShowMessage
         local args = {
             stringID = 'UI_OmiChat_Flip' .. (heads and 'Heads' or 'Tails'),
             args = { name },
         }
 
-        req:broadcastOn(Topic.SHOW_MESSAGE, args)
+        req:broadcastOn(TOPIC.SHOW_MESSAGE, args)
     end,
 
-    ---@param args omichat.request.Args.ReportFlipCoin
+    ---@param args request.Args.ReportFlipCoin
     onClientReceive = function(_, args)
         local commandStream = API_C._flipCommand
         local targetStream = API_C.streams.firstChatStreamWithTag('FlipCommandTarget')
@@ -331,14 +337,14 @@ Request.TOPIC.FLIP_COIN = dispatch:topic('FLIP_COIN', {
     end,
 })
 
----Client → server: requests that the server refreshes the player cache for all players.<br>
+---Client → server: requests that the server refreshes the player cache for all players.
 ---Server → client: updates the player cache.
-Request.TOPIC.PLAYER_CACHE = dispatch:topic('PLAYER_CACHE', {
+TOPIC.PLAYER_CACHE = dispatch:topic('PLAYER_CACHE', {
     serverTriggers = {
         dispatch.trigger.onInterval(60000),
     },
 
-    ---@param args omichat.request.Args.UpdatePlayerCache
+    ---@param args request.Args.UpdatePlayerCache
     ---@return string?
     onStringifyServerArgs = function(args)
         return '{"items": ' .. Request._encodeListDisplay(args.items) .. '}'
@@ -346,12 +352,12 @@ Request.TOPIC.PLAYER_CACHE = dispatch:topic('PLAYER_CACHE', {
 
     onServerSend = function(req)
         local items = API_S.data.refreshPlayerCache()
-        local args = { items = items } ---@type omichat.request.Args.UpdatePlayerCache
+        local args = { items = items } ---@type request.Args.UpdatePlayerCache
 
         req:send(args)
     end,
 
-    ---@param args omichat.request.Args.UpdatePlayerCache
+    ---@param args request.Args.UpdatePlayerCache
     onClientReceive = function(_, args)
         API.data.setPlayerCache(args.items)
     end,
@@ -360,7 +366,7 @@ Request.TOPIC.PLAYER_CACHE = dispatch:topic('PLAYER_CACHE', {
 })
 
 ---Client → server: report that the player died.
-Request.TOPIC.PLAYER_DEATH = dispatch:topic('PLAYER_DEATH', {
+TOPIC.PLAYER_DEATH = dispatch:topic('PLAYER_DEATH', {
     allowDead = true,
 
     clientTriggers = {
@@ -408,23 +414,23 @@ Request.TOPIC.PLAYER_DEATH = dispatch:topic('PLAYER_DEATH', {
 })
 
 ---Client → server: report that a player joined.
-Request.TOPIC.PLAYER_JOINED = dispatch:topic('PLAYER_JOINED', {
+TOPIC.PLAYER_JOINED = dispatch:topic('PLAYER_JOINED', {
     clientTriggers = {
         dispatch.trigger.onPlayerJoined(),
     },
 
     onServerReceive = function(req)
-        req:broadcastOn(Topic.PLAYER_CACHE)
-        req:replyWith(Topic.CONFIGURATION)
-        req:replyWith(Topic.CONFIGURATION_PRESETS)
+        req:broadcastOn(TOPIC.PLAYER_CACHE)
+        req:replyWith(TOPIC.CONFIGURATION)
+        req:replyWith(TOPIC.CONFIGURATION_PRESETS)
     end,
 })
 
----Client → server: request that dice is rolled.<br>
+---Client → server: request that dice is rolled.
 ---Server → client: display the result of rolling dice.
-Request.TOPIC.ROLL_DICE = dispatch:topic('ROLL_DICE', {
+TOPIC.ROLL_DICE = dispatch:topic('ROLL_DICE', {
     ---@param req omi.ClientRequest
-    ---@param args omichat.request.Args.RollDice
+    ---@param args request.Args.RollDice
     ---@return boolean
     ---@return string?
     onClientValidate = function(req, args)
@@ -441,34 +447,34 @@ Request.TOPIC.ROLL_DICE = dispatch:topic('ROLL_DICE', {
     end,
 
     ---@param req omi.ClientRequest
-    ---@param args omichat.request.Args.RollDice
+    ---@param args request.Args.RollDice
     onServerReceive = function(req, args)
         local sides = args.sides
         if sides < 1 or sides > 100 then
-            local replyArgs = { stringID = 'UI_ServerOptionDesc_Roll' } ---@type omichat.request.Args.ShowMessage
-            req:replyWith(Topic.SHOW_MESSAGE, replyArgs)
+            local replyArgs = { stringID = 'UI_ServerOptionDesc_Roll' } ---@type request.Args.ShowMessage
+            req:replyWith(TOPIC.SHOW_MESSAGE, replyArgs)
             return
         end
 
         local player = req:getPlayer()
-        local roll = 1 + ZombRand(sides)
+        local roll = utils.randInt(1, sides)
         if config.Commands.Roll.Global then
             local name = API.data.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
 
-            ---@type omichat.request.Args.ShowMessage
+            ---@type request.Args.ShowMessage
             local replyArgs = {
                 stringID = 'UI_OmiChat_Roll',
                 args = { name, tostring(roll), tostring(sides) },
             }
 
-            req:broadcastOn(Topic.SHOW_MESSAGE, replyArgs)
+            req:broadcastOn(TOPIC.SHOW_MESSAGE, replyArgs)
         else
-            local replyArgs = { roll = roll, sides = sides } ---@type omichat.request.Args.ReportRoll
+            local replyArgs = { roll = roll, sides = sides } ---@type request.Args.ReportRoll
             req:reply(replyArgs)
         end
     end,
 
-    ---@param args omichat.request.Args.ReportRoll
+    ---@param args request.Args.ReportRoll
     onClientReceive = function(_, args)
         local commandStream = API_C._rollCommand
         local targetStream = API_C.streams.firstChatStreamWithTag('RollCommandTarget')
@@ -492,8 +498,8 @@ Request.TOPIC.ROLL_DICE = dispatch:topic('ROLL_DICE', {
 })
 
 ---Server → client: display an info message in chat.
-Request.TOPIC.SHOW_MESSAGE = dispatch:topic('SHOW_MESSAGE', {
-    ---@param args omichat.request.Args.ShowMessage
+TOPIC.SHOW_MESSAGE = dispatch:topic('SHOW_MESSAGE', {
+    ---@param args request.Args.ShowMessage
     onClientReceive = function(_, args)
         local text
         if args.text then
@@ -511,12 +517,12 @@ Request.TOPIC.SHOW_MESSAGE = dispatch:topic('SHOW_MESSAGE', {
     end,
 })
 
----Server → client: notify that another player is a typing.<br>
+---Server → client: notify that another player is a typing.
 ---Client → server: send typing information to other players.
-Request.TOPIC.TYPING = dispatch:topic('TYPING', {
-    ---@param args omichat.request.Args.UpdateTyping
+TOPIC.TYPING = dispatch:topic('TYPING', {
+    ---@param args request.Args.UpdateTyping
     onClientReceive = function(_, args)
-        local typingInfo ---@type omichat.TypingInformation?
+        local typingInfo ---@type TypingInformation?
 
         local player = args.typing and API.data.getPlayerInfoByUsername(args.username)
         local display = player and API.data.getPlayerTypingName(player)
@@ -532,7 +538,7 @@ Request.TOPIC.TYPING = dispatch:topic('TYPING', {
     end,
 
     ---@param req omi.ClientRequest
-    ---@param args omichat.request.Args.Typing
+    ---@param args request.Args.Typing
     onServerReceive = function(req, args)
         local sender = req:getPlayer()
         local senderUsername = sender:getUsername()
@@ -541,13 +547,13 @@ Request.TOPIC.TYPING = dispatch:topic('TYPING', {
             local receiver = onlinePlayers:get(i)
 
             if sender ~= receiver or IS_DEBUG then
-                ---@type omichat.request.Args.UpdateTyping
+                ---@type request.Args.UpdateTyping
                 local replyArgs = {
                     username = senderUsername,
                     typing = args.typing and Request._shouldSendTyping(sender, receiver, args.range, args.chatType),
                 }
 
-                Topic.TYPING:toPlayer(receiver, replyArgs, req)
+                TOPIC.TYPING:toPlayer(receiver, replyArgs, req)
             end
         end
     end,
@@ -566,7 +572,7 @@ end
 
 ---Gets a display string for a list in request arguments.
 ---Displays only the number of items.
----@param list unknown[]
+---@param list any[]
 ---@return string
 ---@private
 function Request._encodeListDisplay(list)
@@ -617,82 +623,81 @@ end
 API.request = Request
 return Request
 
-
 --#region Type Definitions
 
 ---Client to server request to add or remove a user-defined configuration preset.
----@class omichat.request.Args.AddOrRemovePreset
+---@class request.Args.AddOrRemovePreset
 ---@field type 'ADD' | 'DELETE' The operation to complete.
 ---@field name string The name of the preset.
 ---@field values table? The configuration values.
 
 ---Client to server request to clear player data for a username.
----@class omichat.request.Args.ClearPlayerData
+---@class request.Args.ClearPlayerData
 ---@field username string The username of the player whose data should be cleared.
 
 ---Client to server request to execute a command.
----@class omichat.request.Args.Command
----@field name omichat.request.CommandName The name of the command.
+---@class request.Args.Command
+---@field name request.ChatCommandName The name of the command.
 ---@field text string The command text, excluding the command itself.
 
 ---Client to server request to update player data.
----@class omichat.request.Args.PlayerDataUpdate
+---@class request.Args.PlayerDataUpdate
 ---@field target string The target username.
----@field field omichat.PlayerDataField The field to update.
+---@field field PlayerDataField The field to update.
 ---@field fromCommand boolean? Flag for whether the request was created from a command.
----@field value unknown? The value to set on the field.
+---@field value? any The value to set on the field.
 
 ---Server to client response to a request for player data.
----@class omichat.request.Args.PlayerDataListResponse
----@field list omichat.PlayerData[] The request list of player data.
+---@class request.Args.PlayerDataListResponse
+---@field list PlayerData[] The request list of player data.
 
 ---Server to client request to report the result of drawing a card.
----@class omichat.request.Args.ReportDrawCard
+---@class request.Args.ReportDrawCard
 ---@field name string? The name of the player who drew the card, if called for a global message.
 ---@field card integer The card number, in [1, 13].
 ---@field suit integer The suit number, in [1, 4].
 
 ---Server to client request to report the result of flipping a coin.
----@class omichat.request.Args.ReportFlipCoin
+---@class request.Args.ReportFlipCoin
 ---@field heads boolean Flag for whether the result of the flip was heads.
 
 ---Server to client request to report the result of rolling dice.
----@class omichat.request.Args.ReportRoll
+---@class request.Args.ReportRoll
 ---@field roll integer The value of the dice roll.
 ---@field sides integer The number of sides on the dice that was rolled.
 
 ---Server to client request to display a message.
----@class omichat.request.Args.ShowMessage
+---@class request.Args.ShowMessage
 ---@field text string? The message text.
 ---@field stringID string? The string ID of a message to translate.
 ---@field args string[]? Arguments for message translation.
 ---@field serverAlert boolean? Flag for whether this should be treated as a server alert.
 
 ---Client to server request to roll dice.
----@class omichat.request.Args.RollDice
+---@class request.Args.RollDice
 ---@field sides integer The number of sides on the dice to roll.
 
 ---Client to server request to notify other players about typing status.
----@class omichat.request.Args.Typing
+---@class request.Args.Typing
 ---@field typing boolean Flag for whether the source player is typing.
 ---@field range integer? Optional range to limit notifications to.
 ---@field chatType omi.ChatTypeString? The chat type of the stream on which the player is typing.
 
 ---Client to server request to update the configuration.
----@class omichat.request.Args.UpdateConfiguration
----@field values omichat.Configuration The new configuration values.
+---@class request.Args.UpdateConfiguration
+---@field values Configuration The new configuration values.
 
 ---Server to client request to update typing information.
----@class omichat.request.Args.UpdateTyping
+---@class request.Args.UpdateTyping
 ---@field username string Flag for whether the target player is typing.
 ---@field typing boolean Flag for whether the target player is typing.
 
 ---Client to server request to update the player cache.
----@class omichat.request.Args.UpdatePlayerCache
----@field items omichat.PlayerCacheData[] The new cache items.
+---@class request.Args.UpdatePlayerCache
+---@field items PlayerCacheData[] The new cache items.
 
 ---Client to server request to update the user-defined configuration presets.
----@class omichat.request.Args.UpdatePresets
----@field list omichat.Configuration.PresetTable[] The new values.
+---@class request.Args.UpdatePresets
+---@field list Configuration.PresetTable[] The new values.
 
 --#endregion

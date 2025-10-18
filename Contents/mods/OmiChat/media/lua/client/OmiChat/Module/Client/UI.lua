@@ -1,6 +1,8 @@
+---@namespace omichat
 ---Handles operations on the chat UI.
 
-local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
+---@class(partial) api.client
+local API = require 'OmiChat/Module/Client/Core'
 local callback = require 'OmiChat/Module/Client/Callbacks'
 
 local max = math.max
@@ -17,13 +19,10 @@ local config = API.Configuration
 local MultiMap = utils.MultiMap
 
 ---Contains functions for controlling the chat window and related UI components.
----@class omichat.api.client.ui
----@field suggestBox omi.ui.SuggestBox? The auto-suggest box for the chat input.
----@field private _actionHandlers table<string, omichat.RichTextAction> Handlers for rich text actions.
----@field private _configPanel omi.forms.Form? The configuration panel.
----@field private _customButtons ISButton[] A list of custom buttons added to the chat window.
----@field private _typingDisplay string? The current display text for the typing indicator.
----@field private _settingHandlers table<omichat.SettingCategory, omichat.SettingHandler[]> Handlers for setting sections.
+---@class api.client.ui
+---@field suggestBox? omi.ui.SuggestBox The auto-suggest box for the chat input.
+---@field private _configPanel? omi.forms.Form The configuration panel.
+---@field private _typingDisplay? string The current display text for the typing indicator.
 local UI = {}
 
 --#region Static Fields
@@ -34,10 +33,19 @@ UI.typingFont = UIFont.Small
 ---The height of the font used for the typing indicator.
 UI.typingFontHgt = textManager:getFontHeight(UI.typingFont)
 
+---Associates names to handler functions for rich text actions.
+---@type table<string, RichTextAction>
+---@private
 UI._actionHandlers = {}
 
+---List of custom buttons added to the chat window.
+---@type ISButton[]
+---@private
 UI._customButtons = {}
 
+---Associates settings categories to lists of handlers for extending settings.
+---@type table<SettingCategory, SettingHandler[]>
+---@private
 UI._settingHandlers = {
     admin = {},
     basic = {},
@@ -115,8 +123,8 @@ function UI.getConfigPanel()
 
     local w, h = 800, 600
     local x, y = UI_LIB.getScreenCenter(w, h)
-    local generator = config:getSchema():getFormGenerator()
-    local panel = generator:generate {
+    local schema = config:getSchema()
+    local panel = schema:generateForm {
         x = x,
         y = y,
         w = w,
@@ -154,7 +162,7 @@ function UI.getInfoRichText(player)
 end
 
 ---Returns the current display string for the typing indicator.
----@param maxWidth integer? The maximum width of the text.
+---@param maxWidth number? The maximum width of the text.
 ---@return string? display
 function UI.getTypingDisplay(maxWidth)
     local display = UI._typingDisplay
@@ -282,6 +290,7 @@ function UI.toggleInfo()
             backgroundColor = { r = 0, g = 0, b = 0, a = 0.8 },
         }
 
+        ---@cast infoDialog.chatText -?
         infoDialog.chatText:setOnAction(instance, API.callback.onInfoPanelAction)
         infoDialog.chatText:setOnUpdate(instance, API.callback.onInfoPanelUpdate)
 
@@ -454,7 +463,7 @@ function UI._addAdminOptions(context)
         return
     end
 
-    ---@type omichat.AdminOption[]
+    ---@type AdminOption[]
     local options = {
         'ShowIcon',
         'KnowAllLanguages',
@@ -581,7 +590,7 @@ function UI._addLanguageOptions(context)
     local languageSlots = math.min(API.player.getLanguageSlots(), config.MAX_LANGUAGE_SLOTS)
 
     local isKnown = {}
-    local knownLanguages = {}
+    local knownLanguages = {} ---@type string[]
     for i = 1, #languages do
         local lang = languages[i]
         if API.language.exists(lang) then
@@ -590,7 +599,7 @@ function UI._addLanguageOptions(context)
         end
     end
 
-    local addLanguages = {}
+    local addLanguages = {} ---@type any[]
     if languageSlots - #knownLanguages >= 1 then
         local allLanguages = API.language.getList()
         for i = 1, #allLanguages do
@@ -681,6 +690,7 @@ function UI._addRetainOptions(context)
     local retainSubmenu = context:getNew(context)
     context:addSubMenu(retainOption, retainSubmenu)
 
+    ---@type StreamCategory[]
     local categories = {
         'chat',
         'rp',
@@ -770,6 +780,8 @@ function UI._addVanillaSubmenuOptions(context)
     fontSubmenu:addOption(getText('UI_chat_context_font_small'), instance, ISChat.onFontSizeChange, 'small')
     fontSubmenu:addOption(getText('UI_chat_context_font_medium'), instance, ISChat.onFontSizeChange, 'medium')
     fontSubmenu:addOption(getText('UI_chat_context_font_large'), instance, ISChat.onFontSizeChange, 'large')
+
+    ---@cast fontSubmenu.options table<integer, any>
     if instance.chatFont == 'small' then
         fontSubmenu:setOptionChecked(fontSubmenu.options[1], true)
     elseif instance.chatFont == 'medium' then
@@ -781,7 +793,7 @@ function UI._addVanillaSubmenuOptions(context)
     local minOpaqueOption = context:addOption(getText('UI_chat_context_opaque_min'), instance)
     local minOpaqueSubmenu = context:getNew(context)
     context:addSubMenu(minOpaqueOption, minOpaqueSubmenu)
-    local opaques = { 0, 0.25, 0.5, 0.75, 1 }
+    local opaques = { 0, 0.25, 0.5, 0.75, 1 } ---@type number[]
     for i = 1, #opaques do
         if logTo01(opaques[i]) <= instance.maxOpaque then
             local optName = (opaques[i] * 100) .. '%'
@@ -832,11 +844,13 @@ function UI._addVanillaSubmenuOptions(context)
     context:addSubMenu(opaqueOnFocusOption, opaqueOnFocusSubmenu)
     opaqueOnFocusSubmenu:addOption(getText('UI_chat_context_disable'), instance, ISChat.onFocusOpaqueChange, false)
     opaqueOnFocusSubmenu:addOption(getText('UI_chat_context_enable'), instance, ISChat.onFocusOpaqueChange, true)
-    opaqueOnFocusSubmenu:setOptionChecked(opaqueOnFocusSubmenu.options[instance.opaqueOnFocus and 2 or 1], true)
+
+    local opt = opaqueOnFocusSubmenu.options[instance.opaqueOnFocus and 2 or 1] ---@cast opt -?
+    opaqueOnFocusSubmenu:setOptionChecked(opt, true)
 end
 
 ---Creates additional children for the chat.
----@param instance omichat.ISChat
+---@param instance ISChat
 ---@private
 function UI._createChildren(instance)
     local th = instance:titleBarHeight()
@@ -902,7 +916,7 @@ end
 
 ---Runs settings handlers on a context menu or submenu.
 ---@param context ISContextMenu
----@param category omichat.SettingCategory
+---@param category SettingCategory
 ---@private
 function UI._runSettingsHandlers(context, category)
     local handlers = UI._settingHandlers[category]
@@ -923,14 +937,14 @@ function UI._updateChatVisibility()
         return
     end
 
-    local closeBtn = ISChat.instance.closeButton
+    local closeBtn = instance.closeButton
     local alwaysShowChat = config.General.AlwaysShowChat
     if closeBtn and closeBtn:isVisible() == alwaysShowChat then
         closeBtn:setVisible(not alwaysShowChat)
     end
 
     if alwaysShowChat then
-        ISChat.instance:setVisible(true)
+        instance:setVisible(true)
     end
 end
 
@@ -940,11 +954,11 @@ return UI
 
 --#region Type Definitions
 
----@alias omichat.RichTextAction fun(name: string, action: omi.RichTextActionType, ...: string)
+---@alias RichTextAction fun(name: string, action: omi.RichTextActionType, ...: string)
 
----@alias omichat.SettingHandler fun(submenu: ISContextMenu)
+---@alias SettingHandler fun(submenu: ISContextMenu)
 
----@alias omichat.SettingCategory
+---@alias SettingCategory
 ---| 'basic'
 ---| 'customization'
 ---| 'language'

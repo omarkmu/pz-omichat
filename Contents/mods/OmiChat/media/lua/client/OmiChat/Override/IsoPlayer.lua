@@ -1,12 +1,13 @@
+---@namespace omichat
 ---Handles IsoPlayer overrides.
 
 local API = require 'OmiChat/Module/Client/Core'
+local utils = API.utils
 local config = API.Configuration
 local core = getCore()
 
 local min = math.min
 local addSound = addSound
-local ZombRand = ZombRand
 local _IsoPlayer = __classmetatables[IsoPlayer.class].__index
 local _Callout = _IsoPlayer.Callout
 
@@ -51,7 +52,7 @@ function _IsoPlayer:Callout(playEmote)
     end
 
     local formatterName
-    local shout = shouts[ZombRand(1, shoutMax + 1)]
+    local shout = shouts[utils.randInt(1, shoutMax + 1)] --[[@as string]]
     if isSneaking then
         formatterName = 'sneakCallout'
         shout = shout:lower()

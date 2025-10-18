@@ -1,20 +1,34 @@
+---@namespace omichat
 ---UI element for managing player preference profiles.
 
-local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
+---@class(partial) api.client
+local API = require 'OmiChat/Module/Client/Core'
 
 local config = API.Configuration
 local utils = API.utils
 local UI = utils.ui
 
 
----@class omichat.ProfileManager : omi.ui.Panel
+---@class ProfileManager : omi.ui.Panel
+---@field current? PlayerProfile The profile being edited.
+---@field profiles PlayerProfile[] The list of profiles.
+---@field profileNameControl omi.ui.TextEntry The control for setting a profile name.
+---@field nicknameControl? omi.ui.TextEntry The control for setting a nickname to use when switching to a profile.
+---@field colorControls table<string, omi.ui.ColorEntry> Associates color options to controls.
+---@field calloutControls table<string, omi.ui.TextEntry> Associates callout types to controls.
+---@field createBtn omi.ui.Button The button to add a new profile.
+---@field deleteBtn omi.ui.Button The button to delete the current profile.
+---@field duplicateBtn omi.ui.Button The button to duplicate the current profile.
+---@field emptyLabel omi.ui.Label The label to display when there are no profiles.
+---@field addText string The text for the create button in the non-empty state.
+---@field createText string The text for the create button in the empty state.
 local ProfileManager = UI.Panel:derive('ProfileManager')
 
 local textManager = getTextManager()
 
 local CONTROL_FONT = UIFont.Medium
 local FONT_H_LARGE = textManager:getFontHeight(UIFont.Large)
-local FONT_H_MEDIUM = textManager:getFontHeight(UIFont.Medium)
+local FONT_H_MEDIUM = textManager:getFontHeight(CONTROL_FONT)
 local FONT_H_SMALL = textManager:getFontHeight(UIFont.Small)
 local LABEL_H = FONT_H_MEDIUM + 4
 local CONTENT_PAD_X = 20
@@ -24,11 +38,11 @@ local SECTION_PAD_Y = 20
 
 
 ---Creates a copy of a player profile.
----@param profile omichat.PlayerProfile The profile to clone.
----@return omichat.PlayerProfile clone
+---@param profile PlayerProfile The profile to clone.
+---@return PlayerProfile clone
 ---@private
 function ProfileManager._cloneProfile(profile)
-    ---@type omichat.PlayerProfile
+    ---@type PlayerProfile
     local clone = {
         name = profile.name,
         chatNickname = profile.chatNickname,
@@ -41,9 +55,9 @@ function ProfileManager._cloneProfile(profile)
 end
 
 ---Clones a list of player profiles.
----@param profiles omichat.PlayerProfile[] The profiles to clone.
+---@param profiles PlayerProfile[] The profiles to clone.
 ---@param markIndices boolean? Flag for whether the original indices of the profiles should be marked.
----@return omichat.PlayerProfile[] cloneList
+---@return PlayerProfile[] cloneList
 ---@private
 function ProfileManager._cloneProfiles(profiles, markIndices)
     local result = {}
@@ -270,7 +284,7 @@ end
 
 ---Callback for callout update.
 ---@param entry omi.ui.TextEntry The custom callout text entry.
----@param category omichat.CalloutCategory The callout category of the entry.
+---@param category CalloutCategory The callout category of the entry.
 function ProfileManager:onCalloutsChange(entry, category)
     local profile = self.current
     if not profile then
@@ -362,7 +376,7 @@ end
 function ProfileManager:_addControls()
     local panel = self.contentPanel
     local controlW = panel.width * 0.5 - CONTENT_PAD_X * 2
-    local startY = CONTENT_PAD_Y
+    local startY = CONTENT_PAD_Y ---@type number
 
     -- profile name
     local nameLabel = UI.label {
@@ -419,7 +433,7 @@ function ProfileManager:_addControls()
     end
 
     -- colors
-    local maxY = startY + SECTION_PAD_Y
+    local maxY = startY + SECTION_PAD_Y ---@type number
     self.colorControls, maxY = self:_createColorControls(maxY)
 
     -- callouts
@@ -432,7 +446,7 @@ function ProfileManager:_addControls()
 end
 
 ---Adds a profile to the listbox.
----@param profile omichat.PlayerProfile
+---@param profile PlayerProfile
 ---@private
 function ProfileManager:_addListboxItem(profile)
     local item = self.listbox:addItem(profile.name, profile)
@@ -705,10 +719,10 @@ end
 
 
 ---Creates a new panel for managing profiles.
----@param args omichat.Args.ProfileManager Arguments for creation of the profile manager.
----@return omichat.ProfileManager manager
+---@param args Args.ProfileManager Arguments for creation of the profile manager.
+---@return ProfileManager manager
 function ProfileManager:new(args)
-    local this = UI.Panel.new(self, args) --[[@as omichat.ProfileManager]]
+    local this = UI.Panel.new(self, args) --[[@as ProfileManager]]
 
     this.moveWithMouse = true
     this.deletedCurrentProfile = false
@@ -728,24 +742,9 @@ end
 API.ProfileManager = ProfileManager
 return ProfileManager
 
-
 --#region Type Definitions
 
----@class omichat.ProfileManager
----@field current omichat.PlayerProfile? The profile being edited.
----@field profiles omichat.PlayerProfile[] The list of profiles.
----@field profileNameControl omi.ui.TextEntry The control for setting a profile name.
----@field nicknameControl omi.ui.TextEntry? The control for setting a nickname to use when switching to a profile.
----@field colorControls table<string, omi.ui.ColorEntry> Associates color options to controls.
----@field calloutControls table<string, omi.ui.TextEntry> Associates callout types to controls.
----@field createBtn omi.ui.Button The button to add a new profile.
----@field deleteBtn omi.ui.Button The button to delete the current profile.
----@field duplicateBtn omi.ui.Button The button to duplicate the current profile.
----@field emptyLabel omi.ui.Label The label to display when there are no profiles.
----@field addText string The text for the create button in the non-empty state.
----@field createText string The text for the create button in the empty state.
-
----@class omichat.Args.ProfileManager : omi.ui.Args.Panel
----@field profiles omichat.PlayerProfile[] The current profiles.
+---@class Args.ProfileManager : omi.ui.Args.Panel
+---@field profiles PlayerProfile[] The current profiles.
 
 --#endregion

@@ -1,3 +1,4 @@
+---@namespace omichat
 ---Compatibility patch for Search Players For Weapons.
 ---@diagnostic disable: undefined-global
 

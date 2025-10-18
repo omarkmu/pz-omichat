@@ -1,16 +1,18 @@
+---@namespace omichat
 ---UI element for the chat rich text panel.
 
-local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
+---@class(partial) api.client
+local API = require 'OmiChat/Module/Client/Core'
 local UI = API.utils.ui
 
----@class omichat.ChatTab : omi.ui.RichTextPanel
+---@class ChatTab : omi.ui.RichTextPanel
 ---@field parent omichat.ISChat The parent chat.
 ---@field logIndex integer The current index in the tab's input history.
 ---@field tabID integer The 0-indexed tab ID of this tab.
 ---@field text string The current rich text of the chat tab.
----@field chatStreams (omichat.ChatStream | omichat.StreamTable)[] Chat streams available in this tab.
+---@field chatStreams (ChatStream | StreamTable)[] Chat streams available in this tab.
 ---@field chatTextLines string[] An array of rich text strings of the current messages.
----@field chatMessages omichat.Message[] Current chat messages.
+---@field chatMessages Message[] Current chat messages.
 ---@field log string[] The input history of this tab.
 ---@field tabTitle string The title of this tab.
 ---@field streamID integer The stream ID of the current stream.
@@ -20,9 +22,9 @@ local ChatTab = UI.RichTextPanel:derive('ChatTab')
 
 ---Creates a new chat tab panel.
 ---@param args omi.ui.InitArgs.RichTextPanel Arguments for creation of the chat tab.
----@return omichat.ChatTab tab
+---@return ChatTab tab
 function ChatTab:new(args)
-    local this = UI.RichTextPanel.new(self, args) --[[@as omichat.ChatTab]]
+    local this = UI.RichTextPanel.new(self, args) --[[@as ChatTab]]
 
     this.tabID = 0
     this.streamID = 0

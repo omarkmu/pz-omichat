@@ -1,3 +1,4 @@
+---@namespace omichat
 ---UI element for displaying `/status` text.
 
 local API = require 'OmiChat/Module/Client/Core'
@@ -11,15 +12,15 @@ local core = getCore()
 local tileScale = Core.getTileScale()
 
 
----@class omichat.StatusDisplay : omi.ui.Base
+---@class StatusDisplay : omi.ui.Base
 ---@field target IsoPlayer The player to display the status over.
 ---@field mouseOver boolean Flag for whether the mouse is over the player.
----@field protected text string? The text of the display.
+---@field protected text? string The text of the display.
 ---@field protected font UIFont The font to use for the display.
 ---@field protected targetUsername string The username of the target player.
 ---@field protected drawObject TextDrawObject The draw object used to render the text.
 ---@field protected shouldHide boolean Flag for whether the display should be hidden.
----@field protected player IsoPlayer? The local player.
+---@field protected player? IsoPlayer The local player.
 local StatusDisplay = UI.class('StatusDisplay')
 
 
@@ -108,9 +109,9 @@ end
 
 ---Creates a new status display element.
 ---@param target IsoPlayer The player to display the status over.
----@return omichat.StatusDisplay element
+---@return StatusDisplay element
 function StatusDisplay:new(target)
-    local this = StatusDisplay.__base.new(self, 0, 0, 0, 0) --[[@as omichat.StatusDisplay]]
+    local this = StatusDisplay.__base.new(self, 0, 0, 0, 0) --[[@as StatusDisplay]]
 
     this.font = UIFont.Small
     this.target = target

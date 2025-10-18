@@ -1,6 +1,8 @@
+---@namespace omichat
 ---Manages the display of text set with `/status`.
 
-local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
+---@class(partial) api.client
+local API = require 'OmiChat/Module/Client/Core'
 local StatusDisplay = require 'OmiChat/Component/UI/StatusDisplay'
 
 local utils = API.utils
@@ -9,10 +11,12 @@ local getPicked = UIManager.getPicked
 local getClassFieldVal = getClassFieldVal
 
 
----@class omichat.StatusManager
----@field private _displayByUsername table<string, omichat.StatusDisplay> Associates usernames to display UI elements.
+---@class StatusManager
 local StatusManager = {}
 
+---Associates usernames to display UI elements.
+---@type table<string, StatusDisplay>
+---@private
 StatusManager._displayByUsername = {}
 
 ---Flag for whether statuses are enabled.
@@ -27,7 +31,7 @@ local TILE_FIELD_INDEX = 2
 
 ---Gets a set of objects the mouse is hovering over.
 ---This uses the same logic as the name hovering functionality.
----@return table<IsoMovingObject, boolean>
+---@return omi.SetTable<IsoMovingObject>
 function StatusManager.getHoveringObjects()
     local square = StatusManager.getPickedSquare()
     if not square then
@@ -113,7 +117,7 @@ function StatusManager.update()
         end
     end
 
-    local toRemove = {}
+    local toRemove = {} ---@type string[]
     local hoverSet = StatusManager.getHoveringObjects()
     for username, display in pairs(displayCache) do
         local onlinePlayer = display.target

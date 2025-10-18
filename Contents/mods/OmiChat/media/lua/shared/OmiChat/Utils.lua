@@ -1,3 +1,4 @@
+---@namespace omichat
 ---Utility functions.
 
 local lib = require 'OmiLibrary'
@@ -15,16 +16,14 @@ local INVISIBLE_PATTERN = '['
 
 
 ---Contains various utility functions.
----@class omichat.utils : omi.proxy
-local utils = lib.proxy({ name = 'OmiChat' })
-
----Reference to library functions.
-utils.lib = lib
+---@class utils : omi.proxy
+local utils = lib.proxy('OmiChat')
 
 utils.Interpolator = Interpolator
 
 
-local clientAPI ---@type omichat.api.client?
+local API_C ---@type api.client?
+
 local loadedIcons = false
 local iconToTextureNameMap = {} ---@type table<string, string>
 local accessLevels = {
@@ -138,7 +137,7 @@ function utils.decodeInvisibleInt(text)
             return
         end
 
-        value = value + digit * pow(32, i - 2)
+        value = value + digit * pow(32, i - 2) --[[@as integer]]
     end
 
     return value, text:sub(endPos + 1)
@@ -226,13 +225,13 @@ end
 
 ---Helper for requiring the client API in a shared context.
 ---Should only be used client-side.
----@return omichat.api.client API
+---@return api.client API
 function utils.getAPI()
-    if not clientAPI then
-        clientAPI = require 'OmiChat/Shared' --[[@as omichat.api.client]]
+    if not API_C then
+        API_C = (require 'OmiChat/Shared') --[[@as api.client]]
     end
 
-    return clientAPI
+    return API_C
 end
 
 ---Gets the name of a playing card in English.
@@ -469,7 +468,7 @@ end
 ---Interpolates substitution tokens into a string with format strings using `$var` format.
 ---@param text string The format string.
 ---@param tokens table A table of format substitution strings.
----@param seed unknown? Seed value for random functions.
+---@param seed any? Seed value for random functions.
 ---@return string interpolated
 function utils.interpolate(text, tokens, seed)
     return tostring(utils.interpolateRaw(text, tokens, seed))
@@ -480,7 +479,7 @@ end
 ---@param name string The name of the default to use for the interpolation.
 ---@param text string The format string.
 ---@param tokens table A table of format substitution strings.
----@param seed unknown? Seed value for random functions.
+---@param seed any? Seed value for random functions.
 ---@return string interpolated
 function utils.interpolateNamed(name, text, tokens, seed)
     tokens.DEFAULT = name
@@ -491,7 +490,7 @@ end
 ---Leaves character entities as-is.
 ---@param text string The format string.
 ---@param tokens table A table of format substitution strings.
----@param seed unknown? Seed value for random functions.
+---@param seed any? Seed value for random functions.
 ---@return string interpolated
 function utils.interpolateNoEntities(text, tokens, seed)
     return tostring(utils.interpolateRaw(text, tokens, seed, true))
@@ -501,9 +500,9 @@ end
 ---Returns the raw result, which may or may not be a string.
 ---@param text string The format string.
 ---@param tokens table A table of format substitution strings.
----@param seed unknown? Seed value for random functions.
+---@param seed any? Seed value for random functions.
 ---@param noEntities boolean? If given, character entities will be disallowed.
----@return unknown interpolated
+---@return any interpolated
 function utils.interpolateRaw(text, tokens, seed, noEntities)
     if not text or text == '' then
         return ''
@@ -524,7 +523,6 @@ end
 
 ---Returns an iterator over an icon-to-texture name map.
 ---@return fun(): string?, string? iterator
----@return table<string, string> state
 function utils.iterateIcons()
     if not loadedIcons then
         utils._loadIcons()

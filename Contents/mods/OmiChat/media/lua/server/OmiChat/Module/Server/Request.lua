@@ -1,12 +1,14 @@
+---@namespace omichat
 ---Handles dispatching server commands to clients.
 
 if isClient() then return end
 
-local API = require 'OmiChat/Module/Server/Core' ---@class omichat.api.server
+---@class(partial) api.server
+local API = require 'OmiChat/Module/Server/Core'
 
 
 ---Contains functions for sending requests to the client.
----@class omichat.api.server.request : omichat.api.shared.request
+---@class api.server.request : api.shared.request
 local Request = API.request
 local Topic = Request.TOPIC
 
@@ -32,7 +34,7 @@ function Request.sendPresets(player) return Topic.CONFIGURATION_PRESETS:toPlayer
 ---@return boolean success
 ---@return string? error
 function Request.sendTyping(player, target, isTyping)
-    ---@type omichat.request.Args.UpdateTyping
+    ---@type request.Args.UpdateTyping
     local args = { username = target:getUsername(), typing = isTyping }
 
     return Topic.TYPING:toPlayer(player, args)
@@ -45,7 +47,7 @@ end
 ---@return boolean success
 ---@return string? error
 function Request.sendInfoMessage(player, text, serverAlert)
-    ---@type omichat.request.Args.ShowMessage
+    ---@type request.Args.ShowMessage
     local args = { text = text, serverAlert = serverAlert }
 
     return Topic.SHOW_MESSAGE:toPlayer(player, args)
@@ -57,7 +59,7 @@ end
 ---@return boolean success
 ---@return string? error
 function Request.sendServerMessage(text, serverAlert)
-    ---@type omichat.request.Args.ShowMessage
+    ---@type request.Args.ShowMessage
     local args = { text = text, serverAlert = serverAlert }
 
     return Topic.SHOW_MESSAGE:broadcast(args)
@@ -71,7 +73,7 @@ end
 ---@return boolean success
 ---@return string? error
 function Request.sendTranslatedInfoMessage(player, stringID, stringArgs, serverAlert)
-    ---@type omichat.request.Args.ShowMessage
+    ---@type request.Args.ShowMessage
     local args = { stringID = stringID, args = stringArgs, serverAlert = serverAlert }
 
     return Topic.SHOW_MESSAGE:toPlayer(player, args)
@@ -84,7 +86,7 @@ end
 ---@return boolean success
 ---@return string? error
 function Request.sendTranslatedServerMessage(stringID, stringArgs, serverAlert)
-    ---@type omichat.request.Args.ShowMessage
+    ---@type request.Args.ShowMessage
     local args = { stringID = stringID, args = stringArgs, serverAlert = serverAlert }
 
     return Topic.SHOW_MESSAGE:broadcast(args)

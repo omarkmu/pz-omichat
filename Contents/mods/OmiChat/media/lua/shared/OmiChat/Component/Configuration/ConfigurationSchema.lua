@@ -1,3 +1,4 @@
+---@namespace omichat
 ---Information about the mod's configuration options.
 
 local utils = require 'OmiChat/Utils'
@@ -30,7 +31,7 @@ return utils.schema {
             CaseInsensitiveChatStreams = bool(true),
 
             ClearOnDeath = set {
-                default = utils.set.simple { 'Icon', 'Languages', 'Nickname', 'Status' },
+                default = utils.set.table { 'Icon', 'Languages', 'Nickname', 'Status' },
                 items = enum {
                     values = {
                         'Icon',
@@ -142,7 +143,7 @@ return utils.schema {
             EnableCharacterCustomization = bool(false),
 
             CleanEffects = set {
-                default = utils.set.simple { 'Body', 'Clothing' },
+                default = utils.set.table { 'Body', 'Clothing' },
                 items = enum {
                     values = {
                         'Body',
@@ -394,12 +395,11 @@ return utils.schema {
         },
     },
 
-    ---@diagnostic disable: inject-field
-    ---@param values omichat.Configuration
+    ---@param values Configuration
     onRead = function(values)
         -- read default languages
         local languages = values.Language.List
-        values._Languages = languages
+        values._Languages = languages ---@diagnostic disable-line: access-invisible
 
         if type(languages) ~= 'table' or values.Language.UseDefaultList then
             languages = Helpers.getDefaultLanguages()
@@ -407,7 +407,8 @@ return utils.schema {
 
         -- read default stream data
         local streams = values.Streams.List
-        values._Streams = streams
+
+        values._Streams = streams ---@diagnostic disable-line: access-invisible
 
         if type(streams) ~= 'table' or #streams == 0 or values.Streams.UseDefaultList then
             streams = Helpers.getDefaultStreams()
@@ -419,59 +420,59 @@ return utils.schema {
         values.Streams.List = Helpers.processStreams(streams)
     end,
 
-    ---@param values omichat.Configuration
+    ---@param values Configuration
     sanitize = function(values)
         values.Streams = values.Streams or {}
         values.Language = values.Language or {}
 
-        values.Streams.List = values._Streams
-        values.Language.List = values._Languages
-        values._Streams = nil
-        values._Languages = nil
+        values.Streams.List = values._Streams ---@diagnostic disable-line: access-invisible
+        values.Language.List = values._Languages ---@diagnostic disable-line: access-invisible
+        values._Streams = nil ---@diagnostic disable-line: access-invisible
+        values._Languages = nil ---@diagnostic disable-line: access-invisible
     end,
-    ---@diagnostic enable: inject-field
 }
-
 
 --#region Type Definitions
 
----@class omichat.Configuration
----@field General omichat.Configuration.General
----@field Buffs omichat.Configuration.Buffs
----@field Callouts omichat.Configuration.Callouts
----@field Commands omichat.Configuration.Commands
----@field Compatibility omichat.Configuration.Compatibility
----@field Customization omichat.Configuration.Customization
----@field Discord omichat.Configuration.Discord
----@field Format omichat.Configuration.Format
----@field EchoMessages omichat.Configuration.EchoMessages
----@field Language omichat.Configuration.Language
----@field Macros omichat.Configuration.Macros
----@field Mentions omichat.Configuration.Mentions
----@field NarrativeStyle omichat.Configuration.NarrativeStyle
----@field Radio omichat.Configuration.Radio
----@field ServerMessages omichat.Configuration.ServerMessages
----@field Streams omichat.Configuration.Streams
----@field TypingIndicator omichat.Configuration.TypingIndicator
----@field ZombieAttraction omichat.Configuration.ZombieAttraction
+---@class Configuration
+---@field General Configuration.General
+---@field Buffs Configuration.Buffs
+---@field Callouts Configuration.Callouts
+---@field Commands Configuration.Commands
+---@field Compatibility Configuration.Compatibility
+---@field Customization Configuration.Customization
+---@field Discord Configuration.Discord
+---@field Format Configuration.Format
+---@field EchoMessages Configuration.EchoMessages
+---@field Language Configuration.Language
+---@field Macros Configuration.Macros
+---@field Mentions Configuration.Mentions
+---@field NarrativeStyle Configuration.NarrativeStyle
+---@field Radio Configuration.Radio
+---@field ServerMessages Configuration.ServerMessages
+---@field Streams Configuration.Streams
+---@field TypingIndicator Configuration.TypingIndicator
+---@field ZombieAttraction Configuration.ZombieAttraction
+---@field private _Languages? any
+---@field private _Streams? any
 
----@class omichat.Configuration.General
+---@class Configuration.General
 ---@field Preset string
 ---@field AlwaysShowChat boolean
 ---@field CaseInsensitiveChatStreams boolean
 ---@field MinimumCommandAccessLevel integer
 ---@field AdminIcon string
----@field ClearOnDeath omichat.Configuration.General.ClearOnDeath
+---@field ClearOnDeath Configuration.General.ClearOnDeath
 ---@field InfoText string
 ---@field Variables string[]
 
----@class omichat.Configuration.General.ClearOnDeath
+---@class Configuration.General.ClearOnDeath
 ---@field Icon boolean?
 ---@field Languages boolean?
 ---@field Nickname boolean?
 ---@field Status boolean?
 
----@class omichat.Configuration.Buffs
+---@class Configuration.Buffs
 ---@field Enable boolean
 ---@field Cooldown integer
 ---@field Boredom number
@@ -481,34 +482,34 @@ return utils.schema {
 ---@field Fatigue number
 ---@field CigaretteStress number
 
----@class omichat.Configuration.Callouts
+---@class Configuration.Callouts
 ---@field Range integer
 ---@field SneakRange integer
 ---@field Format string
 ---@field SneakFormat string
 
----@class omichat.Configuration.Commands
----@field Name omichat.Configuration.Commands.Name
----@field Status omichat.Configuration.Commands.Status
----@field Card omichat.Configuration.Commands.ItemCommand
----@field Roll omichat.Configuration.Commands.ItemCommand
----@field Flip omichat.Configuration.Commands.ItemCommand
+---@class Configuration.Commands
+---@field Name Configuration.Commands.Name
+---@field Status Configuration.Commands.Status
+---@field Card Configuration.Commands.ItemCommand
+---@field Roll Configuration.Commands.ItemCommand
+---@field Flip Configuration.Commands.ItemCommand
 
----@class omichat.Configuration.Commands.Name
----@field Mode omichat.Configuration.Commands.Name.Mode
+---@class Configuration.Commands.Name
+---@field Mode Configuration.Commands.Name.Mode
 
----@class omichat.Configuration.Commands.Status
+---@class Configuration.Commands.Status
 ---@field Enable boolean
 ---@field Range number
 
----@class omichat.Configuration.Commands.ItemCommand
+---@class Configuration.Commands.ItemCommand
 ---@field Global boolean
 ---@field Format string
 ---@field OverheadFormat string
 ---@field Items string[]
 ---@field Tags string[]
 
----@class omichat.Configuration.Compatibility
+---@class Configuration.Compatibility
 ---@field ApplyOverrides boolean
 ---@field BuffyCharacterBios omi.schema.CompatibilityValue
 ---@field BuffyRPGSystem omi.schema.CompatibilityValue
@@ -516,37 +517,37 @@ return utils.schema {
 ---@field SearchPlayers omi.schema.CompatibilityValue
 ---@field TrueActionsDancing omi.schema.CompatibilityValue
 
----@class omichat.Configuration.Customization
+---@class Configuration.Customization
 ---@field AllowCustomShouts boolean
 ---@field EnableNameColors boolean
 ---@field EnableCharacterCustomization boolean
----@field CleanEffects omi.SimpleSet
+---@field CleanEffects omi.SetTable
 
----@class omichat.Configuration.Discord
+---@class Configuration.Discord
 ---@field ShowColorOption 'Yes' | 'No' | 'Respect_Server_Setting'
 ---@field ChatFormat string
----@field DefaultColor omi.ColorTable
+---@field DefaultColor omi.ColorTable<integer>
 ---@field Tags string[]
 
----@class omichat.Configuration.EchoMessages
+---@class Configuration.EchoMessages
 ---@field Enable boolean
 ---@field ChatFormat string
 ---@field OverheadFormat string
 ---@field Tags string[]
 
----@class omichat.Configuration.Format
----@field Chat omichat.Configuration.Format.Chat
----@field Component omichat.Configuration.Format.Component
----@field Filter omichat.Configuration.Format.Filter
----@field MenuName omichat.Configuration.Format.MenuName
----@field PerceptionRange omichat.Configuration.Format.PerceptionRange
----@field Overhead omichat.Configuration.Format.Overhead
+---@class Configuration.Format
+---@field Chat Configuration.Format.Chat
+---@field Component Configuration.Format.Component
+---@field Filter Configuration.Format.Filter
+---@field MenuName Configuration.Format.MenuName
+---@field PerceptionRange Configuration.Format.PerceptionRange
+---@field Overhead Configuration.Format.Overhead
 
----@class omichat.Configuration.Format.Chat
+---@class Configuration.Format.Chat
 ---@field Final string
 ---@field Prefix string
 
----@class omichat.Configuration.Format.Component
+---@class Configuration.Format.Component
 ---@field Name string
 ---@field Tag string
 ---@field Timestamp string
@@ -555,26 +556,26 @@ return utils.schema {
 ---@field EmbeddedAction string
 ---@field EmbeddedQuote string
 
----@class omichat.Configuration.Format.Filter
+---@class Configuration.Format.Filter
 ---@field Name string
 ---@field Status string
 ---@field ChatInput string
 
----@class omichat.Configuration.Format.MenuName
+---@class Configuration.Format.MenuName
 ---@field Trade string
 ---@field Medical string
 ---@field SearchPlayer string
 ---@field MiniScoreboard string
 
----@class omichat.Configuration.Format.PerceptionRange
+---@class Configuration.Format.PerceptionRange
 ---@field Chat string
 ---@field Overhead string
 
----@class omichat.Configuration.Format.Overhead
+---@class Configuration.Format.Overhead
 ---@field Final string
 ---@field Prefix string
 
----@class omichat.Configuration.Language
+---@class Configuration.Language
 ---@field DefaultSlots integer
 ---@field InterpretationRolls integer
 ---@field InterpretationChance integer
@@ -584,64 +585,64 @@ return utils.schema {
 ---@field UnknownLanguageRadio string
 ---@field UnknownLanguageOverhead string
 ---@field UseDefaultList boolean
----@field List omichat.Configuration.LanguageDefinition[]
+---@field List Configuration.LanguageDefinition[]
 
----@class omichat.Configuration.Macros
+---@class Configuration.Macros
 ---@field AllowEmotes boolean
 
----@class omichat.Configuration.Mentions
+---@class Configuration.Mentions
 ---@field Enable boolean
 ---@field AlwaysUseNameColors boolean
 ---@field Range integer
 ---@field Format string
 ---@field ChatFormat string
 
----@class omichat.Configuration.NarrativeStyle
+---@class Configuration.NarrativeStyle
 ---@field Enable boolean
 ---@field OverheadContentFormat string
 ---@field ChatContentFormat string
 ---@field DialogueTagFormat string
 ---@field InputFilter string
 
----@class omichat.Configuration.Radio
+---@class Configuration.Radio
 ---@field ChatFormat string
----@field DefaultColor omi.ColorTable
+---@field DefaultColor omi.ColorTable<integer>
 ---@field Tags string[]
 
----@class omichat.Configuration.ServerMessages
+---@class Configuration.ServerMessages
 ---@field ChatFormat string
----@field DefaultColor omi.ColorTable
+---@field DefaultColor omi.ColorTable<integer>
 ---@field Tags string[]
 
----@class omichat.Configuration.Streams
+---@class Configuration.Streams
 ---@field UseDefaultList boolean
 ---@field GlobalTags string[]
----@field List omichat.Configuration.StreamDefinition[]
+---@field List Configuration.StreamDefinition[]
 
----@class omichat.Configuration.TypingIndicator
+---@class Configuration.TypingIndicator
 ---@field Enable boolean
 ---@field NameFormat string
 ---@field Format string
 
----@class omichat.Configuration.ZombieAttraction
+---@class Configuration.ZombieAttraction
 ---@field ChatRangeMultiplier number
 ---@field CalloutRange integer
 ---@field SneakCalloutRange integer
 
 
----@class omichat.Configuration.LanguageDefinition
+---@class Configuration.LanguageDefinition
 ---@field Name string The name of the language.
 ---@field Signed boolean? Flag for whether the language should be treated as signed.
 
----@class omichat.Configuration.StreamDefinition
+---@class Configuration.StreamDefinition
 ---@field Enable boolean?
 ---@field Stream string?
----@field ChatType string?
----@field Category string?
+---@field ChatType omi.ChatTypeString?
+---@field Category StreamCategory?
 ---@field Name string?
 ---@field Command string?
 ---@field ShortCommand string?
----@field DefaultColor omi.ColorTable?
+---@field DefaultColor omi.ColorTable<integer>?
 ---@field Aliases string[]?
 ---@field Tags string[]?
 ---@field OverheadFormat string?
@@ -657,5 +658,14 @@ return utils.schema {
 ---@field AllowTypingIndicator boolean?
 ---@field AttractZombies boolean?
 ---@field UseNarrativeStyle boolean?
+
+
+---@alias Configuration.Commands.Name.Mode
+---| 'Disable'
+---| 'Nickname'
+---| 'Forename'
+---| 'Fullname'
+---| 'Forename_Plus_Nickname'
+---| 'Fullname_Plus_Nickname'
 
 --#endregion

@@ -1,5 +1,6 @@
+---@namespace omichat
 ---API functionality available on both the client and server.
----@class omichat.api.shared
+---@class(partial) api.shared
 local API = {}
 
 ---The mod identifier key.

@@ -1,3 +1,4 @@
+---@namespace omichat
 ---Handles formatting chat messages with invisible characters.
 
 local utils = require 'OmiChat/Utils'
@@ -9,13 +10,13 @@ local metaChar = char(65535)
 
 
 ---Handles formatting text with invisible metadata.
----@class omichat.MetaFormatter : omi.Class
+---@class MetaFormatter : omi.Class
 ---@field protected _id integer The ID of the metadata formatter.
 ---@field protected _formatString string The format string used when formatting text.
 ---@field protected _idPrefix string The prefix for formatted text.
 ---@field protected _idSuffix string The suffix for formatted text.
 ---@field protected _defaultName string The name of the default to use for the `$Default()` interpolation function.
----@field private _formatters table<integer, omichat.MetaFormatter> Associates IDs to formatter objects.
+---@field private _formatters table<integer, MetaFormatter> Associates IDs to formatter objects.
 local MetaFormatter = utils.lib.class()
 
 MetaFormatter._formatters = {}
@@ -162,10 +163,10 @@ end
 
 ---Creates a new meta formatter.
 ---@param id integer A numerical ID for the formatter, in [101, 1024]. 1–100 are reserved by OmiChat.
----@param options omichat.Args.MetaFormatter? Optional initialization options.
----@return omichat.MetaFormatter
+---@param options Args.MetaFormatter? Optional initialization options.
+---@return MetaFormatter
 function MetaFormatter:new(id, options)
-    ---@type omichat.MetaFormatter
+    ---@type MetaFormatter
     local this = setmetatable({}, MetaFormatter)
 
     options = options or {}
@@ -179,10 +180,9 @@ end
 
 return MetaFormatter
 
-
 --#region Type Definitions
 
----@class omichat.Args.MetaFormatter
+---@class Args.MetaFormatter
 ---@field format string? The format string to use.
 ---@field defaultName string? The name of the default to use for the `$Default()` interpolation function.
 

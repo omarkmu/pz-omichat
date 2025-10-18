@@ -1,6 +1,8 @@
+---@namespace omichat
 ---Handles chat manipulation.
 
-local API = require 'OmiChat/Module/Client/Core' ---@class omichat.api.client
+---@class(partial) api.client
+local API = require 'OmiChat/Module/Client/Core'
 
 local utils = API.utils
 local config = API.Configuration
@@ -15,7 +17,7 @@ local _ChatBase = __classmetatables[ChatBase.class].__index
 local _getChatType = _ChatBase.getType
 
 ---Contains functions related to manipulating the chat.
----@class omichat.api.client.chat
+---@class api.client.chat
 local Chat = {}
 
 --#region Static Fields
@@ -109,14 +111,14 @@ end
 
 ---Gets a playable emote by name.
 ---@param name string The name of the emote.
----@return (string | omichat.EmoteHandler)? emote An emote name or handler function. `Nil` if there's no such emote.
+---@return (string | EmoteHandler)? emote An emote name or handler function. `Nil` if there's no such emote.
 function Chat.getEmote(name)
     return API._emotes[name]
 end
 
 ---Returns the first emote found from an emote shortcut in the provided text.
 ---@param command string The command to read.
----@return (string | omichat.EmoteHandler)? emote An emote name or handler function. `Nil` if there's no such emote.
+---@return (string | EmoteHandler)? emote An emote name or handler function. `Nil` if there's no such emote.
 ---@return integer? start The start position of the emote in the text.
 ---@return integer? finish The end position of the emote in the text.
 ---@return string? emoteText The emote name from the text.
@@ -124,7 +126,7 @@ function Chat.getEmoteFromCommand(command)
     local startPos = 1
     while startPos < #command do
         local start, finish, whitespace, text = command:find('(%s*)%.([%w_]+)', startPos)
-        if not start then
+        if not start or not finish then
             break
         end
 
@@ -135,6 +137,7 @@ function Chat.getEmoteFromCommand(command)
 
         local emoteToPlay = text and Chat.getEmote(text:lower())
         if emoteToPlay then
+            ---@cast text -?
             return emoteToPlay, start, finish, text:lower()
         end
 
@@ -143,7 +146,7 @@ function Chat.getEmoteFromCommand(command)
 end
 
 ---Returns the chat type of a chat message.
----@param message omichat.Message The message to retrieve the chat type of.
+---@param message Message The message to retrieve the chat type of.
 ---@return omi.ChatTypeString chatType
 function Chat.getMessageChatType(message)
     if utils.isinstance(message, API.MimicMessage) then
@@ -152,7 +155,7 @@ function Chat.getMessageChatType(message)
     end
 
     ---@cast message ChatMessage
-    return tostring(_getChatType(message:getChat()))
+    return tostring(_getChatType(message:getChat())) --[[@as omi.ChatTypeString]]
 end
 
 ---Gets an emote meant to simulate sign language based on the given text.
@@ -162,7 +165,8 @@ function Chat.getSignLanguageEmote(text)
     -- same text should map to same 'sign'
     signEmoteRand:seed(utils.trim(text:lower()))
 
-    return Chat._signLanguageEmotes[signEmoteRand:random(1, #Chat._signLanguageEmotes)]
+    local idx = signEmoteRand:random(1, #Chat._signLanguageEmotes) --[[@as integer]]
+    return Chat._signLanguageEmotes[idx] --[[@as string]]
 end
 
 ---Suggests text based on the provided input text.
@@ -173,7 +177,7 @@ function Chat.getSuggestions(text)
         return {}
     end
 
-    ---@type omichat.SuggestionInfo
+    ---@type SuggestionInfo
     local info = {
         input = text,
         context = {},
@@ -197,7 +201,7 @@ function Chat.isTyping()
 end
 
 ---Processes a chat command.
----@param args omichat.Args.ProcessCommand Arguments for processing the command.
+---@param args Args.ProcessCommand Arguments for processing the command.
 ---@return boolean handled
 ---@return boolean? shouldRetainText
 function Chat.processCommand(args)
@@ -209,9 +213,9 @@ function Chat.processCommand(args)
     end
 
     local stream, command, chatCommand, disabledStream = API.streams.chatCommandToStream(input, { enabledOnly = true })
-    local streamToUse ---@type omichat.Stream?
+    local streamToUse ---@type Stream?
 
-    local commandCategory = 'other'
+    local commandCategory = 'other' ---@type StreamCategory
     local isHandled = false
     local allowEmotes = false
     local isDefault = false
@@ -254,6 +258,9 @@ function Chat.processCommand(args)
     if allowEmotes and config:isEmoteMacroEnabled() then
         local emoteToPlay, start, finish, emote = API.chat.getEmoteFromCommand(command)
         if emoteToPlay then
+            ---@cast start -?
+            ---@cast finish -?
+
             -- remove the emote text
             isHandled = true
             playedEmote = true
@@ -264,7 +271,7 @@ function Chat.processCommand(args)
                 if type(emoteToPlay) == 'string' then
                     player:playEmote(emoteToPlay)
                 else
-                    ---@cast emote string
+                    ---@cast emote -?
                     emoteToPlay(player, emote)
                 end
             end
@@ -334,10 +341,10 @@ function Chat.processCommand(args)
 end
 
 ---Sends a message on the given stream.
----@param args omichat.Args.Send? Arguments for sending the command.
+---@param args Args.Send? Arguments for sending the command.
 ---@return string? result For private messages, the username of the target when sending is successful. Otherwise, `nil`.
 function Chat.send(args)
-    local stream = args and args.stream --[[@as omichat.ChatStream]]
+    local stream = args and args.stream --[[@as ChatStream]]
     if not args or not stream or not utils.isinstance(stream, API.ChatStream) then
         return
     end
@@ -358,7 +365,7 @@ function Chat.send(args)
             m1, m2 = text:match('^([^"]%S*%s)(.+)$')
         end
 
-        if not m1 then
+        if not m1 or not m2 then
             -- not a valid whisper chat
             return
         end
@@ -403,8 +410,10 @@ function Chat.send(args)
     local process = Chat.raw[chatType] or Chat.raw.say
     if process then
         processResult = process(prefix .. text)
-        if processResult and chatType == 'whisper' and API.preferences.getRetainCommand(stream:getCategory()) then
-            local chatText = ISChat.instance.chatText
+
+        local instance = ISChat.instance
+        if instance and processResult and chatType == 'whisper' and API.preferences.getRetainCommand(stream:getCategory()) then
+            local chatText = instance.chatText
             chatText.lastChatCommand = chatText.lastChatCommand .. tostring(processResult) .. ' '
         end
     end
@@ -440,44 +449,44 @@ function Chat.send(args)
 end
 
 ---Sends an /admin message, formatted according to configuration.
----@param args string | omichat.Args.Send.Partial Arguments for sending the command.
+---@param args string | Args.Send.Partial Arguments for sending the command.
 function Chat.sendAdmin(args)
     Chat.send(Chat._transformSendArgs(args, 'admin'))
 end
 
 ---Sends a /faction message, formatted according to configuration.
----@param args string | omichat.Args.Send.Partial Arguments for sending the command.
+---@param args string | Args.Send.Partial Arguments for sending the command.
 function Chat.sendFaction(args)
     Chat.send(Chat._transformSendArgs(args, 'faction'))
 end
 
 ---Sends an /all message, formatted according to configuration.
----@param args string | omichat.Args.Send.Partial Arguments for sending the command.
+---@param args string | Args.Send.Partial Arguments for sending the command.
 function Chat.sendGeneral(args)
     Chat.send(Chat._transformSendArgs(args, 'general'))
 end
 
 ---Sends a /pm message, formatted according to configuration.
----@param args string | omichat.Args.Send.Partial Arguments for sending the command.
+---@param args string | Args.Send.Partial Arguments for sending the command.
 ---@return string username The username of the target user, or the empty string if sending failed.
 function Chat.sendPM(args)
     return Chat.send(Chat._transformSendArgs(args, 'private')) or ''
 end
 
 ---Sends a /safehouse message, formatted according to configuration.
----@param args string | omichat.Args.Send.Partial Arguments for sending the command.
+---@param args string | Args.Send.Partial Arguments for sending the command.
 function Chat.sendSafehouse(args)
     Chat.send(Chat._transformSendArgs(args, 'safehouse'))
 end
 
 ---Sends a /say message, formatted according to configuration.
----@param args string | omichat.Args.Send.Partial Arguments for sending the command.
+---@param args string | Args.Send.Partial Arguments for sending the command.
 function Chat.sendSay(args)
     Chat.send(Chat._transformSendArgs(args, 'say'))
 end
 
 ---Sends a /yell message, formatted according to configuration.
----@param args string | omichat.Args.Send.Partial Arguments for sending the command.
+---@param args string | Args.Send.Partial Arguments for sending the command.
 function Chat.sendShout(args)
     Chat.send(Chat._transformSendArgs(args, 'yell'))
 end
@@ -561,7 +570,7 @@ function Chat.updateTypingStatus(skipTimer)
         local trimmed = text:trim()
         local stream = API.streams.chatCommandToStream(text, { chatsOnly = true, enabledOnly = true })
 
-        ---@cast stream omichat.ChatStream?
+        ---@cast stream ChatStream?
         if not stream and not utils.startsWith(trimmed, '/') then
             stream = API.streams.getDefaultTabStream(instance.currentTabID)
         end
@@ -585,7 +594,7 @@ end
 
 
 ---Adds an info message to chat that displays the available streams, when an unavailable stream is used.
----@param stream omichat.Stream
+---@param stream Stream
 ---@private
 function Chat._addDisabledStreamMessage(stream)
     local disabledCommand = utils.trim(stream:getCommand())
@@ -596,12 +605,10 @@ function Chat._addDisabledStreamMessage(stream)
 
         local availableCommand
         if utils.isinstance(availableStream, API.ChatStream) then
-            ---@cast availableStream omichat.ChatStream
             if availableStream:isEnabled() then
                 availableCommand = availableStream:getCommand()
             end
         else
-            ---@cast availableStream omichat.StreamTable
             availableCommand = availableStream.command
         end
 
@@ -619,7 +626,7 @@ function Chat._addDisabledStreamMessage(stream)
 end
 
 ---Clears the last chat command for a tab based on retain options.
----@param tab omichat.ChatTab
+---@param tab ChatTab
 ---@private
 function Chat._checkLastCommand(tab)
     local lastChatCommand = tab.lastChatCommand
@@ -635,9 +642,9 @@ function Chat._checkLastCommand(tab)
 end
 
 ---Builds send arguments for the given stream.
----@param args string | omichat.Args.Send.Partial
+---@param args string | Args.Send.Partial
 ---@param streamName string
----@return omichat.Args.Send?
+---@return Args.Send?
 ---@private
 function Chat._transformSendArgs(args, streamName)
     local stream = API.streams.getChatStream(streamName)
@@ -656,7 +663,7 @@ function Chat._transformSendArgs(args, streamName)
         return
     end
 
-    args = utils.copy(args) --[[@as omichat.Args.Send]]
+    args = utils.copy(args) --[[@as Args.Send]]
     args.stream = stream
 
     return args
@@ -666,64 +673,42 @@ end
 API.chat = Chat
 return Chat
 
-
 --#region Type Definitions
 
----@class omichat.ISChat : ISChat
----@field instance omichat.ISChat? The ISChat instance.
----@field focused boolean Flag for whether the chat is currently focused.
----@field showTitle boolean Flag for whether chat type titles should display.
----@field showTimestamp boolean Flag for whether timestamps should display.
----@field chatFont omichat.ChatFont The current font of the chat.
----@field chatText omichat.ChatTab The current chat tab.
----@field tabs omichat.ChatTab[] List of available chat tabs.
----@field allChatStreams (omichat.ChatStream | omichat.StreamTable)[] List of all available chat streams.
----@field defaultTabStream table<integer, omichat.ChatStream?> An association of 1-indexed tab IDs to default streams.
----@field gearButton ISButton The settings button.
----@field textEntry omi.ui.TextEntry The text entry UI element.
----@field currentTabID integer The 1-indexed tab ID of the current tab.
----@field tabCnt integer The number of available tabs.
----@field infoButton omi.ui.Button The info button.
----@field activeProfilesPanel omichat.ProfileManager? The active profile manager panel.
----@field activeConfigurationPanel omi.forms.Form? The active configuration menu panel.
----@field activeLanguageDialog omi.ui.Dialog? The active language add confirmation dialog.
----@field activeColorDialog omi.ui.Dialog? The active hair color dialog.
----@field activePlayerDataPanel omichat.PlayerDataManager? The active player data manager panel.
-
-
----@class omichat.Args.ProcessCommand
+---@class Args.ProcessCommand
 ---@field input string The input text.
 
----@class omichat.Args.UseStream.Partial
+---@class Args.UseStream.Partial
 ---@field text string The text passed to the command, excluding the command name.
+---@field stream? Stream The stream being used.
 
----@class omichat.Args.UseStream : omichat.Args.UseStream.Partial
----@field stream omichat.Stream The stream being used.
+---@class Args.UseStream : Args.UseStream.Partial
+---@field stream Stream The stream being used.
 
----@class omichat.Args.Send.Partial : omichat.Args.UseStream.Partial
----@field formatStream omichat.Stream? The stream to use to format the input text. Defaults to `stream`.
----@field formatter omichat.MetaFormatter? A formatter to use to format the input. If not given, the formatter from `formatStream` or `stream` is used.
----@field playSignedEmote boolean? Flag for whether a random emote should be played for a signed language.
----@field echoType integer? The echo type identifier, if this is an echo message.
----@field tokens table? Initial tokens to pass to interpolation strings.
----@field extraTags string[]? Additional tags to include in the tags token.
----@field allowInvisible boolean? Flag for whether invisible characters should not be removed from the input.
+---@class Args.Send.Partial : Args.UseStream.Partial
+---@field formatStream? Stream The stream to use to format the input text. Defaults to `stream`.
+---@field formatter? MetaFormatter A formatter to use to format the input. If not given, the formatter from `formatStream` or `stream` is used.
+---@field playSignedEmote? boolean Flag for whether a random emote should be played for a signed language.
+---@field echoType? integer The echo type identifier, if this is an echo message.
+---@field tokens? table Initial tokens to pass to interpolation strings.
+---@field extraTags? string[] Additional tags to include in the tags token.
+---@field allowInvisible? boolean Flag for whether invisible characters should not be removed from the input.
 
----@class omichat.Args.Send : omichat.Args.Send.Partial, omichat.Args.UseStream
+---@class Args.Send : Args.Send.Partial, Args.UseStream
 
 
----@class omichat.TypingInformation
+---@class TypingInformation
 ---@field display string The display name to use for the typing player.
 ---@field lastUpdate integer The timestamp in milliseconds of the last update of this information.
 
----@class omichat.SuggestionInfo
+---@class SuggestionInfo
 ---@field input string The current input text.
 ---@field context table Table for arbitrary context data.
 ---@field suggestions omi.ui.SuggestBox.Suggestion[] The current list of suggestions.
 
 
----@alias omichat.ChatFont 'small' | 'medium' | 'large'
+---@alias ChatFont 'small' | 'medium' | 'large'
 
----@alias omichat.Message ChatMessage | omi.MimicMessage
+---@alias Message ChatMessage | omi.MimicMessage
 
 --#endregion

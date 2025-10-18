@@ -1,3 +1,4 @@
+---@namespace omichat
 ---Stream for sending chat messages.
 
 local Stream = require 'OmiChat/Component/Stream'
@@ -7,14 +8,14 @@ local utils = require 'OmiChat/Utils'
 local checkPlayerCanUseChat = checkPlayerCanUseChat
 
 
----@class omichat.ChatStream : omichat.Stream
+---@class ChatStream : Stream
 ---@field protected allowBuffs boolean Flag for whether the stream can apply buffs when it's used.
 ---@field protected allowLanguages boolean Flag for whether the stream should allow messages to be sent using roleplay languages.
 ---@field protected allowTypingIndicator boolean Flag for whether typing on the stream triggers a typing indicator.
 ---@field protected attractZombies boolean Flag for whether the stream can attract zombies.
----@field protected chatFormat string? The format to use for chat messages.
+---@field protected chatFormat? string The format to use for chat messages.
 ---@field protected chatType omi.ChatTypeString The chat type that stream messages are sent over.
----@field protected defaultColor omi.ColorTable The default color for messages on the stream.
+---@field protected defaultColor omi.ColorTable<integer> The default color for messages on the stream.
 ---@field protected range integer The range of the chat stream.
 ---@field protected tabID integer The 1-indexed tab ID of the tab in which this stream is available.
 ---@field protected useNarrativeStyle boolean Flag for whether the stream should apply narrative style (if narrative style is enabled).
@@ -58,7 +59,7 @@ function ChatStream.isReservedName(name)
 end
 
 ---Checks whether a stream definition is valid.
----@param def omichat.Configuration.StreamDefinition The definition to check.
+---@param def Configuration.StreamDefinition The definition to check.
 ---@return boolean valid
 function ChatStream.isValidDefinition(def)
     if not def.Stream or def.Stream == 'custom' then
@@ -70,9 +71,9 @@ function ChatStream.isValidDefinition(def)
 end
 
 ---Creates a chat stream given a stream definition, if it's valid.
----@param def omichat.Configuration.StreamDefinition The definition to use.
+---@param def Configuration.StreamDefinition The definition to use.
 ---@param additionalTags string[]? Extra tags to add to the created stream.
----@return omichat.ChatStream? stream
+---@return ChatStream? stream
 function ChatStream.fromDefinition(def, additionalTags)
     if not ChatStream.isValidDefinition(def) then
         return
@@ -168,7 +169,7 @@ function ChatStream:getChatType()
 end
 
 ---Returns the default color to use for the stream.
----@return omi.ColorTable defaultColor
+---@return omi.ColorTable<integer> defaultColor
 function ChatStream:getDefaultColor()
     if self.defaultColor then
         return utils.copy(self.defaultColor)
@@ -230,17 +231,17 @@ function ChatStream:setChatFormat(format)
 end
 
 ---Sets the default color for the stream.
----@param color omi.ColorTable The color table to set as the default color.
+---@param color omi.ColorTable<integer> The color table to set as the default color.
 function ChatStream:setDefaultColor(color)
     self.defaultColor = utils.copy(color)
 end
 
 
 ---Creates a new chat stream.
----@param args omichat.Args.ChatStream Arguments for creation of the stream.
----@return omichat.ChatStream stream
+---@param args Args.ChatStream Arguments for creation of the stream.
+---@return ChatStream stream
 function ChatStream:new(args)
-    local this = Stream.new(self, args) --[[@as omichat.ChatStream]]
+    local this = Stream.new(self, args) --[[@as ChatStream]]
 
     this.isChat = true
     this.allowLanguages = args.allowLanguages or false
@@ -254,7 +255,7 @@ function ChatStream:new(args)
     this.verticalRange = args.verticalRange or 2
     this.perceptionRange = args.perceptionRange or 0
     this.perceptionRangeSigned = args.perceptionRangeSigned or 0
-    this.defaultColor = args.defaultColor and utils.copy(args.defaultColor) or { r = 255, g = 255, b = 255 }
+    this.defaultColor = utils.color.default(args.defaultColor, 255, 255, 255)
 
     return this
 end
@@ -262,23 +263,21 @@ end
 
 return ChatStream
 
-
-
 --#region Type Definitions
 
----@class omichat.Args.ChatStream : omichat.Args.Stream
----@field defaultColor omi.ColorTable? The default color for messages on the stream.
----@field allowBuffs boolean? Flag for whether the stream can apply buffs when it's used.
----@field allowLanguages boolean? Flag for whether the stream allows messages to be sent using roleplay languages.
----@field allowTypingIndicator boolean? Flag for whether typing on the stream triggers a typing indicator.
----@field attractZombies boolean? Flag for whether the stream can attract zombies.
----@field chatFormat string? The format to use for chat messages.
----@field useNarrativeStyle boolean? Flag for whether the stream should apply narrative style if it's enabled.
----@field chatType omi.ChatTypeString? The chat type that stream messages are sent over.
----@field range integer? The range of the chat stream.
----@field verticalRange integer? The vertical range of the chat stream.
----@field perceptionRange integer? The perception range of the chat stream.
----@field perceptionRangeSigned integer? The perception range of the chat stream, for signed languages.
----@field tabID integer? The 1-indexed tab ID of the tab in which this stream is available.
+---@class Args.ChatStream : Args.Stream
+---@field defaultColor? omi.ColorTable<integer> The default color for messages on the stream.
+---@field allowBuffs? boolean Flag for whether the stream can apply buffs when it's used.
+---@field allowLanguages? boolean Flag for whether the stream allows messages to be sent using roleplay languages.
+---@field allowTypingIndicator? boolean Flag for whether typing on the stream triggers a typing indicator.
+---@field attractZombies? boolean Flag for whether the stream can attract zombies.
+---@field chatFormat? string The format to use for chat messages.
+---@field useNarrativeStyle? boolean Flag for whether the stream should apply narrative style if it's enabled.
+---@field chatType? omi.ChatTypeString The chat type that stream messages are sent over.
+---@field range? integer The range of the chat stream.
+---@field verticalRange? integer The vertical range of the chat stream.
+---@field perceptionRange? integer The perception range of the chat stream.
+---@field perceptionRangeSigned? integer The perception range of the chat stream, for signed languages.
+---@field tabID? integer The 1-indexed tab ID of the tab in which this stream is available.
 
 --#endregion

@@ -1,3 +1,4 @@
+---@namespace omichat
 local utils = require 'OmiChat/Utils'
 
 local array = utils.schema.array
@@ -10,7 +11,7 @@ local container = utils.schema.container
 
 ---Upgrades player preferences from V1 to V2.
 ---@param values table
----@return omichat.PlayerPreferences
+---@return PlayerPreferences
 local function transformToV2(values)
     if type(values.VERSION) ~= 'number' or values.VERSION ~= 1 then
         return values
@@ -18,15 +19,15 @@ local function transformToV2(values)
 
     local prefs = {
         settings = {
-            showNameColors = utils.default(values.showNameColors, true),
-            useSuggester = utils.default(values.useSuggester, true),
-            useSignEmotes = utils.default(values.useSignEmotes, true),
-            retainChatInput = utils.default(values.retainChatInput, true),
-            retainRPInput = utils.default(values.retainRPInput, false),
-            retainOtherInput = utils.default(values.retainOtherInput, false),
-            adminShowIcon = utils.default(values.adminShowIcon, true),
-            adminKnowLanguages = utils.default(values.adminKnowLanguages, true),
-            adminIgnoreRange = utils.default(values.adminIgnoreRange, true),
+            showNameColors = values.showNameColors ~= false,
+            useSuggester = values.useSuggester ~= false,
+            useSignEmotes = values.useSignEmotes ~= false,
+            retainChatInput = values.retainChatInput ~= false,
+            retainRPInput = values.retainRPInput or false,
+            retainOtherInput = values.retainOtherInput or false,
+            adminShowIcon = values.adminShowIcon ~= false,
+            adminKnowLanguages = values.adminKnowLanguages ~= false,
+            adminIgnoreRange = values.adminIgnoreRange ~= false,
         },
     }
 
@@ -76,7 +77,7 @@ local function transformToV2(values)
         }
     end
 
-    return prefs
+    return prefs --[[@as PlayerPreferences]]
 end
 
 return utils.schema {
@@ -120,11 +121,10 @@ return utils.schema {
     },
 }
 
-
 --#region Type Definitions
 
----@class omichat.PlayerPreferences
----@field HIGHER_VERSION boolean? Flag which is set when the preferences file had a higher verson than the current version, to avoid bad overwrites.
+---@class PlayerPreferences
+---@field HIGHER_VERSION? boolean Flag which is set when the preferences file had a higher verson than the current version, to avoid bad overwrites.
 ---@field showNameColors boolean Flag for whether name colors are enabled.
 ---@field useSuggester boolean Flag for whether suggestions are enabled.
 ---@field useSignEmotes boolean Flag for whether signed roleplay languages should play a random emote.
@@ -138,13 +138,13 @@ return utils.schema {
 ---@field adminKnowLanguages boolean Flag for whether all languages should be treated as known.
 ---@field adminIgnoreRange boolean Flag for whether message range should be ignored.
 ---@field profileIndex integer The index of the current profile.
----@field profiles omichat.PlayerProfile[] List of chat profiles.
+---@field profiles PlayerProfile[] List of chat profiles.
 
----@class omichat.PlayerProfile
+---@class PlayerProfile
 ---@field name string The name of the profile.
----@field chatNickname string? Nickname to use in chat when switching to a profile.
+---@field chatNickname? string Nickname to use in chat when switching to a profile.
 ---@field callouts string[] Custom callouts.
 ---@field sneakcallouts string[] Custom sneak callouts.
----@field colors table<string, omi.ColorTable> Associates stream names to custom colors.
+---@field colors table<string, omi.ColorTable<integer>> Associates stream names to custom colors.
 
 --#endregion

@@ -1,10 +1,13 @@
+---@namespace omichat
 ---Functionality for default interpolation formats.
 
 local API = require 'OmiChat/Module/Shared/Core'
-local Library = require 'OmiChat/Module/InterpolationLibrary/Core' ---@class omichat.InterpolationLibrary
+
+---@class(partial) InterpolationLibrary
+local Library = require 'OmiChat/Module/InterpolationLibrary/Core'
 
 ---Contains handlers for the `$Default` interpolation function.
----@class omichat.InterpolationLibrary.Defaults
+---@class(partial) InterpolationLibrary.Defaults
 Library.Defaults = Library.Defaults or {}
 
 
@@ -22,9 +25,9 @@ local optionOrTokenWrapped = Helpers.optionOrTokenWrapped
 
 
 ---Default forwarding function for format strings.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
----@return unknown?
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
+---@return any?
 function Library.Default(interpolator, args)
     local target
     if type(args) == 'string' then
@@ -44,8 +47,8 @@ end
 
 
 ---Default format for text of chat messages.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string?
 function Library.Defaults.Chat(interpolator, args)
     local options = readOptions(args)
@@ -85,7 +88,7 @@ function Library.Defaults.Chat(interpolator, args)
     end
 
     if tags.IsIncomingPM and not tags.UseVanillaPM and name ~= '' then
-        local parens = config:getVariableAsNumber('PMParenthesisCount') or 1
+        local parens = (config:getVariableAsNumber('PMParenthesisCount') or 1) --[[@as integer]]
         local pmFrom = getText('UI_OmiChat_PrivateChatFrom', ' <SPACE> ' .. name)
 
         name = rep('(', parens) .. pmFrom .. rep(')', parens)
@@ -104,7 +107,7 @@ function Library.Defaults.Chat(interpolator, args)
             if tags.UseVanillaPM then
                 name = 'to ' .. name
             else
-                local parens = config:getVariableAsNumber('PMParenthesisCount') or 1
+                local parens = (config:getVariableAsNumber('PMParenthesisCount') or 1) --[[@as integer]]
                 local pmTo = getText('UI_OmiChat_PrivateChatTo', ' <SPACE> ' .. name)
 
                 name = rep('(', parens) .. pmTo .. rep(')', parens)
@@ -177,8 +180,8 @@ function Library.Defaults.Chat(interpolator, args)
 end
 
 ---Default format for the final chat text.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string
 function Library.Defaults.ChatFinal(interpolator, args)
     local options = readOptions(args)
@@ -194,8 +197,8 @@ function Library.Defaults.ChatFinal(interpolator, args)
 end
 
 ---Default format for the chat text prefix.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string
 function Library.Defaults.ChatPrefix(interpolator, args)
     local options = readOptions(args)
@@ -258,12 +261,12 @@ function Library.Defaults.ChatPrefix(interpolator, args)
 end
 
 ---Default format for actions embedded in dialogue text.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string?
 function Library.Defaults.EmbeddedAction(interpolator, args)
-    local options = Helpers.readOptions(args)
-    local tags = Helpers.readTags(interpolator)
+    local options = readOptions(args)
+    local tags = readTags(interpolator)
 
     local input = optionOrToken(interpolator, options, 'input')
     if utils.trim(input) == '' then
@@ -289,12 +292,12 @@ function Library.Defaults.EmbeddedAction(interpolator, args)
 end
 
 ---Default format for quotes embedded in actions.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string?
 function Library.Defaults.EmbeddedQuote(interpolator, args)
-    local options = Helpers.readOptions(args)
-    local tags = Helpers.readTags(interpolator)
+    local options = readOptions(args)
+    local tags = readTags(interpolator)
 
     local input = optionOrToken(interpolator, options, 'input')
     if utils.trim(input) == '' then
@@ -320,8 +323,8 @@ function Library.Defaults.EmbeddedQuote(interpolator, args)
 end
 
 ---Default filter for chat input.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string?
 function Library.Defaults.FilterChatInput(interpolator, args)
     local tags = readTags(interpolator)
@@ -342,7 +345,7 @@ function Library.Defaults.FilterChatInput(interpolator, args)
         return
     end
 
-    local truncateLength = options:getNumber('truncateTo', 2000)
+    local truncateLength = options:getNumber('truncateTo', 2000) --[[@as integer]]
     if truncateLength > 0 then
         input = input:sub(1, truncateLength)
     end
@@ -351,8 +354,8 @@ function Library.Defaults.FilterChatInput(interpolator, args)
 end
 
 ---Default filter for names.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string?
 function Library.Defaults.FilterName(interpolator, args)
     local options = readOptions(args)
@@ -368,7 +371,7 @@ function Library.Defaults.FilterName(interpolator, args)
         return
     end
 
-    local truncateLength = tonumber(options:get('truncateTo', 40))
+    local truncateLength = utils.tointeger(options:get('truncateTo', 40))
     if truncateLength then
         input = input:sub(1, truncateLength)
     end
@@ -377,8 +380,8 @@ function Library.Defaults.FilterName(interpolator, args)
 end
 
 ---Default filter for narrative style messages.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string
 function Library.Defaults.FilterNarrativeInput(interpolator, args)
     local options = readOptions(args)
@@ -396,8 +399,8 @@ function Library.Defaults.FilterNarrativeInput(interpolator, args)
 end
 
 ---Default filter for statuses.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string?
 function Library.Defaults.FilterStatus(interpolator, args)
     local options = readOptions(args)
@@ -413,7 +416,7 @@ function Library.Defaults.FilterStatus(interpolator, args)
         return
     end
 
-    local truncateLength = tonumber(options:get('truncateTo'))
+    local truncateLength = utils.tointeger(options:get('truncateTo'))
     if truncateLength then
         input = input:sub(1, truncateLength)
     end
@@ -422,14 +425,14 @@ function Library.Defaults.FilterStatus(interpolator, args)
 end
 
 ---Default format for `/card` command result content.
----@param interpolator omichat.Interpolator The interpolator in use.
+---@param interpolator Interpolator The interpolator in use.
 ---@return string
 function Library.Defaults.FormatCard(interpolator)
     return 'draws ' .. interpolator:tokenString('card')
 end
 
 ---Default format for `/flip` command result content.
----@param interpolator omichat.Interpolator The interpolator in use.
+---@param interpolator Interpolator The interpolator in use.
 ---@return string
 function Library.Defaults.FormatFlip(interpolator)
     local result = interpolator:toBoolean(interpolator:token('heads')) and 'heads' or 'tails'
@@ -437,7 +440,7 @@ function Library.Defaults.FormatFlip(interpolator)
 end
 
 ---Default format for `/roll` command result content.
----@param interpolator omichat.Interpolator The interpolator in use.
+---@param interpolator Interpolator The interpolator in use.
 ---@return string
 function Library.Defaults.FormatRoll(interpolator)
     local roll = interpolator:tokenString('roll')
@@ -446,8 +449,8 @@ function Library.Defaults.FormatRoll(interpolator)
 end
 
 ---Default format for chat icons.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string?
 function Library.Defaults.Icon(interpolator, args)
     local options = readOptions(args)
@@ -471,7 +474,7 @@ function Library.Defaults.Icon(interpolator, args)
 end
 
 ---Default format for roleplay languages in a message prefix.
----@param interpolator omichat.Interpolator The interpolator in use.
+---@param interpolator Interpolator The interpolator in use.
 ---@return string?
 function Library.Defaults.Language(interpolator)
     local tags = readTags(interpolator)
@@ -488,8 +491,8 @@ function Library.Defaults.Language(interpolator)
 end
 
 ---Default format for a mention in chat text.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string
 function Library.Defaults.MentionChat(interpolator, args)
     local options = readOptions(args)
@@ -505,8 +508,8 @@ function Library.Defaults.MentionChat(interpolator, args)
 end
 
 ---Default format for mention text.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string
 function Library.Defaults.MentionText(interpolator, args)
     local options = readOptions(args)
@@ -521,10 +524,10 @@ function Library.Defaults.MentionText(interpolator, args)
 end
 
 ---Default format for menu names.
----@param interpolator omichat.Interpolator The interpolator in use.
+---@param interpolator Interpolator The interpolator in use.
 ---@return string
 function Library.Defaults.MenuName(interpolator)
-    local menuType = interpolator:tokenString('menuType') ---@type omichat.MenuTypeString
+    local menuType = interpolator:tokenString('menuType') --[[@as MenuTypeString]]
     local name = interpolator:tokenString('name')
 
     if menuType == 'mini_scoreboard' then
@@ -536,8 +539,8 @@ function Library.Defaults.MenuName(interpolator)
 end
 
 ---Default format for name display in chat.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string
 function Library.Defaults.Name(interpolator, args)
     local options = readOptions(args)
@@ -588,8 +591,8 @@ function Library.Defaults.Name(interpolator, args)
 end
 
 ---Default chat content format for narrative style.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string?
 function Library.Defaults.NarrativeChatContent(interpolator, args)
     local options = readOptions(args)
@@ -608,8 +611,8 @@ function Library.Defaults.NarrativeChatContent(interpolator, args)
 end
 
 ---Default overhead content format for narrative style.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string?
 function Library.Defaults.NarrativeOverheadContent(interpolator, args)
     local options = readOptions(args)
@@ -641,8 +644,8 @@ function Library.Defaults.NarrativeOverheadContent(interpolator, args)
 end
 
 ---Default format for a narrative style dialogue tag.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string?
 function Library.Defaults.NarrativeTag(interpolator, args)
     local options = readOptions(args)
@@ -667,11 +670,13 @@ function Library.Defaults.NarrativeTag(interpolator, args)
         optionalActionAsterisk = tags.OptionalActionAsterisk,
     })
 
-    if #segments == 0 or segments[1].type ~= 'quote' then
+    local firstSegment = segments[1]
+
+    if not firstSegment or firstSegment.type ~= 'quote' then
         return options:getString('statementTag', 'says')
     end
 
-    local testInput = Helpers.ensureUnwrapped(segments[1].text, '"')
+    local testInput = Helpers.ensureUnwrapped(firstSegment.text, '"')
     testInput = utils.trim(utils.removeInvisible(testInput))
 
     if utils.endsWith(testInput, '?') then
@@ -686,8 +691,8 @@ function Library.Defaults.NarrativeTag(interpolator, args)
 end
 
 ---Default format for overhead text of chat messages.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string?
 function Library.Defaults.Overhead(interpolator, args)
     local options = readOptions(args)
@@ -743,8 +748,8 @@ function Library.Defaults.Overhead(interpolator, args)
 end
 
 ---Default format for the full overhead text.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string
 function Library.Defaults.OverheadFinal(interpolator, args)
     local options = readOptions(args)
@@ -760,8 +765,8 @@ function Library.Defaults.OverheadFinal(interpolator, args)
 end
 
 ---Default format for the overhead prefix.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string?
 function Library.Defaults.OverheadPrefix(interpolator, args)
     local options = readOptions(args)
@@ -794,8 +799,8 @@ function Library.Defaults.OverheadPrefix(interpolator, args)
 end
 
 ---Default chat format for out-of-range, perceived messages.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string?
 function Library.Defaults.PerceptionRangeChat(interpolator, args)
     local tags = readTags(interpolator)
@@ -812,8 +817,8 @@ function Library.Defaults.PerceptionRangeChat(interpolator, args)
 end
 
 ---Default overhead format for out-of-range, perceived messages.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string?
 function Library.Defaults.PerceptionRangeOverhead(interpolator, args)
     local tags = readTags(interpolator)
@@ -828,7 +833,7 @@ function Library.Defaults.PerceptionRangeOverhead(interpolator, args)
 end
 
 ---Default format for chat tags in a message prefix.
----@param interpolator omichat.Interpolator The interpolator in use.
+---@param interpolator Interpolator The interpolator in use.
 ---@return string
 function Library.Defaults.Tag(interpolator)
     local tags = readTags(interpolator)
@@ -842,7 +847,7 @@ function Library.Defaults.Tag(interpolator)
 end
 
 ---Default format for chat message timestamps in a message prefix.
----@param interpolator omichat.Interpolator The interpolator in use.
+---@param interpolator Interpolator The interpolator in use.
 ---@return string
 function Library.Defaults.Timestamp(interpolator)
     local hour
@@ -856,8 +861,8 @@ function Library.Defaults.Timestamp(interpolator)
 end
 
 ---Default format for the typing indicator display.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string?
 function Library.Defaults.TypingIndicator(interpolator, args)
     local options = readOptions(args)
@@ -868,7 +873,6 @@ function Library.Defaults.TypingIndicator(interpolator, args)
 
     local names = options:get('names') or interpolator:token('names')
     if utils.isinstance(names, MultiMap) then
-        ---@cast names omi.MultiMap
         local size = names:size()
         if size == 0 then
             return
@@ -891,15 +895,15 @@ function Library.Defaults.TypingIndicator(interpolator, args)
 end
 
 ---Default format for names in the typing indicator display.
----@param interpolator omichat.Interpolator The interpolator in use.
+---@param interpolator Interpolator The interpolator in use.
 ---@return string?
 function Library.Defaults.TypingName(interpolator)
     return interpolator:tokenString('name')
 end
 
 ---Default format for the content of a message indicating that a language is unknown.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string?
 function Library.Defaults.UnknownLanguageChat(interpolator, args)
     local tags = readTags(interpolator)
@@ -927,7 +931,7 @@ function Library.Defaults.UnknownLanguageChat(interpolator, args)
     local fragment = Helpers.getFragmentedMessage(interpolator, message)
     if fragment then
         if tags.AutoColorQuotes then
-            local segment = { type = 'quote', text = fragment } ---@type omichat.MessageSegment
+            local segment = { type = 'quote', text = fragment } ---@type MessageSegment
             Helpers.colorQuotes({ segment }, options, tags)
             fragment = segment.text
         end
@@ -939,8 +943,8 @@ function Library.Defaults.UnknownLanguageChat(interpolator, args)
 end
 
 ---Default format for the overhead content of a message indicating that a language is unknown.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param args unknown? The first argument passed to the default function.
+---@param interpolator Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
 ---@return string?
 function Library.Defaults.UnknownLanguageOverhead(interpolator, args)
     local tags = readTags(interpolator)

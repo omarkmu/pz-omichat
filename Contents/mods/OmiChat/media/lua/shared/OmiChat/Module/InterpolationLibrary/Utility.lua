@@ -1,23 +1,23 @@
+---@namespace omichat
 ---Utility interpolation library functions.
----@diagnostic disable: unused-local
 
 local API = require 'OmiChat/Module/Shared/Core'
-local API_C = API --[[@as omichat.api.client]]
+local API_C = API --[[@as api.client]]
 
 local utils = API.utils
 local MultiMap = utils.MultiMap
 
 local IS_CLIENT = not isServer()
 
----@class omichat.InterpolationLibrary
+---@class(partial) InterpolationLibrary
 local Library = require 'OmiChat/Module/InterpolationLibrary/Core'
 local Helpers = Library.Helpers
 
 
 ---Adds a tag to `tags` token.
 ---This fails if there is no `tags` token or it is not a multimap.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param tag unknown The tag to add.
+---@param interpolator Interpolator The interpolator in use.
+---@param tag any The tag to add.
 function Library.AddTag(interpolator, tag)
     tag = tag and tostring(tag)
     if not tag or utils.trim(tag) == '' then
@@ -33,17 +33,17 @@ function Library.AddTag(interpolator, tag)
 end
 
 ---Capitalizes the first non-invisible character of a string.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param ... unknown Arguments passed to the interpolator function. Combined and converted into a string.
+---@param interpolator Interpolator The interpolator in use.
+---@param ...any Arguments passed to the interpolator function. Combined and converted into a string.
 ---@return string capitalized
 function Library.Capitalize(interpolator, ...)
     return Helpers.capitalize(utils.concat({ ... }))
 end
 
 ---Colors actions in a string based on the streams tagged with `ActionColorTarget`.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param message unknown? The message text.
----@param options unknown? A multimap of options.
+---@param interpolator Interpolator The interpolator in use.
+---@param message any? The message text.
+---@param options any? A multimap of options.
 ---@return string? formatted
 function Library.ColorActions(interpolator, message, options)
     message = tostring(message or '')
@@ -61,9 +61,9 @@ function Library.ColorActions(interpolator, message, options)
 end
 
 ---Colors quotes in a string based on the streams tagged with `QuoteColorTarget`.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param message unknown? The message text.
----@param options unknown? A multimap of options.
+---@param interpolator Interpolator The interpolator in use.
+---@param message any? The message text.
+---@param options any? A multimap of options.
 ---@return string? formatted
 function Library.ColorQuotes(interpolator, message, options)
     message = tostring(message or '')
@@ -85,8 +85,8 @@ end
 
 ---Validates that the message is not being sent with a signed language.
 ---Sets an error token if it is.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param options unknown? A multimap of options.
+---@param interpolator Interpolator The interpolator in use.
+---@param options any? A multimap of options.
 ---@return boolean isAllowed
 function Library.DisallowSignedOverRadio(interpolator, options)
     options = Helpers.readOptions(options)
@@ -110,8 +110,8 @@ function Library.DisallowSignedOverRadio(interpolator, options)
 end
 
 ---Formats text that indicates the radio channel a message was sent over.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param ... unknown Arguments passed to the interpolator function. Combined and converted into a string.
+---@param interpolator Interpolator The interpolator in use.
+---@param ...any Arguments passed to the interpolator function. Combined and converted into a string.
 ---@return string formatted
 function Library.FormatRadio(interpolator, ...)
     local s = Helpers.stringify(...)
@@ -123,7 +123,7 @@ function Library.FormatRadio(interpolator, ...)
 end
 
 ---Returns a partial quote representing a fragment of what a player character understood.
----@param interpolator omichat.Interpolator The interpolator in use.
+---@param interpolator Interpolator The interpolator in use.
 ---@param message string The message to fragment.
 ---@return string? fragmented
 function Library.Fragmented(interpolator, message)
@@ -131,8 +131,8 @@ function Library.Fragmented(interpolator, message)
 end
 
 ---Checks the `tags` token for a tag.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param tag unknown The tag to check for.
+---@param interpolator Interpolator The interpolator in use.
+---@param tag any The tag to check for.
 ---@return boolean hasTag Whether the tag is present. If there is no `tags` token or it is not a multimap, `false`.
 function Library.HasTag(interpolator, tag)
     tag = tag and tostring(tag)
@@ -149,43 +149,43 @@ function Library.HasTag(interpolator, tag)
 end
 
 ---Returns text without invisible wrapping characters used for mod functionality.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param ... unknown Arguments passed to the interpolator function. Combined and converted into a string.
+---@param interpolator Interpolator The interpolator in use.
+---@param ...any Arguments passed to the interpolator function. Combined and converted into a string.
 ---@return string
 function Library.Internal(interpolator, ...)
     return (utils.getInternalText(Helpers.stringify(...)))
 end
 
 ---Returns whether the given language is signed.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param language unknown
+---@param interpolator Interpolator The interpolator in use.
+---@param language any
 ---@return boolean isSigned
 function Library.IsSigned(interpolator, language)
     return API.language.isSigned(tostring(language or ''))
 end
 
 ---Wraps text in parentheses.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param ... unknown Arguments passed to the interpolator function. Combined and converted into a string.
+---@param interpolator Interpolator The interpolator in use.
+---@param ...any Arguments passed to the interpolator function. Combined and converted into a string.
 ---@return string formatted
 function Library.Parens(interpolator, ...)
     return '(' .. Helpers.stringifySep(' ', ...) .. ')'
 end
 
 ---Adds punctuation to a string if it isn't already present.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param input unknown? The string to punctuate.
----@param punctuation unknown? The punctuation character to use. Defaults to `.`.
----@param characters unknown? Characters to treat as punctuation. Defaults to using the punctuation string pattern.
+---@param interpolator Interpolator The interpolator in use.
+---@param input any? The string to punctuate.
+---@param punctuation any? The punctuation character to use. Defaults to `.`.
+---@param characters any? Characters to treat as punctuation. Defaults to using the punctuation string pattern.
 ---@return string formatted
 function Library.Punctuate(interpolator, input, punctuation, characters)
     return Helpers.punctuate(tostring(input or ''), punctuation, characters)
 end
 
 ---Returns the stream category given a stream name.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param name unknown? The name of a stream.
----@return omichat.StreamCategory? category
+---@param interpolator Interpolator The interpolator in use.
+---@param name any? The name of a stream.
+---@return StreamCategory? category
 function Library.StreamCategory(interpolator, name)
     if not IS_CLIENT or not name then
         return
@@ -200,8 +200,8 @@ function Library.StreamCategory(interpolator, name)
 end
 
 ---Strips rich text colors from a string.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param input unknown? The input text.
+---@param interpolator Interpolator The interpolator in use.
+---@param input any? The input text.
 ---@return string formatted
 function Library.StripColors(interpolator, input)
     input = tostring(input or ''):gsub('<RGB:[%d,.]*>', '')
@@ -210,8 +210,8 @@ end
 
 ---Removes a tag from the `tags` token.
 ---This fails if there is no `tags` token or it is not a multimap.
----@param interpolator omichat.Interpolator The interpolator in use.
----@param tag unknown The tag to remove.
+---@param interpolator Interpolator The interpolator in use.
+---@param tag any The tag to remove.
 function Library.RemoveTag(interpolator, tag)
     tag = tag and tostring(tag)
     if not tag or #tag == 0 then

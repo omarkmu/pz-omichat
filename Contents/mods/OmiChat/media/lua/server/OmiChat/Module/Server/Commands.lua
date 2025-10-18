@@ -1,24 +1,26 @@
+---@namespace omichat
 ---Handlers for processing commands on the server.
 
 if isClient() then return end
 
-local API = require 'OmiChat/Module/Server/Core' ---@class omichat.api.server
+---@class(partial) api.server
+local API = require 'OmiChat/Module/Server/Core'
 local config = API.Configuration
 local utils = API.utils
 
 
 ---Contains server handlers for chat commands.
----@class omichat.api.server.commands
+---@class api.server.commands
 local Command = {}
 
 
 ---Handles the `/addlanguage` command.
 ---@param player IsoPlayer The requesting player.
----@param args omichat.request.Args.Command Arguments with command information.
+---@param args request.Args.Command Arguments with command information.
 function Command.addLanguage(player, args)
-    args = utils.parseCommandArgs(args.text)
-    local username = args[1]
-    local language = args[2]
+    local parsed = utils.parseCommandArgs(args.text)
+    local username = parsed[1]
+    local language = parsed[2]
 
     local err
     local success = false
@@ -29,9 +31,10 @@ function Command.addLanguage(player, args)
             fromCommand = true,
             value = language,
         })
+
+        username = utils.escapeRichText(username)
     end
 
-    username = utils.escapeRichText(username)
     if not success then
         if err == 'FULL' then
             API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_AddLanguageFull', { username })
@@ -66,10 +69,10 @@ end
 
 ---Handles the `/reseticon` command.
 ---@param player IsoPlayer The requesting player.
----@param args omichat.request.Args.Command Arguments with command information.
+---@param args request.Args.Command Arguments with command information.
 function Command.resetIcon(player, args)
-    args = utils.parseCommandArgs(args.text)
-    local username = args[1]
+    local parsed = utils.parseCommandArgs(args.text)
+    local username = parsed[1]
 
     local err
     local success = false
@@ -79,9 +82,10 @@ function Command.resetIcon(player, args)
             field = 'icon',
             fromCommand = true,
         })
+
+        username = utils.escapeRichText(username)
     end
 
-    username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
             API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
@@ -97,10 +101,10 @@ end
 
 ---Handles the `/resetlanguages` command.
 ---@param player IsoPlayer The requesting player.
----@param args omichat.request.Args.Command Arguments with command information.
+---@param args request.Args.Command Arguments with command information.
 function Command.resetLanguages(player, args)
-    args = utils.parseCommandArgs(args.text)
-    local username = args[1]
+    local parsed = utils.parseCommandArgs(args.text)
+    local username = parsed[1]
 
     local err
     local success = false
@@ -110,9 +114,10 @@ function Command.resetLanguages(player, args)
             field = 'languages',
             fromCommand = true,
         })
+
+        username = utils.escapeRichText(username)
     end
 
-    username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
             API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
@@ -128,10 +133,10 @@ end
 
 ---Handles the `/resetname` command.
 ---@param player IsoPlayer The requesting player.
----@param args omichat.request.Args.Command Arguments with command information.
+---@param args request.Args.Command Arguments with command information.
 function Command.resetName(player, args)
-    args = utils.parseCommandArgs(args.text)
-    local username = args[1]
+    local parsed = utils.parseCommandArgs(args.text)
+    local username = parsed[1]
 
     local err
     local success = false
@@ -141,9 +146,10 @@ function Command.resetName(player, args)
             field = 'nickname',
             fromCommand = true,
         })
+
+        username = utils.escapeRichText(username)
     end
 
-    username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
             API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
@@ -159,11 +165,11 @@ end
 
 ---Handles the `/seticon` command.
 ---@param player IsoPlayer The requesting player.
----@param args omichat.request.Args.Command Arguments with command information.
+---@param args request.Args.Command Arguments with command information.
 function Command.setIcon(player, args)
-    args = utils.parseCommandArgs(args.text)
-    local username = args[1]
-    local icon = args[2]
+    local parsed = utils.parseCommandArgs(args.text)
+    local username = parsed[1]
+    local icon = parsed[2]
 
     local err
     local success = false
@@ -174,9 +180,10 @@ function Command.setIcon(player, args)
             value = icon,
             fromCommand = true,
         })
+
+        username = utils.escapeRichText(username)
     end
 
-    username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
             API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
@@ -192,11 +199,11 @@ end
 
 ---Handles the `/setlanguageslots` command.
 ---@param player IsoPlayer The requesting player.
----@param args omichat.request.Args.Command Arguments with command information.
+---@param args request.Args.Command Arguments with command information.
 function Command.setLanguageSlots(player, args)
-    args = utils.parseCommandArgs(args.text)
-    local username = args[1]
-    local slots = args[2]
+    local parsed = utils.parseCommandArgs(args.text)
+    local username = parsed[1]
+    local slots = parsed[2]
 
     local err
     local success = false
@@ -207,9 +214,10 @@ function Command.setLanguageSlots(player, args)
             fromCommand = true,
             value = slots,
         })
+
+        username = utils.escapeRichText(username)
     end
 
-    username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
             API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
@@ -225,11 +233,11 @@ end
 
 ---Handles the `/setname` command.
 ---@param player IsoPlayer The requesting player.
----@param args omichat.request.Args.Command Arguments with command information.
+---@param args request.Args.Command Arguments with command information.
 function Command.setName(player, args)
-    args = utils.parseCommandArgs(args.text)
-    local username = args[1]
-    local name = args[2]
+    local parsed = utils.parseCommandArgs(args.text)
+    local username = parsed[1]
+    local name = parsed[2]
 
     local err
     local success = false
@@ -240,9 +248,11 @@ function Command.setName(player, args)
             value = name,
             fromCommand = true,
         })
+
+        username = utils.escapeRichText(username)
+        name = utils.escapeRichText(name)
     end
 
-    username = utils.escapeRichText(username)
     if not success then
         if err == 'UNKNOWN_PLAYER' then
             API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
@@ -253,7 +263,6 @@ function Command.setName(player, args)
         return
     end
 
-    name = utils.escapeRichText(name)
     API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_SetNameOther', { username, name })
 end
 
@@ -261,10 +270,9 @@ end
 API.commands = Command
 return Command
 
-
 --#region Type Definitions
 
----@alias omichat.request.CommandName
+---@alias request.ChatCommandName
 ---| 'addLanguage'
 ---| 'clearNames'
 ---| 'resetIcon'

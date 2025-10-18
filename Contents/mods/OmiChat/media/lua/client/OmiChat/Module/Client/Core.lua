@@ -1,10 +1,7 @@
+---@namespace omichat
 ---API functionality exclusive to the client.
----@class omichat.api.client : omichat.api.shared
----@field utils omichat.utils.client
----@field private _chatFormatters table<integer, omichat.MetaFormatter> Associates formatter IDs to MetaFormatters for chat streams.
----@field private _emotes table<string, string | omichat.EmoteHandler> Associates emote names to emotes or handler functions.
----@field private _metadataFormatters table<omichat.FormatterName, omichat.MetaFormatter> Associates formatter names to formatters for metadata.
----@field private _typingInfo table<string, omichat.TypingInformation> Associates usernames to information about typing status.
+---@class(partial) api.client : api.shared
+---@field utils utils.client
 local API = require 'OmiChat/Shared'
 
 require 'Chat/ISChat'
@@ -20,18 +17,36 @@ API.Stream = require 'OmiChat/Component/Stream'
 API.ChatStream = require 'OmiChat/Component/ChatStream'
 API.CommandStream = require 'OmiChat/Component/CommandStream'
 
----Contains various utility functions.
----@class omichat.utils.client : omichat.utils
-local utils = API.utils
-utils.lib = lib
-utils.ui = lib.ui
-
-
 --#region Static Fields
 
+---Contains various utility functions.
+---@class utils.client : utils
+local utils = API.utils
+
+---Reference to the library module.
+utils.lib = lib
+
+---Contains UI utilities.
+utils.ui = lib.ui
+
+---Associates formatter IDs to MetaFormatters for chat streams.
+---@type table<integer, MetaFormatter>
+---@private
 API._chatFormatters = {}
+
+---Associates formatter names to formatters for metadata.
+---@type table<FormatterName, MetaFormatter>
+---@private
 API._metadataFormatters = {}
+
+---Associates usernames to information about typing status.
+---@type table<string, TypingInformation>
+---@private
 API._typingInfo = {}
+
+---Associates emote names to emotes or handler functions.
+---@type table<string, string | EmoteHandler>
+---@private
 API._emotes = {
     yes = 'yes',
     no = 'no',
@@ -74,9 +89,9 @@ API._emotes = {
 API._discordStream = API.ChatStream:new {
     name = 'discord',
     chatType = 'general',
-    chatFormat = API.Configuration.Discord.ChatFormat,
-    defaultColor = API.Configuration.Discord.DefaultColor,
-    tags = API.Configuration.Discord.Tags,
+    chatFormat = config.Discord.ChatFormat,
+    defaultColor = config.Discord.DefaultColor,
+    tags = config.Discord.Tags,
     autoTags = { 'IsDiscordStream' },
 }
 
@@ -85,9 +100,9 @@ API._discordStream = API.ChatStream:new {
 API._radioStream = API.ChatStream:new {
     name = 'radio',
     chatType = 'radio',
-    chatFormat = API.Configuration.Radio.ChatFormat,
-    defaultColor = API.Configuration.Radio.DefaultColor,
-    tags = API.Configuration.Radio.Tags,
+    chatFormat = config.Radio.ChatFormat,
+    defaultColor = config.Radio.DefaultColor,
+    tags = config.Radio.Tags,
     autoTags = { 'IsRadioStream' },
 }
 
@@ -96,9 +111,9 @@ API._radioStream = API.ChatStream:new {
 API._serverStream = API.ChatStream:new {
     name = 'server',
     chatType = 'server',
-    chatFormat = API.Configuration.ServerMessages.ChatFormat,
-    defaultColor = API.Configuration.ServerMessages.DefaultColor,
-    tags = API.Configuration.ServerMessages.Tags,
+    chatFormat = config.ServerMessages.ChatFormat,
+    defaultColor = config.ServerMessages.DefaultColor,
+    tags = config.ServerMessages.Tags,
     autoTags = { 'IsServerStream' },
 }
 
@@ -217,7 +232,7 @@ API._rollCommand = API.CommandStream:new {
 
         local command = utils.trim(ctx.text)
         local first = command:split(' ')[1]
-        local sides = first and tonumber(first)
+        local sides = utils.tointeger(first)
         if not sides and #command == 0 then
             sides = 6
         elseif not sides then

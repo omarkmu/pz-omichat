@@ -1,3 +1,4 @@
+---@namespace omichat
 ---Information about the tokens and options that format strings accept.
 
 local utils = require 'OmiChat/Utils'
@@ -19,6 +20,7 @@ local TOKENS_MENU_NAME = {
     'menuType',
 }
 
+---@type (FormatDataTranslation | string)[]
 local TOKENS_OVERHEAD_NO_NARRATIVE = {
     'chatType',
     'input',
@@ -33,6 +35,7 @@ local TOKENS_OVERHEAD_NO_NARRATIVE = {
     'sneakCallout',
 }
 
+---@type (FormatDataTranslation | string)[]
 local TOKENS_CHAT_NO_NARRATIVE = {
     'admin',
     'stream',
@@ -61,7 +64,7 @@ local TOKENS_CHAT_NO_NARRATIVE = {
     'sides',
 }
 
----@type (omichat.FormatDataTranslation | string)[]
+---@type (FormatDataTranslation | string)[]
 local TOKENS_CHAT_PROCESSED = {
     'tag',
     'chatType',
@@ -115,15 +118,15 @@ local TOKENS_OVERHEAD = utils.appendCopy(TOKENS_OVERHEAD_NO_NARRATIVE, TOKENS_NA
 --#endregion
 
 
----@class omichat.FormatData
+---@class FormatData
 ---@field tokenDescription string? A string ID for the description of a format's tokens.
 ---@field optionDescription string? A string ID for the description of a format's options.
----@field tokens (omichat.FormatDataTranslation | string)[]? A list of token names or translation tables.
----@field options (omichat.FormatDataTranslation | string)[]? A list of option names or translation tables.
+---@field tokens (FormatDataTranslation | string)[]? A list of token names or translation tables.
+---@field options (FormatDataTranslation | string)[]? A list of option names or translation tables.
 ---@field canSetError boolean? Flag for whether the format can set the error tokens.
 
 
----@type table<string, omichat.FormatData>
+---@type table<string, FormatData>
 return {
     Callouts_Format = {
         tokens = TOKENS_OVERHEAD,
