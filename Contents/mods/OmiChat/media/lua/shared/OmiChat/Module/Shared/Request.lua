@@ -13,7 +13,6 @@ local API_S = API
 local utils = API.utils
 local config = API.Configuration
 
-local sqrt = math.sqrt
 local unpack = unpack
 local format = string.format
 local getTimestampMs = getTimestampMs
@@ -598,12 +597,8 @@ function Request._shouldSendTyping(sender, receiver, range, chatType)
         return false
     end
 
-    if range then
-        local xDiff = receiver:getX() - sender:getX()
-        local yDiff = receiver:getY() - sender:getY()
-        if sqrt(xDiff * xDiff + yDiff * yDiff) > range then
-            return false
-        end
+    if range and receiver:getDistanceSq(sender) > range * range then
+        return false
     end
 
     if chatType == 'faction' then

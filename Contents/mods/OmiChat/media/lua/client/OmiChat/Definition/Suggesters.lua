@@ -284,11 +284,7 @@ return {
 
                 local outOfRange = false
                 if isRanged and range > 0 then
-                    local dist = API.player.getDistanceFrom(utils.getPlayerByUsername(username))
-
-                    if not dist or dist > range then
-                        outOfRange = true
-                    end
+                    outOfRange = not API.player.isWithinRange(range, utils.getPlayerByUsername(username))
                 end
 
                 local playerData = not outOfRange and API.data.getPlayerInfoByUsername(username, true)

@@ -9,6 +9,7 @@ local config = API.Configuration
 local concat = table.concat
 local sqrt = math.sqrt
 local getText = getText
+local getSpecificPlayer = getSpecificPlayer
 local ISChat = ISChat ---@type ISChat
 
 
@@ -152,10 +153,7 @@ function Player.getDistanceFrom(otherPlayer, player)
         return
     end
 
-    local xDiff = otherPlayer:getX() - player:getX()
-    local yDiff = otherPlayer:getY() - player:getY()
-
-    return sqrt(xDiff * xDiff + yDiff * yDiff)
+    return sqrt(otherPlayer:getDistanceSq(player))
 end
 
 ---Gets a list of the local player's known roleplay languages.
@@ -233,6 +231,25 @@ end
 function Player.isDeadOrUnavailable()
     local player = getSpecificPlayer(0)
     return not player or player:isDead()
+end
+
+---Checks whether the local player's distance to another player is within the given range.
+---Returns `nil` if either player is unavailable.
+---@param otherPlayer IsoPlayer? The other player to check. If this is `nil`, returns `false`.
+---@param player IsoPlayer? The local player. Will be retrieved if not given.
+---@param range number The range to check.
+---@return boolean inRange
+function Player.isWithinRange(range, otherPlayer, player)
+    if not otherPlayer then
+        return false
+    end
+
+    player = player or getSpecificPlayer(0)
+    if not player then
+        return false
+    end
+
+    return otherPlayer:getDistanceSq(player) <= range * range
 end
 
 ---Checks whether the local player knows a given roleplay language.
