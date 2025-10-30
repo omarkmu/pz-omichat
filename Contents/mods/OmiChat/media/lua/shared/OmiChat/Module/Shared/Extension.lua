@@ -60,9 +60,9 @@ end
 
 ---Adds a function that should be available to all interpolator patterns.
 ---@param name string The name of the new interpolation function.
----@param func InterpolatorFunction The function to execute when the interpolation function is used.
+---@param func omi.InterpolatorFunction The function to execute when the interpolation function is used.
 function Extension.registerInterpolatorFunction(name, func)
-    utils.Interpolator.register(name, func)
+    utils.lib.interpolate.register(name, func)
 end
 
 ---Removes a custom preset.

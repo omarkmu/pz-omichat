@@ -16,7 +16,7 @@ local Helpers = Library.Helpers
 
 ---Adds a tag to `tags` token.
 ---This fails if there is no `tags` token or it is not a multimap.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@param tag any The tag to add.
 function Library.AddTag(interpolator, tag)
     tag = tag and tostring(tag)
@@ -33,7 +33,7 @@ function Library.AddTag(interpolator, tag)
 end
 
 ---Capitalizes the first non-invisible character of a string.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@param ...any Arguments passed to the interpolator function. Combined and converted into a string.
 ---@return string capitalized
 function Library.Capitalize(interpolator, ...)
@@ -41,7 +41,7 @@ function Library.Capitalize(interpolator, ...)
 end
 
 ---Colors actions in a string based on the streams tagged with `ActionColorTarget`.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@param message any? The message text.
 ---@param options any? A multimap of options.
 ---@return string? formatted
@@ -61,7 +61,7 @@ function Library.ColorActions(interpolator, message, options)
 end
 
 ---Colors quotes in a string based on the streams tagged with `QuoteColorTarget`.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@param message any? The message text.
 ---@param options any? A multimap of options.
 ---@return string? formatted
@@ -85,7 +85,7 @@ end
 
 ---Validates that the message is not being sent with a signed language.
 ---Sets an error token if it is.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@param options any? A multimap of options.
 ---@return boolean isAllowed
 function Library.DisallowSignedOverRadio(interpolator, options)
@@ -110,7 +110,7 @@ function Library.DisallowSignedOverRadio(interpolator, options)
 end
 
 ---Formats text that indicates the radio channel a message was sent over.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@param ...any Arguments passed to the interpolator function. Combined and converted into a string.
 ---@return string formatted
 function Library.FormatRadio(interpolator, ...)
@@ -123,7 +123,7 @@ function Library.FormatRadio(interpolator, ...)
 end
 
 ---Returns a partial quote representing a fragment of what a player character understood.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@param message string The message to fragment.
 ---@return string? fragmented
 function Library.Fragmented(interpolator, message)
@@ -131,7 +131,7 @@ function Library.Fragmented(interpolator, message)
 end
 
 ---Checks the `tags` token for a tag.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@param tag any The tag to check for.
 ---@return boolean hasTag Whether the tag is present. If there is no `tags` token or it is not a multimap, `false`.
 function Library.HasTag(interpolator, tag)
@@ -149,7 +149,7 @@ function Library.HasTag(interpolator, tag)
 end
 
 ---Returns text without invisible wrapping characters used for mod functionality.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@param ...any Arguments passed to the interpolator function. Combined and converted into a string.
 ---@return string
 function Library.Internal(interpolator, ...)
@@ -157,7 +157,7 @@ function Library.Internal(interpolator, ...)
 end
 
 ---Returns whether the given language is signed.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@param language any
 ---@return boolean isSigned
 function Library.IsSigned(interpolator, language)
@@ -165,7 +165,7 @@ function Library.IsSigned(interpolator, language)
 end
 
 ---Wraps text in parentheses.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@param ...any Arguments passed to the interpolator function. Combined and converted into a string.
 ---@return string formatted
 function Library.Parens(interpolator, ...)
@@ -173,7 +173,7 @@ function Library.Parens(interpolator, ...)
 end
 
 ---Adds punctuation to a string if it isn't already present.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@param input any? The string to punctuate.
 ---@param punctuation any? The punctuation character to use. Defaults to `.`.
 ---@param characters any? Characters to treat as punctuation. Defaults to using the punctuation string pattern.
@@ -183,7 +183,7 @@ function Library.Punctuate(interpolator, input, punctuation, characters)
 end
 
 ---Returns the stream category given a stream name.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@param name any? The name of a stream.
 ---@return StreamCategory? category
 function Library.StreamCategory(interpolator, name)
@@ -200,7 +200,7 @@ function Library.StreamCategory(interpolator, name)
 end
 
 ---Strips rich text colors from a string.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@param input any? The input text.
 ---@return string formatted
 function Library.StripColors(interpolator, input)
@@ -210,7 +210,7 @@ end
 
 ---Removes a tag from the `tags` token.
 ---This fails if there is no `tags` token or it is not a multimap.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@param tag any The tag to remove.
 function Library.RemoveTag(interpolator, tag)
     tag = tag and tostring(tag)

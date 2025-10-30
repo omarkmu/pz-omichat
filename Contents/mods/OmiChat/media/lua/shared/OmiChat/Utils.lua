@@ -2,7 +2,6 @@
 ---Utility functions.
 
 local lib = require 'OmiLibrary'
-local Interpolator = require 'OmiChat/Component/Interpolator'
 
 local min = math.min
 local pow = math.pow
@@ -19,7 +18,13 @@ local INVISIBLE_PATTERN = '['
 ---@class utils : omi.proxy
 local utils = lib.proxy('OmiChat')
 
-utils.Interpolator = Interpolator
+---The interpolator used for basic interpolation.
+---@private
+utils._interpolator = lib.interpolate.Interpolator:new()
+
+---The interpolator used for interpolation without character entities.
+---@private
+utils._noEntityInterpolator = lib.interpolate.Interpolator:new({ allowCharacterEntities = false })
 
 
 local API_C ---@type api.client?
@@ -508,10 +513,10 @@ function utils.interpolateRaw(text, tokens, seed, noEntities)
         return ''
     end
 
-    local interpolator = Interpolator.getOrCreate(text, noEntities)
+    local interpolator = noEntities and utils._noEntityInterpolator or utils._interpolator
     interpolator:randomseed(seed) -- always seed to avoid content changing on refresh
 
-    return interpolator:interpolateRaw(tokens)
+    return interpolator:interpolateRaw(text, tokens)
 end
 
 ---Checks whether a byte value is an invisible character used for encoding mod information.

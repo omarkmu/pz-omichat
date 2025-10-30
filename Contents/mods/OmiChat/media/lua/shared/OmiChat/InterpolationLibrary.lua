@@ -1,15 +1,16 @@
 ---@namespace omichat
 ---Interpolation function library.
+---@diagnostic disable: access-invisible
 
----@class(partial) Interpolator
-local Interpolator = require 'OmiChat/Component/Interpolator'
+
 local Library = require 'OmiChat/Module/InterpolationLibrary/Core'
+local utils = require 'OmiChat/Utils'
 
 require 'OmiChat/Module/InterpolationLibrary/Defaults'
 require 'OmiChat/Module/InterpolationLibrary/Utility'
 
 
-Interpolator.Library = Library
-
+utils._interpolator:addLibraries(Library --[[@as table]])
+utils._noEntityInterpolator:addLibraries(Library --[[@as table]])
 
 return Library

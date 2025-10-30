@@ -9,7 +9,7 @@ local sort = table.sort
 local utils = API.utils
 local config = API.Configuration
 local MultiMap = utils.MultiMap
-local baseLib = utils.lib.interpolate.Interpolator.Libraries
+local baseLib = utils.lib.interpolate.Libraries
 local stringLib = baseLib.string
 
 local IS_CLIENT = not isServer()
@@ -172,7 +172,7 @@ end
 
 ---Checks whether the language being sent is signed and returns an error ID if it is.
 ---The translation of the error assumes the stream is intended to be a "radio" channel for RP purposes.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@return string? errorID The string ID of the error message.
 function Helpers.checkSignedOverRadio(interpolator)
     local language = interpolator:token('languageRaw')
@@ -355,7 +355,7 @@ end
 
 ---Formats actions based on the embedded action format.
 ---@param segments MessageSegment[] The message segments list.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 function Helpers.formatEmbeddedActions(segments, interpolator)
     local tokens = interpolator:getTokens()
 
@@ -379,7 +379,7 @@ end
 
 ---Formats quotes based on the embedded quote format.
 ---@param segments MessageSegment[] The message segments list.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 function Helpers.formatEmbeddedQuotes(segments, interpolator)
     local tokens = interpolator:getTokens()
 
@@ -518,7 +518,7 @@ function Helpers.getColorFromTarget(colorTag, options, tags)
 end
 
 ---Returns a partial quote representing a fragment of what a player character understood.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@param message string The message text.
 ---@return string? fragmented The message text, fragmented to only include some words.
 function Helpers.getFragmentedMessage(interpolator, message)
@@ -670,7 +670,7 @@ end
 
 ---Gets the string to display when an out-of-range chat is perceived.
 ---@param author string The author of the message.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@param tags omi.SetTable<string> A set of tags.
 ---@return string text A translated string indicating that a message was out-of-range, but perceived.
 function Helpers.getPerceivedChatString(author, interpolator, tags)
@@ -694,7 +694,7 @@ function Helpers.getPerceivedChatString(author, interpolator, tags)
 end
 
 ---Gets the prefix to use for a message to indicate that it was sent over the radio.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@param tags omi.SetTable<string> A set of tags.
 ---@return string prefix A translated string indicating a radio message and its frequency, or an "over radio" indicator.
 function Helpers.getRadioPrefix(interpolator, tags)
@@ -741,7 +741,7 @@ function Helpers.getVolumeIndicator(options, tags, shouldTranslate)
 end
 
 ---Gets the value of an option, or a token as a fallback.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@param options omi.MultiMap A multimap of options.
 ---@param key string The key to use to retrieve the option.
 ---@param token string? The token to retrieve from the interpolator. Defaults to `key`.
@@ -757,7 +757,7 @@ end
 
 ---Gets the value of an option, or a token as a fallback.
 ---If there's both an option and a token, the value of the option is wrapped in the same characters from the token.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@param options omi.MultiMap A multimap of options.
 ---@param key string The key to use to retrieve the option.
 ---@param token string? The token to retrieve from the interpolator. Defaults to `key`.
@@ -824,7 +824,7 @@ function Helpers.readOptions(args)
 end
 
 ---Reads tags from an interpolator.
----@param interpolator Interpolator The interpolator in use.
+---@param interpolator omi.Interpolator The interpolator in use.
 ---@return omi.SetTable<string> tags A set of tags.
 function Helpers.readTags(interpolator)
     local tags
@@ -950,7 +950,7 @@ return Helpers
 ---@field onlyFirstSegment? boolean Flag for whether only the first segment should be returned.
 
 ---@class Args.PerformSharedOperations
----@field interpolator Interpolator The interpolator in use.
+---@field interpolator omi.Interpolator The interpolator in use.
 ---@field options omi.MultiMap A multimap of options.
 ---@field tags omi.SetTable<string> A set of tags.
 ---@field input string The input text.

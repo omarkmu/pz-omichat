@@ -30,5 +30,4 @@ function API._onInitGlobalModData()
 end
 
 
-Events.EveryDays.Add(API.utils.Interpolator.cleanupCache)
 Events.OnInitGlobalModData.Add(API._onInitGlobalModData)
