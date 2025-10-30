@@ -3,12 +3,10 @@
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
-local MessageInfo = require 'OmiChat/Component/MessageInfo'
 
 local utils = API.utils
 local config = API.Configuration
 local MultiMap = utils.MultiMap
-local isempty = table.isempty
 
 
 ---Contains functions for formatting messages and validating the format of commands.
@@ -23,7 +21,7 @@ local Format = {}
 ---@return string original The original message text.
 function Format.buildMessageInfo(message, skipFormatting)
     ---@type MessageInfo
-    local info = MessageInfo:new(message)
+    local info = API.MessageInfo:new(message)
     local text = info:getRawText()
 
     info:applyTransforms(API._transformers)
@@ -175,38 +173,9 @@ end
 
 ---Decodes information encoded in a message's tag.
 ---@param message Message The message with the tag to decode.
----@param metadata table? A table to populate with the metadata. This will be cleared before populating.
----@return MessageInfo.Metadata metadata
-function Format.decodeMessageMetadata(message, metadata)
-    local tag = message:getCustomTag()
-
-    metadata = metadata or {} ---@type MessageInfo.Metadata
-    table.wipe(metadata)
-    if not tag or tag == '' then
-        return metadata
-    end
-
-    local _, decoded = utils.json.tryDecode(tag)
-    if type(decoded) ~= 'table' then
-        return metadata
-    end
-
-    metadata.faction = decoded.faction
-    metadata.rangeResult = decoded.rangeResult
-    metadata.suppressedRadio = decoded.suppressedRadio
-    metadata.attractedZombies = decoded.attractedZombies
-    metadata.language = decoded.language
-    metadata.name = decoded.name
-    metadata.nameColor = utils.color.fromString(decoded.nameColor)
-    metadata.recipientNameColor = utils.color.fromString(decoded.recipientNameColor)
-    metadata.icon = decoded.icon
-    metadata.adminIcon = decoded.adminIcon
-    metadata.stream = decoded.stream
-    metadata.originalStream = decoded.originalStream
-    metadata.displayedOverhead = decoded.displayedOverhead
-    metadata.mentions = decoded.mentions
-
-    return metadata
+---@return MessageMetadata metadata
+function Format.decodeMessageMetadata(message)
+    return API.MessageMetadata:new(message)
 end
 
 ---Encodes message information including chat name and colors into a message's metadata.
@@ -290,7 +259,8 @@ end
 ---@param message Message The message to check.
 ---@return boolean hasMetadata
 function Format.hasEncodedMetadata(message)
-    return not isempty(Format.decodeMessageMetadata(message))
+    local meta = API.MessageMetadata:new(message)
+    return not meta:isEmpty()
 end
 
 ---Text entry validator that validates against the nickname filter.

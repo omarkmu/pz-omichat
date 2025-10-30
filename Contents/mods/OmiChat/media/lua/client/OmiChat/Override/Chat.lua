@@ -79,7 +79,7 @@ function ISChat.addLineInChat(message, tabID)
             end
 
             if info:shouldAttractZombies(username) then
-                soundRange = info:getZombieAttractionRange()
+                soundRange = info.zombieAttractRange
             end
         end
     end
@@ -95,7 +95,7 @@ function ISChat.addLineInChat(message, tabID)
         addSound(player, player:getX(), player:getY(), player:getZ(), soundRange, soundRange)
 
         if info then
-            info:setMetadataAttractedZombies()
+            info.meta:set('attractedZombies', true)
         end
     end
 end

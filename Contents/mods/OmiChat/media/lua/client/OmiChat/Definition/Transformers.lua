@@ -59,7 +59,7 @@ return {
                 local faction = player and Faction.getPlayerFaction(player)
                 local name = faction and faction:getName() or ''
                 info.tokens.faction = name
-                info:setMetadataFaction(name)
+                info.meta:setFaction(name)
 
                 return
             elseif chatType == 'server' then
@@ -341,7 +341,7 @@ return {
                     language = API.format.decodeLanguage(text)
 
                     if language then
-                        info:setMetadataLanguage(language)
+                        info.meta:setLanguage(language)
                     end
                 end
             end
@@ -380,17 +380,17 @@ return {
             local username = player and player:getUsername()
             if not isRadio and username and info:getAuthor() == username then
                 -- everyone understands themselves
-                info:setMetadataLanguageResult('known-language')
+                info.meta:setLanguageResult('known-language')
                 return
             elseif language and API.player.knowsLanguage(language) then
                 -- if they understand the language, we're done here
-                info:setMetadataLanguageResult('known-language')
+                info.meta:setLanguageResult('known-language')
                 return
             end
 
             -- they didn't understand it
             info:setUseUnknownLanguageText(true)
-            info:setMetadataLanguageResult('unknown-language')
+            info.meta:setLanguageResult('unknown-language')
             info.tokens.unknownLanguage = language
             info.tags.IsUnknownLanguage = true
         end,
@@ -442,7 +442,7 @@ return {
             local useColors = info:shouldUseMentionColors()
 
             local i = 1
-            local mentions = {} ---@type MessageInfo.Metadata.Mention[]
+            local mentions = {} ---@type MessageMetadata.Mention[]
 
             info.content = text:gsub('%s*<@%d+:.->%s*', function(match)
                 local leading, onlineID, name, trailing = match:match('(%s*)<@(%d+):(.-)>(%s*)')
@@ -504,7 +504,7 @@ return {
             end)
 
             if not cached then
-                info:setMetadataMentions(mentions)
+                info.meta:setMentions(mentions)
             end
         end,
     },
@@ -548,7 +548,7 @@ return {
             end
 
             if isAdmin() and API.preferences.getIgnoreMessageRange() then
-                info:setMetadataRangeResult('in-range')
+                info.meta:setRangeResult('in-range')
                 return
             end
 
@@ -571,7 +571,7 @@ return {
             end
 
             if not outOfRange then
-                info:setMetadataRangeResult('in-range')
+                info.meta:setRangeResult('in-range')
                 return
             end
 
@@ -592,13 +592,13 @@ return {
 
                 if dist <= range then
                     info:setUsePerceivedText(true)
-                    info:setMetadataRangeResult('in-perception-range')
+                    info.meta:setRangeResult('in-perception-range')
                     return
                 end
             end
 
             info:hide()
-            info:setMetadataRangeResult('out-of-range')
+            info.meta:setRangeResult('out-of-range')
         end,
     },
     {

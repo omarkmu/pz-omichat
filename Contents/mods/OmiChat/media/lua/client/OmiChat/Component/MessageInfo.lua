@@ -3,6 +3,7 @@
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
+local Metadata = require 'OmiChat/Component/MessageMetadata'
 
 local utils = API.utils
 local config = API.Configuration
@@ -28,8 +29,10 @@ local getZomboidRadio = getZomboidRadio
 ---@field stream? Stream The source stream of the message.
 ---@field originalStream? Stream The original stream of a radio message.
 ---@field author string The username of the message author.
+---@field titleID string The string ID of the chat type's tag.
 ---@field zombieAttractRange? number The range at which the message will be heard by zombies.
 ---@field tags omi.SetTable<string> A set of tags to add to the message tokens.
+---@field meta MessageMetadata Metadata attached to the message.
 ---@field private usePerceivedText? boolean Flag for whether the message text should be replaced by the "perception range" text.
 ---@field private useUnknownLanguageText? boolean Flag for whether the message text should be replaced by the unknown language text.
 ---@field private overheadText? string The text to show overhead instead of the message text.
@@ -42,12 +45,10 @@ local getZomboidRadio = getZomboidRadio
 ---@field private tag? string The result of the `FormatTag` option.
 ---@field private timestamp? string The result of the `FormatTimestamp` option.
 ---@field private language? string The result of the `FormatLanguage` option.
----@field private titleID string The string ID of the chat type's tag.
 ---@field private showTitle boolean Flag for whether the message will include the chat type tag.
 ---@field private showTimestamp boolean Flag for whether the message will include a timestamp.
 ---@field private font ChatFont The font size of the message.
 ---@field private color? omi.ColorTable<integer> The message color.
----@field private meta MessageInfo.Metadata Metadata attached to the message.
 local MessageInfo = utils.lib.class()
 
 
@@ -142,7 +143,7 @@ function MessageInfo:applyFormatting()
         self.tag = utils.interpolateNamed('Tag', config.Format.Component.Tag, {
             chatType = chatType,
             stream = self.tokens.stream,
-            tag = getText(self:getTitleID()),
+            tag = getText(self.titleID),
             tags = self.tokens.tags,
             originalTags = self.tokens.originalTags,
         }, seed)
@@ -152,8 +153,8 @@ function MessageInfo:applyFormatting()
         chatType = chatType,
         stream = self.tokens.stream,
         buffyRoll = self.tokens.buffyRoll,
-        icon = self:getIcon(),
-        adminIcon = self:getAdminIcon(),
+        icon = self.meta.icon,
+        adminIcon = self.meta.adminIcon,
         tags = self.tokens.tags,
         originalTags = self.tokens.originalTags,
     }, seed)
@@ -177,7 +178,7 @@ function MessageInfo:applyFormatting()
 
         if nameColorTag ~= '' then
             if not encodedColor then
-                self:setMetadataNameColor(nameColor)
+                self.meta:setNameColor(nameColor)
             end
 
             self.tokens.name = nameColorTag .. self.tokens.name .. ' <POPRGB> '
@@ -193,7 +194,7 @@ function MessageInfo:applyFormatting()
 
             if recipColorTag ~= '' then
                 if not encodedRecipColor then
-                    self:setMetadataRecipientNameColor(recipColor)
+                    self.meta:setRecipientNameColor(recipColor)
                 end
 
                 self.tokens.recipientName = recipColorTag .. self.tokens.recipientName .. ' <POPRGB> '
@@ -324,12 +325,6 @@ function MessageInfo:checkMismatch()
     return false
 end
 
----Gets the admin icon encoded in the message.
----@return string?
-function MessageInfo:getAdminIcon()
-    return self.meta.adminIcon
-end
-
 ---Gets the username of the author of the message.
 ---If there is no author, returns the empty string.
 ---@return string
@@ -374,12 +369,6 @@ function MessageInfo:getFormat()
     return self.format
 end
 
----Gets the icon encoded in the message.
----@return string?
-function MessageInfo:getIcon()
-    return self.meta.icon
-end
-
 ---Gets the text to use as the language indicator in chat.
 ---@return string?
 function MessageInfo:getLanguageText()
@@ -387,33 +376,9 @@ function MessageInfo:getLanguageText()
 end
 
 ---Returns metadata about the message.
----@return MessageInfo.Metadata
+---@return MessageMetadata
 function MessageInfo:getMetadata()
     return self.meta
-end
-
----Gets the roleplay language that was encoded in the message metadata.
----@return string?
-function MessageInfo:getMetadataLanguage()
-    return self.meta.language
-end
-
----Gets the result of language checking stored in the message metadata.
----@return MessageInfo.Metadata.LanguageResult?
-function MessageInfo:getMetadataLanguageResult()
-    return self.meta.languageResult
-end
-
----Gets the result of range checking stored in the message metadata.
----@return MessageInfo.Metadata.RangeResult?
-function MessageInfo:getMetadataRangeResult()
-    return self.meta.rangeResult
-end
-
----Gets the name color encoded in the message.
----@return omi.ColorTable<integer>?
-function MessageInfo:getNameColor()
-    return self.meta.nameColor
 end
 
 ---Gets the original text color of the message.
@@ -446,16 +411,10 @@ function MessageInfo:getOverheadTokens()
     return tokens
 end
 
----Gets the raw message text, without transformations.
+---Gets the raw message text, without modifications.
 ---@return string
 function MessageInfo:getRawText()
     return self.rawText
-end
-
----Gets the recipient name color encoded in the message.
----@return omi.ColorTable<integer>?
-function MessageInfo:getRecipientNameColor()
-    return self.meta.recipientNameColor
 end
 
 ---Gets the stream the message was sent over, if it was able to be decoded.
@@ -480,13 +439,6 @@ end
 ---@return string
 function MessageInfo:getTitleID()
     return self.titleID
-end
-
----Gets the range within which the message should attract zombies.
----A `nil` value indicates that the message should not attract zombies.
----@return number?
-function MessageInfo:getZombieAttractionRange()
-    return self.zombieAttractRange
 end
 
 ---Checks whether content has been set for the message.
@@ -586,64 +538,6 @@ function MessageInfo:setIsSneakCallout(sneakCallout)
     self.sneakCallout = sneakCallout
 end
 
----Sets a value in the message metadata to indicate that zombie attraction has already occurred.
-function MessageInfo:setMetadataAttractedZombies()
-    self:_setMetadataValue('attractedZombies', true)
-end
-
----Sets the faction in the message metadata.
----@param faction string
----@return boolean success
-function MessageInfo:setMetadataFaction(faction)
-    return self:_setMetadataValue('faction', faction)
-end
-
----Sets the language in the message metadata.
----@param language string
----@return boolean success
-function MessageInfo:setMetadataLanguage(language)
-    return self:_setMetadataValue('language', language)
-end
-
----Sets a value in the message metadata to indicate the result of language checking.
----@param result MessageInfo.Metadata.LanguageResult
----@return boolean success
-function MessageInfo:setMetadataLanguageResult(result)
-    return self:_setMetadataValue('languageResult', result)
-end
-
----Sets the results of formatting mentions in the message.
----@param mentions MessageInfo.Metadata.Mention[]
-function MessageInfo:setMetadataMentions(mentions)
-    self:_setMetadataValue('mentions', mentions)
-end
-
----Sets the color to use for the author name in the message metadata.
----@param color omi.ColorTable<integer>
-function MessageInfo:setMetadataNameColor(color)
-    self:_setMetadataValue('nameColor', utils.color.toHexString(color))
-end
-
----Sets a value in the message metadata to indicate the message has already been suppressed for the radio.
----@param suppressed boolean
----@return boolean success
-function MessageInfo:setMetadataRadioSuppressed(suppressed)
-    return self:_setMetadataValue('suppressedRadio', suppressed)
-end
-
----Sets a value in the message metadata to indicate the result of range checking.
----@param result MessageInfo.Metadata.RangeResult
----@return boolean success
-function MessageInfo:setMetadataRangeResult(result)
-    return self:_setMetadataValue('rangeResult', result)
-end
-
----Sets the color to use for the recipient name in the message metadata.
----@param color omi.ColorTable<integer>
-function MessageInfo:setMetadataRecipientNameColor(color)
-    self:_setMetadataValue('recipientNameColor', utils.color.toHexString(color))
-end
-
 ---Sets the text to show overhead for this message.
 ---@param text string?
 ---@param doFullFormatting boolean?
@@ -715,17 +609,14 @@ function MessageInfo:setUseUnknownLanguageText(useUnknownLanguage)
     self.useUnknownLanguageText = useUnknownLanguage
 end
 
----Sets the range within which the message should attract zombies.
----A `nil` value indicates that the message should not attract zombies.
----@param range integer?
-function MessageInfo:setZombieAttractionRange(range)
-    self.zombieAttractRange = range
-end
-
 ---Determines whether a message should attract zombies for a given user.
 ---@param username string
 ---@return boolean
 function MessageInfo:shouldAttractZombies(username)
+    if self.loudCallout or self.sneakCallout then
+        return false
+    end
+
     local range = self.zombieAttractRange
     if not range or self.author ~= username or self.meta.attractedZombies then
         return false
@@ -792,12 +683,6 @@ function MessageInfo:syncTags()
     end
 
     self.tokens.tags = MultiMap.fromSet(self.tags)
-end
-
----Checks whether overhead radio messages were already suppressed for this message.
----@return boolean
-function MessageInfo:wasRadioSuppressed()
-    return self.meta.suppressedRadio == true
 end
 
 
@@ -904,13 +789,6 @@ function MessageInfo:_avoidEmptyMessages()
     end
 end
 
----Decodes information encoded in the message's tag.
----@return MessageInfo.Metadata
----@private
-function MessageInfo:_decodeMetadata()
-    return API.format.decodeMessageMetadata(self.message, self.meta)
-end
-
 ---Gets the best action stream to use for displaying a message.
 ---@return ChatStream? stream
 ---@private
@@ -961,41 +839,11 @@ function MessageInfo:_getMessageStream(skipRadio)
     end
 end
 
----Sets a key in the message's metadata.
----@param key string
----@param value any
----@return boolean success
----@private
-function MessageInfo:_setMetadataValue(key, value)
-    local message = self.message
-    local tag = message:getCustomTag()
-
-    local success, newTag = utils.json.tryDecode(tag)
-    if not success or type(newTag) ~= 'table' then
-        newTag = {}
-    end
-
-    newTag[key] = value
-    local encodedTag = utils.json.tryEncode(newTag)
-    if not encodedTag then
-        -- other data may be bad; throw it out and re-encode
-        encodedTag = utils.json.tryEncode({ key = value })
-    end
-
-    -- if the value is bad, set the original tag
-    message:setCustomTag(encodedTag or tag)
-
-    self:_decodeMetadata() -- update metadata cache
-    return encodedTag ~= nil
-end
-
 ---Reads the stream information from the metadata or the message content.
 ---@private
 function MessageInfo:_setupStreamInfo()
     local meta = self.meta
-    self.stream = self.stream or (meta.stream and API.streams.getChatStream(meta.stream))
-    self.stream = self.stream or self:_getMessageStream()
-
+    self.stream = self.stream or (meta.stream and API.streams.getChatStream(meta.stream)) or self:_getMessageStream()
     self.originalStream = self.originalStream or (meta.originalStream and API.streams.getChatStream(meta.originalStream))
 
     if not self.originalStream and self.stream and self.stream:isRadioStream() then
@@ -1003,11 +851,11 @@ function MessageInfo:_setupStreamInfo()
     end
 
     if self.stream then
-        self:_setMetadataValue('stream', self.stream:getName())
+        meta:set('stream', self.stream:getName())
     end
 
     if self.originalStream then
-        self:_setMetadataValue('originalStream', self.originalStream:getName())
+        meta:set('originalStream', self.originalStream:getName())
     end
 
     self.tags = self.stream and self.stream:getTags() or {}
@@ -1021,7 +869,7 @@ function MessageInfo:_showReplacementOverheadText()
         return
     end
 
-    self:_setMetadataValue('displayedOverhead', true)
+    self.meta:set('displayedOverhead', true)
 
     local authorPlayer = utils.getPlayerByUsername(self.author)
     if not authorPlayer then
@@ -1074,7 +922,7 @@ function MessageInfo:_suppressRadioOverhead()
         return
     end
 
-    self:setMetadataRadioSuppressed(true) -- avoid doing this again
+    self.meta:set('suppressedRadio', true) -- avoid doing this again
 
     -- push the message up with blank text
     local player = getSpecificPlayer(0)
@@ -1115,8 +963,8 @@ function MessageInfo:new(message)
     local this = setmetatable({}, self) --[[@as MessageInfo]]
     local instance = ISChat.instance
 
-    this.meta = {}
     this.context = {}
+    this.meta = Metadata:new(message)
     this.message = message
     this.chatType = API.chat.getMessageChatType(message)
     this.author = message:getAuthor() or ''
@@ -1127,8 +975,6 @@ function MessageInfo:new(message)
     this.font = instance and instance.chatFont or 'medium'
     this.showTitle = instance and instance.showTitle or false
     this.showTimestamp = instance and instance.showTimestamp or false
-
-    this:_decodeMetadata()
 
     if utils.isinstance(message, MimicMessage) then
         this.rawText = message:getTextWithPrefixBase()
@@ -1172,32 +1018,5 @@ return MessageInfo
 ---@field forceFormat? boolean Flag for if the format should be set to the chat's format regardless of whether it's already set.
 ---@field noTagUpdate? boolean Flag for whether the tags shouldn't be updated to include the target stream's tags.
 ---@field overwriteTags? boolean Flag for whether the previous tags should be overwritten with the tags from the target stream, instead of merging.
-
-
----@class MessageInfo.Metadata
----@field language? string The roleplay language in which the message was sent.
----@field name? string The name of the author when this message was sent.
----@field icon? string The user's icon when this message was sent.
----@field adminIcon? string The admin icon when this message was sent, if it was enabled.
----@field nameColor? omi.ColorTable<integer> The name color of the author when this message was sent.
----@field recipientNameColor? omi.ColorTable<integer> The name color of the recipient when this message was sent.
----@field suppressedRadio? boolean Flag for whether the overhead text for this message has already been suppressed on radio.
----@field stream? string The name of the stream the message was sent over.
----@field originalStream? string The name of the original stream a radio message was sent over.
----@field faction? string The name of the faction to which the message was sent.
----@field rangeResult? MessageInfo.Metadata.RangeResult The result of range checking.
----@field languageResult? MessageInfo.Metadata.LanguageResult The result of language checking.
----@field attractedZombies? boolean Flag for whether the message has already attracted zombies.
----@field displayedOverhead? boolean Flag for whether the replacement overhead text has already displayed.
----@field mentions? MessageInfo.Metadata.Mention[] The results of formatting mentions.
-
----@class MessageInfo.Metadata.Mention
----@field color string The color of the mention text.
----@field name? string The name to display in hover text for the mention.
-
-
----@alias MessageInfo.Metadata.LanguageResult 'known-language' | 'unknown-language'
-
----@alias MessageInfo.Metadata.RangeResult 'in-range' | 'out-of-range' | 'in-perception-range'
 
 --#endregion
