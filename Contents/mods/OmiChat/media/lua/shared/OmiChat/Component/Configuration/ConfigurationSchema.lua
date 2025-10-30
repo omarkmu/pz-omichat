@@ -1,5 +1,6 @@
 ---@namespace omichat
 ---Information about the mod's configuration options.
+---@diagnostic disable: access-invisible
 
 local utils = require 'OmiChat/Utils'
 local Helpers = require 'OmiChat/Component/Configuration/ConfigurationHelpers'
@@ -399,7 +400,7 @@ return utils.schema {
     onRead = function(values)
         -- read default languages
         local languages = values.Language.List
-        values._Languages = languages ---@diagnostic disable-line: access-invisible
+        values._Languages = languages
 
         if type(languages) ~= 'table' or values.Language.UseDefaultList then
             languages = Helpers.getDefaultLanguages()
@@ -408,7 +409,7 @@ return utils.schema {
         -- read default stream data
         local streams = values.Streams.List
 
-        values._Streams = streams ---@diagnostic disable-line: access-invisible
+        values._Streams = streams
 
         if type(streams) ~= 'table' or #streams == 0 or values.Streams.UseDefaultList then
             streams = Helpers.getDefaultStreams()
@@ -422,13 +423,16 @@ return utils.schema {
 
     ---@param values Configuration
     sanitize = function(values)
+        -- doesn't do anything, so don't save it to avoid confusion
+        values.General.Preset = nil
+
         values.Streams = values.Streams or {}
         values.Language = values.Language or {}
 
-        values.Streams.List = values._Streams ---@diagnostic disable-line: access-invisible
-        values.Language.List = values._Languages ---@diagnostic disable-line: access-invisible
-        values._Streams = nil ---@diagnostic disable-line: access-invisible
-        values._Languages = nil ---@diagnostic disable-line: access-invisible
+        values.Streams.List = values._Streams
+        values.Language.List = values._Languages
+        values._Streams = nil
+        values._Languages = nil
     end,
 }
 
