@@ -69,14 +69,11 @@ return CommandStream
 
 ---@class Args.CommandStream : Args.Stream
 ---@field helpTextID? string String ID for a help message.
----@field onHelp? Stream.Callback.OnHelp Invoked when the `/help` command is used.
+---@field onHelp? fun(stream: CommandStream) Invoked when the `/help` command is used.
 ---@field allowMentions? boolean Flag for whether mentions should be allowed on this stream. Defaults to `false`.
 
 
 ---@class CommandStream.Callbacks : Stream.Callbacks
----@field onHelp? Stream.Callback.OnHelp Invoked when the `/help` command is used.
-
-
----@alias Stream.Callback.OnHelp fun(stream: CommandStream)
+---@field onHelp? fun(stream: CommandStream) Invoked when the `/help` command is used.
 
 --#endregion

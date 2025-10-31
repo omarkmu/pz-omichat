@@ -45,7 +45,7 @@ API._metadataFormatters = {}
 API._typingInfo = {}
 
 ---Associates emote names to emotes or handler functions.
----@type table<string, string | EmoteHandler>
+---@type table<string, string | fun(player: IsoPlayer, emote: string)>
 ---@private
 API._emotes = {
     yes = 'yes',

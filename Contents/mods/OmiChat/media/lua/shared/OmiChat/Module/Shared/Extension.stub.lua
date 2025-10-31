@@ -5,8 +5,6 @@
 ---@class(partial) api.shared.extension
 local Extension = {}
 
----@alias Hook.Command fun(args: Args.UseStream): boolean?
----@alias Hook.CommandEnabled fun(): boolean?
 
 ---Adds a hook that runs after decoding message content.
 ---@param type 'afterDecodeMessage'
@@ -20,12 +18,12 @@ function Extension.addHook(type, callback) end
 
 ---Adds a hook for the `/card` command.
 ---@param type 'cardCommand'
----@param callback Hook.Command The hook callback function. If this returns `true`, the original command handling will not run.
+---@param callback fun(args: Args.UseStream): boolean? The hook callback function. If this returns `true`, the original command handling will not run.
 function Extension.addHook(type, callback) end
 
 ---Adds a hook for checking whether the `/card` command is enabled.
 ---@param type 'cardCommandEnabled'
----@param callback Hook.CommandEnabled The hook callback function. If this returns `nil`, the original checks will run.
+---@param callback fun(): boolean? The hook callback function. If this returns `nil`, the original checks will run.
 function Extension.addHook(type, callback) end
 
 ---Adds a hook for getting text suggestions for chat.
@@ -45,12 +43,12 @@ function Extension.addHook(type, callback) end
 
 ---Adds a hook for the `/flip` command.
 ---@param type 'flipCommand'
----@param callback Hook.Command The hook callback function. If this returns `true`, the original command handling will not run.
+---@param callback fun(args: Args.UseStream): boolean? The hook callback function. If this returns `true`, the original command handling will not run.
 function Extension.addHook(type, callback) end
 
 ---Adds a hook for checking whether the `/flip` command is enabled.
 ---@param type 'flipCommandEnabled'
----@param callback Hook.CommandEnabled The hook callback function. If this returns `nil`, the original checks will run.
+---@param callback fun(): boolean? The hook callback function. If this returns `nil`, the original checks will run.
 function Extension.addHook(type, callback) end
 
 ---Adds a hook for determining the perception range.
@@ -60,10 +58,10 @@ function Extension.addHook(type, callback) end
 
 ---Adds a hook for the `/roll` command.
 ---@param type 'rollCommand'
----@param callback Hook.Command The hook callback function. If this returns `true`, the original command handling will not run.
+---@param callback fun(args: Args.UseStream): boolean? The hook callback function. If this returns `true`, the original command handling will not run.
 function Extension.addHook(type, callback) end
 
 ---Adds a hook for checking whether the `/roll` command is enabled.
 ---@param type 'rollCommandEnabled'
----@param callback Hook.CommandEnabled The hook callback function. If this returns `nil`, the original checks will run.
+---@param callback fun(): boolean? The hook callback function. If this returns `nil`, the original checks will run.
 function Extension.addHook(type, callback) end

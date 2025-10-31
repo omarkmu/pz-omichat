@@ -471,11 +471,11 @@ return Stream
 ---@field aliases? string[] Additional aliases for the stream.
 ---@field disabled? boolean Flag for whtehr the stream should always be treated as not enabled. Defaults to `false`.
 ---@field category? StreamCategory The stream category, used to determine whether input should be retained.
----@field isEnabled? Stream.Callback.IsEnabled Invoked to check whether the stream should be treated as enabled.
+---@field isEnabled? fun(stream: Stream): boolean Invoked to check whether the stream should be treated as enabled.
 ---@field overheadFormat? string The overhead format to use for the stream.
 ---@field chatFormat? string The format to use for the stream in chat.
----@field onUse? Stream.Callback.OnUse Invoked when the stream is used.
----@field onUseDisabled? Stream.Callback.OnUseDisabled Invoked when the stream is used while disabled.
+---@field onUse? fun(ctx: Args.UseStream) Invoked when the stream is used.
+---@field onUseDisabled? fun(stream: Stream, command: string) Invoked when the stream is used while disabled.
 ---@field allowEmotes? boolean Flag for whether emotes should be allowed on this stream. Defaults to `false`.
 ---@field allowMentions? boolean Flag for whether mentions should be allowed on this stream. Defaults to `true`.
 ---@field suggestSpec? SuggestArgSpec[] Spec to use for suggestions.
@@ -486,16 +486,10 @@ return Stream
 
 
 ---@class Stream.Callbacks
----@field isEnabled? Stream.Callback.IsEnabled Invoked to check whether the stream should be treated as enabled.
----@field onUse? Stream.Callback.OnUse Invoked when the stream is used.
----@field onUseDisabled? Stream.Callback.OnUseDisabled Invoked when the stream is used while disabled.
+---@field isEnabled? fun(stream: Stream): boolean Invoked to check whether the stream should be treated as enabled.
+---@field onUse? fun(ctx: Args.UseStream) Invoked when the stream is used.
+---@field onUseDisabled? fun(stream: Stream, command: string) Invoked when the stream is used while disabled.
 
-
----@alias Stream.Callback.IsEnabled fun(stream: Stream): boolean
-
----@alias Stream.Callback.OnUse fun(ctx: Args.UseStream)
-
----@alias Stream.Callback.OnUseDisabled fun(stream: Stream, command: string)
 
 ---@alias StreamCategory 'chat' | 'rp' | 'other'
 

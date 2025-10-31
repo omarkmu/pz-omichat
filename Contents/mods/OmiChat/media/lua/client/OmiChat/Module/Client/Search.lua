@@ -736,8 +736,8 @@ return Search
 ---@field maxResults? integer The maximum number of search results to return.
 ---@field maxSearch? integer The maximum number of elements to search before terminating.
 ---@field searchDisplay? boolean Flag for whether the display string should be searched.
----@field filter? SearchContext.Filter Filter function for results.
----@field display? SearchContext.MapString Function to retrieve display strings for results.
+---@field filter? fun(value: any, args: string[]): boolean Filter function for results.
+---@field display? fun(value: any, comparisonString: string): string? Function to retrieve display strings for results.
 ---@field args? string[] Arguments for the `filter` function.
 ---@field isTerminated? boolean Flag for terminating the search.
 ---@field exact? SearchResult The last exact match for the search.
@@ -747,8 +747,8 @@ return Search
 ---@field searchForContains? string The search to use for 'contains' comparison. Defaults to the same string as `search`.
 ---@field startsWith search.InternalSearchResult[] Search results that start with the search text.
 ---@field contains search.InternalSearchResult[] Search results that contain the search text, but don't start with it.
----@field mapValue? SearchContext.MapString Callback to map search result values to strings.
----@field mapTexture? SearchContext.MapTexture Callback to map search result values to textures.
+---@field mapValue? fun(value: any, comparisonString: string): string? Callback to map search result values to strings.
+---@field mapTexture? fun(value: any, comparisonString: string): Texture? Callback to map search result values to textures.
 ---@field caseSensitive? boolean Flag for whether the search should be case-sensitive. Defaults to `false`.
 ---@field exactInternal? search.InternalSearchResult The last exact match for the internal search.
 ---@field args string[] Arguments for the `filter` function.
@@ -766,13 +766,5 @@ return Search
 ---@class search.PlayerInfo
 ---@field name string The player's name in chat.
 ---@field username string The player's username.
-
-
----@alias SearchContext.MapString fun(value: any, comparisonString: string): string?
-
----@alias SearchContext.MapTexture fun(value: any, comparisonString: string): Texture?
-
----@alias SearchContext.Filter fun(value: any, args: string[]): boolean
-
 
 --#endregion

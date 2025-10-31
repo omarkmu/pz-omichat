@@ -111,14 +111,14 @@ end
 
 ---Gets a playable emote by name.
 ---@param name string The name of the emote.
----@return (string | EmoteHandler)? emote An emote name or handler function. `Nil` if there's no such emote.
+---@return (string | fun(player: IsoPlayer, emote: string))? emote An emote name or handler function. `Nil` if there's no such emote.
 function Chat.getEmote(name)
     return API._emotes[name]
 end
 
 ---Returns the first emote found from an emote shortcut in the provided text.
 ---@param command string The command to read.
----@return (string | EmoteHandler)? emote An emote name or handler function. `Nil` if there's no such emote.
+---@return (string | fun(player: IsoPlayer, emote: string))? emote An emote name or handler function. `Nil` if there's no such emote.
 ---@return integer? start The start position of the emote in the text.
 ---@return integer? finish The end position of the emote in the text.
 ---@return string? emoteText The emote name from the text.

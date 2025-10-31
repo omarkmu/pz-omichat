@@ -35,7 +35,7 @@ end
 
 ---Adds an emote that is playable from chat with the .emote syntax.
 ---@param name string The name of the emote, as it can be used from chat.
----@param emote (string | EmoteHandler) The string or handler to associate with the emote.
+---@param emote (string | fun(player: IsoPlayer, emote: string)) The string or handler to associate with the emote.
 function Extension.addEmote(name, emote)
     if type(emote) ~= 'function' then
         emote = tostring(emote)
@@ -46,14 +46,14 @@ end
 
 ---Adds a callback that can be triggered by clicking an action in a rich text panel.
 ---@param name string The name of the action.
----@param callback RichTextAction the action callback.
+---@param callback fun(name: string, action: omi.RichTextActionType, ...: string) The action callback.
 function Extension.addRichTextAction(name, callback)
     API.ui._actionHandlers[name] = callback
 end
 
 ---Adds a handler for adding setting context menu options.
 ---@param category SettingCategory The setting category to add to.
----@param callback SettingHandler The setting handler callback.
+---@param callback fun(submenu: ISContextMenu) The setting handler callback.
 function Extension.addSettingHandler(category, callback)
     local tab = API.ui._settingHandlers[category]
     if tab then
@@ -103,7 +103,7 @@ end
 
 ---Registers an argument type for suggester specs.
 ---@param argType string The argument type.
----@param callback Callback.SuggestSearch The suggestion callback.
+---@param callback fun(ctx: SearchContext | string, spec: SuggestArgSpec): SearchResults? The suggestion callback.
 function Extension.addSuggesterType(argType, callback)
     API.suggestion._customArgTypes[argType] = callback
 end
@@ -135,7 +135,7 @@ end
 
 ---Removes a handler for adding setting context menu options.
 ---@param category SettingCategory The setting category to remove from.
----@param callback SettingHandler The setting handler callback to remove.
+---@param callback fun(submenu: ISContextMenu) The setting handler callback to remove.
 function Extension.removeSettingHandler(category, callback)
     local list = API.ui._settingHandlers[category]
     if list then
@@ -219,9 +219,3 @@ end
 
 API.extension = Extension
 return Extension
-
---#region Type Definitions
-
----@alias EmoteHandler fun(player: IsoPlayer, emote: string)
-
---#endregion

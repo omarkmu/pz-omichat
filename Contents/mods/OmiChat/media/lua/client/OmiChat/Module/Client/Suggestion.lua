@@ -20,7 +20,7 @@ local MAX_SEARCH = 100
 local Suggestion = {}
 
 ---Associates names to custom suggestion spec argument type handlers.
----@type table<string, Callback.SuggestSearch>
+---@type table<string, fun(ctx: SearchContext | string, spec: SuggestArgSpec): SearchResults?>
 ---@private
 Suggestion._customArgTypes = {}
 
@@ -45,7 +45,7 @@ end
 
 ---Retrieves the search callback for a suggester argument type.
 ---@param argType string The name of the suggester argument type.
----@return Callback.SuggestSearch? callback
+---@return (fun(ctx: SearchContext | string, spec: SuggestArgSpec): SearchResults?)? callback
 function Suggestion.getArgTypeCallback(argType)
     return Suggestion._customArgTypes[argType]
 end
@@ -396,9 +396,6 @@ return Suggestion
 ---@field searchDisplay? boolean Flag for whether the display string should be used for determining suggestions.
 ---@field filter? fun(result: any, args: string[]): boolean Filter function for results.
 ---@field display? fun(value: any, str: string): string? Function to retrieve display strings for results.
-
-
----@alias Callback.SuggestSearch fun(ctx: SearchContext | string, spec: SuggestArgSpec): SearchResults?
 
 
 ---@alias SuggestArgSpec SuggestArgSpecTable | SuggestionType | string

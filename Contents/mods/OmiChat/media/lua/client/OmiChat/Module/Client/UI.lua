@@ -49,7 +49,7 @@ UI._statusEnabled = false
 UI._statusDisplayByUsername = {}
 
 ---Associates names to handler functions for rich text actions.
----@type table<string, RichTextAction>
+---@type table<string, fun(name: string, action: omi.RichTextActionType, ...: string)>
 ---@private
 UI._actionHandlers = {}
 
@@ -59,7 +59,7 @@ UI._actionHandlers = {}
 UI._customButtons = {}
 
 ---Associates settings categories to lists of handlers for extending settings.
----@type table<SettingCategory, SettingHandler[]>
+---@type table<SettingCategory, fun(submenu: ISContextMenu)[]>
 ---@private
 UI._settingHandlers = {
     admin = {},
@@ -1078,10 +1078,6 @@ API.ui = UI
 return UI
 
 --#region Type Definitions
-
----@alias RichTextAction fun(name: string, action: omi.RichTextActionType, ...: string)
-
----@alias SettingHandler fun(submenu: ISContextMenu)
 
 ---@alias SettingCategory
 ---| 'basic'
