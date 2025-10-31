@@ -10,7 +10,6 @@ local concat = table.concat
 local sqrt = math.sqrt
 local getText = getText
 local getSpecificPlayer = getSpecificPlayer
-local ISChat = ISChat ---@type ISChat
 
 
 ---Contains functions for getting and setting data related to the local player.

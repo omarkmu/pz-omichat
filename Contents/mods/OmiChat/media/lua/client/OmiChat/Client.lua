@@ -6,7 +6,7 @@ local API = require 'OmiChat/Module/Client/Core'
 
 ---List of built-in command streams.
 ---@type CommandStream[]
-API._commandStreams = require 'OmiChat/Definition/Commands'
+API._commandStreams = require 'OmiChat/Component/ChatCommands'
 
 
 require 'OmiChat/Module/Client/Callbacks'
