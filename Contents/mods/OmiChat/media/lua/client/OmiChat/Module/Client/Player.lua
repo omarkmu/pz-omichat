@@ -479,13 +479,6 @@ function Player.updateCharacterName(name, updateSurname)
     end
 
     desc:setForename(forename)
-
-    -- fix incompatibility with buffy's character bios
-    if ISChat.instance and config:compatBuffyCharacterBiosEnabled() then
-        ---@diagnostic disable-next-line: inject-field
-        ISChat.instance.rpName = forename
-    end
-
     if surname then
         desc:setSurname(surname)
     end

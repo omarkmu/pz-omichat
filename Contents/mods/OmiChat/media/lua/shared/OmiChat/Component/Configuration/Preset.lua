@@ -120,8 +120,6 @@ function Preset.compatibility(enable)
     ---@type Configuration.Compatibility
     return {
         ApplyOverrides = true,
-        BuffyCharacterBios = value,
-        BuffyRPGSystem = value,
         ChatBubble = value,
         SearchPlayers = value,
         TrueActionsDancing = value,

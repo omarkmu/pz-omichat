@@ -64,8 +64,6 @@ Sandbox_EN = {
     Sandbox_OmiChat_Compatibility = "Compatibility",
     Sandbox_OmiChat_Compatibility_title = "Compatibility Options",
     Sandbox_OmiChat_Compatibility_ApplyOverrides = "Automatic Overrides",
-    Sandbox_OmiChat_Compatibility_BuffyCharacterBios = "Buffy's Character Bios",
-    Sandbox_OmiChat_Compatibility_BuffyRPGSystem = "Buffy's Tabletop RPG System",
     Sandbox_OmiChat_Compatibility_ChatBubble = "Chat Bubble",
     Sandbox_OmiChat_Compatibility_SearchPlayers = "Search Players For Weapons",
     Sandbox_OmiChat_Compatibility_TrueActionsDancing = "True Actions Act 3 - Dancing",
@@ -264,10 +262,6 @@ Sandbox_EN = {
 
     Sandbox_OmiChat_Compatibility_ApplyOverrides_tooltip = "If enabled, chat functions called by other mods will be intercepted by this mod." ..
         " <BR> For example, if another mod sends a message directly to <SPACE> <PUSHRGB:0,1,0> /say <POPRGB> <SPACE>, this will attempt to apply the configured formatting.",
-    Sandbox_OmiChat_Compatibility_BuffyCharacterBios_tooltip = "Controls compatibility with the <SPACE> <PUSHRGB:0,0.5,1> Buffy's Character Bios <POPRGB> <SPACE> mod." ..
-        " <BR> The compatibility patch fixes an incompatibility with forename-setting commands and uses server message formatting for bio update notifications."
-    Sandbox_OmiChat_Compatibility_BuffyRPGSystem_tooltip = "Controls compatibility with the <SPACE> <PUSHRGB:0,0.5,1> Buffy's Tabletop RPG System <POPRGB> <SPACE> mod." ..
-        " <BR> The compatibility patch provides tokens for roll messages to control their formatting and uses <SPACE> <PUSHRGB:0,1,0> /me <POPRGB> <SPACE> formatting for these messages if the stream is enabled."
     Sandbox_OmiChat_Compatibility_ChatBubble_tooltip = "Controls compatibility with the <SPACE> <PUSHRGB:0,0.5,1> Chat Bubble v0.6 <POPRGB> <SPACE> mod." ..
         " <BR> The compatibility patch prevents image messages from that mod from showing up in chat.",
     Sandbox_OmiChat_Compatibility_SearchPlayers_tooltip = "Controls compatibility with the <SPACE> <PUSHRGB:0,0.5,1> Search Players For Weapons <POPRGB> <SPACE> mod." ..
@@ -439,8 +433,6 @@ Sandbox_EN = {
     Sandbox_OmiChat_tag_AutoPunctuateNarrative = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> AutoPunctuate <POPRGB> , but only applies to narrative style formatting.",
     Sandbox_OmiChat_tag_AutoPunctuateOverhead = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> AutoPunctuate <POPRGB> , but only applies to overhead formatting.",
     Sandbox_OmiChat_tag_BracketedNames = "Indicates that names should be surrounded by square brackets.",
-    Sandbox_OmiChat_tag_BuffyRPGTarget = "Indicates the stream that should be used for formatting messages from the <SPACE> <PUSHRGB:0,0.5,1> Buffy's Tabletop RPG System <POPRGB> <SPACE> mod." ..
-        " <LINE> This has no effect if the compatibility option is not enabled.",
     Sandbox_OmiChat_tag_Callout = "Indicates the stream that should be used for formatting callout messages.",
     Sandbox_OmiChat_tag_CardCommandTarget = "Indicates the stream that should be used for formatting messages from the <SPACE> <PUSHRGB:0,1,0> /card <POPRGB> <SPACE> command.",
     Sandbox_OmiChat_tag_EchoTarget = "Indicates the stream that echo messages should be sent on.",

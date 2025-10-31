@@ -149,7 +149,6 @@ return Preset:new {
                         'CardCommandTarget',
                         'FlipCommandTarget',
                         'RollCommandTarget',
-                        'BuffyRPGTarget',
                         'UseNameColor',
                     },
                 },

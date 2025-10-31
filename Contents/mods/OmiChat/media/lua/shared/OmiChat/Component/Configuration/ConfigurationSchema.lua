@@ -131,8 +131,6 @@ return utils.schema {
 
         Compatibility = container {
             ApplyOverrides = bool(true),
-            BuffyCharacterBios = compat(),
-            BuffyRPGSystem = compat(),
             ChatBubble = compat(),
             SearchPlayers = compat(),
             TrueActionsDancing = compat(),
@@ -515,8 +513,6 @@ return utils.schema {
 
 ---@class Configuration.Compatibility
 ---@field ApplyOverrides boolean
----@field BuffyCharacterBios omi.schema.CompatibilityValue
----@field BuffyRPGSystem omi.schema.CompatibilityValue
 ---@field ChatBubble omi.schema.CompatibilityValue
 ---@field SearchPlayers omi.schema.CompatibilityValue
 ---@field TrueActionsDancing omi.schema.CompatibilityValue

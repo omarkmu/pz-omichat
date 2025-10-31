@@ -27,7 +27,6 @@ local TagList = {
     'AutoPunctuateNarrative',
     'AutoPunctuateOverhead',
     'BracketedNames',
-    'BuffyRPGTarget',
     'Callout',
     'CardCommandTarget',
     'EchoTarget',

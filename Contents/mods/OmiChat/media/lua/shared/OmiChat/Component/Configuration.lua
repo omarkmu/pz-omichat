@@ -262,18 +262,6 @@ function Configuration:chatStreams()
     end
 end
 
----Returns whether the Buffy's Character Bios compatibility patch is enabled.
----@return boolean enabled
-function Configuration:compatBuffyCharacterBiosEnabled()
-    return self:_isCompatEnabled(self.Compatibility.BuffyCharacterBios, 'CharacterBio')
-end
-
----Returns whether the Buffy's Tabletop RPG System compatibility patch is enabled.
----@return boolean enabled
-function Configuration:compatBuffyRPGSystemEnabled()
-    return self:_isCompatEnabled(self.Compatibility.BuffyRPGSystem, 'roleplaydnd_update15')
-end
-
 ---Returns whether the Chat Bubble compatibility patch is enabled.
 ---@return boolean enabled
 function Configuration:compatChatBubbleEnabled()

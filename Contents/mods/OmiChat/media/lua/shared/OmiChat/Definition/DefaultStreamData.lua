@@ -151,7 +151,6 @@ local DefaultStreamData = {
             'CardCommandTarget',
             'FlipCommandTarget',
             'RollCommandTarget',
-            'BuffyRPGTarget',
             'UseNameColor',
         },
     },
