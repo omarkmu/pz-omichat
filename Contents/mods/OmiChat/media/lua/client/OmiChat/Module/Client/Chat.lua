@@ -169,31 +169,6 @@ function Chat.getSignLanguageEmote(text)
     return Chat._signLanguageEmotes[idx] --[[@as string]]
 end
 
----Suggests text based on the provided input text.
----@param text string The input text.
----@return omi.ui.SuggestBox.Suggestion[] suggestions A list of text suggestions.
-function Chat.getSuggestions(text)
-    if not text or text == '' then
-        return {}
-    end
-
-    ---@type SuggestionInfo
-    local info = {
-        input = text,
-        context = {},
-        suggestions = {},
-    }
-
-    for i = 1, #API._suggesters do
-        local suggester = API._suggesters[i]
-        if suggester.suggest then
-            suggester:suggest(info)
-        end
-    end
-
-    return info.suggestions
-end
-
 ---Returns whether the player is currently typing.
 ---@return boolean typing
 function Chat.isTyping()

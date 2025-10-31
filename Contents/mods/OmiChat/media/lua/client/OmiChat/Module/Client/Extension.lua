@@ -44,16 +44,6 @@ function Extension.addEmote(name, emote)
     API._emotes[name] = emote
 end
 
----Adds a message transformer which can act on message information to modify display or behavior.
----@param transformer MessageTransformer The transformer to add.
----@return MessageTransformer transformer
-function Extension.addMessageTransformer(transformer)
-    API._transformers[#API._transformers + 1] = transformer
-    sort(API._transformers, Extension._prioritySort)
-
-    return transformer
-end
-
 ---Adds a callback that can be triggered by clicking an action in a rich text panel.
 ---@param name string The name of the action.
 ---@param callback RichTextAction the action callback.
@@ -111,21 +101,11 @@ function Extension.addStreamBefore(stream, otherStream)
     return Extension._insertStreamRelative(stream, otherStream, 0)
 end
 
----Adds a suggester which can suggest inputs to the player.
----@param suggester Suggester The suggester to add.
----@return Suggester suggester
-function Extension.addSuggester(suggester)
-    API._suggesters[#API._suggesters + 1] = suggester
-    sort(API._suggesters, Extension._prioritySort)
-
-    return suggester
-end
-
 ---Registers an argument type for suggester specs.
 ---@param argType string The argument type.
 ---@param callback Callback.SuggestSearch The suggestion callback.
 function Extension.addSuggesterType(argType, callback)
-    API.search._customSuggesterTypes[argType] = callback
+    API.suggestion._customArgTypes[argType] = callback
 end
 
 ---Removes a registered custom button.
@@ -135,7 +115,7 @@ function Extension.removeCustomButton(button)
     Extension._remove(API.ui._customButtons, button)
 end
 
----Removes a stream from the list of available chat commands.
+---Removes a stream from the list of available commands.
 ---@param stream CommandStream The stream to remove.
 function Extension.removeCommand(stream)
     Extension._remove(API._commandStreams, stream)
@@ -145,18 +125,6 @@ end
 ---@param name string The name of the emote to remove.
 function Extension.removeEmote(name)
     API._emotes[name] = nil
-end
-
----Removes a message transformer.
----@param transformer MessageTransformer The transformer to remove.
-function Extension.removeMessageTransformer(transformer)
-    Extension._remove(API._transformers, transformer)
-end
-
----Removes the first message transformer with the provided name.
----@param name string The name of the transformer to remove.
-function Extension.removeMessageTransformerByName(name)
-    Extension._removeByName(API._transformers, name)
 end
 
 ---Removes a rich text action handler.
@@ -194,22 +162,10 @@ function Extension.removeStream(stream)
     end
 end
 
----Removes a suggester.
----@param suggester Suggester The suggester to remove.
-function Extension.removeSuggester(suggester)
-    Extension._remove(API._suggesters, suggester)
-end
-
----Removes the first suggester with the provided name.
----@param name string The name of the suggester to remove.
-function Extension.removeSuggesterByName(name)
-    Extension._removeByName(API._suggesters, name)
-end
-
 ---Removes an argument type for suggester specs.
 ---@param argType string The argument type to remove.
 function Extension.removeSuggesterType(argType)
-    API.search._customSuggesterTypes[argType] = nil
+    API.suggestion._customArgTypes[argType] = nil
 end
 
 
@@ -258,18 +214,6 @@ function Extension._insertStreamRelative(stream, other, relativeIndex)
     end
 
     return stream
-end
-
----Sort function for sorting items by a priority field.
----@param a table
----@param b table
----@return boolean
----@private
-function Extension._prioritySort(a, b)
-    local aPri = a.priority or 1
-    local bPri = b.priority or 1
-
-    return aPri > bPri
 end
 
 

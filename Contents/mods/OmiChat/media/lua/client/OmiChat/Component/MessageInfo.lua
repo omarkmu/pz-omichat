@@ -32,12 +32,12 @@ local getZomboidRadio = getZomboidRadio
 ---@field titleID string The string ID of the chat type's tag.
 ---@field zombieAttractRange? number The range at which the message will be heard by zombies.
 ---@field tags omi.SetTable<string> A set of tags to add to the message tokens.
+---@field hidden boolean Flag for whether the message has been hidden both in chat and overhead.
 ---@field meta MessageMetadata Metadata attached to the message.
 ---@field private usePerceivedText? boolean Flag for whether the message text should be replaced by the "perception range" text.
 ---@field private useUnknownLanguageText? boolean Flag for whether the message text should be replaced by the unknown language text.
 ---@field private overheadText? string The text to show overhead instead of the message text.
 ---@field private doFullOverhead? boolean Flag for whether the replacement overhead text should also use the overhead prefix and final formats.
----@field private hidden boolean Flag for whether the message has been hidden both in chat and overhead.
 ---@field private loudCallout boolean Flag for whether the message is a regular callout.
 ---@field private sneakCallout boolean Flag for whether the message is a sneak callout.
 ---@field private datetime string A string representing the date and time the message was sent.
@@ -215,41 +215,6 @@ function MessageInfo:applyFormatting()
 
     self.tokens.input = content
     return true
-end
-
----Runs transformers on the message.
----@param transformers MessageTransformer[]
-function MessageInfo:applyTransforms(transformers)
-    for i = 1, #transformers do
-        local transformer = transformers[i]
-        if transformer.transform and transformer:transform(self) == true then
-            break
-        end
-
-        -- message is hidden; stop processing transforms
-        if self.hidden then
-            break
-        end
-    end
-
-    if self.usePerceivedText then
-        self:_applyPerceivedText()
-    elseif self.useUnknownLanguageText then
-        self:_applyUnknownLanguageText()
-    end
-
-    if self.tags.HideOverhead or (self.overheadText and not self.meta.displayedOverhead) then
-        self.message:setOverHeadSpeech(false)
-    end
-
-    self:_avoidEmptyMessages()
-    if self.chatType == 'radio' then
-        self:_applyRadioStormFix()
-        self:_suppressRadioOverhead()
-    end
-
-    -- show the modified message
-    self:_showReplacementOverheadText()
 end
 
 ---Gets the message text to use.
@@ -494,6 +459,27 @@ end
 ---@return boolean
 function MessageInfo:isChatType(chatType)
     return self.chatType == chatType
+end
+
+---Runs after transforms are applied.
+function MessageInfo:onTransform()
+    if self.usePerceivedText then
+        self:_applyPerceivedText()
+    elseif self.useUnknownLanguageText then
+        self:_applyUnknownLanguageText()
+    end
+
+    if self.tags.HideOverhead or (self.overheadText and not self.meta.displayedOverhead) then
+        self.message:setOverHeadSpeech(false)
+    end
+
+    self:_avoidEmptyMessages()
+    if self.chatType == 'radio' then
+        self:_applyRadioStormFix()
+        self:_suppressRadioOverhead()
+    end
+
+    self:_showReplacementOverheadText()
 end
 
 ---Sets the color to use for the message.

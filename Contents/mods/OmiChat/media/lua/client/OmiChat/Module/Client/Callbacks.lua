@@ -337,7 +337,7 @@ function Callback.populateChatSuggestBox(target, suggestBox, text)
     end
 
     text = text or target.textEntry:getInternalText()
-    suggestBox:setSuggestions(API.chat.getSuggestions(text))
+    suggestBox:setSuggestions(API.suggestion.getChatSuggestions(text))
 end
 
 ---Callback for selecting the current roleplay language.

@@ -44,7 +44,6 @@ function Extension.addCustomPreset(name, values, doRequest)
     return preset
 end
 
----Adds a hook of the given type.
 ---@param type HookType The type of hook to add.
 ---@param callback function The hook callback function.
 ---@diagnostic disable-next-line: duplicate-set-field

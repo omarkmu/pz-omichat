@@ -17,85 +17,6 @@ local ISChat = ISChat
 ---@field private _iconList? search.IconInfo[] Lazy-loaded list with information about icons.
 local Search = {}
 
----Associates names to custom suggestion spec argument type handlers.
----@type table<string, Callback.SuggestSearch>
----@private
-Search._customSuggesterTypes = {}
-
-
----Converts search results to a list of suggestions to use for a suggest box.
----@param search SearchResults The results of the search.
----@param allowExact boolean? Flag for whether an exact match should be ignored. Unless this is `true`, an empty table will be returned if there's an exact match.
----@return omi.ui.SuggestBox.Suggestion[] suggestions
-function Search.getSuggestions(search, allowExact)
-    if search.exact and not allowExact then
-        return {}
-    end
-
-    local suggestions = {} ---@type omi.ui.SuggestBox.Suggestion[]
-    for i = 1, #search.results do
-        local result = search.results[i]
-        suggestions[#suggestions + 1] = {
-            text = result.display,
-            content = result.value,
-            texture = result.texture,
-        }
-    end
-
-    return suggestions
-end
-
----Gets an argument spec table from a list of argument specs.
----@param spec SuggestArgSpec[] The list of argument specs.
----@param idx integer The index of the spec to retrieve.
----@return SuggestArgSpecTable? argSpec
-function Search.getSuggestionArgumentSpec(spec, idx)
-    local argSpec = spec[idx]
-    if type(argSpec) == 'string' then
-        argSpec = { type = argSpec }
-    end
-
-    ---@cast argSpec SuggestArgSpecTable
-    if not argSpec or argSpec.type == '?' then
-        return
-    end
-
-    return argSpec
-end
-
----Retrieves the search callback for a suggester argument type.
----@param argType string The name of the suggester argument type.
----@return Callback.SuggestSearch? callback
-function Search.getSuggestionTypeCallback(argType)
-    return Search._customSuggesterTypes[argType]
-end
-
----Retrieves a suggestion spec given the current input.
----@param input string The input text.
----@return SuggestArgSpec[]? spec A list of argument specs, or `nil` if no spec matches the input.
-function Search.getSuggestionSpec(input)
-    local stream = API.streams.chatCommandToStream(input, { enabledOnly = true })
-    if stream then
-        return stream:getSuggestSpec()
-    end
-
-    local accessLevel = utils.getEffectiveAccessLevel()
-    if not accessLevel then
-        return
-    end
-
-    -- vanilla command specs
-    for i = 1, #vanillaCommands do
-        local commandInfo = vanillaCommands[i]
-        if utils.hasAccess(commandInfo.access, accessLevel) then
-            local vanillaCommand = '/' .. commandInfo.name .. ' '
-            if commandInfo.suggestSpec and utils.startsWith(input:lower(), vanillaCommand) then
-                return commandInfo.suggestSpec
-            end
-        end
-    end
-end
-
 ---Searches for an icon by texture name or chat alias.
 ---@param ctxOrSearch SearchContext | string A search string or a table with options for the search.
 ---@return SearchResults results
@@ -238,7 +159,7 @@ end
 ---@param search SearchResults The results of the search.
 ---@param allowExact boolean? Flag for whether an exact match should be ignored. Unless this is `true`, suggestions will be cleared for an exact match.
 function Search.populateSuggestions(suggestBox, search, allowExact)
-    suggestBox:setSuggestions(Search.getSuggestions(search, allowExact))
+    suggestBox:setSuggestions(Search.toSuggestions(search, allowExact))
 end
 
 ---Collects stream commands based on a search string.
@@ -313,6 +234,28 @@ function Search.strings(ctxOrSearch, list)
     end
 
     return Search._collectResults(ctx)
+end
+
+---Converts search results to a list of suggestions to use for a suggest box.
+---@param search SearchResults The results of the search.
+---@param allowExact boolean? Flag for whether an exact match should be ignored. Unless this is `true`, an empty table will be returned if there's an exact match.
+---@return omi.ui.SuggestBox.Suggestion[] suggestions
+function Search.toSuggestions(search, allowExact)
+    if search.exact and not allowExact then
+        return {}
+    end
+
+    local suggestions = {} ---@type omi.ui.SuggestBox.Suggestion[]
+    for i = 1, #search.results do
+        local result = search.results[i]
+        suggestions[#suggestions + 1] = {
+            text = result.display,
+            content = result.value,
+            texture = result.texture,
+        }
+    end
+
+    return suggestions
 end
 
 
@@ -825,39 +768,11 @@ return Search
 ---@field username string The player's username.
 
 
----@class SuggestArgSpecTable
----@field type SuggestionType | string The type of the argument.
----@field prefix? string A prefix to apply to the suggestion result.
----@field suffix? string A suffix to apply to the suggestion result.
----@field options? string[] String options for the `option` suggestion type.
----@field searchDisplay? boolean If true, the display string will be used for determining suggestions.
----@field filter? SuggestArgSpec.Filter Filter function for results.
----@field display? SuggestArgSpec.Display Function to retrieve display strings for results.
-
-
 ---@alias SearchContext.MapString fun(value: any, comparisonString: string): string?
 
 ---@alias SearchContext.MapTexture fun(value: any, comparisonString: string): Texture?
 
 ---@alias SearchContext.Filter fun(value: any, args: string[]): boolean
 
----@alias SuggestArgSpec.Display fun(value: any, str: string): string?
-
----@alias SuggestArgSpec.Filter fun(result: any, args: string[]): boolean
-
----@alias Callback.SuggestSearch fun(ctx: SearchContext | string, spec: SuggestArgSpec): SearchResults?
-
-
----@alias SuggestArgSpec SuggestArgSpecTable | SuggestionType | string
-
----@alias SuggestionType
----| 'online-username'
----| 'online-username-with-self'
----| 'language'
----| 'known-language'
----| 'icon'
----| 'perk'
----| 'option'
----| '?'
 
 --#endregion

@@ -515,7 +515,7 @@ function Helpers.populateTagSuggest(listEntry, suggestBox, text)
         filter = function(value) return not values[value] end,
     }, TagList)
 
-    local list = API_C.search.getSuggestions(search, #search.results > 1)
+    local list = API_C.search.toSuggestions(search, #search.results > 1)
     for i = 1, #list do
         local suggestion = list[i]
         suggestion.tooltip = Helpers.getTagTooltip(suggestion.content)

@@ -24,7 +24,7 @@ function Format.buildMessageInfo(message, skipFormatting)
     local info = API.MessageInfo:new(message)
     local text = info:getRawText()
 
-    info:applyTransforms(API._transformers)
+    API.transformation.run(info)
 
     if not skipFormatting and not info:applyFormatting() then
         return nil, text

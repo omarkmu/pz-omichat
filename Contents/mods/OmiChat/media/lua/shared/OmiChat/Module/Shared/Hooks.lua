@@ -9,94 +9,93 @@ local API = require 'OmiChat/Module/Shared/Core'
 ---@class(partial) api.shared.hooks
 local Hooks = {}
 
+---@enum HookType
+Hooks.HookType = {
+    afterDecodeMessage = 'afterDecodeMessage',
+    beforeDecodeMessage = 'beforeDecodeMessage',
+    cardCommand = 'cardCommand',
+    cardCommandEnabled = 'cardCommandEnabled',
+    chatSuggestions = 'chatSuggestions',
+    decodeCommand = 'decodeCommand',
+    flipCommand = 'flipCommand',
+    flipCommandEnabled = 'flipCommandEnabled',
+    perceptionRange = 'perceptionRange',
+    rollCommand = 'rollCommand',
+    rollCommandEnabled = 'rollCommandEnabled',
+    decodeMessage = 'decodeMessage',
+}
+
 ---Associates hook types to a boolean indicating whether there are active hooks.
 ---@type omi.SetTable<HookType>
 Hooks.has = {}
 
 ---Associates hook types to lists of callback functions.
+---@type table<HookType, function[]>
 ---@protected
-Hooks._callbacks = {
-    ---@type Hook.Command[]
-    cardCommand = {},
+Hooks._callbacks = {}
+for k in pairs(Hooks.HookType) do
+    Hooks._callbacks[k] = {}
+end
 
-    ---@type Hook.CommandEnabled[]
-    cardCommandEnabled = {},
 
-    ---@type Hook.Command[]
-    flipCommand = {},
+---Applies hooks for after message information is decoded.
+---@param info MessageInfo Information about the message to transform.
+function Hooks.afterDecodeMessage(info)
+    Hooks._handleEvent(Hooks._callbacks.afterDecodeMessage, info)
+end
 
-    ---@type Hook.CommandEnabled[]
-    flipCommandEnabled = {},
-
-    ---@type Hook.PerceptionRange[]
-    perceptionRange = {},
-
-    ---@type Hook.Command[]
-    rollCommand = {},
-
-    ---@type Hook.CommandEnabled[]
-    rollCommandEnabled = {},
-}
-
+---Applies hooks for before message information is decoded.
+---@param info MessageInfo Information about the message to transform.
+function Hooks.beforeDecodeMessage(info)
+    Hooks._handleEvent(Hooks._callbacks.beforeDecodeMessage, info)
+end
 
 ---Applies hooks for the `/card` command.
 ---@param args Args.UseStream Arguments for the hook callback.
 ---@return boolean handled `True` if the command was handled by a hook. Otherwise, `false`.
 function Hooks.cardCommand(args)
-    local list = Hooks._callbacks.cardCommand
-    for i = 1, #list do
-        local callback = list[i]
-        if callback(args) then
-            return true
-        end
-    end
+    return Hooks._handle(Hooks._callbacks.cardCommand, args)
+end
 
-    return false
+---Applies hooks for getting suggestions from chat input text.
+---@param info SuggestionInfo Information about the suggestion.
+---@return boolean handled `True` if the suggestions were handled by a hook. Otherwise, `false`.
+function Hooks.chatSuggestions(info)
+    return Hooks._handle(Hooks._callbacks.chatSuggestions, info)
 end
 
 ---Applies hooks for checking whether the `/card` command is enabled.
 ---@return boolean? enabled `True` or `false` to enable or disable the command. If the return value is `nil`, existing logic is used.
 function Hooks.cardCommandEnabled()
-    local list = Hooks._callbacks.cardCommandEnabled
-    for i = 1, #list do
-        local callback = list[i]
-        local isEnabled = callback()
-        if isEnabled then
-            return true
-        elseif isEnabled == false then
-            return false
-        end
-    end
+    return Hooks._handleBoolean(Hooks._callbacks.cardCommandEnabled)
+end
+
+---Applies hooks for decoding command information during message transformation.
+---@param match string The text matched on the command's formatter.
+---@param info MessageInfo Information about the message.
+---@return boolean handled `True` if decoding was handled by a hook. Otherwise, `false`.
+function Hooks.decodeCommand(match, info)
+    return Hooks._handle(Hooks._callbacks.decodeCommand, match, info)
+end
+
+---Applies hooks for decoding message information.
+---@param info MessageInfo Information about the message to transform.
+---@return boolean handled `True` if transformation handling should stop. Otherwise, `false`.
+function Hooks.decodeMessage(info)
+    return Hooks._handle(Hooks._callbacks.decodeMessage, info)
 end
 
 ---Applies hooks for the `/flip` command.
 ---@param args Args.UseStream Arguments for the hook callback.
 ---@return boolean handled `True` if the command was handled by a hook. Otherwise, `false`.
 function Hooks.flipCommand(args)
-    local list = Hooks._callbacks.flipCommand
-    for i = 1, #list do
-        local callback = list[i]
-        if callback(args) then
-            return true
-        end
-    end
-
-    return false
+    return Hooks._handle(Hooks._callbacks.flipCommand, args)
 end
 
 ---Applies hooks for checking whether the `/flip` command is enabled.
 ---@return boolean? enabled `True` or `false` to enable or disable the command. If the return value is `nil`, existing logic is used.
 function Hooks.flipCommandEnabled()
-    local list = Hooks._callbacks.flipCommandEnabled
-    for i = 1, #list do
-        local callback = list[i]
-        local isEnabled = callback()
-        if isEnabled then
-            return true
-        elseif isEnabled == false then
-            return false
-        end
-    end
+    return Hooks._handleBoolean(Hooks._callbacks.flipCommandEnabled)
 end
 
 ---Applies modifications to perception range from hooks.
@@ -126,10 +125,25 @@ end
 ---@param args Args.UseStream Arguments for the hook callback.
 ---@return boolean handled `True` if the command was handled by a hook. Otherwise, `false`.
 function Hooks.rollCommand(args)
-    local list = Hooks._callbacks.rollCommand
+    return Hooks._handle(Hooks._callbacks.rollCommand, args)
+end
+
+---Applies hooks for checking whether the `/roll` command is enabled.
+---@return boolean? enabled `True` or `false` to enable or disable the command. If the return value is `nil`, existing logic is used.
+function Hooks.rollCommandEnabled()
+    return Hooks._handleBoolean(Hooks._callbacks.rollCommandEnabled)
+end
+
+
+---Handles a standard hook.
+---@param list function[]
+---@param ...any
+---@return boolean handled
+---@private
+function Hooks._handle(list, ...)
     for i = 1, #list do
         local callback = list[i]
-        if callback(args) then
+        if callback(...) then
             return true
         end
     end
@@ -137,18 +151,33 @@ function Hooks.rollCommand(args)
     return false
 end
 
----Applies hooks for checking whether the `/roll` command is enabled.
----@return boolean? enabled `True` or `false` to enable or disable the command. If the return value is `nil`, existing logic is used.
-function Hooks.rollCommandEnabled()
-    local list = Hooks._callbacks.rollCommandEnabled
+---Handles a boolean-returning hook.
+---@param list function[]
+---@param ...any
+---@return boolean result
+---@private
+function Hooks._handleBoolean(list, ...)
     for i = 1, #list do
         local callback = list[i]
-        local isEnabled = callback()
-        if isEnabled then
+        local result = callback()
+        if result then
             return true
-        elseif isEnabled == false then
+        elseif result == false then
             return false
         end
+    end
+
+    return false
+end
+
+---Handles an event hook.
+---@param list function[]
+---@param ...any
+---@private
+function Hooks._handleEvent(list, ...)
+    for i = 1, #list do
+        local callback = list[i]
+        callback(...)
     end
 end
 
@@ -168,22 +197,5 @@ return Hooks
 
 ---@class Args.Hook.PerceptionRange : Args.ApplyHook.PerceptionRange
 ---@field originalRange integer The original value, before applying any hooks.
-
-
----@alias Hook.Command fun(args: Args.UseStream): boolean?
-
----@alias Hook.CommandEnabled fun(): boolean?
-
----@alias Hook.PerceptionRange fun(args: Args.Hook.PerceptionRange): integer?
-
-
----@alias HookType
----| 'cardCommand'
----| 'cardCommandEnabled'
----| 'flipCommand'
----| 'flipCommandEnabled'
----| 'perceptionRange'
----| 'rollCommand'
----| 'rollCommandEnabled'
 
 --#endregion
