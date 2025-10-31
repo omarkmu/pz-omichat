@@ -51,7 +51,7 @@ function Preferences.get()
     if version > Preferences._version then
         -- use default settings & add flag to avoid overwrite
         local msg = 'Preferences file has a higher version (%d > %d). Changes to preferences will not be saved.'
-        utils.log.once(msg, version, Preferences._version)
+        utils.log.warn.once(msg, version, Preferences._version)
         prefs.HIGHER_VERSION = true
 
         return prefs

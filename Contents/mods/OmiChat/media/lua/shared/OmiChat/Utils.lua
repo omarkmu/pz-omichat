@@ -20,11 +20,16 @@ local utils = lib.proxy('OmiChat')
 
 ---The interpolator used for basic interpolation.
 ---@private
-utils._interpolator = lib.interpolate.Interpolator:new()
+utils._interpolator = lib.interpolate.Interpolator:new({
+    logger = utils.log,
+})
 
 ---The interpolator used for interpolation without character entities.
 ---@private
-utils._noEntityInterpolator = lib.interpolate.Interpolator:new({ allowCharacterEntities = false })
+utils._noEntityInterpolator = lib.interpolate.Interpolator:new({
+    logger = utils.log,
+    allowCharacterEntities = false,
+})
 
 
 local API_C ---@type api.client?

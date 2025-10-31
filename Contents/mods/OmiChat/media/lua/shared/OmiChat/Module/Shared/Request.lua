@@ -33,7 +33,6 @@ Request.TOPIC = {}
 Request.dispatch = utils.dispatch {
     module = API._key,
     logger = utils.log,
-    enableLogs = IS_DEBUG,
 }
 
 

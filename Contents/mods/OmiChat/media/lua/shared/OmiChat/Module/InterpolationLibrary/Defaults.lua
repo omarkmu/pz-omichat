@@ -41,7 +41,7 @@ function Library.Default(interpolator, args)
     if func then
         return func(interpolator, args)
     else
-        utils.log.once('Tried to call unknown default: ' .. tostring(target))
+        utils.log.warn.once('Tried to call unknown default: %s', target)
     end
 end
 

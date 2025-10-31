@@ -27,9 +27,12 @@ function _IsoPlayer:Callout(playEmote)
         stream = API.streams.firstChatStreamWithTag('SneakCallout')
     end
 
-    stream = stream or API.streams.firstChatStreamWithTag('Callout') or API.streams.get('yell')
+    stream = stream
+        or API.streams.firstChatStreamWithTag('Callout')
+        or API.streams.getChatStream('yell', { enabledOnly = true })
+
     if not stream then
-        API.utils.log.once('No stream defined for callouts. Add the `Callout` tag to a stream.')
+        utils.log.warn.once('No stream defined for callouts. Add the `Callout` tag to a stream.')
         _Callout(self, playEmote)
         return
     end

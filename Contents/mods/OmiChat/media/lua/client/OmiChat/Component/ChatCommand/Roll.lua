@@ -60,7 +60,7 @@ API._rollCommand = API.CommandStream:new {
     end,
     onUseDisabled = function(stream)
         if not API.streams.firstChatStreamWithTag('RollCommandTarget') then
-            utils.log.once('No target stream defined for /roll')
+            utils.log.warn.once('No target stream defined for /roll')
             API.chat.addInfoMessage('Unknown command ' .. stream:getCommand():sub(2))
         else
             stream:showHelpText()
