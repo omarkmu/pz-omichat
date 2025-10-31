@@ -15,14 +15,16 @@ Hooks.HookType = {
     beforeDecodeMessage = 'beforeDecodeMessage',
     cardCommand = 'cardCommand',
     cardCommandEnabled = 'cardCommandEnabled',
+    chatSettingsMenu = 'chatSettingsMenu',
     chatSuggestions = 'chatSuggestions',
     decodeCommand = 'decodeCommand',
+    decodeMessage = 'decodeMessage',
     flipCommand = 'flipCommand',
     flipCommandEnabled = 'flipCommandEnabled',
     perceptionRange = 'perceptionRange',
+    richTextAction = 'richTextAction',
     rollCommand = 'rollCommand',
     rollCommandEnabled = 'rollCommandEnabled',
-    decodeMessage = 'decodeMessage',
 }
 
 ---Associates hook types to a boolean indicating whether there are active hooks.
@@ -31,7 +33,7 @@ Hooks.has = {}
 
 ---Associates hook types to lists of callback functions.
 ---@type table<HookType, function[]>
----@protected
+---@private
 Hooks._callbacks = {}
 for k in pairs(Hooks.HookType) do
     Hooks._callbacks[k] = {}
@@ -55,6 +57,13 @@ end
 ---@return boolean handled `True` if the command was handled by a hook. Otherwise, `false`.
 function Hooks.cardCommand(args)
     return Hooks._handle(Hooks._callbacks.cardCommand, args)
+end
+
+---Applies hooks for adding settings to the context menu.
+---@param category SettingCategory
+---@param submenu ISContextMenu
+function Hooks.chatSettingsMenu(category, submenu)
+    Hooks._handleEvent(Hooks._callbacks.chatSettingsMenu, category, submenu)
 end
 
 ---Applies hooks for getting suggestions from chat input text.
@@ -119,6 +128,15 @@ function Hooks.perceptionRange(args)
     end
 
     return value
+end
+
+---Applies hooks for a rich text action.
+---@param name string The name of the action.
+---@param action omi.RichTextActionType The type of the action.
+---@param ...any Additional arguments to pass to the action handler.
+---@return boolean handled `True` if the action was handled by a hook. Otherwise, `false`.
+function Hooks.richTextAction(name, action, ...)
+    return Hooks._handle(Hooks._callbacks.richTextAction, name, action, ...)
 end
 
 ---Applies hooks for the `/roll` command.

@@ -48,27 +48,10 @@ UI._statusEnabled = false
 ---@private
 UI._statusDisplayByUsername = {}
 
----Associates names to handler functions for rich text actions.
----@type table<string, fun(name: string, action: omi.RichTextActionType, ...: string)>
----@private
-UI._actionHandlers = {}
-
 ---List of custom buttons added to the chat window.
 ---@type ISButton[]
 ---@private
 UI._customButtons = {}
-
----Associates settings categories to lists of handlers for extending settings.
----@type table<SettingCategory, fun(submenu: ISContextMenu)[]>
----@private
-UI._settingHandlers = {
-    admin = {},
-    basic = {},
-    customization = {},
-    language = {},
-    suggestions = {},
-    main = {},
-}
 
 ---Associates chat types to title string IDs.
 UI._chatTypeTitleIDs = {
@@ -268,7 +251,10 @@ function UI.showSettingsContextMenu()
     UI._addCustomizationSettings(context)
     UI._addProfileSwitchSubmenu(context)
     UI._addLanguageOptions(context)
-    UI._runSettingsHandlers(context, 'main')
+
+    if API.hooks.has.chatSettingsMenu then
+        API.hooks.chatSettingsMenu('main', context)
+    end
 
     return context
 end
@@ -504,7 +490,9 @@ function UI._addAdminOptions(context)
         submenu:setOptionChecked(opt, API.preferences.getAdminOption(option))
     end
 
-    UI._runSettingsHandlers(submenu, 'admin')
+    if API.hooks.has.chatSettingsMenu then
+        API.hooks.chatSettingsMenu('admin', submenu)
+    end
 end
 
 ---Adds the chat settings submenu to the context menu.
@@ -540,7 +528,10 @@ function UI._addChatSettings(context)
     UI._addSuggestionOptions(submenu)
     UI._addRetainOptions(submenu)
     UI._addVanillaSubmenuOptions(submenu)
-    UI._runSettingsHandlers(submenu, 'basic')
+
+    if API.hooks.has.chatSettingsMenu then
+        API.hooks.chatSettingsMenu('basic', submenu)
+    end
 end
 
 ---Adds the customization submenu to the context menu.
@@ -594,7 +585,9 @@ function UI._addCustomizationSettings(context)
         end
     end
 
-    UI._runSettingsHandlers(submenu, 'customization')
+    if API.hooks.has.chatSettingsMenu then
+        API.hooks.chatSettingsMenu('customization', submenu)
+    end
 end
 
 ---Adds the context menu options for roleplay languages.
@@ -663,7 +656,9 @@ function UI._addLanguageOptions(context)
         end
     end
 
-    UI._runSettingsHandlers(languageSubmenu, 'language')
+    if API.hooks.has.chatSettingsMenu then
+        API.hooks.chatSettingsMenu('language', languageSubmenu)
+    end
 
     if #languageSubmenu.options == 0 then
         context:removeLastOption()
@@ -776,7 +771,9 @@ function UI._addSuggestionOptions(context)
     submenu:setOptionChecked(onEnterOpt, API.preferences.getSuggestOnEnter())
     submenu:setOptionChecked(onTabOpt, API.preferences.getSuggestOnTab())
 
-    UI._runSettingsHandlers(submenu, 'suggestions')
+    if API.hooks.has.chatSettingsMenu then
+        API.hooks.chatSettingsMenu('suggestions', submenu)
+    end
 end
 
 ---Adds the chat setting submenus from vanilla.
@@ -983,21 +980,6 @@ function UI._getPickedSquare()
 
     ---@cast value IsoObject
     return value:getSquare()
-end
-
----Runs settings handlers on a context menu or submenu.
----@param context ISContextMenu
----@param category SettingCategory
----@private
-function UI._runSettingsHandlers(context, category)
-    local handlers = UI._settingHandlers[category]
-    if not handlers then
-        return
-    end
-
-    for i = 1, #handlers do
-        handlers[i](context)
-    end
 end
 
 ---Updates the visibility of the chat and close button based on the `Always Show Chat` option.

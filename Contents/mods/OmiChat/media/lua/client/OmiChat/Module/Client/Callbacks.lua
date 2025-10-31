@@ -15,7 +15,6 @@ local getCoveredParts = BloodClothingType.getCoveredParts
 
 local getText = getText
 local max = math.max
-local concat = table.concat
 local wipe = table.wipe
 local textManager = getTextManager()
 
@@ -25,7 +24,7 @@ local textManager = getTextManager()
 local Callback = {}
 
 ---Counter for skipping info panel updates.
----@protected
+---@private
 Callback._infoUpdateCounter = 0
 
 
@@ -214,19 +213,9 @@ end
 ---@param action omi.RichTextActionType The type of the action.
 ---@param ...string Additional arguments to pass to the handler.
 function Callback.onInfoPanelAction(_, name, action, ...)
-    local cb = API.ui._actionHandlers[name] ---@diagnostic disable-line: invisible
-    if not cb then
-        local args = { ... }
-        if #args == 0 then
-            utils.log.debug('Unknown rich text %s action: %s', action, name)
-        else
-            utils.log.debug('Unknown rich text %s action: %s(%s)', action, name, concat(args, ','))
-        end
-
-        return
+    if API.hooks.has.richTextAction then
+        API.hooks.richTextAction(name, action, ...)
     end
-
-    cb(name, action, ...)
 end
 
 ---Called every 100ms while the info text panel is visible.

@@ -44,23 +44,6 @@ function Extension.addEmote(name, emote)
     API._emotes[name] = emote
 end
 
----Adds a callback that can be triggered by clicking an action in a rich text panel.
----@param name string The name of the action.
----@param callback fun(name: string, action: omi.RichTextActionType, ...: string) The action callback.
-function Extension.addRichTextAction(name, callback)
-    API.ui._actionHandlers[name] = callback
-end
-
----Adds a handler for adding setting context menu options.
----@param category SettingCategory The setting category to add to.
----@param callback fun(submenu: ISContextMenu) The setting handler callback.
-function Extension.addSettingHandler(category, callback)
-    local tab = API.ui._settingHandlers[category]
-    if tab then
-        tab[#tab + 1] = callback
-    end
-end
-
 ---Adds a chat stream.
 ---@param stream ChatStream The stream to add.
 ---@return ChatStream stream
@@ -125,22 +108,6 @@ end
 ---@param name string The name of the emote to remove.
 function Extension.removeEmote(name)
     API._emotes[name] = nil
-end
-
----Removes a rich text action handler.
----@param name string The name of the action to remove.
-function Extension.removeRichTextAction(name)
-    API.ui._actionHandlers[name] = nil
-end
-
----Removes a handler for adding setting context menu options.
----@param category SettingCategory The setting category to remove from.
----@param callback fun(submenu: ISContextMenu) The setting handler callback to remove.
-function Extension.removeSettingHandler(category, callback)
-    local list = API.ui._settingHandlers[category]
-    if list then
-        Extension._remove(list, callback)
-    end
 end
 
 ---Removes a stream from the list of available chat streams.

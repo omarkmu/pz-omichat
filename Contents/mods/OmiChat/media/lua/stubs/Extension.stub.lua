@@ -26,6 +26,11 @@ function Extension.addHook(type, callback) end
 ---@param callback fun(): boolean? The hook callback function. If this returns `nil`, the original checks will run.
 function Extension.addHook(type, callback) end
 
+---Adds a hook for adding settings to the context menu.
+---@param type 'chatSettingsMenu'
+---@param callback fun(category: string, submenu: ISContextMenu) The hook callback function.
+function Extension.addHook(type, callback) end
+
 ---Adds a hook for getting text suggestions for chat.
 ---@param type 'chatSuggestions'
 ---@param callback fun(info: SuggestionInfo) The hook callback function.
@@ -54,6 +59,11 @@ function Extension.addHook(type, callback) end
 ---Adds a hook for determining the perception range.
 ---@param type 'perceptionRange'
 ---@param callback fun(args: Args.Hook.PerceptionRange): integer? The hook callback function. Returns the range to use.
+function Extension.addHook(type, callback) end
+
+---Adds a hook for a mouse action in a rich text panel.
+---@param type 'richTextAction'
+---@param callback fun(name: string, action: omi.RichTextActionType) The hook callback function.
 function Extension.addHook(type, callback) end
 
 ---Adds a hook for the `/roll` command.
