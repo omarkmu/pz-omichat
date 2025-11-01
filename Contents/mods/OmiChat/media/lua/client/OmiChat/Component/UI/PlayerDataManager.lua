@@ -1,10 +1,9 @@
 ---@namespace omichat
 ---UI element for the player data manager admin utility.
 
-local Editor = require 'OmiChat/Component/UI/PlayerDataEditor'
-
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
+local Editor = require 'OmiChat/Component/UI/PlayerDataEditor'
 
 local utils = API.utils
 local UI = utils.ui
@@ -450,5 +449,4 @@ function PlayerDataManager:new(args)
 end
 
 
-API.PlayerDataManager = PlayerDataManager
 return PlayerDataManager

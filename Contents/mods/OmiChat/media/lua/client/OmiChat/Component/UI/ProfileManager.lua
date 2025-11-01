@@ -8,6 +8,16 @@ local config = API.Configuration
 local utils = API.utils
 local UI = utils.ui
 
+local textManager = getTextManager()
+local CONTROL_FONT = UIFont.Medium
+local FONT_H_LARGE = textManager:getFontHeight(UIFont.Large)
+local FONT_H_MEDIUM = textManager:getFontHeight(CONTROL_FONT)
+local FONT_H_SMALL = textManager:getFontHeight(UIFont.Small)
+local LABEL_H = FONT_H_MEDIUM + 4
+local CONTENT_PAD_X = 20
+local CONTENT_PAD_Y = 10
+local CONTROL_PAD_Y = 5
+local SECTION_PAD_Y = 20
 
 ---@class ProfileManager : omi.ui.Panel
 ---@field current? PlayerProfile The profile being edited.
@@ -23,18 +33,6 @@ local UI = utils.ui
 ---@field addText string The text for the create button in the non-empty state.
 ---@field createText string The text for the create button in the empty state.
 local ProfileManager = UI.Panel:derive('ProfileManager')
-
-local textManager = getTextManager()
-
-local CONTROL_FONT = UIFont.Medium
-local FONT_H_LARGE = textManager:getFontHeight(UIFont.Large)
-local FONT_H_MEDIUM = textManager:getFontHeight(CONTROL_FONT)
-local FONT_H_SMALL = textManager:getFontHeight(UIFont.Small)
-local LABEL_H = FONT_H_MEDIUM + 4
-local CONTENT_PAD_X = 20
-local CONTENT_PAD_Y = 10
-local CONTROL_PAD_Y = 5
-local SECTION_PAD_Y = 20
 
 
 ---Creates a copy of a player profile.
@@ -739,7 +737,6 @@ function ProfileManager:new(args)
 end
 
 
-API.ProfileManager = ProfileManager
 return ProfileManager
 
 --#region Type Definitions

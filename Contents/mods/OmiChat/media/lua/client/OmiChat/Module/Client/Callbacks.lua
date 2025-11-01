@@ -3,7 +3,6 @@
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
-local ConfigurationHelpers = require 'OmiChat/Component/Configuration/ConfigurationHelpers'
 
 local utils = API.utils
 local config = API.Configuration
@@ -15,7 +14,6 @@ local getCoveredParts = BloodClothingType.getCoveredParts
 
 local getText = getText
 local max = math.max
-local wipe = table.wipe
 local textManager = getTextManager()
 
 
@@ -141,34 +139,6 @@ function Callback.onHairColorMenuClick(_, args)
     sendVisual(player)
 end
 
----Callback for clicking the update configuration admin context option.
----@param target ISChat The chat instance.
-function Callback.openConfiguration(target)
-    local form = target.activeConfigurationPanel
-    if not form then
-        form = API.ui.getConfigPanel()
-        target.activeConfigurationPanel = form
-    end
-
-    ConfigurationHelpers.refreshPresetsList(form)
-
-    local x, y = UI.getScreenCenter(800, 600)
-    form:setX(x)
-    form:setY(y)
-
-    if form:isVisible() then
-        form:bringToTop()
-        return
-    end
-
-    wipe(form:getState())
-    form.values = config:getValuesForSave()
-    form:refresh()
-
-    form:setVisible(true)
-    form:addToUIManager()
-end
-
 ---Callback for hair color customization menu initialization.
 ---@param target ISChat The chat instance.
 function Callback.openHairColorDialog(target)
@@ -229,11 +199,6 @@ function Callback.onInfoPanelUpdate(target)
     end
 
     Callback._infoUpdateCounter = 0
-    target = target or ISChat.instance
-    if not target then
-        return
-    end
-
     local text = API.ui.getInfoRichText()
     if text ~= target.infoText then
         target:setInfo(text)
@@ -256,42 +221,6 @@ function Callback.openLanguageConfirmation(target, language)
     }
 end
 
----Callback for clicking the view player data admin context option.
----@param target ISChat The chat instance.
-function Callback.openPlayerDataManager(target)
-    if target.activePlayerDataPanel then
-        target.activePlayerDataPanel:destroy()
-    end
-
-    local x, y = UI.getScreenCenter(1200, 650)
-    local panel = API.PlayerDataManager:new({ x = x, y = y, w = 1200, h = 650 })
-    panel:initialise()
-    panel:addToUIManager()
-
-    target.activePlayerDataPanel = panel
-end
-
----Callback for clicking the manage profiles context option.
----@param target ISChat The chat instance.
-function Callback.openProfileManager(target)
-    if target.activeProfilesPanel then
-        target.activeProfilesPanel:destroy()
-    end
-
-    local x, y = UI.getScreenCenter(800, 600)
-    local panel = API.ProfileManager:new({
-        x = x,
-        y = y,
-        w = 800,
-        h = 600,
-        profiles = API.preferences.getProfiles(),
-    })
-
-    panel:initialise()
-    panel:addToUIManager()
-    target.activeProfilesPanel = panel
-end
-
 ---Called when the configuration menu is closed.
 ---@param args omi.forms.Args.Callback.Close Callback arguments.
 function Callback.onConfigurationClose(args)
@@ -311,15 +240,10 @@ function Callback.onConfigurationSave(args)
 end
 
 ---Populates the auto-suggest box with relevant suggestions.
----@param target ISChat? The chat instance.
+---@param target ISChat The chat instance.
 ---@param suggestBox omi.ui.SuggestBox The suggest box to populate.
 ---@param text string The search text. Defaults to the chat entry's text.
 function Callback.populateChatSuggestBox(target, suggestBox, text)
-    target = target or ISChat.instance
-    if not target then
-        return
-    end
-
     if not API.preferences.getUseSuggester() then
         suggestBox:setVisible(false)
         return

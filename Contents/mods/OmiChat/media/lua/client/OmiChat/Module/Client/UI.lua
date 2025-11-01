@@ -4,11 +4,15 @@
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
 local StatusDisplay = require 'OmiChat/Component/UI/StatusDisplay'
+local ProfileManager = require 'OmiChat/Component/UI/ProfileManager'
+local PlayerDataManager = require 'OmiChat/Component/UI/PlayerDataManager'
+local ConfigurationHelpers = require 'OmiChat/Component/Configuration/ConfigurationHelpers'
 local callback = require 'OmiChat/Module/Client/Callbacks'
 
 local max = math.max
 local sort = table.sort
 local concat = table.concat
+local wipe = table.wipe
 local getTimestampMs = getTimestampMs
 local getPicked = UIManager.getPicked
 local getClassFieldVal = getClassFieldVal
@@ -176,6 +180,88 @@ function UI.hideSuggestBox()
     if UI.suggestBox then
         UI.suggestBox:setVisible(false)
     end
+end
+
+---Opens the mod configuration window.
+function UI.openConfiguration()
+    local instance = ISChat.instance
+    if not instance then
+        return
+    end
+
+    local form = instance.activeConfigurationPanel
+    if not form then
+        form = API.ui.getConfigPanel()
+        instance.activeConfigurationPanel = form
+    end
+
+    ConfigurationHelpers.refreshPresetsList(form)
+
+    local x, y = UI_LIB.getScreenCenter(800, 600)
+    form:setX(x)
+    form:setY(y)
+
+    if form:isVisible() then
+        form:bringToTop()
+        return
+    end
+
+    wipe(form:getState())
+    form.values = config:getValuesForSave()
+    form:refresh()
+
+    form:setVisible(true)
+    form:addToUIManager()
+end
+
+---Opens the player data manager admin utility window.
+function UI.openPlayerDataManager()
+    local instance = ISChat.instance
+    if not instance then
+        return
+    end
+
+    if instance.activePlayerDataPanel then
+        instance.activePlayerDataPanel:destroy()
+    end
+
+    local x, y = UI_LIB.getScreenCenter(1200, 650)
+    local panel = PlayerDataManager:new({
+        x = x,
+        y = y,
+        w = 1200,
+        h = 650,
+    })
+
+    panel:initialise()
+    panel:addToUIManager()
+    instance.activePlayerDataPanel = panel
+end
+
+---Opens the profile manager window.
+function UI.openProfileManager()
+    local instance = ISChat.instance
+    if not instance then
+        return
+    end
+
+    if instance.
+        activeProfilesPanel then
+        instance.activeProfilesPanel:destroy()
+    end
+
+    local x, y = UI_LIB.getScreenCenter(800, 600)
+    local panel = ProfileManager:new({
+        x = x,
+        y = y,
+        w = 800,
+        h = 600,
+        profiles = API.preferences.getProfiles(),
+    })
+
+    panel:initialise()
+    panel:addToUIManager()
+    instance.activeProfilesPanel = panel
 end
 
 ---Redraws the current chat messages.
@@ -478,10 +564,10 @@ function UI._addAdminOptions(context)
     context:addSubMenu(adminOption, submenu)
 
     local manageName = getText('UI_OmiChat_ContextAdminViewPlayerData')
-    submenu:addOption(manageName, ISChat.instance, callback.openPlayerDataManager)
+    submenu:addOption(manageName, nil, UI.openPlayerDataManager)
 
     local optionsName = getText('UI_OmiChat_ContextAdminUpdateConfiguration')
-    submenu:addOption(optionsName, ISChat.instance, callback.openConfiguration)
+    submenu:addOption(optionsName, nil, UI.openConfiguration)
 
     for i = 1, #options do
         local option = options[i]
@@ -564,7 +650,7 @@ function UI._addCustomizationSettings(context)
     end
 
     local manageOptName = getText('UI_OmiChat_ContextManageProfiles')
-    submenu:addOption(manageOptName, instance, callback.openProfileManager)
+    submenu:addOption(manageOptName, nil, UI.openProfileManager)
 
     -- character customization
     if config.Customization.EnableCharacterCustomization then
