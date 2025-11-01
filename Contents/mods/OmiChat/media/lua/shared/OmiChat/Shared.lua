@@ -1,5 +1,5 @@
----@namespace omichat
 ---Shared API.
+---@namespace omichat
 
 ---@class(partial) api.shared
 local API = require 'OmiChat/Module/Shared/Core'

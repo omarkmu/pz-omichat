@@ -1,5 +1,5 @@
----@namespace omichat
 ---Contains mod configuration and enables updating it.
+---@namespace omichat
 
 local utils = require 'OmiChat/Utils'
 local MetaFormatter = require 'OmiChat/Component/MetaFormatter'
@@ -9,7 +9,6 @@ local sort = table.sort
 local isempty = table.isempty
 
 
----Helper for managing and retrieving mod configuration.
 ---@class ConfigurationHelper : omi.ConfigurationHelper, Configuration
 local Configuration = utils.configuration {
     schema = require 'OmiChat/Component/Configuration/ConfigurationSchema',
@@ -26,9 +25,10 @@ local Configuration = utils.configuration {
     onLoad = function(self) self:refreshValueCaches() end,
 }
 
-Configuration.Preset = Preset
-
 --#region Static Fields
+
+---Class representing a configuration preset.
+Configuration.Preset = Preset
 
 ---Filename used for storing presets on the server.
 ---@private

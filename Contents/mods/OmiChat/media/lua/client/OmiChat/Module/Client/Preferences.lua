@@ -1,5 +1,5 @@
----@namespace omichat
 ---Handles player preferences.
+---@namespace omichat
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
@@ -9,10 +9,12 @@ local utils = API.utils
 local config = API.Configuration
 
 
----Contains functions for getting and setting player preferences.
 ---@class api.client.preferences
 ---@field private _prefs? PlayerPreferences The loaded player preferences.
 local Preferences = {}
+
+---Contains functions for getting and setting player preferences.
+API.preferences = Preferences
 
 ---The current preferences file version.
 ---@private
@@ -470,7 +472,6 @@ function Preferences._readPrefsJson()
 end
 
 
-API.preferences = Preferences
 return Preferences
 
 --#region Type Definitions

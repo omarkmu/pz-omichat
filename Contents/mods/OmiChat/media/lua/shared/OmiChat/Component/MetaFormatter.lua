@@ -1,5 +1,5 @@
----@namespace omichat
 ---Handles formatting chat messages with invisible characters.
+---@namespace omichat
 
 local utils = require 'OmiChat/Utils'
 
@@ -9,7 +9,6 @@ local floor = math.floor
 local metaChar = char(65535)
 
 
----Handles formatting text with invisible metadata.
 ---@class MetaFormatter : omi.Class
 ---@field protected _id integer The ID of the metadata formatter.
 ---@field protected _formatString string The format string used when formatting text.

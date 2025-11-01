@@ -1,7 +1,8 @@
----@namespace omichat
 ---Vanilla command list.
 ---Used for the rewritten `/help` command.
 ---This excludes disabled commands and commands without help text.
+---@namespace omichat
+
 ---@type VanillaCommand[]
 local VanillaCommandList = {
     {

@@ -1,5 +1,5 @@
----@namespace omichat
 ---Command stream definition for `/iconinfo`.
+---@namespace omichat
 
 local API = require 'OmiChat/Module/Client/Core'
 local utils = API.utils

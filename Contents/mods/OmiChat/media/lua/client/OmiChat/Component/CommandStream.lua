@@ -1,5 +1,5 @@
----@namespace omichat
 ---Stream for sending commands in chat.
+---@namespace omichat
 
 local Stream = require 'OmiChat/Component/Stream'
 local utils = require 'OmiChat/Utils'

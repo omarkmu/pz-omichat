@@ -1,5 +1,5 @@
----@namespace omichat
 ---Handles suggesting text based on input.
+---@namespace omichat
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
@@ -15,9 +15,12 @@ local MAX_RESULTS = 30
 local MAX_SEARCH = 100
 
 
----Contains functions for determining suggestions from input.
 ---@class api.client.suggestion
 local Suggestion = {}
+
+---Contains functions for determining suggestions from input.
+API.suggestion = Suggestion
+
 
 ---Associates names to custom suggestion spec argument type handlers.
 ---@type table<string, fun(ctx: SearchContext | string, spec: SuggestArgSpec): SearchResults?>
@@ -355,7 +358,7 @@ function Suggestion._suggestMentions(info)
 
     local range = config.Mentions.Range
     local isRanged = stream:isRanged()
-    local chatType = stream:getChatType()
+    local chatType = stream:getChatType() --[[@as omi.ChatTypeString]]
 
     local search = API.search.onlineUsernamesByChatName(text, chatType, true)
     local results = search.results
@@ -383,7 +386,6 @@ function Suggestion._suggestMentions(info)
 end
 
 
-API.suggestion = Suggestion
 return Suggestion
 
 --#region Type Definitions

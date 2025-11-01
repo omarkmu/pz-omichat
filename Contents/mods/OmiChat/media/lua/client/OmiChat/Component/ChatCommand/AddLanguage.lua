@@ -1,5 +1,5 @@
----@namespace omichat
 ---Command stream definition for `/addlanguage`.
+---@namespace omichat
 
 local API = require 'OmiChat/Module/Client/Core'
 

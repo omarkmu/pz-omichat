@@ -1,5 +1,5 @@
----@meta
 ---Type definitions that cannot be declared within the mod namespace.
+---@meta
 
 ---@class omichat.ISChat : ISChat
 ---@field instance? omichat.ISChat The ISChat instance.

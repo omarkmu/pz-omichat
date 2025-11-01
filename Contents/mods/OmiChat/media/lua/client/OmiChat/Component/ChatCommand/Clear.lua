@@ -1,5 +1,5 @@
----@namespace omichat
 ---Command stream definition for `/clear`.
+---@namespace omichat
 
 local API = require 'OmiChat/Module/Client/Core'
 

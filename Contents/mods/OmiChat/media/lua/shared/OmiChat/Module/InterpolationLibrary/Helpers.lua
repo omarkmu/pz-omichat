@@ -1,5 +1,5 @@
----@namespace omichat
 ---Helpers for interpolation functions.
+---@namespace omichat
 
 local API = require 'OmiChat/Module/Shared/Core'
 local API_C = API --[[@as api.client]]
@@ -19,7 +19,6 @@ local ASTERISK_PREFIX_PATTERN = '^(%s*[*' .. ASTERISK_CHAR .. '])(.+)'
 local ASTERISK_DELIM_PATTERN = '^"%s*[*' .. ASTERISK_CHAR .. ']'
 
 
----Contains helper functions for the interpolation library.
 ---@class InterpolationLibrary.Helpers
 local Helpers = {}
 

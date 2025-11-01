@@ -1,5 +1,5 @@
----@namespace omichat
 ---Base stream type.
+---@namespace omichat
 
 local utils = require 'OmiChat/Utils'
 local config = require 'OmiChat/Component/Configuration'

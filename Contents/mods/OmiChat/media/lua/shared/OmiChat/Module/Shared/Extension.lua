@@ -1,5 +1,5 @@
----@namespace omichat
 ---Handles extension of mod functionality.
+---@namespace omichat
 ---@diagnostic disable: access-invisible
 
 ---@class(partial) api.shared
@@ -14,9 +14,11 @@ local utils = API.utils
 local IS_CLIENT = not isServer()
 
 
----Contains functions for extending mod functionality.
 ---@class(partial) api.shared.extension
 local Extension = {}
+
+---Contains functions for extending mod functionality.
+API.extension = Extension
 
 
 ---Adds a new custom preset.
@@ -165,5 +167,4 @@ function Extension._writePresets()
 end
 
 
-API.extension = Extension
 return Extension

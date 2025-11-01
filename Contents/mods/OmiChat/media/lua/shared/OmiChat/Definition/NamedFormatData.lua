@@ -1,5 +1,5 @@
----@namespace omichat
 ---Information about the tokens and options that format strings accept.
+---@namespace omichat
 
 local utils = require 'OmiChat/Utils'
 
@@ -116,14 +116,6 @@ local TOKENS_CHAT = utils.appendCopy(TOKENS_CHAT_NO_NARRATIVE, TOKENS_NARRATIVE)
 local TOKENS_OVERHEAD = utils.appendCopy(TOKENS_OVERHEAD_NO_NARRATIVE, TOKENS_NARRATIVE)
 
 --#endregion
-
-
----@class FormatData
----@field tokenDescription string? A string ID for the description of a format's tokens.
----@field optionDescription string? A string ID for the description of a format's options.
----@field tokens (FormatDataTranslation | string)[]? A list of token names or translation tables.
----@field options (FormatDataTranslation | string)[]? A list of option names or translation tables.
----@field canSetError boolean? Flag for whether the format can set the error tokens.
 
 
 ---@type table<string, FormatData>
@@ -496,3 +488,14 @@ return {
         },
     },
 }
+
+--#region Type Definitions
+
+---@class FormatData
+---@field tokenDescription string? A string ID for the description of a format's tokens.
+---@field optionDescription string? A string ID for the description of a format's options.
+---@field tokens (FormatDataTranslation | string)[]? A list of token names or translation tables.
+---@field options (FormatDataTranslation | string)[]? A list of option names or translation tables.
+---@field canSetError boolean? Flag for whether the format can set the error tokens.
+
+--#endregion

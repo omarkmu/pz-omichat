@@ -1,5 +1,5 @@
----@namespace omichat
 ---Handles operations on the chat UI.
+---@namespace omichat
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
@@ -28,12 +28,14 @@ local UI_LIB = utils.lib.ui
 local config = API.Configuration
 local MultiMap = utils.MultiMap
 
----Contains functions for controlling the chat window and related UI components.
 ---@class api.client.ui
 ---@field suggestBox? omi.ui.SuggestBox The auto-suggest box for the chat input.
 ---@field private _configPanel? omi.forms.Form The configuration panel.
 ---@field private _typingDisplay? string The current display text for the typing indicator.
 local UI = {}
+
+---Contains functions for controlling the chat window and related UI components.
+API.ui = UI
 
 --#region Static Fields
 
@@ -1142,7 +1144,6 @@ end
 
 
 utils.setIntervalUI(UI._updateStatusDisplays)
-API.ui = UI
 return UI
 
 --#region Type Definitions

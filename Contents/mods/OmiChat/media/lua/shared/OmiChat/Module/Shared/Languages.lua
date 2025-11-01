@@ -1,14 +1,16 @@
----@namespace omichat
 ---Handles operations related to roleplay languages.
+---@namespace omichat
 
 ---@class(partial) api.shared
 local API = require 'OmiChat/Module/Shared/Core'
 local config = API.Configuration
 
 
----Contains functions related to roleplay languages.
 ---@class(partial) api.shared.language
 local Language = {}
+
+---Contains functions related to roleplay languages.
+API.language = Language
 
 
 ---Checks whether a player character speaks a roleplay language.
@@ -80,5 +82,4 @@ function Language.isSigned(language)
 end
 
 
-API.language = Language
 return Language

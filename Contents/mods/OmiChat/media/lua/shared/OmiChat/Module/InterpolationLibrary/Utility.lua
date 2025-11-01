@@ -1,5 +1,5 @@
----@namespace omichat
 ---Utility interpolation library functions.
+---@namespace omichat
 
 local API = require 'OmiChat/Module/Shared/Core'
 local API_C = API --[[@as api.client]]

@@ -1,5 +1,5 @@
----@namespace omichat
 ---Interpolation function library.
+---@namespace omichat
 ---@diagnostic disable: access-invisible
 
 

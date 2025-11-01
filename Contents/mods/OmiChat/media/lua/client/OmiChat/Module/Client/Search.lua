@@ -1,5 +1,5 @@
----@namespace omichat
 ---Handles searching.
+---@namespace omichat
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
@@ -11,11 +11,14 @@ local getTexture = getTexture
 local ISChat = ISChat
 
 
----Contains functions for performing searches.
 ---@class api.client.search
 ---@field private _perkList? search.PerkInfo[] Lazy-loaded list with information about perks.
 ---@field private _iconList? search.IconInfo[] Lazy-loaded list with information about icons.
 local Search = {}
+
+---Contains functions for performing searches.
+API.search = Search
+
 
 ---Searches for an icon by texture name or chat alias.
 ---@param ctxOrSearch SearchContext | string A search string or a table with options for the search.
@@ -699,7 +702,6 @@ function Search._playerUsername(player, ctx, ownUsername, includeSelf)
 end
 
 
-API.search = Search
 return Search
 
 --#region Type Definitions

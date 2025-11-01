@@ -1,5 +1,5 @@
----@namespace omichat
 ---Handles IsoPlayer overrides.
+---@namespace omichat
 
 local API = require 'OmiChat/Module/Client/Core'
 local utils = API.utils

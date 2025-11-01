@@ -1,5 +1,5 @@
----@namespace omichat
 ---Handles formatting, encoding, and decoding of chat messages.
+---@namespace omichat
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
@@ -9,10 +9,11 @@ local config = API.Configuration
 local MultiMap = utils.MultiMap
 
 
----Contains functions for formatting messages and validating the format of commands.
 ---@class api.client.format
 local Format = {}
 
+---Contains functions for formatting messages and validating the format of commands.
+API.format = Format
 
 ---Applies message transforms and format options to a message.
 ---@param message Message The message to build information for.
@@ -447,7 +448,6 @@ function Format._applyNarrativeStyle(input, stream, tokens)
 end
 
 
-API.format = Format
 return Format
 
 --#region Type Definitions

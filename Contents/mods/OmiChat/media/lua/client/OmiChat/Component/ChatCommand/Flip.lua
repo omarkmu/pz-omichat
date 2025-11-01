@@ -1,5 +1,5 @@
----@namespace omichat
 ---Command stream definition for `/flip`.
+---@namespace omichat
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'

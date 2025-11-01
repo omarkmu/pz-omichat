@@ -1,5 +1,5 @@
----@namespace omichat
 ---UI element for the chat rich text panel.
+---@namespace omichat
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
@@ -19,6 +19,8 @@ local UI = API.utils.ui
 ---@field lastChatCommand string The last command input in the chat tab.
 local ChatTab = UI.RichTextPanel:derive('ChatTab')
 
+---UI element for the chat rich text panel.
+API.ChatTab = ChatTab
 
 ---Creates a new chat tab panel.
 ---@param args omi.ui.InitArgs.RichTextPanel Arguments for creation of the chat tab.
@@ -41,5 +43,4 @@ function ChatTab:new(args)
 end
 
 
-API.ChatTab = ChatTab
 return ChatTab

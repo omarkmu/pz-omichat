@@ -1,8 +1,7 @@
----@namespace omichat
 ---Vanilla preset.
+---@namespace omichat
 
 local Preset = require 'OmiChat/Component/Configuration/Preset'
-
 
 return Preset:new {
     name = 'Vanilla',

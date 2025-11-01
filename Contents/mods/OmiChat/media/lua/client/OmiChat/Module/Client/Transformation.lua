@@ -1,5 +1,5 @@
----@namespace omichat
 ---Handles transforming chat message content based on settings.
+---@namespace omichat
 ---@diagnostic disable: access-invisible
 
 ---@class(partial) api.client
@@ -19,9 +19,11 @@ local hasSafehouse = SafeHouse.hasSafehouse
 local COMMAND_ARGS_START = utils.encodeInvisibleCharacter(config.ID_COMMAND_ARGS)
 
 
----Contains functions for transforming chat messages.
 ---@class api.client.transformation
 local Transformation = {}
+
+---Contains functions for modifying chat messages.
+API.transformation = Transformation
 
 
 ---Applies transformations to a message.
@@ -676,5 +678,4 @@ function Transformation._setup(info, player)
 end
 
 
-API.transformation = Transformation
 return Transformation

@@ -1,5 +1,5 @@
----@namespace omichat
 ---Handles chat overrides.
+---@namespace omichat
 
 local API = require 'OmiChat/Client'
 

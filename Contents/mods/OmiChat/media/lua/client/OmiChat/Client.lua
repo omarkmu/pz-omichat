@@ -1,11 +1,12 @@
----@namespace omichat
 ---Client API.
+---@namespace omichat
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
 
 ---List of built-in command streams.
 ---@type CommandStream[]
+---@private
 API._commandStreams = require 'OmiChat/Component/ChatCommands'
 
 

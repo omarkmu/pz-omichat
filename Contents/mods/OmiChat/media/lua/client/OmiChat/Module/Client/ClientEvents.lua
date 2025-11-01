@@ -1,5 +1,5 @@
----@namespace omichat
 ---Client-side event handlers.
+---@namespace omichat
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'

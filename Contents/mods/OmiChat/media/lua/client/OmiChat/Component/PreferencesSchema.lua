@@ -1,4 +1,6 @@
+---Schema for player preferences.
 ---@namespace omichat
+
 local utils = require 'OmiChat/Utils'
 
 local array = utils.schema.array

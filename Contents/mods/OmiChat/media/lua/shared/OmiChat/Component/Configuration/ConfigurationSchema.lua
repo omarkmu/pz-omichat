@@ -1,5 +1,5 @@
+---Schema for the mod's configuration options.
 ---@namespace omichat
----Information about the mod's configuration options.
 ---@diagnostic disable: access-invisible
 
 local utils = require 'OmiChat/Utils'

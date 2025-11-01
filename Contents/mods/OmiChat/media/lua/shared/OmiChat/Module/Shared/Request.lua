@@ -1,5 +1,5 @@
----@namespace omichat
 ---Handles defining topics for client and server requests.
+---@namespace omichat
 
 ---@class(partial) api.shared
 local API = require 'OmiChat/Module/Shared/Core'
@@ -22,9 +22,11 @@ local IS_DEBUG = getDebug()
 local COMMAND_ARGS_START = utils.encodeInvisibleCharacter(config.ID_COMMAND_ARGS)
 
 
----Contains functions for sending server and client commands.
 ---@class(partial) api.shared.request
 local Request = {}
+
+---Contains functions for sending server and client commands.
+API.request = Request
 
 ---Contains topics for request exchanges between the server and client.
 Request.TOPIC = {}
@@ -614,7 +616,6 @@ function Request._shouldSendTyping(sender, receiver, range, chatType)
 end
 
 
-API.request = Request
 return Request
 
 --#region Type Definitions

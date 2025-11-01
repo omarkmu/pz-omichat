@@ -1,5 +1,5 @@
----@namespace omichat
 ---Handles dispatching server commands to clients.
+---@namespace omichat
 
 if isClient() then return end
 
@@ -7,11 +7,12 @@ if isClient() then return end
 local API = require 'OmiChat/Module/Server/Core'
 
 
----Contains functions for sending requests to the client.
 ---@class api.server.request : api.shared.request
 local Request = API.request
 local Topic = Request.TOPIC
 
+---Contains functions for sending requests to the client.
+API.request = Request
 
 ---Sends the configuration to the given player.
 ---If no player is given, configuration is sent to all players.
@@ -98,5 +99,4 @@ end
 function Request.updatePlayerCache() return Topic.PLAYER_CACHE:broadcast() end
 
 
-API.request = Request
 return Request

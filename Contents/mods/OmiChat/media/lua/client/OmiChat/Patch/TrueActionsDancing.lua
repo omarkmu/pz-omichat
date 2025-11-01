@@ -1,5 +1,5 @@
----@namespace omichat
 ---Compatibility patch for True Actions Act 3 - Dancing.
+---@namespace omichat
 
 local API = require 'OmiChat/Client'
 local utils = API.utils

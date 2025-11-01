@@ -1,5 +1,5 @@
----@namespace omichat
 ---UI element for managing player preference profiles.
+---@namespace omichat
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'

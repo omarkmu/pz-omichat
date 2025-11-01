@@ -1,5 +1,6 @@
----@namespace omichat
 ---Command stream definition for `/help`.
+---@namespace omichat
+---@diagnostic disable: access-invisible
 
 local API = require 'OmiChat/Module/Client/Core'
 local vanillaCommands = require 'OmiChat/Definition/VanillaCommandList'

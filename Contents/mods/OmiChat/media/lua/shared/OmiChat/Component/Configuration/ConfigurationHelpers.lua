@@ -1,5 +1,5 @@
----@namespace omichat
 ---Helper functions for the configuration form and schema.
+---@namespace omichat
 
 local utils = require 'OmiChat/Utils'
 

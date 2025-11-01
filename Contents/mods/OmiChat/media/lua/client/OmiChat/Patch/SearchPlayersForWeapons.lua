@@ -1,5 +1,5 @@
----@namespace omichat
 ---Compatibility patch for Search Players For Weapons.
+---@namespace omichat
 ---@diagnostic disable: undefined-global
 
 local API = require 'OmiChat/Client'

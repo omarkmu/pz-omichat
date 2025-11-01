@@ -1,5 +1,5 @@
----@namespace omichat
 ---Handles operations on chat streams.
+---@namespace omichat
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
@@ -10,9 +10,12 @@ local MetaFormatter = API.MetaFormatter
 local ISChat = ISChat --[[@as omichat.ISChat]]
 
 
----Contains functions for retrieving and operating on streams.
 ---@class api.client.streams
 local Streams = {}
+
+---Contains functions for retrieving and operating on streams.
+API.streams = Streams
+
 
 ---Associates tags to chat streams that include them.
 ---@type table<string, ChatStream[]>
@@ -593,7 +596,6 @@ function Streams._updateOverrides()
 end
 
 
-API.streams = Streams
 return Streams
 
 --#region Type Definitions

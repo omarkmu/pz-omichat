@@ -1,5 +1,5 @@
----@namespace omichat
 ---Helper for building information about a chat message.
+---@namespace omichat
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
@@ -50,6 +50,9 @@ local getZomboidRadio = getZomboidRadio
 ---@field private font ChatFont The font size of the message.
 ---@field private color? omi.ColorTable<integer> The message color.
 local MessageInfo = utils.lib.class()
+
+---Helper for building information about a chat message.
+API.MessageInfo = MessageInfo
 
 
 local _ChatBase = __classmetatables[ChatBase.class].__index
@@ -994,7 +997,6 @@ function MessageInfo:new(message)
 end
 
 
-API.MessageInfo = MessageInfo
 return MessageInfo
 
 --#region Type Definitions

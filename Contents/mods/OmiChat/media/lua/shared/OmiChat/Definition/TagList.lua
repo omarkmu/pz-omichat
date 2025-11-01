@@ -1,6 +1,7 @@
----@namespace omichat
 ---List of built-in tags.
 ---This is used, alongside Sandbox strings, for populating suggestions and tooltips in the mod configuration.
+---@namespace omichat
+
 local TagList = {
     'Action',
     'ActionAsterisks',

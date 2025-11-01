@@ -1,5 +1,5 @@
----@namespace omichat
 ---Configuration form layout.
+---@namespace omichat
 
 local utils = require 'OmiChat/Utils'
 local Helpers = require 'OmiChat/Component/Configuration/ConfigurationHelpers'

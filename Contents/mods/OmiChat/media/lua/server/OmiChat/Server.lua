@@ -1,5 +1,5 @@
----@namespace omichat
 ---Server API.
+---@namespace omichat
 
 if isClient() then return end
 
@@ -10,6 +10,5 @@ local API = require 'OmiChat/Module/Server/Core'
 require 'OmiChat/Module/Server/Data'
 require 'OmiChat/Module/Server/Commands'
 require 'OmiChat/Module/Server/Request'
-require 'OmiChat/Module/Server/ServerEvents'
 
 return API

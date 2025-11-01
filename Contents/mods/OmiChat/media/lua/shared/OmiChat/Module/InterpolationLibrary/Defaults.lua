@@ -6,7 +6,6 @@ local API = require 'OmiChat/Module/Shared/Core'
 ---@class(partial) InterpolationLibrary
 local Library = require 'OmiChat/Module/InterpolationLibrary/Core'
 
----Contains handlers for the `$Default` interpolation function.
 ---@class(partial) InterpolationLibrary.Defaults
 Library.Defaults = Library.Defaults or {}
 

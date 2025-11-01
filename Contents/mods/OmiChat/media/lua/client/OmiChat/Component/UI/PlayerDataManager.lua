@@ -1,5 +1,5 @@
----@namespace omichat
 ---UI element for the player data manager admin utility.
+---@namespace omichat
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'

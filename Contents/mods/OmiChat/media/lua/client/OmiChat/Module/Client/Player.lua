@@ -1,5 +1,5 @@
----@namespace omichat
 ---Handles getting and setting data about the local player.
+---@namespace omichat
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
@@ -12,10 +12,11 @@ local getText = getText
 local getSpecificPlayer = getSpecificPlayer
 
 
----Contains functions for getting and setting data related to the local player.
 ---@class api.client.player
 local Player = {}
 
+---Contains functions for getting and setting data related to the local player.
+API.player = Player
 
 ---Adds a roleplay language to the local player's list.
 ---@param language string The language to add.
@@ -496,5 +497,4 @@ function Player.updateCharacterName(name, updateSurname)
 end
 
 
-API.player = Player
 return Player

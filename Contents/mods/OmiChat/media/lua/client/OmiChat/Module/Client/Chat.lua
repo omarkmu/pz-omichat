@@ -1,5 +1,5 @@
----@namespace omichat
 ---Handles chat manipulation.
+---@namespace omichat
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
@@ -16,9 +16,11 @@ local signEmoteRand = newrandom()
 local _ChatBase = __classmetatables[ChatBase.class].__index
 local _getChatType = _ChatBase.getType
 
----Contains functions related to manipulating the chat.
 ---@class api.client.chat
 local Chat = {}
+
+---Contains functions related to manipulating the chat.
+API.chat = Chat
 
 --#region Static Fields
 
@@ -645,7 +647,6 @@ function Chat._transformSendArgs(args, streamName)
 end
 
 
-API.chat = Chat
 return Chat
 
 --#region Type Definitions

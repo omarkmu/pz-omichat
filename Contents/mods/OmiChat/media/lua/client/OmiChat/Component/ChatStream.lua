@@ -1,5 +1,5 @@
----@namespace omichat
 ---Stream for sending chat messages.
+---@namespace omichat
 
 local Stream = require 'OmiChat/Component/Stream'
 local defaultStreamData = require 'OmiChat/Definition/DefaultStreamData'

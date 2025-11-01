@@ -1,14 +1,16 @@
----@namespace omichat
 ---Handles making client command requests to the server.
+---@namespace omichat
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
 
 
----Contains functions for sending requests to the server.
 ---@class api.client.request : api.shared.request
 local Request = API.request
 local Topic = Request.TOPIC
+
+---Contains functions for sending requests to the server.
+API.request = Request
 
 
 ---Requests adding a user-defined configuration preset to the list.
@@ -131,5 +133,4 @@ function Request.updateTypingStatus(range, chatType)
 end
 
 
-API.request = Request
 return Request

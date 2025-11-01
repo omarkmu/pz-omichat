@@ -1,25 +1,29 @@
----@namespace omichat
 ---API functionality exclusive to the client.
+---@namespace omichat
+
 ---@class(partial) api.client : api.shared
----@field utils utils.client
+---@field utils utils.client Contains various utility functions.
 local API = require 'OmiChat/Shared'
+local lib = require 'OmiLibrary/Client'
+local config = API.Configuration
 
 require 'Chat/ISChat'
-local lib = require 'OmiLibrary/Client'
 
 
-local config = API.Configuration
-local MetaFormatter = API.MetaFormatter
-
-
+---Dummy chat message object.
 API.MimicMessage = lib.chat.MimicMessage
+
+---Base stream type.
 API.Stream = require 'OmiChat/Component/Stream'
+
+---Stream for sending chat messages.
 API.ChatStream = require 'OmiChat/Component/ChatStream'
+
+---Stream for sending commands in chat.
 API.CommandStream = require 'OmiChat/Component/CommandStream'
 
 --#region Static Fields
 
----Contains various utility functions.
 ---@class utils.client : utils
 local utils = API.utils
 

@@ -1,5 +1,6 @@
----@namespace omichat
 ---List of default stream configuration objects without default data.
+---@namespace omichat
+
 ---@type Configuration.StreamDefinition[]
 local DefaultStreamList = {
     { Stream = 'admin', Enable = true },

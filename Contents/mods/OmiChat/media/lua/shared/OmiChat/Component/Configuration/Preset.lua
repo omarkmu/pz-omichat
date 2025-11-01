@@ -1,5 +1,5 @@
----@namespace omichat
 ---Class for configuration presets.
+---@namespace omichat
 
 local utils = require 'OmiChat/Utils'
 local set = utils.set.table

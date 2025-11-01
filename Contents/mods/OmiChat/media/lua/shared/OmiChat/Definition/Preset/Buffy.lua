@@ -1,8 +1,7 @@
----@namespace omichat
 ---Buffy preset.
+---@namespace omichat
 
 local Preset = require 'OmiChat/Component/Configuration/Preset'
-
 
 return Preset:new {
     name = 'Buffy',

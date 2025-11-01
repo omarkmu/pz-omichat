@@ -1,13 +1,16 @@
+---Handles operations related to managing hooks.
 ---@namespace omichat
----Handles operations related to managing hooks of mod functionality.
 
 ---@class(partial) api.shared
 local API = require 'OmiChat/Module/Shared/Core'
 
 
----Contains functions for handling hooks.
 ---@class(partial) api.shared.hooks
 local Hooks = {}
+
+---Contains functions for handling hooks.
+API.hooks = Hooks
+
 
 ---@enum HookType
 Hooks.HookType = {
@@ -200,7 +203,6 @@ function Hooks._handleEvent(list, ...)
 end
 
 
-API.hooks = Hooks
 return Hooks
 
 

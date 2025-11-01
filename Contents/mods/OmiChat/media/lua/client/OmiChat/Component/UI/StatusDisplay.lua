@@ -1,5 +1,5 @@
+---UI element for displaying text set with `/status`.
 ---@namespace omichat
----UI element for displaying `/status` text.
 
 local API = require 'OmiChat/Module/Client/Core'
 

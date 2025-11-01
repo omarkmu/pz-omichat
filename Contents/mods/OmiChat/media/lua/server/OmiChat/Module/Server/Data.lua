@@ -1,5 +1,5 @@
----@namespace omichat
 ---Handles player data.
+---@namespace omichat
 
 if isClient() then return end
 
@@ -8,10 +8,11 @@ local API = require 'OmiChat/Module/Server/Core'
 local config = API.Configuration
 local utils = API.utils
 
----Contains functions for handling player data.
 ---@class api.server.data : api.shared.data
 local Data = API.data
 
+---Contains functions for handling player data.
+API.data = Data
 
 ---Adds a roleplay language for a player.
 ---This does not broadcast changes to clients.
@@ -335,7 +336,6 @@ function Data._updateField(field, target, value, fromCommand)
 end
 
 
-API.data = Data
 return Data
 
 --#region Type Definitions

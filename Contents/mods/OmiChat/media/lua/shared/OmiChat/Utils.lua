@@ -1,5 +1,5 @@
----@namespace omichat
 ---Utility functions.
+---@namespace omichat
 
 local lib = require 'OmiLibrary'
 
@@ -14,7 +14,6 @@ local INVISIBLE_PATTERN = '['
     .. char(65535) .. '?'
 
 
----Contains various utility functions.
 ---@class utils : omi.proxy
 local utils = lib.proxy('OmiChat')
 

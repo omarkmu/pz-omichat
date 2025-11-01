@@ -1,6 +1,6 @@
----@meta
----@namespace omichat
 ---Type stub to describe the overloads of `Extension.addHook`.
+---@namespace omichat
+---@meta
 
 ---@class(partial) api.shared.extension
 local Extension = {}

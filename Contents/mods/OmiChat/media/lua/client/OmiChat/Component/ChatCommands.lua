@@ -1,5 +1,5 @@
----@namespace omichat
 ---Command stream definitions.
+---@namespace omichat
 
 -- load early for `player.canUseAdminCommands`
 require 'OmiChat/Module/Client/Player'

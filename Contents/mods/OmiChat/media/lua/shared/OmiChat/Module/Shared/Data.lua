@@ -1,5 +1,5 @@
----@namespace omichat
 ---Shared API functionality related to handling player data.
+---@namespace omichat
 
 ---@class(partial) api.shared
 local API = require 'OmiChat/Module/Shared/Core'
@@ -12,11 +12,13 @@ local ModData = ModData
 local getPlayerByOnlineID = getPlayerByOnlineID
 
 
----Contains functions for handling player data.
----On the client, these functions can only retrieve information for online players.
 ---@class(partial) api.shared.data
 ---@field protected _modData ModData? The cached mod data table. This is only present on the server.
 local Data = {}
+
+---Contains functions for handling player data.
+---On the client, these functions can only retrieve information for online players.
+API.data = Data
 
 ---The current mod data version.
 ---@protected
@@ -352,7 +354,6 @@ function Data._getPlayerUsername(player)
 end
 
 
-API.data = Data
 return Data
 
 --#region Type Definitions

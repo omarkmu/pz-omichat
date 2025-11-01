@@ -1,5 +1,5 @@
+---Contains callbacks for UI controls.
 ---@namespace omichat
----Contains callbacks for chat UI controls.
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
@@ -17,9 +17,11 @@ local max = math.max
 local textManager = getTextManager()
 
 
----Contains callbacks for UI controls.
 ---@class api.client.callbacks
 local Callback = {}
+
+---Contains callbacks for UI controls.
+API.callback = Callback
 
 ---Counter for skipping info panel updates.
 ---@private
@@ -344,5 +346,4 @@ function Callback.toggleUseSuggester(_)
 end
 
 
-API.callback = Callback
 return Callback

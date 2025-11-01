@@ -1,5 +1,5 @@
+---Handlers for processing chat commands on the server.
 ---@namespace omichat
----Handlers for processing commands on the server.
 
 if isClient() then return end
 
@@ -9,9 +9,11 @@ local config = API.Configuration
 local utils = API.utils
 
 
----Contains server handlers for chat commands.
 ---@class api.server.commands
 local Command = {}
+
+---Handlers for processing chat commands on the server.
+API.commands = Command
 
 
 ---Handles the `/addlanguage` command.
@@ -267,7 +269,6 @@ function Command.setName(player, args)
 end
 
 
-API.commands = Command
 return Command
 
 --#region Type Definitions

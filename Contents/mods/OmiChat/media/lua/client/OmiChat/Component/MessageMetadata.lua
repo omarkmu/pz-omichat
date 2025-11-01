@@ -1,5 +1,5 @@
+---Helper for accessing and setting metadata about a chat message.
 ---@namespace omichat
----Contains metadata about a chat message.
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
@@ -24,6 +24,8 @@ local utils = API.utils
 ---@field suppressedRadio? boolean Flag for whether the overhead text for this message has already been suppressed on radio.
 local MessageMetadata = utils.lib.class()
 
+---Helper for accessing and setting metadata about a chat message.
+API.MessageMetadata = MessageMetadata
 
 ---Clears the metadata information contained by the object.
 function MessageMetadata:clear()
@@ -156,7 +158,6 @@ function MessageMetadata:new(message)
 end
 
 
-API.MessageMetadata = MessageMetadata
 return MessageMetadata
 
 

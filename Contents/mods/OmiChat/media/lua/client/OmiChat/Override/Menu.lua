@@ -1,5 +1,5 @@
----@namespace omichat
 ---Handles overrides to show chat names within in-game menus.
+---@namespace omichat
 ---@diagnostic disable: duplicate-set-field
 
 local API = require 'OmiChat/Client'

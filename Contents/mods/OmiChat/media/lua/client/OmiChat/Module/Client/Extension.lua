@@ -1,18 +1,18 @@
+---Handles extending client-side mod functionality.
 ---@namespace omichat
----Client extension API.
 
 local insert = table.insert
-local sort = table.sort
 local ISChat = ISChat --[[@as omichat.ISChat]]
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
 
 
----Contains functions for extending mod functionality.
 ---@class api.client.extension : api.shared.extension
 local Extension = API.extension
 
+---Contains functions for extending mod functionality.
+API.extension = Extension
 
 ---Adds a command that can be triggered from chat.
 ---@param stream CommandStream
@@ -184,5 +184,4 @@ function Extension._insertStreamRelative(stream, other, relativeIndex)
 end
 
 
-API.extension = Extension
 return Extension

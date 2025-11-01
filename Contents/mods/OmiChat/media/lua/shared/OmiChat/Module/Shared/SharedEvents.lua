@@ -1,5 +1,5 @@
----@namespace omichat
 ---Shared event handlers.
+---@namespace omichat
 
 ---@class(partial) api.shared
 local API = require 'OmiChat/Module/Shared/Core'
