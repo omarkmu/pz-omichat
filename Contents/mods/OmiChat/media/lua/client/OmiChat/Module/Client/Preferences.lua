@@ -18,9 +18,13 @@ local Preferences = {}
 ---@private
 Preferences._version = 2
 
+---The old filename used for preferences.
+---@private
+Preferences._legacyFilename = 'omichat.json'
+
 ---The filename from which preferences are loaded.
 ---@private
-Preferences._filename = 'omichat.json'
+Preferences._filename = 'omichat/settings.json'
 
 ---Associates admin options to setting names.
 ---@type table<AdminOption, string>
@@ -435,9 +439,23 @@ end
 ---@return table?
 ---@private
 function Preferences._readPrefsJson()
-    local decoded, err = schema:readFile(Preferences._filename)
+    local decoded, err = schema:readFile({
+        filename = Preferences._filename,
+        create = false,
+    })
+
     if err then
-        utils.log.error('Failed to read preferences: %s', err)
+        -- read from legacy file when file is not found
+        if utils.startsWith(err, 'could not open file') then
+            decoded, err = schema:readFile({
+                filename = Preferences._legacyFilename,
+                create = false,
+            })
+        end
+
+        if err then
+            utils.log.error('Failed to read preferences: %s', err)
+        end
     end
 
     if not decoded then

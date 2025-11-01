@@ -32,7 +32,7 @@ Configuration.Preset = Preset
 
 ---Filename used for storing presets on the server.
 ---@private
-Configuration._presetFilename = 'omichat_presets.json'
+Configuration._presetFilename = 'omichat/configuration_presets.json'
 
 ---Table containing built-in presets.
 ---@private
