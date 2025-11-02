@@ -29,7 +29,8 @@ UI_EN = {
     UI_OmiChat_Info_IconUnknown = "'%1' is not a known icon name.",
     UI_OmiChat_Info_IconAlias = "'%3' is an alias for '%1', the icon name for: %2",
     UI_OmiChat_Info_Clear = "Console cleared",
-    UI_OmiChat_Info_AvailableEmotes = "Trigger emote animations in local chats by including one of the following emotes in your message. Available emotes:",
+    UI_OmiChat_Info_AvailableEmotes = "Available emotes:",
+    UI_OmiChat_Info_AvailableEmotes_WithMacro = "You can also trigger emotes in chat messages with !emote.",
     UI_OmiChat_Info_CommandList = "List of commands:",
     UI_OmiChat_Info_AvailableDances = "Available dances:",
     UI_OmiChat_Info_DanceUnknown = "Unknown dance. Use '/dance list' to see available dances.",
@@ -67,7 +68,7 @@ UI_EN = {
     UI_OmiChat_Error_LanguageUnknown = "Player '%1' does not know %2.",
 
     --[[ Help Text ]]--
-    UI_OmiChat_HelpText_Emotes = "Get a list of available chat emotes",
+    UI_OmiChat_HelpText_Emote = "Trigger an emote animation. Example: /emote yes. To see a list of emotes, use /emote list",
     UI_OmiChat_HelpText_SwitchLanguage = "Switch your active language. Example: /language Spanish",
     UI_OmiChat_HelpText_Name = "To set your name, use: /name Name. Example: /name Bob",
     UI_OmiChat_HelpText_NameFull = "To set your name, use: /name FirstName LastName. Example: /name Bob Smith",

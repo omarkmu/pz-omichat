@@ -24,6 +24,7 @@ Hooks.HookType = {
     decodeMessage = 'decodeMessage',
     flipCommand = 'flipCommand',
     flipCommandEnabled = 'flipCommandEnabled',
+    macro = 'macro',
     perceptionRange = 'perceptionRange',
     richTextAction = 'richTextAction',
     rollCommand = 'rollCommand',
@@ -108,6 +109,26 @@ end
 ---@return boolean? enabled `True` or `false` to enable or disable the command. If the return value is `nil`, existing logic is used.
 function Hooks.flipCommandEnabled()
     return Hooks._handleBoolean(Hooks._callbacks.flipCommandEnabled)
+end
+
+---Applies hooks for applying macros.
+---@param text string The input text.
+---@return ProcessMacroResults results The results of macro processing from the hooks.
+function Hooks.macro(text)
+    local playedEmote = false
+    local list = Hooks._callbacks.macro
+
+    for i = 1, #list do
+        local callback = list[i]
+        local result = callback(text, playedEmote) --[[@as ProcessMacroResults?]]
+
+        if result then
+            text = result.text or text
+            playedEmote = result.playedEmote or playedEmote
+        end
+    end
+
+    return { text = text, playedEmote = playedEmote }
 end
 
 ---Applies modifications to perception range from hooks.

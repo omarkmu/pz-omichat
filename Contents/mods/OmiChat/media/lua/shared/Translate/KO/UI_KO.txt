@@ -29,7 +29,8 @@ UI_KO = {
     UI_OmiChat_Info_IconUnknown = "'%1'은(는) 알려진 아이콘 이름이 아닙니다.",
     UI_OmiChat_Info_IconAlias = "'%3'은(는) 다음 아이콘의 이름인 '%1'의 별칭입니다. %2",
     UI_OmiChat_Info_Clear = "콘솔을 지웠습니다",
-    UI_OmiChat_Info_AvailableEmotes = "로컬 채팅장의 애니매이션을 사용하려면 다음 사용가능한 이모티콘을 입력하세요:",
+    UI_OmiChat_Info_AvailableEmotes = "사용가능한 이모티콘을:",
+    UI_OmiChat_Info_AvailableEmotes_WithMacro = "You can also trigger emotes in chat messages with !emote.",
     UI_OmiChat_Info_CommandList = "사용 가능한 명령어:",
     UI_OmiChat_Info_AvailableDances = "사용 가능한 춤:",
     UI_OmiChat_Info_DanceUnknown = "인식할 수 없는 춤을 입력했습니다. 사용가능한 춤 목록을 보려면, '/dance list'라고 입력하세요.",
@@ -67,7 +68,7 @@ UI_KO = {
     UI_OmiChat_Error_LanguageUnknown = "플레이어 '%1'이/가 %2을(를) 모릅니다.",
 
     --[[ Help Text ]]--
-    UI_OmiChat_HelpText_Emotes = "사용가능한 채팅 이모티콘 불러오기",
+    UI_OmiChat_HelpText_Emote = "Trigger an emote animation. Example: /emote yes. To see a list of emotes, use /emote list",
     UI_OmiChat_HelpText_SwitchLanguage = "현재 활성 언어를 전환합니다. Example: /language Spanish",
     UI_OmiChat_HelpText_Name = "이름을 설정하기위해, '/name Name'을 사용하세요. Example: /name Bob",
     UI_OmiChat_HelpText_NameFull = "이름을 설정하기위해, '/name FirstName LastName'을 사용하세요. Example: /name Bob Smith",

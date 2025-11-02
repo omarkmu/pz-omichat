@@ -29,7 +29,8 @@ UI_FR = {
     UI_OmiChat_Info_IconUnknown = "'%1' n'est pas un nom d'icône connu.",
     UI_OmiChat_Info_IconAlias = "'%3' est un alias pour '%1', le nom de l'icône pour : %2",
     UI_OmiChat_Info_Clear = "Console effacée",
-    UI_OmiChat_Info_AvailableEmotes = "Déclenchez des animations d'émoticônes dans les discussions locales en incluant l'une des émoticônes suivantes dans votre message. Émoticônes disponibles :",
+    UI_OmiChat_Info_AvailableEmotes = "Émoticônes disponibles :",
+    UI_OmiChat_Info_AvailableEmotes_WithMacro = "You can also trigger emotes in chat messages with !emote.",
     UI_OmiChat_Info_CommandList = "Liste des commandes :",
     UI_OmiChat_Info_AvailableDances = "Danses disponibles :",
     UI_OmiChat_Info_DanceUnknown = "Danse inconnue. Utilisez '/dance list' pour voir les danses disponibles.",
@@ -67,7 +68,7 @@ UI_FR = {
     UI_OmiChat_Error_LanguageUnknown = "Le joueur '%1' ne connaît pas %2.",
 
     --[[ Help Text ]]--
-    UI_OmiChat_HelpText_Emotes = "Obtenez une liste des émoticônes de discussion disponibles",
+    UI_OmiChat_HelpText_Emote = "Trigger an emote animation. Example: /emote yes. To see a list of emotes, use /emote list",
     UI_OmiChat_HelpText_SwitchLanguage = "Changer votre langue active. Exemple : /language Spanish",
     UI_OmiChat_HelpText_Name = "Pour définir votre nom, utilisez : /name Nom. Exemple : /name Bob",
     UI_OmiChat_HelpText_NameFull = "Pour définir votre nom, utilisez : /name Prénom Nom. Exemple : /name Bob Smith",

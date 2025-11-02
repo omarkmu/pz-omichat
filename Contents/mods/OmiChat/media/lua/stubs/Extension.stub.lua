@@ -56,6 +56,11 @@ function Extension.addHook(type, callback) end
 ---@param callback fun(): boolean? The hook callback function. If this returns `nil`, the original checks will run.
 function Extension.addHook(type, callback) end
 
+---Adds a hook for processing macros.
+---@param type 'macro'
+---@param callback fun(text: string, playedEmote: boolean): ProcessMacroResults? The hook callback function. Returns the results of processing.
+function Extension.addHook(type, callback) end
+
 ---Adds a hook for determining the perception range.
 ---@param type 'perceptionRange'
 ---@param callback fun(args: Args.Hook.PerceptionRange): integer? The hook callback function. Returns the range to use.

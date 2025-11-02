@@ -136,7 +136,9 @@ Sandbox_EN = {
 
     Sandbox_OmiChat_Macros = "Macros",
     Sandbox_OmiChat_Macros_title = "Macro Settings",
-    Sandbox_OmiChat_Macros_AllowEmotes = "Enable Emote Shortcuts",
+    Sandbox_OmiChat_Macros_Enable = "Enabled",
+    Sandbox_OmiChat_Macros_BuiltIn = "Built-In Macros",
+    Sandbox_OmiChat_Macros_BuiltIn_Emote = "Emotes",
 
     Sandbox_OmiChat_Mentions = "Mentions",
     Sandbox_OmiChat_Mentions_Enable = "Enabled",
@@ -333,7 +335,9 @@ Sandbox_EN = {
     Sandbox_OmiChat_Language_SelfAddAllowlist_tooltip = "The list of languages that should display in the menu for adding languages.",
     Sandbox_OmiChat_Language_SelfAddBlocklist_tooltip = "The list of languages that should not display in the menu for adding languages.",
 
-    Sandbox_OmiChat_Macros_AllowEmotes_tooltip = "Controls whether emote shortcuts can be used in chat to trigger animations.",
+    Sandbox_OmiChat_Macros_Enable_tooltip = "Controls whether macros, including built-in macros, can be used.",
+    Sandbox_OmiChat_Macros_BuiltIn_tooltip = "Controls which built-in macros are enabled.",
+    Sandbox_OmiChat_Macros_BuiltIn_Emote_tooltip = "If enables, players can use shortcuts in chat to trigger animations.",
 
     Sandbox_OmiChat_Mentions_Enable_tooltip = "Controls whether players can use @ to mention other players, which includes their name color in chat.",
     Sandbox_OmiChat_Mentions_AlwaysUseNameColors_tooltip = "If this is enabled, the name color option on streams will be ignored for mentions.",
@@ -400,7 +404,7 @@ Sandbox_EN = {
 
 
     --[[ Tags ]]--
-    Sandbox_OmiChat_tag_unknown = "Unrecognized tag.",
+    Sandbox_OmiChat_unrecognized_tag = "Unrecognized tag.",
     Sandbox_OmiChat_tag_Action = "Indicates that a stream is a roleplay action (e.g., <SPACE> <PUSHRGB:0,1,0> /me <POPRGB> )." ..
         " <LINE> This controls various defaults for formatting.",
     Sandbox_OmiChat_tag_ActionAsterisks = "Indicates that an action should be prefixed by two asterisks and a space.",
@@ -644,7 +648,7 @@ Sandbox_EN = {
     Sandbox_OmiChat_option_whisperTag = "The default dialogue tag to use for a whispered message. Defaults to 'whispers'.",
 
     --[[ Format String Overview ]]--
-    Sandbox_OmiChat_format_strings = "<CENTRE> <SIZE:large> Format Strings <LINE> <SIZE:small> " ..
+    Sandbox_OmiChat_format_strings = "<CENTRE> <SIZE:large> Format Strings <LINE> <SIZE:small> <LEFT> " ..
         " The style of format strings is designed to be fairly simple to modify but flexible enough to satisfy most servers' needs for customization." ..
         " They can utilize a few features, which are described below." ..
         "" ..

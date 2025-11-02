@@ -9,6 +9,7 @@ local PAD_N = 10
 local PAD_TOP = { paddingTop = PAD_N }
 local PAD_BOTTOM = { paddingBottom = PAD_N }
 local NO_REORDER = { noReorderButtons = true }
+local ENABLE = { togglePageFields = true }
 
 local TAGS = { noReorderButtons = true, onChange = Helpers.onChangeTag }
 local FORMAT = { init = Helpers.initFormatOption, onInfoClick = Helpers.onClickFormatInfo }
@@ -46,9 +47,7 @@ return {
         },
 
         Buffs = rules {
-            Enable = {
-                togglePageFields = true,
-            },
+            Enable = ENABLE,
             Cooldown = PAD_BOTTOM,
         },
 
@@ -141,9 +140,7 @@ return {
         },
 
         EchoMessages = rules {
-            Enable = {
-                togglePageFields = true,
-            },
+            Enable = ENABLE,
             ChatFormat = FORMAT,
             OverheadFormat = FORMAT,
             Tags = TAGS,
@@ -216,10 +213,12 @@ return {
             UnknownLanguageRadio = FORMAT_PAD_BOTTOM,
         },
 
+        Macros = rules {
+            Enable = ENABLE,
+        },
+
         Mentions = rules {
-            Enable = {
-                togglePageFields = true,
-            },
+            Enable = ENABLE,
 
             Range = PAD_TOP,
             Format = FORMAT,
@@ -227,9 +226,7 @@ return {
         },
 
         NarrativeStyle = rules {
-            Enable = {
-                togglePageFields = true,
-            },
+            Enable = ENABLE,
 
             OverheadContentFormat = FORMAT,
             ChatContentFormat = FORMAT_PAD_BOTTOM,
@@ -278,10 +275,7 @@ return {
         },
 
         TypingIndicator = rules {
-            Enable = {
-                togglePageFields = true,
-            },
-
+            Enable = ENABLE,
             Format = FORMAT,
             NameFormat = FORMAT,
         },

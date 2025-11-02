@@ -113,37 +113,47 @@ end
 
 ---Gets a playable emote by name.
 ---@param name string The name of the emote.
----@return (string | fun(player: IsoPlayer, emote: string))? emote An emote name or handler function. `Nil` if there's no such emote.
+---@return ChatEmote? emote An emote handler, or `nil` if there's no such emote.
 function Chat.getEmote(name)
     return API._emotes[name]
 end
 
----Returns the first emote found from an emote shortcut in the provided text.
+---Gets a list of enabled emote names.
+---@return string[] list
+function Chat.getEmoteNames()
+    local list = {}
+    for i = 1, #API._emoteList do
+        local name = API._emoteList[i]
+        local emote = API._emotes[name]
+        if emote and emote:isEnabled() then
+            list[#list + 1] = name
+        end
+    end
+
+    return list
+end
+
+---Returns the first enabled emote found from an emote macro in the provided text.
 ---@param command string The command to read.
----@return (string | fun(player: IsoPlayer, emote: string))? emote An emote name or handler function. `Nil` if there's no such emote.
+---@return ChatEmote? emote An emote handler, or `nil` if no enabled emote could be found.
 ---@return integer? start The start position of the emote in the text.
----@return integer? finish The end position of the emote in the text.
+---@return integer? stop The end position of the emote in the text.
 ---@return string? emoteText The emote name from the text.
 function Chat.getEmoteFromCommand(command)
     local startPos = 1
     while startPos < #command do
-        local start, finish, whitespace, text = command:find('(%s*)%.([%w_]+)', startPos)
-        if not start or not finish then
-            break
+        local macro = Chat.getNextMacroText(command, startPos)
+        if not macro then
+            return
         end
 
-        -- require whitespace unless the emote is at the start
-        if start ~= 1 and #whitespace == 0 then
-            text = nil
+        local text = macro.text:lower()
+        local emote = Chat.getEmote(text)
+        if emote and emote:isEnabled() then
+            return emote, macro.start, macro.stop, text
         end
 
-        local emoteToPlay = text and Chat.getEmote(text:lower())
-        if emoteToPlay then
-            ---@cast text -?
-            return emoteToPlay, start, finish, text:lower()
-        end
-
-        startPos = finish + 1
+        startPos = macro.stop + 1
     end
 end
 
@@ -158,6 +168,29 @@ function Chat.getMessageChatType(message)
 
     ---@cast message ChatMessage
     return tostring(_getChatType(message:getChat())) --[[@as omi.ChatTypeString]]
+end
+
+---Returns the next macro text found in a command, at or after the given start position.
+---@param command string The command text to search.
+---@param startPos integer? The start position. Defaults to `1`.
+---@return MacroTextResult? result
+function Chat.getNextMacroText(command, startPos)
+    startPos = startPos or 1
+    local start, stop, whitespace, text = command:find('(%s*)!([%w_]+)', startPos)
+    if not start or not stop or not text then
+        return
+    end
+
+    -- require leading whitespace unless the macro is at the start
+    if start ~= 1 and #whitespace == 0 then
+        return
+    end
+
+    return {
+        start = start,
+        stop = stop,
+        text = text,
+    }
 end
 
 ---Gets an emote meant to simulate sign language based on the given text.
@@ -194,19 +227,18 @@ function Chat.processCommand(args)
 
     local commandCategory = 'other' ---@type StreamCategory
     local isHandled = false
-    local allowEmotes = false
+    local processMacros = false
     local isDefault = false
 
     if not stream then
-        -- process emotes for streamless messages unless there's a leading slash
+        -- process macros for streamless messages unless there's a leading slash
         local isCommand = utils.startsWith(input, '/')
-        allowEmotes = not isCommand
+        processMacros = not isCommand
         command = input
 
         local default = API.streams.getDefaultTabStream(instance.currentTabID)
         if not isCommand and default then
             stream = default
-            allowEmotes = not isCommand and default:isAllowEmotes()
             isDefault = true
         end
     end
@@ -218,10 +250,10 @@ function Chat.processCommand(args)
             -- wrong chat tab
             showWrongChatTabMessage(instance.currentTabID - 1, stream:getTabID() - 1, chatCommand or '')
             stream = nil
-            allowEmotes = false
+            processMacros = false
         else
             streamToUse = stream
-            allowEmotes = not isDefault and stream:isAllowEmotes() or allowEmotes
+            processMacros = stream:isChatStream()
             commandCategory = stream:getCategory()
         end
 
@@ -230,29 +262,11 @@ function Chat.processCommand(args)
         end
     end
 
-    -- handle emotes specified with .emote
     local playedEmote
-    if allowEmotes and config:isEmoteMacroEnabled() then
-        local emoteToPlay, start, finish, emote = API.chat.getEmoteFromCommand(command)
-        if emoteToPlay then
-            ---@cast start -?
-            ---@cast finish -?
-
-            -- remove the emote text
-            isHandled = true
-            playedEmote = true
-            command = utils.trim(command:sub(1, start - 1) .. command:sub(finish + 1))
-
-            local player = getSpecificPlayer(0)
-            if player then
-                if type(emoteToPlay) == 'string' then
-                    player:playEmote(emoteToPlay)
-                else
-                    ---@cast emote -?
-                    emoteToPlay(player, emote)
-                end
-            end
-        end
+    if processMacros then
+        local macroResult = Chat.processMacros(command)
+        command = macroResult.text or command
+        playedEmote = macroResult.playedEmote
     end
 
     -- fix the switching functionality by updating to the used stream
@@ -315,6 +329,47 @@ function Chat.processCommand(args)
     instance.timerTextEntry = 20
 
     return true
+end
+
+---Processes macros in an input string.
+---@param text string The input text.
+---@return ProcessMacroResults results
+function Chat.processMacros(text)
+    if not config.Macros.Enable then
+        return {}
+    end
+
+    local playedEmote = false
+    local hookResult = API.hooks.has.macro and API.hooks.macro(text)
+    if hookResult then
+        text = hookResult.text or text
+        playedEmote = hookResult.playedEmote or false
+    end
+
+    if playedEmote or not config.Macros.BuiltIn.Emote then
+        return { text = text, playedEmote = playedEmote }
+    end
+
+    local player = getSpecificPlayer(0)
+    if not player then
+        return { text = text }
+    end
+
+    local emote, start, stop, emoteName = API.chat.getEmoteFromCommand(text)
+    if not emote then
+        return { text = text }
+    end
+
+    ---@cast start -?
+    ---@cast stop -?
+    ---@cast emoteName -?
+
+    emote:play(player, emoteName)
+
+    return {
+        playedEmote = true,
+        text = utils.trim(text:sub(1, start - 1) .. text:sub(stop + 1)),
+    }
 end
 
 ---Sends a message on the given stream.
@@ -682,6 +737,14 @@ return Chat
 ---@field context table Table for arbitrary context data.
 ---@field suggestions omi.ui.SuggestBox.Suggestion[] The current list of suggestions.
 
+---@class MacroTextResult
+---@field start integer The start position of the macro in the text.
+---@field stop integer The end position of the macro in the text.
+---@field text string The macro text.
+
+---@class ProcessMacroResults
+---@field text? string The processed text.
+---@field playedEmote? boolean Flag for whether an emote was played.
 
 ---@alias ChatFont 'small' | 'medium' | 'large'
 

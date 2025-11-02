@@ -55,7 +55,7 @@ function _IsoPlayer:Callout(playEmote)
     end
 
     local formatterName
-    local shout = shouts[utils.randInt(1, shoutMax + 1)] --[[@as string]]
+    local shout = shouts[utils.randInt(1, shoutMax)] --[[@as string]]
     if isSneaking then
         formatterName = 'sneakCallout'
         shout = shout:lower()

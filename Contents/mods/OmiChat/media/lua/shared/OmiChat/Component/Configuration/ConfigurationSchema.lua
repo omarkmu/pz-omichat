@@ -18,6 +18,17 @@ local set = utils.schema.set
 local str = utils.schema.string
 local DEFAULT = '$Default()'
 
+local CLEAR_ON_DEATH = {
+    'Icon',
+    'Languages',
+    'Nickname',
+    'Status',
+}
+
+local BUILTIN_MACROS = {
+    'Emote',
+}
+
 
 return utils.schema {
     form = require 'OmiChat/Component/Configuration/ConfigurationForm',
@@ -32,15 +43,8 @@ return utils.schema {
             CaseInsensitiveChatStreams = bool(true),
 
             ClearOnDeath = set {
-                default = utils.set.table { 'Icon', 'Languages', 'Nickname', 'Status' },
-                items = enum {
-                    values = {
-                        'Icon',
-                        'Languages',
-                        'Nickname',
-                        'Status',
-                    },
-                },
+                default = utils.set.table(CLEAR_ON_DEATH),
+                items = enum { values = CLEAR_ON_DEATH },
             },
 
             MinimumCommandAccessLevel = int(16, 1, 32),
@@ -250,7 +254,11 @@ return utils.schema {
         },
 
         Macros = container {
-            AllowEmotes = bool(true),
+            Enable = bool(true),
+            BuiltIn = set {
+                default = utils.set.table(BUILTIN_MACROS),
+                items = enum { values = BUILTIN_MACROS },
+            },
         },
 
         Mentions = container {
@@ -364,7 +372,6 @@ return utils.schema {
                         OverheadFormat = str(DEFAULT),
 
                         AllowBuffs = bool(false),
-                        AllowEmotes = bool(false),
                         AllowMentions = bool(true),
                         AllowLanguages = bool(false),
                         AllowTypingIndicator = bool(false),
@@ -588,7 +595,11 @@ return utils.schema {
 ---@field List Configuration.LanguageDefinition[]
 
 ---@class Configuration.Macros
----@field AllowEmotes boolean
+---@field Enable boolean
+---@field BuiltIn Configuration.Macros.BuiltIn
+
+---@class Configuration.Macros.BuiltIn
+---@field Emote boolean?
 
 ---@class Configuration.Mentions
 ---@field Enable boolean
@@ -652,7 +663,6 @@ return utils.schema {
 ---@field PerceptionRange integer?
 ---@field PerceptionRangeSigned integer?
 ---@field AllowBuffs boolean?
----@field AllowEmotes boolean?
 ---@field AllowMentions boolean?
 ---@field AllowLanguages boolean?
 ---@field AllowTypingIndicator boolean?

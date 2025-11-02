@@ -1,5 +1,6 @@
 ---Compatibility patch for True Actions Act 3 - Dancing.
 ---@namespace omichat
+---@diagnostic disable: access-invisible
 
 local API = require 'OmiChat/Client'
 local utils = API.utils
@@ -14,27 +15,31 @@ local trim = utils.trim
 -- dances from TAD
 local itemDanceByItemType = {}
 local itemDances = {
-    afoxe_samba_raggae = {
+    afoxe_samba_reggae = {
         item = 'TAD.BobTA_Afoxe_Samba_Raggae_card',
         emote = 'BobTA_Afoxe_Samba_Raggae',
+        display = 'Afoxe Samba Reggae',
     },
-    belly_1 = {
+    belly1 = {
         item = 'TAD.BobTA_Belly_Dancing_One_card',
         emote = 'BobTA_Belly_Dancing_One',
+        display = 'Belly Dancing 1',
     },
-    belly_2 = {
+    belly2 = {
         item = 'TAD.BobTA_Belly_Dancing_Two_card',
         emote = 'BobTA_Belly_Dancing_Two',
+        display = 'Belly Dancing 2',
     },
-    belly_3 = {
+    belly3 = {
         item = 'TAD.BobTA_Belly_Dancing_Three_card',
         emote = 'BobTA_Belly_Dancing_Three',
+        display = 'Belly Dancing 3',
     },
     boogaloo = {
         item = 'TAD.BobTA_Boogaloo_card',
         emote = 'BobTA_Boogaloo',
     },
-    breakdance_1990 = {
+    breakdance1990 = {
         item = 'TAD.BobTA_Breakdance_1990_card',
         emote = 'BobTA_Breakdance_1990',
     },
@@ -58,9 +63,10 @@ local itemDances = {
         item = 'TAD.BobTA_Locking_card',
         emote = 'BobTA_Locking',
     },
-    moonwalk_2 = {
+    moonwalk2 = {
         item = 'TAD.BobTA_Moonwalk_Two_card',
         emote = 'BobTA_Moonwalk_Two',
+        display = 'Moonwalk 2',
     },
     northern_soul_spin_and_floor_work = {
         item = 'TAD.BobTA_Northern_Soul_Spin_and_Floor_Work_card',
@@ -74,17 +80,20 @@ local itemDances = {
         item = 'TAD.BobTA_Rick_Dancing_card',
         emote = 'BobTA_Rick_Dancing',
     },
-    robot_1 = {
+    robot1 = {
         item = 'TAD.BobTA_Robot_One_card',
         emote = 'BobTA_Robot_One',
+        display = 'Robot 1',
     },
-    robot_2 = {
+    robot2 = {
         item = 'TAD.BobTA_Robot_Two_card',
         emote = 'BobTA_Robot_Two',
+        display = 'Robot 2',
     },
-    salsa_2 = {
+    salsa2 = {
         item = 'TAD.BobTA_Salsa_Two_card',
         emote = 'BobTA_Salsa_Two',
+        display = 'Salsa 2',
     },
     samba_olodum = {
         item = 'TAD.BobTA_Samba_Olodum_card',
@@ -102,37 +111,45 @@ local itemDances = {
         item = 'TAD.BobTA_Snake_card',
         emote = 'BobTA_Snake',
     },
-    thriller_1 = {
+    thriller1 = {
         item = 'TAD.BobTA_Thriller_One_card',
         emote = 'BobTA_Thriller_One',
+        display = 'Thriller 1',
     },
-    thriller_2 = {
+    thriller2 = {
         item = 'TAD.BobTA_Thriller_Two_card',
         emote = 'BobTA_Thriller_Two',
+        display = 'Thriller 2',
     },
-    thriller_3 = {
+    thriller3 = {
         item = 'TAD.BobTA_Thriller_Three_card',
         emote = 'BobTA_Thriller_Three',
+        display = 'Thriller 3',
     },
-    thriller_4 = {
+    thriller4 = {
         item = 'TAD.BobTA_Thriller_Four_card',
         emote = 'BobTA_Thriller_Four',
+        display = 'Thriller 4',
     },
-    tut_1 = {
+    tut1 = {
         item = 'TAD.BobTA_Tut_One_card',
         emote = 'BobTA_Tut_One',
+        display = 'Tut 1',
     },
-    tut_2 = {
+    tut2 = {
         item = 'TAD.BobTA_Tut_Two_card',
         emote = 'BobTA_Tut_Two',
+        display = 'Tut 2',
     },
-    wave_1 = {
+    wave1 = {
         item = 'TAD.BobTA_Wave_One_card',
         emote = 'BobTA_Wave_One',
+        display = 'Wave 1',
     },
-    wave_2 = {
+    wave2 = {
         item = 'TAD.BobTA_Wave_Two_card',
         emote = 'BobTA_Wave_Two',
+        display = 'Wave 2',
     },
 }
 local recipeDances = {
@@ -152,11 +169,11 @@ local recipeDances = {
         recipe = 'BobTA Arm Push',
         emote = 'BobTA_Arm_Push',
     },
-    arm_wave_1 = {
+    arm_wave1 = {
         recipe = 'BobTA Arm Wave One',
         emote = 'BobTA_Arm_Wave_One',
     },
-    arm_wave_2 = {
+    arm_wave2 = {
         recipe = 'BobTA Arm Wave Two',
         emote = 'BobTA_Arm_Wave_Two',
     },
@@ -164,15 +181,15 @@ local recipeDances = {
         recipe = 'BobTA Around The World',
         emote = 'BobTA_Around_The_World',
     },
-    bboy_hip_hop_1 = {
+    bboy_hip_hop1 = {
         recipe = 'BobTA Bboy Hip Hop One',
         emote = 'BobTA_Bboy_Hip_Hop_One',
     },
-    bboy_hip_hop_2 = {
+    bboy_hip_hop2 = {
         recipe = 'BobTA Bboy Hip Hop Two',
         emote = 'BobTA_Bboy_Hip_Hop_Two',
     },
-    bboy_hip_hop_3 = {
+    bboy_hip_hop3 = {
         recipe = 'BobTA Bboy Hip Hop Three',
         emote = 'BobTA_Bboy_Hip_Hop_Three',
     },
@@ -224,7 +241,7 @@ local recipeDances = {
         recipe = 'BobTA Maraschino',
         emote = 'BobTA_Maraschino',
     },
-    moonwalk_1 = {
+    moonwalk1 = {
         recipe = 'BobTA MoonWalk One',
         emote = 'BobTA_MoonWalk_One',
     },
@@ -256,15 +273,15 @@ local recipeDances = {
         recipe = 'BobTA Rumba Dancing',
         emote = 'BobTA_Rumba_Dancing',
     },
-    running_man_1 = {
+    running_man1 = {
         recipe = 'BobTA Running Man One',
         emote = 'BobTA_Running_Man_One',
     },
-    running_man_2 = {
+    running_man2 = {
         recipe = 'BobTA Running Man Two',
         emote = 'BobTA_Running_Man_Two',
     },
-    running_man_3 = {
+    running_man3 = {
         recipe = 'BobTA Running Man Three',
         emote = 'BobTA_Running_Man_Three',
     },
@@ -300,11 +317,11 @@ local recipeDances = {
         recipe = 'BobTA Side to Side',
         emote = 'BobTA_Side_to_Side',
     },
-    twist_1 = {
+    twist1 = {
         recipe = 'BobTA Twist One',
         emote = 'BobTA_Twist_One',
     },
-    twist_2 = {
+    twist2 = {
         recipe = 'BobTA Twist Two',
         emote = 'BobTA_Twist_Two',
     },
@@ -318,6 +335,11 @@ local recipeDances = {
     },
 }
 
+---Checks whether the compatibility patch is enabled.
+---@return boolean
+local function isPatchEnabled()
+    return config:compatTADEnabled()
+end
 
 ---Display function for dances.
 ---@param dance table
@@ -405,6 +427,25 @@ local function mapDanceValue(dance)
     return dance.name
 end
 
+---Gets a random dance the player knows, or `nil` if the player doesn't know any.
+---@return table?
+local function getRandomKnownDance(player)
+    local dances, currentDanceIdx = getAvailableDances(player, player:getVariableString('emote'))
+
+    local idx ---@type integer
+    if currentDanceIdx then
+        -- avoid doing the same dance
+        idx = utils.randInt(1, #dances - 1)
+        if idx == currentDanceIdx then
+            idx = #dances
+        end
+    else
+        idx = utils.randInt(1, #dances)
+    end
+
+    return dances[idx]
+end
+
 ---Returns a dance emote given command input, or information
 ---used to display an error message.
 ---@param name string
@@ -419,20 +460,7 @@ local function processDanceCommand(name, player)
 
     -- get a random known dance
     if #name == 0 then
-        local dances, currentDanceIdx = getAvailableDances(player, player:getVariableString('emote'))
-
-        local idx ---@type integer
-        if currentDanceIdx then
-            -- avoid doing the same dance
-            idx = utils.randInt(1, #dances)
-            if idx == currentDanceIdx then
-                idx = #dances
-            end
-        else
-            idx = utils.randInt(1, #dances + 1)
-        end
-
-        local dance = dances[idx]
+        local dance = getRandomKnownDance(player)
         if dance then
             return { emote = dance.emote }
         end
@@ -485,7 +513,7 @@ local function searchKnownDances(ctxOrSearch)
         return
     end
 
-    ---@diagnostic disable: access-invisible
+
     local ctx = API.search._buildContext(ctxOrSearch)
     ctx.display = ctx.display or danceDisplay
     ctx.mapValue = mapDanceValue
@@ -502,15 +530,22 @@ local function searchKnownDances(ctxOrSearch)
     end
 
     return API.search._collectResults(ctx)
-    ---@diagnostic enable: access-invisible
 end
 
+---Plays a dance emote.
+---@param emote string The dance emote to play.
+---@param player IsoPlayer The player to play the emote on.
+local function playDanceEmote(emote, player)
+    player:setPrimaryHandItem(nil)
+    player:setSecondaryHandItem(nil)
+    player:playEmote(emote)
+end
 
 local danceStream = API.CommandStream:new {
     name = 'dance',
     helpTextID = 'UI_OmiChat_HelpText_Dance',
     suggestSpec = { 'known-dance' },
-    isEnabled = function() return config:compatTADEnabled() end,
+    isEnabled = isPatchEnabled,
     onUse = function(args)
         local player = getSpecificPlayer(0)
         if not player then
@@ -520,9 +555,7 @@ local danceStream = API.CommandStream:new {
         local feedback
         local info = processDanceCommand(args.text, player)
         if info.emote then
-            player:setPrimaryHandItem(nil)
-            player:setSecondaryHandItem(nil)
-            player:playEmote(info.emote)
+            playDanceEmote(info.emote, player)
         elseif info.unknownRecipe then
             feedback = getText('UI_OmiChat_Info_DanceUnknownRecipe', info.name)
         elseif info.missingItem then
@@ -541,17 +574,61 @@ local danceStream = API.CommandStream:new {
 
 ---Applies the TAD patch.
 local function applyPatch()
+    local emotes = {}
     for k, v in pairs(itemDances) do
         v.name = k
-        v.display = v.emote:gsub('^BobTA_', ''):gsub('_', ' ')
+        v.display = v.display or v.emote:gsub('^BobTA_', ''):gsub('_', ' ')
         itemDanceByItemType[v.item] = v
+
+        emotes['dance_' .. k] = API.ChatEmote:new {
+            emote = v.emote,
+            isEnabled = function()
+                if not isPatchEnabled() then
+                    return false
+                end
+
+                local player = getSpecificPlayer(0)
+                if not player then
+                    return false
+                end
+
+                return player:getInventory():getItemFromType(v.item) ~= nil
+            end,
+        }
     end
 
     for k, v in pairs(recipeDances) do
         v.name = k
-        v.display = v.recipe:gsub('^BobTA%s*', '')
+        v.display = v.display or v.recipe:gsub('^BobTA%s*', '')
+
+        emotes['dance_' .. k] = API.ChatEmote:new {
+            emote = v.emote,
+            isEnabled = function()
+                if not isPatchEnabled() then
+                    return false
+                end
+
+                local player = getSpecificPlayer(0)
+                if not player then
+                    return false
+                end
+
+                return player:isRecipeKnown(v.recipe)
+            end,
+        }
     end
 
+    emotes.dance = API.ChatEmote:new {
+        isEnabled = isPatchEnabled,
+        onPlay = function(player)
+            local dance = getRandomKnownDance(player)
+            if dance then
+                playDanceEmote(dance.emote, player)
+            end
+        end,
+    }
+
+    API.extension.addEmotes(emotes)
     API.extension.addCommand(danceStream)
     API.extension.addSuggesterType('known-dance', searchKnownDances)
 end

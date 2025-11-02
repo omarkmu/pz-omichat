@@ -2,10 +2,12 @@
 ---@namespace omichat
 
 local insert = table.insert
+local sort = table.sort
 local ISChat = ISChat --[[@as omichat.ISChat]]
 
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
+local utils = API.utils
 
 
 ---@class api.client.extension : api.shared.extension
@@ -33,15 +35,24 @@ function Extension.addCustomButton(button)
     return button
 end
 
----Adds an emote that is playable from chat with the .emote syntax.
----@param name string The name of the emote, as it can be used from chat.
----@param emote (string | fun(player: IsoPlayer, emote: string)) The string or handler to associate with the emote.
+---Adds an emote that is playable from chat using an emote macro (`!emote`).
+---@param name string The name of the emote, as it should be used in chat.
+---@param emote ChatEmote The handler to associate with the emote.
 function Extension.addEmote(name, emote)
-    if type(emote) ~= 'function' then
-        emote = tostring(emote)
+    API._emotes[name] = emote
+    API._emoteList = utils.keys(API._emotes)
+    sort(API._emoteList)
+end
+
+---Adds emotes that are playable from chat using an emote macro (`!emote`).
+---@param emoteMap table<string, ChatEmote> The emotes to add. Associates emote names to emote handlers.
+function Extension.addEmotes(emoteMap)
+    for name, emote in pairs(emoteMap) do
+        API._emotes[name] = emote
     end
 
-    API._emotes[name] = emote
+    API._emoteList = utils.keys(API._emotes)
+    sort(API._emoteList)
 end
 
 ---Adds a chat stream.
@@ -108,6 +119,18 @@ end
 ---@param name string The name of the emote to remove.
 function Extension.removeEmote(name)
     API._emotes[name] = nil
+    Extension._remove(API._emoteList, name)
+end
+
+---Removes emotes from the registry.
+---@param list string[] The emotes to remove.
+function Extension.removeEmotes(list)
+    for i = 1, #list do
+        API._emotes[list[i]] = nil
+    end
+
+    API._emoteList = utils.keys(API._emotes)
+    sort(API._emoteList)
 end
 
 ---Removes a stream from the list of available chat streams.

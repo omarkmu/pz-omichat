@@ -73,7 +73,7 @@ function Suggestion.getChatSuggestions(text)
     end
 
     Suggestion._suggestCommands(info)
-    Suggestion._suggestFromArgSpecs(info)
+    Suggestion._suggestFromSpec(info)
     Suggestion._suggestEmotes(info)
     Suggestion._suggestMentions(info)
 
@@ -179,16 +179,11 @@ function Suggestion._suggestCommands(info)
     end
 end
 
----Provides suggestions for emote animation names.
+---Provides suggestions for emote macros.
 ---@param info SuggestionInfo
 ---@private
 function Suggestion._suggestEmotes(info)
-    if not config.Macros.AllowEmotes then
-        return
-    end
-
-    local stream = Suggestion._getStreamFromInput(info.input)
-    if not stream or not stream:isAllowEmotes() then
+    if not config:isEmoteMacroEnabled() then
         return
     end
 
@@ -197,38 +192,32 @@ function Suggestion._suggestEmotes(info)
         return
     end
 
-    local start, _, whitespace, period, text = info.input:find('(%s*)()%.([%w_]*)$')
-    ---@cast period -string, +integer
-    ---@cast text -?
-
+    local start, _, whitespace, mark, text = info.input:find('(%s*)()!([%w_]*)$')
     if not start or (start ~= 1 and #whitespace == 0) then
         -- require whitespace unless the emote is at the start
         return
     end
 
-    local keys = {}
-    ---@diagnostic disable-next-line: access-invisible
-    for k in pairs(API._emotes) do
-        keys[#keys + 1] = k
-    end
-
     local search = API.search.strings({
-        search = text,
+        search = text --[[@as string]],
         terminateOnExact = true,
         maxSearch = MAX_SEARCH,
         maxResults = MAX_RESULTS,
-    }, keys)
+    }, API.chat.getEmoteNames())
 
     if search.exact then
         return
     end
 
-    local prefix = info.input:sub(1, period)
+    ---@cast mark -string, +integer
+    local prefix = info.input:sub(1, mark)
     local results = search.results
     for i = 1, #results do
-        local emote = results[i].value
+        local result = results[i]
+        local emote = result.value
+
         info.suggestions[#info.suggestions + 1] = {
-            text = '.' .. emote,
+            text = '!' .. emote,
             content = prefix .. emote,
         }
     end
@@ -237,7 +226,7 @@ end
 ---Provides suggestions based on the command in use.
 ---@param info SuggestionInfo
 ---@private
-function Suggestion._suggestFromArgSpecs(info)
+function Suggestion._suggestFromSpec(info)
     local spec = Suggestion.getSpec(info.input)
     if not spec then
         return
@@ -302,6 +291,8 @@ function Suggestion._suggestFromArgSpecs(info)
     elseif argType == 'perk' then
         search = API.search.perks(ctx)
         applyQuotes = false
+    elseif argType == 'emote' then
+        search = API.search.emotes(ctx)
     elseif argType == 'option' and argSpec.options then
         search = API.search.strings(ctx, argSpec.options)
     else
@@ -410,6 +401,7 @@ return Suggestion
 ---| 'icon'
 ---| 'perk'
 ---| 'option'
+---| 'emote'
 ---| '?'
 
 --#endregion

@@ -19,7 +19,6 @@ local isempty = table.isempty
 ---@field protected chatFormat? string The format to use for chat messages sent from this stream.
 ---@field protected overheadFormat? string The format to use for overhead messages sent from this stream.
 ---@field protected formatter? MetaFormatter The formatter to use for this stream.
----@field protected allowEmotes boolean Flag for whether to allow emotes on this stream.
 ---@field protected allowMentions boolean Flag for whether to allow mentions on this stream.
 ---@field protected suggestSpec? SuggestArgSpec[] Spec to use for suggestions.
 ---@field protected tags omi.SetTable<string> A set of tags for the stream.
@@ -108,12 +107,6 @@ end
 ---@return boolean canUse
 function Stream:checkPlayerCanUse()
     return true
-end
-
----Returns whether the stream allows emote macros.
----@return boolean isAllowed
-function Stream:isAllowEmotes()
-    return self.allowEmotes
 end
 
 ---Returns whether the stream allows mentions.
@@ -419,7 +412,6 @@ function Stream:new(args)
     local this = setmetatable({}, self) --[[@as Stream]]
 
     this.name = args.name
-    this.allowEmotes = args.allowEmotes or false
     this.allowMentions = args.allowMentions ~= false
     this.disabled = args.disabled or false
     this.category = args.category or 'other'
@@ -476,7 +468,6 @@ return Stream
 ---@field chatFormat? string The format to use for the stream in chat.
 ---@field onUse? fun(ctx: Args.UseStream) Invoked when the stream is used.
 ---@field onUseDisabled? fun(stream: Stream, command: string) Invoked when the stream is used while disabled.
----@field allowEmotes? boolean Flag for whether emotes should be allowed on this stream. Defaults to `false`.
 ---@field allowMentions? boolean Flag for whether mentions should be allowed on this stream. Defaults to `true`.
 ---@field suggestSpec? SuggestArgSpec[] Spec to use for suggestions.
 ---@field formatter? MetaFormatter The formatter to use for this stream.

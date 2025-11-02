@@ -31,7 +31,7 @@ return Preset:new {
             UseDefaultList = false,
         },
         Macros = Preset.macros {
-            AllowEmotes = false,
+            Enable = false,
         },
         Mentions = Preset.mentions {
             Enable = false,

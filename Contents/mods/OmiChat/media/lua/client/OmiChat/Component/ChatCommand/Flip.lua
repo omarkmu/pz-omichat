@@ -50,7 +50,7 @@ API._flipCommand = API.CommandStream:new {
     end,
     onUseDisabled = function(stream)
         if not API.streams.firstChatStreamWithTag('FlipCommandTarget') then
-            utils.log.warn.once('No target stream defined for /flip')
+            utils.log.warn.once('No target stream defined for /flip; add the `FlipCommandTarget` tag to a stream')
             API.chat.addInfoMessage('Unknown command ' .. stream:getCommand():sub(2))
         else
             stream:showHelpText()

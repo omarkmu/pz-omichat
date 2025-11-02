@@ -507,10 +507,11 @@ function Configuration:isCustomShoutsEnabled()
     return self.Customization.AllowCustomShouts
 end
 
----Returns whether emote shortcut macros are enabled.
+---Returns whether the built-in emote macro is enabled.
+---This also checks whether macros are enabled.
 ---@return boolean enabled
 function Configuration:isEmoteMacroEnabled()
-    return self.Macros.AllowEmotes
+    return self.Macros.Enable and self.Macros.BuiltIn.Emote == true
 end
 
 ---Returns `true` if a given language exists and is signed.

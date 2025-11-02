@@ -259,7 +259,10 @@ function Preset.macros(options)
 
     ---@type Configuration.Macros
     return {
-        AllowEmotes = options.AllowEmotes ~= false,
+        Enable = options.Enable ~= false,
+        BuiltIn = {
+            Emote = true,
+        },
     }
 end
 
@@ -441,7 +444,7 @@ return Preset
 ---@field List Configuration.LanguageDefinition[]? A list of languages to use.
 
 ---@class Args.ConfigurationPreset.Macros
----@field AllowEmotes boolean? Flag for whether emotes should be enabled. Defaults to `true`.
+---@field Enable boolean? Flag for whether macros should be enabled. Defaults to `true`.
 
 ---@class Args.ConfigurationPreset.Mentions
 ---@field Enable boolean? Flag for whether mentions should be enabled. Defaults to `true`.

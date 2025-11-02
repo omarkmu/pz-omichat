@@ -20,6 +20,13 @@ local Search = {}
 API.search = Search
 
 
+---Searches for an enabled emote by name.
+---@param ctxOrSearch SearchContext | string A search string or a table with options for the search.
+---@return SearchResults results
+function Search.emotes(ctxOrSearch)
+    return Search.strings(ctxOrSearch, API.chat.getEmoteNames())
+end
+
 ---Searches for an icon by texture name or chat alias.
 ---@param ctxOrSearch SearchContext | string A search string or a table with options for the search.
 ---@return SearchResults results
@@ -408,6 +415,10 @@ function Search._collectResults(ctx)
         results[#results + 1] = result
     end
 
+    if ctx.sortByDisplay then
+        sort(results, function(a, b) return (a.display or a.value) < (b.display or b.value) end)
+    end
+
     ---@type SearchResults
     return {
         exact = ctx.exact,
@@ -752,6 +763,7 @@ return Search
 ---@field mapValue? fun(value: any, comparisonString: string): string? Callback to map search result values to strings.
 ---@field mapTexture? fun(value: any, comparisonString: string): Texture? Callback to map search result values to textures.
 ---@field caseSensitive? boolean Flag for whether the search should be case-sensitive. Defaults to `false`.
+---@field sortByDisplay? boolean Flag for whether results should be sorted by the display text. Defaults to `false`.
 ---@field exactInternal? search.InternalSearchResult The last exact match for the internal search.
 ---@field args string[] Arguments for the `filter` function.
 

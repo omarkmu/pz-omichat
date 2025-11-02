@@ -98,7 +98,6 @@ function ChatStream.fromDefinition(def, additionalTags)
         perceptionRange = def.PerceptionRange,
         perceptionRangeSigned = def.PerceptionRangeSigned,
         allowBuffs = def.AllowBuffs,
-        allowEmotes = def.AllowEmotes,
         allowMentions = def.AllowMentions,
         allowLanguages = def.AllowLanguages,
         allowTypingIndicator = def.AllowTypingIndicator,

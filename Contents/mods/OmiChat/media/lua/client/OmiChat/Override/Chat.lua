@@ -200,7 +200,7 @@ function ISChat:onActivateView()
     API.ui.updateInfoText()
 end
 
----Override to support custom commands and emote shortcuts.
+---Override to support custom commands and macros.
 function ISChat:onCommandEntered()
     local instance = ISChat.instance
     if not instance or API.player.isDeadOrUnavailable() then

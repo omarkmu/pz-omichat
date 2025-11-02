@@ -50,7 +50,7 @@ API._cardCommand = API.CommandStream:new {
     end,
     onUseDisabled = function(stream)
         if not API.streams.firstChatStreamWithTag('CardCommandTarget') then
-            utils.log.warn.once('No target stream defined for /card')
+            utils.log.warn.once('No target stream defined for /card; add the `CardCommandTarget` tag to a stream')
             API.chat.addInfoMessage('Unknown command ' .. stream:getCommand():sub(2))
         else
             stream:showHelpText()

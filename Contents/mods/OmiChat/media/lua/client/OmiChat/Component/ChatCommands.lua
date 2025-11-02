@@ -21,7 +21,7 @@ return {
     require 'OmiChat/Component/ChatCommand/ResetLanguages',
     require 'OmiChat/Component/ChatCommand/SetLanguageSlots',
     require 'OmiChat/Component/ChatCommand/Language',
-    require 'OmiChat/Component/ChatCommand/Emotes',
+    require 'OmiChat/Component/ChatCommand/Emote',
     require 'OmiChat/Component/ChatCommand/Clear',
     require 'OmiChat/Component/ChatCommand/Help',
 }

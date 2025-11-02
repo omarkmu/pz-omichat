@@ -243,7 +243,7 @@ function Helpers.getTagTooltip(tag)
     local desc = getTextOrNull('Sandbox_OmiChat_tag_' .. tag)
     local isKnown = desc ~= nil
 
-    desc = desc or getText('Sandbox_OmiChat_tag_unknown')
+    desc = desc or getText('Sandbox_OmiChat_unrecognized_tag')
     local color = isKnown and ' <PUSHRGB:0,0.5,1> ' or ' <PUSHRGB:0.93,0.824,0> '
 
     return color .. tag .. ' <POPRGB> <LINE> ' .. desc, isKnown
