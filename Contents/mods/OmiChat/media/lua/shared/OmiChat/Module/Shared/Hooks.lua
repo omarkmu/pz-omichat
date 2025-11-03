@@ -14,16 +14,16 @@ API.hooks = Hooks
 
 ---@enum HookType
 Hooks.HookType = {
-    afterDecodeMessage = 'afterDecodeMessage',
-    beforeDecodeMessage = 'beforeDecodeMessage',
+    afterBuildMessage = 'afterBuildMessage',
+    beforeBuildMessage = 'beforeBuildMessage',
+    buildMessage = 'buildMessage',
     cardCommand = 'cardCommand',
     cardCommandEnabled = 'cardCommandEnabled',
     chatSettingsMenu = 'chatSettingsMenu',
     chatSuggestions = 'chatSuggestions',
-    decodeCommand = 'decodeCommand',
-    decodeMessage = 'decodeMessage',
     flipCommand = 'flipCommand',
     flipCommandEnabled = 'flipCommandEnabled',
+    initCommandMessage = 'initCommandMessage',
     macro = 'macro',
     perceptionRange = 'perceptionRange',
     richTextAction = 'richTextAction',
@@ -44,16 +44,23 @@ for k in pairs(Hooks.HookType) do
 end
 
 
----Applies hooks for after message information is decoded.
+---Applies hooks for after message information is built.
 ---@param info MessageInfo Information about the message to transform.
-function Hooks.afterDecodeMessage(info)
-    Hooks._handleEvent(Hooks._callbacks.afterDecodeMessage, info)
+function Hooks.afterBuildMessage(info)
+    Hooks._handleEvent(Hooks._callbacks.afterBuildMessage, info)
 end
 
----Applies hooks for before message information is decoded.
+---Applies hooks for before message information is built.
 ---@param info MessageInfo Information about the message to transform.
-function Hooks.beforeDecodeMessage(info)
-    Hooks._handleEvent(Hooks._callbacks.beforeDecodeMessage, info)
+function Hooks.beforeBuildMessage(info)
+    Hooks._handleEvent(Hooks._callbacks.beforeBuildMessage, info)
+end
+
+---Applies hooks for building message information.
+---@param info MessageInfo Information about the message being transformed.
+---@return boolean handled `True` if transformation handling should stop. Otherwise, `false`.
+function Hooks.buildMessage(info)
+    return Hooks._handle(Hooks._callbacks.buildMessage, info)
 end
 
 ---Applies hooks for the `/card` command.
@@ -83,21 +90,6 @@ function Hooks.cardCommandEnabled()
     return Hooks._handleBoolean(Hooks._callbacks.cardCommandEnabled)
 end
 
----Applies hooks for decoding command information during message transformation.
----@param match string The text matched on the command's formatter.
----@param info MessageInfo Information about the message.
----@return boolean handled `True` if decoding was handled by a hook. Otherwise, `false`.
-function Hooks.decodeCommand(match, info)
-    return Hooks._handle(Hooks._callbacks.decodeCommand, match, info)
-end
-
----Applies hooks for decoding message information.
----@param info MessageInfo Information about the message to transform.
----@return boolean handled `True` if transformation handling should stop. Otherwise, `false`.
-function Hooks.decodeMessage(info)
-    return Hooks._handle(Hooks._callbacks.decodeMessage, info)
-end
-
 ---Applies hooks for the `/flip` command.
 ---@param args Args.UseStream Arguments for the hook callback.
 ---@return boolean handled `True` if the command was handled by a hook. Otherwise, `false`.
@@ -109,6 +101,13 @@ end
 ---@return boolean? enabled `True` or `false` to enable or disable the command. If the return value is `nil`, existing logic is used.
 function Hooks.flipCommandEnabled()
     return Hooks._handleBoolean(Hooks._callbacks.flipCommandEnabled)
+end
+
+---Applies hooks for building initial message information for a command.
+---@param info MessageInfo Information about the message being transformed.
+---@return boolean handled `True` if building initial information was handled by a hook. Otherwise, `false`.
+function Hooks.initCommandMessage(info)
+    return Hooks._handle(Hooks._callbacks.initCommandMessage, info)
 end
 
 ---Applies hooks for applying macros.

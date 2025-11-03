@@ -32,7 +32,7 @@ function _IsoPlayer:Callout(playEmote)
         or API.streams.getChatStream('yell', { enabledOnly = true })
 
     if not stream then
-        utils.log.warn.once('No stream defined for callouts. Add the `Callout` tag to a stream.')
+        utils.log.warn.once('No stream defined for callouts; add the `Callout` tag to a stream')
         _Callout(self, playEmote)
         return
     end
@@ -54,28 +54,20 @@ function _IsoPlayer:Callout(playEmote)
         shoutMax = min(#shouts, config.MAX_CUSTOM_SHOUTS)
     end
 
-    local formatterName
     local shout = shouts[utils.randInt(1, shoutMax)] --[[@as string]]
     if isSneaking then
-        formatterName = 'sneakCallout'
         shout = shout:lower()
     else
-        formatterName = 'callout'
         shout = shout:upper()
     end
 
     API.chat.send {
         stream = stream,
         text = shout,
-        formatter = API.format.get(formatterName),
         playSignedEmote = not playEmote,
-        tokens = {
-            callout = '1',
-            sneakCallout = isSneaking and '1' or nil,
-        },
-        extraTags = {
-            'IsCallout',
-            isSneaking and 'IsSneakCallout' or nil,
+        context = {
+            type = 'omichat.callout',
+            sneak = isSneaking,
         },
     }
 

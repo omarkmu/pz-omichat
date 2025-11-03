@@ -37,16 +37,6 @@ utils.lib = lib
 ---Contains UI utilities.
 utils.ui = lib.ui
 
----Associates formatter IDs to MetaFormatters for chat streams.
----@type table<integer, MetaFormatter>
----@private
-API._chatFormatters = {}
-
----Associates formatter names to formatters for metadata.
----@type table<FormatterName, MetaFormatter>
----@private
-API._metadataFormatters = {}
-
 ---Associates usernames to information about typing status.
 ---@type table<string, TypingInformation>
 ---@private
@@ -109,6 +99,7 @@ API._discordStream = API.ChatStream:new {
 API._radioStream = API.ChatStream:new {
     name = 'radio',
     chatType = 'radio',
+    overheadFormat = config.Radio.OverheadFormat,
     chatFormat = config.Radio.ChatFormat,
     defaultColor = config.Radio.DefaultColor,
     tags = config.Radio.Tags,

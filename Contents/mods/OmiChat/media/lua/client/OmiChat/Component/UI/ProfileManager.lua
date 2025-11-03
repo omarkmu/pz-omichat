@@ -322,7 +322,7 @@ function ProfileManager:onNicknameChange(entry)
     if #text == 0 then
         valid = false
     else
-        valid, filtered = API.format.validateName(entry, text)
+        valid, filtered = API.chat.validateNameEntry(entry, text)
         if filtered and text ~= filtered then
             entry:setText(filtered)
         end
@@ -423,7 +423,7 @@ function ProfileManager:_addControls()
             tooltip = getText('UI_OmiChat_ProfileManager_Tooltip_Nickname'),
         }
 
-        nicknameControl:setValidateFunction(nicknameControl, API.format.validateName)
+        nicknameControl:setValidateFunction(nicknameControl, API.chat.validateNameEntry)
         nicknameControl:setOnChange(self, self.onNicknameChange, nicknameControl)
 
         self.nicknameControl = nicknameControl

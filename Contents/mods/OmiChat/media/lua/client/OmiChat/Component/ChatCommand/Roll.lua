@@ -6,14 +6,12 @@ local API = require 'OmiChat/Module/Client/Core'
 
 local utils = API.utils
 local config = API.Configuration
-local MetaFormatter = API.MetaFormatter
 
 ---Command stream for the `/roll` command.
 ---@private
 API._rollCommand = API.CommandStream:new {
     name = 'roll',
     command = '/roll ',
-    formatter = MetaFormatter:new(config.ID_ROLL),
     helpTextID = 'UI_ServerOptionDesc_Roll',
     autoTags = { 'IsRollCommand' },
     onUse = function(ctx)

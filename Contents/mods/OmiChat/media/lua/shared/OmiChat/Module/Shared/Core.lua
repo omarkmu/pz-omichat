@@ -15,8 +15,5 @@ API.utils = require 'OmiChat/Utils'
 ---Helper for managing and retrieving mod configuration.
 API.Configuration = require 'OmiChat/Component/Configuration'
 
----Helper for formatting text with invisible metadata.
-API.MetaFormatter = require 'OmiChat/Component/MetaFormatter'
-
 
 return API

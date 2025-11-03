@@ -13,20 +13,16 @@ local API_S = API
 function API._onInitGlobalModData()
     local config = API.Configuration
 
-    -- server loads from mod data
+    -- server loads settings from mod data
+    -- client loads default settings; will ultimately be received from server
     if not isClient() then
-        local loadSuccess = config:loadModData()
-        if loadSuccess then
+        if config:loadModData() then
             config:saveModData()
         end
 
-        config:updateFormatters()
         API_S.request.sendConfiguration()
         return
     end
-
-    -- client loads default settings; will ultimately be received from server
-    config:updateFormatters()
 end
 
 

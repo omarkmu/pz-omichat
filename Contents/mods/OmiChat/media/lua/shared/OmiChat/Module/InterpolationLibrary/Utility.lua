@@ -52,12 +52,12 @@ function Library.ColorActions(interpolator, message, options)
     end
 
     options = Helpers.readOptions(options)
-    local segments, prefix, suffix = Helpers.getMessageSegments(tostring(message), {
+    local segments = Helpers.getMessageSegments(message, {
         optionalActionAsterisk = options:getBoolean('optionalAsterisks'),
     })
 
     Helpers.colorActions(segments, options, Helpers.readTags(interpolator))
-    return prefix .. Helpers.combineSegments(segments) .. suffix
+    return Helpers.combineSegments(segments)
 end
 
 ---Colors quotes in a string based on the streams tagged with `QuoteColorTarget`.
@@ -74,13 +74,13 @@ function Library.ColorQuotes(interpolator, message, options)
     options = Helpers.readOptions(options)
     local optionalAsterisks = options:getBoolean('optionalAsterisks')
 
-    local segments, prefix, suffix = Helpers.getMessageSegments(tostring(message), {
+    local segments = Helpers.getMessageSegments(message, {
         startInAction = true,
         optionalActionAsterisk = optionalAsterisks,
     })
 
     Helpers.colorQuotes(segments, options, Helpers.readTags(interpolator))
-    return prefix .. Helpers.combineSegments(segments) .. suffix
+    return Helpers.combineSegments(segments)
 end
 
 ---Validates that the message is not being sent with a signed language.
@@ -90,7 +90,6 @@ end
 ---@return boolean isAllowed
 function Library.DisallowSignedOverRadio(interpolator, options)
     options = Helpers.readOptions(options)
-    local optionalAsterisks = options:getBoolean('optionalAsterisks')
 
     local condition = options and options:get('condition')
     if condition ~= nil and not interpolator:toBoolean(condition) then
@@ -140,20 +139,12 @@ function Library.HasTag(interpolator, tag)
         return false
     end
 
-    local tags = interpolator:token('tags') --[[@as omi.MultiMap]]
+    local tags = interpolator:token('tags')
     if not utils.isinstance(tags, MultiMap) then
         return false
     end
 
     return tags:has(tag)
-end
-
----Returns text without invisible wrapping characters used for mod functionality.
----@param interpolator omi.Interpolator The interpolator in use.
----@param ...any Arguments passed to the interpolator function. Combined and converted into a string.
----@return string
-function Library.Internal(interpolator, ...)
-    return (utils.getInternalText(Helpers.stringify(...)))
 end
 
 ---Returns whether the given language is signed.
@@ -176,7 +167,7 @@ end
 ---@param interpolator omi.Interpolator The interpolator in use.
 ---@param input any? The string to punctuate.
 ---@param punctuation any? The punctuation character to use. Defaults to `.`.
----@param characters any? Characters to treat as punctuation. Defaults to using the punctuation string pattern.
+---@param characters any? Characters to treat as punctuation. Defaults to `.,!?:/-~`.
 ---@return string formatted
 function Library.Punctuate(interpolator, input, punctuation, characters)
     return Helpers.punctuate(tostring(input or ''), punctuation, characters)

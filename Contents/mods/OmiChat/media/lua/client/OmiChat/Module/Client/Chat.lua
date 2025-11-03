@@ -6,15 +6,13 @@ local API = require 'OmiChat/Module/Client/Core'
 
 local utils = API.utils
 local config = API.Configuration
+local MultiMap = utils.MultiMap
 
 local concat = table.concat
 local getText = getText
 local getTimestampMs = getTimestampMs
 local ISChat = ISChat --[[@as omichat.ISChat]]
 local signEmoteRand = newrandom()
-
-local _ChatBase = __classmetatables[ChatBase.class].__index
-local _getChatType = _ChatBase.getType
 
 ---@class api.client.chat
 local Chat = {}
@@ -155,19 +153,6 @@ function Chat.getEmoteFromCommand(command)
 
         startPos = macro.stop + 1
     end
-end
-
----Returns the chat type of a chat message.
----@param message Message The message to retrieve the chat type of.
----@return omi.ChatTypeString chatType
-function Chat.getMessageChatType(message)
-    if utils.isinstance(message, API.MimicMessage) then
-        ---@cast message omi.MimicMessage
-        return message:getChatType()
-    end
-
-    ---@cast message ChatMessage
-    return tostring(_getChatType(message:getChat())) --[[@as omi.ChatTypeString]]
 end
 
 ---Returns the next macro text found in a command, at or after the given start position.
@@ -376,22 +361,25 @@ end
 ---@param args Args.Send? Arguments for sending the command.
 ---@return string? result For private messages, the username of the target when sending is successful. Otherwise, `nil`.
 function Chat.send(args)
-    local stream = args and args.stream --[[@as ChatStream]]
-    if not args or not stream or not utils.isinstance(stream, API.ChatStream) then
+    local instance = ISChat.instance
+    local player = getSpecificPlayer(0)
+    if not player or not instance then
         return
     end
 
-    local text = args.text or ''
-    if not args.allowInvisible then
-        text = utils.removeInvisible(text)
+    local stream = args and args.stream
+    if not args or not stream then
+        return
     end
 
-    text = utils.trim(text)
+    ---@type string?
+    local text
+    text = utils.trim(utils.removeInvisible(args.text or ''))
 
     local prefix = ''
     local chatType = stream:getChatType()
     if chatType == 'whisper' then
-        -- don't apply formatting to the username
+        -- don't apply filtering to the username
         local m1, m2 = text:match('^("[^"]*%s+[^"]*"%s)(.+)$')
         if not m1 then
             m1, m2 = text:match('^([^"]%S*%s)(.+)$')
@@ -403,59 +391,52 @@ function Chat.send(args)
         end
 
         prefix = m1
-        text = m2
+        text = utils.trim(m2)
     end
 
-    if #text == 0 then
+    if not args.allowEmpty and #text == 0 then
         return
     end
 
-    local language
-    local currentLanguage = API.player.getCurrentLanguage()
-    if currentLanguage and currentLanguage ~= API.language.getDefault() then
-        language = currentLanguage
+    local tokens = Chat._getFilterTokens(text, stream, args, player, chatType)
+    if not tokens then
+        return
     end
 
-    local initialText = text
-    local formatResult = API.format.chat {
-        text = text,
+    local messageData = API.messages.buildData({
+        player = player,
         stream = stream,
-        language = language,
-        chatType = chatType,
         echoType = args.echoType,
-        formatStream = args.formatStream,
-        formatter = args.formatter,
-        tokens = args.tokens,
-        extraTags = args.extraTags,
-    }
+        context = args.context,
+    })
 
-    text = formatResult.text
-    if text == '' then
-        if formatResult.error then
-            Chat.addInfoMessage(formatResult.error)
-        end
+    local language = messageData.language
+    tokens.language = language
 
+    local initialText = tokens.input
+    text = Chat._filterInput(tokens)
+    if not text or (not args.allowEmpty and #text == 0) then
         return
     end
 
-    local processResult
-    local process = Chat.raw[chatType] or Chat.raw.say
-    if process then
-        processResult = process(prefix .. text)
-
-        local instance = ISChat.instance
-        if instance and processResult and chatType == 'whisper' and API.preferences.getRetainCommand(stream:getCategory()) then
-            local chatText = instance.chatText
-            chatText.lastChatCommand = chatText.lastChatCommand .. tostring(processResult) .. ' '
+    if messageData.useNarrative then
+        tokens.input = text
+        text = Chat._filterInput(tokens, 'FilterNarrativeInput', config.NarrativeStyle.InputFilter)
+        if not text or (not args.allowEmpty and #text == 0) then
+            return
         end
     end
 
-    local isSigned = formatResult.allowLanguage and language and API.language.isSigned(language)
-    if isSigned and args.playSignedEmote and API.preferences.getSignEmotesEnabled() then
-        local player = getSpecificPlayer(0)
-        if player then
-            player:playEmote(Chat.getSignLanguageEmote(initialText))
-        end
+    local process = Chat.raw[chatType] or Chat.raw.say
+    local processResult = process(prefix .. text .. API.messages.encodeData(messageData))
+    if processResult and chatType == 'whisper' and API.preferences.getRetainCommand(stream:getCategory()) then
+        local chatText = instance.chatText
+        chatText.lastChatCommand = chatText.lastChatCommand .. tostring(processResult) .. ' '
+    end
+
+    local isSigned = language and API.language.isSigned(language)
+    if player and isSigned and args.playSignedEmote and API.preferences.getSignEmotesEnabled() then
+        player:playEmote(Chat.getSignLanguageEmote(initialText))
     end
 
     if config.Buffs.Enable and stream:isAllowBuffs() then
@@ -463,18 +444,8 @@ function Chat.send(args)
     end
 
     local echoType = Chat._echoTypes[chatType]
-    if config.EchoMessages.Enable and echoType then
-        local echoStream = API.streams.firstChatStreamWithTag('EchoTarget')
-        if not echoStream or Chat._echoTypes[echoStream:getChatType()] or not echoStream:isEnabled() then
-            return processResult
-        end
-
-        echoStream:onUse({
-            echoType = echoType,
-            text = initialText,
-            formatter = API._metadataFormatters.echo,
-            extraTags = config.EchoMessages.Tags,
-        })
+    if echoType and config.EchoMessages.Enable then
+        Chat._sendEcho(initialText, echoType)
     end
 
     return processResult
@@ -624,6 +595,69 @@ function Chat.updateTypingStatus(skipTimer)
     end
 end
 
+---Text entry validator that validates against the nickname filter.
+---@param entry omi.ui.TextEntry The entry to validate.
+---@param text string The text to validate. Defaults to the entry text.
+---@return boolean valid Flag for whether the name is valid.
+---@return string? nickname The filtered name. Guaranteed if `valid` is `true`.
+function Chat.validateNameEntry(entry, text)
+    if not text then
+        text = entry:getInternalText()
+    end
+
+    text = utils.trim(text)
+    if #text == 0 then
+        return true
+    end
+
+    local tokens = {
+        target = 'nickname',
+        input = text,
+        error = '',
+        errorID = '',
+    }
+
+    local nickname = utils.interpolateNamed('FilterName', config.Format.Filter.Name, tokens)
+    local err = utils.extractError(tokens)
+    if not err and not utils.isNilOrWhitespace(nickname) then
+        return true, nickname
+    end
+
+    entry:setValidateTooltipText(err or getText('UI_OmiChat_Error_InvalidName', utils.escapeRichText(text)))
+    return false
+end
+
+---Text entry validator that validates against the status filter.
+---@param entry omi.ui.TextEntry The entry to validate.
+---@param text string The text to validate.
+---@return boolean valid Flag for whether the text is valid.
+---@return string? status The filtered status. Guaranteed if `valid` is `true`.
+function Chat.validateStatusEntry(entry, text)
+    if not text then
+        text = entry:getInternalText()
+    end
+
+    text = utils.trim(text)
+    if #text == 0 then
+        return true
+    end
+
+    local tokens = {
+        input = text,
+        error = '',
+        errorID = '',
+    }
+
+    local status = utils.interpolateNamed('FilterStatus', config.Format.Filter.Status, tokens)
+    local err = utils.extractError(tokens)
+    if not err and not utils.isNilOrWhitespace(status) then
+        return true, status
+    end
+
+    entry:setValidateTooltipText(err or getText('UI_OmiChat_Error_InvalidStatus', utils.escapeRichText(text)))
+    return false
+end
+
 
 ---Adds an info message to chat that displays the available streams, when an unavailable stream is used.
 ---@param stream Stream
@@ -673,6 +707,89 @@ function Chat._checkLastCommand(tab)
     end
 end
 
+---Passes text through an input filter.
+---@param tokens table Tokens to provide to the filter.
+---@param filterName string? The name of the filter to apply. Defaults to `FilterChatInput`.
+---@param filterString string? The filter interpolation string. Defaults to the chat input filter.
+---@return string? filteredText The text returned from the filter.
+---@private
+function Chat._filterInput(tokens, filterName, filterString)
+    filterName = filterName or 'FilterChatInput'
+    filterString = filterString or config.Format.Filter.ChatInput
+
+    local result = utils.interpolateNamed(filterName, filterString, tokens)
+    local err = utils.extractError(tokens)
+    if err then
+        if err then
+            Chat.addInfoMessage(err)
+        end
+
+        return nil
+    end
+
+    return result
+end
+
+---Sends an echo message to the configured echo target stream.
+---@param text string
+---@param echoType integer
+---@private
+function Chat._sendEcho(text, echoType)
+    local echoStream = API.streams.firstChatStreamWithTag('EchoTarget')
+    if not echoStream then
+        utils.log.warn.once('No stream defined for echo messages; add the `EchoTarget` tag to a stream')
+        return
+    end
+
+    if not echoStream:isEnabled() then
+        utils.log.warn.once('Echo target stream is disabled')
+        return
+    end
+
+    if Chat._echoTypes[echoStream:getChatType()] then
+        utils.log.warn.once('Invalid echo target stream; echo target cannot be faction or safehouse')
+        return
+    end
+
+    echoStream:onUse({
+        text = text,
+        echoType = echoType,
+    })
+end
+
+---Gets an initial token table for filtering an outgoing chat message.
+---For private messages, this also returns the recipient string from the command.
+---@param text string
+---@param stream ChatStream
+---@param args Args.Send
+---@param player IsoPlayer
+---@param chatType omi.ChatTypeString
+---@return table? tokens
+---@private
+function Chat._getFilterTokens(text, stream, args, player, chatType)
+    local tokens = {}
+    local username = player:getUsername()
+
+    tokens.error = ''
+    tokens.errorID = ''
+    tokens.chatType = chatType
+    tokens.input = text
+    tokens.username = username
+    tokens.name = username and API.data.getNameInChat(username, chatType)
+    tokens.stream = stream:getName()
+
+    local tags = stream:getTags()
+    API.messages.addContextData({
+        tokens = tokens,
+        tags = tags,
+        context = args.context,
+        isEcho = args.echoType ~= nil,
+    })
+
+    tokens.tags = MultiMap.fromSet(tags)
+    return tokens
+end
+
 ---Builds send arguments for the given stream.
 ---@param args string | Args.Send.Partial
 ---@param streamName string
@@ -717,15 +834,13 @@ return Chat
 ---@field stream Stream The stream being used.
 
 ---@class Args.Send.Partial : Args.UseStream.Partial
----@field formatStream? Stream The stream to use to format the input text. Defaults to `stream`.
----@field formatter? MetaFormatter A formatter to use to format the input. If not given, the formatter from `formatStream` or `stream` is used.
 ---@field playSignedEmote? boolean Flag for whether a random emote should be played for a signed language.
 ---@field echoType? integer The echo type identifier, if this is an echo message.
----@field tokens? table Initial tokens to pass to interpolation strings.
----@field extraTags? string[] Additional tags to include in the tags token.
----@field allowInvisible? boolean Flag for whether invisible characters should not be removed from the input.
+---@field allowEmpty? boolean Flag for whether empty messages should be allowed.
+---@field context? table Arbitrary context data.
 
 ---@class Args.Send : Args.Send.Partial, Args.UseStream
+---@field stream ChatStream The stream being used.
 
 
 ---@class TypingInformation

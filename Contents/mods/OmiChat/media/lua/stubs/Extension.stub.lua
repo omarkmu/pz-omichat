@@ -6,14 +6,19 @@
 local Extension = {}
 
 
----Adds a hook that runs after decoding message content.
----@param type 'afterDecodeMessage'
+---Adds a hook that runs after building message information.
+---@param type 'afterBuildMessage'
 ---@param callback fun(info: MessageInfo) The hook callback function.
 function Extension.addHook(type, callback) end
 
----Adds a hook that runs before decoding message content.
----@param type 'beforeDecodeMessage'
+---Adds a hook that runs before building message information.
+---@param type 'beforeBuildMessage'
 ---@param callback fun(info: MessageInfo) The hook callback function.
+function Extension.addHook(type, callback) end
+
+---Adds a hook for building message content.
+---@param type 'buildMessage'
+---@param callback fun(info: MessageInfo): boolean? The hook callback function. If this returns `true`, building will stop.
 function Extension.addHook(type, callback) end
 
 ---Adds a hook for the `/card` command.
@@ -36,16 +41,6 @@ function Extension.addHook(type, callback) end
 ---@param callback fun(info: SuggestionInfo) The hook callback function.
 function Extension.addHook(type, callback) end
 
----Adds a hook for decoding command information from a chat message.
----@param type 'decodeCommand'
----@param callback fun(match: string, info: MessageInfo): boolean? The hook callback function. If this returns `true`, the original command decoding will not run.
-function Extension.addHook(type, callback) end
-
----Adds a hook for decoding message content.
----@param type 'decodeMessage'
----@param callback fun(info: MessageInfo): boolean? The hook callback function. If this returns `true`, decoding will stop.
-function Extension.addHook(type, callback) end
-
 ---Adds a hook for the `/flip` command.
 ---@param type 'flipCommand'
 ---@param callback fun(args: Args.UseStream): boolean? The hook callback function. If this returns `true`, the original command handling will not run.
@@ -54,6 +49,11 @@ function Extension.addHook(type, callback) end
 ---Adds a hook for checking whether the `/flip` command is enabled.
 ---@param type 'flipCommandEnabled'
 ---@param callback fun(): boolean? The hook callback function. If this returns `nil`, the original checks will run.
+function Extension.addHook(type, callback) end
+
+---Adds a hook for building initial message information for a command.
+---@param type 'initCommandMessage'
+---@param callback fun(info: MessageInfo) The hook callback function.
 function Extension.addHook(type, callback) end
 
 ---Adds a hook for processing macros.

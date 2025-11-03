@@ -1,6 +1,5 @@
 ---Command stream definition for `/help`.
 ---@namespace omichat
----@diagnostic disable: access-invisible
 
 local API = require 'OmiChat/Module/Client/Core'
 local vanillaCommands = require 'OmiChat/Definition/VanillaCommandList'
@@ -25,8 +24,7 @@ return API.CommandStream:new {
 
         -- specific command help
         if #command > 0 then
-            for i = 1, #API._commandStreams do
-                local stream = API._commandStreams[i]
+            for stream in API.streams.commandStreams() do
                 if stream:getName() == command and stream:isEnabled() and stream:onHelp() then
                     return
                 end
@@ -49,8 +47,7 @@ return API.CommandStream:new {
         local seen = {}
         local commands = {} ---@type VanillaCommand[]
 
-        for i = 1, #API._commandStreams do
-            local stream = API._commandStreams[i]
+        for stream in API.streams.commandStreams() do
             local name = stream:getName()
             if not seen[name] and stream:isEnabled() then
                 seen[name] = true

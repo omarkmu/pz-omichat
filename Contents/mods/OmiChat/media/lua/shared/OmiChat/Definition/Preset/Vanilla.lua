@@ -41,7 +41,6 @@ return Preset:new {
         },
         Radio = Preset.radio {
             Tags = {
-                'IncludeColon',
                 'UseAuthorUsername',
             },
         },

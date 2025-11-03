@@ -13,6 +13,13 @@ local API ---@type api.client?
 local CommandStream = Stream:derive()
 
 
+---Copies all settings from another stream into this stream.
+---@param other CommandStream
+function CommandStream:copyFrom(other)
+    Stream.copyFrom(self, other)
+    self.helpTextID = other.helpTextID
+end
+
 ---Returns the help text for the stream.
 ---@return string? helpText The help text, or `nil` if not defined.
 function CommandStream:getHelpText()

@@ -39,6 +39,7 @@ local TagList = {
     'IncludeColon',
     'IncludeMentionAtSign',
     'IncludeMentionAtSignChat',
+    'IncludeMentionAtSignOverhead',
     'IncludeName',
     'IncludeNameChat',
     'IncludeNameOverhead',
@@ -92,7 +93,6 @@ local TagList = {
     -- automatic tags (not included in the list because they shouldn't be suggested)
     --[[
         'IsActionUnknownLanguage',
-        'IsBuffyRoll',
         'IsCallout',
         'IsCardCommand',
         'IsDiscordStream',

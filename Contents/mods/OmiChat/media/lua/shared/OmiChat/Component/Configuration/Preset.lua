@@ -277,8 +277,8 @@ function Preset.mentions(options)
         Enable = options.Enable ~= false,
         AlwaysUseNameColors = true,
         Range = options.Range or 10,
-        Format = DEFAULT,
         ChatFormat = DEFAULT,
+        OverheadFormat = DEFAULT,
     }
 end
 
@@ -307,8 +307,9 @@ function Preset.radio(options)
     ---@type Configuration.Radio
     return {
         ChatFormat = DEFAULT,
+        OverheadFormat = DEFAULT,
         DefaultColor = { r = 178, g = 178, b = 178 },
-        Tags = options.Tags or {},
+        Tags = options.Tags or { 'NoVolumeIndicator' },
     }
 end
 

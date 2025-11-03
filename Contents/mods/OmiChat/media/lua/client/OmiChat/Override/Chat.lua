@@ -9,7 +9,7 @@ local utils = API.utils
 local config = API.Configuration
 local UI = utils.ui
 
-local _addLineInChat = ISChat.addLineInChat ---@type any
+local _addLineInChat = ISChat.addLineInChat
 local _onCommandEntered = ISChat.onCommandEntered
 local _logChatCommand = ISChat.logChatCommand
 local _createChildren = ISChat.createChildren
@@ -29,64 +29,49 @@ local _ServerChatMessage = __classmetatables[ServerChatMessage.class].__index
 
 
 ---Override to enable custom formatting.
-_ChatMessage.getTextWithPrefix = API.format.buildMessageText
-_ServerChatMessage.getTextWithPrefix = API.format.buildMessageText
+_ChatMessage.getTextWithPrefix = API.messages.getTextWithPrefix
+_ServerChatMessage.getTextWithPrefix = API.messages.getTextWithPrefix
 
 
 ---Override to add information to chat messages and remove blank lines.
----@param message Message The new chat message.
+---@param message table The new chat message.
 ---@param tabID integer 0-indexed tab ID.
 function ISChat.addLineInChat(message, tabID)
     if not message then
         return
     end
 
-    local info ---@type MessageInfo?
+    local player = getSpecificPlayer(0) ---@type IsoPlayer?
+
     local soundRange
-    local player = getSpecificPlayer(0)
-
-    local mtIndex = (getmetatable(message) or {}).__index
-    if mtIndex == _ChatMessage or mtIndex == _ServerChatMessage or utils.isinstance(message, API.MimicMessage) then
-        local username = player and player:getUsername()
-        local chatType = API.chat.getMessageChatType(message)
-
-        if chatType == 'radio' then
-            local formatter = API.format.get('onlineID')
-            if formatter then
-                local value = formatter:read(message:getText())
-                local onlineID = value and utils.decodeInvisibleInt(value)
-                local authorPlayer = onlineID and API.data.getPlayerInfoByOnlineID(onlineID)
-                if authorPlayer then
-                    message:setAuthor(authorPlayer.username)
-                elseif username and message:getAuthor() == username then
-                    -- if we can't find the author, clear instead of attributing to the local player
-                    message:setAuthor('')
-                end
-            end
+    local info ---@type MessageInfo?
+    if API.messages.isManaged(message) then
+        -- ignore empty messages
+        if message:getText():trim() == '' then
+            return
         end
 
+        local username = player and player:getUsername()
         if config:compatChatBubbleEnabled() and message:getText():match('%[img=media/textures/bubble%d%.png%]') then
             return
         end
 
-        API.format.encodeMessageMetadata(message)
+        API.messages.encodeInitialMetadata(message)
 
-        -- necessary to process transforms so we know whether this message should be added to chat
-        info = API.format.buildMessageInfo(message, true)
-        if info then
-            if not message:isShowInChat() then
-                return
-            end
+        -- necessary to process so we know whether the message should be added to chat
+        info = API.messages.process(message)
+        if not message:isShowInChat() then
+            return
+        end
 
-            if info:shouldAttractZombies(username) then
-                soundRange = info.zombieAttractRange
-            end
+        if username and info:shouldAttractZombies(username) then
+            soundRange = info.zombieAttractRange
         end
     end
 
     local s, e = pcall(_addLineInChat, message, tabID)
     if not s then
-        utils.log.error('Error while adding message %s: %s', tostring(message), tostring(e))
+        utils.log.error('Error while adding message %s: %s', message, e)
         return
     end
 
@@ -157,7 +142,7 @@ function ISChat:createTab()
     tab.onRightMouseUp = ISChat.onRightMouseUp
     tab.onRightMouseDown = ISChat.onRightMouseDown
     tab.onMouseUp = ISChat.onMouseUp
-    tab.onMouseDown = ISChat.onMouseDown
+    tab.onMouseDown = ISChat.onMouseDown ---@diagnostic disable-line: preferred-local-alias
     tab.render = ISChat.render_chatText
 
     tab:ignoreHeightChange()

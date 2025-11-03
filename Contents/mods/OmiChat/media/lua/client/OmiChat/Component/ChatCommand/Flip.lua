@@ -6,14 +6,12 @@ local API = require 'OmiChat/Module/Client/Core'
 
 local utils = API.utils
 local config = API.Configuration
-local MetaFormatter = API.MetaFormatter
 
 ---Command stream for the `/flip` command.
 ---@private
 API._flipCommand = API.CommandStream:new {
     name = 'flip',
     command = '/flip ',
-    formatter = MetaFormatter:new(config.ID_FLIP),
     helpTextID = 'UI_OmiChat_HelpText_Flip',
     autoTags = { 'IsFlipCommand' },
     onUse = function(ctx)

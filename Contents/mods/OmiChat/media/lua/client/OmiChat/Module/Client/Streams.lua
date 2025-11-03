@@ -6,7 +6,6 @@ local API = require 'OmiChat/Module/Client/Core'
 
 local utils = API.utils
 local config = API.Configuration
-local MetaFormatter = API.MetaFormatter
 local ISChat = ISChat --[[@as omichat.ISChat]]
 
 
@@ -351,7 +350,7 @@ end
 
 ---Updates streams and formatters based on configuration.
 function Streams.update()
-    Streams._updateFormatters()
+    Streams._updateCommandStreams()
     Streams._updateChatStreams()
     Streams._updateOverrides()
 end
@@ -378,78 +377,35 @@ end
 ---Updates chat streams based on configuration options.
 ---@private
 function Streams._updateChatStreams()
-    -- collect existing stream formatters
-    local existingFormatters = {} ---@type table<string, MetaFormatter>
+    -- collect existing streams
+    local existingStreams = {} ---@type table<string, ChatStream>
     for stream in Streams.chatStreams() do
-        existingFormatters[stream:getName()] = stream:getFormatter()
+        existingStreams[stream:getName()] = stream
     end
 
     -- create stream objects
     local seen = {}
     local streams = {} ---@type ChatStream[]
-    local toCreate = {} ---@type ChatStream[]
-    local toCreateIDs = {} ---@type integer[]
 
-    local needsRecycle = false
-    local nextID = config.MIN_CHAT_ID
-
+    local globalTags = config.Streams.GlobalTags
     for def in config:chatStreams() do
-        local stream = API.ChatStream.fromDefinition(def, config.Streams.GlobalTags)
-        if stream and not seen[stream:getName()] then
-            local name = stream:getName()
-
+        local stream = API.ChatStream.fromDefinition(def, globalTags)
+        local name = stream and stream:getName()
+        if stream and name and not seen[name] then
             seen[name] = true
-            streams[#streams + 1] = stream
 
-            local formatter = existingFormatters[name]
-            if formatter then
-                local id = formatter:getID()
-
-                -- if the stream order has changed, we need to recycle
-                if id ~= nextID then
-                    needsRecycle = true
-                else
-                    formatter:setFormatString(stream:getOverheadFormat())
-                    stream:setFormatter(formatter)
-                end
-            else
-                toCreate[#toCreate + 1] = stream
-                toCreateIDs[#toCreateIDs + 1] = nextID
+            -- stream already exists → update
+            local existing = existingStreams[name]
+            if existing then
+                existing:copyFrom(stream)
+                stream = existing
             end
 
-            nextID = nextID + 1
+            streams[#streams + 1] = stream
             if #streams == config.MAX_CHAT_STREAMS then
                 break
             end
         end
-    end
-
-    -- stream IDs must increase in order so players' streams all match
-    -- if that's not the case, "recycle" — reallocate all stream formatters and clear old messages
-    if needsRecycle then
-        utils.log.info('Recycling chat streams')
-
-        toCreate = streams -- update all streams' formatters
-        API.chat.clear()   -- clear so old messages don't use the wrong format
-
-        for i = 1, #toCreate do
-            toCreateIDs[i] = config.MIN_CHAT_ID + i - 1
-        end
-    end
-
-    -- create and save formatters
-    for i = 1, #toCreate do
-        local stream = toCreate[i]
-        local id = toCreateIDs[i] --[[@as integer]]
-
-        local formatter = API._chatFormatters[id]
-        if not formatter then
-            formatter = MetaFormatter:new(id)
-            API._chatFormatters[id] = formatter
-        end
-
-        formatter:setFormatString(stream:getOverheadFormat())
-        stream:setFormatter(formatter)
     end
 
     -- keep unknown streams for compatibility with other mods that add commands
@@ -510,9 +466,10 @@ function Streams._updateChatStreams()
         local stream = info[1]
         local streamConfig = info[2]
 
+        stream:setOverheadFormat(streamConfig.OverheadFormat)
         stream:setChatFormat(streamConfig.ChatFormat)
         stream:setDefaultColor(streamConfig.DefaultColor --[[@as any]])
-        stream:_setTags(streamConfig.Tags) ---@diagnostic disable-line: access-invisible
+        stream:setTags(streamConfig.Tags)
     end
 
     -- cycle if current stream is now unavailable
@@ -528,33 +485,14 @@ function Streams._updateChatStreams()
     Streams.updateTagCache()
 end
 
----Creates or updates metadata formatters.
+---Updates command stream information.
 ---@private
-function Streams._updateFormatters()
-    config:updateFormatters()
+function Streams._updateCommandStreams()
+    local commands = config.Commands
 
-    table.wipe(API._metadataFormatters)
-    for info in config:formatters() do
-        API._metadataFormatters[info.name] = info.formatter
-    end
-
-    local cmdConfig = config.Commands
-    local commandsToUpdate = {
-        { API._cardCommand, cmdConfig.Card.OverheadFormat, cmdConfig.Card.Tags },
-        { API._flipCommand, cmdConfig.Flip.OverheadFormat, cmdConfig.Flip.Tags },
-        { API._rollCommand, cmdConfig.Roll.OverheadFormat, cmdConfig.Roll.Tags },
-    }
-
-    for i = 1, #commandsToUpdate do
-        local info = commandsToUpdate[i] ---@cast info -?
-        local stream = info[1]
-        local formatter = stream:getFormatter()
-
-        stream:_setTags(info[3]) ---@diagnostic disable-line: access-invisible
-        if formatter then
-            formatter:setFormatString(info[2])
-        end
-    end
+    API._cardCommand:setTags(commands.Card.Tags)
+    API._flipCommand:setTags(commands.Flip.Tags)
+    API._rollCommand:setTags(commands.Roll.Tags)
 end
 
 ---Updates overrides to chat functions based on configuration options.

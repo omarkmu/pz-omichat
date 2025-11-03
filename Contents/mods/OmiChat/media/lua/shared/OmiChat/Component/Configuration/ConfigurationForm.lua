@@ -221,8 +221,8 @@ return {
             Enable = ENABLE,
 
             Range = PAD_TOP,
-            Format = FORMAT,
             ChatFormat = FORMAT,
+            OverheadFormat = FORMAT,
         },
 
         NarrativeStyle = rules {
@@ -237,6 +237,7 @@ return {
 
         Radio = rules {
             ChatFormat = FORMAT,
+            OverheadFormat = FORMAT,
             Tags = TAGS,
         },
 

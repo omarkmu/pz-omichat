@@ -2,7 +2,6 @@
 ---@namespace omichat
 
 local utils = require 'OmiChat/Utils'
-local MetaFormatter = require 'OmiChat/Component/MetaFormatter'
 local Preset = require 'OmiChat/Component/Configuration/Preset'
 local base = utils.configuration.ConfigurationHelper
 local sort = table.sort
@@ -67,11 +66,6 @@ Configuration._idToLanguage = {}
 ---@private
 Configuration._nameToLanguage = {}
 
----Associates formatter IDs to information about formatters used for encoding metadata.
----@type table<integer, FormatterInfo>
----@private
-Configuration._formatterInfo = {}
-
 ---List containing presets in presentation order. Contains built-in and custom presets.
 ---@type ConfigurationPreset[]
 ---@private
@@ -91,33 +85,10 @@ Configuration._variables = {}
 
 --#region Constants
 
--- reserved ID layout:
---   1–10: general-purpose arguments
---  11–32: other arguments & signals
---  33–64: chat streams
---  65–80: command streams
--- 81–100: metadata
-
-
----Constant for the number at which chat format IDs start.
----@readonly
-Configuration.MIN_CHAT_ID = 33
-
----Constant for the number at which chat format IDs end.
----@readonly
-Configuration.MAX_CHAT_ID = 64
-
----Constant for the number at which metadata format IDs start.
----@readonly
-Configuration.MIN_META_ID = 81
-
----Constant for the number at which metadata format IDs end.
----@readonly
-Configuration.MAX_META_ID = 89
-
 ---Constant for the maximum number of configured chat streams.
+---This should match the `maxItems` field of `Streams.List` in the configuration form.
 ---@readonly
-Configuration.MAX_CHAT_STREAMS = 32
+Configuration.MAX_CHAT_STREAMS = 50
 
 ---Constant for the maximum number of custom shouts that can be configured.
 ---@readonly
@@ -128,6 +99,7 @@ Configuration.MAX_CUSTOM_SHOUTS = 20
 Configuration.MAX_CUSTOM_SHOUT_LEN = 200
 
 ---Constant for the maximum number of languages that can be configured.
+---This should match the `maxItems` field of `Language.List` in the configuration form.
 ---@readonly
 Configuration.MAX_LANGUAGES = 1000
 
@@ -138,91 +110,6 @@ Configuration.MAX_LANGUAGE_SLOTS = 50
 ---Constant for the maximum number of profiles a player can have.
 ---@readonly
 Configuration.MAX_PROFILES = 20
-
-
----Constant for a narrative style dialogue tag argument.
----@readonly
-Configuration.ID_NARRATIVE_TAG = 11
-
----Constant for a narrative style content argument.
----@readonly
-Configuration.ID_NARRATIVE_TEXT = 12
-
----Constant for echo type argument.
----@readonly
-Configuration.ID_ECHO_TYPE = 13
-
----Constant for an invisible asterisk for coloring actions.
----@readonly
-Configuration.ID_ASTERISK_SIGNAL = 14
-
----Constant for an indicator for the position of encoded command arguments.
----@readonly
-Configuration.ID_COMMAND_ARGS = 15
-
-
----Constant for the format ID for `/card`.
----@readonly
-Configuration.ID_CARD = 65
-
----Constant for the format ID for `/flip`.
----@readonly
-Configuration.ID_FLIP = 66
-
----Constant for the format ID for `/roll`.
----@readonly
-Configuration.ID_ROLL = 67
-
-
----Constant for the format ID for the final overhead text.
----@readonly
-Configuration.ID_OVERHEAD_FINAL = 81
-
----Constant for the format ID for callouts.
----@readonly
-Configuration.ID_CALLOUT = 82
-
----Constant for the format ID for sneak callouts.
----@readonly
-Configuration.ID_SNEAK_CALLOUT = 83
-
----Constant for the format ID for languages.
----@readonly
-Configuration.ID_LANGUAGE = 84
-
----Constant for the format ID for the admin icon.
----@readonly
-Configuration.ID_ADMIN_ICON = 85
-
----Constant for the format ID for narrative style.
----@readonly
-Configuration.ID_NARRATIVE_STYLE = 86
-
----Constant for the format ID for encoded online IDs.
----@readonly
-Configuration.ID_ONLINE_ID = 87
-
----Constant for the format ID for echo messages.
----@readonly
-Configuration.ID_ECHO = 88
-
----Constant for the format ID for mentions.
----@readonly
-Configuration.ID_MENTION = 89
-
----Associates metadata format IDs with names for those formatters.
----@readonly
-Configuration.FORMAT_NAMES = {
-    [Configuration.ID_OVERHEAD_FINAL] = 'overheadFinal',
-    [Configuration.ID_CALLOUT] = 'callout',
-    [Configuration.ID_SNEAK_CALLOUT] = 'sneakCallout',
-    [Configuration.ID_LANGUAGE] = 'language',
-    [Configuration.ID_ADMIN_ICON] = 'adminIcon',
-    [Configuration.ID_NARRATIVE_STYLE] = 'narrative',
-    [Configuration.ID_ONLINE_ID] = 'onlineID',
-    [Configuration.ID_ECHO] = 'echo',
-    [Configuration.ID_MENTION] = 'mention',
-}
 
 --#endregion
 
@@ -278,19 +165,6 @@ end
 ---@return boolean enabled
 function Configuration:compatTADEnabled()
     return self:_isCompatEnabled(self.Compatibility.TrueActionsDancing, 'TrueActionsDancing')
-end
-
----Returns an iterator over metadata formatter information.
----@return fun(): FormatterInfo? iterator
-function Configuration:formatters()
-    local i = self.MIN_META_ID - 1
-    return function()
-        i = i + 1
-        local info = self._formatterInfo[i]
-        if info then
-            return utils.copy(info)
-        end
-    end
 end
 
 ---Returns a table of valid items for /card.
@@ -601,48 +475,6 @@ function Configuration:requireDiceItem()
     return #self.Commands.Roll.Items > 0
 end
 
----Updates the format text used for metadata formatters.
-function Configuration:updateFormatters()
-    self._formatterInfo = self._formatterInfo or {}
-
-    local callout = self.Callouts or {}
-    local format = self.Format or {}
-    local echo = self.EchoMessages or {}
-    for i = self.MIN_META_ID, self.MAX_META_ID do
-        if not self._formatterInfo[i] then
-            local name = self.FORMAT_NAMES[i]
-            if not name then
-                utils.log.error('Missing name for metadata formatter with ID %d', i)
-            end
-
-            self._formatterInfo[i] = {
-                id = i,
-                name = name or '',
-                formatter = MetaFormatter:new(i),
-            }
-        end
-
-        local targetFormat
-        local defaultName
-        if i == self.ID_CALLOUT then
-            targetFormat = callout.Format
-        elseif i == self.ID_SNEAK_CALLOUT then
-            targetFormat = callout.SneakFormat
-        elseif i == self.ID_OVERHEAD_FINAL then
-            defaultName = 'OverheadFinal'
-            targetFormat = format.Overhead.Final
-        elseif i == self.ID_ECHO then
-            targetFormat = echo.OverheadFormat
-        end
-
-        if targetFormat then
-            local info = self._formatterInfo[i] --[[@as FormatterInfo]]
-            info.formatter:setDefaultName(defaultName)
-            info.formatter:setFormatString(targetFormat)
-        end
-    end
-end
-
 
 ---Adds a custom preset to the configuration.
 ---@param preset ConfigurationPreset
@@ -785,11 +617,6 @@ return Configuration
 
 ---@class LanguageRecord : Configuration.LanguageDefinition
 ---@field ID integer The ID of the language.
-
----@class FormatterInfo
----@field name FormatterName The name of the formatter.
----@field id integer The formatter's ID.
----@field formatter MetaFormatter The formatter.
 
 ---@class ConfigurationFormState
 ---@field activePresetDialog? omi.ui.Dialog The active dialog related to presets.

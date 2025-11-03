@@ -16,9 +16,6 @@ local isempty = table.isempty
 ---@field protected disabled? boolean Flag for whether the stream should always be treated as not enabled.
 ---@field protected aliasesList string[] Additional aliases for the stream.
 ---@field protected category StreamCategory The stream category, used to determine whether input should be retained.
----@field protected chatFormat? string The format to use for chat messages sent from this stream.
----@field protected overheadFormat? string The format to use for overhead messages sent from this stream.
----@field protected formatter? MetaFormatter The formatter to use for this stream.
 ---@field protected allowMentions boolean Flag for whether to allow mentions on this stream.
 ---@field protected suggestSpec? SuggestArgSpec[] Spec to use for suggestions.
 ---@field protected tags omi.SetTable<string> A set of tags for the stream.
@@ -109,6 +106,24 @@ function Stream:checkPlayerCanUse()
     return true
 end
 
+---Copies all settings from another stream into this stream.
+---@param other Stream
+function Stream:copyFrom(other)
+    self.name = other.name
+    self.allowMentions = other.allowMentions
+    self.disabled = other.disabled
+    self.category = other.category
+    self.aliasesList = utils.copyList(other.aliasesList)
+    self.suggestSpec = other.suggestSpec and utils.copy(other.suggestSpec) or nil
+    self.defaultOnDisabled = other.defaultOnDisabled
+    self.autoTags = utils.copy(other.autoTags)
+    self.command = other.command
+    self.shortCommand = other.shortCommand
+    self.callbacks = utils.copy(other.callbacks)
+
+    self:setTags(utils.keys(other.tags))
+end
+
 ---Returns whether the stream allows mentions.
 ---@return boolean isAllowed
 function Stream:isAllowMentions()
@@ -184,13 +199,9 @@ end
 ---Checks the stream's tab ID against a given tab ID.
 ---@param otherTabID integer The tab ID to match against.
 ---@return boolean isMatch `True` if the tab ID is a match, or if the stream has no tab ID. Otherwise, `false`.
+---@diagnostic disable-next-line: unused
 function Stream:isTabID(otherTabID)
-    local tabID = self:getTabID()
-    if not tabID then
-        return true
-    end
-
-    return tabID == otherTabID
+    return true
 end
 
 ---Returns the category of the stream.
@@ -200,26 +211,10 @@ function Stream:getCategory()
     return self.category
 end
 
----Returns the format string used for chat content on the stream.
----@return string? formatString
-function Stream:getChatFormat()
-    return self.chatFormat
-end
-
----Returns the chat type that stream messages are sent over.
----@return omi.ChatTypeString? chatType The chat type of the stream. For command streams, `nil`.
-function Stream:getChatType() end
-
 ---Returns the primary command of the stream.
 ---@return string command
 function Stream:getCommand()
     return self.command
-end
-
----Returns the formatter used to format the overhead text for messages sent on the stream.
----@return MetaFormatter? formatter
-function Stream:getFormatter()
-    return self.formatter
 end
 
 ---Returns help text for the stream.
@@ -231,16 +226,6 @@ function Stream:getHelpText() end
 function Stream:getName()
     return self.name
 end
-
----Returns the format string used for overhead content from the stream.
----@return string? formatString
-function Stream:getOverheadFormat()
-    return self.overheadFormat
-end
-
----Returns the range of the stream if it's a ranged stream.
----@return integer? range
-function Stream:getRange() end
 
 ---Returns the short command of the stream.
 ---@return string? shortCommand
@@ -256,18 +241,16 @@ end
 
 ---Gets the 1-indexed tab ID of the stream.
 ---For non-chat streams, this returns `nil`.
----@return integer? tabID The tab ID. For command streams, this is always `nil`.
-function Stream:getTabID() end
+---@return integer tabID The tab ID. For command streams, this is always `-1`.
+function Stream:getTabID()
+    return -1
+end
 
 ---Gets the set of tags for the stream.
 ---@return omi.SetTable<string> tags
 function Stream:getTags()
     return utils.copy(self.tags)
 end
-
----Returns the vertical range of the stream if it's a ranged stream.
----@return integer? verticalRange
-function Stream:getVerticalRange() end
 
 ---Returns whether the stream is tagged with any of the given tags.
 ---@param tags string[] The list of tags to check for.
@@ -316,6 +299,7 @@ end
 
 ---Handler for when the stream is used.
 ---@param args Args.UseStream.Partial | Args.Send.Partial Arguments for using the stream.
+---The stream will be injected into the argument table as `stream`.
 ---@return boolean handled Indicates whether the command was handled.
 function Stream:onUse(args)
     if not args.stream then
@@ -357,10 +341,19 @@ function Stream:onUseDisabled(command)
     return false
 end
 
----Sets the formatter used to format overhead text sent on the stream.
----@param formatter MetaFormatter The formatter to use for overhead text.
-function Stream:setFormatter(formatter)
-    self.formatter = formatter
+---Sets the tags included on the stream.
+---The tag cache should **always** be updated after updating tags for a chat stream.
+---@param tags string[] The new tags for the stream.
+---@see api.client.streams.updateTagCache
+function Stream:setTags(tags)
+    self.tags = utils.set.table(tags)
+    utils.extend(self.tags, self.autoTags)
+
+    if self:isCommandStream() then
+        self.tags.IsCommand = true
+    end
+
+    self.noTags = isempty(self.tags)
 end
 
 ---Displays help text for the stream, if it exists.
@@ -376,32 +369,9 @@ end
 ---@param input string The input text.
 ---@return boolean valid Flag for whether the input text is valid for the stream.
 ---@return string? message A translated error message to report to the player.
+---@diagnostic disable-next-line: unused
 function Stream:validate(input)
-    if self:getChatType() ~= 'whisper' then
-        return true
-    end
-
-    -- vanilla regex is /("[^"]*\s+[^"]*"|[^"]\S*)\s(.+)/
-    if input:match('^"[^"]*%s+[^"]*"%s.+$') or input:match('^[^"]%S*%s.+$') then
-        return true
-    end
-
-    return false, getText('IGUI_Commands_Whisper')
-end
-
-
----Sets the tags included on the stream.
----@param tags string[] The new tags for the stream.
----@protected
-function Stream:_setTags(tags)
-    self.tags = utils.set.table(tags)
-    utils.extend(self.tags, self.autoTags)
-
-    if self:isCommandStream() then
-        self.tags.IsCommand = true
-    end
-
-    self.noTags = isempty(self.tags)
+    return true
 end
 
 
@@ -417,12 +387,11 @@ function Stream:new(args)
     this.category = args.category or 'other'
     this.aliasesList = utils.mapList(Stream._stringToCommand, args.aliases or {})
     this.suggestSpec = args.suggestSpec
-    this.formatter = args.formatter
     this.isChat = false
     this.isCommand = false
     this.defaultOnDisabled = args.defaultOnDisabled ~= false
     this.autoTags = utils.set.table(args.autoTags)
-    this:_setTags(args.tags or {})
+    this:setTags(args.tags or {})
 
     if not utils.isNilOrWhitespace(args.command) then
         this.command = Stream._stringToCommand(args.command)
@@ -432,14 +401,6 @@ function Stream:new(args)
 
     if not utils.isNilOrWhitespace(args.shortCommand) then
         this.shortCommand = Stream._stringToCommand(args.shortCommand)
-    end
-
-    if not utils.isNilOrWhitespace(args.overheadFormat) then
-        this.overheadFormat = utils.trim(args.overheadFormat --[[@as string]])
-    end
-
-    if not utils.isNilOrWhitespace(args.chatFormat) then
-        this.chatFormat = utils.trim(args.chatFormat --[[@as string]])
     end
 
     this.callbacks = {
@@ -464,13 +425,10 @@ return Stream
 ---@field disabled? boolean Flag for whtehr the stream should always be treated as not enabled. Defaults to `false`.
 ---@field category? StreamCategory The stream category, used to determine whether input should be retained.
 ---@field isEnabled? fun(stream: Stream): boolean Invoked to check whether the stream should be treated as enabled.
----@field overheadFormat? string The overhead format to use for the stream.
----@field chatFormat? string The format to use for the stream in chat.
 ---@field onUse? fun(ctx: Args.UseStream) Invoked when the stream is used.
 ---@field onUseDisabled? fun(stream: Stream, command: string) Invoked when the stream is used while disabled.
 ---@field allowMentions? boolean Flag for whether mentions should be allowed on this stream. Defaults to `true`.
 ---@field suggestSpec? SuggestArgSpec[] Spec to use for suggestions.
----@field formatter? MetaFormatter The formatter to use for this stream.
 ---@field tags? string[] Tags for the stream.
 ---@field autoTags? string[] Tags which should always be included on the stream.
 ---@field defaultOnDisabled? boolean Flag for whether the stream should defer to default handling when disabled. Defaults to `true`.

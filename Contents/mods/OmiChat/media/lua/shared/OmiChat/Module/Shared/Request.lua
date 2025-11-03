@@ -19,7 +19,6 @@ local getTimestampMs = getTimestampMs
 local getOnlinePlayers = getOnlinePlayers
 
 local IS_DEBUG = getDebug()
-local COMMAND_ARGS_START = utils.encodeInvisibleCharacter(config.ID_COMMAND_ARGS)
 
 
 ---@class(partial) api.shared.request
@@ -254,28 +253,20 @@ TOPIC.DRAW_CARD = dispatch:topic('DRAW_CARD', {
         end
 
         -- local message
-        local commandStream = API_C._cardCommand
         local targetStream = API_C.streams.firstChatStreamWithTag('CardCommandTarget')
         if not targetStream then
             return
         end
 
-        -- display English text overhead, encode card values for per-client translation
-        local cardName = utils.getCardName(card, suit)
-        local content = utils.interpolateNamed('FormatCard', config.Commands.Card.Format, {
-            suit = suit,
-            number = card,
-            card = cardName,
-        })
-
-        local result = utils.encodeInvisibleCharacter(suit) .. utils.encodeInvisibleCharacter(card)
-        local encoded = COMMAND_ARGS_START .. result
-
         API_C.chat.send {
-            allowInvisible = true,
+            allowEmpty = true,
             stream = targetStream,
-            formatStream = commandStream,
-            text = encoded .. content,
+            text = '',
+            context = {
+                type = 'omichat.card',
+                suit = suit,
+                card = card,
+            },
         }
     end,
 })
@@ -314,25 +305,19 @@ TOPIC.FLIP_COIN = dispatch:topic('FLIP_COIN', {
 
     ---@param args request.Args.ReportFlipCoin
     onClientReceive = function(_, args)
-        local commandStream = API_C._flipCommand
         local targetStream = API_C.streams.firstChatStreamWithTag('FlipCommandTarget')
         if not targetStream then
             return
         end
 
-        local heads = args.heads
-        local content = utils.interpolateNamed('FormatFlip', config.Commands.Flip.Format, {
-            heads = args.heads and '1' or nil,
-        })
-
-        local result = utils.encodeInvisibleCharacter(heads and 1 or 2)
-        local encoded = COMMAND_ARGS_START .. result
-
         API_C.chat.send {
-            allowInvisible = true,
+            allowEmpty = true,
             stream = targetStream,
-            formatStream = commandStream,
-            text = encoded .. content,
+            text = '',
+            context = {
+                type = 'omichat.flip',
+                heads = args.heads,
+            },
         }
     end,
 })
@@ -476,23 +461,20 @@ TOPIC.ROLL_DICE = dispatch:topic('ROLL_DICE', {
 
     ---@param args request.Args.ReportRoll
     onClientReceive = function(_, args)
-        local commandStream = API_C._rollCommand
         local targetStream = API_C.streams.firstChatStreamWithTag('RollCommandTarget')
         if not targetStream then
             return
         end
 
-        local tokens = { roll = tostring(args.roll), sides = tostring(args.sides) }
-        local content = utils.interpolateNamed('FormatRoll', config.Commands.Roll.Format, tokens)
-
-        local result = utils.encodeInvisibleInt(args.roll) .. utils.encodeInvisibleInt(args.sides)
-        local encoded = COMMAND_ARGS_START .. result
-
         API_C.chat.send {
-            allowInvisible = true,
+            allowEmpty = true,
             stream = targetStream,
-            formatStream = commandStream,
-            text = encoded .. content,
+            text = '',
+            context = {
+                type = 'omichat.roll',
+                roll = args.roll,
+                sides = args.sides,
+            },
         }
     end,
 })

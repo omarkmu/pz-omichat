@@ -732,7 +732,7 @@ function UI._addLanguageOptions(context)
     end
 
     if #addLanguages > 0 then
-        table.sort(addLanguages, function(a, b) return a.translated < b.translated end)
+        sort(addLanguages, function(a, b) return a.translated < b.translated end)
 
         local addLanguageSubmenu = languageSubmenu:getNew(languageSubmenu)
         local addLanguageOption = languageSubmenu:addOption(getText('UI_OmiChat_ContextAddLanguage'), ISChat.instance)

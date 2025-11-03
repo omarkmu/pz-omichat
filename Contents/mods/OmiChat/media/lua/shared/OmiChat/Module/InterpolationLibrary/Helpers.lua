@@ -14,7 +14,7 @@ local stringLib = baseLib.string
 
 local IS_CLIENT = not isServer()
 
-local ASTERISK_CHAR = utils.encodeInvisibleCharacter(config.ID_ASTERISK_SIGNAL)
+local ASTERISK_CHAR = string.char(140)
 local ASTERISK_PREFIX_PATTERN = '^(%s*[*' .. ASTERISK_CHAR .. '])(.+)'
 local ASTERISK_DELIM_PATTERN = '^"%s*[*' .. ASTERISK_CHAR .. ']'
 
@@ -82,7 +82,7 @@ function Helpers.applySharedFormatting(args)
     end
 
     local options = args.options
-    local segments, prefix, suffix = Helpers.getMessageSegments(input, {
+    local segments = Helpers.getMessageSegments(input, {
         startInAction = tags.Action,
         optionalActionAsterisk = tags.OptionalActionAsterisk,
         hasInternalQuote = args.hasInternalQuote,
@@ -122,16 +122,13 @@ function Helpers.applySharedFormatting(args)
         Helpers.colorQuotes(segments, options, tags)
     end
 
-    return prefix .. Helpers.combineSegments(segments) .. suffix
+    return Helpers.combineSegments(segments)
 end
 
 ---Capitalizes the first non-invisible character of a string. Handles leading spaces.
 ---@param input string The input text.
 ---@return string capitalized The capitalized text.
 function Helpers.capitalize(input)
-    local prefix, suffix
-    input, prefix, suffix = utils.getInternalText(input)
-
     local spaces, first = input:match('^(%s*)()')
     spaces = spaces or ''
     if first then
@@ -142,7 +139,7 @@ function Helpers.capitalize(input)
     ---@diagnostic disable-next-line: param-type-not-match
     input = stringLib.Capitalize(nil, input)
 
-    return prefix .. spaces .. input .. suffix
+    return spaces .. input
 end
 
 ---Modifies the case of the input depending on the tags.
@@ -205,7 +202,7 @@ function Helpers.colorActions(segments, options, tags)
     for i = 1, #segments do
         local part = segments[i]
         if part.type == 'action' then
-            local text = part.text:gsub(ASTERISK_CHAR, '*')
+            local text = part.text
             local space, asterisk, after = text:match('^(%s*)(%*)()')
             if asterisk and not keepAsterisk then
                 text = space .. text:sub(after)
@@ -586,8 +583,6 @@ end
 ---@param input string The input text.
 ---@param options Args.GetMessageSegments? Options for retrieving segments.
 ---@return MessageSegment[] segments A list of message segments.
----@return string prefix Invisible characters that preceded the text.
----@return string suffix Invisible characters that followed the text.
 function Helpers.getMessageSegments(input, options)
     options = options or {}
     input = utils.trim(input)
@@ -598,8 +593,6 @@ function Helpers.getMessageSegments(input, options)
 
     local start = 1
     local pos = 1
-    local prefix, suffix
-    input, prefix, suffix = utils.getInternalText(input)
 
     -- avoid triggering actions with an initial asterisk in narrative style
     if not inAction and options.hasInternalQuote then
@@ -631,7 +624,7 @@ function Helpers.getMessageSegments(input, options)
             end
 
             if onlyFirstSegment and #segments > 0 then
-                return segments, prefix, suffix
+                return segments
             end
         else
             -- skip mentions
@@ -651,7 +644,7 @@ function Helpers.getMessageSegments(input, options)
         }
     end
 
-    return segments, prefix, suffix
+    return segments
 end
 
 ---Gets the text to use for an "over radio" indicator.
@@ -701,7 +694,7 @@ function Helpers.getRadioPrefix(interpolator, tags)
     if tags.IsRadioStream then
         prefix = getText('UI_OmiChat_Radio', tostring(interpolator:token('frequency') or '???'))
 
-        if tags.IncludeColon or not (tags.NoColon or tags.IsNarrativeStyle or tags.IsBuffyRoll) then
+        if tags.IncludeColon or not (tags.NoColon or tags.NoColonChat or tags.IsNarrativeStyle) then
             prefix = prefix .. ':'
         end
 
@@ -716,9 +709,8 @@ end
 ---Gets a volume indicator based on tags.
 ---@param options omi.MultiMap A multimap of options.
 ---@param tags omi.SetTable<string> A set of tags.
----@param shouldTranslate boolean? Flag for whether translation should be attempted.
 ---@return string? indicator A translated or untranslated string indicating the volume of a message.
-function Helpers.getVolumeIndicator(options, tags, shouldTranslate)
+function Helpers.getVolumeIndicator(options, tags)
     local indicator
     if not tags.IsSneakCallout and (tags.Loud or tags.IsCallout) then
         indicator = options:getString('loudIndicator', config:getVariable('VolumeIndicatorLoud') or 'Loud')
@@ -732,10 +724,7 @@ function Helpers.getVolumeIndicator(options, tags, shouldTranslate)
         return
     end
 
-    if shouldTranslate then
-        indicator = getTextOrNull('UI_OmiChat_VolumeIndicator_' .. indicator:gsub('%s', '_')) or indicator
-    end
-
+    indicator = getTextOrNull('UI_OmiChat_VolumeIndicator_' .. indicator:gsub('%s', '_')) or indicator
     return '[' .. indicator .. ']'
 end
 
@@ -754,44 +743,13 @@ function Helpers.optionOrToken(interpolator, options, key, token)
     return interpolator:tokenString(token or key)
 end
 
----Gets the value of an option, or a token as a fallback.
----If there's both an option and a token, the value of the option is wrapped in the same characters from the token.
----@param interpolator omi.Interpolator The interpolator in use.
----@param options omi.MultiMap A multimap of options.
----@param key string The key to use to retrieve the option.
----@param token string? The token to retrieve from the interpolator. Defaults to `key`.
----@return string value The option or token, or the empty string if neither exist.
-function Helpers.optionOrTokenWrapped(interpolator, options, key, token)
-    local tokenValue = interpolator:tokenString(token or key)
-    local optionValue = options:get(key)
-
-    if not optionValue then
-        return tokenValue
-    end
-
-    optionValue = tostring(optionValue)
-
-    local _, prefix, suffix = utils.getInternalText(tokenValue)
-    local _, optPrefix, optSuffix = utils.getInternalText(optionValue)
-
-    if optPrefix == prefix and optSuffix == suffix then
-        -- already wrapped
-        return optionValue
-    end
-
-    return prefix .. optionValue .. suffix
-end
-
 ---Adds punctuation to a string if it isn't already present.
----Handles encoded invisible characters and trailing spaces.
+---Handles trailing spaces.
 ---@param input string The string to punctuate.
 ---@param punctuation string? The punctuation character to use. Defaults to `.`.
----@param characters string? Characters to treat as punctuation. Defaults to using the punctuation string pattern.
+---@param characters string? Characters to treat as punctuation. Defaults to `.,!?:/-~`
 ---@return string punctuated Text with punctuation added.
 function Helpers.punctuate(input, punctuation, characters)
-    local prefix, suffix
-    input, prefix, suffix = utils.getInternalText(input)
-
     local last, spaces = input:match('()(%s*)$')
     spaces = spaces or ''
     if last then
@@ -799,16 +757,11 @@ function Helpers.punctuate(input, punctuation, characters)
         input = input:sub(1, last - 1)
     end
 
-    -- if it ends with a mention, always punctuate
-    if input:match('<@%d+:.->$') then
-        return prefix .. input .. (punctuation or '.') .. spaces .. suffix
-    end
-
     -- doesn't actually use the interpolator
     ---@diagnostic disable-next-line: param-type-not-match
-    input = stringLib.Punctuate(nil, input, punctuation, characters)
+    input = stringLib.Punctuate(nil, input, punctuation, characters or '.,!?:/-~')
 
-    return prefix .. input .. spaces .. suffix
+    return input .. spaces
 end
 
 ---Reads at-function options.
@@ -848,8 +801,7 @@ function Helpers.readTags(interpolator)
     return tagSet
 end
 
----Replaces asterisks intended for coloring actions with invisible characters.
----This prevents them from displaying overhead while still allowing the action coloring to handle them properly.
+---Replaces asterisks intended for coloring actions with an invisible signal character.
 ---@param segments MessageSegment[] The message segments list.
 function Helpers.replaceColorActionsAsterisks(segments)
     for i = 1, #segments do

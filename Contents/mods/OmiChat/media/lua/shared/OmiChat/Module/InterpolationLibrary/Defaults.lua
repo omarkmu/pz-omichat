@@ -20,7 +20,6 @@ local concat = table.concat
 local readTags = Helpers.readTags
 local readOptions = Helpers.readOptions
 local optionOrToken = Helpers.optionOrToken
-local optionOrTokenWrapped = Helpers.optionOrTokenWrapped
 
 
 ---Default forwarding function for format strings.
@@ -53,8 +52,8 @@ function Library.Defaults.Chat(interpolator, args)
     local options = readOptions(args)
     local tags = readTags(interpolator)
 
-    local defaultNoColon = tags.IsNarrativeStyle or tags.IsBuffyRoll or tags.IsServerStream or tags.Action
-    local noColon = tags.IsRadioStream or (not tags.IncludeColon and (tags.NoColon or defaultNoColon))
+    local defaultNoColon = tags.IsNarrativeStyle or tags.IsServerStream or tags.Action
+    local noColon = not tags.IncludeColon and (tags.NoColon or tags.NoColonChat or defaultNoColon)
 
     local name = '' ---@type string?
     local includeName = tags.IncludeName or tags.IncludeNameChat
@@ -150,9 +149,11 @@ function Library.Defaults.Chat(interpolator, args)
     local prefix = ''
     if tags.IsRadioStream then
         prefix = getText('UI_OmiChat_Radio', tostring(interpolator:token('frequency') or '???'))
-        noColon = true
+        if name and tags.IsNarrativeStyle then
+            noColon = true
+        end
 
-        if not tags.NoColon then
+        if not tags.NoColon and not tags.NoColonChat then
             prefix = prefix .. ': '
         end
 
@@ -211,7 +212,7 @@ function Library.Defaults.ChatPrefix(interpolator, args)
     result[#result + 1] = interpolator:tokenString('tag')
 
     if not tags.NoVolumeIndicator and not tags.NoVolumeIndicatorChat then
-        local volume = Helpers.getVolumeIndicator(options, tags, true)
+        local volume = Helpers.getVolumeIndicator(options, tags)
         if volume then
             result[#result + 1] = volume
         end
@@ -225,13 +226,7 @@ function Library.Defaults.ChatPrefix(interpolator, args)
         result[#result + 1] = interpolator:tokenString('language')
     end
 
-    local buffyCrit = interpolator:tokenString('buffyCrit')
-    if buffyCrit ~= '' then
-        result[#result + 1] = ' <SPACE> '
-        result[#result + 1] = buffyCrit
-    end
-
-    if (tags.OverRadio or tags.OverRadioChat) and not tags.IsUnknownLanguage then
+    if (tags.OverRadio or tags.OverRadioChat) and not tags.IsUnknownLanguage and not tags.IsRadioStream then
         result[#result + 1] = ' <SPACE> '
         result[#result + 1] = Helpers.getOverRadioIndicator(interpolator:token('chatType'))
     end
@@ -460,7 +455,7 @@ function Library.Defaults.Icon(interpolator, args)
     elseif tags.IsFlipCommand then
         -- the plate is the most coin-like icon I could find in vanilla
         return options:getString('flipIcon', 'Item_Plate')
-    elseif tags.IsRollCommand or tags.IsBuffyRoll then
+    elseif tags.IsRollCommand then
         return options:getString('rollIcon', 'Item_Dice')
     end
 
@@ -498,24 +493,23 @@ function Library.Defaults.MentionChat(interpolator, args)
     local tags = readTags(interpolator)
     local input = optionOrToken(interpolator, options, 'input')
 
-    -- don't include if already included in mention text
-    if tags.IncludeMentionAtSignChat and not tags.IncludeMentionAtSign then
+    if tags.IncludeMentionAtSign or tags.IncludeMentionAtSignChat then
         return '@' .. input
     end
 
     return input
 end
 
----Default format for mention text.
+---Default format for a mention text in overhead text.
 ---@param interpolator omi.Interpolator The interpolator in use.
 ---@param args any? The first argument passed to the default function.
 ---@return string
-function Library.Defaults.MentionText(interpolator, args)
+function Library.Defaults.MentionOverhead(interpolator, args)
     local options = readOptions(args)
     local tags = readTags(interpolator)
     local input = optionOrToken(interpolator, options, 'input')
 
-    if tags.IncludeMentionAtSign then
+    if tags.IncludeMentionAtSign or tags.IncludeMentionAtSignOverhead then
         return '@' .. input
     end
 
@@ -599,13 +593,26 @@ function Library.Defaults.NarrativeChatContent(interpolator, args)
     local input = optionOrToken(interpolator, options, 'input')
     local dialogueTag = optionOrToken(interpolator, options, 'dialogueTag')
 
-    local segments = Helpers.getMessageSegments(input, { optionalActionAsterisk = tags.OptionalActionAsterisk })
-    local startQuote = (segments[1] and segments[1].type == 'quote') and '"' or ''
-    local endQuote = (segments[#segments] and segments[#segments].type == 'quote') and '"' or ''
+    local autoCapitalize = tags.AutoCapitalize or tags.AutoCapitalizeChat or tags.AutoCapitalizeNarrative
+    if tags.IsSneakCallout then
+        autoCapitalize = tags.AutoCapitalizeSneakCallout
+    end
+
+    input = Helpers.applySharedFormatting {
+        interpolator = interpolator,
+        options = options,
+        tags = tags,
+        input = input,
+        applyCase = true,
+        doCapitalize = autoCapitalize,
+        doPunctuate = tags.AutoPunctuate or tags.AutoPunctuateChat or tags.AutoPunctuateNarrative,
+        applyEmbeddedQuotes = true,
+        applyEmbeddedActions = true,
+        doAutoQuotes = true,
+        doReplaceAsterisks = tags.AutoColorActions,
+    }
 
     local comma = options:getBoolean('noComma') and '' or ', '
-    input = Helpers.ensureWrapped(input, startQuote, endQuote)
-
     return dialogueTag:lower() .. comma .. input
 end
 
@@ -616,7 +623,7 @@ end
 function Library.Defaults.NarrativeOverheadContent(interpolator, args)
     local options = readOptions(args)
     local tags = readTags(interpolator)
-    local input = optionOrTokenWrapped(interpolator, options, 'input')
+    local input = optionOrToken(interpolator, options, 'input')
     local dialogueTag = optionOrToken(interpolator, options, 'dialogueTag')
 
     local autoCapitalize = tags.AutoCapitalize or tags.AutoCapitalizeOverhead or tags.AutoCapitalizeNarrative
@@ -635,7 +642,7 @@ function Library.Defaults.NarrativeOverheadContent(interpolator, args)
         applyEmbeddedQuotes = true,
         applyEmbeddedActions = true,
         doAutoQuotes = true,
-        doReplaceAsterisks = tags.AutoColorActions and tags.IsNarrativeStyle,
+        doReplaceAsterisks = tags.AutoColorActions,
     }
 
     local comma = options:getBoolean('noComma') and '' or ', '
@@ -670,14 +677,11 @@ function Library.Defaults.NarrativeTag(interpolator, args)
     })
 
     local firstSegment = segments[1]
-
     if not firstSegment or firstSegment.type ~= 'quote' then
         return options:getString('statementTag', 'says')
     end
 
-    local testInput = Helpers.ensureUnwrapped(firstSegment.text, '"')
-    testInput = utils.trim(utils.removeInvisible(testInput))
-
+    local testInput = utils.trim(Helpers.ensureUnwrapped(firstSegment.text, '"'))
     if utils.endsWith(testInput, '?') then
         return options:getString('questionTag', 'asks')
     elseif utils.endsWith(testInput, '!') then
@@ -702,7 +706,7 @@ function Library.Defaults.Overhead(interpolator, args)
     end
 
     local name = optionOrToken(interpolator, options, 'name')
-    local input = optionOrTokenWrapped(interpolator, options, 'input')
+    local input = optionOrToken(interpolator, options, 'input')
 
     local autoCapitalize = tags.AutoCapitalize or tags.AutoCapitalizeOverhead
     if tags.IsSneakCallout then
@@ -730,7 +734,7 @@ function Library.Defaults.Overhead(interpolator, args)
 
     if name and includeName and not noName then
         local defaultNoColon = tags.IsNarrativeStyle or tags.Action
-        local noColon = not tags.IncludeColon and (tags.NoColon or defaultNoColon)
+        local noColon = not tags.IncludeColon and (tags.NoColon or tags.NoColonOverhead or defaultNoColon)
 
         input = tostring(name) .. (noColon and ' ' or ': ') .. input
     end
@@ -739,7 +743,7 @@ function Library.Defaults.Overhead(interpolator, args)
         input = Helpers.wrapActionOverhead(input, tags)
     end
 
-    if (tags.OverRadio or tags.OverRadioOverhead) and not tags.IsUnknownLanguage then
+    if (tags.OverRadio or tags.OverRadioOverhead) and not tags.IsUnknownLanguage and not tags.IsRadioStream then
         input = Helpers.getOverRadioIndicator(interpolator:token('chatType')) .. ' ' .. input
     end
 
@@ -784,7 +788,7 @@ function Library.Defaults.OverheadPrefix(interpolator, args)
     end
 
     if not tags.NoLanguage and not tags.NoLanguageOverhead and not tags.IsPerceptionRange and not tags.IsUnknownLanguage then
-        local language = interpolator:tokenString('languageRaw')
+        local language = interpolator:tokenString('language')
         if language ~= '' then
             result[#result + 1] = '[' .. language .. ']'
         end

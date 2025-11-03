@@ -265,8 +265,8 @@ return utils.schema {
             Enable = bool(true),
             AlwaysUseNameColors = bool(true),
             Range = int(20, 0, 60),
-            Format = str(DEFAULT),
             ChatFormat = str(DEFAULT),
+            OverheadFormat = str(DEFAULT),
         },
 
         NarrativeStyle = container {
@@ -279,12 +279,13 @@ return utils.schema {
 
         Radio = container {
             ChatFormat = str(DEFAULT),
+            OverheadFormat = str(DEFAULT),
             DefaultColor = color {
                 default = { r = 178, g = 178, b = 178 },
             },
             Tags = array {
                 items = str(),
-                default = { 'IncludeColon' },
+                default = { 'NoVolumeIndicator' },
             },
         },
 
@@ -302,7 +303,7 @@ return utils.schema {
         Streams = container {
             UseDefaultList = bool(true),
             List = array {
-                maxItems = 32, -- Configuration.MAX_CHAT_STREAMS
+                maxItems = 50, -- Configuration.MAX_CHAT_STREAMS
 
                 getDefault = Helpers.getDefaultStreamsPopulated,
 
@@ -605,8 +606,8 @@ return utils.schema {
 ---@field Enable boolean
 ---@field AlwaysUseNameColors boolean
 ---@field Range integer
----@field Format string
 ---@field ChatFormat string
+---@field OverheadFormat string
 
 ---@class Configuration.NarrativeStyle
 ---@field Enable boolean
@@ -617,6 +618,7 @@ return utils.schema {
 
 ---@class Configuration.Radio
 ---@field ChatFormat string
+---@field OverheadFormat string
 ---@field DefaultColor omi.ColorTable<integer>
 ---@field Tags string[]
 

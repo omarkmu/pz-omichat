@@ -44,11 +44,7 @@ return Preset:new {
         NarrativeStyle = Preset.narrative {
             Enable = true,
         },
-        Radio = Preset.radio {
-            Tags = {
-                'IncludeColon',
-            },
-        },
+        Radio = Preset.radio(),
         ServerMessages = Preset.server {
             Tags = {
                 'NoTimestamp',

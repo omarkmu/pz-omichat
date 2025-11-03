@@ -13,7 +13,6 @@ local checkPlayerCanUseChat = checkPlayerCanUseChat
 ---@field protected allowLanguages boolean Flag for whether the stream should allow messages to be sent using roleplay languages.
 ---@field protected allowTypingIndicator boolean Flag for whether typing on the stream triggers a typing indicator.
 ---@field protected attractZombies boolean Flag for whether the stream can attract zombies.
----@field protected chatFormat? string The format to use for chat messages.
 ---@field protected chatType omi.ChatTypeString The chat type that stream messages are sent over.
 ---@field protected defaultColor omi.ColorTable<integer> The default color for messages on the stream.
 ---@field protected range integer The range of the chat stream.
@@ -22,6 +21,8 @@ local checkPlayerCanUseChat = checkPlayerCanUseChat
 ---@field protected verticalRange integer The vertical range of the chat stream.
 ---@field protected perceptionRange integer The perception range of the chat stream.
 ---@field protected perceptionRangeSigned integer The perception range of the chat stream, for signed languages.
+---@field protected chatFormat? string The format to use for chat messages sent from this stream.
+---@field protected overheadFormat? string The format to use for overhead messages sent from this stream.
 local ChatStream = Stream:derive()
 
 
@@ -136,6 +137,27 @@ function ChatStream:checkPlayerCanUse()
     return true
 end
 
+---Copies all settings from another stream into this stream.
+---@param other ChatStream
+function ChatStream:copyFrom(other)
+    Stream.copyFrom(self, other)
+    self.allowBuffs = other.allowBuffs
+    self.allowLanguages = other.allowLanguages
+    self.allowTypingIndicator = other.allowTypingIndicator
+    self.attractZombies = other.attractZombies
+    self.useNarrativeStyle = other.useNarrativeStyle
+    self.chatType = other.chatType
+    self.range = other.range
+    self.verticalRange = other.verticalRange
+    self.tabID = other.tabID
+    self.perceptionRange = other.perceptionRange
+    self.perceptionRangeSigned = other.perceptionRangeSigned
+    self.defaultColor = utils.color.copy(other.defaultColor)
+    self.overheadFormat = other.overheadFormat
+    self.chatFormat = other.chatFormat
+end
+
+
 ---Returns whether the stream applies buffs.
 ---@return boolean allowed
 function ChatStream:isAllowBuffs()
@@ -161,6 +183,19 @@ function ChatStream:isRanged()
     return chatType == 'say' or chatType == 'shout'
 end
 
+---Checks the stream's tab ID against a given tab ID.
+---@param otherTabID integer The tab ID to match against.
+---@return boolean isMatch `True` if the tab ID is a match. Otherwise, `false`.
+function ChatStream:isTabID(otherTabID)
+    return self:getTabID() == otherTabID
+end
+
+---Returns the format string used for chat content on the stream.
+---@return string? formatString
+function ChatStream:getChatFormat()
+    return self.chatFormat
+end
+
 ---Returns the chat type that stream messages are sent over.
 ---@return omi.ChatTypeString chatType
 function ChatStream:getChatType()
@@ -170,11 +205,13 @@ end
 ---Returns the default color to use for the stream.
 ---@return omi.ColorTable<integer> defaultColor
 function ChatStream:getDefaultColor()
-    if self.defaultColor then
-        return utils.copy(self.defaultColor)
-    end
+    return utils.color.copy(self.defaultColor)
+end
 
-    return { r = 255, g = 255, b = 255 }
+---Returns the format string used for overhead content from the stream.
+---@return string? formatString
+function ChatStream:getOverheadFormat()
+    return self.overheadFormat
 end
 
 ---Returns the perception range of the stream if it's a ranged stream.
@@ -235,6 +272,29 @@ function ChatStream:setDefaultColor(color)
     self.defaultColor = utils.copy(color)
 end
 
+---Sets the format string used for the overhead format of the stream.
+---@param format string? The format string to use.
+function ChatStream:setOverheadFormat(format)
+    self.overheadFormat = format
+end
+
+---Validates stream input.
+---@param input string The input text.
+---@return boolean valid Flag for whether the input text is valid for the stream.
+---@return string? message A translated error message to report to the player.
+function ChatStream:validate(input)
+    if self:getChatType() ~= 'whisper' then
+        return true
+    end
+
+    -- vanilla regex is /("[^"]*\s+[^"]*"|[^"]\S*)\s(.+)/
+    if input:match('^"[^"]*%s+[^"]*"%s.+$') or input:match('^[^"]%S*%s.+$') then
+        return true
+    end
+
+    return false, getText('IGUI_Commands_Whisper')
+end
+
 
 ---Creates a new chat stream.
 ---@param args Args.ChatStream Arguments for creation of the stream.
@@ -255,6 +315,14 @@ function ChatStream:new(args)
     this.perceptionRange = args.perceptionRange or 0
     this.perceptionRangeSigned = args.perceptionRangeSigned or 0
     this.defaultColor = utils.color.default(args.defaultColor, 255, 255, 255)
+
+    if not utils.isNilOrWhitespace(args.overheadFormat) then
+        this.overheadFormat = utils.trim(args.overheadFormat --[[@as string]])
+    end
+
+    if not utils.isNilOrWhitespace(args.chatFormat) then
+        this.chatFormat = utils.trim(args.chatFormat --[[@as string]])
+    end
 
     return this
 end
@@ -278,5 +346,7 @@ return ChatStream
 ---@field perceptionRange? integer The perception range of the chat stream.
 ---@field perceptionRangeSigned? integer The perception range of the chat stream, for signed languages.
 ---@field tabID? integer The 1-indexed tab ID of the tab in which this stream is available.
+---@field chatFormat? string The format to use for the stream in chat.
+---@field overheadFormat? string The overhead format to use for the stream.
 
 --#endregion

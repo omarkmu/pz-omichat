@@ -6,14 +6,12 @@ local API = require 'OmiChat/Module/Client/Core'
 
 local utils = API.utils
 local config = API.Configuration
-local MetaFormatter = API.MetaFormatter
 
 ---Command stream for the `/card` command.
 ---@private
 API._cardCommand = API.CommandStream:new {
     name = 'card',
     command = '/card ',
-    formatter = MetaFormatter:new(config.ID_CARD),
     helpTextID = 'UI_ServerOptionDesc_Card',
     autoTags = { 'IsCardCommand' },
     onUse = function(ctx)

@@ -144,8 +144,8 @@ Sandbox_EN = {
     Sandbox_OmiChat_Mentions_Enable = "Enabled",
     Sandbox_OmiChat_Mentions_AlwaysUseNameColors = "Always Use Name Colors",
     Sandbox_OmiChat_Mentions_Range = "Mention Suggestion Range",
-    Sandbox_OmiChat_Mentions_Format = "Content Format",
     Sandbox_OmiChat_Mentions_ChatFormat = "Chat Format",
+    Sandbox_OmiChat_Mentions_OverheadFormat = "Overhead Format",
 
     Sandbox_OmiChat_NarrativeStyle = "Narrative Style",
     Sandbox_OmiChat_NarrativeStyle_Enable = "Enabled",
@@ -158,6 +158,7 @@ Sandbox_EN = {
     Sandbox_OmiChat_Radio = "Radio",
     Sandbox_OmiChat_Radio_title = "Radio Settings",
     Sandbox_OmiChat_Radio_ChatFormat = "Chat Format",
+    Sandbox_OmiChat_Radio_OverheadFormat = "Overhead Format",
     Sandbox_OmiChat_Radio_DefaultColor = "Default Message Color",
     Sandbox_OmiChat_Radio_Tags = "Tags",
 
@@ -343,8 +344,8 @@ Sandbox_EN = {
     Sandbox_OmiChat_Mentions_AlwaysUseNameColors_tooltip = "If this is enabled, the name color option on streams will be ignored for mentions.",
     Sandbox_OmiChat_Mentions_Range_tooltip = "The range a player has to be on a ranged stream within to have another player suggested for a mention." ..
         " This has no effect on non-ranged streams and is ignored if set to 0.",
-    Sandbox_OmiChat_Mentions_Format_tooltip = "Defines the format of mentions before sending.",
     Sandbox_OmiChat_Mentions_ChatFormat_tooltip = "Defines the format of mentions in the chat.",
+    Sandbox_OmiChat_Mentions_OverheadFormat_tooltip = "Defines the format of mentions in the overhead speech bubble.",
 
     Sandbox_OmiChat_NarrativeStyle_Enable_tooltip = "Controls whether narrative style is enabled for streams that allow it.",
     Sandbox_OmiChat_NarrativeStyle_ChatContentFormat_tooltip = "Defines the format of the narrative style tag and quote in the chat",
@@ -354,6 +355,7 @@ Sandbox_EN = {
     Sandbox_OmiChat_NarrativeStyle_InputFilter_tooltip = "Filters messages sent on a stream with narrative style enabled.",
 
     Sandbox_OmiChat_Radio_ChatFormat_tooltip = "Controls how radio messages appear in chat.",
+    Sandbox_OmiChat_Radio_OverheadFormat_tooltip = "Controls how radio messages appear in overhead speech bubbles.",
     Sandbox_OmiChat_Radio_DefaultColor_tooltip = "The default color used for radio messages.",
     Sandbox_OmiChat_Radio_Tags_tooltip = "Tags that modify the appearance and behavior of radio messages.",
 
@@ -363,8 +365,6 @@ Sandbox_EN = {
 
     Sandbox_OmiChat_Streams_UseDefaultList_tooltip = "If this is enabled, the streams configured below will be ignored in favor of the default streams.",
     Sandbox_OmiChat_Streams_GlobalTags_tooltip = "Additional tags to include in every stream.",
-    Sandbox_OmiChat_Streams_List_tooltip_add_delete = " <PUSHRGB:1,0,0> Adding or removing chat streams may clear the chat history. <POPRGB> <LINE> ",
-    Sandbox_OmiChat_Streams_List_tooltip_up_down = " <PUSHRGB:1,0,0> Reordering chat streams will clear the chat history. <POPRGB> <LINE> ",
     Sandbox_OmiChat_Streams_List_Enable_tooltip = "Controls whether this stream is enabled.",
     Sandbox_OmiChat_Streams_List_Stream_tooltip = "The type of the stream." ..
         " <BR> Using a value other than <SPACE> <PUSHRGB:0.7,0.7,0.7> custom <POPRGB> <SPACE> for this option disables some other options. These will be inherited from the stream type.",
@@ -451,9 +451,10 @@ Sandbox_EN = {
     Sandbox_OmiChat_tag_IncludeColon = "Indicates that a colon should be added after names." ..
         " <LINE> This is the default behavior unless in narrative style or on the server message stream." ..
         " <LINE> Takes precedence over <SPACE> <PUSHRGB:0,0.5,1> NoColon <POPRGB> .",
-    Sandbox_OmiChat_tag_IncludeAdminIndicator = "Indicates that a parenthesized prefix should be included when a message is sent from an admin.",
+    Sandbox_OmiChat_tag_IncludeAdminIndicator = "Indicates that a parenthesized prefix should be included when a message is sent from an admin with the icon enabled.",
     Sandbox_OmiChat_tag_IncludeMentionAtSign = "Indicates that mentions should be prefixed with an at-sign.",
     Sandbox_OmiChat_tag_IncludeMentionAtSignChat = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> IncludeMentionAtSign <POPRGB> , but only applies to chat formatting.",
+    Sandbox_OmiChat_tag_IncludeMentionAtSignOverhead = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> IncludeMentionAtSign <POPRGB> , but only applies to overhead formatting.",
     Sandbox_OmiChat_tag_IncludeName = "Indicates that names should be included in messages." ..
         " <LINE> This is the default behavior unless on the server message stream.",
     Sandbox_OmiChat_tag_IncludeNameChat = "This is the same as <SPACE> <PUSHRGB:0,0.5,1> IncludeName <POPRGB> , but only applies to chat formatting.",
@@ -461,7 +462,7 @@ Sandbox_EN = {
     Sandbox_OmiChat_tag_KeepActionAsterisk = "Indicates that embedded actions should keep a visible signal asterisk.",
     Sandbox_OmiChat_tag_Loud = "Indicates that a stream should be treated as the loud volume.",
     Sandbox_OmiChat_tag_Lowercase = "Indicates that text should be converted to all lowercase.",
-    Sandbox_OmiChat_tag_NoAdminIndicator = "Indicates that a parenthesized prefix should be included when a message is sent from an admin." ..
+    Sandbox_OmiChat_tag_NoAdminIndicator = "Indicates that a parenthesized prefix should not be included when a message is sent from an admin with the icon enabled." ..
         " <LINE> This is the default behavior." ..
         " <LINE> Takes precedence over <SPACE> <PUSHRGB:0,0.5,1> IncludeAdminIndicator <POPRGB> .",
     Sandbox_OmiChat_tag_NoColon = "Indicates that a colon should not be added after names." ..

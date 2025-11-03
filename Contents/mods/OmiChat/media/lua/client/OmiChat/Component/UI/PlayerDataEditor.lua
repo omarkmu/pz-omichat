@@ -92,11 +92,11 @@ function PlayerDataEditor:createChildren()
 
     text = getText('UI_OmiChat_PlayerDataManager_Column_nickname')
     y, self.nicknameEntry = self:_createEntry('text', y + PAD_Y, text, item.nickname)
-    self.nicknameEntry:setValidateFunction(self.nicknameEntry, API.format.validateName)
+    self.nicknameEntry:setValidateFunction(self.nicknameEntry, API.chat.validateNameEntry)
 
     text = getText('UI_OmiChat_PlayerDataManager_Column_status')
     y, self.statusEntry = self:_createEntry('text', y + PAD_Y, text, item.status)
-    self.statusEntry:setValidateFunction(self.statusEntry, API.format.validateStatus)
+    self.statusEntry:setValidateFunction(self.statusEntry, API.chat.validateStatusEntry)
 
     text = getText('UI_OmiChat_PlayerDataManager_Column_icon')
     y, self.iconEntry = self:_createEntry('text', y + PAD_Y, text, item.icon)

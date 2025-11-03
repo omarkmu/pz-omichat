@@ -73,9 +73,6 @@ local TOKENS_CHAT_PROCESSED = {
     'echo',
     'stream',
     'iconRaw',
-    'buffyRoll',
-    'buffyCrit',
-    'buffyCritRaw',
     'tags',
     'originalTags',
     'originalStream',
@@ -215,7 +212,6 @@ return {
         tokens = {
             'chatType',
             'stream',
-            'buffyRoll',
             'icon',
             'adminIcon',
             'tags',
@@ -407,7 +403,7 @@ return {
             'chatType',
         },
     },
-    Mentions_Format = {
+    Mentions_OverheadFormat = {
         tokens = {
             'input',
             'onlineID',
@@ -448,6 +444,12 @@ return {
             'frequency',
         }),
         options = OPTIONS_CHAT,
+    },
+    Radio_OverheadFormat = {
+        tokens = utils.appendCopy(TOKENS_OVERHEAD, {
+            'frequency',
+        }),
+        options = OPTIONS_OVERHEAD,
     },
     ServerMessages_ChatFormat = {
         tokens = TOKENS_CHAT,

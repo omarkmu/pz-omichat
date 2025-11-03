@@ -3,11 +3,9 @@
 
 local lib = require 'OmiLibrary'
 
-local min = math.min
-local pow = math.pow
-local floor = math.floor
 local char = string.char
 local concat = table.concat
+local transformIntoKahluaTable = transformIntoKahluaTable
 
 local INVISIBLE_PATTERN = '['
     .. char(128) .. '-' .. char(159) .. ']?'
@@ -34,6 +32,7 @@ utils._noEntityInterpolator = lib.interpolate.Interpolator:new({
 local API_C ---@type api.client?
 
 local loadedIcons = false
+local iconToBBCodeNameMap = {} ---@type table<string, string>
 local iconToTextureNameMap = {} ---@type table<string, string>
 local accessLevels = {
     admin = 32,
@@ -88,130 +87,6 @@ function utils.canAccessTarget(player, target, minAccessLevel, fromCommand)
     return true
 end
 
----Replaces invisible text with indicators for debugging.
----@param text string The text to replace invisible characters in.
----@return string debugText
-function utils.debugText(text)
-    text = text:gsub(INVISIBLE_PATTERN, function(chars)
-        local result = ''
-        for i = 1, #chars do
-            local c = chars:sub(i, i):byte()
-            if c == 65535 then
-                c = 0
-            else
-                c = c - 127
-            end
-
-            result = result .. '\\' .. c
-        end
-
-        return result
-    end)
-
-    return text
-end
-
----Decodes an encoded character.
----@param text string The text to decode an invisible character from.
----@param index integer? The index of the invisible character in the text. Defaults to `1`.
----@return integer
-function utils.decodeInvisibleCharacter(text, index)
-    text = text or ''
-    if index then
-        text = text:sub(index, index)
-    end
-
-    if #text == 0 then
-        return 0
-    end
-
-    return text:byte() - 127
-end
-
----Decodes an encoded invisible integer value.
----@param text string The text to decode an integer value from.
----@return integer? value The decoded integer value.
----@return string? remaining The remaining text after the integer.
-function utils.decodeInvisibleInt(text)
-    local len = utils.decodeInvisibleCharacter(text)
-    if len < 1 or len > 32 then
-        return
-    end
-
-    local value = 0
-    local endPos = min(#text, len + 1)
-    for i = 2, endPos do
-        local digit = utils.decodeInvisibleCharacter(text:sub(i, i)) - 1
-        if digit < 0 or digit > 31 then
-            return
-        end
-
-        value = value + digit * pow(32, i - 2) --[[@as integer]]
-    end
-
-    return value, text:sub(endPos + 1)
-end
-
----Decodes a sequence of encoded invisible integers.
----@param text string The text to encode an integer sequence from.
----@param amount integer The expected number of encoded integers.
----@return integer[]? sequence The decoded integer sequence.
----@return string? remaining The remaining text after the sequence.
-function utils.decodeInvisibleIntSequence(text, amount)
-    local decoded
-    local remaining = text ---@type string?
-
-    local results = {}
-    for _ = 1, amount do
-        decoded, remaining = utils.decodeInvisibleInt(text)
-        if not decoded or not remaining then
-            return
-        end
-
-        results[#results + 1] = decoded
-        text = remaining
-    end
-
-    return results, text
-end
-
----Encodes an integer value as a character.
----@param value integer The integer to encode, in [1, 32].
----@return string encoded
-function utils.encodeInvisibleCharacter(value)
-    return char(value + 127)
-end
-
----Encodes a non-negative integer value as an invisible representation of its digits.
----@param value integer The integer value to encode.
----@return string encoded
-function utils.encodeInvisibleInt(value)
-    value = floor(value)
-    if value < 0 then
-        utils.log.error('Attempted to encode negative value: %f', value)
-        return ''
-    end
-
-    local originalValue = value
-    local result = {}
-    while value > 0 do
-        if #result == 32 then
-            utils.log.error('Value is too large to encode: %f', originalValue)
-            return ''
-        end
-
-        result[#result + 1] = utils.encodeInvisibleCharacter((value % 32) + 1)
-        value = floor(value / 32)
-    end
-
-    if #result == 0 then
-        result[1] = utils.encodeInvisibleCharacter(1)
-    end
-
-    local len = utils.encodeInvisibleCharacter(#result)
-    return len .. concat(result)
-end
-
 ---Gets an error from the error tokens, if one is set, and unsets the tokens.
 ---@param tokens table The table of tokens that an error should be extracted from.
 ---@return string? error The error string, or `nil` if none was found.
@@ -243,25 +118,15 @@ function utils.getAPI()
     return API_C
 end
 
----Gets the name of a playing card in English.
----@param card integer The card value, in [1, 13].
----@param suit integer The suit value, in [1, 4].
----@return string name
-function utils.getCardName(card, suit)
-    local cardName = cards[card]
-    local suitName = suits[suit]
-    if not cardName or not suitName then
-        return ''
+---Retrieves a BBCode icon name given a chat icon alias.
+---@param icon string A chat icon alias.
+---@return string? iconName The name of the icon for BBCode, or `nil` if not found.
+function utils.getBBCodeNameFromIcon(icon)
+    if not loadedIcons then
+        utils._loadIcons()
     end
 
-    local article = 'a '
-    if card == 8 then
-        article = 'an '
-    elseif card == 1 or card > 10 then
-        article = 'the '
-    end
-
-    return article .. cardName .. ' of ' .. suitName
+    return iconToBBCodeNameMap[icon]
 end
 
 ---Returns the player's current access level.
@@ -274,52 +139,6 @@ function utils.getEffectiveAccessLevel()
 
     local player = getSpecificPlayer(0)
     return player and player:getAccessLevel() or 'none'
-end
-
----Gets the text within invisible character wrapping.
----Returns the text and the invisible character prefix & suffix.
----@param text string The text to extract invisible characters from.
----@return string internal The internal text.
----@return string prefix The invisible characters from the start of the text.
----@return string suffix The invisible characters from the end of the text.
-function utils.getInternalText(text)
-    -- first non-invisible pos
-    local start = 1
-    local i = 1
-    while i <= #text do
-        local c = text:sub(i, i)
-        if not utils.isInvisibleByte(c:byte()) then
-            start = i
-            break
-        end
-
-        i = i + 1
-    end
-
-    -- last non-invisible pos
-    local finish = #text
-    i = #text
-    while i > 0 do
-        local c = text:sub(i, i)
-        if not utils.isInvisibleByte(c:byte()) then
-            finish = i
-            break
-        end
-
-        i = i - 1
-    end
-
-    local prefix = ''
-    local suffix = ''
-    if start > 1 then
-        prefix = text:sub(1, start - 1)
-    end
-
-    if finish < #text then
-        suffix = text:sub(finish + 1, #text)
-    end
-
-    return text:sub(start, finish), prefix, suffix
 end
 
 ---Returns the non-empty lines of a string.
@@ -360,7 +179,7 @@ function utils.getNumericAccessLevel(access)
     return accessLevels[access:lower()] or 1
 end
 
----Retrieves a texture name given a chat icon name.
+---Retrieves a texture name given a chat icon alias.
 ---@param icon string A chat icon alias.
 ---@return string? textureName The name of a texture, or `nil` if not found.
 function utils.getTextureNameFromIcon(icon)
@@ -475,59 +294,57 @@ function utils.hasAnyItemType(player, list)
 end
 
 ---Interpolates substitution tokens into a string with format strings using `$var` format.
----@param text string The format string.
+---@param format string The format string.
 ---@param tokens table A table of format substitution strings.
 ---@param seed any? Seed value for random functions.
 ---@return string interpolated
-function utils.interpolate(text, tokens, seed)
-    return tostring(utils.interpolateRaw(text, tokens, seed))
+function utils.interpolate(format, tokens, seed)
+    return tostring(utils.interpolateRaw(format, tokens, seed))
 end
 
 ---Interpolates substitution tokens into a string with format strings using `$var` format.
 ---Injects the name into the the `DEFAULT` key of the `tokens` table.
 ---@param name string The name of the default to use for the interpolation.
----@param text string The format string.
+---@param format string The format string.
 ---@param tokens table A table of format substitution strings.
 ---@param seed any? Seed value for random functions.
 ---@return string interpolated
-function utils.interpolateNamed(name, text, tokens, seed)
+function utils.interpolateNamed(name, format, tokens, seed)
+    local oldDefault = tokens.DEFAULT
     tokens.DEFAULT = name
-    return utils.interpolate(text, tokens, seed)
+
+    local result = tostring(utils.interpolateRaw(format, tokens, seed))
+
+    tokens.DEFAULT = oldDefault
+    return result
 end
 
 ---Interpolates substitution tokens into a string with format strings using `$var` format.
 ---Leaves character entities as-is.
----@param text string The format string.
+---@param format string The format string.
 ---@param tokens table A table of format substitution strings.
 ---@param seed any? Seed value for random functions.
 ---@return string interpolated
-function utils.interpolateNoEntities(text, tokens, seed)
-    return tostring(utils.interpolateRaw(text, tokens, seed, true))
+function utils.interpolateNoEntities(format, tokens, seed)
+    return tostring(utils.interpolateRaw(format, tokens, seed, true))
 end
 
 ---Interpolates substitution tokens into a string with format strings using `$var` format.
 ---Returns the raw result, which may or may not be a string.
----@param text string The format string.
+---@param format string The format string.
 ---@param tokens table A table of format substitution strings.
 ---@param seed any? Seed value for random functions.
 ---@param noEntities boolean? If given, character entities will be disallowed.
 ---@return any interpolated
-function utils.interpolateRaw(text, tokens, seed, noEntities)
-    if not text or text == '' then
+function utils.interpolateRaw(format, tokens, seed, noEntities)
+    if not format or format == '' then
         return ''
     end
 
     local interpolator = noEntities and utils._noEntityInterpolator or utils._interpolator
     interpolator:randomseed(seed) -- always seed to avoid content changing on refresh
 
-    return interpolator:interpolateRaw(text, tokens)
-end
-
----Checks whether a byte value is an invisible character used for encoding mod information.
----@param byte integer The byte to check.
----@return boolean isInvisible
-function utils.isInvisibleByte(byte)
-    return (byte >= 128 and byte <= 159) or byte == 65535
+    return interpolator:interpolateRaw(format, tokens)
 end
 
 ---Returns an iterator over an icon-to-texture name map.
@@ -593,34 +410,20 @@ function utils.removeInvisible(text)
     return (text:gsub(INVISIBLE_PATTERN, ''))
 end
 
----Matches on text wrapped in invisible characters.
----@param text string The string to read.
----@param n integer A number in [1, 32].
----@param pattern string? The string pattern to use. Defaults to `(.-)`.
----@return ...
-function utils.unwrapStringArgument(text, n, pattern)
-    pattern = pattern or '(.-)'
-    local c = utils.encodeInvisibleCharacter(n)
-    return text:match(c .. pattern .. c)
-end
-
----Encodes `n` as an invisible character and wraps text with it.
----@param text string The string to wrap.
----@param n integer A number in [1, 32].
----@return string wrapped
-function utils.wrapStringArgument(text, n)
-    local c = utils.encodeInvisibleCharacter(n)
-    return c .. text .. c
-end
-
 
 ---Collects valid icons and builds a map of icon names to texture names.
 ---@private
 function utils._loadIcons()
     local dest = HashMap.new()
-    Texture.collectAllIcons(HashMap.new(), dest)
-    iconToTextureNameMap = transformIntoKahluaTable(dest)
-    iconToTextureNameMap.music = 'Icon_music_notes' -- special case for 'music'
+    local fullDest = HashMap.new()
+    Texture.collectAllIcons(dest, fullDest)
+
+    iconToBBCodeNameMap = transformIntoKahluaTable(dest)
+    iconToTextureNameMap = transformIntoKahluaTable(fullDest)
+
+    -- special case for 'music'
+    iconToBBCodeNameMap.music = 'music'
+    iconToTextureNameMap.music = 'Icon_music_notes'
     loadedIcons = true
 end
 
