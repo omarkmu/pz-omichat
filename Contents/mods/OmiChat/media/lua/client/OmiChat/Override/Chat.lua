@@ -41,7 +41,7 @@ function ISChat.addLineInChat(message, tabID)
         return
     end
 
-    local player = getSpecificPlayer(0) ---@type IsoPlayer?
+    local player = API.player.get()
 
     local soundRange
     local info ---@type MessageInfo?

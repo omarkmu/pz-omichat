@@ -9,10 +9,10 @@ local config = API.Configuration
 local concat = table.concat
 local sqrt = math.sqrt
 local getText = getText
-local getSpecificPlayer = getSpecificPlayer
 
 
 ---@class api.client.player
+---@field private _obj IsoPlayer? A reference to player 1.
 local Player = {}
 
 ---Contains functions for getting and setting data related to the local player.
@@ -38,9 +38,13 @@ end
 ---Applies a buff to the player if the cooldown period has expired.
 ---@param ignoreCooldown boolean? Flag for whether the buff should be applied even if the cooldown has not expired.
 function Player.applyBuff(ignoreCooldown)
-    local player = getSpecificPlayer(0)
-    local modData = player and player:getModData()
-    if not modData then
+    local player = Player.get()
+    if not player then
+        return
+    end
+
+    local modData = player:getModData()
+    if not player or not modData then
         return
     end
 
@@ -69,9 +73,23 @@ end
 ---Checks whether the current player can use admin commands added by the mod.
 ---@return boolean isAllowed
 function Player.canUseAdminCommands()
-    local player = getSpecificPlayer(0)
-    local access = player and player:getAccessLevel()
-    return utils.getNumericAccessLevel(access) >= config.General.MinimumCommandAccessLevel
+    local player = Player.get()
+    if not player then
+        return false
+    end
+
+    return utils.getNumericAccessLevel(player:getAccessLevel()) >= config.General.MinimumCommandAccessLevel
+end
+
+---Returns player 1.
+---@return IsoPlayer? player
+---@private
+function Player.get()
+    if not Player._obj then
+        Player._obj = getSpecificPlayer(0)
+    end
+
+    return Player._obj
 end
 
 ---Returns a color table preferred by the local player.
@@ -148,12 +166,24 @@ function Player.getDistanceFrom(otherPlayer, player)
         return
     end
 
-    player = player or getSpecificPlayer(0)
+    player = player or Player.get()
     if not player then
         return
     end
 
     return sqrt(otherPlayer:getDistanceSq(player))
+end
+
+---Returns the player's current access level.
+---If the connection is a coop host, returns `admin`.
+---@return string accessLevel
+function Player.getEffectiveAccessLevel()
+    if isCoopHost() then
+        return 'admin'
+    end
+
+    local player = Player.get()
+    return player and player:getAccessLevel() or 'none'
 end
 
 ---Gets a list of the local player's known roleplay languages.
@@ -199,7 +229,7 @@ end
 ---Returns a color table for the local player's speech color.
 ---@return omi.ColorTable<integer>? color
 function Player.getSpeechColor()
-    local player = getSpecificPlayer(0)
+    local player = Player.get()
     if not player then
         return
     end
@@ -219,7 +249,7 @@ end
 ---Gets the username of the local player.
 ---@return string? username The player's username, or `nil` if the player is unavailable.
 function Player.getUsername()
-    local player = getSpecificPlayer(0)
+    local player = Player.get()
     local username = player and player:getUsername()
     if username then
         return username
@@ -229,7 +259,7 @@ end
 ---Checks whether the player is dead or unable to be retrieved.
 ---@return boolean isDeadOrUnavailable
 function Player.isDeadOrUnavailable()
-    local player = getSpecificPlayer(0)
+    local player = Player.get()
     return not player or player:isDead()
 end
 
@@ -244,7 +274,7 @@ function Player.isWithinRange(range, otherPlayer, player)
         return false
     end
 
-    player = player or getSpecificPlayer(0)
+    player = player or Player.get()
     if not player then
         return false
     end
@@ -366,7 +396,7 @@ end
 ---@param doRequest boolean? Flag for whether a request to update the cache should be made. Defaults to `true`.
 ---@return boolean success
 function Player.setSpeechColor(color, doRequest)
-    local player = getSpecificPlayer(0)
+    local player = Player.get()
     if not player then
         return false
     end
@@ -446,8 +476,12 @@ function Player.updateCharacterName(name, updateSurname)
         return false
     end
 
-    local player = getSpecificPlayer(0)
-    local desc = player and player:getDescriptor()
+    local player = Player.get()
+    if not player then
+        return false
+    end
+
+    local desc = player:getDescriptor()
     if not desc then
         return false
     end

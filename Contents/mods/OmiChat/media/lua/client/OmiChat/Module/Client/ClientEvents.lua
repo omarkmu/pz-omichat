@@ -11,6 +11,7 @@ local API = require 'OmiChat/Module/Client/Core'
 ---@private
 function API._onCreatePlayer(playerNum, player)
     if playerNum == 0 then
+        API.player._obj = player
         API.ui.updateInfoText(player)
     end
 end

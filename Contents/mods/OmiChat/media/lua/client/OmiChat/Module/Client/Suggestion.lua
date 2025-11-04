@@ -89,7 +89,7 @@ function Suggestion.getSpec(input)
         return stream:getSuggestSpec()
     end
 
-    local accessLevel = utils.getEffectiveAccessLevel()
+    local accessLevel = API.player.getEffectiveAccessLevel()
     if not accessLevel then
         return
     end

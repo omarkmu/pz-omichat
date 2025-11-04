@@ -103,7 +103,7 @@ end
 ---@return SearchResults results
 function Search.onlineUsernames(ctxOrSearch, includeSelf)
     local ctx = Search._buildContext(ctxOrSearch)
-    local player = getSpecificPlayer(0)
+    local player = API.player.get()
     local ownUsername = player and player:getUsername()
 
     for _, item in API.data.iteratePlayerCache() do
@@ -128,7 +128,7 @@ function Search.onlineUsernamesByChatName(ctxOrSearch, chatType, includeSelf, se
     ctx.display = ctx.display or Search._mapPlayerInfoToName
     ctx.mapValue = ctx.mapValue or Search._mapPlayerInfoToUsername
 
-    local player = getSpecificPlayer(0)
+    local player = API.player.get()
     local ownUsername = player and player:getUsername()
     chatType = chatType or 'say'
 
@@ -436,7 +436,7 @@ function Search._filterStream(stream)
         return stream:isTabID(tabID) and stream:isEnabled()
     end
 
-    local accessLevel = utils.getEffectiveAccessLevel()
+    local accessLevel = API.player.getEffectiveAccessLevel()
     if not accessLevel then
         return false
     end
@@ -662,7 +662,7 @@ end
 ---@param player IsoPlayer | PlayerCacheData
 ---@param chatType omi.ChatTypeString
 ---@param ctx search.InternalSearchContext
----@param ownUsername string
+---@param ownUsername string?
 ---@param includeSelf boolean?
 ---@param searchUsernames boolean?
 ---@return search.InternalSearchResult? result
@@ -694,7 +694,7 @@ end
 ---Searches a player username for a string, if it should be included.
 ---@param player IsoPlayer | PlayerCacheData
 ---@param ctx search.InternalSearchContext
----@param ownUsername string
+---@param ownUsername string?
 ---@param includeSelf boolean?
 ---@return search.InternalSearchResult? result
 ---@private

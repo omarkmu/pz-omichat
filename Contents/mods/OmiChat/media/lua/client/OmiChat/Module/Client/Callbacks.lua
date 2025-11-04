@@ -31,8 +31,12 @@ Callback._infoUpdateCounter = 0
 ---Callback for the clean character customization option.
 ---@param _ ISChat Unused.
 function Callback.cleanCharacter(_)
-    local player = getSpecificPlayer(0)
-    local visual = player and player:getHumanVisual()
+    local player = API.player.get()
+    if not player then
+        return
+    end
+
+    local visual = player:getHumanVisual()
     if not visual then
         return
     end
@@ -79,7 +83,7 @@ end
 ---Callback for the grow beard customization option.
 ---@param _ ISChat Unused.
 function Callback.growBeard(_)
-    local player = getSpecificPlayer(0)
+    local player = API.player.get()
     if not player then
         return
     end
@@ -90,7 +94,7 @@ end
 ---Callback for the grow hair customization option.
 ---@param _ ISChat Unused.
 function Callback.growHair(_)
-    local player = getSpecificPlayer(0)
+    local player = API.player.get()
     if not player then
         return
     end
@@ -119,8 +123,12 @@ function Callback.onHairColorMenuClick(_, args)
         return
     end
 
-    local player = getSpecificPlayer(0)
-    local visual = player and player:getHumanVisual()
+    local player = API.player.get()
+    if not player then
+        return
+    end
+
+    local visual = player:getHumanVisual()
     if not visual then
         return
     end
@@ -144,7 +152,7 @@ end
 ---Callback for hair color customization menu initialization.
 ---@param target ISChat The chat instance.
 function Callback.openHairColorDialog(target)
-    local player = getSpecificPlayer(0)
+    local player = API.player.get()
     local visual = player and player:getHumanVisual()
     if not visual then
         return

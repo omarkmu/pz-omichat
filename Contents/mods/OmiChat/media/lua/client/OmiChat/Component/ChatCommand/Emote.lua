@@ -20,7 +20,7 @@ return API.CommandStream:new {
             return
         end
 
-        local player = getSpecificPlayer(0)
+        local player = API.player.get()
         if not player then
             return
         end

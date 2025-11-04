@@ -150,7 +150,7 @@ end
 ---@param player IsoPlayer? The player to use to populate token values. If this is `nil`, player 1 will be used.
 ---@return string richText
 function UI.getInfoRichText(player)
-    player = player or getSpecificPlayer(0)
+    player = player or API.player.get()
     if not player then
         return ''
     end
@@ -631,7 +631,7 @@ function UI._addCustomizationSettings(context)
         return
     end
 
-    local player = getSpecificPlayer(0)
+    local player = API.player.get()
     if not player then
         return
     end
@@ -1100,7 +1100,7 @@ function UI._updateStatusDisplays()
     UI._statusEnabled = statusEnabled
 
     local players = getOnlinePlayers()
-    local selfPlayer = getSpecificPlayer(0)
+    local selfPlayer = API.player.get()
     if not players or not selfPlayer then
         return
     end

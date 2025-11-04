@@ -34,7 +34,7 @@ API._rollCommand = API.CommandStream:new {
         end
     end,
     isEnabled = function()
-        local player = getSpecificPlayer(0)
+        local player = API.player.get()
         if not player then
             return false
         end

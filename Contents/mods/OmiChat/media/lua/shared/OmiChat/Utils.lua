@@ -129,18 +129,6 @@ function utils.getBBCodeNameFromIcon(icon)
     return iconToBBCodeNameMap[icon]
 end
 
----Returns the player's current access level.
----If the connection is a coop host, returns `admin`.
----@return string accessLevel
-function utils.getEffectiveAccessLevel()
-    if isCoopHost() then
-        return 'admin'
-    end
-
-    local player = getSpecificPlayer(0)
-    return player and player:getAccessLevel() or 'none'
-end
-
 ---Returns the non-empty lines of a string.
 ---If there are no non-empty lines, returns `nil`.
 ---@param text string The text to get lines from.

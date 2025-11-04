@@ -508,7 +508,7 @@ local function searchKnownDances(ctxOrSearch)
         return
     end
 
-    local player = getSpecificPlayer(0)
+    local player = API.player.get()
     if not player then
         return
     end
@@ -547,7 +547,7 @@ local danceStream = API.CommandStream:new {
     suggestSpec = { 'known-dance' },
     isEnabled = isPatchEnabled,
     onUse = function(args)
-        local player = getSpecificPlayer(0)
+        local player = API.player.get()
         if not player then
             return
         end
@@ -587,7 +587,7 @@ local function applyPatch()
                     return false
                 end
 
-                local player = getSpecificPlayer(0)
+                local player = API.player.get()
                 if not player then
                     return false
                 end
@@ -608,7 +608,7 @@ local function applyPatch()
                     return false
                 end
 
-                local player = getSpecificPlayer(0)
+                local player = API.player.get()
                 if not player then
                     return false
                 end

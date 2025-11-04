@@ -335,7 +335,7 @@ function Chat.processMacros(text)
         return { text = text, playedEmote = playedEmote }
     end
 
-    local player = getSpecificPlayer(0)
+    local player = API.player.get()
     if not player then
         return { text = text }
     end
@@ -362,7 +362,7 @@ end
 ---@return string? result For private messages, the username of the target when sending is successful. Otherwise, `nil`.
 function Chat.send(args)
     local instance = ISChat.instance
-    local player = getSpecificPlayer(0)
+    local player = API.player.get()
     if not player or not instance then
         return
     end

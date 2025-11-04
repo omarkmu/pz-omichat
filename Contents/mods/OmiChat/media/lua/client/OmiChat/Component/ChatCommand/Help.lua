@@ -12,7 +12,7 @@ return API.CommandStream:new {
     name = 'help',
     command = '/help ',
     onUse = function(ctx)
-        local accessLevel = utils.getEffectiveAccessLevel()
+        local accessLevel = API.player.getEffectiveAccessLevel()
         local command = ctx.text
         if not accessLevel then
             -- something went wrong, defer to default help command

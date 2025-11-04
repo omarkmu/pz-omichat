@@ -13,7 +13,6 @@ local abs = math.abs
 local concat = table.concat
 local isAdmin = isAdmin
 local getPlayerFaction = Faction.getPlayerFaction
-local getSpecificPlayer = getSpecificPlayer
 local hasSafehouse = SafeHouse.hasSafehouse
 
 local FONT_MEDIUM = UIFont.Medium
@@ -557,7 +556,7 @@ end
 ---@param info MessageInfo
 ---@private
 function Messages._build(info)
-    local player = getSpecificPlayer(0)
+    local player = API.player.get()
     local username = player and player:getUsername()
 
     local author = info.author
@@ -755,7 +754,7 @@ end
 
 ---Checks whether the player is in range to see a message.
 ---@param info MessageInfo
----@param player IsoPlayer
+---@param player IsoPlayer?
 ---@private
 function Messages._checkRange(info, player)
     local stream = info.stream
@@ -1058,7 +1057,7 @@ function Messages._suppressRadioOverhead(info)
     info.meta:set('suppressedRadio', true) -- avoid doing this again
 
     -- push the message up with blank text
-    local player = getSpecificPlayer(0)
+    local player = API.player.get()
     if player then
         for _ = 1, 5 do
             player:Say(' ')
