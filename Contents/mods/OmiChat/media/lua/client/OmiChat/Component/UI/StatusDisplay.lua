@@ -19,8 +19,6 @@ local tileScale = Core.getTileScale()
 ---@field protected font UIFont The font to use for the display.
 ---@field protected targetUsername string The username of the target player.
 ---@field protected drawObject TextDrawObject The draw object used to render the text.
----@field protected shouldHide boolean Flag for whether the display should be hidden.
----@field protected player? IsoPlayer The local player.
 local StatusDisplay = UI.class('StatusDisplay')
 
 
@@ -41,7 +39,7 @@ end
 ---Renders the status of the character.
 function StatusDisplay:render()
     local text = self.text
-    if self.shouldHide or not text then
+    if not text then
         return
     end
 
@@ -60,50 +58,49 @@ function StatusDisplay:render()
     self.drawObject:Draw(x, y, true)
 end
 
----Updates the status text with the latest status.
-function StatusDisplay:update()
-    self.text = API.data.getStatus(self.targetUsername)
-
-    local text = self.text or ''
-    if text ~= self.drawObject:getOriginal() then
-        self.drawObject:ReadString(text)
-    end
-
-    self.shouldHide = self:_getShouldHide()
-end
-
-
----Determines whether the display should be hidden.
----@private
-function StatusDisplay:_getShouldHide()
-    if not self.mouseOver then
-        return true
-    end
-
-    self.player = self.player or getSpecificPlayer(0)
-
-    local target = self.target
-    local player = self.player
-
-    if not target or not player then
-        return true
-    end
-
-    if target == player or player:isCanSeeAll() then
+---Determines whether the display should be visible.
+---@param player IsoPlayer The local player.
+---@param range number The display range.
+---@return boolean shouldShow
+function StatusDisplay:shouldShow(player, range)
+    if not self.text then
         return false
     end
 
-    local range = config.Commands.Status.Range
-    if player:getDistanceSq(target) > range * range then
+    local target = self.target
+    if not target then
+        return false
+    end
+
+    if target == player or player:isCanSeeAll() then
         return true
     end
 
     if target:isInvisible() and not player:isInvisible() then
-        return true
+        return false
+    end
+
+    if not API.player.isWithinRange(range, target, player) then
+        return false
     end
 
     local square = target:getCurrentSquare()
-    return not square or not square:getCanSee(0)
+    if not square or not square:getCanSee(0) then
+        return false
+    end
+
+    return true
+end
+
+---Updates the status text with the latest status.
+function StatusDisplay:update()
+    local oldText = self.text
+    self.text = API.data.getStatus(self.targetUsername)
+
+    local text = self.text or ''
+    if self.text ~= oldText then
+        self.drawObject:ReadString(text)
+    end
 end
 
 
@@ -117,9 +114,6 @@ function StatusDisplay:new(target)
     this.target = target
     this.targetUsername = target:getUsername()
     this.text = API.data.getStatus(this.targetUsername)
-    this.mouseOver = false
-    this.shouldHide = true
-    this.player = getSpecificPlayer(0)
 
     return this
 end

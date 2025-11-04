@@ -1102,43 +1102,39 @@ function UI._updateStatusDisplays()
     local players = getOnlinePlayers()
     local selfPlayer = getSpecificPlayer(0)
     if not players or not selfPlayer then
-        -- for singleplayer debugging
         return
     end
 
     -- update display cache
     local onlineSet = {}
     local displayCache = UI._statusDisplayByUsername
+    local range = config.Commands.Status.Range
+    local hoverSet = UI._getHoveringObjects()
     for i = 0, players:size() - 1 do
         local onlinePlayer = players:get(i) ---@type IsoPlayer
         local username = onlinePlayer:getUsername()
 
         onlineSet[onlinePlayer] = true
-        if not displayCache[username] then
-            local display = StatusDisplay:new(onlinePlayer)
+        local display = displayCache[username]
+        if not display then
+            display = StatusDisplay:new(onlinePlayer)
             display:initialise()
             display:addToUIManager()
 
             displayCache[username] = display
         end
+
+        local show = hoverSet[onlinePlayer] and display:shouldShow(onlinePlayer, range) or false
+        display:setVisible(show)
     end
 
-    local toRemove = {} ---@type string[]
-    local hoverSet = UI._getHoveringObjects()
     for username, display in pairs(displayCache) do
         local onlinePlayer = display.target
-        display.mouseOver = hoverSet[onlinePlayer] == true
-
         if not statusEnabled or not onlineSet[onlinePlayer] then
             -- player is unavailable or feature is disabled; remove the display
-            toRemove[#toRemove + 1] = username
+            display:destroy()
+            displayCache[username] = nil
         end
-    end
-
-    for i = 1, #toRemove do
-        local username = toRemove[i]
-        displayCache[username]:destroy()
-        displayCache[username] = nil
     end
 end
 
