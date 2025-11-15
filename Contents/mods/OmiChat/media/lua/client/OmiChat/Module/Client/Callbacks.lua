@@ -10,9 +10,9 @@ local UI = utils.ui
 local ISChat = ISChat --[[@as omichat.ISChat]]
 
 local BloodBodyPartType = BloodBodyPartType
+local getAttr = utils.getAttr
 local getCoveredParts = BloodClothingType.getCoveredParts
 
-local getText = getText
 local max = math.max
 local textManager = getTextManager()
 
@@ -175,7 +175,7 @@ function Callback.openHairColorDialog(target)
         b = naturalHairColor:getBlueInt(),
     }
 
-    local text = getText('UI_OmiChat_ContextHairColorDesc')
+    local text = getAttr('context-hair-color', 'dialog')
     target.activeColorDialog = UI.colorDialog {
         w = max(450, textManager:MeasureStringX(UIFont.Small, text) + 60),
         h = 250,
@@ -224,7 +224,7 @@ function Callback.openLanguageConfirmation(target, language)
     end
 
     target.activeLanguageDialog = UI.yesNoDialog {
-        text = getText('UI_OmiChat_ContextConfirmAddLanguage', utils.getTranslatedLanguageName(language)),
+        text = getAttr('context-add-language', 'dialog', { language = utils.getTranslatedLanguageName(language) }),
         target = target,
         onClick = Callback.onConfirmAddLanguage,
         onClickArgs = { language },
@@ -278,12 +278,22 @@ function Callback.switchProfile(_, idx)
     API.ui.redraw()
 end
 
----Callback for toggling admin options.
----@param _ ISChat Unused.
----@param option AdminOption The option to toggle.
-function Callback.toggleAdminOption(_, option)
-    local value = API.preferences.getAdminOption(option)
-    API.preferences.setAdminOption(option, not value)
+---Callback for toggling the admin option for ignoring message range.
+function Callback.toggleAdminIgnoreRange()
+    local value = API.preferences.getIgnoreMessageRange()
+    API.preferences.setIgnoreMessageRange(not value)
+end
+
+---Callback for toggling the admin option for showing a chat icon.
+function Callback.toggleAdminShowIcon()
+    local value = API.preferences.getShowAdminIcon()
+    API.preferences.setShowAdminIcon(not value)
+end
+
+---Callback for toggling the admin option for understanding all languags.
+function Callback.toggleAdminUnderstandLanguages()
+    local value = API.preferences.getUnderstandAllLanguages()
+    API.preferences.setUnderstandAllLanguages(not value)
 end
 
 ---Callback for toggling command retaining.

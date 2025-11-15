@@ -11,7 +11,8 @@ local itemDances = danceData.itemDances
 local recipeDances = danceData.recipeDances
 local itemDanceByItemType = danceData.itemDanceByItemType
 
-local getText = getText
+local getTextVanilla = getText
+local getText = utils.getText
 local pairs = pairs
 local concat = table.concat
 local sort = table.sort
@@ -62,7 +63,7 @@ function Patch.getAvailableDanceHelpText(player)
     end)
 
     if #dances > 0 then
-        parts[#parts + 1] = getText('UI_OmiChat_Info_AvailableDances')
+        parts[#parts + 1] = getText('info-available-dances')
     end
 
     for i = 1, #dances do
@@ -222,7 +223,7 @@ function Patch.processDanceCommand(name, player)
 
         return {
             unknownRecipe = true,
-            name = getText('IGUI_Emote_' .. dance.emote):gsub('\n', ' '),
+            name = getTextVanilla('IGUI_Emote_' .. dance.emote):gsub('\n', ' '),
         }
     end
 
@@ -236,7 +237,7 @@ function Patch.processDanceCommand(name, player)
 
         return {
             missingItem = true,
-            name = getText('IGUI_Emote_' .. cardDance.emote):gsub('\n', ' '),
+            name = getTextVanilla('IGUI_Emote_' .. cardDance.emote):gsub('\n', ' '),
         }
     end
 
@@ -295,7 +296,7 @@ end
 
 Patch._danceStream = API.CommandStream:new {
     name = 'dance',
-    helpTextID = 'UI_OmiChat_HelpText_Dance',
+    helpTextID = 'help-text-dance',
     suggestSpec = { 'known-dance' },
     isEnabled = Patch.isEnabled,
     onUse = function(args)
@@ -309,13 +310,13 @@ Patch._danceStream = API.CommandStream:new {
         if info.emote then
             Patch.playEmote(info.emote, player)
         elseif info.unknownRecipe then
-            feedback = getText('UI_OmiChat_Info_DanceUnknownRecipe', info.name)
+            feedback = getText('info-dance-unknown-recipe', { dance = info.name })
         elseif info.missingItem then
-            feedback = getText('UI_OmiChat_Info_DanceMissingItem', info.name)
+            feedback = getText('info-dance-missing-item', { dance = info.name })
         elseif info.list then
             feedback = Patch.getAvailableDanceHelpText(player)
         else
-            feedback = getText('UI_OmiChat_Info_DanceUnknown')
+            feedback = getText('info-dance-unknown')
         end
 
         if feedback then

@@ -39,21 +39,27 @@ function Command.addLanguage(player, args)
 
     if not success then
         if err == 'FULL' then
-            API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_AddLanguageFull', { username })
+            API.request.sendTranslatedInfoMessage(player, 'error-add-language-full', { username = username })
         elseif err == 'ALREADY_KNOW' then
-            API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_AddLanguageKnown', { username, language })
+            API.request.sendTranslatedInfoMessage(player, 'error-add-language-known', {
+                username = username,
+                language = language,
+            })
         elseif err == 'UNKNOWN' then
-            API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_AddLanguageNotConfigured', { language })
+            API.request.sendTranslatedInfoMessage(player, 'error-add-language-not-configured', { language = language })
         elseif err == 'UNKNOWN_PLAYER' then
-            API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
+            API.request.sendTranslatedInfoMessage(player, 'error-unknown-player', { username = username })
         else
-            API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_AddLanguage')
+            API.request.sendTranslatedInfoMessage(player, 'help-text-add-language')
         end
 
         return
     end
 
-    API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_AddLanguageOther', { username, language })
+    API.request.sendTranslatedInfoMessage(player, 'success-add-language-other', {
+        username = username,
+        language = language,
+    })
 end
 
 ---Handles the `/clearnames` command.
@@ -66,7 +72,7 @@ function Command.clearNames(player)
 
     API.data.clearNicknames()
     API.request.updatePlayerCache()
-    API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ClearNames')
+    API.request.sendTranslatedInfoMessage(player, 'success-clear-names')
 end
 
 ---Handles the `/reseticon` command.
@@ -90,15 +96,15 @@ function Command.resetIcon(player, args)
 
     if not success then
         if err == 'UNKNOWN_PLAYER' then
-            API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
+            API.request.sendTranslatedInfoMessage(player, 'error-unknown-player', { username = username })
         else
-            API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_ResetIcon')
+            API.request.sendTranslatedInfoMessage(player, 'help-text-reset-icon')
         end
 
         return
     end
 
-    API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ResetIconOther', { username })
+    API.request.sendTranslatedInfoMessage(player, 'success-reset-icon-other', { username = username })
 end
 
 ---Handles the `/resetlanguages` command.
@@ -122,15 +128,15 @@ function Command.resetLanguages(player, args)
 
     if not success then
         if err == 'UNKNOWN_PLAYER' then
-            API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
+            API.request.sendTranslatedInfoMessage(player, 'error-unknown-player', { username = username })
         else
-            API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_ResetLanguages')
+            API.request.sendTranslatedInfoMessage(player, 'help-text-reset-languages')
         end
 
         return
     end
 
-    API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ResetLanguagesOther', { username })
+    API.request.sendTranslatedInfoMessage(player, 'success-reset-languages-other', { username = username })
 end
 
 ---Handles the `/resetname` command.
@@ -154,15 +160,15 @@ function Command.resetName(player, args)
 
     if not success then
         if err == 'UNKNOWN_PLAYER' then
-            API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
+            API.request.sendTranslatedInfoMessage(player, 'error-unknown-player', { username = username })
         else
-            API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_ResetName')
+            API.request.sendTranslatedInfoMessage(player, 'help-text-reset-name')
         end
 
         return
     end
 
-    API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_ResetNameOther', { username })
+    API.request.sendTranslatedInfoMessage(player, 'success-reset-name-other', { username = username })
 end
 
 ---Handles the `/seticon` command.
@@ -188,15 +194,15 @@ function Command.setIcon(player, args)
 
     if not success then
         if err == 'UNKNOWN_PLAYER' then
-            API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
+            API.request.sendTranslatedInfoMessage(player, 'error-unknown-player', { username = username })
         else
-            API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_SetIcon')
+            API.request.sendTranslatedInfoMessage(player, 'help-text-set-icon')
         end
 
         return
     end
 
-    API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_SetIconOther', { username })
+    API.request.sendTranslatedInfoMessage(player, 'success-reset-icon-other', { username = username })
 end
 
 ---Handles the `/setlanguageslots` command.
@@ -222,15 +228,18 @@ function Command.setLanguageSlots(player, args)
 
     if not success then
         if err == 'UNKNOWN_PLAYER' then
-            API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
+            API.request.sendTranslatedInfoMessage(player, 'error-unknown-player', { username = username })
         else
-            API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_SetLanguageSlots')
+            API.request.sendTranslatedInfoMessage(player, 'help-text-set-language-slots')
         end
 
         return
     end
 
-    API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_SetLanguageSlotsOther', { username, slots })
+    API.request.sendTranslatedInfoMessage(player, 'success-set-language-slots-other', {
+        username = username,
+        slots = slots,
+    })
 end
 
 ---Handles the `/setname` command.
@@ -257,15 +266,15 @@ function Command.setName(player, args)
 
     if not success then
         if err == 'UNKNOWN_PLAYER' then
-            API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Error_UnknownPlayer', { username })
+            API.request.sendTranslatedInfoMessage(player, 'error-unknown-player', { username = username })
         else
-            API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_HelpText_SetName')
+            API.request.sendTranslatedInfoMessage(player, 'help-text-set-name')
         end
 
         return
     end
 
-    API.request.sendTranslatedInfoMessage(player, 'UI_OmiChat_Success_SetNameOther', { username, name })
+    API.request.sendTranslatedInfoMessage(player, 'success-set-name-other', { username = username, name = name })
 end
 
 

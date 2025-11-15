@@ -4,6 +4,9 @@
 local Stream = require 'OmiChat/Component/Stream'
 local utils = require 'OmiChat/Utils'
 
+local getTextVanilla = getText
+local getTextOrNull = utils.getTextOrNull
+
 local API ---@type api.client?
 
 
@@ -24,7 +27,7 @@ end
 ---@return string? helpText The help text, or `nil` if not defined.
 function CommandStream:getHelpText()
     if self.helpTextID then
-        return getText(self.helpTextID)
+        return getTextOrNull(self.helpTextID) or getTextVanilla(self.helpTextID)
     end
 end
 

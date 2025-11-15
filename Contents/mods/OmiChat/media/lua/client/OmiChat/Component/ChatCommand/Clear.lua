@@ -2,6 +2,7 @@
 ---@namespace omichat
 
 local API = require 'OmiChat/Module/Client/Core'
+local getText = API.utils.getText
 
 -- reimplementing this because the vanilla clear doesn't actually clear the chatbox
 return API.CommandStream:new {
@@ -12,7 +13,7 @@ return API.CommandStream:new {
         API.chat.clear()
 
         if not getDebug() then
-            API.chat.addInfoMessage(getText('UI_OmiChat_Info_Clear'))
+            API.chat.addInfoMessage(getText('info-clear'))
         end
     end,
 }

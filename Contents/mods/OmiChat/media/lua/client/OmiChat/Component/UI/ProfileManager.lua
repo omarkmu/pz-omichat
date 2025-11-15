@@ -8,8 +8,14 @@ local config = API.Configuration
 local utils = API.utils
 local UI = utils.ui
 
+local getAttr = utils.getAttr
+local getAttrOrNull = utils.getAttrOrNull
+local getText = utils.getText
+local getTextOrNull = utils.getTextOrNull
+
 local textManager = getTextManager()
-local CONTROL_FONT = UIFont.Medium
+local FONT_MEDIUM = UIFont.Medium
+local CONTROL_FONT = FONT_MEDIUM
 local FONT_H_LARGE = textManager:getFontHeight(UIFont.Large)
 local FONT_H_MEDIUM = textManager:getFontHeight(CONTROL_FONT)
 local FONT_H_SMALL = textManager:getFontHeight(UIFont.Small)
@@ -83,14 +89,14 @@ function ProfileManager._validateCustomCalloutText(entry, text)
 
     local maxShouts = config.MAX_CUSTOM_SHOUTS
     if #lines > maxShouts then
-        entry:setValidateTooltipText(getText('UI_OmiChat_Error_TooManyShouts', tostring(maxShouts)))
+        entry:setValidateTooltipText(getText('error-too-many-shouts', { max = maxShouts }))
         return false
     end
 
     local maxLen = config.MAX_CUSTOM_SHOUT_LEN
     for i = 1, #lines do
         if #lines[i] > maxLen then
-            entry:setValidateTooltipText(getText('UI_OmiChat_Error_TooLongShout', tostring(maxLen)))
+            entry:setValidateTooltipText(getText('error-too-long-shout', { max = maxLen }))
             return false
         end
     end
@@ -107,7 +113,7 @@ function ProfileManager:addProfile()
     end
 
     local profile = {
-        name = getText('UI_OmiChat_ProfileManager_DefaultProfileName', idx),
+        name = getAttr('profile-manager', 'default-profile-name', { index = idx }),
         colors = {},
         callouts = {},
         sneakcallouts = {},
@@ -121,7 +127,7 @@ end
 
 ---Creates the children of the profile manager.
 function ProfileManager:createChildren()
-    local titleText = getText('UI_OmiChat_ProfileManager_Title')
+    local titleText = getAttr('profile-manager', 'title')
     local titleWidth = textManager:MeasureStringX(UIFont.Large, titleText)
     local titleH = FONT_H_LARGE
 
@@ -168,7 +174,7 @@ function ProfileManager:createChildren()
         anchorRight = false,
         anchorBottom = true,
         internal = 'CLOSE',
-        text = getText('IGUI_CraftUI_Close'),
+        text = getText('.btn-close'),
         target = self,
         onClick = self.destroy,
         setWidthToText = true,
@@ -186,7 +192,7 @@ function ProfileManager:createChildren()
         anchorRight = false,
         anchorBottom = true,
         internal = 'SAVE',
-        text = getText('IGUI_RadioSave'),
+        text = getText('.btn-save'),
         target = self,
         onClick = self.onSave,
         setWidthToText = true,
@@ -211,8 +217,8 @@ function ProfileManager:createChildren()
     self.emptyLabel = UI.label {
         parent = self,
         h = FONT_H_MEDIUM,
-        text = getText('UI_OmiChat_ProfileManager_Empty'),
-        font = UIFont.Medium,
+        text = getAttr('profile-manager', 'empty'),
+        font = FONT_MEDIUM,
         left = false,
     }
 
@@ -273,7 +279,7 @@ function ProfileManager:duplicateProfile()
     end
 
     local profile = ProfileManager._cloneProfile(item)
-    profile.name = getText('UI_OmiChat_ProfileManager_DefaultProfileName', newIdx)
+    profile.name = getAttr('profile-manager', 'default-profile-name', { index = newIdx })
 
     self.profiles[newIdx] = profile
     self:_addListboxItem(profile)
@@ -340,7 +346,7 @@ function ProfileManager:onProfileNameChange(entry)
     local text = entry:getInternalText()
     text = utils.trim(text)
     if #text == 0 then
-        text = getText('UI_OmiChat_ProfileManager_DefaultProfileName', self.listbox.selected)
+        text = getAttr('profile-manager', 'default-profile-name', { index = self.listbox.selected })
     elseif #text >= 50 then
         text = text:sub(1, 50)
     end
@@ -382,7 +388,7 @@ function ProfileManager:_addControls()
         x = CONTENT_PAD_X,
         y = CONTENT_PAD_Y,
         h = LABEL_H,
-        text = getText('UI_OmiChat_ProfileManager_Label_ProfileName'),
+        text = getAttr('profile-manager', 'label-profile-name'),
         font = CONTROL_FONT,
     }
 
@@ -409,7 +415,7 @@ function ProfileManager:_addControls()
             x = CONTENT_PAD_X,
             y = startY,
             h = LABEL_H,
-            text = getText('UI_OmiChat_ProfileManager_Label_Nickname'),
+            text = getAttr('profile-manager', 'label-nickname'),
             font = CONTROL_FONT,
         }
 
@@ -420,7 +426,7 @@ function ProfileManager:_addControls()
             w = controlW,
             h = LABEL_H,
             font = CONTROL_FONT,
-            tooltip = getText('UI_OmiChat_ProfileManager_Tooltip_Nickname'),
+            tooltip = getAttr('profile-manager', 'tooltip-nickname'),
         }
 
         nicknameControl:setValidateFunction(nicknameControl, API.chat.validateNameEntry)
@@ -467,7 +473,7 @@ function ProfileManager:_createButtons()
         w = btnW,
         h = btnH,
         internal = 'DELETE',
-        text = getText('UI_OmiChat_ProfileManager_DeleteButton'),
+        text = getAttr('profile-manager', 'btn-delete'),
         target = self,
         onClick = self.deleteProfile,
         setWidthToText = true,
@@ -480,7 +486,7 @@ function ProfileManager:_createButtons()
         w = btnW,
         h = btnH,
         internal = 'DUPLICATE',
-        text = getText('UI_OmiChat_ProfileManager_DuplicateButton'),
+        text = getAttr('profile-manager', 'btn-duplicate'),
         target = self,
         onClick = self.duplicateProfile,
         setWidthToText = true,
@@ -507,9 +513,9 @@ function ProfileManager:_createCalloutControls(startY)
         local category = categories[i]
         local calloutText
         if category == 'callouts' then
-            calloutText = getText('UI_OmiChat_ProfileManager_Label_Callouts')
+            calloutText = getAttr('profile-manager', 'label-callouts')
         else
-            calloutText = getText('UI_OmiChat_ProfileManager_Label_SneakCallouts')
+            calloutText = getAttr('profile-manager', 'label-sneak-callouts')
         end
 
         local label = UI.label {
@@ -528,7 +534,7 @@ function ProfileManager:_createCalloutControls(startY)
             w = panel.width - CONTENT_PAD_X * 2,
             h = FONT_H_MEDIUM * numLines + 4,
             font = CONTROL_FONT,
-            tooltip = getText('UI_OmiChat_ProfileManager_Tooltip_Callouts'),
+            tooltip = getAttr('profile-manager', 'tooltip-callouts'),
             maxLines = numLines,
             forceUppercase = category == 'callouts',
         }
@@ -562,18 +568,18 @@ function ProfileManager:_createColorControls(startY)
     for i = 1, #availableColorOpts do
         local opt = availableColorOpts[i]
         local displayCommand = API.streams.getDisplayCommand(opt)
-        local labelText = getTextOrNull('UI_OmiChat_ContextColor_' .. opt)
+        local labelText = getAttrOrNull('profile-manager', 'label-color-' .. opt)
         if not labelText then
-            labelText = getText('UI_OmiChat_ContextColor', displayCommand)
+            labelText = getAttr('profile-manager', 'label-color', { command = displayCommand })
         end
 
         local leftCol = i <= splitIdx
         local x = leftCol and CONTENT_PAD_X or (controlW + CONTENT_PAD_X * 2)
 
-        local tooltip = getTextOrNull('UI_OmiChat_ProfileManager_Tooltip_Color_' .. opt)
+        local tooltip = getAttrOrNull('profile-manager', 'tooltip-color-' .. opt)
         if not tooltip then
-            local optName = getTextOrNull('UI_OmiChat_ContextMessageType_' .. opt) or displayCommand
-            tooltip = getText('UI_OmiChat_ProfileManager_Tooltip_Color', optName)
+            local cmdType = getTextOrNull('message-type-' .. opt) or displayCommand
+            tooltip = getAttr('profile-manager', 'tooltip-color', { type = cmdType })
         end
 
         local label = UI.label {
@@ -682,12 +688,12 @@ function ProfileManager:_updateUIState(resetItems, selectIdx)
         end
     end
 
-    if selectIdx and #self.listbox.items > 0 then
-        self.listbox.selected = math.min(selectIdx, #self.listbox.items)
+    if selectIdx and #listbox.items > 0 then
+        listbox.selected = math.min(selectIdx, #listbox.items)
     end
 
     local addEnabled = #self.profiles < config.MAX_PROFILES
-    local addTooltip = not addEnabled and getText('UI_OmiChat_ProfileManager_MaxProfiles') or nil
+    local addTooltip = not addEnabled and getAttr('profile-manager', 'tooltip-max-profiles') or nil
     createBtn:setEnable(addEnabled)
     createBtn:setTooltip(addTooltip)
 
@@ -730,8 +736,8 @@ function ProfileManager:new(args)
     this.colorControls = {}
     this.calloutControls = {}
 
-    this.addText = getText('UI_OmiChat_ProfileManager_AddButton')
-    this.createText = getText('UI_OmiChat_ProfileManager_CreateButton')
+    this.addText = getText('.btn-add')
+    this.createText = getAttr('profile-manager', 'btn-create')
 
     return this
 end

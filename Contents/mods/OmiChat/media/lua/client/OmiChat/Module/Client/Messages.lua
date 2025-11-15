@@ -570,34 +570,21 @@ function Messages._build(info)
     -- handle command messages
     local handled = API.hooks.has.initCommandMessage and API.hooks.initCommandMessage(info)
     if not handled and commandContextTypes[ctxType] then
-        local fmt
         local overheadFmt
-        local default
         if isRadio then
             info:hide()
         elseif ctxType == 'omichat.card' then
-            default = 'FormatCard'
-            fmt = config.Commands.Card.Format
             overheadFmt = config.Commands.Card.OverheadFormat
         elseif ctxType == 'omichat.flip' then
-            default = 'FormatFlip'
-            fmt = config.Commands.Flip.Format
             overheadFmt = config.Commands.Flip.OverheadFormat
         elseif ctxType == 'omichat.roll' then
-            default = 'FormatRoll'
-            fmt = config.Commands.Roll.Format
             overheadFmt = config.Commands.Roll.OverheadFormat
         end
 
-        local result = fmt and default and utils.interpolateNamed(default, fmt, info.tokens)
-        if result == '' then
-            info:hide()
-        elseif result then
-            info.chatText = result
-            if info.doOverhead then
-                info.overheadText = result
-                info.overheadFormat = overheadFmt
-            end
+        info.chatText = ''
+        if info.doOverhead then
+            info.overheadText = ''
+            info.overheadFormat = overheadFmt
         end
     end
 

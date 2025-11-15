@@ -17,6 +17,7 @@ local Helpers = Library.Helpers
 
 local rep = string.rep
 local concat = table.concat
+local getText = utils.getText
 local readTags = Helpers.readTags
 local readOptions = Helpers.readOptions
 local optionOrToken = Helpers.optionOrToken
@@ -55,42 +56,33 @@ function Library.Defaults.Chat(interpolator, args)
     local defaultNoColon = tags.IsNarrativeStyle or tags.IsServerStream or tags.Action
     local noColon = not tags.IncludeColon and (tags.NoColon or tags.NoColonChat or defaultNoColon)
 
-    local name = '' ---@type string?
-    local includeName = tags.IncludeName or tags.IncludeNameChat
-    local excludeName = tags.NoName or tags.NoNameChat or (tags.IsServerStream and not includeName)
-    if not excludeName then
-        name = options:getString('name')
-        if name == '' then
-            if tags.UseAuthorUsername then
-                name = interpolator:tokenString('author')
-            else
-                name = interpolator:tokenString('name')
-            end
+    ---@type string?
+    local name = options:getString('name')
+    if name == '' then
+        if tags.UseAuthorUsername then
+            name = interpolator:tokenString('author')
+        else
+            name = interpolator:tokenString('name')
         end
     end
 
     local message = options:getString('input')
     if message == '' then
-        if tags.IsCardCommand then
-            message = getText('UI_OmiChat_CardLocal', interpolator:tokenString('card'))
-        elseif tags.IsFlipCommand then
-            local result = interpolator:tokenBoolean('heads') and 'Heads' or 'Tails'
-            message = getText('UI_OmiChat_FlipLocal' .. result)
-        elseif tags.IsRollCommand then
-            local roll = interpolator:tokenString('roll')
-            local sides = interpolator:tokenString('sides')
-            message = getText('UI_OmiChat_RollLocal', roll, sides)
-        else
-            message = interpolator:tokenString('input')
-        end
+        message, name = Helpers.getMessage(interpolator, tags, name --[[@as string]])
+    end
+
+    local includeName = tags.IncludeName or tags.IncludeNameChat
+    local excludeName = tags.NoName or tags.NoNameChat or (tags.IsServerStream and not includeName)
+    if excludeName then
+        name = ''
     end
 
     if tags.IsIncomingPM and not tags.UseVanillaPM and name ~= '' then
         local parens = (config:getVariableAsNumber('PMParenthesisCount') or 1) --[[@as integer]]
-        local pmFrom = getText('UI_OmiChat_PrivateChatFrom', ' <SPACE> ' .. name)
+        local pmFrom = getText('private-chat-from', { name = ' <SPACE> ' .. name })
 
         name = rep('(', parens) .. pmFrom .. rep(')', parens)
-    elseif tags.IsOutgoingPM and not excludeName then
+    elseif tags.IsOutgoingPM and name ~= '' then
         local recipient = options:getString('recipientName')
         if recipient == '' then
             if tags.UseAuthorUsername then
@@ -106,7 +98,7 @@ function Library.Defaults.Chat(interpolator, args)
                 name = 'to ' .. name
             else
                 local parens = (config:getVariableAsNumber('PMParenthesisCount') or 1) --[[@as integer]]
-                local pmTo = getText('UI_OmiChat_PrivateChatTo', ' <SPACE> ' .. name)
+                local pmTo = getText('private-chat-to', { name = ' <SPACE> ' .. name })
 
                 name = rep('(', parens) .. pmTo .. rep(')', parens)
             end
@@ -116,6 +108,10 @@ function Library.Defaults.Chat(interpolator, args)
     message = utils.trim(message)
     if message == '' then
         return
+    end
+
+    if name == '' then
+        name = nil
     end
 
     if tags.OOC then
@@ -142,13 +138,9 @@ function Library.Defaults.Chat(interpolator, args)
         hasInternalQuote = tags.IsNarrativeStyle,
     }
 
-    if name == '' then
-        name = nil
-    end
-
     local prefix = ''
     if tags.IsRadioStream then
-        prefix = getText('UI_OmiChat_Radio', tostring(interpolator:token('frequency') or '???'))
+        prefix = getText('radio', { frequency = tostring(interpolator:token('frequency') or '???') })
         if name and tags.IsNarrativeStyle then
             noColon = true
         end
@@ -219,7 +211,7 @@ function Library.Defaults.ChatPrefix(interpolator, args)
     end
 
     if tags.IsPerceptionRange and not tags.NoOutOfRangeIndicator and not tags.NoOutOfRangeIndicatorChat then
-        result[#result + 1] = '[' .. getText('UI_OmiChat_OutOfRange') .. ']'
+        result[#result + 1] = '[' .. getText('out-of-range') .. ']'
     end
 
     if not tags.NoLanguage and not tags.NoLanguageChat and not tags.IsPerceptionRange then
@@ -247,7 +239,7 @@ function Library.Defaults.ChatPrefix(interpolator, args)
     if tags.IncludeAdminIndicator and not tags.NoAdminIndicator then
         if interpolator:tokenBoolean('admin') then
             result[#result + 1] = ' <SPACE> '
-            result[#result + 1] = getText('UI_OmiChat_AdminIndicator')
+            result[#result + 1] = getText('admin-indicator')
         end
     end
 
@@ -335,7 +327,7 @@ function Library.Defaults.FilterChatInput(interpolator, args)
 
     local maxLength = options:getNumber('maxLength')
     if maxLength > 0 and #input > maxLength then
-        interpolator:setToken('error', getText('UI_OmiLibrary_Error_LengthMax', tostring(maxLength)))
+        interpolator:setToken('error', getText('.error-length-max', { max = maxLength }))
         return
     end
 
@@ -358,10 +350,10 @@ function Library.Defaults.FilterName(interpolator, args)
     local maxLength = options:getNumber('maxLength')
     local minLength = options:getNumber('minLength')
     if maxLength > 0 and #input > maxLength then
-        interpolator:setToken('error', getText('UI_OmiLibrary_Error_LengthMax', tostring(maxLength)))
+        interpolator:setToken('error', getText('.error-length-max', { max = maxLength }))
         return
     elseif minLength > 0 and #input < minLength then
-        interpolator:setToken('error', getText('UI_OmiLibrary_Error_LengthMin', tostring(minLength)))
+        interpolator:setToken('error', getText('.error-length-min', { min = minLength }))
         return
     end
 
@@ -403,10 +395,10 @@ function Library.Defaults.FilterStatus(interpolator, args)
     local maxLength = options:getNumber('maxLength', 64)
     local minLength = options:getNumber('minLength', 8)
     if maxLength > 0 and #input > maxLength then
-        interpolator:setToken('error', getText('UI_OmiLibrary_Error_LengthMax', tostring(maxLength)))
+        interpolator:setToken('error', getText('.error-length-max', { max = maxLength }))
         return
     elseif minLength > 0 and #input < minLength then
-        interpolator:setToken('error', getText('UI_OmiLibrary_Error_LengthMin', tostring(minLength)))
+        interpolator:setToken('error', getText('.error-length-min', { min = minLength }))
         return
     end
 
@@ -416,30 +408,6 @@ function Library.Defaults.FilterStatus(interpolator, args)
     end
 
     return input
-end
-
----Default format for `/card` command result content.
----@param interpolator omi.Interpolator The interpolator in use.
----@return string
-function Library.Defaults.FormatCard(interpolator)
-    return 'draws ' .. interpolator:tokenString('card')
-end
-
----Default format for `/flip` command result content.
----@param interpolator omi.Interpolator The interpolator in use.
----@return string
-function Library.Defaults.FormatFlip(interpolator)
-    local result = interpolator:toBoolean(interpolator:token('heads')) and 'heads' or 'tails'
-    return 'flips a coin and gets ' .. result
-end
-
----Default format for `/roll` command result content.
----@param interpolator omi.Interpolator The interpolator in use.
----@return string
-function Library.Defaults.FormatRoll(interpolator)
-    local roll = interpolator:tokenString('roll')
-    local sides = interpolator:tokenString('sides')
-    return 'rolls ' .. roll .. ' on a ' .. sides .. '-sided die'
 end
 
 ---Default format for chat icons.
@@ -706,18 +674,21 @@ function Library.Defaults.Overhead(interpolator, args)
     end
 
     local name = optionOrToken(interpolator, options, 'name')
-    local input = optionOrToken(interpolator, options, 'input')
+    local message = options:getString('input')
+    if message == '' then
+        message, name = Helpers.getMessage(interpolator, tags, name --[[@as string]])
+    end
 
     local autoCapitalize = tags.AutoCapitalize or tags.AutoCapitalizeOverhead
     if tags.IsSneakCallout then
         autoCapitalize = tags.AutoCapitalizeSneakCallout
     end
 
-    input = Helpers.applySharedFormatting {
+    message = Helpers.applySharedFormatting {
         interpolator = interpolator,
         options = options,
         tags = tags,
-        input = input,
+        input = message,
         applyCase = true,
         applyEmbeddedQuotes = true,
         applyEmbeddedActions = true,
@@ -726,28 +697,27 @@ function Library.Defaults.Overhead(interpolator, args)
     }
 
     if tags.OOC then
-        input = '(( ' .. input .. ' ))'
+        message = '(( ' .. message .. ' ))'
     end
 
     local noName = tags.NoName or tags.NoNameOverhead
     local includeName = tags.IncludeName or tags.IncludeNameOverhead or tags.IsNarrativeStyle
-
-    if name and includeName and not noName then
+    if name ~= '' and includeName and not noName then
         local defaultNoColon = tags.IsNarrativeStyle or tags.Action
         local noColon = not tags.IncludeColon and (tags.NoColon or tags.NoColonOverhead or defaultNoColon)
 
-        input = tostring(name) .. (noColon and ' ' or ': ') .. input
+        message = tostring(name) .. (noColon and ' ' or ': ') .. message
     end
 
     if tags.Action then
-        input = Helpers.wrapActionOverhead(input, tags)
+        message = Helpers.wrapActionOverhead(message, tags)
     end
 
     if (tags.OverRadio or tags.OverRadioOverhead) and not tags.IsUnknownLanguage and not tags.IsRadioStream then
-        input = Helpers.getOverRadioIndicator(interpolator:token('chatType')) .. ' ' .. input
+        message = Helpers.getOverRadioIndicator(interpolator:token('chatType')) .. ' ' .. message
     end
 
-    return input
+    return message
 end
 
 ---Default format for the full overhead text.
@@ -871,7 +841,7 @@ function Library.Defaults.TypingIndicator(interpolator, args)
     local options = readOptions(args)
 
     if interpolator:tokenBoolean('alt') then
-        return getText('UI_OmiChat_TypingMany')
+        return getText('typing-many')
     end
 
     local names = options:get('names') or interpolator:token('names')
@@ -882,15 +852,20 @@ function Library.Defaults.TypingIndicator(interpolator, args)
         end
 
         local text
-        if size < 4 then
-            local list = {}
+        if size == 1 then
+            text = getText('typing-1', { name = names:first() })
+        elseif size < 4 then
+            local i = 1
+            local typingArgs = {}
+
             for el in names:values() do
-                list[#list + 1] = el
+                typingArgs['name' .. i] = el
+                i = i + 1
             end
 
-            text = getText('UI_OmiChat_Typing' .. size, unpack(list))
+            text = getText('typing-' .. size, typingArgs)
         else
-            text = getText('UI_OmiChat_TypingMany')
+            text = getText('typing-many')
         end
 
         return text

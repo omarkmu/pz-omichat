@@ -10,6 +10,7 @@ local object = utils.schema.object
 local int = utils.schema.int
 local str = utils.schema.string
 local container = utils.schema.container
+local getAttr = utils.getAttr
 
 ---Upgrades player preferences from V1 to V2.
 ---@param values table
@@ -71,7 +72,7 @@ local function transformToV2(values)
         prefs.profileIndex = 1
         prefs.profiles = {
             {
-                name = getText('UI_OmiChat_ProfileManager_DefaultProfileName', '1'),
+                name = getAttr('profile-manager', 'default-profile-name', { index = 1 }),
                 colors = colors or {},
                 callouts = callouts or {},
                 sneakcallouts = sneakcallouts or {},

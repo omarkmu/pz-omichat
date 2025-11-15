@@ -9,11 +9,18 @@ local PlayerDataManager = require 'OmiChat/Component/UI/PlayerDataManager'
 local ConfigurationHelpers = require 'OmiChat/Component/Configuration/ConfigurationHelpers'
 local callback = require 'OmiChat/Module/Client/Callbacks'
 
+local utils = API.utils
+local UI_LIB = utils.lib.ui
+local config = API.Configuration
+local MultiMap = utils.MultiMap
+
 local max = math.max
 local sort = table.sort
 local concat = table.concat
 local wipe = table.wipe
 local getTimestampMs = getTimestampMs
+local getTextVanilla = getText
+local getText = utils.getText
 local getPicked = UIManager.getPicked
 local getClassFieldVal = getClassFieldVal
 local getServerOptions = getServerOptions
@@ -23,10 +30,6 @@ local ISChat = ISChat --[[@as omichat.ISChat]]
 local TILE_FIELD ---@type Field?
 local TILE_FIELD_INDEX = 2
 
-local utils = API.utils
-local UI_LIB = utils.lib.ui
-local config = API.Configuration
-local MultiMap = utils.MultiMap
 
 ---@class api.client.ui
 ---@field suggestBox? omi.ui.SuggestBox The auto-suggest box for the chat input.
@@ -552,31 +555,29 @@ function UI._addAdminOptions(context)
         return
     end
 
-    ---@type AdminOption[]
-    local options = {
-        'ShowIcon',
-        'KnowAllLanguages',
-        'IgnoreMessageRange',
-    }
-
-    local adminOptionName = getText('UI_OmiChat_ContextAdmin')
-    local adminOption = context:addOption(adminOptionName, ISChat.instance)
+    local submenuName = getText('context-admin')
+    local submenuOption = context:addOption(submenuName, ISChat.instance)
 
     local submenu = context:getNew(context)
-    context:addSubMenu(adminOption, submenu)
+    context:addSubMenu(submenuOption, submenu)
 
-    local manageName = getText('UI_OmiChat_ContextAdminViewPlayerData')
-    submenu:addOption(manageName, nil, UI.openPlayerDataManager)
+    local playerDataName = getText('context-admin-view-player-data')
+    submenu:addOption(playerDataName, nil, UI.openPlayerDataManager)
 
-    local optionsName = getText('UI_OmiChat_ContextAdminUpdateConfiguration')
-    submenu:addOption(optionsName, nil, UI.openConfiguration)
+    local settingsName = getText('context-admin-open-settings')
+    submenu:addOption(settingsName, nil, UI.openConfiguration)
 
-    for i = 1, #options do
-        local option = options[i]
-        local name = getText('UI_OmiChat_ContextAdmin_' .. option)
-        local opt = submenu:addOption(name, ISChat.instance, callback.toggleAdminOption, option)
-        submenu:setOptionChecked(opt, API.preferences.getAdminOption(option))
-    end
+    local adminOptionName = getText('context-admin-show-icon')
+    local opt = submenu:addOption(adminOptionName, ISChat.instance, callback.toggleAdminShowIcon)
+    submenu:setOptionChecked(opt, API.preferences.getShowAdminIcon())
+
+    adminOptionName = getText('context-admin-know-all-languages')
+    opt = submenu:addOption(adminOptionName, ISChat.instance, callback.toggleAdminUnderstandLanguages)
+    submenu:setOptionChecked(opt, API.preferences.getUnderstandAllLanguages())
+
+    adminOptionName = getText('context-admin-ignore-message-range')
+    opt = submenu:addOption(adminOptionName, ISChat.instance, callback.toggleAdminIgnoreRange)
+    submenu:setOptionChecked(opt, API.preferences.getIgnoreMessageRange())
 
     if API.hooks.has.chatSettingsMenu then
         API.hooks.chatSettingsMenu('admin', submenu)
@@ -592,24 +593,24 @@ function UI._addChatSettings(context)
         return
     end
 
-    local option = context:addOption(getText('UI_OmiChat_ContextChatSettings'), instance)
+    local option = context:addOption(getText('context-chat-settings'), instance)
     local submenu = context:getNew(context)
     context:addSubMenu(option, submenu)
 
     local timestampOptName = instance.showTimestamp
-        and getText('UI_chat_context_disable_timestamp')
-        or getText('UI_chat_context_enable_timestamp')
+        and getTextVanilla('UI_chat_context_disable_timestamp')
+        or getTextVanilla('UI_chat_context_enable_timestamp')
     local tagOptName = instance.showTitle
-        and getText('UI_chat_context_disable_tags')
-        or getText('UI_chat_context_enable_tags')
+        and getTextVanilla('UI_chat_context_disable_tags')
+        or getTextVanilla('UI_chat_context_enable_tags')
 
     submenu:addOption(timestampOptName, instance, ISChat.onToggleTimestampPrefix)
     submenu:addOption(tagOptName, instance, ISChat.onToggleTagPrefix)
 
     if config.TypingIndicator.Enable then
         local typingOptName = API.preferences.getShowTyping()
-            and getText('UI_OmiChat_ContextDisableTypingIndicator')
-            or getText('UI_OmiChat_ContextEnableTypingIndicator')
+            and getText('context-disable-typing-indicator')
+            or getText('context-enable-typing-indicator')
         submenu:addOption(typingOptName, instance, callback.toggleShowTyping)
     end
 
@@ -636,7 +637,7 @@ function UI._addCustomizationSettings(context)
         return
     end
 
-    local option = context:addOption(getText('UI_OmiChat_ContextCustomization'), instance)
+    local option = context:addOption(getText('context-customization'), instance)
     local submenu = context:getNew(context)
     context:addSubMenu(option, submenu)
 
@@ -645,30 +646,30 @@ function UI._addCustomizationSettings(context)
 
     if config.Customization.EnableNameColors then
         local nameColorOptName = API.preferences.getNameColorsEnabled()
-            and getText('UI_OmiChat_ContextDisableNameColors')
-            or getText('UI_OmiChat_ContextEnableNameColors')
+            and getText('context-disable-name-colors')
+            or getText('context-enable-name-colors')
 
         submenu:addOption(nameColorOptName, instance, callback.toggleShowNameColor)
     end
 
-    local manageOptName = getText('UI_OmiChat_ContextManageProfiles')
+    local manageOptName = getText('context-manage-profiles')
     submenu:addOption(manageOptName, nil, UI.openProfileManager)
 
     -- character customization
     if config.Customization.EnableCharacterCustomization then
         if config:isCleanCustomizationEnabled() then
-            local cleanOptName = getText('UI_OmiChat_ContextClean')
+            local cleanOptName = getText('context-clean')
             submenu:addOption(cleanOptName, instance, callback.cleanCharacter)
         end
 
-        local hairColorOptName = getText('UI_OmiChat_ContextHairColor')
+        local hairColorOptName = getText('context-hair-color')
         submenu:addOption(hairColorOptName, instance, callback.openHairColorDialog)
 
-        local growHairOptName = getText('UI_OmiChat_ContextGrowHair')
+        local growHairOptName = getText('context-grow-hair')
         submenu:addOption(growHairOptName, instance, callback.growHair)
 
         if not player:isFemale() then
-            local growBeardOptName = getText('UI_OmiChat_ContextGrowBeard')
+            local growBeardOptName = getText('context-grow-beard')
             submenu:addOption(growBeardOptName, instance, callback.growBeard)
         end
     end
@@ -718,7 +719,7 @@ function UI._addLanguageOptions(context)
         return
     end
 
-    local languageOptionName = getText('UI_OmiChat_ContextLanguages')
+    local languageOptionName = getText('context-languages')
     local languageOption = context:addOption(languageOptionName, ISChat.instance)
     local languageSubmenu = context:getNew(context)
     context:addSubMenu(languageOption, languageSubmenu)
@@ -735,7 +736,7 @@ function UI._addLanguageOptions(context)
         sort(addLanguages, function(a, b) return a.translated < b.translated end)
 
         local addLanguageSubmenu = languageSubmenu:getNew(languageSubmenu)
-        local addLanguageOption = languageSubmenu:addOption(getText('UI_OmiChat_ContextAddLanguage'), ISChat.instance)
+        local addLanguageOption = languageSubmenu:addOption(getText('context-add-language'), ISChat.instance)
         languageSubmenu:addSubMenu(addLanguageOption, addLanguageSubmenu)
         for i = 1, #addLanguages do
             local lang = addLanguages[i].language
@@ -763,13 +764,13 @@ function UI._addProfileSwitchSubmenu(context)
         return
     end
 
-    local submenuName = getText('UI_OmiChat_ContextProfiles')
+    local submenuName = getText('context-profiles')
     local submenuOption = context:addOption(submenuName, instance)
     local submenu = context:getNew(context)
     context:addSubMenu(submenuOption, submenu)
 
     local currentIndex = API.preferences.getCurrentProfileIndex()
-    local option = submenu:addOption(getText('UI_OmiChat_ContextProfileDefault'), instance, callback.switchProfile, 0)
+    local option = submenu:addOption(getText('context-profile-default'), instance, callback.switchProfile, 0)
     submenu:setOptionChecked(option, currentIndex == nil)
 
     for i = 1, #profiles do
@@ -783,7 +784,7 @@ end
 ---@param context ISContextMenu
 ---@private
 function UI._addRetainOptions(context)
-    local retainOption = context:addOption(getText('UI_OmiChat_ContextRetainCommands'), ISChat.instance)
+    local retainOption = context:addOption(getText('context-retain-commands'), ISChat.instance)
 
     local retainSubmenu = context:getNew(context)
     context:addSubMenu(retainOption, retainSubmenu)
@@ -797,7 +798,7 @@ function UI._addRetainOptions(context)
 
     for i = 1, #categories do
         local cat = categories[i]
-        local name = getText('UI_OmiChat_ContextRetainCommands_' .. cat)
+        local name = getText('context-retain-commands-' .. cat)
         local opt = retainSubmenu:addOption(name, ISChat.instance, callback.toggleRetainCommand, cat)
         retainSubmenu:setOptionChecked(opt, API.preferences.getRetainCommand(cat))
     end
@@ -825,11 +826,11 @@ function UI._addSignEmoteOption(context)
         return
     end
 
-    local suffix = API.preferences.getSignEmotesEnabled() and 'Disable' or 'Enable'
-    local optName = getText('UI_OmiChat_ContextSignEmotes' .. suffix)
+    local suffix = API.preferences.getSignEmotesEnabled() and 'disable' or 'enable'
+    local optName = getText('context-sign-emotes-' .. suffix)
     local option = context:addOption(optName, ISChat.instance, callback.toggleUseSignEmotes)
     option.toolTip = ISToolTip:new()
-    option.toolTip.description = getText('UI_OmiChat_ContextSignEmotesTooltip')
+    option.toolTip.description = getText('context-sign-emotes-tooltip')
 end
 
 ---Adds the context menu options for suggestions.
@@ -839,18 +840,18 @@ function UI._addSuggestionOptions(context)
     local instance = ISChat.instance
     local isUseSuggester = API.preferences.getUseSuggester()
     if not isUseSuggester then
-        local optName = getText('UI_OmiChat_ContextSuggestions_Enable')
+        local optName = getText('context-suggestions-enable')
         context:addOption(optName, instance, callback.toggleUseSuggester)
         return
     end
 
-    local suggestOption = context:addOption(getText('UI_OmiChat_ContextSuggestions'), instance)
+    local suggestOption = context:addOption(getText('context-suggestions'), instance)
     local submenu = context:getNew(context)
     context:addSubMenu(suggestOption, submenu)
 
-    local disableOptName = getText('UI_OmiChat_ContextSuggestions_Disable')
-    local onEnterOptName = getText('UI_OmiChat_ContextSuggestions_OnEnter')
-    local onTabOptName = getText('UI_OmiChat_ContextSuggestions_OnTab')
+    local disableOptName = getText('context-suggestions-disable')
+    local onEnterOptName = getText('context-suggestions-on-enter')
+    local onTabOptName = getText('context-suggestions-on-tab')
 
     submenu:addOption(disableOptName, instance, callback.toggleUseSuggester)
 
@@ -874,12 +875,12 @@ function UI._addVanillaSubmenuOptions(context)
         return
     end
 
-    local fontSizeOption = context:addOption(getText('UI_chat_context_font_submenu_name'), instance)
+    local fontSizeOption = context:addOption(getTextVanilla('UI_chat_context_font_submenu_name'), instance)
     local fontSubmenu = context:getNew(context)
     context:addSubMenu(fontSizeOption, fontSubmenu)
-    fontSubmenu:addOption(getText('UI_chat_context_font_small'), instance, ISChat.onFontSizeChange, 'small')
-    fontSubmenu:addOption(getText('UI_chat_context_font_medium'), instance, ISChat.onFontSizeChange, 'medium')
-    fontSubmenu:addOption(getText('UI_chat_context_font_large'), instance, ISChat.onFontSizeChange, 'large')
+    fontSubmenu:addOption(getTextVanilla('UI_chat_context_font_small'), instance, ISChat.onFontSizeChange, 'small')
+    fontSubmenu:addOption(getTextVanilla('UI_chat_context_font_medium'), instance, ISChat.onFontSizeChange, 'medium')
+    fontSubmenu:addOption(getTextVanilla('UI_chat_context_font_large'), instance, ISChat.onFontSizeChange, 'large')
 
     ---@cast fontSubmenu.options table<integer, any>
     if instance.chatFont == 'small' then
@@ -890,7 +891,7 @@ function UI._addVanillaSubmenuOptions(context)
         fontSubmenu:setOptionChecked(fontSubmenu.options[3], true)
     end
 
-    local minOpaqueOption = context:addOption(getText('UI_chat_context_opaque_min'), instance)
+    local minOpaqueOption = context:addOption(getTextVanilla('UI_chat_context_opaque_min'), instance)
     local minOpaqueSubmenu = context:getNew(context)
     context:addSubMenu(minOpaqueOption, minOpaqueSubmenu)
     local opaques = { 0, 0.25, 0.5, 0.75, 1 } ---@type number[]
@@ -906,7 +907,7 @@ function UI._addVanillaSubmenuOptions(context)
         end
     end
 
-    local maxOpaqueOption = context:addOption(getText('UI_chat_context_opaque_max'), instance)
+    local maxOpaqueOption = context:addOption(getTextVanilla('UI_chat_context_opaque_max'), instance)
     local maxOpaqueSubmenu = context:getNew(context)
     context:addSubMenu(maxOpaqueOption, maxOpaqueSubmenu)
     for i = 1, #opaques do
@@ -921,11 +922,11 @@ function UI._addVanillaSubmenuOptions(context)
         end
     end
 
-    local fadeTimeOption = context:addOption(getText('UI_chat_context_opaque_fade_time_submenu_name'), instance)
+    local fadeTimeOption = context:addOption(getTextVanilla('UI_chat_context_opaque_fade_time_submenu_name'), instance)
     local fadeTimeSubmenu = context:getNew(context)
     context:addSubMenu(fadeTimeOption, fadeTimeSubmenu)
     local availFadeTime = { 0, 1, 2, 3, 5, 10 }
-    local optionName = getText('UI_chat_context_disable')
+    local optionName = getTextVanilla('UI_chat_context_disable')
     local option = fadeTimeSubmenu:addOption(optionName, instance, ISChat.onFadeTimeChange, 0)
     if instance.fadeTime == 0 then
         fadeTimeSubmenu:setOptionChecked(option, true)
@@ -939,11 +940,11 @@ function UI._addVanillaSubmenuOptions(context)
         end
     end
 
-    local opaqueOnFocusOption = context:addOption(getText('UI_chat_context_opaque_on_focus'), instance)
+    local opaqueOnFocusOption = context:addOption(getTextVanilla('UI_chat_context_opaque_on_focus'), instance)
     local opaqueOnFocusSubmenu = context:getNew(context)
     context:addSubMenu(opaqueOnFocusOption, opaqueOnFocusSubmenu)
-    opaqueOnFocusSubmenu:addOption(getText('UI_chat_context_disable'), instance, ISChat.onFocusOpaqueChange, false)
-    opaqueOnFocusSubmenu:addOption(getText('UI_chat_context_enable'), instance, ISChat.onFocusOpaqueChange, true)
+    opaqueOnFocusSubmenu:addOption(getTextVanilla('UI_chat_context_disable'), instance, ISChat.onFocusOpaqueChange, false)
+    opaqueOnFocusSubmenu:addOption(getTextVanilla('UI_chat_context_enable'), instance, ISChat.onFocusOpaqueChange, true)
 
     local opt = opaqueOnFocusSubmenu.options[instance.opaqueOnFocus and 2 or 1] ---@cast opt -?
     opaqueOnFocusSubmenu:setOptionChecked(opt, true)

@@ -13,6 +13,7 @@ local ISChat = ISChat --[[@as omichat.ISChat]]
 
 local format = string.format
 local getTexture = getTexture
+local getTextVanilla = getText
 
 
 ---@class MessageInfo : omi.Class
@@ -70,11 +71,13 @@ function MessageInfo:addTags(tags)
 end
 
 ---Applies the formatting determined by building the message.
+---
 ---If the format string or content are unset, the chat text will be set to the empty string.
+---Command messages allow empty content since they have no input.
 ---@private
 function MessageInfo:applyChatFormatting()
     self.chatText = utils.trim(self.chatText)
-    if self.chatText == '' then
+    if not self.tags.IsCommand and self.chatText == '' then
         self:hideInChat()
         return
     end
@@ -145,7 +148,7 @@ function MessageInfo:applyChatFormatting()
         self.tag = utils.interpolateNamed('Tag', config.Format.Component.Tag, {
             chatType = chatType,
             stream = self.tokens.stream,
-            tag = getText(self.titleID),
+            tag = getTextVanilla(self.titleID),
             tags = self.tokens.tags,
             originalTags = self.tokens.originalTags,
         }, seed)
@@ -219,12 +222,12 @@ end
 ---Gets the message text to use for chat.
 ---@return string
 function MessageInfo:buildChatText()
-    if self.chatText == '' then
+    local fmt = self.chatFormat
+    if not fmt or fmt == '' then
         return self.rawTextWithPrefix
     end
 
-    local fmt = self.chatFormat
-    if not fmt or fmt == '' then
+    if not self.tags.IsCommand and self.chatText == '' then
         return self.rawTextWithPrefix
     end
 
@@ -273,7 +276,7 @@ function MessageInfo:buildOverheadText()
 
     local seed = self.datetime
     tokens.input = utils.trim(self.overheadText)
-    if tokens.input == '' then
+    if not self.tags.IsCommand and tokens.input == '' then
         return
     end
 

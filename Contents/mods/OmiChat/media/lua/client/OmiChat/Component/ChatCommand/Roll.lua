@@ -12,7 +12,7 @@ local config = API.Configuration
 API._rollCommand = API.CommandStream:new {
     name = 'roll',
     command = '/roll ',
-    helpTextID = 'UI_ServerOptionDesc_Roll',
+    helpTextID = 'help-text-roll',
     autoTags = { 'IsRollCommand' },
     onUse = function(ctx)
         if API.hooks.has.rollCommand and API.hooks.rollCommand(ctx) then

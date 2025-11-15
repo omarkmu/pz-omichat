@@ -72,15 +72,6 @@ function Preferences.get()
     return prefs
 end
 
----Gets the value of a given admin option preference.
----@param option AdminOption The option to retrieve.
----@return boolean enabled
-function Preferences.getAdminOption(option)
-    local prefs = Preferences.get()
-    local mappedPref = Preferences._adminOptionMap[option]
-    return prefs[mappedPref] or false
-end
-
 ---Gets a color table matching the player's preference.
 ---@param name string The name of a stream.
 ---@return omi.ColorTable<integer>? color The player's preferred color for a stream, or `nil` if unset.
@@ -287,24 +278,6 @@ function Preferences.save()
     return true
 end
 
----Sets the value of a given admin option preference.
----@param option AdminOption The option to update.
----@param value boolean The new value.
-function Preferences.setAdminOption(option, value)
-    local prefs = Preferences.get()
-    local mappedPref = Preferences._adminOptionMap[option]
-    if prefs[mappedPref] == nil then
-        return
-    end
-
-    prefs[mappedPref] = not not value
-    Preferences.save()
-
-    if mappedPref == 'adminKnowLanguages' or mappedPref == 'adminIgnoreRange' then
-        API.ui.redraw()
-    end
-end
-
 ---Sets a color table for the current player's preference for a stream.
 ---This sets the value in the current profile.
 ---@param name string The name of the stream to set a color for.
@@ -331,6 +304,16 @@ function Preferences.setCustomShouts(shoutType, shouts)
     profile[shoutType] = shouts and shouts or {}
     Preferences.save()
     return true
+end
+
+---Sets whether the player has the admin option to ignore message range enabled.
+---@param ignore boolean
+function Preferences.setIgnoreMessageRange(ignore)
+    local prefs = Preferences.get()
+    prefs.adminIgnoreRange = ignore
+
+    Preferences.save()
+    API.ui.redraw()
 end
 
 ---Sets whether the current player has name colors enabled.
@@ -366,6 +349,14 @@ function Preferences.setRetainCommand(category, value)
     Preferences.save()
 end
 
+---Sets whether the admin icon should show for the player while admin permissions are active.
+---@param showIcon boolean Flag for whether the admin icon should be shown.
+function Preferences.setShowAdminIcon(showIcon)
+    local prefs = Preferences.get()
+    prefs.adminShowIcon = not not showIcon
+    Preferences.save()
+end
+
 ---Sets whether typing indicators should be shown for the current player.
 ---@param showTyping boolean Flag for whether typing indicators should be shown.
 function Preferences.setShowTyping(showTyping)
@@ -397,6 +388,17 @@ function Preferences.setSuggestOnTab(enable)
     prefs.suggestOnTab = enable
     Preferences.save()
 end
+
+---Sets whether the player has the admin option to understand all roleplay languages enabled.
+---@param understandAll boolean
+function Preferences.setUnderstandAllLanguages(understandAll)
+    local prefs = Preferences.get()
+    prefs.adminKnowLanguages = understandAll
+
+    Preferences.save()
+    API.ui.redraw()
+end
+
 
 ---Sets whether the current player wants to use chat suggestions.
 ---@param useSuggester boolean Flag for whether suggestions should be shown.

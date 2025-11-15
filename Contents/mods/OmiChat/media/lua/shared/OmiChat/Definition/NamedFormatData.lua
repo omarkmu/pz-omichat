@@ -78,15 +78,15 @@ local TOKENS_CHAT_PROCESSED = {
     'originalStream',
     {
         name = 'input',
-        id = 'Sandbox_OmiChat_token_input_processed',
+        id = 'token-input-processed',
     },
     {
         name = 'language',
-        id = 'Sandbox_OmiChat_token_language_processed',
+        id = 'token-language-processed',
     },
     {
         name = 'icon',
-        id = 'Sandbox_OmiChat_token_icon_processed',
+        id = 'token-icon-processed',
     },
 }
 
@@ -125,34 +125,13 @@ return {
         tokens = TOKENS_OVERHEAD,
         options = OPTIONS_OVERHEAD,
     },
-    Commands_Card_Format = {
-        tokens = {
-            'suit',
-            'number',
-            {
-                name = 'card',
-                id = 'Sandbox_OmiChat_token_card_untranslated',
-            },
-        },
-    },
     Commands_Card_OverheadFormat = {
         tokens = TOKENS_OVERHEAD,
         options = OPTIONS_OVERHEAD,
     },
-    Commands_Flip_Format = {
-        tokens = {
-            'heads',
-        },
-    },
     Commands_Flip_OverheadFormat = {
         tokens = TOKENS_OVERHEAD,
         options = OPTIONS_OVERHEAD,
-    },
-    Commands_Roll_Format = {
-        tokens = {
-            'roll',
-            'sides',
-        },
     },
     Commands_Roll_OverheadFormat = {
         tokens = TOKENS_OVERHEAD,
@@ -174,7 +153,7 @@ return {
         tokens = utils.appendCopy(TOKENS_CHAT_PROCESSED, {
             {
                 name = 'prefix',
-                id = 'Sandbox_OmiChat_token_prefix_chat_final',
+                id = 'token-prefix-chat-final',
             },
         }),
         options = {
@@ -187,7 +166,7 @@ return {
         options = OPTIONS_PREFIX,
     },
     Format_Component_EmbeddedAction = {
-        tokenDescription = 'Sandbox_OmiChat_tokendesc_Embedded',
+        tokenDescription = 'token-desc-embedded',
         tokens = {
             'input',
             'tags',
@@ -198,7 +177,7 @@ return {
         },
     },
     Format_Component_EmbeddedQuote = {
-        tokenDescription = 'Sandbox_OmiChat_tokendesc_Embedded',
+        tokenDescription = 'token-desc-embedded',
         tokens = {
             'input',
             'tags',
@@ -245,7 +224,7 @@ return {
             'username',
             {
                 name = 'name',
-                id = 'Sandbox_OmiChat_token_name_component',
+                id = 'token-name-component',
             },
         },
         options = {
@@ -263,7 +242,7 @@ return {
             'originalStream',
             {
                 name = 'tag',
-                id = 'Sandbox_OmiChat_token_tag_component',
+                id = 'token-tag-component',
             },
         },
     },
@@ -297,7 +276,7 @@ return {
             'maxLength',
             {
                 name = 'truncateTo',
-                id = 'Sandbox_OmiChat_option_truncateTo_filter_chat_input',
+                id = 'option-truncateTo-filter-chat-input',
             },
         },
     },
@@ -307,7 +286,7 @@ return {
             'input',
             {
                 name = 'target',
-                id = 'Sandbox_OmiChat_token_target_filter_name',
+                id = 'token-target-filter-name',
             },
         },
         options = {
@@ -315,7 +294,7 @@ return {
             'maxLength',
             {
                 name = 'truncateTo',
-                id = 'Sandbox_OmiChat_option_truncateTo_filter_name',
+                id = 'option-truncateTo-filter-name',
             },
         },
     },
@@ -328,11 +307,11 @@ return {
             'truncateTo',
             {
                 name = 'maxLength',
-                id = 'Sandbox_OmiChat_option_maxLength_filter_status',
+                id = 'option-maxLength-filter-status',
             },
             {
                 name = 'minLength',
-                id = 'Sandbox_OmiChat_option_minLength_filter_status',
+                id = 'option-minLength-filter-status',
             },
         },
     },
@@ -352,7 +331,7 @@ return {
         tokens = utils.appendCopy(TOKENS_OVERHEAD, {
             {
                 name = 'prefix',
-                id = 'Sandbox_OmiChat_token_prefix_overhead_final',
+                id = 'token-prefix-overhead-final',
             },
         }),
         options = {
@@ -467,17 +446,17 @@ return {
         tokens = {
             {
                 name = 'alt',
-                id = 'Sandbox_OmiChat_token_alt_typing',
+                id = 'token-alt-typing',
             },
             {
                 name = 'names',
-                id = 'Sandbox_OmiChat_token_names_typing',
+                id = 'token-names-typing',
             },
         },
         options = {
             {
                 name = 'names',
-                id = 'Sandbox_OmiChat_option_names_typing',
+                id = 'option-names-typing',
             },
         },
     },

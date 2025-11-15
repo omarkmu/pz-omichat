@@ -6,7 +6,7 @@ local API = require 'OmiChat/Module/Client/Core'
 return API.CommandStream:new {
     name = 'setlanguageslots',
     command = '/setlanguageslots ',
-    helpTextID = 'UI_OmiChat_HelpText_SetLanguageSlots',
+    helpTextID = 'help-text-set-language-slots',
     suggestSpec = { 'online-username-with-self' },
     isEnabled = API.player.canUseAdminCommands,
     defaultOnDisabled = false,

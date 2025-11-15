@@ -4,11 +4,12 @@
 local API = require 'OmiChat/Module/Client/Core'
 local utils = API.utils
 local config = API.Configuration
+local getText = utils.getText
 
 return API.CommandStream:new {
     name = 'status',
     command = '/status ',
-    helpTextID = 'UI_OmiChat_HelpText_Status',
+    helpTextID = 'help-text-status',
     isEnabled = function() return config.Commands.Status.Enable end,
     onUse = function(ctx)
         local text = utils.trim(ctx.text)
@@ -19,9 +20,9 @@ return API.CommandStream:new {
 
             local message
             if status then
-                message = getText('UI_OmiChat_Info_CurrentStatus', status)
+                message = getText('info-current-status', { status = status })
             else
-                message = getText('UI_OmiChat_Info_CurrentStatusUnset')
+                message = getText('info-current-status-unset')
             end
 
             local helpText = ctx.stream:getHelpText()

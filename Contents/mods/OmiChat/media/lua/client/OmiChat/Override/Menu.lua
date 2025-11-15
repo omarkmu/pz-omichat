@@ -4,7 +4,8 @@
 
 local API = require 'OmiChat/Client'
 local utils = API.utils
-local getText = getText
+local getTextVanilla = getText
+local textManager = getTextManager()
 
 
 --#region Medical
@@ -25,7 +26,7 @@ function ISMedicalCheckAction:perform()
         return
     end
 
-    healthWindow:setTitle(getText('IGUI_health_playerHealth', name))
+    healthWindow:setTitle(getTextVanilla('IGUI_health_playerHealth', name))
 end
 
 function ISHealthPanel:update()
@@ -44,7 +45,7 @@ function ISHealthPanel:update()
         return
     end
 
-    self.blockingMessage = getText('IGUI_TradingUI_TooFarAway', name)
+    self.blockingMessage = getTextVanilla('IGUI_TradingUI_TooFarAway', name)
 end
 
 --#endregion
@@ -96,7 +97,7 @@ function ISTradingUI.ReceiveTradeRequest(requester)
         return
     end
 
-    modal.text = getText('IGUI_TradingUI_RequestTrade', name):gsub('\\n', '\n')
+    modal.text = getTextVanilla('IGUI_TradingUI_RequestTrade', name):gsub('\\n', '\n')
 
     local w, h = ISModalDialog.CalcSize(modal.width, modal.height, modal.text)
     modal.width = w
@@ -117,7 +118,7 @@ function ISTradingUI.AcceptedTrade(accepted)
         return
     end
 
-    instance.blockingMessage = getText('IGUI_TradingUI_RefusedTrade', name)
+    instance.blockingMessage = getTextVanilla('IGUI_TradingUI_RefusedTrade', name)
 end
 
 ---@param player IsoPlayer
@@ -135,7 +136,7 @@ function ISTradingUI.OtherAddNewItem(player, item)
         return
     end
 
-    local message = getText('IGUI_TradingUI_AddedItem', name, item:getName())
+    local message = getTextVanilla('IGUI_TradingUI_AddedItem', name, item:getName())
     updateHistoryMessage(message, {
         message = message,
         add = true,
@@ -163,7 +164,7 @@ function ISTradingUI.RemoveItem(player, index)
         return
     end
 
-    local message = getText('IGUI_TradingUI_RemovedItem', name, removed.item:getName())
+    local message = getTextVanilla('IGUI_TradingUI_RemovedItem', name, removed.item:getName())
     updateHistoryMessage(message, {
         message = message,
         add = false,
@@ -194,12 +195,12 @@ function ISTradingUI.UpdateState(player, state)
         end
 
         if instance.otherPlayer == player and instance.blockingMessage then
-            instance.blockingMessage = getText('IGUI_TradingUI_ClosedTrade', name)
+            instance.blockingMessage = getTextVanilla('IGUI_TradingUI_ClosedTrade', name)
         end
     elseif state == ISTradingUI.States.SealOffer then
-        historyMessage = getText('IGUI_TradingUI_OtherPlayerSealedOffer', name)
+        historyMessage = getTextVanilla('IGUI_TradingUI_OtherPlayerSealedOffer', name)
     elseif state == ISTradingUI.States.UnSealOffer then
-        historyMessage = getText('IGUI_TradingUI_OtherPlayerUnSealedOffer', name)
+        historyMessage = getTextVanilla('IGUI_TradingUI_OtherPlayerUnSealedOffer', name)
     end
 
     if historyMessage then
@@ -221,12 +222,12 @@ function ISTradingUI:update()
 
     local player = getPlayerByOnlineID(self.otherPlayer:getOnlineID())
     if not player then
-        self.blockingMessage = getText('IGUI_TradingUI_ClosedTrade', name)
+        self.blockingMessage = getTextVanilla('IGUI_TradingUI_ClosedTrade', name)
     end
 
     if not self.blockingMessage and (math.abs(player:getX() - self.player:getX()) > 2 or
             math.abs(player:getY() - self.player:getY()) > 2) then
-        self.blockingMessage2 = getText('IGUI_TradingUI_TooFarAway', name)
+        self.blockingMessage2 = getTextVanilla('IGUI_TradingUI_TooFarAway', name)
         return
     else
         self.blockingMessage2 = nil
@@ -239,24 +240,25 @@ function ISTradingUI:prerender()
         return ISTradingUI_prerender(self)
     end
 
-    self:drawRect(0, 0, self.width, self.height, self.backgroundColor.a, self.backgroundColor.r, self.backgroundColor.g,
-        self.backgroundColor.b)
-    self:drawText(getText('IGUI_TradingUI_Title'),
-        self.width / 2 - (getTextManager():MeasureStringX(UIFont.Medium, getText('IGUI_TradingUI_Title')) / 2), 15, 1, 1,
-        1, 1, UIFont.Medium)
-    self:drawText(getText('IGUI_TradingUI_YourOffer'), self.yourOfferDatas.x, self.yourOfferDatas.y - 32, 1, 1, 1, 1,
-        UIFont.Small)
-    self:drawText(getText('IGUI_TradingUI_HisOffer', name), self.hisOfferDatas.x, self.hisOfferDatas.y - 32, 1, 1, 1, 1,
-        UIFont.Small)
+    local bgColor = self.backgroundColor
+    local offer = self.yourOfferDatas
+    local hisOffer = self.hisOfferDatas
+    local title = getTextVanilla('IGUI_TradingUI_Title')
+    local titleX = self.width / 2 - (textManager:MeasureStringX(UIFont.Medium, title) / 2)
 
-    local yourItems = getText('IGUI_TradingUI_Items', #self.yourOfferDatas.items, ISTradingUI.MaxItems)
-    local hisItems = getText('IGUI_TradingUI_Items', #self.hisOfferDatas.items, ISTradingUI.MaxItems)
-    self:drawText(yourItems, self.yourOfferDatas.x, self.yourOfferDatas.y - 20, 1, 1, 1, 1, UIFont.Small)
-    self:drawText(hisItems, self.hisOfferDatas.x, self.hisOfferDatas.y - 20, 1, 1, 1, 1, UIFont.Small)
+    self:drawRect(0, 0, self.width, self.height, bgColor.a, bgColor.r, bgColor.g, bgColor.b)
+    self:drawText(title, titleX, 15, 1, 1, 1, 1, UIFont.Medium)
+    self:drawText(getTextVanilla('IGUI_TradingUI_YourOffer'), offer.x, offer.y - 32, 1, 1, 1, 1, UIFont.Small)
+    self:drawText(getTextVanilla('IGUI_TradingUI_HisOffer', name), hisOffer.x, hisOffer.y - 32, 1, 1, 1, 1, UIFont.Small)
+
+    local yourItems = getTextVanilla('IGUI_TradingUI_Items', #offer.items, ISTradingUI.MaxItems)
+    local hisItems = getTextVanilla('IGUI_TradingUI_Items', #hisOffer.items, ISTradingUI.MaxItems)
+    self:drawText(yourItems, offer.x, offer.y - 20, 1, 1, 1, 1, UIFont.Small)
+    self:drawText(hisItems, hisOffer.x, hisOffer.y - 20, 1, 1, 1, 1, UIFont.Small)
 
     if self.otherSealedOffer then
-        self:drawText(getText('IGUI_TradingUI_OtherPlayerSealedOffer', name), self.sealOffer.x,
-            self.sealOffer.y + self.sealOffer.height + 5, 0.2, 1, 0.2, 1, UIFont.Small)
+        local text = getTextVanilla('IGUI_TradingUI_OtherPlayerSealedOffer', name)
+        self:drawText(text, self.sealOffer.x, self.sealOffer.y + self.sealOffer.height + 5, 0.2, 1, 0.2, 1, UIFont.Small)
     end
 end
 
@@ -266,13 +268,14 @@ function ISTradingUIHistorical:prerender()
         return ISTradingUIHistorical_prerender(self)
     end
 
-    local title = getText('IGUI_ISTradingUIHistorical_Title', name)
-    self:drawRect(0, 0, self.width, self.height, self.backgroundColor.a, self.backgroundColor.r, self.backgroundColor.g,
-        self.backgroundColor.b)
-    self:drawRectBorder(0, 0, self.width, self.height, self.borderColor.a, self.borderColor.r, self.borderColor.g,
-        self.borderColor.b)
-    self:drawText(title, self.width / 2 - (getTextManager():MeasureStringX(UIFont.Medium, title) / 2), 10, 1, 1, 1, 1,
-        UIFont.Medium)
+    local bgColor = self.backgroundColor
+    local borderColor = self.borderColor
+    local title = getTextVanilla('IGUI_ISTradingUIHistorical_Title', name)
+    local titleX = self.width / 2 - (textManager:MeasureStringX(UIFont.Medium, title) / 2)
+
+    self:drawRect(0, 0, self.width, self.height, bgColor.a, bgColor.r, bgColor.g, bgColor.b)
+    self:drawRectBorder(0, 0, self.width, self.height, borderColor.a, borderColor.r, borderColor.g, borderColor.b)
+    self:drawText(title, titleX, 10, 1, 1, 1, 1, UIFont.Medium)
 end
 
 ---@param worldobjects table
@@ -291,7 +294,7 @@ function ISWorldObjectContextMenu.onTrade(worldobjects, player, otherPlayer)
         return
     end
 
-    instance.blockingMessage = getText('IGUI_TradingUI_WaitingAnswer', name)
+    instance.blockingMessage = getTextVanilla('IGUI_TradingUI_WaitingAnswer', name)
 end
 
 
@@ -378,14 +381,14 @@ local function handleContextMenuOption(opt)
             return
         end
 
-        opt.name = getText('ContextMenu_Trade', name)
+        opt.name = getTextVanilla('ContextMenu_Trade', name)
         if opt.toolTip and opt.notAvailable then
-            opt.toolTip.description = getText('ContextMenu_GetCloserToTrade', name)
+            opt.toolTip.description = getTextVanilla('ContextMenu_GetCloserToTrade', name)
         end
     elseif onSelect == ISWorldObjectContextMenu.onMedicalCheck then
         local name = opt.toolTip and opt.notAvailable and API.data.getPlayerMenuName(otherPlayer, 'medical')
         if name then
-            opt.toolTip.description = getText('ContextMenu_GetCloser', name)
+            opt.toolTip.description = getTextVanilla('ContextMenu_GetCloser', name)
         end
     end
 end

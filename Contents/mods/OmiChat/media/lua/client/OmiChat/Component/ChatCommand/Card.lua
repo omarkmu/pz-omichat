@@ -12,7 +12,7 @@ local config = API.Configuration
 API._cardCommand = API.CommandStream:new {
     name = 'card',
     command = '/card ',
-    helpTextID = 'UI_ServerOptionDesc_Card',
+    helpTextID = 'help-text-card',
     autoTags = { 'IsCardCommand' },
     onUse = function(ctx)
         if API.hooks.has.cardCommand and API.hooks.cardCommand(ctx) then

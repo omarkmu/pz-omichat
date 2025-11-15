@@ -3,11 +3,12 @@
 
 local API = require 'OmiChat/Module/Client/Core'
 local utils = API.utils
+local getText = utils.getText
 
 return API.CommandStream:new {
     name = 'iconinfo',
     command = '/iconinfo ',
-    helpTextID = 'UI_OmiChat_HelpText_IconInfo',
+    helpTextID = 'help-text-icon-info',
     suggestSpec = { 'icon' },
     isEnabled = API.player.canUseAdminCommands,
     defaultOnDisabled = false,
@@ -19,18 +20,22 @@ return API.CommandStream:new {
         end
 
         if getTexture(command) then
-            local image = ' <SPACE> <IMAGE:' .. command .. ',15,14> '
-            API.chat.addInfoMessage(getText('UI_OmiChat_Info_Icon', command, image))
+            local icon = ' <SPACE> <IMAGE:' .. command .. ',15,14> '
+            API.chat.addInfoMessage(getText('info-icon', { name = command, icon = icon }))
             return
         end
 
         local textureName = utils.getTextureNameFromIcon(command)
         if not textureName or not getTexture(textureName) then
-            API.chat.addInfoMessage(getText('UI_OmiChat_Info_IconUnknown', command))
+            API.chat.addInfoMessage(getText('info-icon-unknown', { name = command }))
             return
         end
 
         local image = ' <SPACE> <IMAGE:' .. textureName .. ',15,14> '
-        API.chat.addInfoMessage(getText('UI_OmiChat_Info_IconAlias', textureName, image, command))
+        API.chat.addInfoMessage(getText('info-icon-alias', {
+            name = textureName,
+            icon = image,
+            alias = command,
+        }))
     end,
 }

@@ -2,9 +2,11 @@
 ---@namespace omichat
 
 local lib = require 'OmiLibrary'
+local l10n = lib.l10n
 
 local char = string.char
 local concat = table.concat
+local getTextVanilla = getText
 local transformIntoKahluaTable = transformIntoKahluaTable
 
 local INVISIBLE_PATTERN = '['
@@ -28,39 +30,45 @@ utils._noEntityInterpolator = lib.interpolate.Interpolator:new({
     allowCharacterEntities = false,
 })
 
+---Lowercase card suit names, for translations.
+---@private
+utils._suits = {
+    'clubs',
+    'diamonds',
+    'hearts',
+    'spades',
+}
+
+---Lowercase playing card names, for translations.
+---@private
+utils._cards = {
+    'ace',
+    'two',
+    'three',
+    'four',
+    'five',
+    'six',
+    'seven',
+    'eight',
+    'nine',
+    'ten',
+    'jack',
+    'queen',
+    'king',
+}
+
 
 local API_C ---@type api.client?
-
 local loadedIcons = false
 local iconToBBCodeNameMap = {} ---@type table<string, string>
 local iconToTextureNameMap = {} ---@type table<string, string>
+
 local accessLevels = {
     admin = 32,
     moderator = 16,
     overseer = 8,
     gm = 4,
     observer = 2,
-}
-local suits = {
-    'Clubs',
-    'Diamonds',
-    'Hearts',
-    'Spades',
-}
-local cards = {
-    'Ace',
-    'Two',
-    'Three',
-    'Four',
-    'Five',
-    'Six',
-    'Seven',
-    'Eight',
-    'Nine',
-    'Ten',
-    'Jack',
-    'Queen',
-    'King',
 }
 
 
@@ -98,7 +106,7 @@ function utils.extractError(tokens)
     if error ~= '' then
         result = error
     elseif errorID ~= '' then
-        result = getText(errorID)
+        result = utils.getTextOrNull(errorID) or getTextVanilla(errorID)
     end
 
     tokens.error = ''
@@ -116,6 +124,26 @@ function utils.getAPI()
     end
 
     return API_C
+end
+
+---Gets a string from a message ID.
+---@param id string The ID of the message to get.
+---If a bundle is not included, it defaults to `omichat`.
+---@param attr string The name of the attribute to get.
+---@param args table<string, omi.l10n.FluentVariable?>? Arguments to pass for message resolution.
+---@return string value
+function utils.getAttr(id, attr, args)
+    return l10n.getAttr(id, attr, args, 'omichat')
+end
+
+---Gets a string from a message ID, or `nil` if no such message exists.
+---@param id string The ID of the message to get.
+---If a bundle is not included, it defaults to `omichat`.
+---@param attr string The name of the attribute to get.
+---@param args table<string, omi.l10n.FluentVariable?>? Arguments to pass for message resolution.
+---@return string? value
+function utils.getAttrOrNull(id, attr, args)
+    return l10n.getAttrOrNull(id, attr, args, 'omichat')
 end
 
 ---Retrieves a BBCode icon name given a chat icon alias.
@@ -167,6 +195,24 @@ function utils.getNumericAccessLevel(access)
     return accessLevels[access:lower()] or 1
 end
 
+---Gets a string from a message ID.
+---@param id string The ID of the message to get.
+---If a bundle is not included, it defaults to `omichat`.
+---@param args table<string, omi.l10n.FluentVariable?>? Arguments to pass for message resolution.
+---@return string value
+function utils.getText(id, args)
+    return l10n.getText(id, args, 'omichat')
+end
+
+---Gets a string from a message ID, or `nil` if no such message exists.
+---@param id string The ID of the message to get.
+---If a bundle is not included, it defaults to `omichat`.
+---@param args table<string, omi.l10n.FluentVariable?>? Arguments to pass for message resolution.
+---@return string? value
+function utils.getTextOrNull(id, args)
+    return l10n.getTextOrNull(id, args, 'omichat')
+end
+
 ---Retrieves a texture name given a chat icon alias.
 ---@param icon string A chat icon alias.
 ---@return string? textureName The name of a texture, or `nil` if not found.
@@ -183,20 +229,21 @@ end
 ---@param suit integer The suit value, in [1, 4].
 ---@return string cardName The card name, translated into the local player's language.
 function utils.getTranslatedCardName(card, suit)
-    if not cards[card] or not suits[suit] then
+    if not utils._cards[card] or not utils._suits[suit] then
         return ''
     end
 
-    local cardTranslated = getText('UI_OmiChat_Card_' .. cards[card])
-    local suitTranslated = getText('UI_OmiChat_CardSuit_' .. suits[suit])
-    return getText('UI_OmiChat_CardName', cardTranslated, suitTranslated)
+    local cardTranslated = utils.getText('card-' .. utils._cards[card])
+    local suitTranslated = utils.getText('card-suit-' .. utils._suits[suit])
+    return utils.getText('card-name', { card = cardTranslated, suit = suitTranslated })
 end
 
 ---Returns the translation of the given language name.
 ---@param language string The untranslated language name.
 ---@return string translated The translated language name, or `language` if no translation was found.
 function utils.getTranslatedLanguageName(language)
-    return getTextOrNull('UI_OmiChat_Language_' .. language:gsub('%s', '_')) or language
+    local id = 'language-' .. language:lower():gsub('%s', '-')
+    return utils.getTextOrNull(id) or language
 end
 
 ---Checks whether a given access level should have access based on provided flags.
@@ -396,6 +443,14 @@ end
 ---@return string modified The `text`, without invisible characters.
 function utils.removeInvisible(text)
     return (text:gsub(INVISIBLE_PATTERN, ''))
+end
+
+---Resolves the value of a translation table.
+---@generic T
+---@param rec omi.TranslateTable<T> The translation table to resolve.
+---@return string? result
+function utils.resolveTranslateTable(rec)
+    return l10n.resolveTranslateTable(rec, 'omichat')
 end
 
 

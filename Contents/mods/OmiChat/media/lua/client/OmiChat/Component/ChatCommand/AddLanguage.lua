@@ -6,7 +6,7 @@ local API = require 'OmiChat/Module/Client/Core'
 return API.CommandStream:new {
     name = 'addlanguage',
     command = '/addlanguage ',
-    helpTextID = 'UI_OmiChat_HelpText_AddLanguage',
+    helpTextID = 'help-text-add-language',
     isEnabled = API.player.canUseAdminCommands,
     defaultOnDisabled = false,
     onUse = function(ctx)

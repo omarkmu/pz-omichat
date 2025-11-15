@@ -5,6 +5,7 @@ local Stream = require 'OmiChat/Component/Stream'
 local defaultStreamData = require 'OmiChat/Definition/DefaultStreamData'
 local utils = require 'OmiChat/Utils'
 
+local getTextVanilla = getText
 local checkPlayerCanUseChat = checkPlayerCanUseChat
 
 
@@ -292,7 +293,7 @@ function ChatStream:validate(input)
         return true
     end
 
-    return false, getText('IGUI_Commands_Whisper')
+    return false, getTextVanilla('IGUI_Commands_Whisper')
 end
 
 

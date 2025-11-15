@@ -9,7 +9,8 @@ local config = API.Configuration
 local MultiMap = utils.MultiMap
 
 local concat = table.concat
-local getText = getText
+local getTextVanilla = getText
+local getText = utils.getText
 local getTimestampMs = getTimestampMs
 local ISChat = ISChat --[[@as omichat.ISChat]]
 local signEmoteRand = newrandom()
@@ -623,7 +624,7 @@ function Chat.validateNameEntry(entry, text)
         return true, nickname
     end
 
-    entry:setValidateTooltipText(err or getText('UI_OmiChat_Error_InvalidName', utils.escapeRichText(text)))
+    entry:setValidateTooltipText(err or getText('error-invalid-name', { name = utils.escapeRichText(text) }))
     return false
 end
 
@@ -654,7 +655,7 @@ function Chat.validateStatusEntry(entry, text)
         return true, status
     end
 
-    entry:setValidateTooltipText(err or getText('UI_OmiChat_Error_InvalidStatus', utils.escapeRichText(text)))
+    entry:setValidateTooltipText(err or getText('error-invalid-status', { status = utils.escapeRichText(text) }))
     return false
 end
 
@@ -664,7 +665,7 @@ end
 ---@private
 function Chat._addDisabledStreamMessage(stream)
     local disabledCommand = utils.trim(stream:getCommand())
-    local msg = { getText('UI_chat_chat_disabled_msg', disabledCommand) }
+    local msg = { getTextVanilla('UI_chat_chat_disabled_msg', disabledCommand) }
 
     for i = 1, #ISChat.allChatStreams do
         local availableStream = ISChat.allChatStreams[i]

@@ -7,6 +7,8 @@ local Editor = require 'OmiChat/Component/UI/PlayerDataEditor'
 
 local utils = API.utils
 local UI = utils.ui
+local getAttr = utils.getAttr
+local getText = utils.getText
 
 local max = math.max
 local min = math.min
@@ -86,7 +88,7 @@ function PlayerDataManager:createChildren()
         w = btnW,
         h = btnH,
         internal = 'MODIFY',
-        text = getText('IGUI_DbViewer_Modify'),
+        text = getText('.btn-modify'),
         target = self,
         onClick = self.onModifyClick,
         borderColor = self.buttonBorderColor,
@@ -99,7 +101,7 @@ function PlayerDataManager:createChildren()
         w = btnW,
         h = btnH,
         internal = 'ADD',
-        text = getText('UI_OmiChat_ProfileManager_AddButton'),
+        text = getText('.btn-add'),
         target = self,
         onClick = self.onAddClick,
         borderColor = self.buttonBorderColor,
@@ -113,7 +115,7 @@ function PlayerDataManager:createChildren()
         w = btnW,
         h = btnH,
         internal = 'DELETE',
-        text = getText('IGUI_DbViewer_Delete'),
+        text = getText('.btn-delete'),
         target = self,
         onClick = self.onDeleteClick,
         borderColor = self.buttonBorderColor,
@@ -125,7 +127,7 @@ function PlayerDataManager:createChildren()
         y = btnY,
         w = btnW,
         h = btnH,
-        text = getText('IGUI_CraftUI_Close'),
+        text = getText('.btn-close'),
         target = self,
         onClick = self.destroy,
         borderColor = self.buttonBorderColor,
@@ -137,7 +139,7 @@ function PlayerDataManager:createChildren()
         y = btnY,
         w = btnW,
         h = btnH,
-        text = getText('IGUI_DbViewer_Refresh'),
+        text = getText('.btn-refresh'),
         target = self,
         onClick = self.refresh,
         borderColor = self.buttonBorderColor,
@@ -260,7 +262,7 @@ function PlayerDataManager:onDeleteClick()
     end
 
     self.activeDialog = UI.yesNoDialog {
-        text = getText('IGUI_DbViewer_DeleteConfirm'),
+        text = getText('.dialog-confirm-delete'),
         target = self,
         onClick = self.onConfirmDelete,
         onClickArgs = { item, idx },
@@ -293,7 +295,7 @@ function PlayerDataManager:onUpdateList(list)
     self.listbox:clear()
 
     local sizes = utils.copy(self.columnSizes)
-    local emptyText = getText('UI_OmiChat_PlayerDataManager_NoData')
+    local emptyText = getAttr('player-data-manager', 'no-data')
     for i = 1, #list do
         local el = list[i]
         local display = {}
@@ -418,7 +420,7 @@ end
 function PlayerDataManager:new(args)
     local this = UI.Panel.new(self, args) --[[@as PlayerDataManager]]
 
-    this.titleText = getText('UI_OmiChat_PlayerDataManager_Title')
+    this.titleText = getAttr('player-data-manager', 'title')
     this.anchorLeft = true
     this.anchorRight = false
     this.anchorTop = true
@@ -439,7 +441,7 @@ function PlayerDataManager:new(args)
 
     for i = 1, #PlayerDataManager._COLUMNS do
         local colName = PlayerDataManager._COLUMNS[i]
-        local colDisplay = getText('UI_OmiChat_PlayerDataManager_Column_' .. colName)
+        local colDisplay = getAttr('player-data-manager', 'column-' .. colName)
 
         this.columnDisplay[colName] = colDisplay
         this.columnSizes[colName] = textManager:MeasureStringX(this.headerFont, colDisplay) + 20

@@ -1,5 +1,6 @@
 ---Handles defining topics for client and server requests.
 ---@namespace omichat
+---@diagnostic disable: access-invisible
 
 ---@class(partial) api.shared
 local API = require 'OmiChat/Module/Shared/Core'
@@ -13,9 +14,10 @@ local API_S = API
 local utils = API.utils
 local config = API.Configuration
 
-local unpack = unpack
 local format = string.format
 local getTimestampMs = getTimestampMs
+local getText = utils.getText
+local getTextOrNull = utils.getTextOrNull
 local getOnlinePlayers = getOnlinePlayers
 
 local IS_DEBUG = getDebug()
@@ -221,15 +223,30 @@ TOPIC.DRAW_CARD = dispatch:topic('DRAW_CARD', {
         local suit = utils.randInt(1, 4)
         local card = utils.randInt(1, 13)
 
-        if config.Commands.Card.Global then
-            local name = API.data.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
-            local args = { name = name, card = card, suit = suit } ---@type request.Args.ReportDrawCard
-
-            req:broadcast(args)
-        else
+        if not config.Commands.Card.Global then
             local args = { card = card, suit = suit } ---@type request.Args.ReportDrawCard
             req:reply(args)
+            return
         end
+
+        local name = API.data.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
+
+        ---@type request.Args.ShowMessage
+        local args = {
+            id = 'command-card-global',
+            args = {
+                name = name,
+                card = {
+                    id = 'card-name',
+                    args = {
+                        card = { id = 'card-' .. card },
+                        suit = { id = 'card-suit-' .. utils._suits[suit] },
+                    },
+                },
+            },
+        }
+
+        req:broadcastOn(TOPIC.SHOW_MESSAGE, args)
     end,
 
     ---@param args request.Args.ReportDrawCard
@@ -244,15 +261,6 @@ TOPIC.DRAW_CARD = dispatch:topic('DRAW_CARD', {
             return
         end
 
-        -- global message
-        if args.name then
-            -- "global" on the client because the card name needs to be translated locally
-            local cardName = utils.getTranslatedCardName(card, suit)
-            API_C.chat.addInfoMessage(getText('UI_OmiChat_Card', args.name, cardName))
-            return
-        end
-
-        -- local message
         local targetStream = API_C.streams.firstChatStreamWithTag('CardCommandTarget')
         if not targetStream then
             return
@@ -296,8 +304,8 @@ TOPIC.FLIP_COIN = dispatch:topic('FLIP_COIN', {
 
         ---@type request.Args.ShowMessage
         local args = {
-            stringID = 'UI_OmiChat_Flip' .. (heads and 'Heads' or 'Tails'),
-            args = { name },
+            id = heads and 'command-flip-heads-global' or 'command-flip-tails-global',
+            args = { name = name },
         }
 
         req:broadcastOn(TOPIC.SHOW_MESSAGE, args)
@@ -436,7 +444,7 @@ TOPIC.ROLL_DICE = dispatch:topic('ROLL_DICE', {
     onServerReceive = function(req, args)
         local sides = args.sides
         if sides < 1 or sides > 100 then
-            local replyArgs = { stringID = 'UI_ServerOptionDesc_Roll' } ---@type request.Args.ShowMessage
+            local replyArgs = { id = 'help-text-roll' } ---@type request.Args.ShowMessage
             req:replyWith(TOPIC.SHOW_MESSAGE, replyArgs)
             return
         end
@@ -448,8 +456,12 @@ TOPIC.ROLL_DICE = dispatch:topic('ROLL_DICE', {
 
             ---@type request.Args.ShowMessage
             local replyArgs = {
-                stringID = 'UI_OmiChat_Roll',
-                args = { name, tostring(roll), tostring(sides) },
+                id = 'command-roll-global',
+                args = {
+                    name = name,
+                    roll = roll,
+                    sides = sides,
+                },
             }
 
             req:broadcastOn(TOPIC.SHOW_MESSAGE, replyArgs)
@@ -486,9 +498,8 @@ TOPIC.SHOW_MESSAGE = dispatch:topic('SHOW_MESSAGE', {
         local text
         if args.text then
             text = args.text
-        elseif args.stringID then
-            local substitutions = args.args or {}
-            text = getText(args.stringID, unpack(substitutions))
+        elseif args.id then
+            text = utils.resolveTranslateTable(args)
         end
 
         if not text then
@@ -644,10 +655,8 @@ return Request
 ---@field sides integer The number of sides on the dice that was rolled.
 
 ---Server to client request to display a message.
----@class request.Args.ShowMessage
+---@class request.Args.ShowMessage : omi.PartialTranslateTable<number | string>
 ---@field text string? The message text.
----@field stringID string? The string ID of a message to translate.
----@field args string[]? Arguments for message translation.
 ---@field serverAlert boolean? Flag for whether this should be treated as a server alert.
 
 ---Client to server request to roll dice.

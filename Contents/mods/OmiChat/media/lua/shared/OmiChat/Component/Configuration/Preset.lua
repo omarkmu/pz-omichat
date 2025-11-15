@@ -153,7 +153,7 @@ function Preset.discord(options)
     return {
         ChatFormat = DEFAULT,
         DefaultColor = { r = 144, g = 137, b = 218 },
-        ShowColorOption = 'Respect_Server_Setting',
+        ShowColorOption = 'Respect-Server-Setting',
         Tags = options.Tags or { 'UseAuthorUsername' },
     }
 end

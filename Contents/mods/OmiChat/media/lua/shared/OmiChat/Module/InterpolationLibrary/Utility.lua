@@ -7,6 +7,7 @@ local API_C = API --[[@as api.client]]
 local utils = API.utils
 local MultiMap = utils.MultiMap
 
+local getText = utils.getText
 local IS_CLIENT = not isServer()
 
 ---@class(partial) InterpolationLibrary
@@ -118,7 +119,7 @@ function Library.FormatRadio(interpolator, ...)
         s = '???'
     end
 
-    return getText('UI_OmiChat_Radio', s)
+    return getText('radio', { frequency = s })
 end
 
 ---Returns a partial quote representing a fragment of what a player character understood.

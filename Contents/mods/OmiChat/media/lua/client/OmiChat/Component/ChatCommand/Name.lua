@@ -5,10 +5,12 @@ local API = require 'OmiChat/Module/Client/Core'
 local utils = API.utils
 local config = API.Configuration
 
+local getText = utils.getText
+
 return API.CommandStream:new {
     name = 'name',
     command = '/name ',
-    helpTextID = 'UI_OmiChat_HelpText_Name',
+    helpTextID = 'help-text-name',
     isEnabled = function() return config:isNameCommandEnabled() end,
     onUse = function(ctx)
         if config:isNameCommandSetNickname() then
@@ -22,7 +24,7 @@ return API.CommandStream:new {
 
         local input = utils.trim(ctx.text or '')
         if #input == 0 then
-            API.chat.addInfoMessage(getText('UI_OmiChat_Info_SetNameEmpty'))
+            API.chat.addInfoMessage(getText('info-set-name-empty'))
             return
         end
 
@@ -32,9 +34,9 @@ return API.CommandStream:new {
         end
     end,
     onHelp = function()
-        local msg = 'UI_OmiChat_HelpText_Name'
+        local msg = 'help-text-name'
         if config:isNameCommandSetFullName() then
-            msg = 'UI_OmiChat_HelpText_NameFull'
+            msg = 'help-text-name-full'
         end
 
         API.chat.addInfoMessage(getText(msg))

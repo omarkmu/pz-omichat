@@ -6,6 +6,9 @@ local API = require 'OmiChat/Module/Client/Core'
 
 local utils = API.utils
 local config = API.Configuration
+
+local getTextVanilla = getText
+local getText = utils.getText
 local concat = table.concat
 local sqrt = math.sqrt
 local getText = getText
@@ -150,7 +153,7 @@ end
 function Player.getDefaultShouts(isSneaking)
     local result = {}
     for i = 1, 3 do
-        result[#result + 1] = getText('IGUI_PlayerText_Callout' .. i .. (isSneaking and 'Sneak' or 'New'))
+        result[#result + 1] = getTextVanilla('IGUI_PlayerText_Callout' .. i .. (isSneaking and 'Sneak' or 'New'))
     end
 
     return result
@@ -364,7 +367,7 @@ function Player.setNickname(nickname)
             field = 'nickname',
         })
 
-        return true, getText('UI_OmiChat_Success_ResetName')
+        return true, getText('success-reset-name')
     end
 
     local original = nickname
@@ -378,7 +381,7 @@ function Player.setNickname(nickname)
     nickname = utils.interpolateNamed('FilterName', config.Format.Filter.Name, tokens)
     local err = utils.extractError(tokens)
     if nickname == '' or err then
-        return false, err or getText('UI_OmiChat_Error_InvalidName', utils.escapeRichText(original))
+        return false, err or getText('error-invalid-name', { name = utils.escapeRichText(original) })
     end
 
     API.request.updateData({
@@ -387,7 +390,7 @@ function Player.setNickname(nickname)
         field = 'nickname',
     })
 
-    return true, getText('UI_OmiChat_Success_SetNameSelf', utils.escapeRichText(nickname))
+    return true, getText('success-set-name-self', { name = utils.escapeRichText(nickname) })
 end
 
 ---Sets the color used for overhead chat bubbles.
@@ -440,7 +443,7 @@ function Player.setStatus(status)
             field = 'status',
         })
 
-        return true, getText('UI_OmiChat_Success_ResetStatus')
+        return true, getText('success-reset-status')
     end
 
     local original = status
@@ -453,7 +456,7 @@ function Player.setStatus(status)
     status = utils.interpolateNamed('FilterStatus', config.Format.Filter.Status, tokens)
     local err = utils.extractError(tokens)
     if status == '' or err then
-        return false, err or getText('UI_OmiChat_Error_InvalidStatus', utils.escapeRichText(original))
+        return false, err or getText('error-invalid-status', { status = utils.escapeRichText(original) })
     end
 
     API.request.updateData({
@@ -462,7 +465,7 @@ function Player.setStatus(status)
         field = 'status',
     })
 
-    return true, getText('UI_OmiChat_Success_SetStatusSelf', utils.escapeRichText(status))
+    return true, getText('success-set-status-self', { status = utils.escapeRichText(status) })
 end
 
 ---Updates the current player's character name.
@@ -497,7 +500,7 @@ function Player.updateCharacterName(name, updateSurname)
 
     local err = utils.extractError(tokens)
     if name == '' or err then
-        return false, err or getText('UI_OmiChat_Error_InvalidName', utils.escapeRichText(name))
+        return false, err or getText('error-invalid-name', { name = utils.escapeRichText(name) })
     end
 
     local surname
@@ -527,7 +530,7 @@ function Player.updateCharacterName(name, updateSurname)
         data.playerInventory:refreshBackpacks()
     end
 
-    return true, getText('UI_OmiChat_Success_SetNameSelf', utils.escapeRichText(name))
+    return true, getText('success-set-name-self', { name = utils.escapeRichText(name) })
 end
 
 

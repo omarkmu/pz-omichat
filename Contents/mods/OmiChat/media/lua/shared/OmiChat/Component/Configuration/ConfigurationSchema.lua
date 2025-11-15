@@ -84,8 +84,8 @@ return utils.schema {
                         'Nickname',
                         'Forename',
                         'Fullname',
-                        'Forename_Plus_Nickname',
-                        'Fullname_Plus_Nickname',
+                        'Forename-Plus-Nickname',
+                        'Fullname-Plus-Nickname',
                     },
                 },
             },
@@ -97,7 +97,6 @@ return utils.schema {
 
             Card = container {
                 Global = bool(false),
-                Format = str(DEFAULT),
                 OverheadFormat = str(DEFAULT),
                 Items = array {
                     items = str(),
@@ -107,7 +106,6 @@ return utils.schema {
             },
             Roll = container {
                 Global = bool(false),
-                Format = str(DEFAULT),
                 OverheadFormat = str(DEFAULT),
                 Items = array {
                     items = str(),
@@ -126,7 +124,6 @@ return utils.schema {
             },
             Flip = container {
                 Global = bool(false),
-                Format = str(DEFAULT),
                 OverheadFormat = str(DEFAULT),
                 Items = array { items = str() },
                 Tags = array { items = str() },
@@ -162,11 +159,11 @@ return utils.schema {
                 default = { r = 144, g = 137, b = 218 },
             },
             ShowColorOption = enum {
-                default = 'Respect_Server_Setting',
+                default = 'Respect-Server-Setting',
                 values = {
                     'Yes',
                     'No',
-                    'Respect_Server_Setting',
+                    'Respect-Server-Setting',
                 },
             },
             Tags = array {
@@ -514,7 +511,6 @@ return utils.schema {
 
 ---@class Configuration.Commands.ItemCommand
 ---@field Global boolean
----@field Format string
 ---@field OverheadFormat string
 ---@field Items string[]
 ---@field Tags string[]
@@ -532,7 +528,7 @@ return utils.schema {
 ---@field CleanEffects omi.SetTable
 
 ---@class Configuration.Discord
----@field ShowColorOption 'Yes' | 'No' | 'Respect_Server_Setting'
+---@field ShowColorOption 'Yes' | 'No' | 'Respect-Server-Setting'
 ---@field ChatFormat string
 ---@field DefaultColor omi.ColorTable<integer>
 ---@field Tags string[]
@@ -677,7 +673,7 @@ return utils.schema {
 ---| 'Nickname'
 ---| 'Forename'
 ---| 'Fullname'
----| 'Forename_Plus_Nickname'
----| 'Fullname_Plus_Nickname'
+---| 'Forename-Plus-Nickname'
+---| 'Fullname-Plus-Nickname'
 
 --#endregion

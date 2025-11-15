@@ -7,7 +7,7 @@ local config = API.Configuration
 return API.CommandStream:new {
     name = 'nickname',
     command = '/nickname ',
-    helpTextID = 'UI_OmiChat_HelpText_Nickname',
+    helpTextID = 'help-text-nickname',
     isEnabled = function() return config:isNicknameCommandEnabled() end,
     onUse = function(ctx)
         local _, feedback = API.player.setNickname(ctx.text)

@@ -5,7 +5,7 @@
 local API = require 'OmiChat/Client'
 local config = API.Configuration
 
-local getText = getText
+local getTextVanilla = getText
 
 
 ---@class patch.SPFW
@@ -33,7 +33,7 @@ function Patch.getContextOptionText(otherPlayer)
     if config:compatSearchPlayersEnabled() then
         local name = API.data.getPlayerMenuName(otherPlayer, 'search_player')
         if name then
-            return getText('UI_SearchStub', name)
+            return getTextVanilla('UI_SearchStub', name)
         end
     end
 
@@ -41,7 +41,7 @@ function Patch.getContextOptionText(otherPlayer)
         return Patch._getContextOptionText(otherPlayer)
     end
 
-    return getText('UI_SearchStub', otherPlayer:getDisplayName())
+    return getTextVanilla('UI_SearchStub', otherPlayer:getDisplayName())
 end
 
 ---Reports being searched by another player.
@@ -51,7 +51,7 @@ function Patch.reportBeingSearched(player, otherPlayer)
     if config:compatSearchPlayersEnabled() then
         local name = API.data.getNameInChat(otherPlayer:getUsername(), 'say')
         if name then
-            player:Say(getText('UI_SearchedBy', name))
+            player:Say(getTextVanilla('UI_SearchedBy', name))
             return
         end
     end
@@ -61,7 +61,7 @@ function Patch.reportBeingSearched(player, otherPlayer)
         return
     end
 
-    player:Say(getText('UI_SearchedBy', otherPlayer:getDisplayName()))
+    player:Say(getTextVanilla('UI_SearchedBy', otherPlayer:getDisplayName()))
 end
 
 Events.OnGameStart.Add(Patch.apply)

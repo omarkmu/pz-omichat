@@ -4,13 +4,16 @@
 local API = require 'OmiChat/Module/Shared/Core'
 local API_C = API --[[@as api.client]]
 
-local concat = table.concat
-local sort = table.sort
 local utils = API.utils
 local config = API.Configuration
 local MultiMap = utils.MultiMap
 local baseLib = utils.lib.interpolate.Libraries
 local stringLib = baseLib.string
+
+local sort = table.sort
+local concat = table.concat
+local getText = utils.getText
+local getTextOrNull = utils.getTextOrNull
 
 local IS_CLIENT = not isServer()
 
@@ -176,12 +179,12 @@ function Helpers.checkSignedOverRadio(interpolator)
         return
     end
 
-    local errorID = 'UI_OmiChat_Error_SignedRadio'
+    local errorID = 'error-signed-radio'
     local chatType = interpolator:token('chatType')
     if chatType == 'safehouse' then
-        errorID = 'UI_OmiChat_Error_SignedSafehouseRadio'
+        errorID = 'error-signed-safehouse-radio'
     elseif chatType == 'faction' then
-        errorID = 'UI_OmiChat_Error_SignedFactionRadio'
+        errorID = 'error-signed-faction-radio'
     end
 
     return errorID
@@ -421,7 +424,7 @@ function Helpers.getBaseUnknownLanguageString(tags, language, author, dialogueTa
     if author ~= '' then
         author = author .. (overhead and ' ' or ' <SPACE> ')
     else
-        return getText('UI_OmiChat_UnknownLanguageNoAuthor', languageName)
+        return getText('unknown-language-no-author', { language = languageName })
     end
 
     dialogueTag = tostring(dialogueTag or '')
@@ -437,37 +440,38 @@ function Helpers.getBaseUnknownLanguageString(tags, language, author, dialogueTa
             dialogueTag = 'says'
         end
     else
-        dialogueTag = dialogueTag:gsub('%s', '_')
+        dialogueTag = dialogueTag:lower():gsub('%s', '-')
     end
 
+    local args = { name = author, language = languageName }
     local isSigned = API.language.isSigned(language)
     if isSigned then
-        local stringID = 'UI_OmiChat_UnknownLanguageSigned_' .. dialogueTag
-        local translated = getTextOrNull(stringID, author, languageName)
+        local stringID = 'unknown-language-signed-' .. dialogueTag
+        local translated = getTextOrNull(stringID, args)
         if translated then
             return translated
         end
 
         if dialogueTag == 'exclaims' then
             -- fallback to 'energetically signs'
-            return getText('UI_OmiChat_UnknownLanguageSigned_shouts', author, languageName)
+            return getText('unknown-language-signed-shouts', args)
         elseif dialogueTag == 'whisper_shouts' or dialogueTag == 'hisses' then
             -- fallback to 'subtly signs'
-            return getText('UI_OmiChat_UnknownLanguageSigned_whispers', author, languageName)
+            return getText('unknown-language-signed-whispers', args)
         elseif dialogueTag == 'says' or dialogueTag == 'states' then
             -- fallback to 'signs'
-            return getText('UI_OmiChat_UnknownLanguage_signs', author, languageName)
+            return getText('unknown-language-signs', args)
         end
     end
 
-    local stringID = 'UI_OmiChat_UnknownLanguage_' .. dialogueTag
-    local translated = getTextOrNull(stringID, author, languageName)
+    local stringID = 'unknown-language-' .. dialogueTag
+    local translated = getTextOrNull(stringID, args)
     if translated then
         return translated
     end
 
-    stringID = 'UI_OmiChat_UnknownLanguage_' .. (isSigned and 'signs' or 'says')
-    return getText(stringID, author, languageName)
+    stringID = 'unknown-language-' .. (isSigned and 'signs' or 'says')
+    return getText(stringID, args)
 end
 
 ---Gets a color to use given a target tag.
@@ -579,6 +583,42 @@ function Helpers.getFragmentedMessage(interpolator, message)
     return '"' .. concat(built, ' ') .. '"'
 end
 
+---Gets the message to use, checking for command messages.
+---@param interpolator omi.Interpolator The interpolator in use.
+---@param tags omi.SetTable<string> A set of tags.
+---@param name string The name to use for the command message.
+---@param rawName string? The raw name to use. Will be retrieved from tokens if not given.
+---@return string message The message, or the input token if the tags indicate this is not a command.
+---@return string name The name to use.
+function Helpers.getMessage(interpolator, tags, name, rawName)
+    if not rawName then
+        if tags.UseAuthorUsername then
+            rawName = interpolator:tokenString('authorRaw')
+        else
+            rawName = interpolator:tokenString('nameRaw')
+        end
+    end
+
+    local message
+    if tags.IsCardCommand then
+        message = getText('command-card', { name = name, rawName = rawName, card = interpolator:tokenString('card') })
+    elseif tags.IsFlipCommand then
+        local id = interpolator:tokenBoolean('heads') and 'command-flip-heads' or 'command-flip-tails'
+        message = getText(id, { name = name, rawName = rawName })
+    elseif tags.IsRollCommand then
+        message = getText('command-roll', {
+            name = name,
+            rawName = rawName,
+            roll = interpolator:tokenString('roll'),
+            sides = interpolator:tokenString('sides'),
+        })
+    else
+        return interpolator:tokenString('input'), name
+    end
+
+    return message, ''
+end
+
 ---Gets the segments in a message, tagging them as actions or quotes.
 ---@param input string The input text.
 ---@param options Args.GetMessageSegments? Options for retrieving segments.
@@ -652,12 +692,12 @@ end
 ---@return string indicator A translated string representing that a message was sent over radio.
 function Helpers.getOverRadioIndicator(chatType)
     if chatType == 'faction' then
-        return getText('UI_OmiChat_FactionRadio')
+        return getText('faction-radio')
     elseif chatType == 'safehouse' then
-        return getText('UI_OmiChat_SafehouseRadio')
+        return getText('safehouse-radio')
     end
 
-    return getText('UI_OmiChat_OverRadio')
+    return getText('over-radio')
 end
 
 ---Gets the string to display when an out-of-range chat is perceived.
@@ -669,20 +709,20 @@ function Helpers.getPerceivedChatString(author, interpolator, tags)
     local language = interpolator:token('languageRaw')
     local isSigned = language and API.language.isSigned(language)
 
-    local stringID = 'UI_OmiChat_PerceivedChat'
+    local stringID = 'perceived-chat'
     if isSigned then
-        stringID = stringID .. 'Signed'
+        stringID = stringID .. '-signed'
     end
 
     if tags.Whisper then
-        stringID = stringID .. '_Whisper'
+        stringID = stringID .. '-whisper'
     elseif tags.Quiet then
-        stringID = stringID .. '_Quiet'
+        stringID = stringID .. '-quiet'
     elseif tags.Loud then
-        stringID = stringID .. '_Loud'
+        stringID = stringID .. '-loud'
     end
 
-    return getText(stringID, author)
+    return getText(stringID, { name = author })
 end
 
 ---Gets the prefix to use for a message to indicate that it was sent over the radio.
@@ -692,7 +732,7 @@ end
 function Helpers.getRadioPrefix(interpolator, tags)
     local prefix = ''
     if tags.IsRadioStream then
-        prefix = getText('UI_OmiChat_Radio', tostring(interpolator:token('frequency') or '???'))
+        prefix = getText('radio', { frequency = tostring(interpolator:token('frequency') or '???') })
 
         if tags.IncludeColon or not (tags.NoColon or tags.NoColonChat or tags.IsNarrativeStyle) then
             prefix = prefix .. ':'
@@ -724,7 +764,7 @@ function Helpers.getVolumeIndicator(options, tags)
         return
     end
 
-    indicator = getTextOrNull('UI_OmiChat_VolumeIndicator_' .. indicator:gsub('%s', '_')) or indicator
+    indicator = getTextOrNull('volume-indicator-' .. indicator:lower():gsub('%s', '-')) or indicator
     return '[' .. indicator .. ']'
 end
 
@@ -869,7 +909,7 @@ function Helpers.wrapActionChat(text, tags)
     if tags.ActionAsterisks or tags.ActionAsterisksChat then
         return '** <SPACE> ' .. text
     elseif not (tags.ActionPlain or tags.ActionPlainChat) then
-        return getText('UI_OmiChat_RPEmote', ' <SPACE> ' .. text .. ' <SPACE> ')
+        return getText('rp-emote', { text = ' <SPACE> ' .. text .. ' <SPACE> ' })
     end
 
     return text

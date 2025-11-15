@@ -6,11 +6,12 @@ local API = require 'OmiChat/Module/Client/Core'
 local config = API.Configuration
 
 local concat = table.concat
+local getText = API.utils.getText
 
 return API.CommandStream:new {
     name = 'emote',
     command = '/emote ',
-    helpTextID = 'UI_OmiChat_HelpText_Emote',
+    helpTextID = 'help-text-emote',
     suggestSpec = { 'emote' },
     isEnabled = function() return config:isEmoteMacroEnabled() end,
     onUse = function(ctx)
@@ -42,7 +43,7 @@ return API.CommandStream:new {
         end
 
         local parts = {
-            getText('UI_OmiChat_Info_AvailableEmotes'),
+            getText('info-available-emotes'),
         }
 
         for i = 1, #names do
@@ -51,8 +52,11 @@ return API.CommandStream:new {
             parts[#parts + 1] = name
         end
 
-        parts[#parts + 1] = ' <LINE> '
-        parts[#parts + 1] = getText('UI_OmiChat_Info_AvailableEmotes_WithMacro')
+        if config:isEmoteMacroEnabled() then
+            parts[#parts + 1] = ' <LINE> '
+            parts[#parts + 1] = getText('info-available-emotes-with-macro')
+        end
+
         parts[#parts + 1] = ' <LINE> '
 
         API.chat.addInfoMessage(concat(parts))

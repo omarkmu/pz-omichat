@@ -12,7 +12,7 @@ local config = API.Configuration
 API._flipCommand = API.CommandStream:new {
     name = 'flip',
     command = '/flip ',
-    helpTextID = 'UI_OmiChat_HelpText_Flip',
+    helpTextID = 'help-text-flip',
     autoTags = { 'IsFlipCommand' },
     onUse = function(ctx)
         if API.hooks.has.flipCommand and API.hooks.flipCommand(ctx) then

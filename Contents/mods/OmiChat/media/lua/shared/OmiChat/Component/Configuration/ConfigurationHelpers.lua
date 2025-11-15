@@ -11,6 +11,9 @@ local DefaultStreamData = require 'OmiChat/Definition/DefaultStreamData'
 
 local sort = table.sort
 local concat = table.concat
+local getText = utils.getText
+local getTextOrNull = utils.getTextOrNull
+local getAttr = utils.getAttr
 local MIDDOT = string.char(183) .. ' <SPACE> '
 
 local API_C ---@type api.client?
@@ -43,7 +46,7 @@ function Helpers.applyPreset(form, preset)
         form:setControlValue('General.InfoText', infoText)
     end
 
-    form:setStatusMessage(getText('Sandbox_OmiChat_status_preset', preset:getName()))
+    form:setStatusMessage(getText('status-preset', { name = preset:getName() }))
 end
 
 ---Creates a new item for the stream list.
@@ -87,7 +90,7 @@ function Helpers.deletePreset(form, state, value)
     local dialog = lib.ui.yesNoDialog {
         w = 400,
         h = 100,
-        text = getText('UI_OmiChat_DeletePreset_Confirm', name),
+        text = getText('dialog-confirm-delete-preset', { name = name }),
         onClick = function(_, args)
             if args.internal ~= 'YES' then
                 return
@@ -176,7 +179,7 @@ function Helpers.getLanguageListDisplay(args)
         return item.Name
     end
 
-    return getText('Sandbox_OmiChat_Language_untitled')
+    return getAttr('config-Language', 'untitled')
 end
 
 ---Gets a list of options for the preset configuration value.
@@ -192,7 +195,7 @@ function Helpers.getPresetOptions()
         list[#list + 1] = {
             data = preset:getID(),
             text = preset:getName(),
-            tooltip = preset:isCustom() and getText('UI_OmiChat_PresetUserDefined') or nil,
+            tooltip = preset:isCustom() and getText('preset-user-defined') or nil,
         }
     end
 
@@ -240,10 +243,10 @@ end
 ---@return string tooltip
 ---@return boolean isKnownTag
 function Helpers.getTagTooltip(tag)
-    local desc = getTextOrNull('Sandbox_OmiChat_tag_' .. tag)
+    local desc = getTextOrNull('tag-' .. tag)
     local isKnown = desc ~= nil
 
-    desc = desc or getText('Sandbox_OmiChat_unrecognized_tag')
+    desc = desc or getText('unrecognized-tag')
     local color = isKnown and ' <PUSHRGB:0,0.5,1> ' or ' <PUSHRGB:0.93,0.824,0> '
 
     return color .. tag .. ' <POPRGB> <LINE> ' .. desc, isKnown
@@ -266,7 +269,7 @@ function Helpers.initFormatOption(args)
     end
 
     local rope = {
-        getText('Sandbox_OmiChat_format_option_heading'),
+        getText('option-heading-format'),
     }
 
     local tokens = {}
@@ -280,15 +283,15 @@ function Helpers.initFormatOption(args)
     end
 
     Helpers.writeFormatDataTranslations(
-        getText('Sandbox_OmiChat_tokens'),
-        Helpers.getFormatDataTranslations(tokens, 'Sandbox_OmiChat_token_'),
+        getText('token-heading'),
+        Helpers.getFormatDataTranslations(tokens, 'token-'),
         data.tokenDescription,
         rope
     )
 
     Helpers.writeFormatDataTranslations(
-        getText('Sandbox_OmiChat_options'),
-        Helpers.getFormatDataTranslations(data.options, 'Sandbox_OmiChat_option_'),
+        getText('option-heading'),
+        Helpers.getFormatDataTranslations(data.options, 'option-'),
         data.optionDescription,
         rope
     )
@@ -477,7 +480,7 @@ function Helpers.onClickFormatInfo(args)
         richText = true,
         moveWithMouse = true,
         setHeightToContents = true,
-        text = getText('Sandbox_OmiChat_format_strings'),
+        text = getText('config-format-strings'),
     }
 
     form:removeOnDestroy(dialog)
@@ -621,15 +624,15 @@ function Helpers.savePreset(form, state)
         state.activePresetDialog:destroy()
     end
 
-    local warningMessage = getText('UI_OmiChat_SavePreset_Overwrite')
+    local warningMessage = getText('save-preset-overwrite')
 
     local dialog ---@type omi.ui.TextDialog
     dialog = lib.ui.textDialog {
         type = 'OKCancel',
         w = 500,
         h = 200,
-        okText = getText('IGUI_RadioSave'),
-        text = getText('UI_OmiChat_SavePreset_Prompt'),
+        okText = getText('.btn-save'),
+        text = getText('dialog-save-preset'),
         minLength = 1,
         maxLength = 50,
         onClick = function(_, args)

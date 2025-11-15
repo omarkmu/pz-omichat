@@ -131,7 +131,7 @@ end
 ---@return boolean canShow
 function Configuration:canShowDiscordColorOption()
     local opt = self.Discord.ShowColorOption
-    if opt == 'Respect_Server_Setting' then
+    if opt == 'Respect-Server-Setting' then
         return getServerOptions():getBoolean('DiscordEnable')
     end
 
@@ -406,14 +406,14 @@ end
 ---@return boolean enabled
 function Configuration:isNameCommandSetForename()
     local mode = self.Commands.Name.Mode
-    return mode == 'Forename' or mode == 'Forename_Plus_Nickname'
+    return mode == 'Forename' or mode == 'Forename-Plus-Nickname'
 end
 
 ---Returns whether `/name` should set characters' full names.
 ---@return boolean enabled
 function Configuration:isNameCommandSetFullName()
     local mode = self.Commands.Name.Mode
-    return mode == 'Fullname' or mode == 'Fullname_Plus_Nickname'
+    return mode == 'Fullname' or mode == 'Fullname-Plus-Nickname'
 end
 
 ---Returns whether `/name` should set characters' nicknames.
@@ -426,7 +426,7 @@ end
 ---@return boolean enabled
 function Configuration:isNicknameCommandEnabled()
     local mode = self.Commands.Name.Mode
-    return mode == 'Forename_Plus_Nickname' or mode == 'Fullname_Plus_Nickname'
+    return mode == 'Forename-Plus-Nickname' or mode == 'Fullname-Plus-Nickname'
 end
 
 ---Returns `true` if the `/nickname` command is enabled or `/name` sets nicknames.

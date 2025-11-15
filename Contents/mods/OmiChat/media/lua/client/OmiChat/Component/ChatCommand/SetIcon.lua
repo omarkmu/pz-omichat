@@ -3,11 +3,12 @@
 
 local API = require 'OmiChat/Module/Client/Core'
 local utils = API.utils
+local getText = utils.getText
 
 return API.CommandStream:new {
     name = 'seticon',
     command = '/seticon ',
-    helpTextID = 'UI_OmiChat_HelpText_SetIcon',
+    helpTextID = 'help-text-set-icon',
     suggestSpec = { 'online-username-with-self', 'icon' },
     isEnabled = API.player.canUseAdminCommands,
     defaultOnDisabled = false,
@@ -17,11 +18,11 @@ return API.CommandStream:new {
         end
 
         local args = utils.parseCommandArgs(ctx.text)
-        local icon = args[2]
-        if not args[1] or not icon then
+        local name = args[2]
+        if not args[1] or not name then
             ctx.stream:showHelpText()
         else
-            API.chat.addInfoMessage(getText('UI_OmiChat_Info_IconUnknown', icon))
+            API.chat.addInfoMessage(getText('info-icon-unknown', { name = name }))
         end
     end,
 }

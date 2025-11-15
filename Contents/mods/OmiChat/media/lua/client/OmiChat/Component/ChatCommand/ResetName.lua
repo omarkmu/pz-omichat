@@ -6,7 +6,7 @@ local API = require 'OmiChat/Module/Client/Core'
 return API.CommandStream:new {
     name = 'resetname',
     command = '/resetname ',
-    helpTextID = 'UI_OmiChat_HelpText_ResetName',
+    helpTextID = 'help-text-reset-name',
     suggestSpec = { 'online-username' },
     isEnabled = API.player.canUseAdminCommands,
     defaultOnDisabled = false,

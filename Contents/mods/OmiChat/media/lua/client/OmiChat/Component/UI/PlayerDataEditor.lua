@@ -6,12 +6,17 @@ local API = require 'OmiChat/Module/Client/Core'
 local utils = API.utils
 local config = API.Configuration
 local UI = utils.ui
+
 local textManager = getTextManager()
+local getAttr = utils.getAttr
+local getText = utils.getText
 
 local PAD_Y = 10
 local FIELD_X = 20
-local FIELD_FONT = UIFont.Medium
-local FONT_H_MEDIUM = textManager:getFontHeight(UIFont.Medium)
+local FONT_MEDIUM = UIFont.Medium
+local FIELD_FONT = FONT_MEDIUM
+local TITLE_FONT = FONT_MEDIUM
+local FONT_H_MEDIUM = textManager:getFontHeight(FONT_MEDIUM)
 local BTN_H = math.max(25, textManager:getFontHeight(UIFont.Small) + 6)
 local LABEL_H = FONT_H_MEDIUM + 4
 
@@ -63,8 +68,8 @@ function PlayerDataEditor:createChildren()
     local btnW = 100
 
     local titleH = FONT_H_MEDIUM
-    local titleText = getText('UI_OmiChat_PlayerDataManager_EditorTitle')
-    local titleWidth = textManager:MeasureStringX(UIFont.Medium, titleText)
+    local titleText = getAttr('player-data-manager', 'editor-title')
+    local titleWidth = textManager:MeasureStringX(TITLE_FONT, titleText)
 
     UI.label {
         parent = self,
@@ -72,7 +77,7 @@ function PlayerDataEditor:createChildren()
         y = 10,
         h = titleH,
         text = titleText,
-        font = UIFont.Medium,
+        font = TITLE_FONT,
     }
 
     local closeX = self.width - btnW - FIELD_X
@@ -81,7 +86,7 @@ function PlayerDataEditor:createChildren()
     -- fields
     local y
     local item = self.item
-    local text = getText('UI_OmiChat_PlayerDataManager_Column_username')
+    local text = getAttr('player-data-manager', 'column-username')
     y, self.usernameEntry = self:_createEntry('text', titleH + 20, text, item.username)
 
     if self.isAdd then
@@ -90,27 +95,27 @@ function PlayerDataEditor:createChildren()
         self.usernameEntry:setEditable(false)
     end
 
-    text = getText('UI_OmiChat_PlayerDataManager_Column_nickname')
+    text = getAttr('player-data-manager', 'column-nickname')
     y, self.nicknameEntry = self:_createEntry('text', y + PAD_Y, text, item.nickname)
     self.nicknameEntry:setValidateFunction(self.nicknameEntry, API.chat.validateNameEntry)
 
-    text = getText('UI_OmiChat_PlayerDataManager_Column_status')
+    text = getAttr('player-data-manager', 'column-status')
     y, self.statusEntry = self:_createEntry('text', y + PAD_Y, text, item.status)
     self.statusEntry:setValidateFunction(self.statusEntry, API.chat.validateStatusEntry)
 
-    text = getText('UI_OmiChat_PlayerDataManager_Column_icon')
+    text = getAttr('player-data-manager', 'column-icon')
     y, self.iconEntry = self:_createEntry('text', y + PAD_Y, text, item.icon)
     self.iconEntry:setValidateFunction(self, self._validateIconText, self.iconEntry)
 
-    text = getText('UI_OmiChat_PlayerDataManager_Column_currentLanguage')
+    text = getAttr('player-data-manager', 'column-currentLanguage')
     y, self.currentLangEntry = self:_createEntry('text', y + PAD_Y, text, item.currentLanguage)
     self.currentLangEntry:setValidateFunction(self, self._validateLanguageText, self.currentLangEntry, true)
 
-    text = getText('UI_OmiChat_PlayerDataManager_Column_languageSlots')
+    text = getAttr('player-data-manager', 'column-languageSlots')
     y, self.languageSlotsEntry = self:_createEntry('number', y + PAD_Y, text, item.languageSlots, 0,
         config.MAX_LANGUAGE_SLOTS)
 
-    y = self:_createLabel(y + PAD_Y, getText('UI_OmiChat_PlayerDataManager_Column_languages'))
+    y = self:_createLabel(y + PAD_Y, getAttr('player-data-manager', 'column-languages'))
 
     self.languageListEntry = UI.listEntry {
         parent = self,
@@ -162,7 +167,7 @@ function PlayerDataEditor:createChildren()
         y = btnY,
         w = btnW,
         h = BTN_H,
-        text = getText('IGUI_CraftUI_Close'),
+        text = getText('.btn-close'),
         borderColor = utils.copy(self.buttonBorderColor),
         target = self,
         onClick = self.destroy,
@@ -175,7 +180,7 @@ function PlayerDataEditor:createChildren()
         y = btnY,
         w = btnW,
         h = BTN_H,
-        text = getText('IGUI_RadioSave'),
+        text = getText('.btn-save'),
         borderColor = utils.copy(self.buttonBorderColor),
         target = self,
         onClick = self.onSave,
@@ -206,7 +211,7 @@ function PlayerDataEditor:isLanguageValid(language)
     local listEntry = self.languageListEntry
     local entry = listEntry.entry
     if #listEntry.listbox.items >= config.MAX_LANGUAGE_SLOTS then
-        entry:setValidateTooltipText(getText('UI_OmiChat_Error_AddLanguageFull', self.item.username))
+        entry:setValidateTooltipText(getText('error-add-language-full', { username = self.item.username }))
         return false
     end
 
@@ -386,7 +391,7 @@ function PlayerDataEditor:_validateIconText(text, entry)
         return true
     end
 
-    entry:setValidateTooltipText(getText('UI_OmiChat_Info_IconUnknown', text))
+    entry:setValidateTooltipText(getText('info-icon-unknown', { name = text }))
     return false
 end
 
@@ -402,14 +407,14 @@ function PlayerDataEditor:_validateLanguageText(text, entry, expectKnown)
     end
 
     if not API.language.exists(text) then
-        entry:setValidateTooltipText(getText('UI_OmiChat_Error_AddLanguageNotConfigured', text))
+        entry:setValidateTooltipText(getText('error-add-language-not-configured', { language = text }))
         return false
     end
 
     if expectKnown ~= nil and self:hasLanguage(text) ~= expectKnown then
         local username = self.usernameEntry:getInternalText()
-        local err = expectKnown and 'UI_OmiChat_Error_LanguageUnknown' or 'UI_OmiChat_Error_AddLanguageKnown'
-        entry:setValidateTooltipText(getText(err, username, text))
+        local err = expectKnown and 'error-language-unknown' or 'error-add-language-known'
+        entry:setValidateTooltipText(getText(err, { username = username, language = text }))
         return false
     end
 

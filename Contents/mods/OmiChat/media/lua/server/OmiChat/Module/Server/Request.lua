@@ -69,26 +69,26 @@ end
 ---Sends an info message that will show only for the specified player.
 ---@param player IsoPlayer
 ---@param stringID string
----@param stringArgs string[]?
+---@param stringArgs omi.TranslateTableArgs<string | number>?
 ---@param serverAlert boolean?
 ---@return boolean success
 ---@return string? error
 function Request.sendTranslatedInfoMessage(player, stringID, stringArgs, serverAlert)
     ---@type request.Args.ShowMessage
-    local args = { stringID = stringID, args = stringArgs, serverAlert = serverAlert }
+    local args = { id = stringID, args = stringArgs, serverAlert = serverAlert }
 
     return Topic.SHOW_MESSAGE:toPlayer(player, args)
 end
 
 ---Sends an info message that will show for all players.
 ---@param stringID string
----@param stringArgs string[]?
+---@param stringArgs omi.TranslateTableArgs<string | number>?
 ---@param serverAlert boolean?
 ---@return boolean success
 ---@return string? error
 function Request.sendTranslatedServerMessage(stringID, stringArgs, serverAlert)
     ---@type request.Args.ShowMessage
-    local args = { stringID = stringID, args = stringArgs, serverAlert = serverAlert }
+    local args = { id = stringID, args = stringArgs, serverAlert = serverAlert }
 
     return Topic.SHOW_MESSAGE:broadcast(args)
 end
