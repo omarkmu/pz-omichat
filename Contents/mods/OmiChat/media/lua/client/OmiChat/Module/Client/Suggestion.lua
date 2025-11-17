@@ -55,7 +55,7 @@ end
 
 ---Suggests text based on the provided chat input text.
 ---@param text string The input text.
----@return omi.ui.SuggestBox.Suggestion[] suggestions A list of text suggestions.
+---@return omi.SuggestBox.Suggestion[] suggestions A list of text suggestions.
 function Suggestion.getChatSuggestions(text)
     if not text or text == '' then
         return {}

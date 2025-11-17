@@ -85,6 +85,8 @@ end
 
 ---@param requester IsoPlayer
 function ISTradingUI.ReceiveTradeRequest(requester)
+    -- TODO(b42): update
+    ---@diagnostic disable-next-line: param-type-mismatch
     ISTradingUI_ReceiveTradeRequest(requester)
 
     local modal = ISTradingUI.tradeQuestionUI

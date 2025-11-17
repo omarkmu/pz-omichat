@@ -49,14 +49,14 @@ local getTextVanilla = getText
 ---@field private showTitle boolean Flag for whether the message will include the chat type tag.
 ---@field private showTimestamp boolean Flag for whether the message will include a timestamp.
 ---@field private font ChatFont The font size of the message.
-local MessageInfo = utils.lib.class()
+local MessageInfo = utils.class()
 
 ---Helper for building information about a chat message.
 API.MessageInfo = MessageInfo
 
 
-local _ChatBase = __classmetatables[ChatBase.class].__index
-local _ChatMessage = __classmetatables[ChatMessage.class].__index
+local _ChatBase = __classmetatables[ChatBase.class].__index ---@type any
+local _ChatMessage = __classmetatables[ChatMessage.class].__index ---@type any
 
 local _getChatTitleID = _ChatBase.getTitleID
 local _getTextWithPrefix = _ChatMessage.getTextWithPrefix
@@ -433,7 +433,7 @@ end
 ---@return MessageInfo info
 ---@private
 function MessageInfo:new(message)
-    local this = setmetatable({}, self) --[[@as MessageInfo]]
+    local this = utils.new(self)
     local instance = ISChat.instance
 
     this.tokens = {}

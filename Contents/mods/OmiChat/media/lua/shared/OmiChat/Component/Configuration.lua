@@ -3,12 +3,11 @@
 
 local utils = require 'OmiChat/Utils'
 local Preset = require 'OmiChat/Component/Configuration/Preset'
-local base = utils.configuration.ConfigurationHelper
 local sort = table.sort
 local isempty = table.isempty
 
 
----@class ConfigurationHelper : omi.ConfigurationHelper, Configuration
+---@class ConfigurationHelper : Configuration, omi.ConfigurationHelper<Configuration>
 local Configuration = utils.configuration {
     schema = require 'OmiChat/Component/Configuration/ConfigurationSchema',
     modDataKey = 'settings',
@@ -316,18 +315,6 @@ function Configuration:getPresetList()
     return utils.copyList(self._presetList)
 end
 
----Returns the current configuration as a simple table.
----@return Configuration values
-function Configuration:getValues()
-    return base.getValues(self) --[[@as Configuration]]
-end
-
----Gets sanitized configuration values that are prepared for saving.
----@return Configuration sanitized
-function Configuration:getValuesForSave()
-    return base.getValuesForSave(self) --[[@as Configuration]]
-end
-
 ---Gets the string value of a variable. Returns `nil` if the variable doesn't exist.
 ---@param key string The key to retrieve.
 ---@return string? value
@@ -619,8 +606,8 @@ return Configuration
 ---@field ID integer The ID of the language.
 
 ---@class ConfigurationFormState
----@field activePresetDialog? omi.ui.Dialog The active dialog related to presets.
----@field activeFormatStringDialog? omi.ui.Dialog The active dialog with an overview of format strings.
+---@field activePresetDialog? omi.Dialog The active dialog related to presets.
+---@field activeFormatStringDialog? omi.Dialog The active dialog with an overview of format strings.
 
 ---@class FormatDataTranslation
 ---@field name string The name of the token or option.

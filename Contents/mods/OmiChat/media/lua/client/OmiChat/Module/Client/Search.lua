@@ -165,7 +165,7 @@ function Search.perks(ctxOrSearch)
 end
 
 ---Populates a suggest box with search results.
----@param suggestBox omi.ui.SuggestBox The suggest box to populate.
+---@param suggestBox omi.SuggestBox The suggest box to populate.
 ---@param search SearchResults The results of the search.
 ---@param allowExact boolean? Flag for whether an exact match should be ignored. Unless this is `true`, suggestions will be cleared for an exact match.
 function Search.populateSuggestions(suggestBox, search, allowExact)
@@ -249,13 +249,13 @@ end
 ---Converts search results to a list of suggestions to use for a suggest box.
 ---@param search SearchResults The results of the search.
 ---@param allowExact boolean? Flag for whether an exact match should be ignored. Unless this is `true`, an empty table will be returned if there's an exact match.
----@return omi.ui.SuggestBox.Suggestion[] suggestions
+---@return omi.SuggestBox.Suggestion[] suggestions
 function Search.toSuggestions(search, allowExact)
     if search.exact and not allowExact then
         return {}
     end
 
-    local suggestions = {} ---@type omi.ui.SuggestBox.Suggestion[]
+    local suggestions = {} ---@type omi.SuggestBox.Suggestion[]
     for i = 1, #search.results do
         local result = search.results[i]
         suggestions[#suggestions + 1] = {

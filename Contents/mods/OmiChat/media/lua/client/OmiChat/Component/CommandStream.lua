@@ -61,7 +61,7 @@ end
 ---@param args Args.CommandStream Arguments for creation of the stream.
 ---@return CommandStream stream
 function CommandStream:new(args)
-    local this = Stream.new(self, args) --[[@as CommandStream]]
+    local this = utils.new(self, Stream.new, args)
 
     this.isCommand = true
     this.allowMentions = args.allowMentions or false

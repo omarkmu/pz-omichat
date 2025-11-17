@@ -363,11 +363,12 @@ function Streams.updateTagCache()
         local tags = stream:getTags()
 
         for tag in pairs(tags) do
-            if not Streams._tagToChatStreams[tag] then
-                Streams._tagToChatStreams[tag] = {}
+            local list = Streams._tagToChatStreams[tag]
+            if not list then
+                list = {}
+                Streams._tagToChatStreams[tag] = list
             end
 
-            local list = Streams._tagToChatStreams[tag]
             list[#list + 1] = stream
         end
     end

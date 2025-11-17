@@ -301,7 +301,7 @@ end
 ---@param args Args.ChatStream Arguments for creation of the stream.
 ---@return ChatStream stream
 function ChatStream:new(args)
-    local this = Stream.new(self, args) --[[@as ChatStream]]
+    local this = utils.new(self, Stream.new, args)
 
     this.isChat = true
     this.allowLanguages = args.allowLanguages or false
@@ -317,12 +317,12 @@ function ChatStream:new(args)
     this.perceptionRangeSigned = args.perceptionRangeSigned or 0
     this.defaultColor = utils.color.default(args.defaultColor, 255, 255, 255)
 
-    if not utils.isNilOrWhitespace(args.overheadFormat) then
-        this.overheadFormat = utils.trim(args.overheadFormat --[[@as string]])
+    if utils.notNilOrWhitespace(args.overheadFormat) then
+        this.overheadFormat = utils.trim(args.overheadFormat)
     end
 
-    if not utils.isNilOrWhitespace(args.chatFormat) then
-        this.chatFormat = utils.trim(args.chatFormat --[[@as string]])
+    if utils.notNilOrWhitespace(args.chatFormat) then
+        this.chatFormat = utils.trim(args.chatFormat)
     end
 
     return this

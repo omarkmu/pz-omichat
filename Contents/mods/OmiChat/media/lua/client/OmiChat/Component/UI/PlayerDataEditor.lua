@@ -21,21 +21,21 @@ local BTN_H = math.max(25, textManager:getFontHeight(UIFont.Small) + 6)
 local LABEL_H = FONT_H_MEDIUM + 4
 
 
----@class PlayerDataEditor : omi.ui.Panel
+---@class PlayerDataEditor : omi.Panel
 ---@field item PlayerData The player data for editing.
 ---@field saveItem PlayerData The input player data item.
----@field nicknameEntry omi.ui.TextEntry The entry for the player nickname.
----@field usernameEntry omi.ui.TextEntry The entry for the player username.
----@field iconEntry omi.ui.TextEntry The entry for the player icon.
----@field currentLangEntry omi.ui.TextEntry The entry for the player's current language.
----@field languageListEntry omi.ui.ListEntry The list entry for the player's known languages.
----@field statusEntry omi.ui.TextEntry The entry for the player's status.
----@field languageSlotsEntry omi.ui.TextEntry The entry for the player's language slots.
----@field languageSuggestBox omi.ui.SuggestBox The suggest box for languages, for the language list entry.
----@field iconSuggestBox omi.ui.SuggestBox The icon suggest box, for the icon entry.
+---@field nicknameEntry omi.TextEntry The entry for the player nickname.
+---@field usernameEntry omi.TextEntry The entry for the player username.
+---@field iconEntry omi.TextEntry The entry for the player icon.
+---@field currentLangEntry omi.TextEntry The entry for the player's current language.
+---@field languageListEntry omi.ListEntry The list entry for the player's known languages.
+---@field statusEntry omi.TextEntry The entry for the player's status.
+---@field languageSlotsEntry omi.TextEntry The entry for the player's language slots.
+---@field languageSuggestBox omi.SuggestBox The suggest box for languages, for the language list entry.
+---@field iconSuggestBox omi.SuggestBox The icon suggest box, for the icon entry.
 ---@field buttonBorderColor omi.ColorTableRGBA<number> The border color used for buttons.
----@field saveBtn omi.ui.Button The save button.
----@field closeBtn omi.ui.Button The close button.
+---@field saveBtn omi.Button The save button.
+---@field closeBtn omi.Button The close button.
 ---@field isAdd boolean Flag for whether the editor is for adding new data, rather than editing existing data.
 ---@field languageFilter? function Filter function for the language suggest box.
 ---@field protected callbacks PlayerDataEditor.Callbacks Container for callbacks.
@@ -280,7 +280,7 @@ end
 ---@param min number?
 ---@param max number?
 ---@return number newY
----@return omi.ui.TextEntry entry
+---@return omi.TextEntry entry
 ---@private
 function PlayerDataEditor:_createEntry(type, y, labelText, default, min, max)
     local controlW = self.width - FIELD_X * 2
@@ -307,7 +307,7 @@ end
 ---@param y number
 ---@param labelText string
 ---@return number newY
----@return omi.ui.Label label
+---@return omi.Label label
 ---@private
 function PlayerDataEditor:_createLabel(y, labelText)
     local label = UI.label {
@@ -329,7 +329,7 @@ function PlayerDataEditor:_filterLanguages(text)
 end
 
 ---Gets the computed value of an entry.
----@param entry omi.ui.TextEntry
+---@param entry omi.TextEntry
 ---@return string? value
 ---@private
 function PlayerDataEditor:_getEntryValue(entry)
@@ -342,14 +342,14 @@ function PlayerDataEditor:_getEntryValue(entry)
 end
 
 ---Called when the language list entry is updated.
----@param entry omi.ui.ListEntry
+---@param entry omi.ListEntry
 ---@private
 function PlayerDataEditor:_onUpdateLanguageList(entry)
     self.item.languages = entry:getValue()
 end
 
 ---Populates suggestions for the icon auto-suggest box.
----@param suggestBox omi.ui.SuggestBox
+---@param suggestBox omi.SuggestBox
 ---@param text string
 ---@private
 function PlayerDataEditor:_populateIconSuggest(suggestBox, text)
@@ -363,7 +363,7 @@ function PlayerDataEditor:_populateIconSuggest(suggestBox, text)
 end
 
 ---Populates suggestions for the language auto-suggest box.
----@param suggestBox omi.ui.SuggestBox
+---@param suggestBox omi.SuggestBox
 ---@param text string
 ---@private
 function PlayerDataEditor:_populateLanguageSuggest(suggestBox, text)
@@ -379,7 +379,7 @@ end
 
 ---Text entry validator for icons.
 ---@param text string
----@param entry omi.ui.TextEntry
+---@param entry omi.TextEntry
 ---@return boolean valid
 ---@private
 function PlayerDataEditor:_validateIconText(text, entry)
@@ -397,7 +397,7 @@ end
 
 ---Text entry validator for roleplay language names.
 ---@param text string
----@param entry omi.ui.TextEntry
+---@param entry omi.TextEntry
 ---@param expectKnown boolean?
 ---@return boolean valid
 ---@private
@@ -426,7 +426,7 @@ end
 ---@param args Args.PlayerDataEditor Arguments for creation of the editor.
 ---@return PlayerDataEditor editor
 function PlayerDataEditor:new(args)
-    local this = UI.Panel.new(self, args) --[[@as PlayerDataEditor]]
+    local this = UI.new(self, UI.Panel.new, args)
 
     local itemCopy = utils.copy(args.item)
     itemCopy.languages = itemCopy.languages and utils.copy(itemCopy.languages) or nil
@@ -448,14 +448,14 @@ return PlayerDataEditor
 
 --#region Type Definitions
 
----@class Args.PlayerDataEditor : omi.ui.Args.Panel
+---@class Args.PlayerDataEditor : omi.Args.Panel
 ---@field item PlayerData The original data to be edited.
 ---@field isAdd? boolean Flag for whether the editor is for adding user data, rather than editing existing data.
----@field onSave? omi.ui.Callback Invoked when saving the player data.
+---@field onSave? omi.UICallback Invoked when saving the player data.
 ---@field onSaveArgs? table Arguments for `onSave`.
 ---@field onSaveTarget? any The first argument to pass to the `onSave` callback.
 
----@class PlayerDataEditor.Callbacks : omi.ui.Panel.Callbacks
+---@class PlayerDataEditor.Callbacks : omi.Panel.Callbacks
 ---@field onSave? omi.CallbackInfo Invoked when saving the player data.
 
 --#endregion

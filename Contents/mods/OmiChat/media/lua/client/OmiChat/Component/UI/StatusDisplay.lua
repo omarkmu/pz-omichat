@@ -3,7 +3,6 @@
 
 local API = require 'OmiChat/Module/Client/Core'
 
-local config = API.Configuration
 local utils = API.utils
 local UI = utils.ui
 local isoToScreenX = isoToScreenX
@@ -12,7 +11,7 @@ local core = getCore()
 local tileScale = Core.getTileScale()
 
 
----@class StatusDisplay : omi.ui.Base
+---@class StatusDisplay : omi.BaseUI
 ---@field target IsoPlayer The player to display the status over.
 ---@field mouseOver boolean Flag for whether the mouse is over the player.
 ---@field protected text? string The text of the display.
@@ -72,6 +71,8 @@ function StatusDisplay:shouldShow(player, range)
         return false
     end
 
+    -- TODO(b42): update
+    ---@diagnostic disable-next-line: undefined-field
     if target == player or player:isCanSeeAll() then
         return true
     end
@@ -108,7 +109,7 @@ end
 ---@param target IsoPlayer The player to display the status over.
 ---@return StatusDisplay element
 function StatusDisplay:new(target)
-    local this = StatusDisplay.__base.new(self, 0, 0, 0, 0) --[[@as StatusDisplay]]
+    local this = UI.new(self, StatusDisplay.__base.new, 0, 0, 0, 0)
 
     this.font = UIFont.Small
     this.target = target

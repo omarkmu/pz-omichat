@@ -25,17 +25,17 @@ local CONTENT_PAD_Y = 10
 local CONTROL_PAD_Y = 5
 local SECTION_PAD_Y = 20
 
----@class ProfileManager : omi.ui.Panel
+---@class ProfileManager : omi.Panel
 ---@field current? PlayerProfile The profile being edited.
 ---@field profiles PlayerProfile[] The list of profiles.
----@field profileNameControl omi.ui.TextEntry The control for setting a profile name.
----@field nicknameControl? omi.ui.TextEntry The control for setting a nickname to use when switching to a profile.
----@field colorControls table<string, omi.ui.ColorEntry> Associates color options to controls.
----@field calloutControls table<string, omi.ui.TextEntry> Associates callout types to controls.
----@field createBtn omi.ui.Button The button to add a new profile.
----@field deleteBtn omi.ui.Button The button to delete the current profile.
----@field duplicateBtn omi.ui.Button The button to duplicate the current profile.
----@field emptyLabel omi.ui.Label The label to display when there are no profiles.
+---@field profileNameControl omi.TextEntry The control for setting a profile name.
+---@field nicknameControl? omi.TextEntry The control for setting a nickname to use when switching to a profile.
+---@field colorControls table<string, omi.ColorEntry> Associates color options to controls.
+---@field calloutControls table<string, omi.TextEntry> Associates callout types to controls.
+---@field createBtn omi.Button The button to add a new profile.
+---@field deleteBtn omi.Button The button to delete the current profile.
+---@field duplicateBtn omi.Button The button to duplicate the current profile.
+---@field emptyLabel omi.Label The label to display when there are no profiles.
 ---@field addText string The text for the create button in the non-empty state.
 ---@field createText string The text for the create button in the empty state.
 local ProfileManager = UI.Panel:derive('ProfileManager')
@@ -77,7 +77,7 @@ function ProfileManager._cloneProfiles(profiles, markIndices)
 end
 
 ---Validation function for custom callout text.
----@param entry omi.ui.TextEntry The text entry to validate.
+---@param entry omi.TextEntry The text entry to validate.
 ---@param text string The text to validate.
 ---@return boolean valid
 ---@private
@@ -287,7 +287,7 @@ function ProfileManager:duplicateProfile()
 end
 
 ---Callback for callout update.
----@param entry omi.ui.TextEntry The custom callout text entry.
+---@param entry omi.TextEntry The custom callout text entry.
 ---@param category CalloutCategory The callout category of the entry.
 function ProfileManager:onCalloutsChange(entry, category)
     local profile = self.current
@@ -306,7 +306,7 @@ function ProfileManager:onCalloutsChange(entry, category)
 end
 
 ---Callback for color update.
----@param entry omi.ui.ColorEntry The color entry that was updated.
+---@param entry omi.ColorEntry The color entry that was updated.
 ---@param name string The name of the stream to update the color for.
 function ProfileManager:onColorChange(entry, name)
     local profile = self.current
@@ -319,7 +319,7 @@ function ProfileManager:onColorChange(entry, name)
 end
 
 ---Callback for nickname update.
----@param entry omi.ui.TextEntry The nickname entry.
+---@param entry omi.TextEntry The nickname entry.
 function ProfileManager:onNicknameChange(entry)
     local text = entry:getInternalText()
     text = utils.trim(text)
@@ -341,7 +341,7 @@ function ProfileManager:onNicknameChange(entry)
 end
 
 ---Callback for profile name update.
----@param entry omi.ui.TextEntry The profile name entry.
+---@param entry omi.TextEntry The profile name entry.
 function ProfileManager:onProfileNameChange(entry)
     local text = entry:getInternalText()
     text = utils.trim(text)
@@ -498,7 +498,7 @@ end
 
 ---Creates the labels and controls for callout text.
 ---@param startY number
----@return table<string, omi.ui.TextEntry> controls
+---@return table<string, omi.TextEntry> controls
 ---@return number newY
 ---@private
 function ProfileManager:_createCalloutControls(startY)
@@ -551,7 +551,7 @@ end
 
 ---Creates the labels and controls for chat colors.
 ---@param startY number
----@return table<string, omi.ui.ColorEntry> controls
+---@return table<string, omi.ColorEntry> controls
 ---@return number newY
 ---@private
 function ProfileManager:_createColorControls(startY)
@@ -726,7 +726,7 @@ end
 ---@param args Args.ProfileManager Arguments for creation of the profile manager.
 ---@return ProfileManager manager
 function ProfileManager:new(args)
-    local this = UI.Panel.new(self, args) --[[@as ProfileManager]]
+    local this = UI.new(self, UI.Panel.new, args)
 
     this.moveWithMouse = true
     this.deletedCurrentProfile = false
@@ -747,7 +747,7 @@ return ProfileManager
 
 --#region Type Definitions
 
----@class Args.ProfileManager : omi.ui.Args.Panel
+---@class Args.ProfileManager : omi.Args.Panel
 ---@field profiles PlayerProfile[] The current profiles.
 
 --#endregion

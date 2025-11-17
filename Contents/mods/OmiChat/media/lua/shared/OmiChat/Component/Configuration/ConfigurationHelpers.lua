@@ -2,6 +2,7 @@
 ---@namespace omichat
 
 local utils = require 'OmiChat/Utils'
+local utils_c = utils --[[@as omichat.utils.client]]
 
 local TagList = require 'OmiChat/Definition/TagList'
 local FormatData = require 'OmiChat/Definition/NamedFormatData'
@@ -80,14 +81,13 @@ function Helpers.deletePreset(form, state, value)
     end
 
     API_C = API_C or utils.getAPI()
-    local lib = utils.lib --[[@as omi.client]]
 
     if state.activePresetDialog then
         state.activePresetDialog:destroy()
     end
 
     local name = value:sub(8)
-    local dialog = lib.ui.yesNoDialog {
+    local dialog = utils_c.ui.yesNoDialog {
         w = 400,
         h = 100,
         text = getText('dialog-confirm-delete-preset', { name = name }),
@@ -183,11 +183,11 @@ function Helpers.getLanguageListDisplay(args)
 end
 
 ---Gets a list of options for the preset configuration value.
----@return omi.ui.Dropdown.Option[]
+---@return omi.Dropdown.Option[]
 function Helpers.getPresetOptions()
     API_C = API_C or utils.getAPI()
 
-    local list = {} ---@type omi.ui.Dropdown.Option[]
+    local list = {} ---@type omi.Dropdown.Option[]
     local presetList = API_C.Configuration:getPresetList()
     for i = 1, #presetList do
         local preset = presetList[i]
@@ -306,7 +306,7 @@ end
 ---Called when a language name changes in the language listbox.
 ---@param args omi.forms.Args.Callback.Item
 function Helpers.onChangeLanguageName(args)
-    local control = args.form:getFieldControl('Language.List.Name') --[[@as omi.ui.TextEntry?]]
+    local control = args.form:getFieldControl('Language.List.Name') --[[@as omi.TextEntry?]]
     if not control then
         return
     end
@@ -383,7 +383,7 @@ function Helpers.onChangeStream(args)
     local rangeControlNames = { 'Range', 'PerceptionRange', 'PerceptionRangeSigned' }
     for i = 1, #rangeControlNames do
         local name = rangeControlNames[i]
-        local rangeControl = form:getFieldControl({ path = { 'Streams', 'List', name } }) --[[@as omi.ui.TextEntry?]]
+        local rangeControl = form:getFieldControl({ path = { 'Streams', 'List', name } }) --[[@as omi.TextEntry?]]
         if rangeControl then
             rangeControl:setMaxValue(maxRange)
         end
@@ -415,7 +415,7 @@ end
 ---Called when a tag list entry changes.
 ---@param args omi.forms.Args.Callback.Item
 function Helpers.onChangeTag(args)
-    local control = args.info.control --[[@as omi.ui.ListEntry]]
+    local control = args.info.control --[[@as omi.ListEntry]]
     local entry = control.entry
     local listbox = control.listbox
     if not entry or not listbox then
@@ -471,8 +471,7 @@ function Helpers.onClickFormatInfo(args)
         x = form:getX() - w
     end
 
-    local lib = utils.lib --[[@as omi.client]]
-    local dialog = lib.ui.okDialog {
+    local dialog = utils_c.ui.okDialog {
         x = x,
         y = form:getY(),
         w = 600,
@@ -506,8 +505,8 @@ function Helpers.onClickPresetAction(args)
 end
 
 ---Populates a tag suggest box and list entry with tags.
----@param listEntry omi.ui.ListEntry The list entry to populate with tooltips.
----@param suggestBox omi.ui.SuggestBox The suggest box to populate with suggestions.
+---@param listEntry omi.ListEntry The list entry to populate with tooltips.
+---@param suggestBox omi.SuggestBox The suggest box to populate with suggestions.
 ---@param text string The search text.
 function Helpers.populateTagSuggest(listEntry, suggestBox, text)
     API_C = API_C or utils.getAPI()
@@ -586,7 +585,7 @@ end
 ---Refreshes the list of presets to match the current custom presets.
 ---@param form omi.forms.Form The form with the field to update.
 function Helpers.refreshPresetsList(form)
-    local dropdown = form:getFieldControl('General.Preset') --[[@as omi.ui.Dropdown?]]
+    local dropdown = form:getFieldControl('General.Preset') --[[@as omi.Dropdown?]]
     if not dropdown then
         return
     end
@@ -598,7 +597,7 @@ function Helpers.refreshPresetsList(form)
         local opt = options[i]
         dropdown:addOptionWithData(opt.text, opt.data)
 
-        local added = dropdown.options[#dropdown.options] --[[@as omi.ui.Dropdown.Option]]
+        local added = dropdown.options[#dropdown.options] --[[@as omi.Dropdown.Option]]
         added.tooltip = opt.tooltip
     end
 end
@@ -616,7 +615,6 @@ end
 ---@param state ConfigurationFormState The current form state.
 function Helpers.savePreset(form, state)
     API_C = API_C or utils.getAPI()
-    local lib = utils.lib --[[@as omi.client]]
     local config = API_C.Configuration
     local values = form.values
 
@@ -626,8 +624,8 @@ function Helpers.savePreset(form, state)
 
     local warningMessage = getText('save-preset-overwrite')
 
-    local dialog ---@type omi.ui.TextDialog
-    dialog = lib.ui.textDialog {
+    local dialog ---@type omi.TextDialog
+    dialog = utils_c.ui.textDialog {
         type = 'OKCancel',
         w = 500,
         h = 200,

@@ -75,6 +75,8 @@ function Callback.cleanCharacter(_)
     sendVisual(player)
 
     if shouldUpdateClothing then
+        -- TODO(b42): update
+        ---@diagnostic disable-next-line: missing-parameter
         sendClothing(player)
         triggerEvent('OnClothingUpdated', player)
     end
@@ -88,6 +90,8 @@ function Callback.growBeard(_)
         return
     end
 
+    -- TODO(b42): update
+    ---@diagnostic disable-next-line: redundant-parameter
     ISTimedActionQueue.add(ISTrimBeard:new(player, 'Long', nil, 1))
 end
 
@@ -105,7 +109,7 @@ end
 
 ---Callback for adding a roleplay language.
 ---@param _ ISChat Unused.
----@param args omi.ui.Args.Dialog.Click Click arguments.
+---@param args omi.Args.Dialog.Click Click arguments.
 ---@param language string The language to add.
 function Callback.onConfirmAddLanguage(_, args, language)
     if args.internal ~= 'YES' then
@@ -117,7 +121,7 @@ end
 
 ---Callback for hair color menu selection.
 ---@param _ ISChat Unused.
----@param args omi.ui.Args.ColorDialog.Click Click arguments.
+---@param args omi.Args.ColorDialog.Click Click arguments.
 function Callback.onHairColorMenuClick(_, args)
     if args.internal ~= 'OK' then
         return
@@ -134,7 +138,7 @@ function Callback.onHairColorMenuClick(_, args)
     end
 
     local hairColor
-    local parent = args.button.parent --[[@as omi.ui.ColorEntry]]
+    local parent = args.button.parent --[[@as omi.ColorEntry]]
     local color = parent:getColor()
     if color then
         hairColor = ImmutableColor.new(color.r / 255, color.g / 255, color.b / 255, 1)
@@ -251,7 +255,7 @@ end
 
 ---Populates the auto-suggest box with relevant suggestions.
 ---@param target ISChat The chat instance.
----@param suggestBox omi.ui.SuggestBox The suggest box to populate.
+---@param suggestBox omi.SuggestBox The suggest box to populate.
 ---@param text string The search text. Defaults to the chat entry's text.
 function Callback.populateChatSuggestBox(target, suggestBox, text)
     if not API.preferences.getUseSuggester() then

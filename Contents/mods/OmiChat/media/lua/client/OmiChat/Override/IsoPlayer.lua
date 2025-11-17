@@ -8,7 +8,7 @@ local core = getCore()
 
 local min = math.min
 local addSound = addSound
-local _IsoPlayer = __classmetatables[IsoPlayer.class].__index
+local _IsoPlayer = __classmetatables[IsoPlayer.class].__index ---@type any
 local _Callout = _IsoPlayer.Callout
 
 

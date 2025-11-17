@@ -139,7 +139,7 @@ function Helpers.capitalize(input)
     end
 
     -- doesn't actually use the interpolator
-    ---@diagnostic disable-next-line: param-type-not-match
+    ---@diagnostic disable-next-line: param-type-mismatch
     input = stringLib.Capitalize(nil, input)
 
     return spaces .. input
@@ -522,7 +522,7 @@ end
 ---@param message string The message text.
 ---@return string? fragmented The message text, fragmented to only include some words.
 function Helpers.getFragmentedMessage(interpolator, message)
-    local parts = message:split('\\s+')
+    local parts = message:split('\\s+') --[[@as any]]
     if #parts <= 1 then
         return
     end
@@ -567,7 +567,7 @@ function Helpers.getFragmentedMessage(interpolator, message)
     local last = 0
     local built = {}
     for i = 1, #selected do
-        local idx = selected[i]
+        local idx = selected[i] --[[@as integer]]
         if idx > last + 1 then
             built[#built + 1] = '...'
         end
@@ -798,7 +798,7 @@ function Helpers.punctuate(input, punctuation, characters)
     end
 
     -- doesn't actually use the interpolator
-    ---@diagnostic disable-next-line: param-type-not-match
+    ---@diagnostic disable-next-line: param-type-mismatch
     input = stringLib.Punctuate(nil, input, punctuation, characters or '.,!?:/-~')
 
     return input .. spaces

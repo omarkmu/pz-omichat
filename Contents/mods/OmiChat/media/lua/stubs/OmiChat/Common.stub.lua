@@ -12,13 +12,13 @@
 ---@field allChatStreams (omichat.ChatStream | omichat.StreamTable)[] List of all available chat streams.
 ---@field defaultTabStream table<integer, omichat.ChatStream?> An association of 1-indexed tab IDs to default streams.
 ---@field gearButton ISButton The settings button.
----@field textEntry omi.ui.TextEntry The text entry UI element.
+---@field textEntry omi.TextEntry The text entry UI element.
 ---@field currentTabID integer The 1-indexed tab ID of the current tab.
 ---@field tabCnt integer The number of available tabs.
----@field infoButton omi.ui.Button The info button.
----@field infoRichText? omi.ui.Dialog The rich text dialog.
+---@field infoButton omi.Button The info button.
+---@field infoRichText? omi.Dialog The rich text dialog.
 ---@field activeProfilesPanel? omichat.ProfileManager The active profile manager panel.
 ---@field activeConfigurationPanel? omi.forms.Form The active configuration menu panel.
----@field activeLanguageDialog? omi.ui.Dialog The active language add confirmation dialog.
----@field activeColorDialog? omi.ui.Dialog The active hair color dialog.
+---@field activeLanguageDialog? omi.Dialog The active language add confirmation dialog.
+---@field activeColorDialog? omi.Dialog The active hair color dialog.
 ---@field activePlayerDataPanel? omichat.PlayerDataManager The active player data manager panel.

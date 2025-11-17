@@ -184,8 +184,8 @@ end
 ---@param emote string The dance emote to play.
 ---@param player IsoPlayer The player to play the emote on.
 function Patch.playEmote(emote, player)
-    player:setPrimaryHandItem(nil)
-    player:setSecondaryHandItem(nil)
+    player:setPrimaryHandItem(nil --[[@as any]])
+    player:setSecondaryHandItem(nil --[[@as any]])
     player:playEmote(emote)
 end
 

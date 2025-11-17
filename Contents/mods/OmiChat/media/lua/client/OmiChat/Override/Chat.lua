@@ -24,8 +24,8 @@ local _render = ISChat.render
 local _setDrawFrame = ISChat.setDrawFrame
 local _onActivateView = ISChat.onActivateView
 
-local _ChatMessage = __classmetatables[ChatMessage.class].__index
-local _ServerChatMessage = __classmetatables[ServerChatMessage.class].__index
+local _ChatMessage = __classmetatables[ChatMessage.class].__index ---@type any
+local _ServerChatMessage = __classmetatables[ServerChatMessage.class].__index ---@type any
 
 
 ---Override to enable custom formatting.
@@ -65,19 +65,25 @@ function ISChat.addLineInChat(message, tabID)
         end
 
         if username and info:shouldAttractZombies(username) then
-            soundRange = info.zombieAttractRange
+            soundRange = info.zombieAttractRange --[[@as integer]]
         end
     end
 
-    local s, e = pcall(_addLineInChat, message, tabID)
+    local s, e = pcall(_addLineInChat, message --[[@as ChatMessage]], tabID)
     if not s then
         utils.log.error('Error while adding message %s: %s', message, e)
         return
     end
 
     if player and soundRange and soundRange > 0 then
-        ---@diagnostic disable-next-line: param-type-not-match
-        addSound(player, player:getX(), player:getY(), player:getZ(), soundRange, soundRange)
+        addSound(
+            player,
+            player:getX() --[[@as integer]],
+            player:getY() --[[@as integer]],
+            player:getZ() --[[@as integer]],
+            soundRange,
+            soundRange
+        )
 
         if info then
             info.meta:set('attractedZombies', true)
@@ -111,7 +117,7 @@ end
 function ISChat:createTab()
     local y = self:titleBarHeight() + self.btnHeight + self.inset * 2
 
-    ---@type omi.ui.InitArgs.RichTextPanel
+    ---@type omi.InitArgs.RichTextPanel
     local args = {
         x = 0,
         y = y,

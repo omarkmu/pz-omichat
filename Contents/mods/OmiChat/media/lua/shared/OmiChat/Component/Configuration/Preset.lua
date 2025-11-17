@@ -10,7 +10,7 @@ local DEFAULT = '$Default()'
 ---@field protected _name string The name of the preset.
 ---@field protected _isCustom boolean Flag for whether the preset is a custom, user-defined preset.
 ---@field protected _values Configuration The preset's configuration values.
-local Preset = utils.lib.class()
+local Preset = utils.class()
 
 
 ---Creates a table for configuration of buffs based on the defaults.
@@ -390,7 +390,7 @@ end
 ---@param args Args.ConfigurationPreset? Arguments for preset creation.
 ---@return ConfigurationPreset preset
 function Preset:new(args)
-    local this = setmetatable({}, self) --[[@as ConfigurationPreset]]
+    local this = utils.new(self)
 
     args = args or {}
     this._name = args.name

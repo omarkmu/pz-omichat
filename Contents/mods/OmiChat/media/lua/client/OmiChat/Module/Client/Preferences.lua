@@ -271,8 +271,10 @@ function Preferences.save()
 
     pcall(function()
         local outFile = getFileWriter(Preferences._filename, true, false)
-        outFile:write(encoded)
-        outFile:close()
+        if outFile then
+            outFile:write(encoded)
+            outFile:close()
+        end
     end)
 
     return true

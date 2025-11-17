@@ -161,8 +161,10 @@ function Extension._writePresets()
         local obj = { list = list }
 
         local outFile = getFileWriter(config._presetFilename, true, false)
-        outFile:write(utils.json.encode(obj))
-        outFile:close()
+        if outFile then
+            outFile:write(utils.json.encode(obj))
+            outFile:close()
+        end
     end)
 end
 

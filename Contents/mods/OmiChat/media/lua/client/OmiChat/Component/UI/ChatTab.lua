@@ -5,7 +5,7 @@
 local API = require 'OmiChat/Module/Client/Core'
 local UI = API.utils.ui
 
----@class ChatTab : omi.ui.RichTextPanel
+---@class ChatTab : omi.RichTextPanel
 ---@field parent omichat.ISChat The parent chat.
 ---@field logIndex integer The current index in the tab's input history.
 ---@field tabID integer The 0-indexed tab ID of this tab.
@@ -23,10 +23,10 @@ local ChatTab = UI.RichTextPanel:derive('ChatTab')
 API.ChatTab = ChatTab
 
 ---Creates a new chat tab panel.
----@param args omi.ui.InitArgs.RichTextPanel Arguments for creation of the chat tab.
+---@param args omi.InitArgs.RichTextPanel Arguments for creation of the chat tab.
 ---@return ChatTab tab
 function ChatTab:new(args)
-    local this = UI.RichTextPanel.new(self, args) --[[@as ChatTab]]
+    local this = UI.new(self, UI.RichTextPanel.new, args)
 
     this.tabID = 0
     this.streamID = 0

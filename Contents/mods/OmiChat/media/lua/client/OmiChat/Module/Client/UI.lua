@@ -10,7 +10,7 @@ local ConfigurationHelpers = require 'OmiChat/Component/Configuration/Configurat
 local callback = require 'OmiChat/Module/Client/Callbacks'
 
 local utils = API.utils
-local UI_LIB = utils.lib.ui
+local UI_LIB = utils.ui
 local config = API.Configuration
 local MultiMap = utils.MultiMap
 
@@ -32,7 +32,7 @@ local TILE_FIELD_INDEX = 2
 
 
 ---@class api.client.ui
----@field suggestBox? omi.ui.SuggestBox The auto-suggest box for the chat input.
+---@field suggestBox? omi.SuggestBox The auto-suggest box for the chat input.
 ---@field private _configPanel? omi.forms.Form The configuration panel.
 ---@field private _typingDisplay? string The current display text for the typing indicator.
 local UI = {}

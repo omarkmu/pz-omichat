@@ -597,7 +597,7 @@ function Chat.updateTypingStatus(skipTimer)
 end
 
 ---Text entry validator that validates against the nickname filter.
----@param entry omi.ui.TextEntry The entry to validate.
+---@param entry omi.TextEntry The entry to validate.
 ---@param text string The text to validate. Defaults to the entry text.
 ---@return boolean valid Flag for whether the name is valid.
 ---@return string? nickname The filtered name. Guaranteed if `valid` is `true`.
@@ -629,7 +629,7 @@ function Chat.validateNameEntry(entry, text)
 end
 
 ---Text entry validator that validates against the status filter.
----@param entry omi.ui.TextEntry The entry to validate.
+---@param entry omi.TextEntry The entry to validate.
 ---@param text string The text to validate.
 ---@return boolean valid Flag for whether the text is valid.
 ---@return string? status The filtered status. Guaranteed if `valid` is `true`.
@@ -851,7 +851,7 @@ return Chat
 ---@class SuggestionInfo
 ---@field input string The current input text.
 ---@field context table Table for arbitrary context data.
----@field suggestions omi.ui.SuggestBox.Suggestion[] The current list of suggestions.
+---@field suggestions omi.SuggestBox.Suggestion[] The current list of suggestions.
 
 ---@class MacroTextResult
 ---@field start integer The start position of the macro in the text.

@@ -2,11 +2,11 @@
 ---@namespace omichat
 
 local lib = require 'OmiLibrary'
-local l10n = lib.l10n
 
 local char = string.char
 local concat = table.concat
 local getTextVanilla = getText
+local getSpecificPlayer = getSpecificPlayer
 local transformIntoKahluaTable = transformIntoKahluaTable
 
 local INVISIBLE_PATTERN = '['
@@ -15,7 +15,8 @@ local INVISIBLE_PATTERN = '['
 
 
 ---@class utils : omi.proxy
-local utils = lib.proxy('OmiChat')
+local utils = lib.proxy({ id = 'omichat', name = 'OmiChat' })
+local l10n = utils.l10n
 
 ---The interpolator used for basic interpolation.
 ---@private

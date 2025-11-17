@@ -20,7 +20,7 @@ local LIGHT_GRAY = Color.lightGray
 
 local _ChatMessage = __classmetatables[ChatMessage.class].__index
 local _ServerChatMessage = __classmetatables[ServerChatMessage.class].__index
-local _ChatBase = __classmetatables[ChatBase.class].__index
+local _ChatBase = __classmetatables[ChatBase.class].__index ---@type any
 local _getChatType = _ChatBase.getType
 
 local DATA_START = string.char(130)
@@ -991,6 +991,8 @@ function Messages._getColorFromText(text)
     end
 
     local parts = text:split(',')
+
+    ---@type any
     local colorTable = {
         r = tonumber(parts[1]),
         g = tonumber(parts[2]),
@@ -998,7 +1000,7 @@ function Messages._getColorFromText(text)
     }
 
     if utils.color.isValid(colorTable) then
-        return colorTable
+        return colorTable --[[@as omi.ColorTable<integer>]]
     end
 end
 

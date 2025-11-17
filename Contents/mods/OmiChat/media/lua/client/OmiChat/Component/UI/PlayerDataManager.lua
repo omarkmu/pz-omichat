@@ -19,8 +19,8 @@ local FONT_SMALL = UIFont.Small
 local FONT_MEDIUM = UIFont.Medium
 
 
----@class PlayerDataManager : omi.ui.Panel
----@field listbox omi.ui.ListBox The listbox used to display player data rows.
+---@class PlayerDataManager : omi.Panel
+---@field listbox omi.ListBox The listbox used to display player data rows.
 ---@field elements PlayerData[] The player data received from the server.
 ---@field columnList string[] The list of columns to display.
 ---@field columnDisplay table<string, string> Associates column names to display strings for column headers.
@@ -34,12 +34,12 @@ local FONT_MEDIUM = UIFont.Medium
 ---@field listFont UIFont The font used for list items.
 ---@field titleText string The text displayed as the manager title.
 ---@field activeEditorPanel? PlayerDataEditor The active data editor element.
----@field activeDialog? omi.ui.Dialog The active dialog.
----@field addBtn omi.ui.Button The button used to add a new data item.
----@field closeBtn omi.ui.Button The button used to close the panel.
----@field deleteBtn omi.ui.Button The button used to delete a data item.
----@field refreshBtn omi.ui.Button The button used to request a refresh items from the server.
----@field modifyBtn omi.ui.Button The button used to open an editor panel.
+---@field activeDialog? omi.Dialog The active dialog.
+---@field addBtn omi.Button The button used to add a new data item.
+---@field closeBtn omi.Button The button used to close the panel.
+---@field deleteBtn omi.Button The button used to delete a data item.
+---@field refreshBtn omi.Button The button used to request a refresh items from the server.
+---@field modifyBtn omi.Button The button used to open an editor panel.
 local PlayerDataManager = UI.Panel:derive('PlayerDataManager')
 
 ---List of player data columns to display.
@@ -149,9 +149,9 @@ function PlayerDataManager:createChildren()
 end
 
 ---Renders an item in the data list.
----@param listbox omi.ui.ListBox The listbox to render an item within.
+---@param listbox omi.ListBox The listbox to render an item within.
 ---@param y number The current Y position.
----@param item omi.ui.ListBoxItem The item to render.
+---@param item omi.ListBoxItem The item to render.
 ---@param alt boolean Flag for whether the alternating color should be used.
 ---@return number newY The new Y position.
 function PlayerDataManager:drawItem(y, item, alt, listbox)
@@ -230,7 +230,7 @@ end
 
 ---Performs deletion of a player data row.
 ---Called after clicking yes on the deletion confirmation prompt.
----@param args omi.ui.Args.Dialog.Click Arguments for dialog button click.
+---@param args omi.Args.Dialog.Click Arguments for dialog button click.
 ---@param item PlayerData The player data item.
 ---@param idx integer The index of the item to remove.
 function PlayerDataManager:onConfirmDelete(args, item, idx)
@@ -415,10 +415,10 @@ end
 
 
 ---Creates a new panel for managing player data.
----@param args omi.ui.Args.Panel Args for creating the element.
+---@param args omi.Args.Panel Args for creating the element.
 ---@return PlayerDataManager manager
 function PlayerDataManager:new(args)
-    local this = UI.Panel.new(self, args) --[[@as PlayerDataManager]]
+    local this = UI.new(self, UI.Panel.new, args)
 
     this.titleText = getAttr('player-data-manager', 'title')
     this.anchorLeft = true
