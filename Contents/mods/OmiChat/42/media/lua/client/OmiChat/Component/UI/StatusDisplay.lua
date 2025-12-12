@@ -71,9 +71,7 @@ function StatusDisplay:shouldShow(player, range)
         return false
     end
 
-    -- TODO(b42): update
-    ---@diagnostic disable-next-line: undefined-field
-    if target == player or player:isCanSeeAll() then
+    if target == player or player:canSeeAll() then
         return true
     end
 

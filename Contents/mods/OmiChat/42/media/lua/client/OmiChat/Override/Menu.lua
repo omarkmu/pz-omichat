@@ -85,8 +85,6 @@ end
 
 ---@param requester IsoPlayer
 function ISTradingUI.ReceiveTradeRequest(requester)
-    -- TODO(b42): update
-    ---@diagnostic disable-next-line: param-type-mismatch
     ISTradingUI_ReceiveTradeRequest(requester)
 
     local modal = ISTradingUI.tradeQuestionUI
@@ -99,7 +97,7 @@ function ISTradingUI.ReceiveTradeRequest(requester)
         return
     end
 
-    modal.text = getTextVanilla('IGUI_TradingUI_RequestTrade', name):gsub('\\n', '\n')
+    modal.text = getTextVanilla('IGUI_TradingUI_RequestTrade', name)
 
     local w, h = ISModalDialog.CalcSize(modal.width, modal.height, modal.text)
     modal.width = w
@@ -147,16 +145,21 @@ function ISTradingUI.OtherAddNewItem(player, item)
 end
 
 ---@param player IsoPlayer
----@param index integer
-function ISTradingUI.RemoveItem(player, index)
-    if not ISTradingUI.instance then
+---@param itemId integer
+function ISTradingUI.RemoveItem(player, itemId)
+    local instance = ISTradingUI.instance
+    if not instance then
         return
     end
 
-    local removed = ISTradingUI.instance.hisOfferDatas.items[index]
+    local index = instance:getIndexFromItemId(itemId)
+    if index == -1 then
+        return
+    end
+
     ISTradingUI_RemoveItem(player, index)
 
-    local instance = ISTradingUI.instance
+    local removed = instance.hisOfferDatas.items[index]
     if not removed or not removed.item or not instance or not instance:isVisible() or not instance.historyMessage then
         return
     end
