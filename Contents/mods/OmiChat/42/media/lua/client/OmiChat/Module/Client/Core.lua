@@ -55,7 +55,7 @@ API._emotes = {
     salute = ChatEmote:new { emote = 'saluteformal' },
     salute2 = ChatEmote:new { emote = 'salutecasual' },
     ceasefire = ChatEmote:new { emote = 'ceasefire' },
-    clap = ChatEmote:new { emote = 'clap02' }, -- 'clap' emote only works while sneaking; Bob_EmoteClap is missing
+    clap = ChatEmote:new { emote = 'clap' },
     comehere = ChatEmote:new { emote = 'comehere' },
     comehere2 = ChatEmote:new { emote = 'comehere02' },
     follow = ChatEmote:new { emote = 'followme' },
@@ -70,6 +70,7 @@ API._emotes = {
     surrender = ChatEmote:new { emote = 'surrender' },
     shrug = ChatEmote:new { emote = 'shrug' },
     shout = ChatEmote:new { emote = 'shout' },
+    slowclap = ChatEmote:new { emote = 'clap02' },
     undecided = ChatEmote:new { emote = 'undecided' },
     moveout = ChatEmote:new { emote = 'moveout' },
     freeze = ChatEmote:new { emote = 'freeze' },
