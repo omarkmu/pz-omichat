@@ -46,7 +46,7 @@ API._rollCommand = API.CommandStream:new {
             end
         end
 
-        if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, config:getDiceItems()) then
+        if not utils.hasIgnoreItemReqPower(player) and not utils.hasAnyItemType(player, config:getDiceItems()) then
             return false
         end
 

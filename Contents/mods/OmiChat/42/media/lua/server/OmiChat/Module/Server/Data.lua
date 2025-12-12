@@ -266,8 +266,7 @@ function Data.tryUpdate(player, args, broadcast)
         end
     end
 
-    local minAccessLevel = config.General.MinimumCommandAccessLevel
-    if not utils.canAccessTarget(player, args.target, minAccessLevel, args.fromCommand) then
+    if not utils.canAccessTarget(player, args.target, args.fromCommand) then
         return false
     end
 

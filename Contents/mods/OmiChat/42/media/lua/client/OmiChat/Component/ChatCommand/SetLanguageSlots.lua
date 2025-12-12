@@ -8,7 +8,7 @@ return API.CommandStream:new {
     command = '/setlanguageslots ',
     helpTextID = 'help-text-set-language-slots',
     suggestSpec = { 'online-username-with-self' },
-    isEnabled = API.player.canUseAdminCommands,
+    isEnabled = API.player.isChatAdmin,
     defaultOnDisabled = false,
     onUse = function(ctx)
         API.request.executeCommand('setLanguageSlots', ctx.text)

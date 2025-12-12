@@ -7,7 +7,7 @@ return API.CommandStream:new {
     name = 'clearnames',
     command = '/clearnames ',
     helpTextID = 'help-text-clear-names',
-    isEnabled = API.player.canUseAdminCommands,
+    isEnabled = API.player.isChatAdmin,
     defaultOnDisabled = false,
     onUse = function() API.request.executeCommand('clearNames') end,
 }

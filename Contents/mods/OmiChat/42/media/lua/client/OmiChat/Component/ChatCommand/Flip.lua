@@ -36,7 +36,7 @@ API._flipCommand = API.CommandStream:new {
             end
         end
 
-        if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, config:getCoinItems()) then
+        if not utils.hasIgnoreItemReqPower(player) and not utils.hasAnyItemType(player, config:getCoinItems()) then
             return false
         end
 

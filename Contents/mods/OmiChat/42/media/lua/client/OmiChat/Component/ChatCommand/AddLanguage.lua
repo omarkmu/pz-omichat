@@ -7,7 +7,7 @@ return API.CommandStream:new {
     name = 'addlanguage',
     command = '/addlanguage ',
     helpTextID = 'help-text-add-language',
-    isEnabled = API.player.canUseAdminCommands,
+    isEnabled = API.player.isChatAdmin,
     defaultOnDisabled = false,
     onUse = function(ctx)
         API.request.executeCommand('addLanguage', ctx.text)

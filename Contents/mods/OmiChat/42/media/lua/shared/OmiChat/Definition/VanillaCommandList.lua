@@ -6,19 +6,39 @@
 ---@type VanillaCommand[]
 local VanillaCommandList = {
     {
+        name = 'addalltowhitelist',
+        helpText = 'UI_ServerOptionDesc_AddAllWhitelist',
+        capability = Capability.ManipulateWhitelist,
+    },
+    {
         name = 'additem',
         helpText = 'UI_ServerOptionDesc_AddItem',
-        access = 60,
+        capability = Capability.AddItem,
+    },
+    {
+        name = 'addkey',
+        helpText = 'UI_ServerOptionDesc_AddKey',
+        capability = Capability.AddItem,
     },
     {
         name = 'adduser',
         helpText = 'UI_ServerOptionDesc_AddUser',
-        access = 48,
+        capability = Capability.ModifyNetworkUsers,
+    },
+    {
+        name = 'addusertosafehouse',
+        helpText = 'UI_ServerOptionDesc_AddToSafehouse',
+        capability = Capability.CanSetupSafehouses,
+    },
+    {
+        name = 'addusertowhitelist',
+        helpText = 'UI_ServerOptionDesc_AddWhitelist',
+        capability = Capability.ManipulateWhitelist,
     },
     {
         name = 'addvehicle',
         helpText = 'UI_ServerOptionDesc_AddVehicle',
-        access = 60,
+        capability = Capability.ManipulateVehicle,
     },
     {
         name = 'addxp',
@@ -27,86 +47,129 @@ local VanillaCommandList = {
             'online-username-with-self',
             { type = 'perk', suffix = '=' },
         },
-        access = 60,
+        capability = Capability.AddXP,
     },
     {
         name = 'alarm',
         helpText = 'UI_ServerOptionDesc_Alarm',
-        access = 60,
+        capability = Capability.MakeEventsAlarmGunshot,
     },
     {
         name = 'banid',
         helpText = 'UI_ServerOptionDesc_BanSteamId',
-        access = 48,
+        capability = Capability.BanUnbanUser,
+    },
+    {
+        name = 'banip',
+        helpText = 'UI_ServerOptionDesc_BanIp',
+        capability = Capability.BanUnbanUser,
     },
     {
         name = 'banuser',
         helpText = 'UI_ServerOptionDesc_BanUser',
-        access = 48,
+        capability = Capability.BanUnbanUser,
     },
     {
         name = 'changeoption',
         helpText = 'UI_ServerOptionDesc_ChangeOptions',
-        access = 32,
+        capability = Capability.ChangeAndReloadServerOptions,
     },
     {
         name = 'checkModsNeedUpdate',
         helpText = 'UI_ServerOptionDesc_CheckModsNeedUpdate',
-        access = 62,
+        capability = Capability.ManipulateMods,
     },
     {
         name = 'chopper',
         helpText = 'UI_ServerOptionDesc_Chopper',
-        access = 60,
+        capability = Capability.MakeEventsAlarmGunshot,
     },
     {
         name = 'createhorde',
         helpText = 'UI_ServerOptionDesc_CreateHorde',
         suggestSpec = { '?', 'online-username-with-self' },
-        access = 56,
+        capability = Capability.CreateHorde,
     },
     {
         name = 'createhorde2',
-        helpText = 'UI_ServerOptionDesc_CreateHorde2',
-        access = 56,
+        -- helpText = 'UI_ServerOptionDesc_CreateHorde2', -- string doesn't exist
+        capability = Capability.CreateHorde,
+    },
+    {
+        name = 'debugplayer',
+        suggestSpec = { 'online-username-with-self' },
+        capability = Capability.ConnectWithDebug,
     },
     {
         name = 'godmod',
         helpText = 'UI_ServerOptionDesc_GodMod',
+        capability = Capability.ToggleGodModHimself,
+    },
+    {
+        name = 'godmodplayer',
+        helpText = 'UI_ServerOptionDesc_GodModPlayer',
         suggestSpec = { 'online-username-with-self' },
-        access = 62,
+        capability = Capability.ToggleGodModEveryone,
+    },
+    {
+        name = 'grantadmin',
+        capability = Capability.ChangeAccessLevel,
     },
     {
         name = 'gunshot',
         helpText = 'UI_ServerOptionDesc_Gunshot',
-        access = 60,
+        capability = Capability.MakeEventsAlarmGunshot,
     },
     {
         name = 'help',
         helpText = 'UI_ServerOptionDesc_Help',
-        access = 32,
+        capability = Capability.LoginOnServer,
     },
     {
         name = 'invisible',
         helpText = 'UI_ServerOptionDesc_Invisible',
+        capability = Capability.ToggleInvisibleHimself,
+    },
+    {
+        name = 'invisibleplayer',
+        helpText = 'UI_ServerOptionDesc_Invisible',
         suggestSpec = { 'online-username-with-self' },
-        access = 62,
+        capability = Capability.ToggleInvisibleEveryone,
     },
     {
         name = 'kick',
         helpText = 'UI_ServerOptionDesc_Kick',
-        access = 56,
+        suggestSpec = { 'online-username' },
+        capability = Capability.KickUser,
+    },
+    {
+        name = 'kickfromsafehouse',
+        helpText = 'UI_ServerOptionDesc_Kick',
+        suggestSpec = { 'online-username' },
+        capability = Capability.CanSetupSafehouses,
     },
     {
         name = 'lightning',
         helpText = 'UI_ServerOptionDesc_Lightning',
         suggestSpec = { 'online-username-with-self' },
-        access = 60,
+        capability = Capability.MakeEventsAlarmGunshot,
+    },
+    {
+        name = 'list',
+        -- helpText = 'UI_ServerOptionDesc_List', -- string doesn't exist
+        capability = Capability.LoginOnServer,
+        suggestSpec = {
+            {
+                type = 'option',
+                options = { 'animals' },
+            },
+        },
     },
     {
         name = 'log',
         helpText = 'UI_ServerOptionDesc_SetLogLevel',
         helpTextArgs = { '"type"', '"severity"' }, -- avoid showing %1 %2
+        capability = Capability.DebugConsole,
         suggestSpec = {
             {
                 type = 'option',
@@ -124,121 +187,170 @@ local VanillaCommandList = {
                 type = 'option',
                 options = {
                     'Trace',
+                    'Noise',
                     'Debug',
                     'General',
                     'Warning',
                     'Error',
+                    'Off',
                 },
             },
         },
-        access = 32,
     },
     {
         name = 'noclip',
         helpText = 'UI_ServerOptionDesc_NoClip',
-        access = 62,
+        capability = Capability.ToggleNoclipHimself,
     },
     {
         name = 'players',
         helpText = 'UI_ServerOptionDesc_Players',
-        access = 62,
+        capability = Capability.SeePlayersConnected,
     },
     {
         name = 'quit',
         helpText = 'UI_ServerOptionDesc_Quit',
-        access = 32,
+        capability = Capability.QuitWorld,
     },
     {
         name = 'releasesafehouse',
         helpText = 'UI_ServerOptionDesc_SafeHouse',
-        access = 63,
+        capability = Capability.CanSetupSafehouses,
+    },
+    {
+        name = 'reloadalllua',
+        helpText = 'UI_ServerOptionDesc_ReloadLua',
+        capability = Capability.ReloadLuaFiles,
     },
     {
         name = 'reloadlua',
         helpText = 'UI_ServerOptionDesc_ReloadLua',
-        access = 32,
+        capability = Capability.ReloadLuaFiles,
     },
     {
         name = 'reloadoptions',
-        helpText = 'UI_ServerOptionDesc_ReloadLua',
-        access = 32,
+        helpText = 'UI_ServerOptionDesc_ReloadOptions',
+        capability = Capability.ChangeAndReloadServerOptions,
     },
     {
         name = 'removeuserfromwhitelist',
         helpText = 'UI_ServerOptionDesc_RemoveWhitelist',
-        access = 48,
+        capability = Capability.ManipulateWhitelist,
+    },
+    {
+        name = 'remove',
+        helpText = 'UI_ServerOptionDesc_Remove',
+        capability = Capability.AnimalCheats,
+        suggestSpec = {
+            {
+                type = 'option',
+                options = {
+                    'animals',
+                    'zombies',
+                    'corpses',
+                    'vehicles',
+                },
+            },
+        },
+    },
+    {
+        name = 'removeadmin',
+        capability = Capability.ChangeAccessLevel,
+    },
+    {
+        name = 'removeitem',
+        helpText = 'UI_ServerOptionDesc_RemoveItem',
+        capability = Capability.EditItem,
+    },
+    {
+        name = 'removeuserfromwhitelist',
+        helpText = 'UI_ServerOptionDesc_RemoveWhitelist',
+        capability = Capability.ManipulateWhitelist,
     },
     {
         name = 'removezombies',
         helpText = 'UI_ServerOptionDesc_RemoveZombies',
-        access = 56,
-    },
-    {
-        name = 'replay',
-        helpText = 'UI_ServerOptionDesc_Replay',
-        access = 32,
+        capability = Capability.ManipulateZombie,
     },
     {
         name = 'save',
         helpText = 'UI_ServerOptionDesc_Save',
-        access = 32,
+        capability = Capability.SaveWorld,
     },
     {
         name = 'servermsg',
         helpText = 'UI_ServerOptionDesc_ServerMsg',
-        access = 56,
+        capability = Capability.DisplayServerMessage,
     },
     {
         name = 'setaccesslevel',
         helpText = 'UI_ServerOptionDesc_SetAccessLevel',
+        capability = Capability.ChangeAccessLevel,
         suggestSpec = {
             'online-username-with-self',
             {
                 type = 'option',
                 options = {
-                    'Admin',
-                    'Moderator',
-                    'Overseer',
-                    'GM',
-                    'Observer',
-                    'None',
+                    'admin',
+                    'moderator',
+                    'overseer',
+                    'gm',
+                    'observer',
+                    'priority',
+                    'user',
+                    'banned',
                 },
             },
         },
-        access = 48,
+    },
+    {
+        name = 'setpassword',
+        helpText = 'UI_ServerOptionDesc_SetPassword',
+        capability = Capability.ModifyNetworkUsers,
+    },
+    {
+        name = 'setTimeSpeed',
+        helpText = 'UI_ServerOptionDesc_SetTimeSpeed',
+        capability = Capability.ConnectWithDebug,
     },
     {
         name = 'showoptions',
         helpText = 'UI_ServerOptionDesc_ShowOptions',
-        access = 63,
+        capability = Capability.SeePublicServerOptions,
     },
     {
         name = 'startrain',
         helpText = 'UI_ServerOptionDesc_StartRain',
-        access = 60,
+        capability = Capability.StartStopRain,
     },
     {
         name = 'startstorm',
         helpText = 'UI_ServerOptionDesc_StartStorm',
-        access = 60,
+        capability = Capability.StartStopRain,
     },
     {
         name = 'stats',
-        helpText = 'UI_ServerOptionDesc_SetStatisticsPeriod',
-        access = 32,
+        helpText = 'UI_ServerOptionDesc_Statistics',
+        capability = Capability.GetStatistic,
     },
     {
         name = 'stoprain',
         helpText = 'UI_ServerOptionDesc_StopRain',
-        access = 60,
+        capability = Capability.StartStopRain,
     },
     {
         name = 'stopweather',
         helpText = 'UI_ServerOptionDesc_StopWeather',
-        access = 60,
+        capability = Capability.StartStopRain,
     },
     {
         name = 'teleport',
+        helpText = 'UI_ServerOptionDesc_TeleportTo',
+        suggestSpec = { 'online-username' },
+        capability = Capability.TeleportToPlayer,
+    },
+    {
+        name = 'teleportplayer',
         helpText = 'UI_ServerOptionDesc_Teleport',
         suggestSpec = {
             'online-username-with-self',
@@ -249,34 +361,55 @@ local VanillaCommandList = {
                 end,
             },
         },
-        access = 62,
+        capability = Capability.TeleportPlayerToAnotherPlayer,
     },
     {
         name = 'teleportto',
         helpText = 'UI_ServerOptionDesc_TeleportTo',
-        access = 62,
+        capability = Capability.TeleportToCoordinates,
     },
     {
         name = 'thunder',
         helpText = 'UI_ServerOptionDesc_Thunder',
         suggestSpec = { 'online-username-with-self' },
-        access = 60,
+        capability = Capability.StartStopRain,
     },
     {
         name = 'unbanid',
         helpText = 'UI_ServerOptionDesc_UnBanSteamId',
-        access = 48,
+        capability = Capability.BanUnbanUser,
+    },
+    {
+        name = 'unbanid',
+        helpText = 'UI_ServerOptionDesc_UnBanIp',
+        capability = Capability.BanUnbanUser,
     },
     {
         name = 'unbanuser',
         helpText = 'UI_ServerOptionDesc_UnBanUser',
-        access = 48,
+        capability = Capability.BanUnbanUser,
     },
     {
         name = 'voiceban',
         helpText = 'UI_ServerOptionDesc_VoiceBan',
         suggestSpec = { 'online-username' },
-        access = 48,
+        capability = Capability.BanUnbanUser,
+    },
+    {
+        name = 'worldgen',
+        helpText = 'UI_ServerOptionDesc_Worldgen',
+        capability = Capability.SaveWorld,
+        suggestSpec = {
+            {
+                type = 'option',
+                options = {
+                    'start',
+                    'stop',
+                    'status',
+                    'recheck',
+                },
+            },
+        },
     },
 }
 
@@ -286,8 +419,8 @@ return VanillaCommandList
 
 ---@class VanillaCommand
 ---@field name string The name of the command.
----@field helpText string The string ID of the command's help text.
----@field access integer Access requirements to use the command.
+---@field helpText? string The string ID of the command's help text.
+---@field capability Capability Capability required to use the command.
 ---@field helpTextArgs? string[] Arguments to supply to the command's help text.
 ---@field suggestSpec? SuggestArgSpec[] Spec for suggestions.
 

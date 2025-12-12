@@ -10,7 +10,7 @@ return API.CommandStream:new {
     command = '/seticon ',
     helpTextID = 'help-text-set-icon',
     suggestSpec = { 'online-username-with-self', 'icon' },
-    isEnabled = API.player.canUseAdminCommands,
+    isEnabled = API.player.isChatAdmin,
     defaultOnDisabled = false,
     onUse = function(ctx)
         if API.request.executeCommand('setIcon', ctx.text) then

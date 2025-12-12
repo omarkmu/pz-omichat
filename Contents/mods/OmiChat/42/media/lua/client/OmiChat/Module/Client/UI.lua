@@ -551,7 +551,7 @@ end
 ---@param context ISContextMenu
 ---@private
 function UI._addAdminOptions(context)
-    if not isAdmin() then
+    if not API.player.isChatAdmin() then
         return
     end
 

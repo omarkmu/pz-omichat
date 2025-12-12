@@ -10,7 +10,7 @@ return API.CommandStream:new {
     command = '/iconinfo ',
     helpTextID = 'help-text-icon-info',
     suggestSpec = { 'icon' },
-    isEnabled = API.player.canUseAdminCommands,
+    isEnabled = API.player.isChatAdmin,
     defaultOnDisabled = false,
     onUse = function(ctx)
         local command = utils.trim(ctx.text)

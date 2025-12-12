@@ -8,7 +8,7 @@ return API.CommandStream:new {
     command = '/resetlanguages ',
     helpTextID = 'help-text-reset-languages',
     suggestSpec = { 'online-username-with-self' },
-    isEnabled = API.player.canUseAdminCommands,
+    isEnabled = API.player.isChatAdmin,
     defaultOnDisabled = false,
     onUse = function(ctx)
         API.request.executeCommand('resetLanguages', ctx.text)

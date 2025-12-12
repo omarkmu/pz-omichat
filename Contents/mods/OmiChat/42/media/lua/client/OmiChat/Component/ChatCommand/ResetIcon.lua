@@ -8,7 +8,7 @@ return API.CommandStream:new {
     command = '/reseticon ',
     helpTextID = 'help-text-reset-icon',
     suggestSpec = { 'online-username-with-self' },
-    isEnabled = API.player.canUseAdminCommands,
+    isEnabled = API.player.isChatAdmin,
     defaultOnDisabled = false,
     onUse = function(ctx)
         API.request.executeCommand('resetIcon', ctx.text)

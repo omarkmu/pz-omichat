@@ -222,7 +222,6 @@ function Preset.general(options)
         Preset = options.Name,
         AlwaysShowChat = false,
         CaseInsensitiveChatStreams = options.CaseInsensitiveChatStreams ~= false,
-        MinimumCommandAccessLevel = 16,
         InfoText = '',
         AdminIcon = options.AdminIcon or 'Item_Sledgehamer',
         ClearOnDeath = options.ClearOnDeath or Preset.clearOnDeath(),

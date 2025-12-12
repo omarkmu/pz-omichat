@@ -12,7 +12,6 @@ local getText = utils.getText
 
 local max = math.max
 local min = math.min
-local isAdmin = isAdmin
 local textManager = getTextManager()
 
 local FONT_SMALL = UIFont.Small
@@ -401,7 +400,7 @@ end
 
 ---Checks for button enable state.
 function PlayerDataManager:update()
-    if not isAdmin() then
+    if not API.player.isChatAdmin() then
         self:destroy()
         return
     end

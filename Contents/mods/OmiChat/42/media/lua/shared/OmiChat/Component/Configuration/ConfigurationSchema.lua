@@ -47,8 +47,6 @@ return utils.schema {
                 items = enum { values = CLEAR_ON_DEATH },
             },
 
-            MinimumCommandAccessLevel = int(16, 1, 32),
-
             AdminIcon = str('Item_Sledgehamer'),
 
             InfoText = str(),
@@ -467,7 +465,6 @@ return utils.schema {
 ---@field Preset string
 ---@field AlwaysShowChat boolean
 ---@field CaseInsensitiveChatStreams boolean
----@field MinimumCommandAccessLevel integer
 ---@field AdminIcon string
 ---@field ClearOnDeath Configuration.General.ClearOnDeath
 ---@field InfoText string

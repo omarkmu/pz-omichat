@@ -89,15 +89,10 @@ function Suggestion.getSpec(input)
         return stream:getSuggestSpec()
     end
 
-    local accessLevel = API.player.getEffectiveAccessLevel()
-    if not accessLevel then
-        return
-    end
-
     -- vanilla command specs
     for i = 1, #vanillaCommands do
         local commandInfo = vanillaCommands[i]
-        if utils.hasAccess(commandInfo.access, accessLevel) then
+        if API.player.hasCapability(commandInfo.capability) then
             local vanillaCommand = '/' .. commandInfo.name .. ' '
             if commandInfo.suggestSpec and utils.startsWith(input:lower(), vanillaCommand) then
                 return commandInfo.suggestSpec

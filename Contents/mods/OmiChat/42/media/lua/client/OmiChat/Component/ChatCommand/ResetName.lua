@@ -8,7 +8,7 @@ return API.CommandStream:new {
     command = '/resetname ',
     helpTextID = 'help-text-reset-name',
     suggestSpec = { 'online-username' },
-    isEnabled = API.player.canUseAdminCommands,
+    isEnabled = API.player.isChatAdmin,
     defaultOnDisabled = false,
     onUse = function(ctx)
         API.request.executeCommand('resetName', ctx.text)

@@ -4,11 +4,13 @@
 local API = require 'OmiChat/Module/Client/Core'
 local getText = API.utils.getText
 
+local CAPABILITY_DEBUG = Capability.DebugConsole
+
 -- reimplementing this because the vanilla clear doesn't actually clear the chatbox
 return API.CommandStream:new {
     name = 'clear',
     command = '/clear ',
-    isEnabled = function() return isAdmin() or isCoopHost() end,
+    isEnabled = function() return API.player.hasCapability(CAPABILITY_DEBUG) end,
     onUse = function()
         API.chat.clear()
 

@@ -11,7 +11,7 @@ local getTextVanilla = getText
 local getText = utils.getText
 local concat = table.concat
 local sqrt = math.sqrt
-local getText = getText
+local CAPABILITY_ADMINCHAT = Capability.AdminChat
 
 
 ---@class api.client.player
@@ -71,17 +71,6 @@ function Player.applyBuff(ignoreCooldown)
     bodyDamage:setBoredomLevel(bodyDamage:getBoredomLevel() - buffConfig.Boredom * 100)
     bodyDamage:setUnhappynessLevel(bodyDamage:getUnhappynessLevel() - buffConfig.Unhappiness * 100)
     modData.ocLastBuff = now
-end
-
----Checks whether the current player can use admin commands added by the mod.
----@return boolean isAllowed
-function Player.canUseAdminCommands()
-    local player = Player.get()
-    if not player then
-        return false
-    end
-
-    return utils.getNumericAccessLevel(player:getAccessLevel()) >= config.General.MinimumCommandAccessLevel
 end
 
 ---Returns player 1.
@@ -177,18 +166,6 @@ function Player.getDistanceFrom(otherPlayer, player)
     return sqrt(otherPlayer:getDistanceSq(player))
 end
 
----Returns the player's current access level.
----If the connection is a coop host, returns `admin`.
----@return string accessLevel
-function Player.getEffectiveAccessLevel()
-    if isCoopHost() then
-        return 'admin'
-    end
-
-    local player = Player.get()
-    return player and player:getAccessLevel() or 'none'
-end
-
 ---Gets a list of the local player's known roleplay languages.
 ---@return string[] languages
 function Player.getLanguages()
@@ -229,6 +206,17 @@ function Player.getNickname()
     return API.data.getNickname(username)
 end
 
+---Returns the player's role.
+---@return Role? role
+function Player.getRole()
+    local player = Player.get()
+    if not player then
+        return
+    end
+
+    return player:getRole()
+end
+
 ---Returns a color table for the local player's speech color.
 ---@return omi.ColorTable<integer>? color
 function Player.getSpeechColor()
@@ -257,6 +245,21 @@ function Player.getUsername()
     if username then
         return username
     end
+end
+
+---Checks whether the player has the given capability.
+---@param capability Capability
+---@return boolean
+function Player.hasCapability(capability)
+    local role = Player.getRole()
+    return role and role:hasCapability(capability) or false
+end
+
+---Checks whether the player has the admin chat capability.
+---@return boolean
+function Player.isChatAdmin()
+    local role = Player.getRole()
+    return role and role:hasCapability(CAPABILITY_ADMINCHAT) or false
 end
 
 ---Checks whether the player is dead or unable to be retrieved.

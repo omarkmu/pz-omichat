@@ -11,7 +11,6 @@ local config = API.Configuration
 
 local abs = math.abs
 local concat = table.concat
-local isAdmin = isAdmin
 local getPlayerFaction = Faction.getPlayerFaction
 local hasSafehouse = SafeHouse.hasSafehouse
 
@@ -113,7 +112,7 @@ function Messages.buildData(args)
     data.language = language
     data.echoType = args.echoType
     data.ctx = args.context
-    data.useAdminIcon = isAdmin() and API.preferences.getShowAdminIcon() or nil
+    data.useAdminIcon = API.player.isChatAdmin() and API.preferences.getShowAdminIcon() or nil
     data.useNarrative = config.NarrativeStyle.Enable and stream:canUseNarrativeStyle() or nil
 
     return data
@@ -631,7 +630,7 @@ function Messages._build(info)
         end
 
         local cached = meta.languageResult
-        if cached == 'unknown-language' and not (isAdmin() and API.preferences.getUnderstandAllLanguages()) then
+        if cached == 'unknown-language' and not (API.player.isChatAdmin() and API.preferences.getUnderstandAllLanguages()) then
             info.tokens.unknownLanguage = language
             info.tags.IsUnknownLanguage = true
             info.useUnknownLanguageText = true
@@ -774,7 +773,7 @@ function Messages._checkRange(info, player)
         info.zombieAttractRange = range * config.ZombieAttraction.ChatRangeMultiplier
     end
 
-    if isAdmin() and API.preferences.getIgnoreMessageRange() then
+    if API.player.isChatAdmin() and API.preferences.getIgnoreMessageRange() then
         if not cached then
             info.meta:setRangeResult('in-range')
         end

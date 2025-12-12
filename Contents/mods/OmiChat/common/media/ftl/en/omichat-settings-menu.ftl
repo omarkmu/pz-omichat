@@ -87,9 +87,6 @@ config-General-CaseInsensitiveChatStreams = Case-Insensitive Streams
         <BR> This means that { -command(name: "say") } and { -command(name: "SAY") } will be
         treated equivalently.
 
-config-General-MinimumCommandAccessLevel = Admin Command Access Level
-    .tooltip = The minimum access level required to execute admin commands added by the mod.
-
 config-General-AdminIcon = Admin Icon
     .tooltip = Defines the value of the { -highlight(text: "adminIcon") } token in the icon format.
         This expects a valid texture name.

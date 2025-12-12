@@ -9,15 +9,16 @@ local concat = table.concat
 local getTextVanilla = getText
 local getText = utils.getText
 local getTextOrNull = utils.getTextOrNull
+local CAPABILITY_NONE = Capability.None
 
 return API.CommandStream:new {
     name = 'help',
     command = '/help ',
     onUse = function(ctx)
-        local accessLevel = API.player.getEffectiveAccessLevel()
+        local role = API.player.getRole()
         local command = ctx.text
-        if not accessLevel then
-            -- something went wrong, defer to default help command
+        if not role then
+            -- player unavailable, defer to default help command
             SendCommandToServer('/help ' .. command)
             return
         end
@@ -56,15 +57,19 @@ return API.CommandStream:new {
 
                 local helpText = stream:getHelpTextStringID()
                 if helpText then
-                    commands[#commands + 1] = { name = name, helpText = helpText, access = 0 }
+                    commands[#commands + 1] = {
+                        name = name,
+                        helpText = helpText,
+                        capability = CAPABILITY_NONE,
+                    }
                 end
             end
         end
 
         for i = 1, #vanillaCommands do
             local info = vanillaCommands[i]
-            if info.name and info.helpText and not seen[info.name] then
-                if utils.hasAccess(info.access, accessLevel) then
+            if info.name and not seen[info.name] then
+                if role:hasCapability(info.capability) then
                     commands[#commands + 1] = info
                 end
             end
@@ -79,7 +84,9 @@ return API.CommandStream:new {
             result[#result + 1] = cmd.name
             result[#result + 1] = ' : '
 
-            if cmd.helpTextArgs then
+            if not cmd.helpText then
+                result[#result + 1] = '?'
+            elseif cmd.helpTextArgs then
                 result[#result + 1] = getTextVanilla(cmd.helpText, unpack(cmd.helpTextArgs))
             else
                 result[#result + 1] = getTextOrNull(cmd.helpText) or getTextVanilla(cmd.helpText)

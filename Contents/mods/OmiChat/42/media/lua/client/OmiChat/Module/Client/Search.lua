@@ -436,13 +436,8 @@ function Search._filterStream(stream)
         return stream:isTabID(tabID) and stream:isEnabled()
     end
 
-    local accessLevel = API.player.getEffectiveAccessLevel()
-    if not accessLevel then
-        return false
-    end
-
     ---@cast stream VanillaCommand
-    return utils.hasAccess(stream.access, accessLevel)
+    return API.player.hasCapability(stream.capability)
 end
 
 ---Display function for icons.

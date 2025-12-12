@@ -16,8 +16,6 @@ local config = API.Configuration
 
 local format = string.format
 local getTimestampMs = getTimestampMs
-local getText = utils.getText
-local getTextOrNull = utils.getTextOrNull
 local getOnlinePlayers = getOnlinePlayers
 
 local IS_DEBUG = getDebug()
@@ -211,7 +209,7 @@ TOPIC.DATA_UPDATE = dispatch:topic('DATA_UPDATE', {
 TOPIC.DRAW_CARD = dispatch:topic('DRAW_CARD', {
     onClientValidate = function(req)
         local player = req:getPlayer()
-        if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, config.Commands.Card.Items) then
+        if not utils.hasIgnoreItemReqPower(player) and not utils.hasAnyItemType(player, config.Commands.Card.Items) then
             return false, 'Missing required item'
         end
 
@@ -284,7 +282,7 @@ TOPIC.DRAW_CARD = dispatch:topic('DRAW_CARD', {
 TOPIC.FLIP_COIN = dispatch:topic('FLIP_COIN', {
     onClientValidate = function(req)
         local player = req:getPlayer()
-        if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, config.Commands.Flip.Items) then
+        if not utils.hasIgnoreItemReqPower(player) and not utils.hasAnyItemType(player, config.Commands.Flip.Items) then
             return false, 'Missing required item'
         end
 
@@ -428,7 +426,7 @@ TOPIC.ROLL_DICE = dispatch:topic('ROLL_DICE', {
     ---@return string?
     onClientValidate = function(req, args)
         local player = req:getPlayer()
-        if player:getAccessLevel() == 'None' and not utils.hasAnyItemType(player, config.Commands.Roll.Items) then
+        if not utils.hasIgnoreItemReqPower(player) and not utils.hasAnyItemType(player, config.Commands.Roll.Items) then
             return false, 'Missing required item'
         end
 
@@ -552,16 +550,6 @@ TOPIC.TYPING = dispatch:topic('TYPING', {
     end,
 })
 
-
----Checks whether a player has permission to execute a command for the given target username.
----@param player IsoPlayer
----@param target string
----@param fromCommand boolean?
----@return boolean
----@private
-function Request._canAccessTarget(player, target, fromCommand)
-    return utils.canAccessTarget(player, target, config.General.MinimumCommandAccessLevel, fromCommand)
-end
 
 ---Gets a display string for a list in request arguments.
 ---Displays only the number of items.

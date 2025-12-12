@@ -5,7 +5,6 @@ if isClient() then return end
 
 ---@class(partial) api.server
 local API = require 'OmiChat/Module/Server/Core'
-local config = API.Configuration
 local utils = API.utils
 
 
@@ -65,8 +64,7 @@ end
 ---Handles the `/clearnames` command.
 ---@param player IsoPlayer The requesting player.
 function Command.clearNames(player)
-    local access = utils.getNumericAccessLevel(player:getAccessLevel())
-    if access < config.General.MinimumCommandAccessLevel then
+    if not utils.hasAdminChatPower(player) then
         return
     end
 

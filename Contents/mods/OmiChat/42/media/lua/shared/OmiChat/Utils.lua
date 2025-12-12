@@ -9,6 +9,9 @@ local getTextVanilla = getText
 local getSpecificPlayer = getSpecificPlayer
 local transformIntoKahluaTable = transformIntoKahluaTable
 
+local CAPABILITY_ADMINCHAT = Capability.AdminChat
+local CAPABILITY_CHEATS = Capability.GeneralCheats
+
 local INVISIBLE_PATTERN = '['
     .. char(128) .. '-' .. char(159) .. ']?'
     .. char(65535) .. '?'
@@ -64,36 +67,31 @@ local loadedIcons = false
 local iconToBBCodeNameMap = {} ---@type table<string, string>
 local iconToTextureNameMap = {} ---@type table<string, string>
 
-local accessLevels = {
-    admin = 32,
-    moderator = 16,
-    overseer = 8,
-    gm = 4,
-    observer = 2,
-}
-
 
 ---Checks whether a player has permission to execute a command.
 ---@param player IsoPlayer The player to check for permissions.
 ---@param target string The username of the target player.
----@param minAccessLevel integer The minimum command access level.
 ---@param fromCommand boolean? Flag for whether the request came from a command.
 ---@return boolean canAccess
-function utils.canAccessTarget(player, target, minAccessLevel, fromCommand)
+function utils.canAccessTarget(player, target, fromCommand)
     if not target then
         return false
     end
 
-    local access = utils.getNumericAccessLevel(player:getAccessLevel())
-    if fromCommand and access < minAccessLevel then
+    local role = player:getRole()
+    if not role then
         return false
     end
 
-    if access == 1 and target ~= player:getUsername() then
-        return false
+    if fromCommand then
+        return role:hasCapability(CAPABILITY_ADMINCHAT)
     end
 
-    return true
+    if target == player:getUsername() then
+        return true
+    end
+
+    return role:hasCapability(CAPABILITY_ADMINCHAT)
 end
 
 ---Gets an error from the error tokens, if one is set, and unsets the tokens.
@@ -185,17 +183,6 @@ function utils.getLines(text, maxLen)
     return lines
 end
 
----Gets a numeric access level given an access level string.
----@param access string The access level.
----@return integer accessLevel The numeric access level associated with the access level.
-function utils.getNumericAccessLevel(access)
-    if not access then
-        return 1
-    end
-
-    return accessLevels[access:lower()] or 1
-end
-
 ---Gets a string from a message ID.
 ---@param id string The ID of the message to get.
 ---If a bundle is not included, it defaults to `OmiChat`.
@@ -247,58 +234,16 @@ function utils.getTranslatedLanguageName(language)
     return utils.getTextOrNull(id) or language
 end
 
----Checks whether a given access level should have access based on provided flags.
----@param flags integer? Bit flags for the access level.
----@param accessLevel string The access level string.
----@return boolean hasAccess
-function utils.hasAccess(flags, accessLevel)
-    if not flags then
-        return true
+---Checks whether the player's role has the admin chat capability.
+---@param player IsoPlayer
+---@return boolean
+function utils.hasAdminChatPower(player)
+    local role = player:getRole()
+    if not role then
+        return false
     end
 
-    accessLevel = accessLevel:lower()
-
-    if flags >= 32 then
-        if accessLevel == 'admin' then
-            return true
-        end
-
-        flags = flags - 32
-    end
-
-    if flags >= 16 then
-        if accessLevel == 'moderator' then
-            return true
-        end
-
-        flags = flags - 16
-    end
-
-    if flags >= 8 then
-        if accessLevel == 'overseer' then
-            return true
-        end
-
-        flags = flags - 8
-    end
-
-    if flags >= 4 then
-        if accessLevel == 'gm' then
-            return true
-        end
-
-        flags = flags - 4
-    end
-
-    if flags >= 2 then
-        if accessLevel == 'observer' then
-            return true
-        end
-
-        flags = flags - 2
-    end
-
-    return flags == 1
+    return role:hasCapability(CAPABILITY_ADMINCHAT)
 end
 
 ---Checks whether the player has any of the item types in the list.
@@ -327,6 +272,18 @@ function utils.hasAnyItemType(player, list)
     end
 
     return false
+end
+
+---Checks whether a player can ignore item requirements for commands.
+---@param player IsoPlayer
+---@return boolean
+function utils.hasIgnoreItemReqPower(player)
+    local role = player:getRole()
+    if not role then
+        return false
+    end
+
+    return role:hasCapability(CAPABILITY_CHEATS)
 end
 
 ---Interpolates substitution tokens into a string with format strings using `$var` format.
