@@ -470,6 +470,7 @@ function MessageInfo:new(message)
         this.rawTextWithPrefix = message:getTextWithPrefixBase()
     else
         local chat = message:getChat()
+        this.keepRichText = this.chatType == 'server'
         this.titleID = _getChatTitleID(chat)
         this.rawTextWithPrefix = _getTextWithPrefix(message)
     end
