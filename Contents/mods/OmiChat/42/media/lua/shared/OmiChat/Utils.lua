@@ -15,7 +15,7 @@ local INVISIBLE_PATTERN = '['
 
 
 ---@class utils : omi.proxy
-local utils = lib.proxy({ id = 'omichat', name = 'OmiChat' })
+local utils = lib.proxy('OmiChat')
 local l10n = utils.l10n
 
 ---The interpolator used for basic interpolation.
@@ -129,22 +129,22 @@ end
 
 ---Gets a string from a message ID.
 ---@param id string The ID of the message to get.
----If a bundle is not included, it defaults to `omichat`.
+---If a bundle is not included, it defaults to `OmiChat`.
 ---@param attr string The name of the attribute to get.
 ---@param args table<string, omi.l10n.FluentVariable?>? Arguments to pass for message resolution.
 ---@return string value
 function utils.getAttr(id, attr, args)
-    return l10n.getAttr(id, attr, args, 'omichat')
+    return l10n.getAttr(id, attr, args, 'OmiChat')
 end
 
 ---Gets a string from a message ID, or `nil` if no such message exists.
 ---@param id string The ID of the message to get.
----If a bundle is not included, it defaults to `omichat`.
+---If a bundle is not included, it defaults to `OmiChat`.
 ---@param attr string The name of the attribute to get.
 ---@param args table<string, omi.l10n.FluentVariable?>? Arguments to pass for message resolution.
 ---@return string? value
 function utils.getAttrOrNull(id, attr, args)
-    return l10n.getAttrOrNull(id, attr, args, 'omichat')
+    return l10n.getAttrOrNull(id, attr, args, 'OmiChat')
 end
 
 ---Retrieves a BBCode icon name given a chat icon alias.
@@ -198,20 +198,20 @@ end
 
 ---Gets a string from a message ID.
 ---@param id string The ID of the message to get.
----If a bundle is not included, it defaults to `omichat`.
+---If a bundle is not included, it defaults to `OmiChat`.
 ---@param args table<string, omi.l10n.FluentVariable?>? Arguments to pass for message resolution.
 ---@return string value
 function utils.getText(id, args)
-    return l10n.getText(id, args, 'omichat')
+    return l10n.getText(id, args, 'OmiChat')
 end
 
 ---Gets a string from a message ID, or `nil` if no such message exists.
 ---@param id string The ID of the message to get.
----If a bundle is not included, it defaults to `omichat`.
+---If a bundle is not included, it defaults to `OmiChat`.
 ---@param args table<string, omi.l10n.FluentVariable?>? Arguments to pass for message resolution.
 ---@return string? value
 function utils.getTextOrNull(id, args)
-    return l10n.getTextOrNull(id, args, 'omichat')
+    return l10n.getTextOrNull(id, args, 'OmiChat')
 end
 
 ---Retrieves a texture name given a chat icon alias.
@@ -451,7 +451,7 @@ end
 ---@param rec omi.TranslateTable<T> The translation table to resolve.
 ---@return string? result
 function utils.resolveTranslateTable(rec)
-    return l10n.resolveTranslateTable(rec, 'omichat')
+    return l10n.resolveTranslateTable(rec, 'OmiChat')
 end
 
 

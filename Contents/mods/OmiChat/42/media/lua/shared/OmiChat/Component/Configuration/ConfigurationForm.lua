@@ -20,7 +20,7 @@ local FORMAT_PAD_BOTTOM = utils.extendCopy(FORMAT, PAD_BOTTOM)
 
 ---@type omi.forms.Args.Generator.Partial
 return {
-    prefix = 'omichat.config',
+    prefix = 'OmiChat.config',
     closeOnSave = false,
     rules = {
         General = rules {
@@ -68,7 +68,7 @@ return {
                 },
             },
             Card = {
-                childPrefix = 'omichat.config-Commands-Command',
+                childPrefix = 'OmiChat.config-Commands-Command',
                 children = {
                     Global = {
                         inverseToggleFields = {
@@ -79,7 +79,7 @@ return {
                     },
                     Items = {
                         noReorderButtons = true,
-                        prefix = 'omichat.config-Commands-Card-Items',
+                        prefix = 'OmiChat.config-Commands-Card-Items',
                     },
                     Format = FORMAT,
                     OverheadFormat = FORMAT,
@@ -87,7 +87,7 @@ return {
                 },
             },
             Roll = {
-                childPrefix = 'omichat.config-Commands-Command',
+                childPrefix = 'OmiChat.config-Commands-Command',
                 children = {
                     Global = {
                         inverseToggleFields = {
@@ -98,7 +98,7 @@ return {
                     },
                     Items = {
                         noReorderButtons = true,
-                        prefix = 'omichat.config-Commands-Roll-Items',
+                        prefix = 'OmiChat.config-Commands-Roll-Items',
                     },
                     Format = FORMAT,
                     OverheadFormat = FORMAT,
@@ -106,7 +106,7 @@ return {
                 },
             },
             Flip = {
-                childPrefix = 'omichat.config-Commands-Command',
+                childPrefix = 'OmiChat.config-Commands-Command',
                 children = {
                     Global = {
                         inverseToggleFields = {
@@ -117,7 +117,7 @@ return {
                     },
                     Items = {
                         noReorderButtons = true,
-                        prefix = 'omichat.config-Commands-Flip-Items',
+                        prefix = 'OmiChat.config-Commands-Flip-Items',
                     },
                     Format = FORMAT,
                     OverheadFormat = FORMAT,
