@@ -17,6 +17,7 @@ local config = API.Configuration
 local format = string.format
 local getTimestampMs = getTimestampMs
 local getOnlinePlayers = getOnlinePlayers
+local CharacterStat = CharacterStat
 
 local IS_DEBUG = getDebug()
 
@@ -27,8 +28,11 @@ local Request = {}
 ---Contains functions for sending server and client commands.
 API.request = Request
 
+---@class api.shared.request.topic
+local TOPIC = {}
+
 ---Contains topics for request exchanges between the server and client.
-Request.TOPIC = {}
+Request.TOPIC = TOPIC
 
 ---Dispatcher that handles routing requests.
 Request.dispatch = utils.dispatch {
@@ -37,9 +41,65 @@ Request.dispatch = utils.dispatch {
 }
 
 
-local TOPIC = Request.TOPIC
 local dispatch = Request.dispatch
 
+local STAT_SYNC_FLAGS = 0
+do
+    -- build bit flags for character stat sync
+    local syncStats = {
+        [CharacterStat.HUNGER] = true,
+        [CharacterStat.THIRST] = true,
+        [CharacterStat.FATIGUE] = true,
+        [CharacterStat.BOREDOM] = true,
+        [CharacterStat.UNHAPPINESS] = true,
+        [CharacterStat.NICOTINE_WITHDRAWAL] = true,
+    }
+
+    ---@type ArrayList<CharacterStat>
+    local arrayList = ArrayList.new(Array.new(CharacterStat.ORDERED_STATS))
+
+    for i = 0, arrayList:size() - 1 do
+        local stat = arrayList:get(i)
+        if syncStats[stat] then
+            STAT_SYNC_FLAGS = STAT_SYNC_FLAGS + (2 ^ i) --[[@as integer]]
+        end
+    end
+end
+
+
+---Client → server: Apply a buff.
+TOPIC.APPLY_BUFF = dispatch:topic('APPLY_BUFF', {
+    onServerReceive = function(req)
+        local player = req:getPlayer()
+        local modData = player:getModData()
+
+        local omichatData = modData.omichat
+        if type(omichatData) ~= 'table' then
+            omichatData = {}
+            modData.omichat = omichatData
+        end
+
+        local now = getTimestampMs()
+        local buffConfig = config.Buffs
+        local lastBuff = tonumber(omichatData.lastBuff)
+        if lastBuff and (now - lastBuff) / 60000 < buffConfig.Cooldown then
+            return
+        end
+
+        local withdrawalReduction = buffConfig.CigaretteStress * CharacterStat.NICOTINE_WITHDRAWAL:getMaximumValue()
+
+        local stats = player:getStats()
+        stats:remove(CharacterStat.HUNGER, buffConfig.Hunger)
+        stats:remove(CharacterStat.THIRST, buffConfig.Thirst)
+        stats:remove(CharacterStat.FATIGUE, buffConfig.Fatigue)
+        stats:remove(CharacterStat.BOREDOM, buffConfig.Boredom * 100)
+        stats:remove(CharacterStat.UNHAPPINESS, buffConfig.Unhappiness * 100)
+        stats:remove(CharacterStat.NICOTINE_WITHDRAWAL, withdrawalReduction)
+        omichatData.lastBuff = now
+
+        syncPlayerStats(player, STAT_SYNC_FLAGS)
+    end,
+})
 
 ---Client → server: Execute a chat command.
 TOPIC.COMMAND = dispatch:topic('COMMAND', {

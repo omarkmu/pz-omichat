@@ -26,6 +26,11 @@ function Request.addPreset(name, values)
     return Topic.CONFIGURATION_PRESETS:toServer(args)
 end
 
+---Requests attempting to apply a buff.
+---@return boolean success
+---@return string? error
+function Request.applyBuff() return Topic.APPLY_BUFF:toServer() end
+
 ---Requests clearing all player data for a username.
 ---Fails if the local player is not an admin.
 ---@param username string The username to clear data for.

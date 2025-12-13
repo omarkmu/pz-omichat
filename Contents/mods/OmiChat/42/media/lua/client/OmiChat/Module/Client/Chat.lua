@@ -441,7 +441,7 @@ function Chat.send(args)
     end
 
     if config.Buffs.Enable and stream:isAllowBuffs() then
-        API.player.applyBuff()
+        API.request.applyBuff()
     end
 
     local echoType = Chat._echoTypes[chatType]
