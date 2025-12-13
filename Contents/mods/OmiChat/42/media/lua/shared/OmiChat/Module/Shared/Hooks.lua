@@ -195,7 +195,7 @@ end
 ---Handles a boolean-returning hook.
 ---@param list function[]
 ---@param ...any
----@return boolean result
+---@return boolean? result
 ---@private
 function Hooks._handleBoolean(list, ...)
     for i = 1, #list do
@@ -207,8 +207,6 @@ function Hooks._handleBoolean(list, ...)
             return false
         end
     end
-
-    return false
 end
 
 ---Handles an event hook.
