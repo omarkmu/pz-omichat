@@ -33,7 +33,6 @@ local LABEL_H = FONT_H_MEDIUM + 4
 ---@field languageSlotsEntry omi.TextEntry The entry for the player's language slots.
 ---@field languageSuggestBox omi.SuggestBox The suggest box for languages, for the language list entry.
 ---@field iconSuggestBox omi.SuggestBox The icon suggest box, for the icon entry.
----@field buttonBorderColor omi.ColorTableRGBA<number> The border color used for buttons.
 ---@field saveBtn omi.Button The save button.
 ---@field closeBtn omi.Button The close button.
 ---@field isAdd boolean Flag for whether the editor is for adding new data, rather than editing existing data.
@@ -168,7 +167,7 @@ function PlayerDataEditor:createChildren()
         w = btnW,
         h = BTN_H,
         text = getText('.btn-close'),
-        borderColor = utils.copy(self.buttonBorderColor),
+        useCancelStyle = true,
         target = self,
         onClick = self.destroy,
     }
@@ -181,7 +180,7 @@ function PlayerDataEditor:createChildren()
         w = btnW,
         h = BTN_H,
         text = getText('.btn-save'),
-        borderColor = utils.copy(self.buttonBorderColor),
+        useAcceptStyle = true,
         target = self,
         onClick = self.onSave,
     }
@@ -434,7 +433,6 @@ function PlayerDataEditor:new(args)
     this.saveItem = args.item
     this.item = itemCopy
     this.moveWithMouse = true
-    this.buttonBorderColor = { r = 0.7, g = 0.7, b = 0.7, a = 0.5 }
     this.languageFilter = utils.bind(this._filterLanguages, this)
     this.isAdd = args.isAdd or false
     this.backgroundColor.a = 0.9

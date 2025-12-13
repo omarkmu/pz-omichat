@@ -127,9 +127,9 @@ function PlayerDataManager:createChildren()
         w = btnW,
         h = btnH,
         text = getText('.btn-close'),
+        useCancelStyle = true,
         target = self,
         onClick = self.destroy,
-        borderColor = self.buttonBorderColor,
     }
 
     self.refreshBtn = UI.button {
