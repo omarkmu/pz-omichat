@@ -35,8 +35,8 @@ Configuration._presetFilename = 'omichat/configuration_presets.json'
 ---Table containing built-in presets.
 ---@private
 Configuration._presets = {
-    Default = require 'OmiChat/Definition/Preset/Default',
     Buffy = require 'OmiChat/Definition/Preset/Buffy',
+    LightRP = require 'OmiChat/Definition/Preset/LightRP',
     Vanilla = require 'OmiChat/Definition/Preset/Vanilla',
 }
 
@@ -522,22 +522,18 @@ end
 ---Caches the list of presets.
 ---@private
 function Configuration:_cachePresetList()
-    local list = { Configuration._presets.Default }
-
-    local other = {}
-    for k, v in pairs(Configuration._presets) do
-        if k ~= 'Default' then
-            other[#other + 1] = v
-        end
+    local list = {}
+    for _, v in pairs(Configuration._presets) do
+        list[#list + 1] = v
     end
 
     for _, v in pairs(Configuration._customPresets) do
-        other[#other + 1] = v
+        list[#list + 1] = v
     end
 
-    sort(other, Configuration._sortPresets)
+    sort(list, Configuration._sortPresets)
 
-    self._presetList = utils.append(list, other)
+    self._presetList = list
 end
 
 ---Checks whether a mod compatibility option is enabled.

@@ -13,8 +13,12 @@ return Preset:new {
                 'DefaultNameMode:username',
             },
         },
-        Buffs = Preset.buffs(),
-        Callouts = Preset.callouts(),
+        Buffs = Preset.buffs {
+            Enable = false,
+        },
+        Callouts = Preset.callouts {
+            Range = 60,
+        },
         Commands = Preset.commands {
             NameMode = 'Disable',
             EnableStatus = false,
@@ -24,8 +28,14 @@ return Preset:new {
         Customization = Preset.customization {
             Enable = false,
         },
-        Discord = Preset.discord(),
-        EchoMessages = Preset.echo(),
+        Discord = Preset.discord {
+            Tags = {
+                'UseAuthorUsername',
+            },
+        },
+        EchoMessages = Preset.echo {
+            Enable = false,
+        },
         Format = Preset.format(),
         Language = Preset.languages {
             UseDefaultList = false,
@@ -44,11 +54,7 @@ return Preset:new {
                 'UseAuthorUsername',
             },
         },
-        ServerMessages = Preset.server {
-            Tags = {
-                'NoTimestamp',
-            },
-        },
+        ServerMessages = Preset.server(),
         TypingIndicator = Preset.typing {
             Enable = false,
         },
@@ -66,10 +72,13 @@ return Preset:new {
                 {
                     Stream = 'admin',
                     Enable = true,
+                    DefaultColor = { r = 255, g = 255, b = 255 },
                 },
                 {
                     Stream = 'say',
                     Enable = true,
+                    DefaultColor = { r = 255, g = 255, b = 255 },
+                    Range = 30,
                     Tags = {
                         'EchoTarget',
                     },
@@ -77,6 +86,7 @@ return Preset:new {
                 {
                     Stream = 'yell',
                     Enable = true,
+                    Range = 60,
                     Tags = {
                         'Loud',
                         'Callout',
@@ -87,14 +97,17 @@ return Preset:new {
                 {
                     Stream = 'low',
                     Enable = false,
+                    Range = 5,
                 },
                 {
                     Stream = 'whisper',
                     Enable = false,
+                    Range = 2,
                 },
                 {
                     Stream = 'me',
                     Enable = false,
+                    Range = 30,
                     Tags = {
                         'AutoPunctuateChat',
                         'AutoColorQuotes',
@@ -109,34 +122,42 @@ return Preset:new {
                 {
                     Stream = 'meloud',
                     Enable = false,
+                    Range = 60,
                 },
                 {
                     Stream = 'mequiet',
                     Enable = false,
+                    Range = 5,
                 },
                 {
                     Stream = 'mewhisper',
                     Enable = false,
+                    Range = 2,
                 },
                 {
                     Stream = 'do',
                     Enable = false,
+                    Range = 30,
                 },
                 {
                     Stream = 'doloud',
                     Enable = false,
+                    Range = 60,
                 },
                 {
                     Stream = 'doquiet',
                     Enable = false,
+                    Range = 5,
                 },
                 {
                     Stream = 'dowhisper',
                     Enable = false,
+                    Range = 2,
                 },
                 {
                     Stream = 'ooc',
                     Enable = false,
+                    Range = 30,
                 },
                 {
                     Stream = 'private',
@@ -150,15 +171,25 @@ return Preset:new {
                 {
                     Stream = 'faction',
                     Enable = true,
+                    Tags = {
+                        'AutoCapitalizeNarrative',
+                        'AutoPunctuateNarrative',
+                    },
                 },
                 {
                     Stream = 'safehouse',
                     Enable = true,
+                    Tags = {
+                        'AutoCapitalizeNarrative',
+                        'AutoPunctuateNarrative',
+                    },
                 },
                 {
                     Stream = 'general',
                     Enable = true,
-                    Tags = {},
+                    Tags = {
+                        'IncludeMentionAtSignChat',
+                    },
                 },
             },
         },

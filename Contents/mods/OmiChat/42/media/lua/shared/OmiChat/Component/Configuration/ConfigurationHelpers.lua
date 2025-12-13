@@ -103,8 +103,8 @@ function Helpers.deletePreset(form, state, value)
                 Helpers.refreshPresetsList(form)
 
                 local values = form.values
-                values.General.Preset = 'Default'
-                form:setControlValue('General.Preset', 'Default')
+                values.General.Preset = 'Buffy'
+                form:setControlValue('General.Preset', 'Buffy')
             end
         end,
     }
@@ -116,19 +116,19 @@ end
 ---Returns a list of default language definition objects.
 ---@return Configuration.LanguageDefinition[]
 function Helpers.getDefaultLanguages()
-    return utils.copyList(DefaultLanguages)
+    return utils.deepcopy(DefaultLanguages)
 end
 
 ---Returns a list of default stream objects.
 ---@return Configuration.StreamDefinition[]
 function Helpers.getDefaultStreams()
-    return utils.copyList(DefaultStreams)
+    return utils.deepcopy(DefaultStreams)
 end
 
 ---Returns a list of default stream objects, populated with required data.
 ---@return Configuration.StreamDefinition[]
 function Helpers.getDefaultStreamsPopulated()
-    return Helpers.processStreams(utils.copyList(DefaultStreams))
+    return Helpers.processStreams(utils.deepcopy(DefaultStreams))
 end
 
 ---Gets a final list of format data translations.

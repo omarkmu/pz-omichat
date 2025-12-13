@@ -37,7 +37,7 @@ return utils.schema {
         VERSION = int(1),
 
         General = container {
-            Preset = str('Default'),
+            Preset = str('Buffy'),
 
             AlwaysShowChat = bool(false),
             CaseInsensitiveChatStreams = bool(true),
@@ -47,15 +47,24 @@ return utils.schema {
                 items = enum { values = CLEAR_ON_DEATH },
             },
 
-            AdminIcon = str('Item_Sledgehamer'),
+            AdminIcon = str('Item_Hammer'),
 
             InfoText = str(),
 
-            Variables = array { items = str() },
+            Variables = array {
+                items = str(),
+                default = {
+                    'DefaultNameMode:name',
+                    'DefaultNameMode_admin:username',
+                    'DefaultNameMode_whisper:both',
+                    'PMParenthesisCount:2',
+                    'VolumeIndicatorLoud:Long',
+                },
+            },
         },
 
         Buffs = container {
-            Enable = bool(false),
+            Enable = bool(true),
             Cooldown = int(15, 0, 1440),
 
             Boredom = double(0.2, 0, 1),
@@ -69,7 +78,7 @@ return utils.schema {
         Callouts = container {
             Format = str(DEFAULT),
             SneakFormat = str(DEFAULT),
-            Range = int(60, 1, 60),
+            Range = int(48, 1, 60),
             SneakRange = int(6, 1, 60),
         },
 
@@ -138,7 +147,7 @@ return utils.schema {
         Customization = container {
             AllowCustomShouts = bool(true),
             EnableNameColors = bool(true), -- based on speech colors
-            EnableCharacterCustomization = bool(false),
+            EnableCharacterCustomization = bool(true),
 
             CleanEffects = set {
                 default = utils.set.table { 'Body', 'Clothing' },
@@ -166,12 +175,12 @@ return utils.schema {
             },
             Tags = array {
                 items = str(),
-                default = { 'UseAuthorUsername' },
+                default = { 'OOC', 'UseAuthorUsername' },
             },
         },
 
         EchoMessages = container {
-            Enable = bool(false),
+            Enable = bool(true),
             ChatFormat = str(DEFAULT),
             OverheadFormat = str(DEFAULT),
             Tags = array {
@@ -265,7 +274,7 @@ return utils.schema {
         },
 
         NarrativeStyle = container {
-            Enable = bool(false),
+            Enable = bool(true),
             OverheadContentFormat = str(DEFAULT),
             ChatContentFormat = str(DEFAULT),
             DialogueTagFormat = str(DEFAULT),
@@ -291,7 +300,7 @@ return utils.schema {
             },
             Tags = array {
                 items = str(),
-                default = { 'NoTimestamp', 'NoTagColon' },
+                default = { 'NoTimestamp' },
             },
         },
 
@@ -381,7 +390,13 @@ return utils.schema {
                 },
             },
 
-            GlobalTags = array { items = str() },
+            GlobalTags = array {
+                items = str(),
+                default = {
+                    'ActionAsterisks',
+                    'IncludeAdminIndicator',
+                },
+            },
         },
 
         TypingIndicator = container {
@@ -427,13 +442,17 @@ return utils.schema {
         -- doesn't do anything, so don't save it to avoid confusion
         values.General.Preset = nil
 
-        values.Streams = values.Streams or {}
-        values.Language = values.Language or {}
+        if values._Streams then
+            values.Streams = values.Streams or {}
+            values.Streams.List = values._Streams
+            values._Streams = nil
+        end
 
-        values.Streams.List = values._Streams
-        values.Language.List = values._Languages
-        values._Streams = nil
-        values._Languages = nil
+        if values._Languages then
+            values.Language = values.Language or {}
+            values.Language.List = values._Languages
+            values._Languages = nil
+        end
     end,
 }
 
@@ -522,7 +541,7 @@ return utils.schema {
 ---@field AllowCustomShouts boolean
 ---@field EnableNameColors boolean
 ---@field EnableCharacterCustomization boolean
----@field CleanEffects omi.SetTable
+---@field CleanEffects omi.SetTable<string>
 
 ---@class Configuration.Discord
 ---@field ShowColorOption 'Yes' | 'No' | 'Respect-Server-Setting'

@@ -17,11 +17,11 @@ local Preset = utils.class()
 ---@param options Args.ConfigurationPreset.Buffs? Options for creation of the table.
 ---@return Configuration.Buffs
 function Preset.buffs(options)
-    options = options or {}
+    options = options or {} --[[@as Args.ConfigurationPreset.Buffs]]
 
     ---@type Configuration.Buffs
     return {
-        Enable = options.Enable or false,
+        Enable = options.Enable ~= false,
         Cooldown = 15,
         Boredom = 0.2,
         Unhappiness = 0.2,
@@ -36,13 +36,13 @@ end
 ---@param options Args.ConfigurationPreset.Callouts? Options for creation of the table.
 ---@return Configuration.Callouts
 function Preset.callouts(options)
-    options = options or {}
+    options = options or {} --[[@as Args.ConfigurationPreset.Callouts]]
 
     ---@type Configuration.Callouts
     return {
         Format = DEFAULT,
         SneakFormat = DEFAULT,
-        Range = options.Range or 60,
+        Range = options.Range or 48,
         SneakRange = options.SneakRange or 6,
     }
 end
@@ -62,7 +62,7 @@ end
 ---@param options Args.ConfigurationPreset.Commands? Options for creation of the table.
 ---@return Configuration.Commands
 function Preset.commands(options)
-    options = options or {}
+    options = options or {} --[[@as Args.ConfigurationPreset.Commands]]
 
     local globalCommands = options.GlobalCommands or false
 
@@ -130,7 +130,7 @@ end
 ---@param options Args.ConfigurationPreset.Customization? Options for creation of the table.
 ---@return Configuration.Customization
 function Preset.customization(options)
-    options = options or {}
+    options = options or {} --[[@as Args.ConfigurationPreset.Customization]]
 
     local value = options.Enable ~= false
 
@@ -147,7 +147,7 @@ end
 ---@param options Args.ConfigurationPreset.Discord? Options for creation of the table.
 ---@return Configuration.Discord
 function Preset.discord(options)
-    options = options or {}
+    options = options or {} --[[@as Args.ConfigurationPreset.Discord]]
 
     ---@type Configuration.Discord
     return {
@@ -162,11 +162,11 @@ end
 ---@param options Args.ConfigurationPreset.Echo? Options for creation of the table.
 ---@return Configuration.EchoMessages
 function Preset.echo(options)
-    options = options or {}
+    options = options or {} --[[@as Args.ConfigurationPreset.Echo]]
 
     ---@type Configuration.EchoMessages
     return {
-        Enable = options.Enable or false,
+        Enable = options.Enable ~= false,
         ChatFormat = DEFAULT,
         OverheadFormat = DEFAULT,
         Tags = options.Tags or { 'OverRadio' },
@@ -223,7 +223,7 @@ function Preset.general(options)
         AlwaysShowChat = false,
         CaseInsensitiveChatStreams = options.CaseInsensitiveChatStreams ~= false,
         InfoText = '',
-        AdminIcon = options.AdminIcon or 'Item_Sledgehamer',
+        AdminIcon = options.AdminIcon or 'Item_Hammer',
         ClearOnDeath = options.ClearOnDeath or Preset.clearOnDeath(),
         Variables = options.Variables or {},
     }
@@ -233,13 +233,13 @@ end
 ---@param options Args.ConfigurationPreset.Language? Options for creation of the table.
 ---@return Configuration.Language
 function Preset.languages(options)
-    options = options or {}
+    options = options or {} --[[@as Args.ConfigurationPreset.Language]]
 
     ---@type Configuration.Language
     return {
         UseDefaultList = options.UseDefaultList ~= false,
         List = options.List or {},
-        DefaultSlots = 1,
+        DefaultSlots = options.DefaultSlots or 1,
         InterpretationRolls = 2,
         InterpretationChance = 25,
         UnknownLanguageChat = DEFAULT,
@@ -254,7 +254,7 @@ end
 ---@param options Args.ConfigurationPreset.Macros? Options for creation of the table.
 ---@return Configuration.Macros
 function Preset.macros(options)
-    options = options or {}
+    options = options or {} --[[@as Args.ConfigurationPreset.Macros]]
 
     ---@type Configuration.Macros
     return {
@@ -269,7 +269,7 @@ end
 ---@param options Args.ConfigurationPreset.Mentions? Options for creation of the table.
 ---@return Configuration.Mentions
 function Preset.mentions(options)
-    options = options or {}
+    options = options or {} --[[@as Args.ConfigurationPreset.Mentions]]
 
     ---@type Configuration.Mentions
     return {
@@ -285,11 +285,11 @@ end
 ---@param options Args.ConfigurationPreset.NarrativeStyle? Options for creation of the table.
 ---@return Configuration.NarrativeStyle
 function Preset.narrative(options)
-    options = options or {}
+    options = options or {} --[[@as Args.ConfigurationPreset.NarrativeStyle]]
 
     ---@type Configuration.NarrativeStyle
     return {
-        Enable = options.Enable or false,
+        Enable = options.Enable ~= false,
         OverheadContentFormat = DEFAULT,
         ChatContentFormat = DEFAULT,
         DialogueTagFormat = DEFAULT,
@@ -301,7 +301,7 @@ end
 ---@param options Args.ConfigurationPreset.Radio? Options for creation of the table.
 ---@return Configuration.Radio
 function Preset.radio(options)
-    options = options or {}
+    options = options or {} --[[@as Args.ConfigurationPreset.Radio]]
 
     ---@type Configuration.Radio
     return {
@@ -316,13 +316,13 @@ end
 ---@param options Args.ConfigurationPreset.ServerMessages? Options for creation of the table.
 ---@return Configuration.ServerMessages
 function Preset.server(options)
-    options = options or {}
+    options = options or {} --[[@as Args.ConfigurationPreset.ServerMessages]]
 
     ---@type Configuration.ServerMessages
     return {
         ChatFormat = DEFAULT,
         DefaultColor = { r = 0, g = 128, b = 255 },
-        Tags = options.Tags or { 'NoTimestamp', 'NoTagColon' },
+        Tags = options.Tags or { 'NoTimestamp' },
     }
 end
 
@@ -330,7 +330,7 @@ end
 ---@param options Args.ConfigurationPreset.TypingIndicator? Options for creation of the table.
 ---@return Configuration.TypingIndicator
 function Preset.typing(options)
-    options = options or {}
+    options = options or {} --[[@as Args.ConfigurationPreset.TypingIndicator]]
 
     ---@type Configuration.TypingIndicator
     return {
@@ -344,7 +344,7 @@ end
 ---@param options Args.ConfigurationPreset.ZombieAttraction? Options for creation of the table.
 ---@return Configuration.ZombieAttraction
 function Preset.zombies(options)
-    options = options or {}
+    options = options or {} --[[@as Args.ConfigurationPreset.ZombieAttraction]]
 
     ---@type Configuration.ZombieAttraction
     return {
@@ -410,10 +410,10 @@ return Preset
 ---@field values? Configuration The preset's configuration values.
 
 ---@class Args.ConfigurationPreset.Buffs
----@field Enable boolean? Flag for whether buffs should be enabled. Defaults to `false`.
+---@field Enable boolean? Flag for whether buffs should be enabled. Defaults to `true`.
 
 ---@class Args.ConfigurationPreset.Callouts
----@field Range integer? The callout range to use. Defaults to `60`.
+---@field Range integer? The callout range to use. Defaults to `48`.
 ---@field SneakRange integer? The sneak callout range to use. Defaults to `6`.
 
 ---@class Args.ConfigurationPreset.Commands
@@ -426,10 +426,10 @@ return Preset
 ---@field CleanEffects string[]? The clean effects to enable. Defaults to `['Body', 'Clothing']`.
 
 ---@class Args.ConfigurationPreset.Discord
----@field Tags string[]? Tags to include on the Discord stream. Defaults to `['UseAuthorUsername']`.
+---@field Tags string[]? Tags to include on the Discord stream. Defaults to `['OOC', 'UseAuthorUsername']`.
 
 ---@class Args.ConfigurationPreset.Echo
----@field Enable boolean? Flag for whether echo messages are enabled. Defaults to `false`.
+---@field Enable boolean? Flag for whether echo messages are enabled. Defaults to `true`.
 ---@field Tags string[]? Tags to include on echo messages. Defaults to `['OverRadio']`.
 
 ---@class Args.ConfigurationPreset.General
@@ -442,6 +442,7 @@ return Preset
 ---@class Args.ConfigurationPreset.Language
 ---@field UseDefaultList boolean? Flag for whether the default language list should be used. Defaults to `true`.
 ---@field List Configuration.LanguageDefinition[]? A list of languages to use.
+---@field DefaultSlots integer? The default number of language slots users should have. Defaults to `1`.
 
 ---@class Args.ConfigurationPreset.Macros
 ---@field Enable boolean? Flag for whether macros should be enabled. Defaults to `true`.
@@ -451,13 +452,13 @@ return Preset
 ---@field Range integer? Range for mentions on ranged streams. Defaults to `10`.
 
 ---@class Args.ConfigurationPreset.NarrativeStyle
----@field Enable boolean? Flag for whether narrative style should be enabled.
+---@field Enable boolean? Flag for whether narrative style should be enabled. Defaults to `true`.
 
 ---@class Args.ConfigurationPreset.Radio
 ---@field Tags string[]? Tags to include on the radio stream. Defaults to no tags.
 
 ---@class Args.ConfigurationPreset.ServerMessages
----@field Tags string[]? Tags to include on the server message stream. Defaults to `['NoTimestamp', 'NoTagColon']`.
+---@field Tags string[]? Tags to include on the server message stream. Defaults to `['NoTimestamp']`.
 
 ---@class Args.ConfigurationPreset.TypingIndicator
 ---@field Enable boolean? Flag for whether the typing indicator should be enabled.

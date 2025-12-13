@@ -701,8 +701,8 @@ function Library.Defaults.Overhead(interpolator, args)
         message = '(( ' .. message .. ' ))'
     end
 
-    local noName = tags.NoName or tags.NoNameOverhead
-    local includeName = tags.IncludeName or tags.IncludeNameOverhead or tags.IsNarrativeStyle
+    local noName = tags.NoName or tags.NoNameOverhead and not (tags.IncludeName or tags.IncludeNameOverhead)
+    local includeName = not noName or tags.IsNarrativeStyle
     if name ~= '' and includeName and not noName then
         local defaultNoColon = tags.IsNarrativeStyle or tags.Action
         local noColon = not tags.IncludeColon and (tags.NoColon or tags.NoColonOverhead or defaultNoColon)
