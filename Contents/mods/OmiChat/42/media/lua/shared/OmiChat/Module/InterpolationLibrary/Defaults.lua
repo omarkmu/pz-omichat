@@ -421,8 +421,7 @@ function Library.Defaults.Icon(interpolator, args)
     if tags.IsCardCommand then
         return options:getString('cardIcon', 'Item_CardDeck')
     elseif tags.IsFlipCommand then
-        -- the plate is the most coin-like icon I could find in vanilla
-        return options:getString('flipIcon', 'Item_Plate')
+        return options:getString('flipIcon', 'Item_Coin_Silver')
     elseif tags.IsRollCommand then
         return options:getString('rollIcon', 'Item_Dice')
     end
