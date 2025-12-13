@@ -126,6 +126,13 @@ return {
             },
         },
 
+        -- hide compatibility options until relevant mods are updated
+        Compatibility = rules {
+            ChatBubble = { skip = true },
+            SearchPlayers = { skip = true },
+            TrueActionsDancing = { skip = true },
+        },
+
         Customization = rules {
             EnableCharacterCustomization = {
                 paddingTop = PAD_N,
