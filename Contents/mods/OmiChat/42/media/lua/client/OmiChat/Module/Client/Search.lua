@@ -14,6 +14,8 @@ local ISChat = ISChat
 ---@class api.client.search
 ---@field private _perkList? search.PerkInfo[] Lazy-loaded list with information about perks.
 ---@field private _iconList? search.IconInfo[] Lazy-loaded list with information about icons.
+---@field private _itemList? string[] Lazy-loaded list of item full types.
+---@field private _vehicleList? string[] Lazy-loaded list of vehicle full types.
 local Search = {}
 
 ---Contains functions for performing searches.
@@ -40,6 +42,24 @@ function Search.icons(ctxOrSearch)
     for i = 1, #icons do
         local info = icons[i]
         Search._internal(ctx, info.alias, info)
+
+        if ctx.isTerminated then
+            break
+        end
+    end
+
+    return Search._collectResults(ctx)
+end
+
+---Searches for an item by full type name.
+---@param ctxOrSearch SearchContext | string A search string or a table with options for the search.
+---@return SearchResults results
+function Search.items(ctxOrSearch)
+    local ctx = Search._buildContext(ctxOrSearch)
+
+    local list = Search._buildItemList()
+    for i = 1, #list do
+        Search._internal(ctx, list[i])
 
         if ctx.isTerminated then
             break
@@ -172,6 +192,49 @@ function Search.populateSuggestions(suggestBox, search, allowExact)
     suggestBox:setSuggestions(Search.toSuggestions(search, allowExact))
 end
 
+---Searches for a role by name.
+---If the client does not have the right to read roles, or they have not yet been fetched, this returns the default list.
+---@param ctxOrSearch SearchContext | string A search string or a table with options for the search.
+---@return SearchResults results
+function Search.roles(ctxOrSearch)
+    local ctx = Search._buildContext(ctxOrSearch)
+    local roles = getRoles()
+
+    local list
+    if roles:isEmpty() then
+        -- unavailable → request & use default list
+        requestRoles()
+        list = {
+            'admin',
+            'moderator',
+            'gm',
+            'observer',
+            'priority',
+            'user',
+            'banned',
+        }
+    else
+        list = {}
+        for i = 0, roles:size() - 1 do
+            local role = roles:get(i)
+            list[#list + 1] = role:getName()
+        end
+
+        sort(list)
+    end
+
+    for i = 1, #list do
+        Search._internal(ctx, list[i] --[[@as string]])
+
+        if ctx.isTerminated then
+            break
+        end
+    end
+
+    return Search._collectResults(ctx)
+end
+
+
 ---Collects stream commands based on a search string.
 ---@param argsOrSearch Args.StreamSearch | string A search string or a table with options for the search.
 ---@return SearchResults results
@@ -268,6 +331,24 @@ function Search.toSuggestions(search, allowExact)
     return suggestions
 end
 
+---Searches for a vehicle type by script name.
+---@param ctxOrSearch SearchContext | string A search string or a table with options for the search.
+---@return SearchResults results
+function Search.vehicles(ctxOrSearch)
+    local ctx = Search._buildContext(ctxOrSearch)
+
+    local list = Search._buildVehicleList()
+    for i = 1, #list do
+        Search._internal(ctx, list[i])
+
+        if ctx.isTerminated then
+            break
+        end
+    end
+
+    return Search._collectResults(ctx)
+end
+
 
 ---Builds internal search context.
 ---@param ctx SearchContext | string A search string or a table with options for the search.
@@ -313,6 +394,27 @@ function Search._buildIconList()
 
     Search._iconList = iconList
     return iconList
+end
+
+---Builds a list of item names, or returns the cached list if already built.
+---@return string[] itemList
+---@private
+function Search._buildItemList()
+    if Search._itemList then
+        return Search._itemList
+    end
+
+    local itemList = {}
+    local arrayList = getAllItems()
+    for i = 0, arrayList:size() - 1 do
+        local item = arrayList:get(i)
+        itemList[#itemList + 1] = item:getFullName()
+    end
+
+    sort(itemList)
+
+    Search._itemList = itemList
+    return itemList
 end
 
 ---Builds a list of perks, or returns the cached list if already built.
@@ -378,6 +480,26 @@ function Search._buildStreamList(options)
     return list
 end
 
+---Builds a list of vehicle script names, or returns the cached list if already built.
+---@return string[] vehicleList
+---@private
+function Search._buildVehicleList()
+    if Search._vehicleList then
+        return Search._vehicleList
+    end
+
+    local vehicleList = {}
+    local arrayList = getAllVehicles()
+    for i = 0, arrayList:size() - 1 do
+        vehicleList[#vehicleList + 1] = arrayList:get(i)
+    end
+
+    sort(vehicleList)
+
+    Search._vehicleList = vehicleList
+    return vehicleList
+end
+
 ---Collects the search results.
 ---@param ctx search.InternalSearchContext
 ---@return SearchResults search
@@ -404,7 +526,7 @@ function Search._collectResults(ctx)
         local result = {
             exact = internal.exact,
             value = mapValue and mapValue(raw, str) or raw,
-            display = internal.display or mapDisplay and mapDisplay(raw, str),
+            display = internal.display or (mapDisplay and mapDisplay(raw, str)),
             texture = mapTexture and mapTexture(raw, str),
         }
 

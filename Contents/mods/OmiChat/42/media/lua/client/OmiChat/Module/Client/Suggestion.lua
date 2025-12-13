@@ -280,16 +280,35 @@ function Suggestion._suggestFromSpec(info)
         search = API.search.languages(ctx, false)
     elseif argType == 'known-language' then
         search = API.search.languages(ctx, true)
+    elseif argType == 'role' then
+        search = API.search.roles(ctx)
     elseif argType == 'icon' then
-        ctx.maxSearch = nil -- search all icons
+        ctx.maxSearch = nil -- search all
         search = API.search.icons(ctx)
     elseif argType == 'perk' then
-        search = API.search.perks(ctx)
         applyQuotes = false
+        search = API.search.perks(ctx)
     elseif argType == 'emote' then
         search = API.search.emotes(ctx)
-    elseif argType == 'option' and argSpec.options then
-        search = API.search.strings(ctx, argSpec.options)
+    elseif argType == 'item' then
+        ctx.maxSearch = nil -- search all
+        search = API.search.items(ctx)
+    elseif argType == 'vehicle' then
+        ctx.maxSearch = nil -- search all
+        search = API.search.vehicles(ctx)
+    elseif argType == 'option' then
+        local options
+        if argSpec.getOptions then
+            options = argSpec.getOptions(args)
+        else
+            options = argSpec.options
+        end
+
+        if not options or #options == 0 then
+            return
+        end
+
+        search = API.search.strings(ctx, options)
     else
         local callback = Suggestion.getArgTypeCallback(argType)
         local cbResult = callback and callback(ctx, argSpec)
@@ -384,6 +403,7 @@ return Suggestion
 ---@field searchDisplay? boolean Flag for whether the display string should be used for determining suggestions.
 ---@field filter? fun(result: any, args: string[]): boolean Filter function for results.
 ---@field display? fun(value: any, str: string): string? Function to retrieve display strings for results.
+---@field getOptions? fun(args: string[]): string[] Function to retrieve options for the `option` suggestion type.
 
 
 ---@alias SuggestArgSpec SuggestArgSpecTable | SuggestionType | string
@@ -397,6 +417,9 @@ return Suggestion
 ---| 'perk'
 ---| 'option'
 ---| 'emote'
+---| 'role'
+---| 'item'
+---| 'vehicle'
 ---| '?'
 
 --#endregion

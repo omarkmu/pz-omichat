@@ -14,6 +14,7 @@ local VanillaCommandList = {
         name = 'additem',
         helpText = 'UI_ServerOptionDesc_AddItem',
         capability = Capability.AddItem,
+        suggestSpec = { 'online-username-with-self', 'item' },
     },
     {
         name = 'addkey',
@@ -29,25 +30,28 @@ local VanillaCommandList = {
         name = 'addusertosafehouse',
         helpText = 'UI_ServerOptionDesc_AddToSafehouse',
         capability = Capability.CanSetupSafehouses,
+        suggestSpec = { 'online-username' },
     },
     {
         name = 'addusertowhitelist',
         helpText = 'UI_ServerOptionDesc_AddWhitelist',
         capability = Capability.ManipulateWhitelist,
+        suggestSpec = { 'online-username' },
     },
     {
         name = 'addvehicle',
         helpText = 'UI_ServerOptionDesc_AddVehicle',
         capability = Capability.ManipulateVehicle,
+        suggestSpec = { 'vehicle' },
     },
     {
         name = 'addxp',
         helpText = 'UI_ServerOptionDesc_AddXp',
+        capability = Capability.AddXP,
         suggestSpec = {
             'online-username-with-self',
             { type = 'perk', suffix = '=' },
         },
-        capability = Capability.AddXP,
     },
     {
         name = 'alarm',
@@ -87,8 +91,8 @@ local VanillaCommandList = {
     {
         name = 'createhorde',
         helpText = 'UI_ServerOptionDesc_CreateHorde',
-        suggestSpec = { '?', 'online-username-with-self' },
         capability = Capability.CreateHorde,
+        suggestSpec = { '?', 'online-username-with-self' },
     },
     {
         name = 'createhorde2',
@@ -97,8 +101,8 @@ local VanillaCommandList = {
     },
     {
         name = 'debugplayer',
-        suggestSpec = { 'online-username-with-self' },
         capability = Capability.ConnectWithDebug,
+        suggestSpec = { 'online-username-with-self' },
     },
     {
         name = 'godmod',
@@ -108,8 +112,8 @@ local VanillaCommandList = {
     {
         name = 'godmodplayer',
         helpText = 'UI_ServerOptionDesc_GodModPlayer',
-        suggestSpec = { 'online-username-with-self' },
         capability = Capability.ToggleGodModEveryone,
+        suggestSpec = { 'online-username-with-self' },
     },
     {
         name = 'grantadmin',
@@ -133,26 +137,26 @@ local VanillaCommandList = {
     {
         name = 'invisibleplayer',
         helpText = 'UI_ServerOptionDesc_Invisible',
-        suggestSpec = { 'online-username-with-self' },
         capability = Capability.ToggleInvisibleEveryone,
+        suggestSpec = { 'online-username-with-self' },
     },
     {
         name = 'kick',
         helpText = 'UI_ServerOptionDesc_Kick',
-        suggestSpec = { 'online-username' },
         capability = Capability.KickUser,
+        suggestSpec = { 'online-username' },
     },
     {
         name = 'kickfromsafehouse',
         helpText = 'UI_ServerOptionDesc_Kick',
-        suggestSpec = { 'online-username' },
         capability = Capability.CanSetupSafehouses,
+        suggestSpec = { 'online-username' },
     },
     {
         name = 'lightning',
         helpText = 'UI_ServerOptionDesc_Lightning',
-        suggestSpec = { 'online-username-with-self' },
         capability = Capability.MakeEventsAlarmGunshot,
+        suggestSpec = { 'online-username-with-self' },
     },
     {
         name = 'list',
@@ -286,22 +290,7 @@ local VanillaCommandList = {
         name = 'setaccesslevel',
         helpText = 'UI_ServerOptionDesc_SetAccessLevel',
         capability = Capability.ChangeAccessLevel,
-        suggestSpec = {
-            'online-username-with-self',
-            {
-                type = 'option',
-                options = {
-                    'admin',
-                    'moderator',
-                    'overseer',
-                    'gm',
-                    'observer',
-                    'priority',
-                    'user',
-                    'banned',
-                },
-            },
-        },
+        suggestSpec = { 'online-username-with-self', 'role' },
     },
     {
         name = 'setpassword',
