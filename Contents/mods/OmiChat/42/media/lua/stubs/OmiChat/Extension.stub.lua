@@ -51,6 +51,11 @@ function Extension.addHook(type, callback) end
 ---@param callback fun(): boolean? The hook callback function. If this returns `nil`, the original checks will run.
 function Extension.addHook(type, callback) end
 
+---Adds a hook for determining a message's base text.
+---@param type 'getMessageText'
+---@param callback fun(args: Args.Hook.GetMessageText): string?, string? The hook callback function. Returns the message and the name to use with the message.
+function Extension.addHook(type, callback) end
+
 ---Adds a hook for building initial message information for a command.
 ---@param type 'initCommandMessage'
 ---@param callback fun(info: MessageInfo) The hook callback function.

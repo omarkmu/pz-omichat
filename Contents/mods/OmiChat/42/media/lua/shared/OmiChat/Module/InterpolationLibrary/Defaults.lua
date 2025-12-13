@@ -68,7 +68,8 @@ function Library.Defaults.Chat(interpolator, args)
 
     local message = options:getString('input')
     if message == '' then
-        message, name = Helpers.getMessage(interpolator, tags, name --[[@as string]], nil, true)
+        ---@cast name -?
+        message, name = Helpers.getMessage(interpolator, tags, name, true)
     end
 
     local includeName = tags.IncludeName or tags.IncludeNameChat
@@ -675,7 +676,8 @@ function Library.Defaults.Overhead(interpolator, args)
     local name = optionOrToken(interpolator, options, 'name')
     local message = options:getString('input')
     if message == '' then
-        message, name = Helpers.getMessage(interpolator, tags, name --[[@as string]])
+        ---@cast name -?
+        message, name = Helpers.getMessage(interpolator, tags, name)
     end
 
     local autoCapitalize = tags.AutoCapitalize or tags.AutoCapitalizeOverhead

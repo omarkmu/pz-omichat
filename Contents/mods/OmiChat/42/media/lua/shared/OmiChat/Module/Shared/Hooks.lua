@@ -23,6 +23,7 @@ Hooks.HookType = {
     chatSuggestions = 'chatSuggestions',
     flipCommand = 'flipCommand',
     flipCommandEnabled = 'flipCommandEnabled',
+    getMessageText = 'getMessageText',
     initCommandMessage = 'initCommandMessage',
     macro = 'macro',
     perceptionRange = 'perceptionRange',
@@ -101,6 +102,34 @@ end
 ---@return boolean? enabled `True` or `false` to enable or disable the command. If the return value is `nil`, existing logic is used.
 function Hooks.flipCommandEnabled()
     return Hooks._handleBoolean(Hooks._callbacks.flipCommandEnabled)
+end
+
+---Applies hooks for determining the base text for a message.
+---@param args Args.ApplyHook.GetMessageText Arguments for the hook callback.
+---@return string? message The message to use.
+---@return string? name The name to use for the message.
+function Hooks.getMessageText(args)
+    local message, name
+    local list = Hooks._callbacks.getMessageText
+    for i = 1, #list do
+        local callback = list[i]
+        local resultMessage, resultName = callback({
+            name = name,
+            message = message,
+            interpolator = args.interpolator,
+            tags = args.tags,
+            originalName = args.name,
+            rawName = args.rawName,
+            forChat = args.forChat,
+        })
+
+        if resultMessage then
+            message = resultMessage
+            name = resultName
+        end
+    end
+
+    return message, name or args.name
 end
 
 ---Applies hooks for building initial message information for a command.
@@ -226,12 +255,23 @@ return Hooks
 
 --#region Type Definition
 
+---@class Args.ApplyHook.GetMessageText
+---@field interpolator omi.Interpolator The current interpolator.
+---@field tags omi.SetTable<string> The set of tags for the message.
+---@field name string The current name to use. May include rich text for chat formatting.
+---@field rawName string The raw name to use, without rich text.
+---@field forChat boolean Flag for whether the message is being displayed in the chat, as opposed to overhead.
+
 ---@class Args.ApplyHook.PerceptionRange
 ---@field range integer The current value for the range.
 ---@field player IsoPlayer The local player.
 ---@field distance number The distance between the players.
 ---@field author IsoPlayer The author of the message being tested for perception.
 ---@field isSigned boolean Flag for whether the message was sent in a signed language.
+
+---@class Args.Hook.GetMessageText : Args.ApplyHook.GetMessageText
+---@field message? string The message set by a previous hook.
+---@field originalName string The original name value, before applying any hooks.
 
 ---@class Args.Hook.PerceptionRange : Args.ApplyHook.PerceptionRange
 ---@field originalRange integer The original value, before applying any hooks.

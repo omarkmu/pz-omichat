@@ -587,11 +587,11 @@ end
 ---@param interpolator omi.Interpolator The interpolator in use.
 ---@param tags omi.SetTable<string> A set of tags.
 ---@param name string The name to use for the command message.
+---@param forChat boolean? Flag for whether the message is being retrieved for the chat, as opposed to overhead text.
 ---@param rawName string? The raw name to use. Will be retrieved from tokens if not given.
----@param richText boolean? Flag for whether the message should be treated as rich text.
 ---@return string message The message, or the input token if the tags indicate this is not a command.
 ---@return string name The name to use.
-function Helpers.getMessage(interpolator, tags, name, rawName, richText)
+function Helpers.getMessage(interpolator, tags, name, forChat, rawName)
     if not rawName then
         if tags.UseAuthorUsername then
             rawName = interpolator:tokenString('authorRaw')
@@ -600,8 +600,22 @@ function Helpers.getMessage(interpolator, tags, name, rawName, richText)
         end
     end
 
+    if API.hooks.has.getMessageText then
+        local hookMsg, hookName = API.hooks.getMessageText {
+            interpolator = interpolator,
+            tags = tags,
+            name = name,
+            rawName = rawName,
+            forChat = forChat or false,
+        }
+
+        if hookMsg then
+            return hookMsg, hookName or ''
+        end
+    end
+
     local message
-    local space = richText and ' <SPACE>' or ''
+    local space = forChat and ' <SPACE>' or ''
     if tags.IsCardCommand then
         message = getText('command-card', {
             name = name,
