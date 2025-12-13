@@ -250,8 +250,7 @@ function UI.openProfileManager()
         return
     end
 
-    if instance.
-        activeProfilesPanel then
+    if instance.activeProfilesPanel then
         instance.activeProfilesPanel:destroy()
     end
 
@@ -659,18 +658,18 @@ function UI._addCustomizationSettings(context)
     if config.Customization.EnableCharacterCustomization then
         if config:isCleanCustomizationEnabled() then
             local cleanOptName = getText('context-clean')
-            submenu:addOption(cleanOptName, instance, callback.cleanCharacter)
+            submenu:addOption(cleanOptName, 'CLEAN_CHARACTER', API.request.applyCustomization)
         end
 
         local hairColorOptName = getText('context-hair-color')
         submenu:addOption(hairColorOptName, instance, callback.openHairColorDialog)
 
         local growHairOptName = getText('context-grow-hair')
-        submenu:addOption(growHairOptName, instance, callback.growHair)
+        submenu:addOption(growHairOptName, 'GROW_HAIR', API.request.applyCustomization)
 
         if not player:isFemale() then
             local growBeardOptName = getText('context-grow-beard')
-            submenu:addOption(growBeardOptName, instance, callback.growBeard)
+            submenu:addOption(growBeardOptName, 'GROW_BEARD', API.request.applyCustomization)
         end
     end
 

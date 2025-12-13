@@ -4,6 +4,8 @@
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Client/Core'
 
+local utils = API.utils
+
 
 ---@class api.client.request : api.shared.request
 local Request = API.request
@@ -30,6 +32,18 @@ end
 ---@return boolean success
 ---@return string? error
 function Request.applyBuff() return Topic.APPLY_BUFF:toServer() end
+
+---Requests applying a customization option.
+---@param customizationType request.CustomizationType The customization to apply.
+---@param args Partial<request.Args.Customization>? Additional arguments for the customization.
+---@return boolean success
+---@return string? error
+function Request.applyCustomization(customizationType, args)
+    args = utils.copy(args --[[@as request.Args.Customization]])
+    args.type = customizationType
+
+    return Topic.APPLY_CUSTOMIZATION:toServer(args)
+end
 
 ---Requests clearing all player data for a username.
 ---Fails if the local player is not an admin.

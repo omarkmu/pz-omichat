@@ -9,11 +9,8 @@ local config = API.Configuration
 local UI = utils.ui
 local ISChat = ISChat --[[@as omichat.ISChat]]
 
-local BloodBodyPartType = BloodBodyPartType
-local getAttr = utils.getAttr
-local getCoveredParts = BloodClothingType.getCoveredParts
-
 local max = math.max
+local getAttr = utils.getAttr
 local textManager = getTextManager()
 
 
@@ -28,129 +25,23 @@ API.callback = Callback
 Callback._infoUpdateCounter = 0
 
 
----Callback for the clean character customization option.
----@param _ ISChat Unused.
-function Callback.cleanCharacter(_)
-    local player = API.player.get()
-    if not player then
-        return
-    end
-
-    local visual = player:getHumanVisual()
-    if not visual then
-        return
-    end
-
-    if config:isCleanBodyEnabled() then
-        for i = 0, BloodBodyPartType.MAX:index() - 1 do
-            local bodyPart = BloodBodyPartType.FromIndex(i)
-            visual:setDirt(bodyPart, 0)
-            visual:setBlood(bodyPart, 0)
-        end
-    end
-
-    local shouldUpdateClothing = config:isCleanClothingEnabled()
-    if shouldUpdateClothing then
-        local items = player:getWornItems()
-        for i = 0, items:size() - 1 do
-            local item = items:getItemByIndex(i)
-            local itemVisual = item and instanceof(item, 'Clothing') and item:getVisual()
-            if itemVisual then
-                ---@cast item Clothing
-                local parts = getCoveredParts(item:getBloodClothingType())
-
-                for j = 0, parts:size() - 1 do
-                    local part = parts:get(j)
-                    itemVisual:setDirt(part, 0)
-                    itemVisual:setBlood(part, 0)
-                end
-
-                item:setDirtyness(0)
-                item:setBloodLevel(0)
-            end
-        end
-    end
-
-    player:resetModel()
-    sendVisual(player)
-
-    if shouldUpdateClothing then
-        -- TODO(b42): update
-        ---@diagnostic disable-next-line: missing-parameter
-        sendClothing(player)
-        triggerEvent('OnClothingUpdated', player)
-    end
-end
-
----Callback for the grow beard customization option.
----@param _ ISChat Unused.
-function Callback.growBeard(_)
-    local player = API.player.get()
-    if not player then
-        return
-    end
-
-    -- TODO(b42): update
-    ---@diagnostic disable-next-line: redundant-parameter
-    ISTimedActionQueue.add(ISTrimBeard:new(player, 'Long', nil, 1))
-end
-
----Callback for the grow hair customization option.
----@param _ ISChat Unused.
-function Callback.growHair(_)
-    local player = API.player.get()
-    if not player then
-        return
-    end
-
-    local hairStyle = player:isFemale() and 'Long2' or 'Fabian'
-    ISTimedActionQueue.add(ISCutHair:new(player, hairStyle, nil, 1))
-end
-
 ---Callback for adding a roleplay language.
 ---@param _ ISChat Unused.
 ---@param args omi.Args.Dialog.Click Click arguments.
 ---@param language string The language to add.
 function Callback.onConfirmAddLanguage(_, args, language)
-    if args.internal ~= 'YES' then
-        return
+    if args.internal == 'YES' then
+        API.player.addLanguage(language)
     end
-
-    API.player.addLanguage(language)
 end
 
 ---Callback for hair color menu selection.
 ---@param _ ISChat Unused.
 ---@param args omi.Args.ColorDialog.Click Click arguments.
 function Callback.onHairColorMenuClick(_, args)
-    if args.internal ~= 'OK' then
-        return
+    if args.internal == 'OK' then
+        API.request.applyCustomization('SET_HAIR_COLOR', { hairColor = args.dialog:getColor() })
     end
-
-    local player = API.player.get()
-    if not player then
-        return
-    end
-
-    local visual = player:getHumanVisual()
-    if not visual then
-        return
-    end
-
-    local hairColor
-    local parent = args.button.parent --[[@as omi.ColorEntry]]
-    local color = parent:getColor()
-    if color then
-        hairColor = ImmutableColor.new(color.r / 255, color.g / 255, color.b / 255, 1)
-    else
-        hairColor = visual:getNaturalHairColor()
-    end
-
-    visual:setHairColor(hairColor)
-    visual:setBeardColor(hairColor)
-
-    player:resetModel()
-    sendVisual(player)
 end
 
 ---Callback for hair color customization menu initialization.

@@ -101,6 +101,42 @@ TOPIC.APPLY_BUFF = dispatch:topic('APPLY_BUFF', {
     end,
 })
 
+---Client → server: Apply a customization option (including character clean).
+---Server → client: Indicates that customization was applied.
+TOPIC.APPLY_CUSTOMIZATION = dispatch:topic('APPLY_CUSTOMIZATION', {
+    ---@param req omi.ClientRequest
+    ---@param args request.Args.Customization
+    onServerReceive = function(req, args)
+        if not config.Customization.EnableCharacterCustomization then
+            return
+        end
+
+        local player = req:getPlayer()
+        if args.type == 'GROW_BEARD' then
+            API_S.customization.growBeard(player)
+        elseif args.type == 'GROW_HAIR' then
+            API_S.customization.growHair(player)
+        elseif args.type == 'SET_HAIR_COLOR' then
+            API_S.customization.setHairColor(player, args.hairColor)
+        elseif args.type == 'CLEAN_CHARACTER' then
+            API_S.customization.cleanCharacter(player)
+        else
+            return
+        end
+
+        req:reply(args)
+    end,
+
+    onClientReceive = function()
+        local player = API_C.player.get()
+        if not player then
+            return
+        end
+
+        triggerEvent('OnClothingUpdated', player)
+    end,
+})
+
 ---Client → server: Execute a chat command.
 TOPIC.COMMAND = dispatch:topic('COMMAND', {
     ---@param args request.Args.Command
@@ -661,6 +697,12 @@ return Request
 
 --#region Type Definitions
 
+---@alias request.CustomizationType
+---| 'GROW_BEARD'
+---| 'GROW_HAIR'
+---| 'CLEAN_CHARACTER'
+---| 'SET_HAIR_COLOR'
+
 ---Client to server request to add or remove a user-defined configuration preset.
 ---@class request.Args.AddOrRemovePreset
 ---@field type 'ADD' | 'DELETE' The operation to complete.
@@ -675,6 +717,11 @@ return Request
 ---@class request.Args.Command
 ---@field name request.ChatCommandName The name of the command.
 ---@field text string The command text, excluding the command itself.
+
+---Client to server request to perform a customization option.
+---@class request.Args.Customization
+---@field type request.CustomizationType The customization type to apply.
+---@field hairColor? omi.ColorTable<integer> The hair color to set. Defaults to the natural hair color.
 
 ---Client to server request to update player data.
 ---@class request.Args.PlayerDataUpdate
