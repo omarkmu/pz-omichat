@@ -506,6 +506,32 @@ TOPIC.PLAYER_JOINED = dispatch:topic('PLAYER_JOINED', {
         dispatch.trigger.onPlayerJoined(),
     },
 
+    -- TODO(vanilla bug): remove when https://theindiestone.com/forums/index.php?/topic/90037-42131 is fixed
+    onClientSend = function()
+        local player = API_C.player.get()
+        if not player then
+            return
+        end
+
+        -- due to the bug, this returns a random color
+        -- this initial call is to ensure the backing field is set
+        local color = getCore():getMpTextColor()
+
+        local prefs = API_C.preferences.get()
+        local profile = prefs.profiles[prefs.profileIndex]
+        local speechColor = profile and profile.colors.speech
+
+        -- since ArrayConfigOption isn't exposed, this is the best workaround as far as I can tell
+        if speechColor then
+            -- if a color is set on the selected profile, use it
+            API_C.player.setSpeechColor(speechColor)
+        else
+            -- otherwise, we'll have to use the random one (which will at least be synced)
+            player:setSpeakColourInfo(color)
+            sendPersonalColor(player)
+        end
+    end,
+
     onServerReceive = function(req)
         req:broadcastOn(TOPIC.PLAYER_CACHE)
         req:replyWith(TOPIC.CONFIGURATION)
