@@ -11,6 +11,4 @@ require 'OmiChat/Module/Shared/Languages'
 require 'OmiChat/Module/Shared/Request'
 require 'OmiChat/InterpolationLibrary'
 
-require 'OmiChat/Module/Shared/SharedEvents'
-
 return API

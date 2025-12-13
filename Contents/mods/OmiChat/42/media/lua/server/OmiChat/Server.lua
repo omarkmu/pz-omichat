@@ -11,4 +11,6 @@ require 'OmiChat/Module/Server/Data'
 require 'OmiChat/Module/Server/Commands'
 require 'OmiChat/Module/Server/Request'
 
+require 'OmiChat/Module/Server/ServerEvents'
+
 return API
