@@ -68,7 +68,7 @@ function Library.Defaults.Chat(interpolator, args)
 
     local message = options:getString('input')
     if message == '' then
-        message, name = Helpers.getMessage(interpolator, tags, name --[[@as string]])
+        message, name = Helpers.getMessage(interpolator, tags, name --[[@as string]], nil, true)
     end
 
     local includeName = tags.IncludeName or tags.IncludeNameChat

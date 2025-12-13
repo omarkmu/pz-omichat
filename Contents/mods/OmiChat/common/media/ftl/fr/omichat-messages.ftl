@@ -29,19 +29,19 @@ typing-many = Plusieurs personnes sont en train d'écrire...
 
 ## Command messages
 
-command-card = { $name } tire { $card }
+command-card = { $name }{ $space } tire { $card }
 
 command-card-global = { $name } a tiré { $card }
 
-command-roll = { $name } lance { $roll } sur un dé à { $sides } faces
+command-roll = { $name }{ $space } lance { $roll } sur un dé à { $sides } faces
 
 command-roll-global = { $name } a lancé un { $roll } sur un dé à { $sides } faces
 
-command-flip-heads = { $name } lance une pièce de monnaie et obtient face
+command-flip-heads = { $name }{ $space } lance une pièce de monnaie et obtient face
 
 command-flip-heads-global = { $name } a lancé une pièce de monnaie et a obtenu face
 
-command-flip-tails = { $name } lance une pièce de monnaie et obtient pile
+command-flip-tails = { $name }{ $space } lance une pièce de monnaie et obtient pile
 
 command-flip-tails-global = { $name } a lancé une pièce de monnaie et a obtenu pile
 

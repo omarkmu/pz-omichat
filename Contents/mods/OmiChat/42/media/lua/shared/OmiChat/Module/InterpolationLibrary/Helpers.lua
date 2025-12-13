@@ -588,9 +588,10 @@ end
 ---@param tags omi.SetTable<string> A set of tags.
 ---@param name string The name to use for the command message.
 ---@param rawName string? The raw name to use. Will be retrieved from tokens if not given.
+---@param richText boolean? Flag for whether the message should be treated as rich text.
 ---@return string message The message, or the input token if the tags indicate this is not a command.
 ---@return string name The name to use.
-function Helpers.getMessage(interpolator, tags, name, rawName)
+function Helpers.getMessage(interpolator, tags, name, rawName, richText)
     if not rawName then
         if tags.UseAuthorUsername then
             rawName = interpolator:tokenString('authorRaw')
@@ -600,14 +601,25 @@ function Helpers.getMessage(interpolator, tags, name, rawName)
     end
 
     local message
+    local space = richText and ' <SPACE>' or ''
     if tags.IsCardCommand then
-        message = getText('command-card', { name = name, rawName = rawName, card = interpolator:tokenString('card') })
+        message = getText('command-card', {
+            name = name,
+            space = space,
+            rawName = rawName,
+            card = interpolator:tokenString('card'),
+        })
     elseif tags.IsFlipCommand then
         local id = interpolator:tokenBoolean('heads') and 'command-flip-heads' or 'command-flip-tails'
-        message = getText(id, { name = name, rawName = rawName })
+        message = getText(id, {
+            name = name,
+            space = space,
+            rawName = rawName,
+        })
     elseif tags.IsRollCommand then
         message = getText('command-roll', {
             name = name,
+            space = space,
             rawName = rawName,
             roll = interpolator:tokenString('roll'),
             sides = interpolator:tokenString('sides'),

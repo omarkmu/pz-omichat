@@ -42,19 +42,21 @@ typing-many = Several people are typing...
 ## Command messages
 
 # @param $name string The name of the player who drew a card. This may include rich text formatting.
-# @param $rawName? string The name of the player who drew a card, without formatting.
 # @param $card string The full name of the card that was drawn.
-command-card = { $name } draws { $card }
+# @param $rawName? string The name of the player who drew a card, without formatting.
+# @param $space? string The rich text space to include after the name, or an empty string if not rich text.
+command-card = { $name }{ $space } draws { $card }
 
 # @param $name string The name of the player who drew a card.
 # @param $card string The full name of the card that was drawn.
 command-card-global = { $name } drew { $card }
 
 # @param $name string The name of the player who rolled a die. This may include rich text formatting.
-# @param $rawName? string The name of the player who rolled a die, without formatting.
 # @param $roll integer The result of the dice roll.
 # @param $sides integer The number of sides on the die.
-command-roll = { $name } rolls { $roll } on a { $sides }-sided die
+# @param $rawName? string The name of the player who rolled a die, without formatting.
+# @param $space? string The rich text space to include after the name, or an empty string if not rich text.
+command-roll = { $name }{ $space } rolls { $roll } on a { $sides }-sided die
 
 # @param $name string The name of the player who rolled a die.
 # @param $roll integer The result of the dice roll.
@@ -63,14 +65,16 @@ command-roll-global = { $name } rolled { $roll } on a { $sides }-sided die
 
 # @param $name string The name of the player who flipped a coin. This may include rich text formatting.
 # @param $rawName? string The name of the player who flipped a coin, without formatting.
-command-flip-heads = { $name } flips a coin and gets heads
+# @param $space? string The rich text space to include after the name, or an empty string if not rich text.
+command-flip-heads = { $name }{ $space } flips a coin and gets heads
 
 # @param $name string The name of the player who flipped a coin.
 command-flip-heads-global = { $name } flipped a coin and got heads
 
 # @param $name string The name of the player who flipped a coin. This may include rich text formatting.
 # @param $rawName? string The name of the player who flipped a coin, without formatting.
-command-flip-tails = { $name } flips a coin and gets tails
+# @param $space? string The rich text space to include after the name, or an empty string if not rich text.
+command-flip-tails = { $name }{ $space } flips a coin and gets tails
 
 # @param $name string The name of the player who flipped a coin.
 command-flip-tails-global = { $name } flipped a coin and got tails
