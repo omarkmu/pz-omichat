@@ -1,0 +1,28 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check-translations:
+    name: Translation check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Checkout pz-utils
+        uses: actions/checkout@v4
+        with:
+          repository: omarkmu/pz-utils
+          path: pz-utils
+      - name: Set up Node
+        uses: actions/setup-node@v6
+      - name: Install pz-utils
+        run: npm install ./pz-utils
+      - name: Run analyzer
+        run: |
+          cd pz-utils
+          npm run analyze -- .. --ignore missing-file
