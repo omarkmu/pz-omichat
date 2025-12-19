@@ -629,7 +629,7 @@ function Helpers.savePreset(form, state)
         type = 'OKCancel',
         w = 500,
         h = 200,
-        okText = getText('.btn-save'),
+        okText = getText('@ui.btn-save'),
         text = getText('dialog-save-preset'),
         minLength = 1,
         maxLength = 50,

@@ -328,7 +328,7 @@ function Library.Defaults.FilterChatInput(interpolator, args)
 
     local maxLength = options:getNumber('maxLength')
     if maxLength > 0 and #input > maxLength then
-        interpolator:setToken('error', getText('.error-length-max', { max = maxLength }))
+        interpolator:setToken('error', getText('@error.length-max', { max = maxLength }))
         return
     end
 
@@ -351,10 +351,10 @@ function Library.Defaults.FilterName(interpolator, args)
     local maxLength = options:getNumber('maxLength')
     local minLength = options:getNumber('minLength')
     if maxLength > 0 and #input > maxLength then
-        interpolator:setToken('error', getText('.error-length-max', { max = maxLength }))
+        interpolator:setToken('error', getText('@error.length-max', { max = maxLength }))
         return
     elseif minLength > 0 and #input < minLength then
-        interpolator:setToken('error', getText('.error-length-min', { min = minLength }))
+        interpolator:setToken('error', getText('@error.length-min', { min = minLength }))
         return
     end
 
@@ -396,10 +396,10 @@ function Library.Defaults.FilterStatus(interpolator, args)
     local maxLength = options:getNumber('maxLength', 64)
     local minLength = options:getNumber('minLength', 8)
     if maxLength > 0 and #input > maxLength then
-        interpolator:setToken('error', getText('.error-length-max', { max = maxLength }))
+        interpolator:setToken('error', getText('@error.length-max', { max = maxLength }))
         return
     elseif minLength > 0 and #input < minLength then
-        interpolator:setToken('error', getText('.error-length-min', { min = minLength }))
+        interpolator:setToken('error', getText('@error.length-min', { min = minLength }))
         return
     end
 

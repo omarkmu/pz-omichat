@@ -174,7 +174,7 @@ function ProfileManager:createChildren()
         anchorRight = false,
         anchorBottom = true,
         internal = 'CLOSE',
-        text = getText('.btn-close'),
+        text = getText('@ui.btn-close'),
         useCancelStyle = true,
         target = self,
         onClick = self.destroy,
@@ -193,7 +193,7 @@ function ProfileManager:createChildren()
         anchorRight = false,
         anchorBottom = true,
         internal = 'SAVE',
-        text = getText('.btn-save'),
+        text = getText('@ui.btn-save'),
         useAcceptStyle = true,
         target = self,
         onClick = self.onSave,
@@ -738,7 +738,7 @@ function ProfileManager:new(args)
     this.colorControls = {}
     this.calloutControls = {}
 
-    this.addText = getText('.btn-add')
+    this.addText = getText('@ui.btn-add')
     this.createText = getAttr('profile-manager', 'btn-create')
 
     return this
