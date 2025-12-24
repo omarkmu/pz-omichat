@@ -51,11 +51,11 @@ option-loudTag = The default dialogue tag to use for a loud message. Defaults to
 
 option-maxLength = The maximum length of the input. Produces a relevant error if exceeded.
 
-option-maxLength-FilterStatus = The maximum length of the input. Produces a relevant error if exceeded. Defaults to 64.
+option-maxLength-filter-status = The maximum length of the input. Produces a relevant error if exceeded. Defaults to 64.
 
 option-minLength = The minimum length of the input. Produces a relevant error if not met.
 
-option-minLength-FilterStatus = The minimum length of the input. Produces a relevant error if not met. Defaults to 8.
+option-minLength-filter-status = The minimum length of the input. Produces a relevant error if not met. Defaults to 8.
 
 option-mode = The mode to use for the name display.
     <LINE> This can be 'username', 'name', or 'both' to include both separated by a slash.
