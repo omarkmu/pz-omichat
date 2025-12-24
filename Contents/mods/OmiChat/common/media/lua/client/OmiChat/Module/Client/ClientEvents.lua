@@ -16,13 +16,6 @@ function API._onCreatePlayer(playerNum, player)
     end
 end
 
----Called on game boot.
----Pregenerates the configuration UI.
----@private
-function API._onGameBoot()
-    API.ui.getConfigPanel()
-end
-
 ---Called on game start.
 ---@private
 function API._onGameStart()
@@ -30,6 +23,5 @@ function API._onGameStart()
 end
 
 
-Events.OnGameBoot.Add(API._onGameBoot)
 Events.OnGameStart.Add(API._onGameStart)
 Events.OnCreatePlayer.Add(API._onCreatePlayer)
