@@ -713,7 +713,7 @@ function UI._addLanguageOptions(context)
         end
     end
 
-    if #knownLanguages == 0 and #addLanguages == 0 then
+    if #knownLanguages <= 1 and #addLanguages == 0 then
         return
     end
 
