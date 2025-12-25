@@ -333,7 +333,7 @@ TOPIC.DRAW_CARD = dispatch:topic('DRAW_CARD', {
                 card = {
                     id = 'card-name',
                     args = {
-                        card = { id = 'card-' .. card },
+                        card = { id = 'card-' .. utils._cards[card] },
                         suit = { id = 'card-suit-' .. utils._suits[suit] },
                     },
                 },
