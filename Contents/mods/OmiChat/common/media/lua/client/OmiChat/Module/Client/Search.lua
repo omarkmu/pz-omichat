@@ -559,7 +559,7 @@ function Search._filterStream(stream)
     end
 
     ---@cast stream VanillaCommand
-    return API.player.hasCapability(stream.capability)
+    return isCoopHost() or API.player.hasCapability(stream.capability)
 end
 
 ---Display function for icons.

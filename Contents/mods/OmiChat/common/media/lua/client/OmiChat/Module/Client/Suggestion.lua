@@ -90,9 +90,10 @@ function Suggestion.getSpec(input)
     end
 
     -- vanilla command specs
+    local isHost = isCoopHost()
     for i = 1, #vanillaCommands do
         local commandInfo = vanillaCommands[i]
-        if API.player.hasCapability(commandInfo.capability) then
+        if isHost or API.player.hasCapability(commandInfo.capability) then
             local vanillaCommand = '/' .. commandInfo.name .. ' '
             if commandInfo.suggestSpec and utils.startsWith(input:lower(), vanillaCommand) then
                 return commandInfo.suggestSpec

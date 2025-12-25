@@ -66,10 +66,11 @@ return API.CommandStream:new {
             end
         end
 
+        local isHost = isCoopHost()
         for i = 1, #vanillaCommands do
             local info = vanillaCommands[i]
             if info.name and not seen[info.name] then
-                if role:hasCapability(info.capability) then
+                if isHost or role:hasCapability(info.capability) then
                     commands[#commands + 1] = info
                 end
             end
