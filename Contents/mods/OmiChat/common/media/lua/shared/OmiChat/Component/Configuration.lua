@@ -6,17 +6,20 @@ local Preset = require 'OmiChat/Component/Configuration/Preset'
 local sort = table.sort
 local isempty = table.isempty
 
-
 ---@class ConfigurationHelper : Configuration, omi.ConfigurationHelper<Configuration>
 local Configuration = utils.configuration {
     schema = require 'OmiChat/Component/Configuration/ConfigurationSchema',
-    modDataKey = 'settings',
+    filename = string.format('omichat/configuration_%s.json', getServerName()),
     logger = utils.log,
 
     ---@param self ConfigurationHelper
     init = function(self)
         self:loadCustomPresets()
         self:loadDefaults()
+
+        if not isClient() then
+            self:loadFile()
+        end
     end,
 
     ---@param self ConfigurationHelper
@@ -30,7 +33,7 @@ Configuration.Preset = Preset
 
 ---Filename used for storing presets on the server.
 ---@private
-Configuration._presetFilename = 'omichat/configuration_presets.json'
+Configuration._presetFilename = 'omichat/presets.json'
 
 ---Table containing built-in presets.
 ---@private

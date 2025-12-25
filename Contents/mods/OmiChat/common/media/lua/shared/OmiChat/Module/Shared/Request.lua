@@ -199,7 +199,7 @@ TOPIC.CONFIGURATION = dispatch:topic('CONFIGURATION', {
         if req:isFromServer() then
             API_C.chat.updateState(true)
         else
-            config:saveModData()
+            config:saveFile()
             req:broadcast()
         end
     end,
