@@ -28,7 +28,6 @@ local textManager = getTextManager()
 local ISChat = ISChat --[[@as omichat.ISChat]]
 
 local TILE_FIELD ---@type Field?
-local TILE_FIELD_INDEX = 2
 
 
 ---@class api.client.ui
@@ -1058,7 +1057,8 @@ function UI._getPickedSquare()
     end
 
     if not TILE_FIELD then
-        TILE_FIELD = getClassField(picked, TILE_FIELD_INDEX)
+        TILE_FIELD = utils.getClassFieldByName(picked, 'tile')
+        assert(TILE_FIELD, 'Failed to get ClickObject.tile field')
     end
 
     local value = getClassFieldVal(picked, TILE_FIELD)
