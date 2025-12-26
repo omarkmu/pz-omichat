@@ -17,6 +17,7 @@ local getTextOrNull = utils.getTextOrNull
 
 local IS_CLIENT = not isServer()
 
+local IGNORE_CHAR = string.char(131)
 local ASTERISK_CHAR = string.char(140)
 local ASTERISK_PREFIX_PATTERN = '^(%s*[*' .. ASTERISK_CHAR .. '])(.+)'
 local ASTERISK_DELIM_PATTERN = '^"%s*[*' .. ASTERISK_CHAR .. ']'
@@ -650,26 +651,26 @@ end
 ---@param options Args.GetMessageSegments? Options for retrieving segments.
 ---@return MessageSegment[] segments A list of message segments.
 function Helpers.getMessageSegments(input, options)
-    options = options or {}
+    options = options or {} --[[@as Args.GetMessageSegments]]
     input = utils.trim(input)
 
     local inAction = options.startInAction or false
     local onlyFirstSegment = options.onlyFirstSegment
     local requireAsterisk = not options.startInAction and not options.optionalActionAsterisk
+    local skipFirstQuote = not inAction and options.hasInternalQuote
 
     local start = 1
     local pos = 1
 
-    -- avoid triggering actions with an initial asterisk in narrative style
-    if not inAction and options.hasInternalQuote then
-        local firstQuote = input:find('"')
-        pos = firstQuote and (firstQuote + 1) or pos
-    end
-
+    local RichTextPanel = API_C.utils.ui and API_C.utils.ui.RichTextPanel
     local segments = {} ---@type MessageSegment[]
     while pos <= #input do
-        if input:sub(pos, pos) == '"' then
-            if start ~= pos then
+        local c = input:sub(pos, pos)
+        if c == '"' then
+            if skipFirstQuote then
+                -- avoid triggering actions with an initial asterisk in narrative style
+                skipFirstQuote = false
+            elseif start ~= pos then
                 if inAction then
                     segments[#segments + 1] = {
                         type = 'action',
@@ -692,12 +693,19 @@ function Helpers.getMessageSegments(input, options)
             if onlyFirstSegment and #segments > 0 then
                 return segments
             end
-        else
-            -- skip mentions
+        elseif c == '<' then
             local _, mentionEnd = input:find('^<@%d+:.->', pos)
             if mentionEnd then
+                -- skip mentions
                 pos = mentionEnd
+            elseif RichTextPanel then
+                -- skip rich text commands
+                local name = RichTextPanel.findCommandName(input, pos + 1)
+                local isCmd = name and name:match('^[/A-Z]+$')
+                pos = isCmd and RichTextPanel.findCommandEnd(input, pos) or pos
             end
+        elseif c == IGNORE_CHAR and input:sub(pos + 1, pos + 1) == '"' then
+            pos = pos + 1
         end
 
         pos = pos + 1

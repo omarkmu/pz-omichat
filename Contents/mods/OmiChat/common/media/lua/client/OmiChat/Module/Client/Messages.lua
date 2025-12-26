@@ -23,7 +23,8 @@ local _ChatBase = __classmetatables[ChatBase.class].__index ---@type any
 local _getChatType = _ChatBase.getType
 
 local DATA_START = string.char(130)
-local DATA_PATTERN = '%s*%' .. string.char(130) .. '({.+})%s*$'
+local IGNORE_QUOTE = string.char(131) .. '"'
+local DATA_PATTERN = '%s*' .. DATA_START .. '({.+})%s*$'
 local commandContextTypes = {
     ['omichat.card'] = true,
     ['omichat.flip'] = true,
@@ -304,6 +305,7 @@ function Messages.parse(text, textWithPrefix, chatType)
     local testChars = {}
     local iconCount = 0
 
+    local specialStartPos = #text
     local inSpecial = false
 
     local i = 1
@@ -321,6 +323,7 @@ function Messages.parse(text, textWithPrefix, chatType)
                 end
 
                 inSpecial = true
+                specialStartPos = i
             else
                 local value = concat(testChars)
                 local valueLower = value:lower()
@@ -344,10 +347,8 @@ function Messages.parse(text, textWithPrefix, chatType)
 
                     inSpecial = false
                 else
-                    segments[#segments + 1] = {
-                        type = 'text',
-                        text = '*' .. value,
-                    }
+                    -- see logic for unterminated asterisks below
+                    i = #text
                 end
             end
         elseif inSpecial then
@@ -375,12 +376,20 @@ function Messages.parse(text, textWithPrefix, chatType)
             end
         end
 
-        i = i + 1
-    end
+        -- rewind for unterminated asterisks;
+        -- necessary to properly parse mentions
+        if inSpecial and i == #text then
+            i = specialStartPos
+            inSpecial = false
+            testChars = {}
 
-    if inSpecial then
-        chars[#chars + 1] = '*'
-        utils.append(chars, testChars)
+            segments[#segments + 1] = {
+                type = 'text',
+                text = '*',
+            }
+        end
+
+        i = i + 1
     end
 
     if #chars > 0 then
@@ -879,7 +888,7 @@ function Messages._formatMentions(info, forChat)
 
         if not forChat or not config.Mentions.Enable then
             local result = utils.interpolateNamed('MentionOverhead', config.Mentions.OverheadFormat, tokens)
-            result = result:gsub('"', "''")
+            result = result:gsub('"', IGNORE_QUOTE)
             if utils.trim(result) == '' then
                 result = name
             end
@@ -905,14 +914,15 @@ function Messages._formatMentions(info, forChat)
             if hoverName == name then
                 hoverName = nil
             elseif hoverName then
-                hoverName = hoverName:gsub('"', "\\'\\'")
+                hoverName = hoverName:gsub('"', IGNORE_QUOTE):gsub("(['\\])", '\\%1')
             end
         end
 
         local result = utils.interpolateNamed('MentionChat', config.Mentions.ChatFormat, tokens)
-        result = result:gsub('"', "''")
         if utils.trim(result) == '' then
             result = name
+        else
+            result = result:gsub('"', IGNORE_QUOTE)
         end
 
         if color and useColors then
@@ -920,7 +930,7 @@ function Messages._formatMentions(info, forChat)
         end
 
         if hoverName then
-            result = ' <HOVER text=\'' .. utils.escapeRichText(hoverName) .. '\'> ' .. result .. ' </HOVER> '
+            result = " <HOVER text='" .. utils.escapeRichText(hoverName) .. "'> " .. result .. ' </HOVER> '
         end
 
         if #leading > 0 then
