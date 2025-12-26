@@ -10,7 +10,9 @@ local CAPABILITY_DEBUG = Capability.DebugConsole
 return API.CommandStream:new {
     name = 'clear',
     command = '/clear ',
-    isEnabled = function() return API.player.hasCapability(CAPABILITY_DEBUG) end,
+    isEnabled = function()
+        return isCoopHost() or API.player.hasCapability(CAPABILITY_DEBUG)
+    end,
     onUse = function()
         API.chat.clear()
 
