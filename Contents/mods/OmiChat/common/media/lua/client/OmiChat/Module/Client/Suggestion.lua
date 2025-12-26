@@ -385,7 +385,7 @@ function Suggestion._suggestMentions(info)
             info.suggestions[#info.suggestions + 1] = {
                 text = nickname,
                 textColor = { r = color.r / 255, g = color.g / 255, b = color.b / 255, a = 1 },
-                content = format('%s<@%03d:%s>', prefix, onlineID, nickname),
+                content = format('%s<@%03d:%s>', prefix, onlineID, utils.escapeRichText(nickname)),
             }
         end
     end

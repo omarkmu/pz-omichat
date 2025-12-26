@@ -911,10 +911,12 @@ function Messages._formatMentions(info, forChat)
             color = playerData and playerData.speechColor
             hoverName = playerData and API.data.getPlayerNameInChat(playerData, info.chatType)
 
-            if hoverName == name then
-                hoverName = nil
-            elseif hoverName then
-                hoverName = hoverName:gsub('"', IGNORE_QUOTE):gsub("(['\\])", '\\%1')
+            if hoverName then
+                if utils.unescapeRichText(hoverName) ~= utils.unescapeRichText(name) then
+                    hoverName = hoverName:gsub('"', IGNORE_QUOTE):gsub("(['\\])", '\\%1')
+                else
+                    hoverName = nil
+                end
             end
         end
 
@@ -1037,7 +1039,8 @@ function Messages._showOverhead(info)
 
     local color = info.chatType == 'radio' and LIGHT_GRAY or overheadPlayer:getSpeakColour()
     overheadPlayer:addLineChatElement(
-        text, color:getR(), color:getG(), color:getB(),
+        utils.replaceEntities(text),
+        color:getR(), color:getG(), color:getB(),
         FONT_MEDIUM, range, 'default',
         true, true, true, true, false, true
     )
