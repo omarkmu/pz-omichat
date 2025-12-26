@@ -79,6 +79,7 @@ function MessageMetadata:encodeInitialData()
     local chatType = API.messages.getChatType(message)
     local data = API.messages.decodeData(message)
     local useAdminIcon = data and data.useAdminIcon
+    local streamName = data and data.stream
     local onlineID = data and data.id
 
     if not data and chatType == 'radio' then
@@ -120,10 +121,17 @@ function MessageMetadata:encodeInitialData()
         end
     end
 
+    -- use the stream matching the chat type if no stream is given
+    -- (e.g., if a message is sent without metadata attached)
+    if not streamName then
+        local stream = API.streams.getChatStream(chatType)
+        streamName = stream and stream:getName()
+    end
+
     local color = author and API.data.getSpeechColor(author)
     local encoded = utils.json.tryEncode {
         language = data and data.language,
-        stream = data and data.stream,
+        stream = streamName,
         echoType = data and data.echoType,
         ctx = data and data.ctx,
         name = author and API.data.getNameInChat(author, chatType),
