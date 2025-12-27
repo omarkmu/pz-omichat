@@ -31,7 +31,7 @@ config =
 config-format-strings = <CENTRE> <SIZE:large> Format Strings <LINE> <SIZE:small> <LEFT>
     The style of format strings is designed to be fairly simple to modify but flexible enough
     to satisfy most servers' needs for customization.
-    They can utilize a few features which are described below.
+    They can utilize a few features, which are described below.
     { -format-section-heading(name: "Tokens") }
     Tokens are case-sensitive placeholder values that are replaced with the relevant value when the format is processed.
     They are specified with a dollar sign followed by the name of the token. For example,

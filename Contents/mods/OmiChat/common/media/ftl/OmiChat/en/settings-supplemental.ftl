@@ -321,17 +321,17 @@ token-desc-embedded = The tokens for this setting differ depending on the contex
 
 ## Token descriptions
 
-token-admin = Set to '1' if the message should display as coming from an admin. Not given otherwise.
+token-admin = Populated if the message should display as coming from an admin.
 
 token-adminIcon = The admin icon to use for the message. Not given unless applicable.
 
-token-alt-typing = Set to '1' if the 'several people are typing' message should be used for the typing indicator.
+token-alt-typing = Populated if the 'several people are typing' message should be used for the typing indicator.
 
-token-author = The message author (usually a username). This may include rich text for the name color.
+token-author = The message author (usually a username). This may include rich text commands.
 
 token-authorRaw = The message author (usually a username), without any rich text.
 
-token-callout = Set to '1' if the message was a callout, including sneak callouts.
+token-callout = Populated if the message was a callout, including sneak callouts.
 
 token-card = The translated name of the drawn card.
 
@@ -340,11 +340,11 @@ token-chatType = The chat type of the stream.
 
 token-dialogueTag = The dialogue tag for a message using narrative style.
 
-token-echo = Set to '1' if this is an echo message.
+token-echo = Populated for echo messages.
 
-token-error = Set to the empty string. This can be set to display as an error to the player.
+token-error = This can be set to display as an error to the player.
 
-token-errorID = Set to the empty string. This can be set to a translation ID to display a translated error to the player.
+token-errorID = This can be set to a string ID to display a translated error to the player.
 
 token-faction = The faction for this stream. Not given unless the stream has the faction chat type.
 
@@ -352,7 +352,7 @@ token-forename = The relevant player character's forename.
 
 token-frequency = The frequency of a radio message.
 
-token-heads = Set to '1' if the result of a coin flip was heads. Not given otherwise.
+token-heads = Populated if the result of a coin flip was heads. Not given otherwise.
 
 token-hourFormat = Set to '12' or '24' depending on the player's hour format preference.
 
@@ -362,7 +362,7 @@ token-iconRaw = The name of the icon used for the { -highlight(text: "icon") } t
 
 token-icon-processed = The &lt;IMAGE&gt; tag for a chat icon, with leading and trailing spaces.
 
-token-incomingPM = Set to '1' for incoming private messages. Not given otherwise.
+token-incomingPM = Populated for incoming private messages. Not given otherwise.
 
 token-input = The input text.
 
@@ -385,9 +385,7 @@ token-name-component = The player's configured nickname.
 
 token-names-typing = A list-style multimap with names to include in the typing list.
 
-token-narrativeStyle = Set to '1' if narrative style was used for the message. Not given otherwise.
-
-token-number = The number of the card, from 1 to 13. Ace is 1, Jack is 11, Queen is 12, and King is 13.
+token-narrativeStyle = Populated if narrative style was used for the message. Not given otherwise.
 
 token-onlineID = The online ID of the relevant player.
 
@@ -395,7 +393,7 @@ token-originalStream = The original stream that a radio message was sent over. N
 
 token-originalTags = The tags of the original stream that a radio message was sent over. Not given for non-radio messages.
 
-token-outgoingPM = Set to '1' for outgoing private messages. Not given otherwise.
+token-outgoingPM = Populated for outgoing private messages. Not given otherwise.
 
 token-prefix-chat-final = The prefix determined by the chat prefix format.
 
@@ -413,11 +411,9 @@ token-roll = The number that was rolled.
 
 token-sides = The number of sides on the die that was rolled.
 
-token-sneakCallout = Set to '1' if the message was a callout sent while sneaking.
+token-sneakCallout = Populated if the message was a callout sent while sneaking.
 
 token-stream = The name of the chat stream on which the message was sent or will be sent.
-
-token-suit = The suit of the card, as a number from 1 to 4. Clubs is 1, Diamonds is 2, Hearts is 3, and Spades is 4.
 
 token-surname = The relevant player character's surname.
 

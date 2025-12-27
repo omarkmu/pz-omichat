@@ -1,6 +1,6 @@
 # Format Strings
 
-Various [sandbox options](../sandbox-options/index.md) use a format string style designed to be flexible enough to satisfy most needs.
+Various configuration options use a format string style designed to be flexible enough to satisfy most needs.
 These format strings can utilize a number of features, which are outlined in this section of the reference guide.
 
 - [Tokens](./tokens.md): placeholders for values that will be replaced when the format string is used.
