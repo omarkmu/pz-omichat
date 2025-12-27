@@ -113,6 +113,19 @@ Configuration.MAX_LANGUAGE_SLOTS = 50
 ---@readonly
 Configuration.MAX_PROFILES = 20
 
+
+---Constant for the signal character for indicating an asterisk.
+---@readonly
+Configuration.SIGNAL_ASTERISK = 0x91
+
+---Constant for the signal character for the start of encoded metadata.
+---@readonly
+Configuration.SIGNAL_DATA_START = 0x92
+
+---Constant for the signal character for indicating an ignored character.
+---@readonly
+Configuration.SIGNAL_IGNORE = 0x9A
+
 --#endregion
 
 

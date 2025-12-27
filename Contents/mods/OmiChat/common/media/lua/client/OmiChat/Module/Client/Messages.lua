@@ -22,8 +22,8 @@ local _ServerChatMessage = __classmetatables[ServerChatMessage.class].__index
 local _ChatBase = __classmetatables[ChatBase.class].__index ---@type any
 local _getChatType = _ChatBase.getType
 
-local DATA_START = string.char(130)
-local IGNORE_QUOTE = string.char(131) .. '"'
+local DATA_START = string.char(config.SIGNAL_DATA_START)
+local IGNORE_QUOTE = string.char(config.SIGNAL_IGNORE) .. '"'
 local DATA_PATTERN = '%s*' .. DATA_START .. '({.+})%s*$'
 local commandContextTypes = {
     ['omichat.card'] = true,

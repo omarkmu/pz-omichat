@@ -17,8 +17,8 @@ local getTextOrNull = utils.getTextOrNull
 
 local IS_CLIENT = not isServer()
 
-local IGNORE_CHAR = string.char(131)
-local ASTERISK_CHAR = string.char(140)
+local IGNORE_CHAR = string.char(config.SIGNAL_IGNORE)
+local ASTERISK_CHAR = string.char(config.SIGNAL_ASTERISK)
 local ASTERISK_PREFIX_PATTERN = '^(%s*[*' .. ASTERISK_CHAR .. '])(.+)'
 local ASTERISK_DELIM_PATTERN = '^"%s*[*' .. ASTERISK_CHAR .. ']'
 
