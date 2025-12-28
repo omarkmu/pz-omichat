@@ -11,7 +11,7 @@ The comment `### @bundle OmiChat` must be included at the top of translation fil
 
 ## Dialogue Tags
 
-Custom dialogue tags can be specified for narrative style using the **Narrative Style > Dialogue Tag Format**.
+Custom dialogue tags can be specified for narrative style using the [`Dialogue Tag Format`](../configuration/narrative-style.md#dialoguetagformat) option.
 
 When defining a custom dialogue tag, the string `unknown-language-[tag]` should also be defined.
 This is used when the player's character doesn't speak the language used for a message with the given tag.

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+OLD_DIR=$(pwd)
+cd $(dirname "$0")
+luarocks >/dev/null --local make ./docgen-scm-0.rockspec
+
+cd $OLD_DIR
+docgen $@
+mdbook build

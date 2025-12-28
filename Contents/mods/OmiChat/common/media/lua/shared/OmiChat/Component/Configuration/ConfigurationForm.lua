@@ -68,7 +68,6 @@ return {
                 },
             },
             Card = {
-                childPrefix = 'OmiChat.config-Commands-Command',
                 children = {
                     Global = {
                         inverseToggleFields = {
@@ -77,17 +76,13 @@ return {
                             { 'Commands', 'Card', 'Tags' },
                         },
                     },
-                    Items = {
-                        noReorderButtons = true,
-                        prefix = 'OmiChat.config-Commands-Card-Items',
-                    },
+                    Items = NO_REORDER,
                     Format = FORMAT,
                     OverheadFormat = FORMAT,
                     Tags = TAGS,
                 },
             },
             Roll = {
-                childPrefix = 'OmiChat.config-Commands-Command',
                 children = {
                     Global = {
                         inverseToggleFields = {
@@ -96,17 +91,13 @@ return {
                             { 'Commands', 'Roll', 'Tags' },
                         },
                     },
-                    Items = {
-                        noReorderButtons = true,
-                        prefix = 'OmiChat.config-Commands-Roll-Items',
-                    },
+                    Items = NO_REORDER,
                     Format = FORMAT,
                     OverheadFormat = FORMAT,
                     Tags = TAGS,
                 },
             },
             Flip = {
-                childPrefix = 'OmiChat.config-Commands-Command',
                 children = {
                     Global = {
                         inverseToggleFields = {
@@ -115,10 +106,7 @@ return {
                             { 'Commands', 'Flip', 'Tags' },
                         },
                     },
-                    Items = {
-                        noReorderButtons = true,
-                        prefix = 'OmiChat.config-Commands-Flip-Items',
-                    },
+                    Items = NO_REORDER,
                     Format = FORMAT,
                     OverheadFormat = FORMAT,
                     Tags = TAGS,
