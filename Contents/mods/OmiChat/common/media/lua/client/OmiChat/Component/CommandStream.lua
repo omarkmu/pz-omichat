@@ -13,7 +13,7 @@ local API ---@type api.client?
 ---@class CommandStream : Stream
 ---@field protected callbacks CommandStream.Callbacks Container for callbacks.
 ---@field protected helpTextID? string String ID for a help message for the stream.
-local CommandStream = Stream:derive()
+local CommandStream = Stream:derive('CommandStream')
 
 
 ---Copies all settings from another stream into this stream.

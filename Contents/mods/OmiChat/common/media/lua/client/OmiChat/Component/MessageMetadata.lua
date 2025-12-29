@@ -30,7 +30,7 @@ local getPlayerFaction = Faction.getPlayerFaction
 ---@field echoType? integer The echo type identifier, if this is an echo message.
 ---@field ctx? table Arbitary context data.
 ---@field suppressedRadio? boolean Flag for whether the overhead text for this message has already been suppressed on radio.
-local MessageMetadata = utils.class()
+local MessageMetadata = utils.class('MessageMetadata')
 
 ---Helper for accessing and setting metadata about a chat message.
 API.MessageMetadata = MessageMetadata

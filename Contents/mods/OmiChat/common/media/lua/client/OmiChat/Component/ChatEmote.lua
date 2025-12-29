@@ -7,7 +7,7 @@ local utils = require 'OmiChat/Utils'
 ---@field emote? string The emote to play using `IsoPlayer.playEmote`.
 ---@field protected _onPlay? fun(player: IsoPlayer, emote: string) A callback function to handle playing the emote.
 ---@field protected _isEnabled? fun(): boolean Callback for determining whether the emote should be usable.
-local ChatEmote = utils.class()
+local ChatEmote = utils.class('ChatEmote')
 
 
 ---Checks whether the emote is enabled.

@@ -24,7 +24,7 @@ local checkPlayerCanUseChat = checkPlayerCanUseChat
 ---@field protected perceptionRangeSigned integer The perception range of the chat stream, for signed languages.
 ---@field protected chatFormat? string The format to use for chat messages sent from this stream.
 ---@field protected overheadFormat? string The format to use for overhead messages sent from this stream.
-local ChatStream = Stream:derive()
+local ChatStream = Stream:derive('ChatStream')
 
 
 ---Associates chat types to commands used to check whether they're enabled.

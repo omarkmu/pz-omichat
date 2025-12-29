@@ -49,7 +49,7 @@ local getTextVanilla = getText
 ---@field private showTitle boolean Flag for whether the message will include the chat type tag.
 ---@field private showTimestamp boolean Flag for whether the message will include a timestamp.
 ---@field private font ChatFont The font size of the message.
-local MessageInfo = utils.class()
+local MessageInfo = utils.class('MessageInfo')
 
 ---Helper for building information about a chat message.
 API.MessageInfo = MessageInfo

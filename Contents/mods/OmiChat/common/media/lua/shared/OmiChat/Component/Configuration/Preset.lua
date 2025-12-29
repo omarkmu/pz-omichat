@@ -10,7 +10,7 @@ local DEFAULT = '$Default()'
 ---@field protected _name string The name of the preset.
 ---@field protected _isCustom boolean Flag for whether the preset is a custom, user-defined preset.
 ---@field protected _values Configuration The preset's configuration values.
-local Preset = utils.class()
+local Preset = utils.class('Preset')
 
 
 ---Creates a table for configuration of buffs based on the defaults.

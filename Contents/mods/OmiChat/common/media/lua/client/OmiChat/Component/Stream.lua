@@ -24,7 +24,7 @@ local isempty = table.isempty
 ---@field protected isCommand boolean Flag for whether this is a command stream.
 ---@field protected noTags boolean Flag for whether the stream has an empty tags table.
 ---@field protected defaultOnDisabled boolean Flag for whether the stream should defer to default handling when disabled.
-local Stream = utils.class()
+local Stream = utils.class('Stream')
 
 
 ---Converts a string into a command by ensuring it starts with `/` and has a trailing whitespace.
