@@ -304,7 +304,7 @@ profile-manager =
 ## Player data manager
 
 player-data-manager =
-    .title = OmiChat Player Data
+    .title = { -mod-name } Player Data
     .editor-title = Edit Player Data
     .no-data = (vide)
     .column-username = Nom d'utilisateur

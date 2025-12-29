@@ -2,7 +2,7 @@
 ### @do-not-translate Settings are untranslated for now
 
 config =
-    .title = OmiChat Settings
+    .title = { -mod-name } Settings
 
 ## Reusable terms
 
@@ -80,11 +80,8 @@ config-format-strings = <CENTRE> <SIZE:large> Format Strings <LINE> <SIZE:small>
 
 config-General = General
     .title = General Settings
-    .short-description = Basic features.
-    .description = These options are used to control the basic features of the mod.
 
 config-General-Preset = Preset
-    .data-nodoc = true
     .tooltip = Presets that can be applied to update all settings.
     .action1 = Apply
     .action2 = New
@@ -129,11 +126,6 @@ config-General-Variables = Variables
 ## Buffs
 
 config-Buffs = Buffs
-    .short-description = Options related to buffs.
-    .description = These options control buffs, which are configurable boosts to stats that are applied when messages
-        are sent on certain streams.
-        <BR> By default, only roleplay streams (e.g., `/me`) apply buffs.
-        Whether a stream applies buffs can be changed using the [`Allow Buffs`](./streams.md#list-allowbuffs) option.
 
 config-Buffs-Enable = { -enabled }
     .tooltip = Controls whether buffs are enabled for streams that allow them.
@@ -164,8 +156,6 @@ config-Buffs-CigaretteStress = Cigarette Stress Reduction
 
 config-Callouts = Callouts
     .title = Callout Settings
-    .short-description = Options for callouts.
-    .description = These options control features related to callouts (shouts).
 
 config-Callouts-Format = Callout Format
     .tooltip = Format used for the overhead text of callout messages.
@@ -182,8 +172,6 @@ config-Callouts-SneakRange = Sneak Callout Range
 ## Commands
 
 config-Commands = Commands
-    .short-description = Options for chat commands.
-    .description = These options control various commands that are available in chat.
 
 config-Commands-Name = Name Commands
     .tooltip = Options related to commands to set character names.
@@ -258,12 +246,6 @@ config-Commands-Flip-Tags = { -tags }
 
 config-Compatibility = Compatibility
     .title = Compatibility Options
-    .short-description = Options to control compatibility with other mods.
-    .description = These options control compatibility patches for other mods.
-        With the exception of `Automatic Overrides`, all of these are initially set to an option which
-        will automatically apply the patch if the mod is found.
-        <BR>**Note**: currently, the compatibility patches are soft-removed.
-        They may be reintroduced when the relevant mods are updated for b42.
 
 config-Compatibility-ApplyOverrides = Automatic Overrides
     .tooltip = If enabled, chat functions called by other mods will be intercepted by this mod.
@@ -285,8 +267,6 @@ config-Compatibility-TrueActionsDancing = True Actions Act 3 - Dancing
 ## Character/UI customization
 
 config-Customization = Customization
-    .short-description = Options for chat and UI customization.
-    .description = These options control the customization options available to players.
 
 config-Customization-AllowCustomShouts = Custom Shouts
     .tooltip = Allows players to set custom callout text.
@@ -306,13 +286,11 @@ config-Customization-CleanEffects = Clean Character Effects
 ## Discord integration
 
 config-Discord = Discord
-    .short-description = Options for Discord integration.
-    .description = These options control the formatting of messages that come from Discord.
 
 config-Discord-ChatFormat = { -chat-format }
     .tooltip = Controls how messages from Discord appear in chat.
 
-config-Discord-DefaultColor = = { -default-color }
+config-Discord-DefaultColor = { -default-color }
     .tooltip = The default color used for messages from Discord.
 
 config-Discord-ShowColorOption = Show Discord Color Option
@@ -329,9 +307,6 @@ config-Discord-Tags = { -tags }
 ## Echo messages
 
 config-EchoMessages = Echo Messages
-    .short-description = Options for echo messages.
-    .description = These options control echo messages,
-        which are messages sent on one stream that automatically send to another.
 
 config-EchoMessages-Enable = { -enabled }
     .tooltip = Controls whether messages from { -command(name: "faction") } and { -command(name: "safehouse") }
@@ -350,11 +325,6 @@ config-EchoMessages-Tags = { -tags }
 ## Format strings
 
 config-Format = Format Strings
-    .short-description = Format strings for advanced customization.
-    .description = These [format strings](../format-strings/index.md) can be used for advanced customization.
-        <BR> All of these formats default to the `$Default()` function, which is used to get the default content
-        for the format.
-        The tokens and options that each format accepts is available in the in-game configuration menu.
 
 config-Format-Chat = Chat Text
     .tooltip = Format strings used to control how messages appear in chat.
@@ -364,6 +334,25 @@ config-Format-Chat-Prefix = Prefix Format
 
 config-Format-Chat-Final = Final Format
     .tooltip = Format used for the final chat message, after all other format strings have been applied.
+
+config-Format-Overhead = Overhead Text
+    .tooltip = Format strings used to control how ranged messages appear over characters' heads.
+
+config-Format-Overhead-Prefix = Prefix Format
+    .tooltip = Defines the value of the { -highlight(text: "prefix") } token in the final overhead format.
+
+config-Format-Overhead-Final = Final Format
+    .tooltip = Format used for the final overhead message, after all other format strings have been applied.
+
+config-Format-PerceptionRange = Perception Range Text
+    .tooltip = Format strings for text to display when a message is out of range, but
+        within range for perceiving that something was said.
+
+config-Format-PerceptionRange-Chat = { -chat-format }
+    .tooltip = Defines how out-of-range perceived messages display in chat.
+
+config-Format-PerceptionRange-Overhead = { -overhead-format }
+    .tooltip = Defines how out-of-range perceived messages display overhead.
 
 config-Format-Component = Components
     .tooltip = Format strings used to define specific values in other format strings.
@@ -408,25 +397,6 @@ config-Format-Filter-Status = Status Filter
     .tooltip = Filters statuses set with the { -command(name: "status") } command.
         If this results in the empty string or sets an error token, the command will fail.
 
-config-Format-Overhead = Overhead Text
-    .tooltip = Format strings used to control how ranged messages appear over characters' heads.
-
-config-Format-Overhead-Prefix = Prefix Format
-    .tooltip = Defines the value of the { -highlight(text: "prefix") } token in the final overhead format.
-
-config-Format-Overhead-Final = Final Format
-    .tooltip = Format used for the final overhead message, after all other format strings have been applied.
-
-config-Format-PerceptionRange = Perception Range Text
-    .tooltip = Format strings for text to display when a message is out of range, but
-        within range for perceiving that something was said.
-
-config-Format-PerceptionRange-Chat = { -chat-format }
-    .tooltip = Defines how out-of-range perceived messages display in chat.
-
-config-Format-PerceptionRange-Overhead = { -overhead-format }
-    .tooltip = Defines how out-of-range perceived messages display overhead.
-
 config-Format-MenuName = In-Game Names
     .tooltip = Options that control how character names are displayed within in-game menus.
 
@@ -449,15 +419,11 @@ config-Format-MenuName-MiniScoreboard = Mini-Scoreboard
 config-Language = Languages
     .title = Language Settings
     .untitled = (New)
-    .short-description = Options for roleplay languages.
-    .description = These options are related to roleplay languages.
-        Players will be unable to fully understand messages sent in a language their character cannot speak.
 
 config-Language-UseDefaultList = Use Defaults
     .tooltip = If this is enabled, the languages configured below will be ignored in favor of the default languages.
 
 config-Language-List =
-    .description = Configuration for roleplay languages.
     .empty = No languages configured. Language features will be disabled.
 
 config-Language-List-Name = Name
@@ -500,9 +466,6 @@ config-Language-SelfAddBlocklist = Add Language Blocklist
 
 config-Macros = Macros
     .title = Macro Settings
-    .short-description = Options for macros.
-    .description = These options control macros.
-        <BR> Currently, the only built-in macro is the one used for [emote shortcuts](../user-guide/emote-shortcuts.md).
 
 config-Macros-Enable = { -enabled }
     .tooltip = Controls whether macros, including built-in macros, can be used.
@@ -515,8 +478,6 @@ config-Macros-BuiltIn = Built-In Macros
 ## Mentions
 
 config-Mentions = Mentions
-    .short-description = Options to control mentions.
-    .description = These options control mentions.
 
 config-Mentions-Enable = { -enabled }
     .tooltip = Controls whether players can use @ to mention other players, which includes their name color in chat.
@@ -537,12 +498,6 @@ config-Mentions-OverheadFormat = { -overhead-format }
 ## Narrative style
 
 config-NarrativeStyle = Narrative Style
-    .short-description = Options to control narrative style.
-    .description = These options control narrative style.
-        If narrative style is used,
-        messages will be enclosed in quotes and prefixed with a dialogue tag depending on the stream.
-        <BR> For example, with the default settings,
-        a message sent with `/yell Hey` will be transformed to `<Name> shouts, “Hey!”`.
 
 config-NarrativeStyle-Enable = { -enabled }
     .tooltip = Controls whether narrative style is enabled for streams that allow it.
@@ -556,9 +511,6 @@ config-NarrativeStyle-ChatContentFormat = Chat Content Format
 config-NarrativeStyle-DialogueTagFormat = Dialogue Tag Format
     .tooltip = Defines the dialogue tag used for a message sent in narrative style.
 
-config-NarrativeStyle-PunctuationFormat = Punctuation Format
-    .tooltip = Defines the punctuation added to a message sent in narrative style without existing punctuation.
-
 config-NarrativeStyle-InputFilter = Input Filter
     .tooltip = Filters messages sent on a stream with narrative style enabled.
 
@@ -566,8 +518,6 @@ config-NarrativeStyle-InputFilter = Input Filter
 
 config-Radio = Radio
     .title = Radio Settings
-    .short-description = Options to control radio messages.
-    .description = These options control formatting of messages sent over the radio.
 
 config-Radio-ChatFormat = { -chat-format }
     .tooltip = Controls how radio messages appear in chat.
@@ -575,7 +525,7 @@ config-Radio-ChatFormat = { -chat-format }
 config-Radio-OverheadFormat = { -overhead-format }
     .tooltip = Controls how radio messages appear in overhead speech bubbles.
 
-config-Radio-DefaultColor = = { -default-color }
+config-Radio-DefaultColor = { -default-color }
     .tooltip = The default color used for radio messages.
 
 config-Radio-Tags = { -tags }
@@ -585,13 +535,11 @@ config-Radio-Tags = { -tags }
 
 config-ServerMessages = Server Messages
     .title = Server Message Settings
-    .short-description = Options to control server messages.
-    .description = These options control formatting of server messages.
 
 config-ServerMessages-ChatFormat = { -chat-format }
     .tooltip = Controls how server messages appear in chat.
 
-config-ServerMessages-DefaultColor = = { -default-color }
+config-ServerMessages-DefaultColor = { -default-color }
     .tooltip = The default color used for server messages.
 
 config-ServerMessages-Tags = { -tags }
@@ -601,21 +549,12 @@ config-ServerMessages-Tags = { -tags }
 
 config-Streams = Streams
     .title = Stream Settings
-    .short-description = Configuration for custom streams.
-    .description = These options control custom stream configuration.
-        With the exception of [`Use Defaults`](#usedefaultlist) and [`Global Tags`](#globaltags),
-        the options on this page are per-stream.
 
 config-Streams-UseDefaultList = Use Defaults
     .tooltip = If this is enabled, the streams configured below will be ignored in favor of the default streams.
-    .description = If this is enabled,
-        the streams configured in the list will be ignored in favor of the default streams.
 
 config-Streams-List =
     .empty = No streams configured. The default streams will be used.
-    .description = Configuration for chat streams. The options in this section are per-stream.
-        <BR> Some options are not available for certain chat types; if this is the case,
-        they will not be editable in the configuration menu.
 
 config-Streams-List-Enable = { -enabled }
     .tooltip = Controls whether this stream is enabled.
@@ -644,20 +583,8 @@ config-Streams-List-ChatType = Chat Type
 config-Streams-List-Category = Category
     .tooltip = The category of this stream. <BR> This is used to categorize streams for retaining options.
 
-config-Streams-List-Tags = { -tags }
-    .tooltip = Tags that modify the appearance and behavior of the stream.
-
-config-Streams-List-DefaultColor = = { -default-color }
+config-Streams-List-DefaultColor = { -default-color }
     .tooltip = The default color used for messages sent over this stream.
-
-config-Streams-List-Aliases = Aliases
-    .tooltip = List of additional aliases that can be used to send messages on the stream.
-
-config-Streams-List-OverheadFormat = { -overhead-format }
-    .tooltip = Format used for overhead speech bubbles.
-
-config-Streams-List-ChatFormat = { -chat-format }
-    .tooltip = Controls how messages sent on this stream appear in chat.
 
 config-Streams-List-Range = Range
     .tooltip = The range of this stream.
@@ -669,13 +596,17 @@ config-Streams-List-PerceptionRange = Perception Range
     .tooltip = The range in which an indicator that something was said out-of-range will send.
 
 config-Streams-List-PerceptionRangeSigned = Perception Range (Signed)
-    .tooltip = The range in which an indicator that something was said out-of-range will send, when sent in a signed roleplay language.
+    .tooltip = The range in which an indicator that something was said out-of-range will send,
+        when sent in a signed roleplay language.
+
+config-Streams-List-ChatFormat = { -chat-format }
+    .tooltip = Controls how messages sent on this stream appear in chat.
+
+config-Streams-List-OverheadFormat = { -overhead-format }
+    .tooltip = Format used for overhead speech bubbles.
 
 config-Streams-List-AllowBuffs = Allow Buffs
     .tooltip = If this is enabled and buffs are turned on, sending a message on this stream will apply a buff.
-
-config-Streams-List-AllowEmotes = Allow Emotes
-    .tooltip = If this is enabled, emote macros will be processed on this stream.
 
 config-Streams-List-AllowMentions = Allow Mentions
     .tooltip = If this is enabled, mentions will be allowed on this stream.
@@ -692,8 +623,11 @@ config-Streams-List-AttractZombies = Attract Zombies
 config-Streams-List-UseNarrativeStyle = Use Narrative Style
     .tooltip = If this is enabled and narrative style is on, messages on this stream will use narrative style.
 
-config-Streams-List-UseNameColor = Use Name Colors
-    .tooltip = If this is enabled and name colors are enabled, messages on this stream will use name colors.
+config-Streams-List-Tags = { -tags }
+    .tooltip = Tags that modify the appearance and behavior of the stream.
+
+config-Streams-List-Aliases = Aliases
+    .tooltip = List of additional aliases that can be used to send messages on the stream.
 
 config-Streams-GlobalTags = Global Tags
     .tooltip = Additional tags to include in every stream.
@@ -701,8 +635,6 @@ config-Streams-GlobalTags = Global Tags
 ## Typing indicator
 
 config-TypingIndicator = Typing Indicator
-    .short-description = Options for the typing indicator.
-    .description = These options control the typing indicator.
 
 config-TypingIndicator-Enable = { -enabled }
     .tooltip = Controls whether the typing indicator is enabled on streams that allow it.
@@ -716,8 +648,6 @@ config-TypingIndicator-NameFormat = Name Format
 ## Zombie attraction
 
 config-ZombieAttraction = Zombie Attraction
-    .short-description = Options for attracting zombies.
-    .description = These options control attraction of zombies from chat messages.
 
 config-ZombieAttraction-ChatRangeMultiplier = Chat Range Multiplier
     .tooltip = A multiplier that will be applied to chat ranges to determine zombie attraction range.

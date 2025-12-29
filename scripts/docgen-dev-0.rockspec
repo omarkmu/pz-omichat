@@ -1,6 +1,6 @@
 rockspec_format = "3.0"
 package = "docgen"
-version = "scm-0"
+version = "dev-0"
 
 dependencies = {
     "lua >= 5.2",
@@ -10,13 +10,10 @@ dependencies = {
 }
 
 source = {
-    url = "git://github.com/omarkmu/pz-omichat.git"
+    url = ""
 }
 
 build = {
-    modules = {
-        docgen = "docgen.lua",
-    },
     install = {
         bin = {
             docgen = "docgen.lua",

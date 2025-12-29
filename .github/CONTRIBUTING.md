@@ -60,7 +60,7 @@ Please indicate how you tested your changes in the PR.
     - If you need to provide further information, do so *after* the first line. The first line should provide a quick summary; subsequent lines may have more details.
 
 ## Contributing translations
-This mod's translations are defined using [Fluent](https://projectfluent.org) translation files, rather than the game's translation system.
+OmiChat's translations are defined using [Fluent](https://projectfluent.org) translation files, rather than the game's translation system.
 
 The `.ftl` files should be placed in the `media/ftl` directory, within a subdirectory matching the
 [language tag](https://developer.mozilla.org/en-US/docs/Glossary/BCP_47_language_tag) for the language.

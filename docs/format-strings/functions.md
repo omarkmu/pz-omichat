@@ -432,8 +432,9 @@ Returns an at-map with only the unique values in the at-map `o`.
 
 These functions are related to generating pseudo-random values.
 
-**Note:** many format strings are seeded with a constant value, to prevent changes when re-evaluating.
-To get pseudo-random values for these, use `$Randomseed()` first.
+> [!NOTE]
+> Many format strings are seeded with a constant value, to prevent changes when re-evaluating.
+> To get pseudo-random values for these, use `$Randomseed()` first.
 
 ### `$Choose(...)` {#random-choose}
 

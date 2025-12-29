@@ -6,7 +6,7 @@ local API = require 'OmiChat/Module/Client/Core'
 local StatusDisplay = require 'OmiChat/Component/UI/StatusDisplay'
 local ProfileManager = require 'OmiChat/Component/UI/ProfileManager'
 local PlayerDataManager = require 'OmiChat/Component/UI/PlayerDataManager'
-local ConfigurationHelpers = require 'OmiChat/Component/Configuration/ConfigurationHelpers'
+local ConfigurationLogic = require 'OmiChat/Component/Configuration/Logic'
 local callback = require 'OmiChat/Module/Client/Callbacks'
 
 local utils = API.utils
@@ -17,7 +17,6 @@ local MultiMap = utils.MultiMap
 local max = math.max
 local sort = table.sort
 local concat = table.concat
-local wipe = table.wipe
 local getTimestampMs = getTimestampMs
 local getTextVanilla = getText
 local getText = utils.getText
@@ -193,27 +192,28 @@ function UI.openConfiguration()
         return
     end
 
+    local isNew = false
     local form = instance.activeConfigurationPanel
     if not form then
         form = API.ui.getConfigPanel()
         instance.activeConfigurationPanel = form
+        isNew = true
     end
 
-    ConfigurationHelpers.refreshPresetsList(form)
+    local isVisible = form:isReallyVisible()
+    if isNew or not isVisible then
+        local x, y = UI_LIB.getScreenCenter(800, 600)
+        form:setX(x)
+        form:setY(y)
+    end
 
-    local x, y = UI_LIB.getScreenCenter(800, 600)
-    form:setX(x)
-    form:setY(y)
-
-    if form:isVisible() then
+    if isVisible then
+        ConfigurationLogic.refreshForm(form)
         form:bringToTop()
         return
     end
 
-    wipe(form:getState())
-    form.values = config:getValuesForSave()
-    form:refresh()
-
+    ConfigurationLogic.refreshForm(form, config:getValuesForSave())
     form:setVisible(true)
     form:addToUIManager()
 end

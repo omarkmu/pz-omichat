@@ -1,7 +1,8 @@
 .vscode/
-guide/
+site/
 
 # don't include generated documentation files
 !docs/configuration/index.md
 docs/configuration/*.md
 docs/SUMMARY.md
+docs/**/_*.md

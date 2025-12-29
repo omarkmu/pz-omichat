@@ -1,5 +1,4 @@
 version=1
-id=3178882070
 title=OmiChat (Roleplay Chat) [b42]
 description=It's a chat mod.
 description=This mod can be added or removed mid-save.
@@ -12,7 +11,7 @@ description=Compatibility patches are currently soft-removed and waiting for the
 description=Additionally, the API structure should not be considered final at this point.
 description=
 description=[h2]Description[/h2]
-description=This mod improves the chat for players and offers many configuration options for server operators. Among other features, it includes color customization, character naming, emote shortcuts, and new chat commands for roleplay.
+description=OmiChat improves the chat for players and offers many configuration options for server operators. Among other features, it includes color customization, character naming, emote shortcuts, and new chat commands for roleplay.
 description=
 description=Chat streams can be customized by admins, but many are available with the default settings: [list]
 description=[*]/all

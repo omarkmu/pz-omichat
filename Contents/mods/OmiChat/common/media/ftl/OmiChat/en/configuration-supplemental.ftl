@@ -18,81 +18,81 @@ unrecognized-tag = Unrecognized tag.
     *[other] { $context }
 }.
 
-## Option headings
+## Format string option headings
 
-option-heading = Available options for the default function (provided with a multimap):
+heading-args = Available options for the default function (provided with a multimap):
 
-option-heading-format = This setting is a <SPACE> { -highlight-inline(text: "format string") }.
+heading-format-string = This setting is a <SPACE> { -highlight-inline(text: "format string") }.
     Click for an overview of the format string syntax.
 
-## Option tooltips
+## Format string option tooltips
 
-option-cardIcon = The icon to use for messages. Defaults to 'Item_CardDeck'.
+arg-cardIcon = The icon to use for messages. Defaults to 'Item_CardDeck'.
 
-option-colorTargetTag = The tag to use for narrowing if multiple streams <LINE> include
+arg-colorTargetTag = The tag to use for narrowing if multiple streams <LINE> include
     <SPACE> { -highlight-inline(text: "ActionColorTarget") } / { -highlight-inline(text: "QuoteColorTarget") }.
 
-option-defaultName = The name to use by default if other options are not available.
+arg-defaultName = The name to use by default if other options are not available.
 
-option-dialogueTag = The narrative style dialogue tag (e.g., 'says,').
+arg-dialogueTag = The narrative style dialogue tag (e.g., 'says,').
 
-option-exclamationTag = The default dialogue tag for an exclamation. Defaults to 'exclaims'.
+arg-exclamationTag = The default dialogue tag for an exclamation. Defaults to 'exclaims'.
 
-option-flipIcon = The icon to use for messages. Defaults to 'Item_Plate'.
+arg-flipIcon = The icon to use for messages. Defaults to 'Item_Plate'.
 
-option-input = Used instead of the value of the { -highlight(text: "input") } token if given.
+arg-input = Used instead of the value of the { -highlight(text: "input") } token if given.
 
-option-language = Used instead of the value of the { -highlight(text: "languageRaw") } token if given.
+arg-language = Used instead of the value of the { -highlight(text: "languageRaw") } token if given.
 
-option-loudIndicator = The volume indicator to use for a loud message.
+arg-loudIndicator = The volume indicator to use for a loud message.
     <LINE> Defaults to the 'VolumeIndicatorLoud' configuration variable, or 'Loud'.
 
-option-loudTag = The default dialogue tag to use for a loud message. Defaults to 'shouts'.
+arg-loudTag = The default dialogue tag to use for a loud message. Defaults to 'shouts'.
 
-option-maxLength = The maximum length of the input. Produces a relevant error if exceeded.
+arg-maxLength = The maximum length of the input. Produces a relevant error if exceeded.
 
-option-maxLength-filter-status = The maximum length of the input. Produces a relevant error if exceeded. Defaults to 64.
+arg-maxLength-filter-status = The maximum length of the input. Produces a relevant error if exceeded. Defaults to 64.
 
-option-minLength = The minimum length of the input. Produces a relevant error if not met.
+arg-minLength = The minimum length of the input. Produces a relevant error if not met.
 
-option-minLength-filter-status = The minimum length of the input. Produces a relevant error if not met. Defaults to 8.
+arg-minLength-filter-status = The minimum length of the input. Produces a relevant error if not met. Defaults to 8.
 
-option-mode = The mode to use for the name display.
+arg-mode = The mode to use for the name display.
     <LINE> This can be 'username', 'name', or 'both' to include both separated by a slash.
 
-option-name = Used instead of the value of the { -highlight(text: "name") } token if given.
+arg-name = Used instead of the value of the { -highlight(text: "name") } token if given.
 
-option-names-typing = A list-style multimap to use for the typing message.
+arg-names-typing = A list-style multimap to use for the typing message.
 
-option-noComma = If given, a comma will not be included after the dialogue tag.
+arg-noComma = If given, a comma will not be included after the dialogue tag.
 
-option-prefix = Used instead of the value of the { -highlight(text: "prefix") } token if given.
+arg-prefix = Used instead of the value of the { -highlight(text: "prefix") } token if given.
 
-option-questionTag = The default dialogue tag for a question. Defaults to 'asks'.
+arg-questionTag = The default dialogue tag for a question. Defaults to 'asks'.
 
-option-quietIndicator = The volume indicator to use for a quiet message.
+arg-quietIndicator = The volume indicator to use for a quiet message.
     <LINE> Defaults to the 'VolumeIndicatorQuiet' configuration variable, or 'Low'.
 
-option-recipientName = Used instead of the value of the { -highlight(text: "recipientName") } token if given.
+arg-recipientName = Used instead of the value of the { -highlight(text: "recipientName") } token if given.
 
-option-rollIcon = The icon to use for messages. Defaults to 'Item_Dice'.
+arg-rollIcon = The icon to use for messages. Defaults to 'Item_Dice'.
 
-option-shortStatementTag = The default dialogue tag for a short statement. Defaults to 'states'.
+arg-shortStatementTag = The default dialogue tag for a short statement. Defaults to 'states'.
 
-option-sneakCalloutTag = The default dialogue tag to use for sneak callouts. Defaults to 'whisper shouts'.
+arg-sneakCalloutTag = The default dialogue tag to use for sneak callouts. Defaults to 'whisper shouts'.
 
-option-statementTag = The default dialogue tag for a statement. Defaults to 'says'.
+arg-statementTag = The default dialogue tag for a statement. Defaults to 'says'.
 
-option-truncateTo = A numeric character limit, after which the input will be cut off.
+arg-truncateTo = A numeric character limit, after which the input will be cut off.
 
-option-truncateTo-filter-chat-input = A numeric character limit, after which the input will be cut off. Defaults to 2000.
+arg-truncateTo-filter-chat-input = A numeric character limit, after which the input will be cut off. Defaults to 2000.
 
-option-truncateTo-filter-name = A numeric character limit, after which the input will be cut off. Defaults to 40.
+arg-truncateTo-filter-name = A numeric character limit, after which the input will be cut off. Defaults to 40.
 
-option-whisperIndicator = The volume indicator to use for a whispered message.
+arg-whisperIndicator = The volume indicator to use for a whispered message.
     <LINE> Defaults to the 'VolumeIndicatorWhisper' configuration variable, or 'Whisper'.
 
-option-whisperTag = The default dialogue tag to use for a whispered message. Defaults to 'whispers'.
+arg-whisperTag = The default dialogue tag to use for a whispered message. Defaults to 'whispers'.
 
 ## Tag tooltips
 
@@ -312,11 +312,31 @@ tag-UseVanillaPM = Indicates that a PM stream should be formatted like the vanil
 
 tag-Whisper = Indicates that a stream should be treated as the whisper volume.
 
+## Auto tags (included here for reference)
+
+# IsActionUnknownLanguage
+# IsCallout
+# IsCardCommand
+# IsDiscordStream
+# IsEchoMessage
+# IsEmbeddedAction
+# IsEmbeddedQuote
+# IsFlipCommand
+# IsIncomingPM
+# IsNarrativeStyle
+# IsOutgoingPM
+# IsPerceptionRange
+# IsRadioStream
+# IsRollCommand
+# IsServerStream
+# IsSneakCallout
+# IsUnknownLanguage
+
 ## Token headings
 
-token-heading = Available tokens:
+heading-tokens = Available tokens:
 
-token-desc-embedded = The tokens for this setting differ depending on the context in which it is used.
+desc-token-embedded = The tokens for this setting differ depending on the context in which it is used.
     <LINE> The following are guaranteed.
 
 ## Token descriptions

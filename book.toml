@@ -6,12 +6,14 @@ language = "en"
 src = "docs"
 
 [build]
-build-dir = "guide"
+build-dir = "site"
 use-default-preprocessors = false
+extra-watch-dirs = ["Contents/mods/OmiChat/common/media/ftl"]
+
+[preprocessor.links]
 
 [output.html]
 git-repository-url = "https://github.com/omarkmu/pz-omichat"
 site-url = "/pz-omichat/"
-theme = "docs/theme"
-
-[preprocessor.links]
+theme = "docs/_theme"
+additional-css = ["docs/_css/color-display.css"]

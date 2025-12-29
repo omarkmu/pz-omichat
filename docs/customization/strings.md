@@ -47,44 +47,4 @@ Translations for `Haitian Creole`, for example, should be defined using `languag
 If the translation is absent, the language name will be used as-is regardless of a player's language.
 Translations are provided by the mod for the following language names:
 
-- ASL
-- Arabic
-- Bengali
-- Cantonese
-- Catalan
-- Danish
-- Dutch
-- English
-- Finnish
-- French
-- German
-- Gujarati
-- Hausa
-- Hawaiian
-- Hindi
-- Hungarian
-- Italian
-- Japanese
-- Javanese
-- Korean
-- Latvian
-- Malay
-- Mandarin
-- Marathi
-- Norwegian
-- Persian
-- Polish
-- Portuguese
-- Punjabi
-- Romanian
-- Russian
-- Shanghainese
-- Spanish
-- Tagalog
-- Tamil
-- Telugu
-- Thai
-- Turkish
-- Ukrainian
-- Urdu
-- Vietnamese
+{{#include _languages.md}}

@@ -79,7 +79,7 @@ function Library.Defaults.Chat(interpolator, args)
     end
 
     if tags.IsIncomingPM and not tags.UseVanillaPM and name ~= '' then
-        local parens = (config:getVariableAsNumber('PMParenthesisCount') or 1) --[[@as integer]]
+        local parens = (config:getVariableAsNumber('PMParenthesisCount') or 2) --[[@as integer]]
         local pmFrom = getText('private-chat-from', { name = ' <SPACE> ' .. name })
 
         name = rep('(', parens) .. pmFrom .. rep(')', parens)
@@ -98,7 +98,7 @@ function Library.Defaults.Chat(interpolator, args)
             if tags.UseVanillaPM then
                 name = 'to ' .. name
             else
-                local parens = (config:getVariableAsNumber('PMParenthesisCount') or 1) --[[@as integer]]
+                local parens = (config:getVariableAsNumber('PMParenthesisCount') or 2) --[[@as integer]]
                 local pmTo = getText('private-chat-to', { name = ' <SPACE> ' .. name })
 
                 name = rep('(', parens) .. pmTo .. rep(')', parens)

@@ -1,6 +1,7 @@
 # Emote Shortcuts
 
-If the **Macros > Built-In Macros > Emotes** configuration option is enabled, players can use emote shortcuts in the form of `!emote` in local chats.
+If the [`Built-In Macros`](../configuration/macros.md#builtin) configuration option includes **Emotes**,
+players can use emote shortcuts in the form of `!emote` in local chats.
 These emote shortcuts cause a player's character to play the animation associated with the emote, but they don't show up in the chat message.
 
 For example, sending the message `Don't shoot! !surrender` would result in the following:
@@ -10,8 +11,9 @@ For example, sending the message `Don't shoot! !surrender` would result in the f
 This can be useful for text roleplay servers, since players can play an animation in sync with their message.
 The shortcuts can also be used without a message; sending `!hi` will play the animation without sending a message in chat.
 
-**Note:** Unless the emote is the only thing sent, it must come after a space.
-This is to prevent accidentally including an emote after ending a sentence with an exclamation point.
+> [!NOTE]
+> Unless the emote is the only thing sent, it must come after a space.
+> This is to prevent accidentally including an emote after ending a sentence with an exclamation point.
 
 ## Shortcut list
 

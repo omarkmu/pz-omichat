@@ -14,9 +14,9 @@ It also cleans up some log messages sent directly to the `DebugLog` file.
 
 ## Installation
 
-**Note:** Clients do not need to do this. The relevant methods are called on the server.
+> [!NOTE]
+> Clients do not need to do this. The relevant methods are called on the server.
 
 To install:
 1. Unzip the `java.zip` included in a [release](https://github.com/omarkmu/pz-omichat/releases).
-2. Copy each file the `zombie` folder into the corresponding subfolder within the `zombie` folder of the server's PZ game directory.
-This folder is likely within a `java` folder.
+2. Copy the `zombie` folder into the game directory (the directory which contains `projectzomboid.jar`).

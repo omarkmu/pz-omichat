@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
+set -e
 
 OLD_DIR=$(pwd)
 cd $(dirname "$0")
-luarocks >/dev/null --local make ./docgen-scm-0.rockspec
+luarocks >/dev/null --local make ./docgen-dev-0.rockspec
 
 cd $OLD_DIR
 docgen $@
+
+if ! command -v mdbook > /dev/null
+then echo mdbook not found && exit 1
+fi
+
 mdbook build

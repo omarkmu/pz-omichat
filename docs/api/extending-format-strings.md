@@ -1,7 +1,7 @@
 # Extending Format Strings
 
-[Format strings](./index.md) can be extended using the API.
-Additional [functions](./functions.md) or overrides of existing functions can be included by calling `OmiChat.extension.registerInterpolatorFunction`.
+[Format strings](../format-strings/index.md) can be extended using the API.
+Additional [functions](../format-strings/functions.md) or overrides of existing functions can be included by calling `OmiChat.extension.registerInterpolatorFunction`.
 
 OmiChat does not perform error handling while performing interpolation.
 Extensions should adhere to the convention of returning the empty string for invalid inputs rather than causing an error.

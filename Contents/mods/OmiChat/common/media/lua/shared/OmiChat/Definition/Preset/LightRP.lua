@@ -8,6 +8,9 @@ return Preset:new {
     values = {
         General = Preset.general {
             Name = 'LightRP',
+            Variables = {
+                'PMParenthesisCount:1',
+            },
         },
         Buffs = Preset.buffs {
             Enable = false,

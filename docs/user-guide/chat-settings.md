@@ -30,7 +30,7 @@ The **enable/disable sign language emotes** option is only shown when the player
 This controls whether a random [emote animation](./emote-shortcuts.md) is played whenever they send a message.
 
 The **enable/disable name colors** option allows players to toggle the appearance of name colors in their chat.
-This will only display if the **Customization > Name Colors** configuration option is enabled.
+This will only display if the [`Name Colors`](../configuration/customization.md##enablenamecolors) configuration option is enabled.
 
 The **manage profiles** option is used to open the profile manager, which can be used to customize callouts and chat colors.
 
@@ -42,7 +42,7 @@ The profile manager contains a number of options that allow players to control h
 
 ![Screenshot of customization options](../images/color-options.png)
 
-For example, to use <span style="color:rgb(255,102,0)">orange</span> for messages sent with `/yell`, the **/yell color** option can be used.
+For example, to use <span style="--color-display: rgb(255,102,0)"></span>orange for messages sent with `/yell`, players can use the **/yell color** option.
 
 ![Screenshot showing a color option for /yell with the color set to orange](../images/color-option-example-1.png)
 
@@ -51,14 +51,15 @@ The available color customization options depend on server configuration.
 ### Callout customization
 
 The profile manager also includes options that allow players to set custom messages for when they use callouts (bound to the `Q` key, by default).
-These options only show up if the **Customization > Custom Shouts** configuration option is enabled.
+These options only show up if the [`Custom Shouts`](../configuration/customization.md#allowcustomshouts) configuration option is enabled.
 
 ![Screenshot of the custom callout input options](../images/callout-example-1.png)  
 ![Screenshot of a player using a custom callout](../images/callout-example-2.png)
 
 ### Character customization
 
-If a server has character customization enabled (**Customization > Character Customization**), the customization submenu also includes QoL character modification options.
+If a server has [character customization](../configuration/customization.md#enablecharactercustomization) enabled,
+the customization submenu also includes QoL character modification options.
 The available options are self-explanatory.
 
 ![Screenshot of character customization settings](../images/chat-settings-customization-2.png)

@@ -6,7 +6,7 @@ OmiChat offers some utilities for admins to use in-game.
 
 When the player has admin access, the gear button's context menu has an `Admin options` entry that offers toggles for mod-specific admin powers.
 
-The chat icon used for the **display chat icon** option is controlled by the **General > Admin Icon** configuration option.
+The chat icon used for the **display chat icon** option is controlled by the [`Admin Icon`](../configuration/general.md#adminicon) configuration option.
 
 ![The in-game admin menu](../images/admin-menu.png)
 
@@ -69,9 +69,11 @@ Sets the language slots for a player.
 
 ## Mini Scoreboard
 
-The “mini scoreboard” included in the admin menu will respect the options configured under **Format Strings > In-Game Names**.
+The “mini scoreboard” included in the admin menu will respect the options configured for [`In-Game Names`](../configuration/format.md#l#menuname).
 
-By default, this will display players' chat names (as determined by **Format Strings > Components > Name**) and usernames, in the format `Username [Name]`.
+By default, this will display players' chat names
+(as determined by the [name format](../configuration/format.md#component-name)) and usernames,
+in the format `Username [Name]`.
 Mousing over names will display more information.
 Admins can use this to quickly determine the username associated with a chat name.
 

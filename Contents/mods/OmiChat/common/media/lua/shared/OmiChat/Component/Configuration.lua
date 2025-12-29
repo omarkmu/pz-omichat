@@ -3,12 +3,13 @@
 
 local utils = require 'OmiChat/Utils'
 local Preset = require 'OmiChat/Component/Configuration/Preset'
+local Logic = require 'OmiChat/Component/Configuration/Logic'
 local sort = table.sort
 local isempty = table.isempty
 
 ---@class ConfigurationHelper : Configuration, omi.ConfigurationHelper<Configuration>
 local Configuration = utils.configuration {
-    schema = require 'OmiChat/Component/Configuration/ConfigurationSchema',
+    schema = Logic.getSchema(),
     filename = string.format('omichat/configuration_%s.json', getServerName()),
     logger = utils.log,
 
@@ -88,7 +89,7 @@ Configuration._variables = {}
 --#region Constants
 
 ---Constant for the maximum number of configured chat streams.
----This should match the `maxItems` field of `Streams.List` in the configuration form.
+---This should match the `max-items` field of `config-Streams-List` in the configuration schema.
 ---@readonly
 Configuration.MAX_CHAT_STREAMS = 50
 
@@ -101,7 +102,7 @@ Configuration.MAX_CUSTOM_SHOUTS = 20
 Configuration.MAX_CUSTOM_SHOUT_LEN = 200
 
 ---Constant for the maximum number of languages that can be configured.
----This should match the `maxItems` field of `Language.List` in the configuration form.
+---This should match the `max-items` field of `config-Language-List` in the configuration schema.
 ---@readonly
 Configuration.MAX_LANGUAGES = 1000
 
@@ -642,5 +643,243 @@ return Configuration
 ---| 'medical'
 ---| 'mini_scoreboard'
 ---| 'search_player'
+
+--#endregion
+
+--#region Configuration Definitions
+
+---@class Configuration
+---@field General Configuration.General
+---@field Buffs Configuration.Buffs
+---@field Callouts Configuration.Callouts
+---@field Commands Configuration.Commands
+---@field Compatibility Configuration.Compatibility
+---@field Customization Configuration.Customization
+---@field Discord Configuration.Discord
+---@field Format Configuration.Format
+---@field EchoMessages Configuration.EchoMessages
+---@field Language Configuration.Language
+---@field Macros Configuration.Macros
+---@field Mentions Configuration.Mentions
+---@field NarrativeStyle Configuration.NarrativeStyle
+---@field Radio Configuration.Radio
+---@field ServerMessages Configuration.ServerMessages
+---@field Streams Configuration.Streams
+---@field TypingIndicator Configuration.TypingIndicator
+---@field ZombieAttraction Configuration.ZombieAttraction
+---@field private _Languages? any
+---@field private _Streams? any
+
+---@class Configuration.General
+---@field Preset string
+---@field AlwaysShowChat boolean
+---@field CaseInsensitiveChatStreams boolean
+---@field ClearOnDeath Configuration.General.ClearOnDeath
+---@field AdminIcon string
+---@field InfoText string
+---@field Variables string[]
+
+---@class Configuration.General.ClearOnDeath
+---@field Icon boolean?
+---@field Languages boolean?
+---@field Nickname boolean?
+---@field Status boolean?
+
+---@class Configuration.Buffs
+---@field Enable boolean
+---@field Cooldown integer
+---@field Boredom number
+---@field Unhappiness number
+---@field Hunger number
+---@field Thirst number
+---@field Fatigue number
+---@field CigaretteStress number
+
+---@class Configuration.Callouts
+---@field Format string
+---@field SneakFormat string
+---@field Range integer
+---@field SneakRange integer
+
+---@class Configuration.Commands
+---@field Name Configuration.Commands.Name
+---@field Status Configuration.Commands.Status
+---@field Card Configuration.Commands.ItemCommand
+---@field Roll Configuration.Commands.ItemCommand
+---@field Flip Configuration.Commands.ItemCommand
+
+---@class Configuration.Commands.Name
+---@field Mode Configuration.Commands.Name.Mode
+
+---@class Configuration.Commands.Status
+---@field Enable boolean
+---@field Range integer
+
+---@class Configuration.Commands.ItemCommand
+---@field Global boolean
+---@field OverheadFormat string
+---@field Items string[]
+---@field Tags string[]
+
+---@class Configuration.Compatibility
+---@field ApplyOverrides boolean
+---@field ChatBubble omi.schema.CompatibilityValue
+---@field SearchPlayers omi.schema.CompatibilityValue
+---@field TrueActionsDancing omi.schema.CompatibilityValue
+
+---@class Configuration.Customization
+---@field AllowCustomShouts boolean
+---@field EnableNameColors boolean
+---@field EnableCharacterCustomization boolean
+---@field CleanEffects omi.SetTable<string>
+
+---@class Configuration.Discord
+---@field ChatFormat string
+---@field DefaultColor omi.ColorTable<integer>
+---@field ShowColorOption 'Yes' | 'No' | 'Respect-Server-Setting'
+---@field Tags string[]
+
+---@class Configuration.EchoMessages
+---@field Enable boolean
+---@field ChatFormat string
+---@field OverheadFormat string
+---@field Tags string[]
+
+---@class Configuration.Format
+---@field Chat Configuration.Format.Chat
+---@field Overhead Configuration.Format.Overhead
+---@field PerceptionRange Configuration.Format.PerceptionRange
+---@field Component Configuration.Format.Component
+---@field Filter Configuration.Format.Filter
+---@field MenuName Configuration.Format.MenuName
+
+---@class Configuration.Format.Chat
+---@field Prefix string
+---@field Final string
+
+---@class Configuration.Format.Overhead
+---@field Prefix string
+---@field Final string
+
+---@class Configuration.Format.PerceptionRange
+---@field Chat string
+---@field Overhead string
+
+---@class Configuration.Format.Component
+---@field Name string
+---@field Tag string
+---@field Timestamp string
+---@field Icon string
+---@field Language string
+---@field EmbeddedAction string
+---@field EmbeddedQuote string
+
+---@class Configuration.Format.Filter
+---@field Name string
+---@field Status string
+---@field ChatInput string
+
+---@class Configuration.Format.MenuName
+---@field Trade string
+---@field Medical string
+---@field SearchPlayer string
+---@field MiniScoreboard string
+
+---@class Configuration.Language
+---@field DefaultSlots integer
+---@field InterpretationRolls integer
+---@field InterpretationChance integer
+---@field SelfAddAllowlist string[]
+---@field SelfAddBlocklist string[]
+---@field UnknownLanguageChat string
+---@field UnknownLanguageRadio string
+---@field UnknownLanguageOverhead string
+---@field UseDefaultList boolean
+---@field List Configuration.LanguageDefinition[]
+
+---@class Configuration.Macros
+---@field Enable boolean
+---@field BuiltIn Configuration.Macros.BuiltIn
+
+---@class Configuration.Macros.BuiltIn
+---@field Emote boolean?
+
+---@class Configuration.Mentions
+---@field Enable boolean
+---@field AlwaysUseNameColors boolean
+---@field Range integer
+---@field ChatFormat string
+---@field OverheadFormat string
+
+---@class Configuration.NarrativeStyle
+---@field Enable boolean
+---@field OverheadContentFormat string
+---@field ChatContentFormat string
+---@field DialogueTagFormat string
+---@field InputFilter string
+
+---@class Configuration.Radio
+---@field ChatFormat string
+---@field OverheadFormat string
+---@field DefaultColor omi.ColorTable<integer>
+---@field Tags string[]
+
+---@class Configuration.ServerMessages
+---@field ChatFormat string
+---@field DefaultColor omi.ColorTable<integer>
+---@field Tags string[]
+
+---@class Configuration.Streams
+---@field UseDefaultList boolean
+---@field GlobalTags string[]
+---@field List Configuration.StreamDefinition[]
+
+---@class Configuration.TypingIndicator
+---@field Enable boolean
+---@field NameFormat string
+---@field Format string
+
+---@class Configuration.ZombieAttraction
+---@field ChatRangeMultiplier number
+---@field CalloutRange integer
+---@field SneakCalloutRange integer
+
+
+---@class Configuration.LanguageDefinition
+---@field Name string The name of the language.
+---@field Signed boolean? Flag for whether the language should be treated as signed.
+
+---@class Configuration.StreamDefinition
+---@field Enable boolean?
+---@field Stream string?
+---@field ChatType omi.ChatTypeString?
+---@field Category StreamCategory?
+---@field Name string?
+---@field Command string?
+---@field ShortCommand string?
+---@field DefaultColor omi.ColorTable<integer>?
+---@field Aliases string[]?
+---@field Tags string[]?
+---@field OverheadFormat string?
+---@field ChatFormat string?
+---@field Range integer?
+---@field VerticalRange integer?
+---@field PerceptionRange integer?
+---@field PerceptionRangeSigned integer?
+---@field AllowBuffs boolean?
+---@field AllowMentions boolean?
+---@field AllowLanguages boolean?
+---@field AllowTypingIndicator boolean?
+---@field AttractZombies boolean?
+---@field UseNarrativeStyle boolean?
+
+
+---@alias Configuration.Commands.Name.Mode
+---| 'Disable'
+---| 'Nickname'
+---| 'Forename'
+---| 'Fullname'
+---| 'Forename-Plus-Nickname'
+---| 'Fullname-Plus-Nickname'
 
 --#endregion

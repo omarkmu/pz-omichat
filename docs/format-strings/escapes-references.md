@@ -12,8 +12,11 @@ For example, `$$PI()` would result in `$PI()`.
 
 ## References
 
-While handling sandbox options, the game removes certain characters such as `«` and `»`.
+Sometimes, it's non-trivial to include certain characters like `«` and `»`.
 The [`$Char`](functions.md#string-char) function can be used to include these characters, but format strings also accept **character references** for ease-of-use.
+
+The configuration menu can handle these characters directly, so this is primarily useful
+for including special characters from a mod using the API.
 
 Both named references and numeric references are supported.
 Numeric references behave similarly to the `$Char` function; the character with the number specified will be used in place of the reference.
