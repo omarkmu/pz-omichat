@@ -352,7 +352,6 @@ end
 function Streams.update()
     Streams._updateCommandStreams()
     Streams._updateChatStreams()
-    Streams._updateOverrides()
 end
 
 ---Updates the tag cache for chat streams.
@@ -494,44 +493,6 @@ function Streams._updateCommandStreams()
     API._cardCommand:setTags(commands.Card.Tags)
     API._flipCommand:setTags(commands.Flip.Tags)
     API._rollCommand:setTags(commands.Roll.Tags)
-end
-
----Updates overrides to chat functions based on configuration options.
----@private
-function Streams._updateOverrides()
-    local override = {}
-    if config.Compatibility.ApplyOverrides then
-        local replacements = {
-            say = API.chat.sendSay,
-            shout = API.chat.sendShout,
-            whisper = API.chat.sendPM,
-            general = API.chat.sendGeneral,
-            safehouse = API.chat.sendSafehouse,
-            faction = API.chat.sendFaction,
-        }
-
-        local names = {
-            shout = 'yell',
-            whisper = 'private',
-        }
-
-        for key, func in pairs(replacements) do
-            local name = names[key] or key
-            local stream = Streams.get(name)
-            if stream and stream:isEnabled() then
-                override[key] = func
-            end
-        end
-    end
-
-    local raw = API.chat.raw
-    processSayMessage = override.say or raw.say
-    processShoutMessage = override.shout or raw.shout
-    proceedPM = override.whisper or raw.whisper
-    processGeneralMessage = override.general or raw.general
-    processSafehouseMessage = override.safehouse or raw.safehouse
-    proceedFactionMessage = override.faction or raw.faction
-    processAdminChatMessage = override.admin or raw.admin
 end
 
 
