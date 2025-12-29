@@ -896,7 +896,7 @@ function Library.Defaults.UnknownLanguageChat(interpolator, args)
         name = ''
     end
 
-    local language = options:get('language') or interpolator:token('languageRaw')
+    local language = options:get('language') or interpolator:token('rawLanguage')
     local dialogueTag = options:get('dialogueTag') or interpolator:token('dialogueTag')
     local base = Helpers.getBaseUnknownLanguageString(tags, language, name, dialogueTag)
     if not base then
@@ -937,7 +937,7 @@ function Library.Defaults.UnknownLanguageOverhead(interpolator, args)
         name = ''
     end
 
-    local language = options:get('language') or interpolator:token('languageRaw')
+    local language = options:get('language') or interpolator:token('rawLanguage')
     local dialogueTag = options:get('dialogueTag') or interpolator:token('dialogueTag')
     local result = Helpers.getBaseUnknownLanguageString(tags, language, name, dialogueTag, true)
     if not result then

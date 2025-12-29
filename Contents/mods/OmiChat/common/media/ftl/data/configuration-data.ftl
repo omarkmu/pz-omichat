@@ -91,23 +91,23 @@ VERSION = 1
     stream;
     chatType;
     author;
-    authorRaw;
+    rawAuthor;
     name;
-    nameRaw;
+    rawName;
     tags;
     originalTags;
     originalStream;
     input;
     language;
-    languageRaw;
+    rawLanguage;
     unknownLanguage;
     faction;
     incomingPM;
     outgoingPM;
     recipient;
-    recipientRaw;
+    rawRecipient;
     recipientName;
-    recipientNameRaw;
+    rawRecipientName;
     card;
     heads;
     roll;
@@ -122,7 +122,7 @@ VERSION = 1
     echo;
     tags;
     language;
-    languageRaw;
+    rawLanguage;
     callout;
     sneakCallout
 
@@ -136,7 +136,7 @@ VERSION = 1
     admin;
     echo;
     stream;
-    iconRaw;
+    rawIcon;
     tags;
     originalTags;
     originalStream;
@@ -564,7 +564,7 @@ config-Format-Component-Icon =
 
 config-Format-Component-Language =
     .type = { -format-string }
-    .tokens = chatType;stream;language;languageRaw;adminIcon;tags;originalTags;originalStream
+    .tokens = chatType;stream;language;rawLanguage;adminIcon;tags;originalTags;originalStream
 
 config-Format-Component-EmbeddedQuote =
     .type = { -format-string }

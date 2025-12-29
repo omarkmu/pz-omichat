@@ -359,7 +359,7 @@ config-Format-Component = Components
 
 config-Format-Component-Name = Name
     .tooltip = Defines the values of the { -highlight(text: "name") }
-        and { -highlight(text: "nameRaw") } tokens in other format strings.
+        and { -highlight(text: "rawName") } tokens in other format strings.
 
 config-Format-Component-Tag = Tag
     .tooltip = Defines the format used for chat tags when a player enables the relevant option.

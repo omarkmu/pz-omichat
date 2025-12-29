@@ -175,7 +175,7 @@ end
 ---@param interpolator omi.Interpolator The interpolator in use.
 ---@return string? errorID The string ID of the error message.
 function Helpers.checkSignedOverRadio(interpolator)
-    local language = interpolator:token('languageRaw')
+    local language = interpolator:token('rawLanguage')
     if not language or not API.language.isSigned(language) then
         return
     end
@@ -595,9 +595,9 @@ end
 function Helpers.getMessage(interpolator, tags, name, forChat, rawName)
     if not rawName then
         if tags.UseAuthorUsername then
-            rawName = interpolator:tokenString('authorRaw')
+            rawName = interpolator:tokenString('rawAuthor')
         else
-            rawName = interpolator:tokenString('nameRaw')
+            rawName = interpolator:tokenString('rawName')
         end
     end
 
@@ -740,7 +740,7 @@ end
 ---@param tags omi.SetTable<string> A set of tags.
 ---@return string text A translated string indicating that a message was out-of-range, but perceived.
 function Helpers.getPerceivedChatString(author, interpolator, tags)
-    local language = interpolator:token('languageRaw')
+    local language = interpolator:token('rawLanguage')
     local isSigned = language and API.language.isSigned(language)
 
     local stringID = 'perceived-chat'

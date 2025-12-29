@@ -137,7 +137,7 @@ function MessageInfo:applyChatFormatting()
     self.language = utils.interpolateNamed('Language', config.Format.Component.Language, {
         chatType = chatType,
         stream = self.tokens.stream,
-        languageRaw = self.tokens.languageRaw,
+        rawLanguage = self.tokens.rawLanguage,
         language = self.tokens.language,
         unknownLanguage = self.tokens.unknownLanguage,
         tags = self.tokens.tags,
@@ -171,7 +171,7 @@ function MessageInfo:applyChatFormatting()
             size = 16
         end
 
-        self.tokens.iconRaw = icon
+        self.tokens.rawIcon = icon
         self.tokens.icon = format(' <IMAGE:%s,%d,%d> ', icon, size + 1, size)
     end
 
@@ -190,10 +190,10 @@ function MessageInfo:applyChatFormatting()
         end
 
         local recip = self.tokens.recipient
+        local recipName = self.tokens.recipientName or recip
         if recip then
             local encodedRecipColor = self.meta.recipientNameColor
             local recipColor = utils.color.default(encodedRecipColor or API.data.getSpeechColor(recip), 255, 255, 255)
-
             local recipColorTag = utils.color.toRichText(recipColor, true)
 
             if recipColorTag ~= '' then
@@ -201,7 +201,7 @@ function MessageInfo:applyChatFormatting()
                     self.meta:setRecipientNameColor(recipColor)
                 end
 
-                self.tokens.recipientName = recipColorTag .. self.tokens.recipientName .. ' <POPRGB> '
+                self.tokens.recipientName = recipColorTag .. recipName .. ' <POPRGB> '
                 self.tokens.recipient = recipColorTag .. recip .. ' <POPRGB> '
             end
         end
@@ -250,7 +250,7 @@ function MessageInfo:buildChatText()
         echo = self.tokens.echo,
         stream = self.tokens.stream,
         icon = self.tokens.icon,
-        iconRaw = self.tokens.iconRaw,
+        rawIcon = self.tokens.rawIcon,
         tags = self.tokens.tags,
         originalTags = self.tokens.originalTags,
         input = input,

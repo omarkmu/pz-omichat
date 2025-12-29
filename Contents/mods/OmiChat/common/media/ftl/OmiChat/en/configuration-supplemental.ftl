@@ -29,7 +29,7 @@ heading-format-string = This setting is a <SPACE> { -highlight-inline(text: "for
 
 arg-cardIcon = The icon to use for messages. Defaults to 'Item_CardDeck'.
 
-arg-colorTargetTag = The tag to use for narrowing if multiple streams <LINE> include
+arg-colorTargetTag = The tag to use for narrowing if multiple streams include
     <SPACE> { -highlight-inline(text: "ActionColorTarget") } / { -highlight-inline(text: "QuoteColorTarget") }.
 
 arg-defaultName = The name to use by default if other options are not available.
@@ -42,7 +42,7 @@ arg-flipIcon = The icon to use for messages. Defaults to 'Item_Plate'.
 
 arg-input = Used instead of the value of the { -highlight(text: "input") } token if given.
 
-arg-language = Used instead of the value of the { -highlight(text: "languageRaw") } token if given.
+arg-language = Used instead of the value of the { -highlight(text: "rawLanguage") } token if given.
 
 arg-loudIndicator = The volume indicator to use for a loud message.
     <LINE> Defaults to the 'VolumeIndicatorLoud' configuration variable, or 'Loud'.
@@ -349,8 +349,6 @@ token-alt-typing = Populated if the 'several people are typing' message should b
 
 token-author = The message author (usually a username). This may include rich text commands.
 
-token-authorRaw = The message author (usually a username), without any rich text.
-
 token-callout = Populated if the message was a callout, including sneak callouts.
 
 token-card = The translated name of the drawn card.
@@ -378,8 +376,6 @@ token-hourFormat = Set to '12' or '24' depending on the player's hour format pre
 
 token-icon = The icon to use for the message.
 
-token-iconRaw = The name of the icon used for the { -highlight(text: "icon") } token.
-
 token-icon-processed = The &lt;IMAGE&gt; tag for a chat icon, with leading and trailing spaces.
 
 token-incomingPM = Populated for incoming private messages. Not given otherwise.
@@ -390,16 +386,12 @@ token-input-processed = The input text, after all prior processing.
 
 token-language = The roleplay language of a message, translated into the current locale.
 
-token-languageRaw = The untranslated roleplay language of a message.
-
 token-language-processed = The result of the language component format.
 
 token-menuType = The type of menu in which the name will appear.
     <LINE> Possible values: medical, mini_scoreboard, search_player, trade.
 
-token-name = The chat name of the relevant player. This may include rich text for the name color.
-
-token-nameRaw = The chat name of the relevant player, without rich text.
+token-name = The name to use in chat for the relevant player. This may include rich text commands for the name color.
 
 token-name-component = The player's configured nickname.
 
@@ -409,9 +401,11 @@ token-narrativeStyle = Populated if narrative style was used for the message. No
 
 token-onlineID = The online ID of the relevant player.
 
-token-originalStream = The original stream that a radio message was sent over. Not given for non-radio messages.
+token-originalStream = The original stream that a radio message was sent over.
+    Not given for non-radio messages.
 
-token-originalTags = The tags of the original stream that a radio message was sent over. Not given for non-radio messages.
+token-originalTags = The tags of the original stream that a radio message was sent over.
+    Not given for non-radio messages.
 
 token-outgoingPM = Populated for outgoing private messages. Not given otherwise.
 
@@ -419,13 +413,22 @@ token-prefix-chat-final = The prefix determined by the chat prefix format.
 
 token-prefix-overhead-final = The prefix determined by the overhead prefix format.
 
+token-rawAuthor = The message author (usually a username), without any rich text commands.
+
+token-rawIcon = The name of the icon used for the { -highlight(text: "icon") } token.
+
+token-rawLanguage = The untranslated roleplay language of a message.
+
+token-rawName = The name to use in chat for the relevant player, without any rich text commnds.
+
+token-rawRecipient = The username of the recipient of a PM, without rich text.
+
+token-rawRecipientName = The name to use in chat for the recipient of a PM, without rich text.
+
 token-recipient = The username of the recipient of a PM. This may include rich text for the name color.
 
-token-recipientRaw = The username of the recipient of a PM, without rich text.
-
-token-recipientName = The chat name of the recipient of a PM. This may include rich text for the name color.
-
-token-recipientNameRaw = The chat name of the recipient of a PM, without rich text.
+token-recipientName = The name to use in chat for the recipient of a PM.
+    This may include rich text commands for the name color.
 
 token-roll = The number that was rolled.
 

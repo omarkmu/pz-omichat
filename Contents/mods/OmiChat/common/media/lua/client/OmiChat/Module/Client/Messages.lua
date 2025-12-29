@@ -630,7 +630,7 @@ function Messages._build(info)
     -- handle roleplay languages
     local language = meta.language
     if language then
-        info.tokens.languageRaw = language
+        info.tokens.rawLanguage = language
         info.tokens.language = utils.getTranslatedLanguageName(language)
 
         -- hide signed messages sent over the radio
@@ -702,7 +702,7 @@ function Messages._buildTokens(info)
         stream = info.stream and info.stream:getName() or info.chatType,
         chatType = info.chatType,
         author = info.author,
-        authorRaw = info.author,
+        rawAuthor = info.author,
         tags = MultiMap.fromSet(info.tags),
     }
 
@@ -712,7 +712,7 @@ function Messages._buildTokens(info)
     end
 
     tokens.name = info.meta.name or tokens.author
-    tokens.nameRaw = tokens.name
+    tokens.rawName = tokens.name
 
     local chatType = info.chatType
     if chatType == 'faction' then
@@ -727,9 +727,9 @@ function Messages._buildTokens(info)
             local recipientName = API.data.getNameInChat(other, 'whisper') or other
 
             tokens.recipient = other
-            tokens.recipientRaw = other
+            tokens.rawRecipient = other
             tokens.recipientName = recipientName
-            tokens.recipientNameRaw = recipientName
+            tokens.rawRecipientName = recipientName
             tokens.outgoingPM = '1'
             info.tags.IsOutgoingPM = true
         end
@@ -814,7 +814,7 @@ function Messages._checkRange(info, player)
     end
 
     -- out of range → check whether we should show text indicating that
-    local language = info.tokens.languageRaw
+    local language = info.tokens.rawLanguage
     local isSigned = language and API.language.isSigned(language)
 
     if dist and not info.tags.Action then
