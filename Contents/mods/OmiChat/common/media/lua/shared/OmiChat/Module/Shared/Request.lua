@@ -105,7 +105,7 @@ TOPIC.APPLY_BUFF = dispatch:topic('APPLY_BUFF', {
 ---Server → client: Indicates that customization was applied.
 TOPIC.APPLY_CUSTOMIZATION = dispatch:topic('APPLY_CUSTOMIZATION', {
     ---@param req omi.ClientRequest
-    ---@param args request.Args.Customization
+    ---@param args Args.Request.Customization
     onServerReceive = function(req, args)
         if not config.Customization.EnableCharacterCustomization then
             return
@@ -139,7 +139,7 @@ TOPIC.APPLY_CUSTOMIZATION = dispatch:topic('APPLY_CUSTOMIZATION', {
 
 ---Client → server: Execute a chat command.
 TOPIC.COMMAND = dispatch:topic('COMMAND', {
-    ---@param args request.Args.Command
+    ---@param args Args.Request.Command
     ---@return boolean
     ---@return string?
     onClientValidate = function(_, args)
@@ -169,7 +169,7 @@ TOPIC.COMMAND = dispatch:topic('COMMAND', {
     end,
 
     ---@param req omi.ClientRequest
-    ---@param args request.Args.Command
+    ---@param args Args.Request.Command
     onServerReceive = function(req, args)
         local handler = API_S.commands[args.name]
         if type(handler) ~= 'function' then
@@ -187,12 +187,12 @@ TOPIC.CONFIGURATION = dispatch:topic('CONFIGURATION', {
     requireAdmin = true,
 
     onSend = function(req)
-        local args = { values = config:getValues() } ---@type request.Args.UpdateConfiguration
+        local args = { values = config:getValues() } ---@type Args.Request.UpdateConfiguration
         req:send(args)
     end,
 
     ---@param req omi.Request
-    ---@param args request.Args.UpdateConfiguration
+    ---@param args Args.Request.UpdateConfiguration
     onReceive = function(req, args)
         config:load(args.values)
 
@@ -210,13 +210,13 @@ TOPIC.CONFIGURATION = dispatch:topic('CONFIGURATION', {
 TOPIC.CONFIGURATION_PRESETS = dispatch:topic('CONFIGURATION_PRESETS', {
     requireAdmin = true,
 
-    ---@param args request.Args.AddOrRemovePreset
+    ---@param args Args.Request.AddOrRemovePreset
     ---@return string?
     onStringifyClientArgs = function(args)
         return format('{"type": %q, "name": %q, "values": {...}}', args.type, args.name)
     end,
 
-    ---@param args request.Args.UpdatePresets
+    ---@param args Args.Request.UpdatePresets
     ---@return string?
     onStringifyServerArgs = function(args)
         if #args.list > 0 then
@@ -225,17 +225,17 @@ TOPIC.CONFIGURATION_PRESETS = dispatch:topic('CONFIGURATION_PRESETS', {
     end,
 
     onServerSend = function(req)
-        local args = { list = config:getCustomPresetsForSave() } ---@type request.Args.UpdatePresets
+        local args = { list = config:getCustomPresetsForSave() } ---@type Args.Request.UpdatePresets
         req:send(args)
     end,
 
-    ---@param args request.Args.UpdatePresets
+    ---@param args Args.Request.UpdatePresets
     onClientReceive = function(_, args)
         config:_setCustomPresets(args.list) ---@diagnostic disable-line: access-invisible
     end,
 
     ---@param req omi.ClientRequest
-    ---@param args request.Args.AddOrRemovePreset
+    ---@param args Args.Request.AddOrRemovePreset
     onServerReceive = function(req, args)
         if args.type == 'DELETE' then
             API_S.extension.removeCustomPreset(args.name)
@@ -251,7 +251,7 @@ TOPIC.CONFIGURATION_PRESETS = dispatch:topic('CONFIGURATION_PRESETS', {
 TOPIC.DATA_CLEAR = dispatch:topic('DATA_CLEAR', {
     requireAdmin = true,
 
-    ---@param args request.Args.ClearPlayerData
+    ---@param args Args.Request.ClearPlayerData
     onServerReceive = function(_, args)
         API_S.data.clear(args.username)
         API_S.request.updatePlayerCache()
@@ -263,7 +263,7 @@ TOPIC.DATA_CLEAR = dispatch:topic('DATA_CLEAR', {
 TOPIC.DATA_LIST = dispatch:topic('DATA_LIST', {
     requireAdmin = true,
 
-    ---@param args request.Args.PlayerDataListResponse
+    ---@param args Args.Request.PlayerDataListResponse
     ---@return string?
     onStringifyServerArgs = function(args)
         if #args.list > 0 then
@@ -271,7 +271,7 @@ TOPIC.DATA_LIST = dispatch:topic('DATA_LIST', {
         end
     end,
 
-    ---@param args request.Args.PlayerDataListResponse
+    ---@param args Args.Request.PlayerDataListResponse
     onClientReceive = function(_, args)
         local instance = ISChat.instance --[[@as omichat.ISChat]]
         local panel = instance and instance.activePlayerDataPanel
@@ -283,7 +283,7 @@ TOPIC.DATA_LIST = dispatch:topic('DATA_LIST', {
     end,
 
     onServerReceive = function(req)
-        ---@type request.Args.PlayerDataListResponse
+        ---@type Args.Request.PlayerDataListResponse
         local resp = { list = API_S.data.getPlayerDataList() }
 
         req:reply(resp)
@@ -293,7 +293,7 @@ TOPIC.DATA_LIST = dispatch:topic('DATA_LIST', {
 ---Client → server: request updating data for a username.
 TOPIC.DATA_UPDATE = dispatch:topic('DATA_UPDATE', {
     ---@param req omi.ClientRequest
-    ---@param args request.Args.PlayerDataUpdate
+    ---@param args Args.Request.PlayerDataUpdate
     onServerReceive = function(req, args)
         args.fromCommand = false
         API_S.data.tryUpdate(req:getPlayer(), args)
@@ -318,14 +318,14 @@ TOPIC.DRAW_CARD = dispatch:topic('DRAW_CARD', {
         local card = utils.randInt(1, 13)
 
         if not config.Commands.Card.Global then
-            local args = { card = card, suit = suit } ---@type request.Args.ReportDrawCard
+            local args = { card = card, suit = suit } ---@type Args.Request.ReportDrawCard
             req:reply(args)
             return
         end
 
         local name = API.data.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
 
-        ---@type request.Args.ShowMessage
+        ---@type Args.Request.ShowMessage
         local args = {
             id = 'command-card-global',
             args = {
@@ -343,7 +343,7 @@ TOPIC.DRAW_CARD = dispatch:topic('DRAW_CARD', {
         req:broadcastOn(TOPIC.SHOW_MESSAGE, args)
     end,
 
-    ---@param args request.Args.ReportDrawCard
+    ---@param args Args.Request.ReportDrawCard
     onClientReceive = function(_, args)
         local card = utils.tointeger(args.card)
         if not card or card < 1 or card > 13 then
@@ -388,7 +388,7 @@ TOPIC.FLIP_COIN = dispatch:topic('FLIP_COIN', {
     onServerReceive = function(req)
         local heads = utils.randInt(2) == 1
         if not config.Commands.Flip.Global then
-            local args = { heads = heads } ---@type request.Args.ReportFlipCoin
+            local args = { heads = heads } ---@type Args.Request.ReportFlipCoin
             req:reply(args)
             return
         end
@@ -396,7 +396,7 @@ TOPIC.FLIP_COIN = dispatch:topic('FLIP_COIN', {
         local player = req:getPlayer()
         local name = API.data.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
 
-        ---@type request.Args.ShowMessage
+        ---@type Args.Request.ShowMessage
         local args = {
             id = heads and 'command-flip-heads-global' or 'command-flip-tails-global',
             args = { name = name },
@@ -405,7 +405,7 @@ TOPIC.FLIP_COIN = dispatch:topic('FLIP_COIN', {
         req:broadcastOn(TOPIC.SHOW_MESSAGE, args)
     end,
 
-    ---@param args request.Args.ReportFlipCoin
+    ---@param args Args.Request.ReportFlipCoin
     onClientReceive = function(_, args)
         local targetStream = API_C.streams.firstChatStreamWithTag('FlipCommandTarget')
         if not targetStream then
@@ -431,7 +431,7 @@ TOPIC.PLAYER_CACHE = dispatch:topic('PLAYER_CACHE', {
         dispatch.trigger.onInterval(60000),
     },
 
-    ---@param args request.Args.UpdatePlayerCache
+    ---@param args Args.Request.UpdatePlayerCache
     ---@return string?
     onStringifyServerArgs = function(args)
         return '{"items": ' .. Request._encodeListDisplay(args.items) .. '}'
@@ -439,12 +439,12 @@ TOPIC.PLAYER_CACHE = dispatch:topic('PLAYER_CACHE', {
 
     onServerSend = function(req)
         local items = API_S.data.refreshPlayerCache()
-        local args = { items = items } ---@type request.Args.UpdatePlayerCache
+        local args = { items = items } ---@type Args.Request.UpdatePlayerCache
 
         req:send(args)
     end,
 
-    ---@param args request.Args.UpdatePlayerCache
+    ---@param args Args.Request.UpdatePlayerCache
     onClientReceive = function(_, args)
         API.data.setPlayerCache(args.items)
     end,
@@ -543,7 +543,7 @@ TOPIC.PLAYER_JOINED = dispatch:topic('PLAYER_JOINED', {
 ---Server → client: display the result of rolling dice.
 TOPIC.ROLL_DICE = dispatch:topic('ROLL_DICE', {
     ---@param req omi.ClientRequest
-    ---@param args request.Args.RollDice
+    ---@param args Args.Request.RollDice
     ---@return boolean
     ---@return string?
     onClientValidate = function(req, args)
@@ -560,11 +560,11 @@ TOPIC.ROLL_DICE = dispatch:topic('ROLL_DICE', {
     end,
 
     ---@param req omi.ClientRequest
-    ---@param args request.Args.RollDice
+    ---@param args Args.Request.RollDice
     onServerReceive = function(req, args)
         local sides = args.sides
         if sides < 1 or sides > 100 then
-            local replyArgs = { id = 'help-text-roll' } ---@type request.Args.ShowMessage
+            local replyArgs = { id = 'help-text-roll' } ---@type Args.Request.ShowMessage
             req:replyWith(TOPIC.SHOW_MESSAGE, replyArgs)
             return
         end
@@ -574,7 +574,7 @@ TOPIC.ROLL_DICE = dispatch:topic('ROLL_DICE', {
         if config.Commands.Roll.Global then
             local name = API.data.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
 
-            ---@type request.Args.ShowMessage
+            ---@type Args.Request.ShowMessage
             local replyArgs = {
                 id = 'command-roll-global',
                 args = {
@@ -586,12 +586,12 @@ TOPIC.ROLL_DICE = dispatch:topic('ROLL_DICE', {
 
             req:broadcastOn(TOPIC.SHOW_MESSAGE, replyArgs)
         else
-            local replyArgs = { roll = roll, sides = sides } ---@type request.Args.ReportRoll
+            local replyArgs = { roll = roll, sides = sides } ---@type Args.Request.ReportRoll
             req:reply(replyArgs)
         end
     end,
 
-    ---@param args request.Args.ReportRoll
+    ---@param args Args.Request.ReportRoll
     onClientReceive = function(_, args)
         local targetStream = API_C.streams.firstChatStreamWithTag('RollCommandTarget')
         if not targetStream then
@@ -613,7 +613,7 @@ TOPIC.ROLL_DICE = dispatch:topic('ROLL_DICE', {
 
 ---Server → client: display an info message in chat.
 TOPIC.SHOW_MESSAGE = dispatch:topic('SHOW_MESSAGE', {
-    ---@param args request.Args.ShowMessage
+    ---@param args Args.Request.ShowMessage
     onClientReceive = function(_, args)
         local text
         if args.text then
@@ -633,7 +633,7 @@ TOPIC.SHOW_MESSAGE = dispatch:topic('SHOW_MESSAGE', {
 ---Server → client: notify that another player is a typing.
 ---Client → server: send typing information to other players.
 TOPIC.TYPING = dispatch:topic('TYPING', {
-    ---@param args request.Args.UpdateTyping
+    ---@param args Args.Request.UpdateTyping
     onClientReceive = function(_, args)
         local typingInfo ---@type TypingInformation?
 
@@ -651,7 +651,7 @@ TOPIC.TYPING = dispatch:topic('TYPING', {
     end,
 
     ---@param req omi.ClientRequest
-    ---@param args request.Args.Typing
+    ---@param args Args.Request.Typing
     onServerReceive = function(req, args)
         local sender = req:getPlayer()
         local senderUsername = sender:getUsername()
@@ -660,7 +660,7 @@ TOPIC.TYPING = dispatch:topic('TYPING', {
             local receiver = onlinePlayers:get(i)
 
             if sender ~= receiver or IS_DEBUG then
-                ---@type request.Args.UpdateTyping
+                ---@type Args.Request.UpdateTyping
                 local replyArgs = {
                     username = senderUsername,
                     typing = args.typing and Request._shouldSendTyping(sender, receiver, args.range, args.chatType),
@@ -730,81 +730,81 @@ return Request
 ---| 'SET_HAIR_COLOR'
 
 ---Client to server request to add or remove a user-defined configuration preset.
----@class request.Args.AddOrRemovePreset
+---@class Args.Request.AddOrRemovePreset
 ---@field type 'ADD' | 'DELETE' The operation to complete.
 ---@field name string The name of the preset.
 ---@field values table? The configuration values.
 
 ---Client to server request to clear player data for a username.
----@class request.Args.ClearPlayerData
+---@class Args.Request.ClearPlayerData
 ---@field username string The username of the player whose data should be cleared.
 
 ---Client to server request to execute a command.
----@class request.Args.Command
+---@class Args.Request.Command
 ---@field name request.ChatCommandName The name of the command.
 ---@field text string The command text, excluding the command itself.
 
 ---Client to server request to perform a customization option.
----@class request.Args.Customization
+---@class Args.Request.Customization
 ---@field type request.CustomizationType The customization type to apply.
 ---@field hairColor? omi.ColorTable<integer> The hair color to set. Defaults to the natural hair color.
 
 ---Client to server request to update player data.
----@class request.Args.PlayerDataUpdate
+---@class Args.Request.PlayerDataUpdate
 ---@field target string The target username.
 ---@field field PlayerDataField The field to update.
 ---@field fromCommand boolean? Flag for whether the request was created from a command.
 ---@field value? any The value to set on the field.
 
 ---Server to client response to a request for player data.
----@class request.Args.PlayerDataListResponse
+---@class Args.Request.PlayerDataListResponse
 ---@field list PlayerData[] The request list of player data.
 
 ---Server to client request to report the result of drawing a card.
----@class request.Args.ReportDrawCard
+---@class Args.Request.ReportDrawCard
 ---@field name string? The name of the player who drew the card, if called for a global message.
 ---@field card integer The card number, in [1, 13].
 ---@field suit integer The suit number, in [1, 4].
 
 ---Server to client request to report the result of flipping a coin.
----@class request.Args.ReportFlipCoin
+---@class Args.Request.ReportFlipCoin
 ---@field heads boolean Flag for whether the result of the flip was heads.
 
 ---Server to client request to report the result of rolling dice.
----@class request.Args.ReportRoll
+---@class Args.Request.ReportRoll
 ---@field roll integer The value of the dice roll.
 ---@field sides integer The number of sides on the dice that was rolled.
 
 ---Server to client request to display a message.
----@class request.Args.ShowMessage : omi.PartialTranslateTable<number | string>
+---@class Args.Request.ShowMessage : omi.PartialTranslateTable<number | string>
 ---@field text string? The message text.
 ---@field serverAlert boolean? Flag for whether this should be treated as a server alert.
 
 ---Client to server request to roll dice.
----@class request.Args.RollDice
+---@class Args.Request.RollDice
 ---@field sides integer The number of sides on the dice to roll.
 
 ---Client to server request to notify other players about typing status.
----@class request.Args.Typing
+---@class Args.Request.Typing
 ---@field typing boolean Flag for whether the source player is typing.
 ---@field range integer? Optional range to limit notifications to.
 ---@field chatType omi.ChatTypeString? The chat type of the stream on which the player is typing.
 
 ---Client to server request to update the configuration.
----@class request.Args.UpdateConfiguration
+---@class Args.Request.UpdateConfiguration
 ---@field values Configuration The new configuration values.
 
 ---Server to client request to update typing information.
----@class request.Args.UpdateTyping
+---@class Args.Request.UpdateTyping
 ---@field username string Flag for whether the target player is typing.
 ---@field typing boolean Flag for whether the target player is typing.
 
 ---Client to server request to update the player cache.
----@class request.Args.UpdatePlayerCache
+---@class Args.Request.UpdatePlayerCache
 ---@field items PlayerCacheData[] The new cache items.
 
 ---Client to server request to update the user-defined configuration presets.
----@class request.Args.UpdatePresets
+---@class Args.Request.UpdatePresets
 ---@field list Configuration.PresetTable[] The new values.
 
 --#endregion

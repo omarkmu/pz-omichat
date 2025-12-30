@@ -22,7 +22,7 @@ API.request = Request
 ---@return boolean success
 ---@return string? error
 function Request.addPreset(name, values)
-    ---@type request.Args.AddOrRemovePreset
+    ---@type Args.Request.AddOrRemovePreset
     local args = { type = 'ADD', name = name, values = values }
 
     return Topic.CONFIGURATION_PRESETS:toServer(args)
@@ -35,11 +35,11 @@ function Request.applyBuff() return Topic.APPLY_BUFF:toServer() end
 
 ---Requests applying a customization option.
 ---@param customizationType request.CustomizationType The customization to apply.
----@param args Partial<request.Args.Customization>? Additional arguments for the customization.
+---@param args Partial<Args.Request.Customization>? Additional arguments for the customization.
 ---@return boolean success
 ---@return string? error
 function Request.applyCustomization(customizationType, args)
-    args = utils.copy(args --[[@as request.Args.Customization]])
+    args = utils.copy(args --[[@as Args.Request.Customization]])
     args.type = customizationType
 
     return Topic.APPLY_CUSTOMIZATION:toServer(args)
@@ -51,7 +51,7 @@ end
 ---@return boolean success
 ---@return string? error
 function Request.clearData(username)
-    ---@type request.Args.ClearPlayerData
+    ---@type Args.Request.ClearPlayerData
     local args = { username = username }
 
     return Topic.DATA_CLEAR:toServer(args)
@@ -68,7 +68,7 @@ function Request.drawCard() return Topic.DRAW_CARD:toServer() end
 ---@return boolean success
 ---@return string? error
 function Request.executeCommand(command, text)
-    ---@type request.Args.Command
+    ---@type Args.Request.Command
     local args = { name = command, text = text or '' }
 
     return Topic.COMMAND:toServer(args)
@@ -90,7 +90,7 @@ function Request.getPlayerDataList() return Topic.DATA_LIST:toServer() end
 ---@return boolean success
 ---@return string? error
 function Request.rollDice(sides)
-    ---@type request.Args.RollDice
+    ---@type Args.Request.RollDice
     local args = { sides = sides }
 
     return Topic.ROLL_DICE:toServer(args)
@@ -102,7 +102,7 @@ end
 ---@return boolean success
 ---@return string? error
 function Request.removePreset(name)
-    ---@type request.Args.AddOrRemovePreset
+    ---@type Args.Request.AddOrRemovePreset
     local args = { type = 'DELETE', name = name }
 
     return Topic.CONFIGURATION_PRESETS:toServer(args)
@@ -129,7 +129,7 @@ end
 function Request.updateConfiguration() return Topic.CONFIGURATION:toServer() end
 
 ---Requests an update to player data.
----@param args request.Args.PlayerDataUpdate Arguments for the update.
+---@param args Args.Request.PlayerDataUpdate Arguments for the update.
 ---@return boolean success
 ---@return string? error
 function Request.updateData(args) return Topic.DATA_UPDATE:toServer(args) end
@@ -145,7 +145,7 @@ function Request.updatePlayerCache() return Topic.PLAYER_CACHE:toServer() end
 ---@return boolean success
 ---@return string? error
 function Request.updateTypingStatus(range, chatType)
-    ---@type request.Args.Typing
+    ---@type Args.Request.Typing
     local args = { range = range, chatType = chatType, typing = API.chat.isTyping() }
 
     return Topic.TYPING:toServer(args)

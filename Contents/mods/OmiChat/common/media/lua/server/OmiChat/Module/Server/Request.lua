@@ -35,7 +35,7 @@ function Request.sendPresets(player) return Topic.CONFIGURATION_PRESETS:toPlayer
 ---@return boolean success
 ---@return string? error
 function Request.sendTyping(player, target, isTyping)
-    ---@type request.Args.UpdateTyping
+    ---@type Args.Request.UpdateTyping
     local args = { username = target:getUsername(), typing = isTyping }
 
     return Topic.TYPING:toPlayer(player, args)
@@ -48,7 +48,7 @@ end
 ---@return boolean success
 ---@return string? error
 function Request.sendInfoMessage(player, text, serverAlert)
-    ---@type request.Args.ShowMessage
+    ---@type Args.Request.ShowMessage
     local args = { text = text, serverAlert = serverAlert }
 
     return Topic.SHOW_MESSAGE:toPlayer(player, args)
@@ -60,7 +60,7 @@ end
 ---@return boolean success
 ---@return string? error
 function Request.sendServerMessage(text, serverAlert)
-    ---@type request.Args.ShowMessage
+    ---@type Args.Request.ShowMessage
     local args = { text = text, serverAlert = serverAlert }
 
     return Topic.SHOW_MESSAGE:broadcast(args)
@@ -74,7 +74,7 @@ end
 ---@return boolean success
 ---@return string? error
 function Request.sendTranslatedInfoMessage(player, stringID, stringArgs, serverAlert)
-    ---@type request.Args.ShowMessage
+    ---@type Args.Request.ShowMessage
     local args = { id = stringID, args = stringArgs, serverAlert = serverAlert }
 
     return Topic.SHOW_MESSAGE:toPlayer(player, args)
@@ -87,7 +87,7 @@ end
 ---@return boolean success
 ---@return string? error
 function Request.sendTranslatedServerMessage(stringID, stringArgs, serverAlert)
-    ---@type request.Args.ShowMessage
+    ---@type Args.Request.ShowMessage
     local args = { id = stringID, args = stringArgs, serverAlert = serverAlert }
 
     return Topic.SHOW_MESSAGE:broadcast(args)

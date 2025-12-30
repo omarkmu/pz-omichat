@@ -97,9 +97,9 @@ function MessageInfo:applyChatFormatting()
     if self.showTimestamp then
         local hour, minute, second = dt:match('(%d%d):(%d%d):(%d%d)')
 
-        hour = tonumber(hour)
-        minute = tonumber(minute)
-        second = tonumber(second)
+        hour = tonumber(hour) --[[@as any]]
+        minute = tonumber(minute) --[[@as any]]
+        second = tonumber(second) --[[@as any]]
 
         if hour and minute and second then
             local hour12 = hour % 12

@@ -133,7 +133,7 @@ end
 ---@param input string The input text.
 ---@return string capitalized The capitalized text.
 function Helpers.capitalize(input)
-    local spaces, first = input:match('^(%s*)()')
+    local spaces, first = input:match('^(%s*)()') --[[@as any]]
     spaces = spaces or ''
     if first then
         input = input:sub(first)
@@ -207,7 +207,7 @@ function Helpers.colorActions(segments, options, tags)
         local part = segments[i]
         if part.type == 'action' then
             local text = part.text
-            local space, asterisk, after = text:match('^(%s*)(%*)()')
+            local space, asterisk, after = text:match('^(%s*)(%*)()') --[[@as any]]
             if asterisk and not keepAsterisk then
                 text = space .. text:sub(after)
             end
@@ -332,7 +332,7 @@ function Helpers.formatQuoteSegments(segments, tags, args)
     for i = 1, #segments do
         local action = segments[i]
         if action.type == 'quote' then
-            local prefix, text, suffix = action.text:match('^(%s*"?)(.-)("?%s*)$')
+            local prefix, text, suffix = action.text:match('^(%s*"?)(.-)("?%s*)$') --[[@as any]]
             if shouldCapitalize and not skipCapitalize then
                 text = Helpers.capitalize(text)
             end
@@ -824,7 +824,7 @@ end
 ---@param characters string? Characters to treat as punctuation. Defaults to `.,!?:/-~`
 ---@return string punctuated Text with punctuation added.
 function Helpers.punctuate(input, punctuation, characters)
-    local last, spaces = input:match('()(%s*)$')
+    local last, spaces = input:match('()(%s*)$') --[[@as any]]
     spaces = spaces or ''
     if last then
         ---@cast last integer
@@ -881,7 +881,7 @@ function Helpers.replaceColorActionsAsterisks(segments)
     for i = 1, #segments do
         local action = segments[i]
         if action.type == 'action' then
-            local space, after = action.text:match('^(%s*)%*()')
+            local space, after = action.text:match('^(%s*)%*()') --[[@as any]]
             if space then
                 action.text = space .. ASTERISK_CHAR .. action.text:sub(after)
             end

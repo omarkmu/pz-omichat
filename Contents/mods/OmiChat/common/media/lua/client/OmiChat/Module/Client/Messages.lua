@@ -877,7 +877,7 @@ function Messages._formatMentions(info, forChat)
     local text = forChat and info.chatText or info.overheadText
     text = text:gsub('%s*<@%d+:.->%s*', function(match)
         local leading, onlineID, name, trailing = match:match('(%s*)<@(%d+):(.-)>(%s*)')
-        onlineID = utils.tointeger(onlineID)
+        onlineID = utils.tointeger(onlineID) --[[@as any]]
         if not onlineID or not name then
             return match
         end

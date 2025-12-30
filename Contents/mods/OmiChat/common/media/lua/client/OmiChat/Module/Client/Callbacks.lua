@@ -127,7 +127,7 @@ function Callback.openLanguageConfirmation(target, language)
 end
 
 ---Called when the configuration menu is closed.
----@param args omi.forms.Args.Callback.Close Callback arguments.
+---@param args omi.Args.FormCallback.Close Callback arguments.
 function Callback.onConfigurationClose(args)
     local form = args.form
     for el in pairs(form:getRemoveOnDestroy()) do
@@ -138,7 +138,7 @@ function Callback.onConfigurationClose(args)
 end
 
 ---Called when configuration is saved from the editor form.
----@param args omi.forms.Args.Callback.Save Callback arguments.
+---@param args omi.Args.FormCallback.Save Callback arguments.
 function Callback.onConfigurationSave(args)
     config:load(args.values)
     API.request.updateConfiguration()

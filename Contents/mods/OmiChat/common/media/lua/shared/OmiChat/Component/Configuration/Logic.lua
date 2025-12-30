@@ -381,7 +381,7 @@ function Logic._getFormatDataTranslations(def, list, _type)
 end
 
 ---Gets the display string to use for an item in the language listbox.
----@param args omi.forms.Args.Callback.Item
+---@param args omi.Args.FormCallback.Item
 ---@return string
 ---@private
 function Logic._getLanguageListDisplay(args)
@@ -442,7 +442,7 @@ function Logic._getStreamCategory(stream)
 end
 
 ---Gets a display string for an item in the stream listbox.
----@param args omi.forms.Args.Callback.Item
+---@param args omi.Args.FormCallback.Item
 ---@private
 ---@return string
 function Logic._getStreamDisplay(args)
@@ -562,7 +562,7 @@ function Logic._loadTags()
 end
 
 ---Called when a language name changes in the language listbox.
----@param args omi.forms.Args.Callback.Item
+---@param args omi.Args.FormCallback.Item
 ---@private
 function Logic._onChangeLanguageName(args)
     local control = args.form:getFieldControl('Language.List.Name') --[[@as omi.TextEntry?]]
@@ -579,7 +579,7 @@ function Logic._onChangeLanguageName(args)
 end
 
 ---Called when the preset option dropdown changes.
----@param args omi.forms.Args.Callback.Item
+---@param args omi.Args.FormCallback.Item
 ---@private
 function Logic._onChangePreset(args)
     local info = args.info
@@ -592,7 +592,7 @@ function Logic._onChangePreset(args)
 end
 
 ---Called when a value in a stream changes.
----@param args omi.forms.Args.Callback.Item
+---@param args omi.Args.FormCallback.Item
 ---@private
 function Logic._onChangeStream(args)
     local form = args.form
@@ -674,7 +674,7 @@ function Logic._onChangeStream(args)
 end
 
 ---Called when a tag list entry changes.
----@param args omi.forms.Args.Callback.Item
+---@param args omi.Args.FormCallback.Item
 ---@private
 function Logic._onChangeTag(args)
     local control = args.info.control --[[@as omi.ListEntry]]
@@ -712,7 +712,7 @@ function Logic._onChangeTag(args)
 end
 
 ---Called when the info button on a format option is clicked.
----@param args omi.forms.Args.Callback.ButtonClick
+---@param args omi.Args.FormCallback.ButtonClick
 ---@private
 function Logic._onClickFormatInfo(args)
     local form = args.form
@@ -750,7 +750,7 @@ function Logic._onClickFormatInfo(args)
 end
 
 ---Called when a preset action button is clicked.
----@param args omi.forms.Args.Callback.ButtonClick
+---@param args omi.Args.FormCallback.ButtonClick
 ---@private
 function Logic._onClickPresetAction(args)
     if args.buttonIndex == 1 then

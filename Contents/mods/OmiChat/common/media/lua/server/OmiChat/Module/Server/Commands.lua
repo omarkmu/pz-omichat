@@ -17,7 +17,7 @@ API.commands = Command
 
 ---Handles the `/addlanguage` command.
 ---@param player IsoPlayer The requesting player.
----@param args request.Args.Command Arguments with command information.
+---@param args Args.Request.Command Arguments with command information.
 function Command.addLanguage(player, args)
     local parsed = utils.parseCommandArgs(args.text)
     local username = parsed[1]
@@ -75,7 +75,7 @@ end
 
 ---Handles the `/reseticon` command.
 ---@param player IsoPlayer The requesting player.
----@param args request.Args.Command Arguments with command information.
+---@param args Args.Request.Command Arguments with command information.
 function Command.resetIcon(player, args)
     local parsed = utils.parseCommandArgs(args.text)
     local username = parsed[1]
@@ -107,7 +107,7 @@ end
 
 ---Handles the `/resetlanguages` command.
 ---@param player IsoPlayer The requesting player.
----@param args request.Args.Command Arguments with command information.
+---@param args Args.Request.Command Arguments with command information.
 function Command.resetLanguages(player, args)
     local parsed = utils.parseCommandArgs(args.text)
     local username = parsed[1]
@@ -139,7 +139,7 @@ end
 
 ---Handles the `/resetname` command.
 ---@param player IsoPlayer The requesting player.
----@param args request.Args.Command Arguments with command information.
+---@param args Args.Request.Command Arguments with command information.
 function Command.resetName(player, args)
     local parsed = utils.parseCommandArgs(args.text)
     local username = parsed[1]
@@ -171,7 +171,7 @@ end
 
 ---Handles the `/seticon` command.
 ---@param player IsoPlayer The requesting player.
----@param args request.Args.Command Arguments with command information.
+---@param args Args.Request.Command Arguments with command information.
 function Command.setIcon(player, args)
     local parsed = utils.parseCommandArgs(args.text)
     local username = parsed[1]
@@ -205,7 +205,7 @@ end
 
 ---Handles the `/setlanguageslots` command.
 ---@param player IsoPlayer The requesting player.
----@param args request.Args.Command Arguments with command information.
+---@param args Args.Request.Command Arguments with command information.
 function Command.setLanguageSlots(player, args)
     local parsed = utils.parseCommandArgs(args.text)
     local username = parsed[1]
@@ -242,7 +242,7 @@ end
 
 ---Handles the `/setname` command.
 ---@param player IsoPlayer The requesting player.
----@param args request.Args.Command Arguments with command information.
+---@param args Args.Request.Command Arguments with command information.
 function Command.setName(player, args)
     local parsed = utils.parseCommandArgs(args.text)
     local username = parsed[1]

@@ -252,7 +252,7 @@ end
 
 ---Attempts to update data as the given player.
 ---@param player IsoPlayer The player to perform the update as.
----@param args request.Args.PlayerDataUpdate The data for the update.
+---@param args Args.Request.PlayerDataUpdate The data for the update.
 ---@param broadcast boolean? Flag for whether the update should be broadcast. Defaults to `true`.
 ---@return boolean success
 ---@return string? errorID
