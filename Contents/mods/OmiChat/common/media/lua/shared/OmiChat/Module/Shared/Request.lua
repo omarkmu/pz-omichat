@@ -447,6 +447,7 @@ TOPIC.PLAYER_CACHE = dispatch:topic('PLAYER_CACHE', {
     ---@param args Args.Request.UpdatePlayerCache
     onClientReceive = function(_, args)
         API.data.setPlayerCache(args.items)
+        API_C.ui.updateLanguageIndicator()
     end,
 
     onServerReceive = function(req) req:broadcast() end,

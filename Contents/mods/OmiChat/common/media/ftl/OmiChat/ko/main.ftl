@@ -18,6 +18,8 @@ over-radio = (라디오)
 
 admin-indicator = (관리자)
 
+placeholder-language-indicator = { KR_WITH_PARTICLE($language, type: "ro") } 말하고 있음
+
 ## Typing indicator
 
 typing-1 = { KR_WITH_PARTICLE($name, type: "subj") } 입력하고 있습니다...
@@ -93,8 +95,6 @@ success-reset-name = 이름이 리셋되었습니다.
 success-reset-status = 상태가 삭제되었습니다.
 
 success-clear-names = 모든 닉네임이 삭제되었습니다.
-
-success-switch-language = 현재 활성 언어가 { KR_WITH_PARTICLE($language, type: "ro") } 전환했습니다.
 
 success-set-name-other = '{ $name }'라는 이름이 '{ $username }' 플레이어에게 적용되었습니다.
 

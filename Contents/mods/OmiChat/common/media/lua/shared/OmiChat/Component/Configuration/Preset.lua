@@ -245,6 +245,8 @@ function Preset.languages(options)
         UnknownLanguageChat = DEFAULT,
         UnknownLanguageRadio = DEFAULT,
         UnknownLanguageOverhead = DEFAULT,
+        PlaceholderFormat = DEFAULT,
+        PlaceholderColor = { r = 127, g = 127, b = 127 },
         SelfAddAllowlist = {},
         SelfAddBlocklist = {},
     }

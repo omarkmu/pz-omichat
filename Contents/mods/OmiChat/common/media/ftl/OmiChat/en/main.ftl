@@ -25,6 +25,9 @@ over-radio = (Over Radio)
 
 admin-indicator = (Admin)
 
+# @param $language string The translated name of the language being spoken.
+placeholder-language-indicator = Speaking { $language }
+
 ## Typing indicator
 
 # @param $name string The name of the player who is typing.
@@ -133,9 +136,6 @@ success-reset-name = Your name has been reset.
 success-reset-status = Your status has been cleared.
 
 success-clear-names = Cleared all nicknames.
-
-# @param $language string The text that the player provided for the /language command.
-success-switch-language = Switched active language to { $language }.
 
 # @param $name string The name that the player provided for the /setname command.
 # @param $username string The username that the player provided for the /setname command.

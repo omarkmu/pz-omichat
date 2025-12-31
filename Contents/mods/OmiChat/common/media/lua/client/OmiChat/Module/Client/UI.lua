@@ -33,6 +33,7 @@ local TILE_FIELD ---@type Field?
 ---@field suggestBox? omi.SuggestBox The auto-suggest box for the chat input.
 ---@field private _configPanel? omi.forms.Form The configuration panel.
 ---@field private _typingDisplay? string The current display text for the typing indicator.
+---@field private _language string? The current language for the language indicator.
 local UI = {}
 
 ---Contains functions for controlling the chat window and related UI components.
@@ -464,6 +465,45 @@ function UI.updateInfoText(player)
     instance:setInfo(UI.getInfoRichText(player))
 end
 
+---Updates the language indicator text.
+---@param force boolean? Flag for whether the indicator should be updated even if the language hasn't changed.
+function UI.updateLanguageIndicator(force)
+    local instance = ISChat.instance
+    local entry = instance and instance.textEntry
+    if not entry then
+        return
+    end
+
+    local color = utils.color.integerToDecimal(config.Language.PlaceholderColor)
+    entry:setPlaceholderRGBA(color.r, color.g, color.b, 1)
+
+    local language = API.player.getCurrentLanguage()
+    if not force and language == UI._language then
+        return
+    end
+
+    UI._language = language
+
+    local tokens = {
+        rawLanguage = language,
+        language = language and utils.getTranslatedLanguageName(language),
+    }
+
+    local display = utils.interpolateNamed(
+        'LanguagePlaceholder',
+        config.Language.PlaceholderFormat,
+        tokens
+    )
+
+    display = display:trim()
+    if display == '' then
+        entry:setPlaceholderText(nil)
+        return
+    end
+
+    entry:setPlaceholderText(display)
+end
+
 ---Updates UI elements to match configuration.
 ---@param redraw boolean? Flag for whether the chat messages should be redrawn.
 function UI.updateState(redraw)
@@ -475,6 +515,7 @@ function UI.updateState(redraw)
     UI.updateChatPanelSize()
     UI.updateInfoText()
     UI.updateButtons()
+    UI.updateLanguageIndicator(true)
 
     if redraw then
         -- some configuration options affect how messages are drawn

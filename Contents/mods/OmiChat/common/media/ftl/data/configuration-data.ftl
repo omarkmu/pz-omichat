@@ -677,6 +677,7 @@ config-Language-UnknownLanguageOverhead =
     .type = { -format-string }
     .tokens = { -tokens-overhead }
     .args = { -args-overhead };language;dialogueTag
+    .pad-top = { -pad }
 
 config-Language-UnknownLanguageChat =
     .type = { -format-string }
@@ -687,6 +688,18 @@ config-Language-UnknownLanguageRadio =
     .type = { -format-string }
     .tokens = { -tokens-chat }
     .args = { -args-chat }
+
+config-Language-PlaceholderFormat =
+    .type = { -format-string }
+    .tokens = language;rawLanguage
+    .pad-top = { -pad }
+    .args = allowDefault
+    .arg-allowDefault = arg-allowDefault-language-placeholder
+
+config-Language-PlaceholderColor =
+    .type = { -color }
+    .default = 70,70,70
+    .pad-bottom = { -pad }
 
 config-Language-SelfAddAllowlist =
     .type = { -string-list }

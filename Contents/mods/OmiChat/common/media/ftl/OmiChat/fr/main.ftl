@@ -17,6 +17,8 @@ over-radio = (À la Radio)
 
 admin-indicator = (Administrateur)
 
+placeholder-language-indicator = Vous parlez { $language }
+
 ## Typing indicator
 
 typing-1 = { $name } est en train d'écrire...
@@ -88,8 +90,6 @@ success-reset-name = Votre nom a été réinitialisé.
 success-reset-status = Your status has been cleared.
 
 success-clear-names = Tous les pseudonymes ont été effacés.
-
-success-switch-language = Langue active basculée vers { $language }.
 
 success-set-name-other = Le nom a été défini sur '{ $name }' pour le joueur '{ $username }'.
 

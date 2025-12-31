@@ -25,8 +25,5 @@ return API.CommandStream:new {
             API.chat.addInfoMessage(getText('error-switch-unknown-language', { language = command }))
             return
         end
-
-        lang = utils.getTranslatedLanguageName(lang)
-        API.chat.addInfoMessage(getText('success-switch-language', { language = lang }))
     end,
 }

@@ -452,6 +452,31 @@ function Library.Defaults.Language(interpolator)
     return '[' .. language .. ']'
 end
 
+---Default format for placeholder text displaying the current language.
+---@param interpolator omi.Interpolator The interpolator in use.
+---@param args any? The first argument passed to the default function.
+---@return string?
+function Library.Defaults.LanguagePlaceholder(interpolator, args)
+    local rawLanguage = interpolator:tokenString('rawLanguage')
+    local language = interpolator:tokenString('language')
+
+    local default = API.language.getDefault()
+    if language == '' then
+        language = default and utils.getTranslatedLanguageName(default) or ''
+        if language == '' then
+            return
+        end
+    end
+
+    local options = readOptions(args)
+    local allowDefault = options:getBoolean('allowDefault')
+    if not allowDefault and rawLanguage == default then
+        return
+    end
+
+    return getText('placeholder-language-indicator', { language = language })
+end
+
 ---Default format for a mention in chat text.
 ---@param interpolator omi.Interpolator The interpolator in use.
 ---@param args any? The first argument passed to the default function.

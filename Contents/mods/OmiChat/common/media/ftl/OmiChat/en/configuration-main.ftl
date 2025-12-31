@@ -456,6 +456,13 @@ config-Language-UnknownLanguageRadio = Unknown Language Chat Format (Radio)
     .tooltip = Controls how messages sent over the radio appear in chat when sent
         using a roleplay language the player's character doesn't speak.
 
+config-Language-PlaceholderFormat = Language Indicator Format
+    .tooltip = Controls the language indicator text that displays as a placeholder for the chat entry.
+        By default, the indicator only shows up for languages other than the default language.
+
+config-Language-PlaceholderColor = Language Indicator Color
+    .tooltip = The color to use for the language indicator placeholder text.
+
 config-Language-SelfAddAllowlist = Add Language Allowlist
     .tooltip = The list of languages that should display in the menu for adding languages.
 

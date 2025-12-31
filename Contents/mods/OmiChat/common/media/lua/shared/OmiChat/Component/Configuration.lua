@@ -794,6 +794,8 @@ return Configuration
 ---@field UnknownLanguageChat string
 ---@field UnknownLanguageRadio string
 ---@field UnknownLanguageOverhead string
+---@field PlaceholderFormat string
+---@field PlaceholderColor omi.ColorTable<integer>
 ---@field UseDefaultList boolean
 ---@field List Configuration.LanguageDefinition[]
 

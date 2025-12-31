@@ -27,6 +27,8 @@ heading-format-string = This setting is a <SPACE> { -highlight-inline(text: "for
 
 ## Format string option tooltips
 
+arg-allowDefault-language-placeholder = If given, the placeholder will be shown for the default language as well.
+
 arg-cardIcon = The icon to use for messages. Defaults to 'Item_CardDeck'.
 
 arg-colorTargetTag = The tag to use for narrowing if multiple streams include
@@ -384,7 +386,7 @@ token-input = The input text.
 
 token-input-processed = The input text, after all prior processing.
 
-token-language = The roleplay language of a message, translated into the current locale.
+token-language = The name of the roleplay language translated into the current locale.
 
 token-language-processed = The result of the language component format.
 
@@ -417,7 +419,7 @@ token-rawAuthor = The message author (usually a username), without any rich text
 
 token-rawIcon = The name of the icon used for the { -highlight(text: "icon") } token.
 
-token-rawLanguage = The untranslated roleplay language of a message.
+token-rawLanguage = The untranslated name of the roleplay language.
 
 token-rawName = The name to use in chat for the relevant player, without any rich text commnds.
 
