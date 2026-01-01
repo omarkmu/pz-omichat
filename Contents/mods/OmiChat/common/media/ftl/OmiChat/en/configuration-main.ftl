@@ -55,7 +55,8 @@ config-format-strings = <CENTRE> <SIZE:large> Format Strings <LINE> <SIZE:small>
     enclose arguments (e.g., { -highlight(text: "$Capitalize($input)") }).
     Like tokens, functions are case-sensitive. Function arguments are separated by spaces. To include a space in a
     single argument, enclose text in backticks (e.g., `text with spaces`).
-    <BR> For a list of built-in functions and their behavior, see the online documentation (linked on the mod page).
+    <BR> For a list of built-in functions and their behavior, see the <SPACE>
+    <LINK url=https://omarkmu.github.io/pz-omichat/format-strings/functions text="online documentation"> .
     { -format-section-heading(name: "Multimaps") }
     Multimaps (or 'at-maps') can be declared using an { -highlight(text: "@") } symbol followed
     by parenthesized elements.
