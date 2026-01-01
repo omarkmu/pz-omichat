@@ -139,9 +139,20 @@ end
 
 ---Called when configuration is saved from the editor form.
 ---@param args omi.Args.FormCallback.Save Callback arguments.
+---@return boolean
 function Callback.onConfigurationSave(args)
     config:load(args.values)
-    API.request.updateConfiguration()
+
+    local success = API.request.updateConfiguration()
+    return success
+end
+
+---Called for UI updates of the configuration form.
+---@param args omi.Args.FormCallback.Update Callback arguments.
+function Callback.onConfigurationUpdate(args)
+    if not API.player.isChatAdmin() then
+        args.form:close()
+    end
 end
 
 ---Populates the auto-suggest box with relevant suggestions.

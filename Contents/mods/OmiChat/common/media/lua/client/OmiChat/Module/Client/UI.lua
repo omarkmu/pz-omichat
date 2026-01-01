@@ -139,6 +139,7 @@ function UI.getConfigPanel()
         values = config:getValuesForSave(),
         onSave = API.callback.onConfigurationSave,
         onClose = API.callback.onConfigurationClose,
+        onUpdate = API.callback.onConfigurationUpdate,
     }
 
     panel:initialise()
