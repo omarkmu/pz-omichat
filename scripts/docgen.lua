@@ -46,6 +46,13 @@ local function quit(err, ...)
     os.exit(1)
 end
 
+---Trims a string.
+---@param s string
+---@return string
+local function trim(s)
+    return (s:gsub('^%s*(.-)%s*$', '%1'))
+end
+
 ---Fills in gaps in `fluent-lua`.
 local function patchFluent()
     local class = require 'pl.class'
@@ -412,7 +419,7 @@ local function readList(str, delimPattern)
     local pos = 1
     local start, stop = str:find(delimPattern)
     while start and stop and pos <= #str do
-        local substr = str:sub(pos, start - 1):gsub('^%s*(.-)%s*$', '%1')
+        local substr = trim(str:sub(pos, start - 1))
         if #substr ~= 0 then
             items[#items + 1] = substr
         end
@@ -422,7 +429,7 @@ local function readList(str, delimPattern)
     end
 
     if pos < #str then
-        local remaining = str:sub(pos):gsub('^%s*(.-)%s*$', '%1')
+        local remaining = trim(str:sub(pos))
         if #remaining ~= 0 then
             items[#items + 1] = remaining
         end
@@ -505,7 +512,7 @@ local function generateFromConfig(dataBundle, contentBundle)
         end
 
         local defaultValue
-        if not LIST_TYPES[_type] then
+        if not LIST_TYPES[_type] and _type ~= 'string-map' then
             defaultValue = element.default
         else
             local defaults = readList(element.default)
@@ -573,6 +580,31 @@ local function generateFromConfig(dataBundle, contentBundle)
                 writeOptList(options, rope, optNames, optDescs)
 
                 rope[#rope + 1] = '\n'
+            end
+        elseif _type == 'string-map' then
+            local defaults = readList(element.default) or {}
+            if #defaults ~= 0 then
+                rope[#rope + 1] = '\n\n**Defaults**:'
+            end
+
+            for i = 1, #defaults do
+                local pair = defaults[i]
+                local sep = pair:find('::')
+
+                local pairKey = trim(pair:sub(1, sep and sep - 1 or #pair))
+                local pairValue = sep and trim(pair:sub(sep + 2))
+
+                rope[#rope + 1] = '\n- `'
+                rope[#rope + 1] = pairKey
+                rope[#rope + 1] = '` = '
+
+                if pairValue then
+                    rope[#rope + 1] = '`'
+                    rope[#rope + 1] = pairValue
+                    rope[#rope + 1] = '`'
+                else
+                    rope[#rope + 1] = '(empty)'
+                end
             end
         end
 
@@ -736,7 +768,10 @@ local function main()
     end
 end
 
-main()
+local success, err = pcall(main)
+if not success then
+    quit(err or 'an error ocurred')
+end
 
 --#region Type Definitions
 

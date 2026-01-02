@@ -79,11 +79,6 @@ Configuration._presetList = {}
 ---@private
 Configuration._customPresets = {}
 
----Contains arbitary variables.
----@type table<string, string>
----@private
-Configuration._variables = {}
-
 --#endregion
 
 --#region Constants
@@ -336,14 +331,14 @@ end
 ---@param key string The key to retrieve.
 ---@return string? value
 function Configuration:getVariable(key)
-    return self._variables[key]
+    return self.General.Variables[key]
 end
 
 ---Gets the boolean value of a variable. Returns `nil` if the variable doesn't exist.
 ---@param key string The key to retrieve.
 ---@return boolean? value
 function Configuration:getVariableAsBool(key)
-    local value = self._variables[key]
+    local value = self.General.Variables[key]
     if not value then
         return nil
     end
@@ -355,7 +350,7 @@ end
 ---@param key string The key to retrieve.
 ---@return number? value
 function Configuration:getVariableAsNumber(key)
-    return tonumber(self._variables[key])
+    return tonumber(self.General.Variables[key])
 end
 
 ---Returns whether the clean character option is set to clean the body.
@@ -458,7 +453,6 @@ end
 ---Refreshes caches associated with configuration values.
 function Configuration:refreshValueCaches()
     self:_cacheLanguages()
-    self:_cacheVariables()
 end
 
 ---Checks whether an item is required for /card.
@@ -517,23 +511,6 @@ function Configuration:_cacheLanguages()
 
     self._languageAllowSet = utils.set.table(self.Language.SelfAddAllowlist)
     self._languageBlockSet = utils.set.table(self.Language.SelfAddBlocklist)
-end
-
----Caches the variables and stores them as a map.
----@private
-function Configuration:_cacheVariables()
-    local varList = self.General.Variables
-
-    self._variables = {}
-    for i = 1, #varList do
-        local varString = varList[i]
-        local split = varString:find(':')
-        if split then
-            local key = utils.trim(varString:sub(1, split - 1))
-            local value = utils.trim(varString:sub(split + 1))
-            self._variables[key] = value
-        end
-    end
 end
 
 ---Caches the list of presets.
@@ -677,7 +654,7 @@ return Configuration
 ---@field ClearOnDeath Configuration.General.ClearOnDeath
 ---@field AdminIcon string
 ---@field InfoText string
----@field Variables string[]
+---@field Variables table<string, string>
 
 ---@class Configuration.General.ClearOnDeath
 ---@field Icon boolean?

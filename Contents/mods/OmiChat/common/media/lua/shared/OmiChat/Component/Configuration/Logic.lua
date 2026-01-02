@@ -214,10 +214,10 @@ function Logic._generateField(def)
     elseif _type == 'object-list' then
         field = schema.array({
             maxItems = utils.tointeger(def.max_items),
-            items = schema.object {
+            items = schema.object({
                 skipMissing = true,
                 properties = properties,
-            },
+            }),
         })
     elseif _type == 'dropdown' then
         field = schema.stringEnum({
@@ -237,6 +237,27 @@ function Logic._generateField(def)
         field = schema.set({
             default = utils.set.table(default),
             items = schema.stringEnum({ values = options }),
+        })
+    elseif _type == 'string-map' then
+        local default = {}
+        if def.default then
+            local defaultKVP = utils.mapList(utils.split, utils.split(def.default, ';'), '::')
+            for i = 1, #defaultKVP do
+                local kvp = defaultKVP[i]
+                if #kvp < 1 or #kvp > 2 then
+                    log.error('Invalid default value for key %s', def._key)
+                else
+                    local key = kvp[1]
+                    local value = kvp[2] or ''
+                    default[key] = value
+                end
+            end
+        end
+
+        field = schema.object({
+            skipMissing = true,
+            default = default,
+            additionalProperties = schema.string(),
         })
     elseif _type == 'string-list' or _type == 'tags' then
         field = schema.array({

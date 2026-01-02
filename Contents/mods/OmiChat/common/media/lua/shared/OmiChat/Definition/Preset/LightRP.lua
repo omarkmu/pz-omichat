@@ -9,7 +9,7 @@ return Preset:new {
         General = Preset.general {
             Name = 'LightRP',
             Variables = {
-                'PMParenthesisCount:1',
+                PMParenthesisCount = '1',
             },
         },
         Buffs = Preset.buffs {

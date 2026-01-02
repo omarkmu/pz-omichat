@@ -439,7 +439,7 @@ return Preset
 ---@field AdminIcon string? The texture name to use as the admin icon. Defaults to `Item_Sledgehamer` [sic].
 ---@field CaseInsensitiveChatStreams boolean? Flag for whether chat streams are case-insensitive. Defaults to `true`.
 ---@field ClearOnDeath Configuration.General.ClearOnDeath? Information taht should be cleared death.
----@field Variables string[]? Arbitrary key-value pairs for variables.
+---@field Variables table<string, string> Arbitrary key-value pairs for variables.
 
 ---@class Args.ConfigurationPreset.Language
 ---@field UseDefaultList boolean? Flag for whether the default language list should be used. Defaults to `true`.

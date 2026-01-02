@@ -10,7 +10,7 @@ return Preset:new {
             Name = 'Vanilla',
             CaseInsensitiveChatStreams = false,
             Variables = {
-                'DefaultNameMode:username',
+                DefaultNameMode = 'username',
             },
         },
         Buffs = Preset.buffs {

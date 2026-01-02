@@ -56,6 +56,9 @@ VERSION = 1
 # A checkbox group backed by a set field with enum items.
 -checkbox-group = checkbox-group
 
+# A mapping of string keys to string values.
+-string-map = string-map
+
 ## Variables
 
 # Default padding amount.
@@ -183,12 +186,12 @@ config-General-InfoText =
     .max-lines = 50
 
 config-General-Variables =
-    .type = { -string-list }
+    .type = { -string-map }
     .default =
-        DefaultNameMode:name;
-        DefaultNameMode_admin:username;
-        DefaultNameMode_whisper:both;
-        VolumeIndicatorLoud:Long
+        DefaultNameMode :: name;
+        DefaultNameMode_admin :: username;
+        DefaultNameMode_whisper :: both;
+        VolumeIndicatorLoud :: Long
 
 ## Buffs
 

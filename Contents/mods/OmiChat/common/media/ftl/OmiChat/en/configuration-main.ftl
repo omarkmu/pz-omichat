@@ -122,7 +122,8 @@ config-General-InfoText = Info Text
 
 config-General-Variables = Variables
     .tooltip = Arbitrary key-value pairs that can be used by interpolation functions.
-        Keys and values are separated with a colon.
+    .placeholder-key = Key
+    .placeholder-value = Value
 
 ## Buffs
 
