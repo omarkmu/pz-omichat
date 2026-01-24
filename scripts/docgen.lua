@@ -678,19 +678,9 @@ local function generateLanguageList(contentBundle)
 
         local isMessage = msg.type == 'Message'
         local id = isMessage and msg.id.name
-        local name = id and id:match('^language%-(.+)')
 
-        if name then
-            -- special case
-            if name == 'asl' then
-                name = name:upper()
-            else
-                name = name:sub(1, 1):upper() .. name:sub(2):gsub('%-(%l)', function(letter)
-                    return ' ' .. letter:upper()
-                end)
-            end
-
-            languages[#languages + 1] = name
+        if id and id:match('^language%-(.+)') then
+            languages[#languages + 1] = tostring(msg)
         end
     end
 
