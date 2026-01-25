@@ -91,6 +91,46 @@ function Logic._applyPreset(form, preset)
     form:setStatusMessage(getText('status-preset', { name = preset:getName() }))
 end
 
+---Creates the tooltip to use for a format string option.
+---@param def ConfigurationFieldDef
+---@param vars table<string, any>
+---@return string
+---@private
+function Logic._buildFormatTooltip(def, vars)
+    local rope = {
+        getText('heading-format-string'),
+    }
+
+    local tokens = Logic._resolveTableVars(def._tokens, vars)
+    local args = Logic._resolveTableVars(def._args, vars)
+
+    if def._errorTokens then
+        tokens = tokens or {}
+        tokens[#tokens + 1] = 'error'
+        tokens[#tokens + 1] = 'errorID'
+    end
+
+    Logic._writeFormatDataTranslations(
+        getText('heading-tokens'),
+        Logic._getFormatDataTranslations(tokens, 'token'),
+        def._descriptionTokens,
+        rope
+    )
+
+    Logic._writeFormatDataTranslations(
+        getText('heading-args'),
+        Logic._getFormatDataTranslations(args, 'arg'),
+        def._descriptionArgs,
+        rope
+    )
+
+    if #rope > 1 then
+        rope[#rope + 1] = '\n'
+    end
+
+    return concat(rope)
+end
+
 ---Creates a new item for the stream list.
 ---@return Configuration.StreamDefinition item The new item.
 ---@private
@@ -466,147 +506,18 @@ function Logic._getTagTooltip(tag)
     return color .. tag .. ' <POPRGB> <LINE> ' .. desc, isKnown
 end
 
----Creates the tooltip to use for a format string option.
----@param def ConfigurationFieldDef
----@param vars table<string, any>
----@return string
+---Handles changes to the stream list or related fields in the form.
+---@param form omi.forms.Form
+---@param item Configuration.StreamDefinition
 ---@private
-function Logic._buildFormatTooltip(def, vars)
-    local rope = {
-        getText('heading-format-string'),
-    }
-
-    local tokens = Logic._resolveTableVars(def._tokens, vars)
-    local args = Logic._resolveTableVars(def._args, vars)
-
-    if def._errorTokens then
-        tokens = tokens or {}
-        tokens[#tokens + 1] = 'error'
-        tokens[#tokens + 1] = 'errorID'
-    end
-
-    Logic._writeFormatDataTranslations(
-        getText('heading-tokens'),
-        Logic._getFormatDataTranslations(tokens, 'token'),
-        def._descriptionTokens,
-        rope
-    )
-
-    Logic._writeFormatDataTranslations(
-        getText('heading-args'),
-        Logic._getFormatDataTranslations(args, 'arg'),
-        def._descriptionArgs,
-        rope
-    )
-
-    if #rope > 1 then
-        rope[#rope + 1] = '\n'
-    end
-
-    return concat(rope)
-end
-
----Reads the data file to generate the schema and form.
----Throws an error for invalid data.
----@param definitions ConfigurationFieldDef[]
----@param vars table<string, any>
----@param version integer
----@private
-function Logic._loadSchema(definitions, vars, version)
-    ---@type table<string, omi.schema.Field>
-    local properties = {
-        VERSION = schema.int(version),
-    }
-
-    local rules = {} ---@type table<string, omi.forms.Rules>
-    for i = 1, #definitions do
-        local def = definitions[i]
-        if def.type ~= 'object' then
-            log.error('Invalid top-level field type for %s (%s)', def.name, def.type)
-        else
-            properties[def.name], rules[def.name] = Logic._generateField(def, vars)
-        end
-    end
-
-    Logic._schema = schema({
-        properties = properties,
-        form = {
-            prefix = 'OmiChat.config',
-            closeOnSave = false,
-            rules = rules,
-        },
-
-        onRead = Logic._onRead,
-        sanitize = Logic._onSanitize,
-    })
-end
-
----Reads translations to load available tags.
----@private
-function Logic._loadTags()
-    local bundle = utils.l10n.getBundle('OmiChat')
-    if not bundle then
-        log.error('Translations are not loaded')
-        return
-    end
-
-    local tagList = {}
-    for name in bundle:messages() do
-        local tag = name:match('^tag%-([A-Z][A-Za-z]+)$')
-        if tag then
-            tagList[#tagList + 1] = tag
-        end
-    end
-
-    Logic._tagList = tagList
-end
-
----Called when a language name changes in the language listbox.
----@param args omi.Args.FormCallback.Item
----@private
-function Logic._onChangeLanguageName(args)
-    local control = args.form:getFieldControl('Language.List.Name') --[[@as omi.TextEntry?]]
-    if not control then
-        return
-    end
-
-    -- only show required input error after edit
-    local oldText = control:getText()
-    local currentText = control:getInternalText():trim()
-    if #oldText > 0 and #currentText == 0 then
-        control:setRequireValue(true)
-    end
-end
-
----Called when the preset option dropdown changes.
----@param args omi.Args.FormCallback.Item
----@private
-function Logic._onChangePreset(args)
-    local info = args.info
-    local deleteBtn = info.actionButtons and info.actionButtons[3]
-    if not deleteBtn then
-        return
-    end
-
-    deleteBtn:setEnabled(utils.startsWith(args.value, 'custom:'))
-end
-
----Called when a value in a stream changes.
----@param args omi.Args.FormCallback.Item
----@private
-function Logic._onChangeStream(args)
-    local form = args.form
-    local item = args.parent ---@type Configuration.StreamDefinition?
-    local index = args.index
-    if not item or not index then
-        return
-    end
-
+function Logic._handleStreamChange(form, item)
     -- enable/disable all fields
-    local allDisabled = not (item.Enable ~= false)
+    local useDefaults = form:getValue('Streams.UseDefaultList')
+    local allDisabled = not (item.Enable ~= false and not useDefaults)
     local parent = form:getFieldRecord('Streams.List')
     local childFields = parent and parent.children or {}
 
+    form:setControlEnabled('Streams.List.Enable', not useDefaults)
     for key, childRec in pairs(childFields) do
         if key ~= 'Enable' then
             form:setFieldControlEnabled(childRec.info, not allDisabled)
@@ -671,6 +582,135 @@ function Logic._onChangeStream(args)
             end
         end
     end
+end
+
+---Reads the data file to generate the schema and form.
+---Throws an error for invalid data.
+---@param definitions ConfigurationFieldDef[]
+---@param vars table<string, any>
+---@param version integer
+---@private
+function Logic._loadSchema(definitions, vars, version)
+    ---@type table<string, omi.schema.Field>
+    local properties = {
+        VERSION = schema.int(version),
+    }
+
+    local rules = {} ---@type table<string, omi.forms.Rules>
+    for i = 1, #definitions do
+        local def = definitions[i]
+        if def.type ~= 'object' then
+            log.error('Invalid top-level field type for %s (%s)', def.name, def.type)
+        else
+            properties[def.name], rules[def.name] = Logic._generateField(def, vars)
+        end
+    end
+
+    Logic._schema = schema({
+        properties = properties,
+        form = {
+            prefix = 'OmiChat.config',
+            closeOnSave = false,
+            rules = rules,
+        },
+
+        onRead = Logic._onRead,
+        sanitize = Logic._onSanitize,
+    })
+end
+
+---Reads translations to load available tags.
+---@private
+function Logic._loadTags()
+    local bundle = utils.l10n.getBundle('OmiChat')
+    if not bundle then
+        log.error('Translations are not loaded')
+        return
+    end
+
+    local tagList = {}
+    for name in bundle:messages() do
+        local tag = name:match('^tag%-([A-Z][A-Za-z]+)$')
+        if tag then
+            tagList[#tagList + 1] = tag
+        end
+    end
+
+    Logic._tagList = tagList
+end
+
+---Called when a language name changes in the language list.
+---@param args omi.Args.FormCallback.Item
+---@private
+function Logic._onChangeLanguageName(args)
+    local control = args.form:getFieldControl('Language.List.Name') --[[@as omi.TextEntry?]]
+    if not control then
+        return
+    end
+
+    -- only show required input error after edit
+    local oldText = control:getText()
+    local currentText = control:getInternalText():trim()
+    if #oldText > 0 and #currentText == 0 then
+        control:setRequireValue(true)
+    end
+end
+
+---Called when the value of `Use Defaults` changes for the language list.
+---@param args omi.Args.FormCallback.Item
+---@private
+function Logic._onChangeLanguageUseDefault(args)
+    local form = args.form
+
+    local useDefault = form:getValue('Language.UseDefaultList')
+    local parent = form:getFieldRecord('Language.List')
+    local childFields = parent and parent.children or {}
+
+    for _, childRec in pairs(childFields) do
+        form:setFieldControlEnabled(childRec.info, not useDefault)
+    end
+end
+
+---Called when the preset option dropdown changes.
+---@param args omi.Args.FormCallback.Item
+---@private
+function Logic._onChangePreset(args)
+    local info = args.info
+    local deleteBtn = info.actionButtons and info.actionButtons[3]
+    if not deleteBtn then
+        return
+    end
+
+    deleteBtn:setEnabled(utils.startsWith(args.value, 'custom:'))
+end
+
+---Called when a value in a stream list item changes.
+---@param args omi.Args.FormCallback.Item
+---@private
+function Logic._onChangeStream(args)
+    local form = args.form
+    local item = args.parent
+    if not item then
+        return
+    end
+
+    Logic._handleStreamChange(form, item)
+end
+
+---Called when the value of `Use Defaults` changes for the stream list.
+---@param args omi.Args.FormCallback.Item
+---@private
+function Logic._onChangeStreamUseDefault(args)
+    local form = args.form
+
+    local list = form:getValue('Streams.List')
+    local index = form:getFieldSelectedIndex('Streams.List')
+    local item = list and index and list[index]
+    if not item then
+        return
+    end
+
+    Logic._handleStreamChange(form, item)
 end
 
 ---Called when a tag list entry changes.
@@ -1074,10 +1114,16 @@ Logic._formRules = {
     ['Language.List.Name'] = {
         onChange = Logic._onChangeLanguageName,
     },
+    ['Language.UseDefaultList'] = {
+        onChange = Logic._onChangeLanguageUseDefault,
+    },
     ['Streams.List'] = {
         createItem = Logic._createStreamItem,
         getItemDisplay = Logic._getStreamDisplay,
         onChange = Logic._onChangeStream,
+    },
+    ['Streams.UseDefaultList'] = {
+        onChange = Logic._onChangeStreamUseDefault,
     },
 }
 
