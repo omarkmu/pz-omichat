@@ -21,6 +21,7 @@ local DefaultStreamList = {
     { Stream = 'faction', Enable = true },
     { Stream = 'safehouse', Enable = true },
     { Stream = 'general', Enable = true },
+    { Stream = 'narrate', Enable = true },
 }
 
 return DefaultStreamList

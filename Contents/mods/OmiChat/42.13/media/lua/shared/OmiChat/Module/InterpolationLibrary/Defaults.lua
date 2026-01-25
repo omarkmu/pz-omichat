@@ -161,6 +161,10 @@ function Library.Defaults.Chat(interpolator, args)
         return prefix .. Helpers.wrapActionChat(message, tags)
     end
 
+    if tags.DoubleBracketedText then
+        message = '[[ <SPACE> ' .. message .. ' <SPACE> ]]'
+    end
+
     if not name then
         return prefix .. message
     end
@@ -738,6 +742,10 @@ function Library.Defaults.Overhead(interpolator, args)
 
     if tags.Action then
         message = Helpers.wrapActionOverhead(message, tags)
+    end
+
+    if tags.DoubleBracketedText then
+        message = '[[' .. message .. ']]'
     end
 
     if (tags.OverRadio or tags.OverRadioOverhead) and not tags.IsUnknownLanguage and not tags.IsRadioStream then

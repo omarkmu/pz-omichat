@@ -592,15 +592,8 @@
             {
               "name": "Icon",
               "type": "format-string",
-              "_args": [
-                "cardIcon",
-                "flipIcon",
-                "rollIcon"
-              ],
-              "_tokens": [
-                "adminIcon",
-                "icon"
-              ]
+              "_args": ["cardIcon", "flipIcon", "rollIcon"],
+              "_tokens": ["adminIcon", "icon"]
             },
             {
               "name": "Language",
@@ -968,7 +961,8 @@
                 "doloud",
                 "doquiet",
                 "dowhisper",
-                "ooc"
+                "ooc",
+                "narrate"
               ]
             },
             {

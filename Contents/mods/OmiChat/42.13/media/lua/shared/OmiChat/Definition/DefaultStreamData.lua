@@ -414,6 +414,37 @@ local DefaultStreamData = {
             'OOC',
         },
     },
+    narrate = {
+        ChatType = 'say',
+        Category = 'rp',
+        Command = '/narrate',
+        ShortCommand = '/n',
+        DefaultColor = { r = 102, g = 204, b = 153 },
+        Range = 16,
+        VerticalRange = 2,
+        PerceptionRange = 0,
+        PerceptionRangeSigned = 0,
+        AllowMentions = true,
+        AllowLanguages = false,
+        AllowTypingIndicator = false,
+        AttractZombies = false,
+        UseNarrativeStyle = false,
+        OverheadFormat = DEFAULT,
+        ChatFormat = DEFAULT,
+        Roles = {
+            'admin',
+            'moderator',
+            'gm',
+        },
+        Tags = {
+            'NoName',
+            'NoEmbeddedActions',
+            'HideOverhead',
+            'DoubleBracketedText',
+            'AutoCapitalize',
+            'AutoPunctuate',
+        },
+    },
 }
 
 return DefaultStreamData

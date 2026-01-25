@@ -192,6 +192,11 @@ return Preset:new {
                         'IncludeMentionAtSignChat',
                     },
                 },
+                {
+                    Stream = 'narrate',
+                    Enable = false,
+                    Range = 30,
+                },
             },
         },
     },

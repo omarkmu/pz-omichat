@@ -163,6 +163,8 @@ tag-Callout = Indicates the stream that should be used for formatting callout me
 tag-CardCommandTarget = Indicates the stream that should be used for formatting messages from
     the { -command(name: "card") } command.
 
+tag-DoubleBracketedText = Indicates that the message text should be surrounded by pairs of two square brackets.
+
 tag-EchoTarget = Indicates the stream that echo messages should be sent on.
 
 tag-EmbeddedActions = Indicates that embedded actions should be formatted.
