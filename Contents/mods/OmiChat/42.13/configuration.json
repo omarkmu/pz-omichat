@@ -592,10 +592,12 @@
             {
               "name": "Icon",
               "type": "format-string",
-              "_tokens": [
+              "_args": [
                 "cardIcon",
                 "flipIcon",
-                "rollIcon",
+                "rollIcon"
+              ],
+              "_tokens": [
                 "adminIcon",
                 "icon"
               ]
