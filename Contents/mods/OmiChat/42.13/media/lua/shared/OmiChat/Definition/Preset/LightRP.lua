@@ -8,9 +8,9 @@ return Preset:new {
     values = {
         General = Preset.general {
             Name = 'LightRP',
-            Variables = {
-                PMParenthesisCount = '1',
-            },
+            PMParentheses = 1,
+            DefaultNameModeForChatType = { admin = 'username' },
+            VolumeIndicators = {},
         },
         Buffs = Preset.buffs {
             Enable = false,

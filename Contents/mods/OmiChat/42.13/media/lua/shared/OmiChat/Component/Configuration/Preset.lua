@@ -226,6 +226,10 @@ function Preset.general(options)
         AdminIcon = options.AdminIcon or 'Item_Hammer',
         ClearOnDeath = options.ClearOnDeath or Preset.clearOnDeath(),
         Variables = options.Variables or {},
+        DefaultNameMode = options.DefaultNameMode or 'name',
+        DefaultNameModeForChatType = options.DefaultNameModeForChatType or {},
+        PMParentheses = options.PMParentheses or 1,
+        VolumeIndicators = options.VolumeIndicators or {},
     }
 end
 
@@ -436,10 +440,14 @@ return Preset
 
 ---@class Args.ConfigurationPreset.General
 ---@field Name string The name of the preset.
----@field AdminIcon string? The texture name to use as the admin icon. Defaults to `Item_Sledgehamer` [sic].
+---@field DefaultNameMode ('name' | 'username' | 'both')? The default name mode.
+---@field DefaultNameModeForChatType table<omi.ChatTypeString, 'name' | 'username' | 'both'>? The default name mode per chat type.
+---@field AdminIcon string? The texture name to use as the admin icon. Defaults to `Item_Hammer`.
 ---@field CaseInsensitiveChatStreams boolean? Flag for whether chat streams are case-insensitive. Defaults to `true`.
 ---@field ClearOnDeath Configuration.General.ClearOnDeath? Information taht should be cleared death.
----@field Variables table<string, string> Arbitrary key-value pairs for variables.
+---@field Variables table<string, string>? Arbitrary key-value pairs for variables.
+---@field PMParentheses integer? The amount of parentheses to include for names in PMs.
+---@field VolumeIndicators table<string, string>? Volume indicator strings.
 
 ---@class Args.ConfigurationPreset.Language
 ---@field UseDefaultList boolean? Flag for whether the default language list should be used. Defaults to `true`.

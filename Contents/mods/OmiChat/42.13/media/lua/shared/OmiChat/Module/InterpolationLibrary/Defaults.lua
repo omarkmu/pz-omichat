@@ -79,7 +79,7 @@ function Library.Defaults.Chat(interpolator, args)
     end
 
     if tags.IsIncomingPM and not tags.UseVanillaPM and name ~= '' then
-        local parens = (config:getVariableAsNumber('PMParenthesisCount') or 2) --[[@as integer]]
+        local parens = config.General.PMParentheses
         local pmFrom = getText('private-chat-from', { name = ' <SPACE> ' .. name })
 
         name = rep('(', parens) .. pmFrom .. rep(')', parens)
@@ -98,7 +98,7 @@ function Library.Defaults.Chat(interpolator, args)
             if tags.UseVanillaPM then
                 name = 'to ' .. name
             else
-                local parens = (config:getVariableAsNumber('PMParenthesisCount') or 2) --[[@as integer]]
+                local parens = config.General.PMParentheses
                 local pmTo = getText('private-chat-to', { name = ' <SPACE> ' .. name })
 
                 name = rep('(', parens) .. pmTo .. rep(')', parens)
@@ -530,16 +530,17 @@ end
 ---@return string
 function Library.Defaults.Name(interpolator, args)
     local options = readOptions(args)
-    local chatType = interpolator:token('chatType')
+    local chatType = interpolator:tokenString('chatType')
 
     local name = options:getString('name')
     local mode = options:getString('mode'):lower()
-    local defaultUsernameMode = name ~= '' and 'name' or 'username'
 
     -- if a mode isn't given, use preset defaults
-    if mode ~= 'username' and mode ~= 'name' and mode ~= 'both' then
-        local defaultMode = config:getVariable('DefaultNameMode_' .. chatType)
-            or config:getVariable('DefaultNameMode')
+    if mode == '' then
+        local defaultMode = config.General.DefaultNameModeForChatType[chatType] or config.General.DefaultNameMode
+
+        -- if a name is given as an option, use it even if username is specified
+        local defaultUsernameMode = name ~= '' and 'name' or 'username'
 
         if defaultMode == 'username' then
             mode = defaultUsernameMode

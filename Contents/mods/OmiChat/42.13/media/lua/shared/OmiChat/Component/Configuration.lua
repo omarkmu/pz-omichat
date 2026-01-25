@@ -655,6 +655,10 @@ return Configuration
 ---@field AdminIcon string
 ---@field InfoText string
 ---@field Variables table<string, string>
+---@field DefaultNameMode 'name' | 'username' | 'both'
+---@field DefaultNameModeForChatType table<string, string>
+---@field PMParentheses integer
+---@field VolumeIndicators table<string, string>
 
 ---@class Configuration.General.ClearOnDeath
 ---@field Icon boolean?

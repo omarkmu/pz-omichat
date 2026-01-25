@@ -9,9 +9,10 @@ return Preset:new {
         General = Preset.general {
             Name = 'Vanilla',
             CaseInsensitiveChatStreams = false,
-            Variables = {
-                DefaultNameMode = 'username',
-            },
+            DefaultNameMode = 'username',
+            DefaultNameModeForChatType = {},
+            PMParentheses = 0,
+            VolumeIndicators = {},
         },
         Buffs = Preset.buffs {
             Enable = false,

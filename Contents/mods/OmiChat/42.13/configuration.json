@@ -87,7 +87,7 @@
       "name": "General",
       "type": "object",
       "_shortDescription": "Basic features.",
-      "_description": "These options are used to control the basic features of the mod.",
+      "_description": "These options are those that don't belong anywhere else.",
       "fields": [
         {
           "name": "Preset",
@@ -118,14 +118,41 @@
         },
         { "name": "InfoText", "type": "textbox", "maxLines": 50 },
         {
+          "name": "PMParentheses",
+          "type": "integer",
+          "padTop": 10,
+          "default": 2,
+          "min": 0,
+          "max": 5
+        },
+        {
+          "name": "DefaultNameMode",
+          "type": "dropdown",
+          "default": "name",
+          "padTop": 10,
+          "options": ["name", "username", "both"]
+        },
+        {
+          "name": "DefaultNameModeForChatType",
+          "type": "string-map",
+          "noLabel": true,
+          "default": {
+            "admin": "username",
+            "whisper": "both"
+          }
+        },
+        {
+          "name": "VolumeIndicators",
+          "type": "string-map",
+          "padTop": 10,
+          "default": {
+            "Loud": "Long"
+          }
+        },
+        {
           "name": "Variables",
           "type": "string-map",
-          "default": {
-            "DefaultNameMode": "name",
-            "DefaultNameMode_admin": "username",
-            "DefaultNameMode_whisper": "both",
-            "VolumeIndicatorLoud": "Long"
-          }
+          "padTop": 10
         }
       ]
     },

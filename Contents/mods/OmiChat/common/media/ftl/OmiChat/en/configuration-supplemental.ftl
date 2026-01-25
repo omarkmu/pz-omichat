@@ -47,7 +47,7 @@ arg-input = Used instead of the value of the { -highlight(text: "input") } token
 arg-language = Used instead of the value of the { -highlight(text: "rawLanguage") } token if given.
 
 arg-loudIndicator = The volume indicator to use for a loud message.
-    <LINE> Defaults to the 'VolumeIndicatorLoud' configuration variable, or 'Loud'.
+    <LINE> Defaults to the value configured under Streams &gt; Volume Indicator, or 'Loud'.
 
 arg-loudTag = The default dialogue tag to use for a loud message. Defaults to 'shouts'.
 
@@ -73,7 +73,7 @@ arg-prefix = Used instead of the value of the { -highlight(text: "prefix") } tok
 arg-questionTag = The default dialogue tag for a question. Defaults to 'asks'.
 
 arg-quietIndicator = The volume indicator to use for a quiet message.
-    <LINE> Defaults to the 'VolumeIndicatorQuiet' configuration variable, or 'Low'.
+    <LINE> Defaults to the value configured under Streams &gt; Volume Indicator, or 'Low'.
 
 arg-recipientName = Used instead of the value of the { -highlight(text: "recipientName") } token if given.
 
@@ -92,7 +92,7 @@ arg-truncateTo-filter-chat-input = A numeric character limit, after which the in
 arg-truncateTo-filter-name = A numeric character limit, after which the input will be cut off. Defaults to 40.
 
 arg-whisperIndicator = The volume indicator to use for a whispered message.
-    <LINE> Defaults to the 'VolumeIndicatorWhisper' configuration variable, or 'Whisper'.
+    <LINE> Defaults to the value configured under Streams &gt; Volume Indicator, or 'Whisper'.
 
 arg-whisperTag = The default dialogue tag to use for a whispered message. Defaults to 'whispers'.
 

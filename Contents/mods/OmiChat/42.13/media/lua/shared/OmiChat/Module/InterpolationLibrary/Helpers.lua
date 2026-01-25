@@ -787,11 +787,11 @@ end
 function Helpers.getVolumeIndicator(options, tags)
     local indicator
     if not tags.IsSneakCallout and (tags.Loud or tags.IsCallout) then
-        indicator = options:getString('loudIndicator', config:getVariable('VolumeIndicatorLoud') or 'Loud')
+        indicator = options:getString('loudIndicator', config.General.VolumeIndicators.Loud or 'Loud')
     elseif tags.Quiet or tags.IsSneakCallout then
-        indicator = options:getString('quietIndicator', config:getVariable('VolumeIndicatorQuiet') or 'Low')
+        indicator = options:getString('quietIndicator', config.General.VolumeIndicators.Quiet or 'Low')
     elseif tags.Whisper then
-        indicator = options:getString('whisperIndicator', config:getVariable('VolumeIndicatorWhisper') or 'Whisper')
+        indicator = options:getString('whisperIndicator', config.General.VolumeIndicators.Whisper or 'Whisper')
     end
 
     if not indicator or indicator == '' then

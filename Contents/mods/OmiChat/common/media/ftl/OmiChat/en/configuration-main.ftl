@@ -120,8 +120,30 @@ config-General-InfoText = Info Text
         If this is blank, the info button will not be available.
         <BR> This can use rich text formatting to include different colors and fonts.
 
+config-General-PMParentheses = PM Parentheses
+    .tooltip = The amount of parentheses to include around names in private messages.
+
+config-General-DefaultNameMode = Default Name Mode
+    .tooltip = The mode to use for the name format unless overridden by an argument.
+        <BR> The { -option(name: "name") } mode uses the chat nickname,
+        { -option(name: "username") } uses the player username,
+        and { -option(name: "both") } includes both separated by a slash.
+
+config-General-DefaultNameModeForChatType = Per Chat Type Name Mode
+    .tooltip = The mode to use for the name format for a chat type unless overridden by an argument.
+        <BR> This maps chat types to options for <SPACE> { -highlight-inline(text: "Default Name Mode") }.
+    .placeholder-key = Chat Type
+    .placeholder-value = Mode
+
+config-General-VolumeIndicators = Volume Indicator
+    .tooltip = Text to use for volume indicators.
+        Keys should be one of "Loud", "Quiet", or "Whisper".
+    .placeholder-key = Volume
+    .placeholder-value = Indicator Text
+
 config-General-Variables = Variables
-    .tooltip = Arbitrary key-value pairs that can be used by interpolation functions.
+    .tooltip = Arbitrary key-value pairs that can be used for providing information to integrations.
+        <BR> Currently, the mod does not use anything specified here.
     .placeholder-key = Key
     .placeholder-value = Value
 
