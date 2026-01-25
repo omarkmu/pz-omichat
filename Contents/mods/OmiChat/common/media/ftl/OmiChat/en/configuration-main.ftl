@@ -660,6 +660,9 @@ config-Streams-List-Tags = { -tags }
 config-Streams-List-Aliases = Aliases
     .tooltip = List of additional aliases that can be used to send messages on the stream.
 
+config-Streams-List-Roles = Roles
+    .tooltip = List of roles that can use this stream. If the list is empty, the stream will not be limited to any roles.
+
 config-Streams-GlobalTags = Global Tags
     .tooltip = Additional tags to include in every stream.
 

@@ -24,6 +24,7 @@ local checkPlayerCanUseChat = checkPlayerCanUseChat
 ---@field protected perceptionRangeSigned integer The perception range of the chat stream, for signed languages.
 ---@field protected chatFormat? string The format to use for chat messages sent from this stream.
 ---@field protected overheadFormat? string The format to use for overhead messages sent from this stream.
+---@field protected roleSet omi.SetTable<string>? Roles that allow using the stream.
 local ChatStream = Stream:derive('ChatStream')
 
 
@@ -92,6 +93,7 @@ function ChatStream.fromDefinition(def, additionalTags)
         shortCommand = def.ShortCommand,
         tabID = def.ChatType == 'admin' and 2 or 1,
         aliases = def.Aliases,
+        roles = def.Roles,
         chatType = def.ChatType,
         category = def.Category,
         disabled = def.Enable == false,
@@ -135,7 +137,18 @@ function ChatStream:checkPlayerCanUse()
         return false
     end
 
-    return true
+    local roles = self.roleSet
+    if not roles then
+        return true
+    end
+
+    local player = utils.getAPI().player:get()
+    if not player then
+        return false
+    end
+
+    local role = player:getRole():getName()
+    return roles[role] ~= nil
 end
 
 ---Copies all settings from another stream into this stream.
@@ -156,6 +169,7 @@ function ChatStream:copyFrom(other)
     self.defaultColor = utils.color.copy(other.defaultColor)
     self.overheadFormat = other.overheadFormat
     self.chatFormat = other.chatFormat
+    self.roleSet = other.roleSet and utils.copy(other.roleSet)
 end
 
 
@@ -317,6 +331,10 @@ function ChatStream:new(args)
     this.perceptionRangeSigned = args.perceptionRangeSigned or 0
     this.defaultColor = utils.color.default(args.defaultColor, 255, 255, 255)
 
+    if args.roles and #args.roles > 0 then
+        this.roleSet = utils.set.table(args.roles)
+    end
+
     if utils.notNilOrWhitespace(args.overheadFormat) then
         this.overheadFormat = utils.trim(args.overheadFormat)
     end
@@ -349,5 +367,6 @@ return ChatStream
 ---@field tabID? integer The 1-indexed tab ID of the tab in which this stream is available.
 ---@field chatFormat? string The format to use for the stream in chat.
 ---@field overheadFormat? string The overhead format to use for the stream.
+---@field roles? string[] A list of roles that allow using the stream. An empty list means there is no limit based on roles.
 
 --#endregion

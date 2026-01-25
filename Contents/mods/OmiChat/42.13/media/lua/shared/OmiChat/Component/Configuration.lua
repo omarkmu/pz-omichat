@@ -842,6 +842,7 @@ return Configuration
 ---@field ShortCommand string?
 ---@field DefaultColor omi.ColorTable<integer>?
 ---@field Aliases string[]?
+---@field Roles string[]?
 ---@field Tags string[]?
 ---@field OverheadFormat string?
 ---@field ChatFormat string?

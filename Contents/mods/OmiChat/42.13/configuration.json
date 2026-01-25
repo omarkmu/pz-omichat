@@ -1072,7 +1072,11 @@
             {
               "name": "Aliases",
               "type": "string-list",
-              "noReorderButtons": false,
+              "noReorderButtons": false
+            },
+            {
+              "name": "Roles",
+              "type": "string-list",
               "padBottom": 10
             }
           ],
