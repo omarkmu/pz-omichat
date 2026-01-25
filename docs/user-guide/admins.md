@@ -69,7 +69,7 @@ Sets the language slots for a player.
 
 ## Mini Scoreboard
 
-The “mini scoreboard” included in the admin menu will respect the options configured for [`In-Game Names`](../configuration/format.md#l#menuname).
+The “mini scoreboard” included in the admin menu will respect the options configured for [`In-Game Names`](../configuration/format.md#menuname).
 
 By default, this will display players' chat names
 (as determined by the [name format](../configuration/format.md#component-name)) and usernames,

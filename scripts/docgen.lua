@@ -5,14 +5,15 @@
 local path = require 'path'
 local env = require 'path.env'
 local cli = require 'cliargs'
+local json = require 'cjson'
 local FTL = require 'fluent.messages'
 local FluentBundle = require 'fluent'
 
 local concat = table.concat
 local format = string.format
 
-local FTL_PATH = 'Contents/mods/OmiChat/common/media/ftl/'
-local FTL_EN_PATH = FTL_PATH .. 'OmiChat/en/'
+local DATA_PATH = 'Contents/mods/OmiChat/42.13/configuration.json'
+local FTL_PATH = 'Contents/mods/OmiChat/common/media/ftl/OmiChat/en/'
 
 local COLORS = {
     ['0,1,0'] = 'code',          -- commands
@@ -195,52 +196,34 @@ local function convertKey(key, pattern)
     return key:lower()
 end
 
----Converts a translation key into a Markdown filename.
----@param key string
----@return string
-local function getFilenameFromKey(key)
-    return convertKey(key, '%u') .. '.md'
-end
-
----Gets a value for a node attribute, or `nil` if not present.
-local function getAttr(node, key)
-    local attr = node:get_attribute(key)
-    if not attr then
-        return
-    end
-
-    return tostring(attr.value)
-end
-
----Gets a boolean value for a node attribute.
-local function getBool(node, key)
-    local attr = getAttr(node, key)
-    if not attr then
-        return false
-    end
-
-    return attr:lower() ~= 'false'
-end
-
 ---Gets the description to use for an element.
-local function getDescription(dataNode, contentNode)
+local function getDescription(data, contentNode, vars)
     local tooltip = contentNode:get_attribute('tooltip')
-    local description = dataNode:get_attribute('description')
 
     local desc ---@type string?
-    if description then
-        desc = tostring(description)
+    if data._description then
+        desc = tostring(data._description)
+        local var = desc:match('^%$([%u_]+)$')
+        if var then
+            desc = vars[var]
+        end
     elseif tooltip then
-        desc = tostring(tooltip)
+        desc = richTextToMarkdown(tostring(tooltip))
     end
 
-    local descExtra = dataNode:get_attribute('extra-description')
-    if descExtra then
-        desc = desc and (desc .. '<BR>') or ''
-        desc = desc .. tostring(descExtra)
+    if data._extraDescription then
+        desc = desc and (desc .. '\n\n') or ''
+
+        local extraDesc = tostring(data._extraDescription)
+        local var = extraDesc:match('^%$([%u_]+)$')
+        if var then
+            extraDesc = vars[var]
+        end
+
+        desc = desc .. extraDesc
     end
 
-    return desc and richTextToMarkdown(desc)
+    return desc
 end
 
 ---Extracts translations for a configuration option's available values.
@@ -268,109 +251,85 @@ local function extractConfigOptionData(node, _type)
     return names, descriptions
 end
 
----Extracts configuration strings from Fluent translation files.
----@param dataBundle any The data bundle to extract from.
+---Processes raw configuration data and extracts configuration strings from Fluent translation files.
+---@param configData any The configuration data table.
 ---@param contentBundle any The bundle containing English translations.
 ---@return table[]
-local function extractConfigData(dataBundle, contentBundle)
-    local pages = { _map = {} }
-    local resource = dataBundle:get_resource()
+local function processConfigData(configData, contentBundle)
+    local pages = {}
+    local vars = configData._VARS
 
-    for i = 1, #resource.body do
-        local data = resource.body[i]
+    local function processField(data, idPrefix)
+        local isTopLevel = idPrefix == nil
+        local skip = data.noDoc or data.hidden
+        local id = (idPrefix or 'config-') .. data.name
 
-        local isMessage = data.type == 'Message'
-        local id = isMessage and data.id.name
-        local isConfig = id and id:find('^config%-%u') ~= nil
+        local content = contentBundle:get_message(id)
+        if not content then
+            quit('missing translation for %s', id)
+        end
 
-        if isConfig then
-            local isTopLevel = id:find('^config%-[^%-]+$') ~= nil
-            local skip = getBool(data, 'no-doc') or getBool(data, 'hidden')
-            local content = contentBundle:get_message(id)
-            if not content then
-                quit('missing translation for key %s', id)
+        if not data.type then
+            quit('missing type for %s', id)
+        elseif type(data.type) ~= 'string' then
+            quit('invalid type for %s', id)
+        end
+
+        local element
+        if isTopLevel and not skip then
+            local title = content:get_attribute('title') or content.value
+            if not title then
+                quit('no title or value for top-level %s', id)
             end
 
-            local typeAttr = data:get_attribute('type')
-            if not typeAttr or not typeAttr.value then
-                quit('no type attribute for key %s', id)
+            element = {
+                key = data.name,
+                name = tostring(title),
+                type = data.type,
+                description = getDescription(data, content, vars),
+                shortDescription = data._shortDescription,
+            }
+        elseif not skip then
+            local optionNames, optionDescs = extractConfigOptionData(content)
+
+            element = {
+                key = data.name,
+                type = data.type,
+                name = content.value and tostring(content.value) or data.name,
+                description = getDescription(data, content, vars),
+                max = data.max,
+                min = data.min,
+                default = data.default,
+                options = data.options,
+                optionNames = optionNames,
+                optionDescriptions = optionDescs,
+                defaultAll = data.defaultAll,
+            }
+
+            if not element.description then
+                quit('no tooltip or description defined for %s', id)
             end
 
-            local _type = tostring(typeAttr.value)
-            if isTopLevel and not skip then
-                local title = content:get_attribute('title') or content.value
-                if not title then
-                    quit('no title or value for key %s', id)
-                end
+            if element.max and not tonumber(element.max) then
+                quit('invalid max value for %s (%s)', id, element.max)
+            end
 
-                local shortDesc = data:get_attribute('short-description')
-
-                local key = id:match('^config%-(.+)')
-                local element = {
-                    _map = {},
-                    key = key,
-                    name = tostring(title),
-                    type = getAttr(data, 'type'),
-                    description = getDescription(data, content),
-                    shortDescription = shortDesc and richTextToMarkdown(shortDesc),
-                }
-
-                pages._map[key] = element
-                pages[#pages + 1] = element
-            elseif not skip then
-                local keys = {} ---@type string[]
-                for key in id:gsub('^config%-[^%-]+', ''):gmatch('%-([^%-]+)') do
-                    keys[#keys + 1] = key
-                end
-
-                local key = keys[#keys] --[[@as string]]
-                keys[#keys] = nil
-
-                local optionNames, optionDescs = extractConfigOptionData(content)
-
-                local element = {
-                    _map = {},
-                    key = key,
-                    type = getAttr(data, 'type'),
-                    name = content.value and tostring(content.value) or key,
-                    description = getDescription(data, content),
-                    max = getAttr(data, 'max'),
-                    min = getAttr(data, 'min'),
-                    default = getAttr(data, 'default'),
-                    options = getAttr(data, 'options'),
-                    optionNames = optionNames,
-                    optionDescriptions = optionDescs,
-                    defaultAll = getBool(data, 'default-all'),
-                }
-
-                if not element.description then
-                    quit('no tooltip or description defined for key %s', id)
-                end
-
-                if element.max and not tonumber(element.max) then
-                    quit('invalid max value for key %s (%s)', id, element.max)
-                end
-
-                if element.min and not tonumber(element.min) then
-                    quit('invalid min value for key %s (%s)', id, element.min)
-                end
-
-                local current = pages[#pages] --[[@as any]]
-                local parent = current
-                for j = 1, #keys do
-                    local parentKey = keys[j]
-                    local target = parent and parent._map[parentKey]
-                    if not target then
-                        quit('string defined before parent: %s (missing %s)', id, parentKey)
-                    end
-
-                    parent = target
-                end
-
-                parent._map[key] = element
-                parent[#parent + 1] = element
+            if element.min and not tonumber(element.min) then
+                quit('invalid min value for %s (%s)', id, element.min)
             end
         end
+
+        if element and data.fields then
+            for i = 1, #data.fields do
+                element[#element + 1] = processField(data.fields[i], id .. '-')
+            end
+        end
+
+        return element
+    end
+
+    for i = 1, #configData.fields do
+        pages[#pages + 1] = processField(configData.fields[i])
     end
 
     return pages --[[@as any]]
@@ -403,51 +362,12 @@ local function readFile(filePath)
     return contents
 end
 
----Reads a delimited list.
----@param str string?
----@param delimPattern string?
----@return string[]?
-local function readList(str, delimPattern)
-    if not str then
-        return
-    end
-
-    delimPattern = delimPattern or ';'
-
-    local items = {}
-
-    local pos = 1
-    local start, stop = str:find(delimPattern)
-    while start and stop and pos <= #str do
-        local substr = trim(str:sub(pos, start - 1))
-        if #substr ~= 0 then
-            items[#items + 1] = substr
-        end
-
-        pos = stop + 1
-        start, stop = str:find(delimPattern, pos)
-    end
-
-    if pos < #str then
-        local remaining = trim(str:sub(pos))
-        if #remaining ~= 0 then
-            items[#items + 1] = remaining
-        end
-    end
-
-    if #items == 0 then
-        return
-    end
-
-    return items
-end
-
 ---Generates documentation for configuration.
----@param dataBundle any The data bundle to extract from.
+---@param configData table The configuration data table.
 ---@param contentBundle any The bundle containing English translations.
 ---@return GeneratedConfigurationData
-local function generateFromConfig(dataBundle, contentBundle)
-    local pages = extractConfigData(dataBundle, contentBundle)
+local function generateFromConfig(configData, contentBundle)
+    local pages = processConfigData(configData, contentBundle)
 
     ---Writes a list of options to a rope.
     ---@param list string[]
@@ -515,8 +435,11 @@ local function generateFromConfig(dataBundle, contentBundle)
         if not LIST_TYPES[_type] and _type ~= 'string-map' then
             defaultValue = element.default
         else
-            local defaults = readList(element.default)
-            defaultValue = defaults and #defaults == 1 and defaults[1]
+            -- if there's one default value for a list type, use the singular display
+            local defaults = element.default
+            if defaults and #defaults == 1 then
+                defaultValue = defaults[1]
+            end
         end
 
         local addedExtra = false
@@ -525,13 +448,18 @@ local function generateFromConfig(dataBundle, contentBundle)
             addedExtra = true
         elseif defaultValue then
             rope[#rope + 1] = '**Default**: `'
-            rope[#rope + 1] = optNames[defaultValue] or defaultValue
-            rope[#rope + 1] = '`'
 
-            if element.type == 'color' and defaultValue:match('^%d+,%d+,%d+$') then
+            if element.type == 'color' then
+                local color = concat(defaultValue, ',')
+                rope[#rope + 1] = color
+                rope[#rope + 1] = '`'
                 rope[#rope + 1] = ' <span style="--color-display: rgb('
-                rope[#rope + 1] = defaultValue
+                rope[#rope + 1] = color
                 rope[#rope + 1] = ')"></span>'
+            else
+                local str = tostring(defaultValue)
+                rope[#rope + 1] = optNames[str] or str
+                rope[#rope + 1] = '`'
             end
 
             rope[#rope + 1] = '  \n'
@@ -566,8 +494,8 @@ local function generateFromConfig(dataBundle, contentBundle)
         if supportsLists and addListExtras then
             rope[#rope + 1] = '\n'
 
-            local options = readList(element.options)
-            local defaults = readList(element.default)
+            local options = element.options
+            local defaults = element.default
 
             if defaults and not defaultValue and not isDropdown then
                 rope[#rope + 1] = '\n**Defaults**:'
@@ -582,29 +510,29 @@ local function generateFromConfig(dataBundle, contentBundle)
                 rope[#rope + 1] = '\n'
             end
         elseif _type == 'string-map' then
-            local defaults = readList(element.default) or {}
-            if #defaults ~= 0 then
+            local defaults = element.default or {}
+            local defaultList = {} ---@type table[]
+
+            for k, v in pairs(defaults) do
+                defaultList[#defaultList + 1] = { k, v }
+            end
+
+            table.sort(defaultList, function(a, b)
+                return a[1] < b[1]
+            end)
+
+            if #defaultList ~= 0 then
                 rope[#rope + 1] = '\n\n**Defaults**:'
             end
 
-            for i = 1, #defaults do
-                local pair = defaults[i]
-                local sep = pair:find('::')
-
-                local pairKey = trim(pair:sub(1, sep and sep - 1 or #pair))
-                local pairValue = sep and trim(pair:sub(sep + 2))
+            for i = 1, #defaultList do
+                local pair = defaultList[i]
 
                 rope[#rope + 1] = '\n- `'
-                rope[#rope + 1] = pairKey
-                rope[#rope + 1] = '` = '
-
-                if pairValue then
-                    rope[#rope + 1] = '`'
-                    rope[#rope + 1] = pairValue
-                    rope[#rope + 1] = '`'
-                else
-                    rope[#rope + 1] = '(empty)'
-                end
+                rope[#rope + 1] = pair[1]
+                rope[#rope + 1] = '` =  `'
+                rope[#rope + 1] = pair[2]
+                rope[#rope + 1] = '`'
             end
         end
 
@@ -630,7 +558,7 @@ local function generateFromConfig(dataBundle, contentBundle)
     local pageContents = {}
     for i = 1, #pages do
         local page = pages[i]
-        local filename = getFilenameFromKey(page.key)
+        local filename = convertKey(page.key, '%u') .. '.md'
 
         local rope = addToRope(page, {}, 1)
         pageContents[filename] = concat(rope)
@@ -662,7 +590,7 @@ local function generateFromConfig(dataBundle, contentBundle)
     return {
         summary = concat(summaryRope),
         list = concat(listRope),
-        pages = pageContents,
+        subpages = pageContents,
     }
 end
 
@@ -717,29 +645,31 @@ local function main()
     cli:option('--root=DIRECTORY', 'path to the root directory', path.cwd())
 
     local args, err = cli:parse(arg)
-    if not args and err then
+    if err then
         quit(err)
+    elseif not args then
+        quit('Failed to parse arguments')
     end
 
-    local termsPath = validatePath('file', args.root, FTL_EN_PATH, 'shared.ftl')
-    local configPath = validatePath('file', args.root, FTL_EN_PATH, 'configuration-main.ftl')
-    local dataPath = validatePath('file', args.root, FTL_PATH, 'data/configuration-data.ftl')
-    local mainPath = validatePath('file', args.root, FTL_EN_PATH, 'main.ftl')
+    local root = args.root
+    local dataJson = readFile(validatePath('file', root, DATA_PATH))
+    local termsPath = validatePath('file', root, FTL_PATH, 'shared.ftl')
+    local mainPath = validatePath('file', root, FTL_PATH, 'main.ftl')
+    local configPath = validatePath('file', root, FTL_PATH, 'configuration-main.ftl')
 
-    local docsPath = validatePath('directory', args.root, 'docs')
+    local docsPath = validatePath('directory', root, 'docs')
     local summary = readFile(validatePath('file', docsPath, 'SUMMARY_TEMPLATE.md'))
 
     patchFluent()
 
-    local dataBundle = FluentBundle()
-    dataBundle:load_file(dataPath)
+    local data = json.decode(dataJson)
 
     local contentBundle = FluentBundle()
     contentBundle:load_file(termsPath)
     contentBundle:load_file(configPath)
     contentBundle:load_file(mainPath)
 
-    local config = generateFromConfig(dataBundle, contentBundle)
+    local config = generateFromConfig(data, contentBundle)
     local languages = generateLanguageList(contentBundle)
 
     -- write the summary using the template
@@ -753,7 +683,7 @@ local function main()
     writeFile(path.abs(docsPath, 'customization', '_languages.md'), languages)
 
     -- write configuration subpages
-    for filename, contents in pairs(config.pages) do
+    for filename, contents in pairs(config.subpages) do
         writeFile(path.abs(docsPath, 'configuration', filename), contents)
     end
 end
@@ -768,6 +698,6 @@ end
 ---@class GeneratedConfigurationData
 ---@field summary string The string to inject into SUMMARY.md.
 ---@field list string The string to inject into configuration/_pages.md.
----@field pages table<string, string> Associates configuration subpage names to file contents.
+---@field subpages table<string, string> Associates configuration subpage names to file contents.
 
 --#endregion

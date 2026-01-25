@@ -7,6 +7,7 @@ dependencies = {
     "fluent >= 0.2.0",
     "lua_cliargs >= 3.0.2",
     "lpath >= 0.4.0",
+    "lua-cjson >= 2.1.0.10",
 }
 
 source = {

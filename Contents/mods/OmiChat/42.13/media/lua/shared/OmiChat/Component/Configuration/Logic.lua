@@ -12,8 +12,6 @@ local DefaultLanguages = require 'OmiChat/Definition/DefaultLanguageList'
 local DefaultStreams = require 'OmiChat/Definition/DefaultStreamList'
 local DefaultStreamData = require 'OmiChat/Definition/DefaultStreamData'
 
-local DATA_PATH = 'media/ftl/data/configuration-data.ftl'
-
 local sort = table.sort
 local concat = table.concat
 local isempty = table.isempty
@@ -31,19 +29,6 @@ local Logic = {}
 
 Logic._tagList = {}
 
-
----Converts a string value to a boolean.
----@param value string?
----@return boolean
----@private
-local function bool(value)
-    if not value then
-        return false
-    end
-
-    return value:lower() ~= 'false'
-end
-
 ---Gets the configuration schema.
 ---If it hasn't already been generated, this will generate it.
 ---@return omi.Schema
@@ -59,8 +44,8 @@ end
 ---Reads the data file to generate the schema, form, and metadata.
 ---Throws an error for invalid data.
 function Logic.load()
-    local defs, version = Logic._readDefinitions()
-    Logic._loadSchema(defs, version)
+    local data = Logic._readDefinitions()
+    Logic._loadSchema(data.fields, data._VARS, data._VERSION)
     Logic._loadTags()
 end
 
@@ -174,15 +159,19 @@ end
 
 ---Generates a single schema field and its corresponding form rules.
 ---@return omi.schema.Field, omi.forms.Rules?
----@param def any
+---@param vars table<string, any>
+---@param def ConfigurationFieldDef
 ---@private
-function Logic._generateField(def)
+function Logic._generateField(def, vars, parentKey)
     local properties = {} ---@type table<string, omi.schema.Field>
     local childRules = {} ---@type table<string, omi.forms.Rules>
 
-    for i = 1, #def do
-        local child = def[i]
-        properties[child._key], childRules[child._key] = Logic._generateField(child)
+    local key = (parentKey and (parentKey .. '.') or '') .. def.name
+
+    local fields = def.fields or {}
+    for i = 1, #fields do
+        local child = fields[i]
+        properties[child.name], childRules[child.name] = Logic._generateField(child, vars, key)
     end
 
     local rules = {} ---@type omi.forms.Rules
@@ -192,7 +181,7 @@ function Logic._generateField(def)
 
     local field ---@type omi.schema.Field
     local _type = def.type
-    if _type == 'container' then
+    if _type == 'object' then
         field = schema.container(properties)
     elseif _type == 'string' or _type == 'textbox' then
         field = schema.string(def.default)
@@ -203,17 +192,17 @@ function Logic._generateField(def)
     elseif _type == 'format-string' then
         field = schema.string(def.default or '$Default()')
         rules.onInfoClick = Logic._onClickFormatInfo
-        rules.infoTooltip = Logic._buildFormatTooltip(def)
+        rules.infoTooltip = Logic._buildFormatTooltip(def, vars)
     elseif _type == 'compatibility' then
         field = schema.compatibility(def.default)
     elseif _type == 'checkbox' then
-        field = schema.bool(bool(def.default))
+        field = schema.bool(def.default)
     elseif _type == 'page-checkbox' then
-        field = schema.bool(bool(def.default))
+        field = schema.bool(def.default)
         rules.togglePageFields = true
     elseif _type == 'object-list' then
         field = schema.array({
-            maxItems = utils.tointeger(def.max_items),
+            maxItems = def.maxItems,
             items = schema.object({
                 skipMissing = true,
                 properties = properties,
@@ -222,15 +211,15 @@ function Logic._generateField(def)
     elseif _type == 'dropdown' then
         field = schema.stringEnum({
             default = def.default,
-            values = utils.split(def.options or '', ';'),
+            values = def.options,
         })
     elseif _type == 'checkbox-group' then
-        local options = utils.split(def.options or '', ';')
+        local options = def.options
 
         local default
         if def.default then
-            default = utils.split(def.default, ';')
-        elseif def.default_all then
+            default = def.default
+        elseif def.defaultAll then
             default = options
         end
 
@@ -239,31 +228,16 @@ function Logic._generateField(def)
             items = schema.stringEnum({ values = options }),
         })
     elseif _type == 'string-map' then
-        local default = {}
-        if def.default then
-            local defaultKVP = utils.mapList(utils.split, utils.split(def.default, ';'), '::')
-            for i = 1, #defaultKVP do
-                local kvp = defaultKVP[i]
-                if #kvp < 1 or #kvp > 2 then
-                    log.error('Invalid default value for key %s', def._key)
-                else
-                    local key = kvp[1]
-                    local value = kvp[2] or ''
-                    default[key] = value
-                end
-            end
-        end
-
         field = schema.object({
             skipMissing = true,
-            default = default,
+            default = def.default,
             additionalProperties = schema.string(),
         })
     elseif _type == 'string-list' or _type == 'tags' then
         field = schema.array({
             items = schema.string(),
-            default = utils.split(def.default or '', ';'),
-            maxItems = utils.tointeger(def.max_items),
+            default = def.default,
+            maxItems = def.maxItems,
         })
 
         if _type == 'tags' then
@@ -271,70 +245,69 @@ function Logic._generateField(def)
         end
     elseif _type == 'color' then
         local default
-        if def.default then
-            default = utils.color.fromString(def.default)
-            if not default then
-                log.error('Invalid default value for key %s', def._key)
-            end
+        local raw = def.default
+        if raw then
+            default = { r = raw[1], g = raw[2], b = raw[3] }
         end
 
         field = schema.color({ default = default })
     elseif _type == 'integer' or _type == 'number' then
         local cons = _type == 'integer' and schema.int or schema.double
 
-        local max = tonumber(def.max) --[[@as integer]]
-        local min = tonumber(def.min) --[[@as integer]]
-        local default = tonumber(def.default) --[[@as integer]]
+        local max = def.max
+        local min = def.min
+        local default = def.default
 
         if not max then
             max = 0
-            log.error('Missing max value for key %s', def._key)
+            log.error('Missing max value for field %s', key)
         end
 
         if not min then
             min = 0
-            log.error('Missing min value for key %s', def._key)
+            log.error('Missing min value for field %s', key)
         end
 
         if not default then
             default = 0
-            log.error('Missing default value for key %s', def._key)
+            log.error('Missing default value for field %s', key)
         end
 
         field = cons(default, min, max)
     else
-        log.error('Invalid field type %s for key %s', _type, def._key)
+        log.error('Invalid field type %s for field %s', _type, key)
     end
 
-    rules.paddingTop = tonumber(def.pad_top)
-    rules.paddingBottom = tonumber(def.pad_bottom)
-    rules.maxLines = tonumber(def.max_lines)
-    rules.displayLines = tonumber(def.display_lines) or rules.displayLines
-    rules.noReorderButtons = not bool(def.can_reorder) or nil
+    rules.paddingTop = def.padTop
+    rules.paddingBottom = def.padBottom
+    rules.maxLines = def.maxLines
+    rules.displayLines = def.displayLines or rules.displayLines
+    rules.noReorderButtons = utils.default(def.noReorderButtons, true)
 
     if def.toggle then
-        rules.toggleFields = utils.mapList(utils.split, utils.split(def.toggle, ';'), '.')
+        rules.toggleFields = utils.mapList(utils.split, def.toggle, '.')
     end
 
-    if def.toggle_inverse then
-        rules.inverseToggleFields = utils.mapList(utils.split, utils.split(def.toggle_inverse, ';'), '.')
+    if def.toggleInverse then
+        rules.inverseToggleFields = utils.mapList(utils.split, def.toggleInverse, '.')
     end
 
     local flags = {
-        no_label = 'noLabel',
-        full_page = 'useFullPage',
-        no_full_width = 'noFullWidth',
-        hidden = 'hidden',
+        'noLabel',
+        'useFullPage',
+        'noFullWidth',
+        'hidden',
     }
 
-    for k, v in pairs(flags) do
-        if bool(def[k]) then
-            rules[v] = true
+    for i = 1, #flags do
+        local flag = flags[i]
+        if def[flag] then
+            rules[flag] = true
         end
     end
 
-    if Logic._formRules[def._id] then
-        utils.extend(rules, Logic._formRules[def._id])
+    if Logic._formRules[key] then
+        utils.extend(rules, Logic._formRules[key])
     end
 
     if isempty(rules) then
@@ -359,29 +332,32 @@ function Logic._getDefaultStreams()
 end
 
 ---Gets a final list of format data translations.
----@param def table
----@param list string[]?
+---@param list (string | FormatDataTranslation)[]?
 ---@param _type 'token' | 'arg'
 ---@return FormatDataTranslation[]
 ---@private
-function Logic._getFormatDataTranslations(def, list, _type)
+function Logic._getFormatDataTranslations(list, _type)
     if not list or #list == 0 then
         return {}
     end
 
     local prefix = _type .. '-'
-    local overridePrefix = _type .. '_'
 
     local index = {}
     local result = {}
     for i = 1, #list do
-        local name = list[i]
-
+        local dataOrName = list[i]
         ---@type FormatDataTranslation
-        local data = {
-            id = def[overridePrefix .. name] or (prefix .. name),
-            name = name,
-        }
+        local data
+
+        if type(dataOrName) == 'string' then
+            data = {
+                id = prefix .. dataOrName,
+                name = dataOrName,
+            }
+        else
+            data = dataOrName
+        end
 
         local replaceIdx = index[data.name]
         if replaceIdx then
@@ -491,33 +467,35 @@ function Logic._getTagTooltip(tag)
 end
 
 ---Creates the tooltip to use for a format string option.
----@param def any
+---@param def ConfigurationFieldDef
+---@param vars table<string, any>
 ---@return string
 ---@private
-function Logic._buildFormatTooltip(def)
+function Logic._buildFormatTooltip(def, vars)
     local rope = {
         getText('heading-format-string'),
     }
 
-    local tokens = def.tokens and utils.split(def.tokens, ';')
-    local args = def.args and utils.split(def.args, ';')
+    local tokens = Logic._resolveTableVars(def._tokens, vars)
+    local args = Logic._resolveTableVars(def._args, vars)
 
-    if def.error_tokens then
+    if def._errorTokens then
+        tokens = tokens or {}
         tokens[#tokens + 1] = 'error'
         tokens[#tokens + 1] = 'errorID'
     end
 
     Logic._writeFormatDataTranslations(
         getText('heading-tokens'),
-        Logic._getFormatDataTranslations(def, tokens, 'token'),
-        def.description_tokens,
+        Logic._getFormatDataTranslations(tokens, 'token'),
+        def._descriptionTokens,
         rope
     )
 
     Logic._writeFormatDataTranslations(
         getText('heading-args'),
-        Logic._getFormatDataTranslations(def, args, 'arg'),
-        def.description_args,
+        Logic._getFormatDataTranslations(args, 'arg'),
+        def._descriptionArgs,
         rope
     )
 
@@ -530,10 +508,11 @@ end
 
 ---Reads the data file to generate the schema and form.
 ---Throws an error for invalid data.
----@param definitions table
+---@param definitions ConfigurationFieldDef[]
+---@param vars table<string, any>
 ---@param version integer
 ---@private
-function Logic._loadSchema(definitions, version)
+function Logic._loadSchema(definitions, vars, version)
     ---@type table<string, omi.schema.Field>
     local properties = {
         VERSION = schema.int(version),
@@ -542,10 +521,10 @@ function Logic._loadSchema(definitions, version)
     local rules = {} ---@type table<string, omi.forms.Rules>
     for i = 1, #definitions do
         local def = definitions[i]
-        if def.type ~= 'container' then
-            log.error('Invalid top-level field type for %s (%s)', def._id, def.type)
+        if def.type ~= 'object' then
+            log.error('Invalid top-level field type for %s (%s)', def.name, def.type)
         else
-            properties[def._key], rules[def._key] = Logic._generateField(def)
+            properties[def.name], rules[def.name] = Logic._generateField(def, vars)
         end
     end
 
@@ -916,77 +895,24 @@ function Logic._processStreams(streams)
 end
 
 ---Reads the configuration definition file.
----@return table definitions
----@return integer version
+---@return table data
 ---@private
 function Logic._readDefinitions()
-    local resource = utils.l10n.loadModResource('\\OmiChat', DATA_PATH)
-    if not resource then
-        log.fatal('Failed to load configuration schema') ---@cast resource -?
+    local reader = getModFileReader('\\OmiChat', 'configuration.json', false)
+    if not reader then
+        log.fatal('Failed to open configuration file') ---@cast reader -?
     end
 
-    local bundle = utils.l10n.FluentBundle:new()
-    bundle:addResource(resource)
-
-    local versionMsg = bundle:getMessage('VERSION')
-    local versionVal = versionMsg and versionMsg.value
-    if not versionVal then
-        log.fatal('Missing VERSION in configuration schema') ---@cast versionVal -?
+    local data, err = schema.read({ reader = reader })
+    if not data then
+        log.fatal(err or 'Failed to read configuration file') ---@cast data -?
     end
 
-    local version = tonumber((bundle:formatPattern(versionVal))) --[[@as integer]]
-    if not version then
-        log.fatal('Invalid value for VERSION in configuration schema')
+    if type(data._VERSION) ~= 'number' then
+        log.fatal('Invalid value for _VERSION in configuration file')
     end
 
-    ---@type any
-    local definitions = { _map = {} }
-    for i = 1, #resource.body do
-        local entry = resource.body[i]
-        local id = entry.id
-        local isTerm = id:sub(1, 1) == '-'
-
-        if isTerm or id == 'VERSION' then
-            -- skip
-        elseif id:sub(1, 7) ~= 'config-' then
-            log.error('Unknown message in configuration schema: %s', id)
-        else
-            id = id:sub(8)
-
-            local parts = utils.split(id, '-')
-            local item = definitions --[[@as any]]
-            for j = 1, #parts do
-                local key = parts[j] --[[@as string]]
-                if not item._map[key] then
-                    local def = {
-                        type = 'container',
-                        _id = id,
-                        _key = key,
-                        _map = {},
-                    }
-
-                    item._map[key] = def
-                    item[#item + 1] = def
-                end
-
-                item = item._map[key]
-            end
-
-            if #parts == 0 then
-                log.error('Invalid configuration key config-%s', id)
-                item = {}
-            end
-
-            for k, v in pairs(entry.attributes) do
-                k = k:gsub('%-', '_')
-
-                local value = bundle:formatPattern(v) ---@type any
-                item[k] = value
-            end
-        end
-    end
-
-    return definitions, version
+    return data
 end
 
 ---Refreshes the list of presets to match the current custom presets.
@@ -1008,6 +934,37 @@ function Logic._refreshPresetsList(form)
         local added = dropdown.options[#dropdown.options] --[[@as omi.Dropdown.Option]]
         added.tooltip = opt.tooltip
     end
+end
+
+---Resolves variable references in a table.
+---@param t any[]?
+---@param vars table<string, any>
+---@return table?
+---@private
+function Logic._resolveTableVars(t, vars)
+    if not t then
+        return
+    end
+
+    local result = {}
+    for i = 1, #t do
+        local el = t[i]
+        if type(el) == 'string' then
+            local var = el:match('^%$([%u_]+)$')
+            local replacement = var and vars[var]
+
+            -- this is only used for tokens and args currently, so only tables
+            if replacement and type(replacement) == 'table' then
+                utils.append(result, replacement)
+            else
+                result[#result + 1] = el
+            end
+        else
+            result[#result + 1] = el
+        end
+    end
+
+    return result
 end
 
 ---Saves a custom user-defined preset.
@@ -1105,19 +1062,19 @@ end
 ---Associates field keys to additional form rules to include.
 ---@type table<string, omi.forms.Rules>
 Logic._formRules = {
-    ['General-Preset'] = {
+    ['General.Preset'] = {
         actionCount = 3,
         getEnumOptions = Logic._getPresetOptions,
         onActionClick = Logic._onClickPresetAction,
         onChange = Logic._onChangePreset,
     },
-    ['Language-List'] = {
+    ['Language.List'] = {
         getItemDisplay = Logic._getLanguageListDisplay,
     },
-    ['Language-List-Name'] = {
+    ['Language.List.Name'] = {
         onChange = Logic._onChangeLanguageName,
     },
-    ['Streams-List'] = {
+    ['Streams.List'] = {
         createItem = Logic._createStreamItem,
         getItemDisplay = Logic._getStreamDisplay,
         onChange = Logic._onChangeStream,
@@ -1125,3 +1082,30 @@ Logic._formRules = {
 }
 
 return Logic
+
+--#region Type Definitions
+
+---@class ConfigurationFieldDef
+---@field name string The name of the field.
+---@field type string The type of the field.
+---@field fields? ConfigurationFieldDef[] Child fields.
+---@field default? any The default value of the field.
+---@field max? any The maximum value of the field.
+---@field min? any The minimum value of the field.
+---@field defaultAll? boolean Whether to use all options as the default value.
+---@field options? any Options for a field.
+---@field padTop? number Padding to add to the top of the field in the form.
+---@field padBottom? number Padding to add to the bottom of the field in the form.
+---@field maxItems? integer The maximum number of items for a field.
+---@field maxLines? integer The maximum number of lines for a field input.
+---@field displayLines? integer The maximum number of lines to display for a field input.
+---@field noReorderButtons? boolean Whether to exclude reorder buttons for a list control.
+---@field toggle? string[] Fields to toggle when a checkbox is checked.
+---@field toggleInverse? string[] Fields to toggle when a checkbox is unchecked.
+---@field _tokens? (string | FormatDataTranslation)[] Tokens available for a format string.
+---@field _args? (string | FormatDataTranslation)[] Arguments available for a format string.
+---@field _errorTokens? boolean Whether to include error tokens in the tokens.
+---@field _descriptionTokens? string A description to include alongside tokens.
+---@field _descriptionArgs? string A description to include alongside arguments.
+
+--#endregion
