@@ -446,7 +446,7 @@ local function generateFromConfig(configData, contentBundle)
         if element.defaultAll then
             rope[#rope + 1] = '**Default**: all  \n'
             addedExtra = true
-        elseif defaultValue then
+        elseif defaultValue ~= nil then
             rope[#rope + 1] = '**Default**: `'
 
             if element.type == 'color' then
