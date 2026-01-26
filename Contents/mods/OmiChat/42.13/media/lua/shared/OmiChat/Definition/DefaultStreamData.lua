@@ -317,7 +317,7 @@ local DefaultStreamData = {
         Command = '/dowhisper',
         ShortCommand = '/dw',
         DefaultColor = { r = 128, g = 0, b = 128 },
-        Range = 4,
+        Range = 2,
         VerticalRange = 1,
         PerceptionRange = 0,
         PerceptionRangeSigned = 0,
