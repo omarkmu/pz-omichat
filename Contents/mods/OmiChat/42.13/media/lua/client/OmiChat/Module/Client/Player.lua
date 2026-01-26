@@ -140,11 +140,26 @@ function Player.getLanguages()
     end
 
     local playerData = API.data.getPlayerInfoByUsername(username)
-    if not playerData or not playerData.languages then
+    local languages = playerData and playerData.languages
+    if not languages or #languages == 0 then
         return { API.language.getDefault() }
     end
 
-    return playerData.languages
+    local filtered = {}
+    local configured = utils.set.table(API.language.getList())
+
+    for i = 1, #languages do
+        local lang = languages[i]
+        if configured[lang] then
+            filtered[#filtered + 1] = lang
+        end
+    end
+
+    if #filtered == 0 then
+        return { API.language.getDefault() }
+    end
+
+    return filtered
 end
 
 ---Gets the number of available roleplay language slots for the local player.

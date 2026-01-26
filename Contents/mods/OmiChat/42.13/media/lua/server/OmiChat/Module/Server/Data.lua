@@ -18,14 +18,20 @@ API.data = Data
 ---This does not broadcast changes to clients.
 ---@param username string The player's username.
 ---@param language string The language to add.
+---@param fromCommand boolean? Flag for whether this is being called from a command.
 ---@return boolean success
 ---@return ('UNKNOWN' | 'FULL' | 'ALREADY_KNOW')? error
-function Data.addLanguage(username, language)
+function Data.addLanguage(username, language, fromCommand)
     if not API.language.exists(language) then
         return false, 'UNKNOWN'
     end
 
     local languages = Data.getLanguages(username)
+
+    -- make sure they have the default language if none are set
+    -- only if the player is adding the language themselves
+    local includeDefault = not fromCommand and #languages == 0
+
     if #languages >= config.MAX_LANGUAGE_SLOTS then
         return false, 'FULL'
     end
@@ -34,6 +40,10 @@ function Data.addLanguage(username, language)
         if languages[i] == language then
             return false, 'ALREADY_KNOW'
         end
+    end
+
+    if includeDefault then
+        languages[#languages + 1] = API.language.getDefault()
     end
 
     languages[#languages + 1] = language
@@ -309,7 +319,7 @@ function Data._updateField(field, target, value, fromCommand)
             return true
         end
 
-        return Data.addLanguage(target, value)
+        return Data.addLanguage(target, value, fromCommand)
     elseif field == 'languageSlots' then
         local slots = utils.tointeger(value)
         if not slots then
