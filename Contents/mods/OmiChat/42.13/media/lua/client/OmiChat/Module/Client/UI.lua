@@ -499,25 +499,29 @@ function UI.updateLanguageIndicator(force)
     local color = utils.color.integerToDecimal(config.Language.PlaceholderColor)
     entry:setPlaceholderRGBA(color.r, color.g, color.b, 1)
 
-    local language = API.player.getCurrentLanguage()
+    local language = API.player.getCurrentLanguage() or API.language.getDefault()
     if not force and language == UI._language then
         return
     end
 
     UI._language = language
 
-    local tokens = {
-        rawLanguage = language,
-        language = language and utils.getTranslatedLanguageName(language),
-    }
+    local display = ''
+    if language then
+        local tokens = {
+            rawLanguage = language,
+            language = utils.getTranslatedLanguageName(language),
+        }
 
-    local display = utils.interpolateNamed(
-        'LanguagePlaceholder',
-        config.Language.PlaceholderFormat,
-        tokens
-    )
+        display = utils.interpolateNamed(
+            'LanguagePlaceholder',
+            config.Language.PlaceholderFormat,
+            tokens
+        )
 
-    display = display:trim()
+        display = display:trim()
+    end
+
     if display == '' then
         entry:setPlaceholderText(nil)
         return
