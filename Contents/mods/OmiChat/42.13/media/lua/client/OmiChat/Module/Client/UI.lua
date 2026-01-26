@@ -8,6 +8,7 @@ local ProfileManager = require 'OmiChat/Component/UI/ProfileManager'
 local PlayerDataManager = require 'OmiChat/Component/UI/PlayerDataManager'
 local ConfigurationLogic = require 'OmiChat/Component/Configuration/Logic'
 local callback = require 'OmiChat/Module/Client/Callbacks'
+local RangeDisplay = require 'OmiChat/Component/UI/RangeDisplay'
 
 local utils = API.utils
 local UI_LIB = utils.ui
@@ -34,6 +35,7 @@ local TILE_FIELD ---@type Field?
 ---@field private _configPanel? omi.forms.Form The configuration panel.
 ---@field private _typingDisplay? string The current display text for the typing indicator.
 ---@field private _language string? The current language for the language indicator.
+---@field private _rangeDisplay RangeDisplay? The range display instance.
 local UI = {}
 
 ---Contains functions for controlling the chat window and related UI components.
@@ -331,6 +333,23 @@ function UI.scrollToTop()
     end
 end
 
+---Shows the range indicator for the given range.
+---@param range integer
+function UI.showRangeIndicator(range)
+    local player = API.player.get()
+    if not player then
+        return
+    end
+
+    if not UI._rangeDisplay then
+        UI._rangeDisplay = RangeDisplay:new(player)
+        UI._rangeDisplay:initialise()
+    end
+
+    local display = UI._rangeDisplay
+    display:show(range, player)
+end
+
 ---Creates and populates the context menu for chat settings.
 function UI.showSettingsContextMenu()
     local x = getMouseX()
@@ -398,12 +417,14 @@ function UI.toggleInfo()
     end
 end
 
----Updates the positions of custom buttons.
+---Updates the visibility and positions of custom buttons.
 function UI.updateButtons()
     local instance = ISChat.instance
     if not instance or not instance.gearButton then
         return
     end
+
+    instance.rangeButton:setVisible(config.General.IncludeRangeIndicatorButton)
 
     local th = instance:titleBarHeight()
     local lastBtn = instance.gearButton
@@ -1013,6 +1034,24 @@ function UI._createChildren(instance)
         onClick = instance.onInfo,
     }
 
+    instance.rangeButton = UI_LIB.button {
+        parent = instance,
+        x = instance.infoButton:getX() - th / 2 - th,
+        w = th,
+        h = th,
+        anchorRight = true,
+        anchorLeft = false,
+        borderColor = { r = 0.7, g = 0.7, b = 0.7, a = 0 },
+        backgroundColor = { r = 0, g = 0, b = 0, a = 0 },
+        backgroundColorMouseOver = { r = 0.3, g = 0.3, b = 0.3, a = 0 },
+        image = getTexture('media/ui/OmiChat/range.png'),
+        uiName = 'chat range button',
+        visible = false,
+        target = instance,
+        onClick = API.callback.onRangeClick,
+    }
+
+    API.extension.addCustomButton(instance.rangeButton)
     API.extension.addCustomButton(instance.infoButton)
 
     -- replace the text entry so we can add the suggest box

@@ -651,6 +651,7 @@ return Configuration
 ---@field Preset string
 ---@field AlwaysShowChat boolean
 ---@field CaseInsensitiveChatStreams boolean
+---@field IncludeRangeIndicatorButton boolean
 ---@field ClearOnDeath Configuration.General.ClearOnDeath
 ---@field AdminIcon string
 ---@field InfoText string

@@ -16,6 +16,7 @@
 ---@field currentTabID integer The 1-indexed tab ID of the current tab.
 ---@field tabCnt integer The number of available tabs.
 ---@field infoButton omi.Button The info button.
+---@field rangeButton omi.Button The range indicator button.
 ---@field infoRichText? omi.Dialog The rich text dialog.
 ---@field activeProfilesPanel? omichat.ProfileManager The active profile manager panel.
 ---@field activeConfigurationPanel? omi.forms.Form The active configuration menu panel.

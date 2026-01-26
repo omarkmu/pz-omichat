@@ -10,6 +10,7 @@ local UI = utils.ui
 local ISChat = ISChat --[[@as omichat.ISChat]]
 
 local max = math.max
+local getText = utils.getText
 local getAttr = utils.getAttr
 local textManager = getTextManager()
 
@@ -152,6 +153,24 @@ end
 function Callback.onConfigurationUpdate(args)
     if not API.player.isChatAdmin() then
         args.form:close()
+    end
+end
+
+---Called when the range indicator button is clicked.
+function Callback.onRangeClick()
+    local context = ISContextMenu.get(0, getMouseX(), getMouseY())
+
+    local hasOptions = false
+    for stream in API.streams.chatStreams() do
+        local range = stream:getRange()
+        if range and range > 0 and stream:isEnabled() then
+            hasOptions = true
+            context:addOption(stream:getCommand():trim(), range, API.ui.showRangeIndicator)
+        end
+    end
+
+    if not hasOptions then
+        context:removeFromUIManager()
     end
 end
 

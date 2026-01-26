@@ -222,6 +222,7 @@ function Preset.general(options)
         Preset = options.Name,
         AlwaysShowChat = false,
         CaseInsensitiveChatStreams = options.CaseInsensitiveChatStreams ~= false,
+        IncludeRangeIndicatorButton = options.IncludeRangeIndicatorButton ~= false,
         InfoText = '',
         AdminIcon = options.AdminIcon or 'Item_Hammer',
         ClearOnDeath = options.ClearOnDeath or Preset.clearOnDeath(),
@@ -444,6 +445,7 @@ return Preset
 ---@field DefaultNameModeForChatType table<omi.ChatTypeString, 'name' | 'username' | 'both'>? The default name mode per chat type.
 ---@field AdminIcon string? The texture name to use as the admin icon. Defaults to `Item_Hammer`.
 ---@field CaseInsensitiveChatStreams boolean? Flag for whether chat streams are case-insensitive. Defaults to `true`.
+---@field IncludeRangeIndicatorButton boolean? Flag for including the range indicator button. Defaults to `true`.
 ---@field ClearOnDeath Configuration.General.ClearOnDeath? Information taht should be cleared death.
 ---@field Variables table<string, string>? Arbitrary key-value pairs for variables.
 ---@field PMParentheses integer? The amount of parentheses to include for names in PMs.

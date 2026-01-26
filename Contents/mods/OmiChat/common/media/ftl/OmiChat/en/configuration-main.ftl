@@ -100,6 +100,9 @@ config-General-CaseInsensitiveChatStreams = Case-Insensitive Streams
         <BR> This means that { -command(name: "say") } and { -command(name: "SAY") } will be
         treated equivalently.
 
+config-General-IncludeRangeIndicatorButton = Range Indicator Button
+    .tooltip = If enabled, a button to display the range of ranged chats will be included.
+
 config-General-ClearOnDeath = Clear On Death
     .tooltip = Determines the information that is cleared when a player's character dies.
     .option-Icon = Icon

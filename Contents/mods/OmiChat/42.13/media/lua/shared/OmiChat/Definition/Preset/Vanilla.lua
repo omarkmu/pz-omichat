@@ -9,6 +9,7 @@ return Preset:new {
         General = Preset.general {
             Name = 'Vanilla',
             CaseInsensitiveChatStreams = false,
+            IncludeRangeIndicatorButton = false,
             DefaultNameMode = 'username',
             DefaultNameModeForChatType = {},
             PMParentheses = 0,
