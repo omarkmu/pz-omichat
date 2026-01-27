@@ -123,38 +123,6 @@
         },
         { "name": "InfoText", "type": "textbox", "maxLines": 50 },
         {
-          "name": "PMParentheses",
-          "type": "integer",
-          "padTop": 10,
-          "default": 2,
-          "min": 0,
-          "max": 5
-        },
-        {
-          "name": "DefaultNameMode",
-          "type": "dropdown",
-          "default": "name",
-          "padTop": 10,
-          "options": ["name", "username", "both"]
-        },
-        {
-          "name": "DefaultNameModeForChatType",
-          "type": "string-map",
-          "noLabel": true,
-          "default": {
-            "admin": "username",
-            "whisper": "both"
-          }
-        },
-        {
-          "name": "VolumeIndicators",
-          "type": "string-map",
-          "padTop": 10,
-          "default": {
-            "Loud": "Long"
-          }
-        },
-        {
           "name": "Variables",
           "type": "string-map",
           "padTop": 10
@@ -478,8 +446,8 @@
     {
       "name": "Format",
       "type": "object",
-      "_shortDescription": "Format strings for advanced customization.",
-      "_description": "These [format strings](../format-strings/index.md) can be used for advanced customization.\n\nAll of these formats default to `$Default()`, which gets the default content. The tokens and options that each format accepts are available in the in-game configuration menu.",
+      "_shortDescription": "Formatting options and advanced customization.",
+      "_description": "This section includes options related to formatting, including [format strings](../format-strings/index.md) which can be used for advanced customization.\n\nAll of the format strings default to `$Default()`, which gets the default content. The tokens and options that each format accepts are available in the in-game configuration menu.",
       "fields": [
         {
           "name": "Chat",
@@ -699,6 +667,43 @@
               "name": "MiniScoreboard",
               "type": "format-string",
               "_tokens": ["$TOKENS_MENU_NAME"]
+            }
+          ]
+        },
+        {
+          "name": "Other",
+          "type": "object",
+          "fields": [
+            {
+              "name": "PMParentheses",
+              "type": "integer",
+              "default": 2,
+              "padBottom": 10,
+              "min": 0,
+              "max": 5
+            },
+            {
+              "name": "DefaultNameMode",
+              "type": "dropdown",
+              "default": "name",
+              "options": ["name", "username", "both"]
+            },
+            {
+              "name": "DefaultNameModeForChatType",
+              "type": "string-map",
+              "noLabel": true,
+              "padBottom": 10,
+              "default": {
+                "admin": "username",
+                "whisper": "both"
+              }
+            },
+            {
+              "name": "VolumeIndicators",
+              "type": "string-map",
+              "default": {
+                "Loud": "Long"
+              }
             }
           ]
         }

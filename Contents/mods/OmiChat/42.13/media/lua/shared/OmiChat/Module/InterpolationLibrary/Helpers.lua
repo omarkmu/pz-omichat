@@ -786,12 +786,13 @@ end
 ---@return string? indicator A translated or untranslated string indicating the volume of a message.
 function Helpers.getVolumeIndicator(options, tags)
     local indicator
+    local volumeIndicators = config.Format.Other.VolumeIndicators
     if not tags.IsSneakCallout and (tags.Loud or tags.IsCallout) then
-        indicator = options:getString('loudIndicator', config.General.VolumeIndicators.Loud or 'Loud')
+        indicator = options:getString('loudIndicator', volumeIndicators.Loud or 'Loud')
     elseif tags.Quiet or tags.IsSneakCallout then
-        indicator = options:getString('quietIndicator', config.General.VolumeIndicators.Quiet or 'Low')
+        indicator = options:getString('quietIndicator', volumeIndicators.Quiet or 'Low')
     elseif tags.Whisper then
-        indicator = options:getString('whisperIndicator', config.General.VolumeIndicators.Whisper or 'Whisper')
+        indicator = options:getString('whisperIndicator', volumeIndicators.Whisper or 'Whisper')
     end
 
     if not indicator or indicator == '' then

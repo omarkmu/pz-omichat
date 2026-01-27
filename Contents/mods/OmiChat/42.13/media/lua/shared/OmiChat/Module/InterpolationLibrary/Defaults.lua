@@ -79,7 +79,7 @@ function Library.Defaults.Chat(interpolator, args)
     end
 
     if tags.IsIncomingPM and not tags.UseVanillaPM and name ~= '' then
-        local parens = config.General.PMParentheses
+        local parens = config.Format.Other.PMParentheses
         local pmFrom = getText('private-chat-from', { name = ' <SPACE> ' .. name })
 
         name = rep('(', parens) .. pmFrom .. rep(')', parens)
@@ -98,7 +98,7 @@ function Library.Defaults.Chat(interpolator, args)
             if tags.UseVanillaPM then
                 name = 'to ' .. name
             else
-                local parens = config.General.PMParentheses
+                local parens = config.Format.Other.PMParentheses
                 local pmTo = getText('private-chat-to', { name = ' <SPACE> ' .. name })
 
                 name = rep('(', parens) .. pmTo .. rep(')', parens)
@@ -541,7 +541,8 @@ function Library.Defaults.Name(interpolator, args)
 
     -- if a mode isn't given, use preset defaults
     if mode == '' then
-        local defaultMode = config.General.DefaultNameModeForChatType[chatType] or config.General.DefaultNameMode
+        local other = config.Format.Other
+        local defaultMode = other.DefaultNameModeForChatType[chatType] or other.DefaultNameMode
 
         -- if a name is given as an option, use it even if username is specified
         local defaultUsernameMode = name ~= '' and 'name' or 'username'

@@ -10,10 +10,6 @@ return Preset:new {
             Name = 'Vanilla',
             CaseInsensitiveChatStreams = false,
             IncludeRangeIndicatorButton = false,
-            DefaultNameMode = 'username',
-            DefaultNameModeForChatType = {},
-            PMParentheses = 0,
-            VolumeIndicators = {},
         },
         Buffs = Preset.buffs {
             Enable = false,
@@ -38,7 +34,12 @@ return Preset:new {
         EchoMessages = Preset.echo {
             Enable = false,
         },
-        Format = Preset.format(),
+        Format = Preset.format {
+            PMParentheses = 0,
+            DefaultNameMode = 'username',
+            DefaultNameModeForChatType = {},
+            VolumeIndicators = {},
+        },
         Language = Preset.languages {
             UseDefaultList = false,
         },

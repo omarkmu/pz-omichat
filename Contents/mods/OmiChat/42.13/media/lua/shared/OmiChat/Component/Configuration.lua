@@ -656,10 +656,6 @@ return Configuration
 ---@field AdminIcon string
 ---@field InfoText string
 ---@field Variables table<string, string>
----@field DefaultNameMode 'name' | 'username' | 'both'
----@field DefaultNameModeForChatType table<string, string>
----@field PMParentheses integer
----@field VolumeIndicators table<string, string>
 
 ---@class Configuration.General.ClearOnDeath
 ---@field Icon boolean?
@@ -734,6 +730,7 @@ return Configuration
 ---@field Component Configuration.Format.Component
 ---@field Filter Configuration.Format.Filter
 ---@field MenuName Configuration.Format.MenuName
+---@field Other Configuration.Format.Other
 
 ---@class Configuration.Format.Chat
 ---@field Prefix string
@@ -766,6 +763,12 @@ return Configuration
 ---@field Medical string
 ---@field SearchPlayer string
 ---@field MiniScoreboard string
+
+---@class Configuration.Format.Other
+---@field PMParentheses integer
+---@field DefaultNameMode 'name' | 'username' | 'both'
+---@field DefaultNameModeForChatType table<string, string>
+---@field VolumeIndicators table<string, string>
 
 ---@class Configuration.Language
 ---@field DefaultSlots integer

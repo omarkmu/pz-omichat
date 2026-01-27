@@ -174,10 +174,19 @@ function Preset.echo(options)
 end
 
 ---Returns the default format configuration.
+---@param options Args.ConfigurationPreset.Format? Options for creation of the table.
 ---@return Configuration.Format
-function Preset.format()
+function Preset.format(options)
+    options = options or {} --[[@as Args.ConfigurationPreset.Format]]
+
     ---@type Configuration.Format
     return {
+        Other = {
+            PMParentheses = options.PMParentheses or 2,
+            DefaultNameMode = options.DefaultNameMode or 'name',
+            DefaultNameModeForChatType = options.DefaultNameModeForChatType or {},
+            VolumeIndicators = options.VolumeIndicators or {},
+        },
         Component = {
             Name = DEFAULT,
             Tag = DEFAULT,
@@ -227,10 +236,6 @@ function Preset.general(options)
         AdminIcon = options.AdminIcon or 'Item_Hammer',
         ClearOnDeath = options.ClearOnDeath or Preset.clearOnDeath(),
         Variables = options.Variables or {},
-        DefaultNameMode = options.DefaultNameMode or 'name',
-        DefaultNameModeForChatType = options.DefaultNameModeForChatType or {},
-        PMParentheses = options.PMParentheses or 1,
-        VolumeIndicators = options.VolumeIndicators or {},
     }
 end
 
@@ -439,17 +444,19 @@ return Preset
 ---@field Enable boolean? Flag for whether echo messages are enabled. Defaults to `true`.
 ---@field Tags string[]? Tags to include on echo messages. Defaults to `['OverRadio']`.
 
----@class Args.ConfigurationPreset.General
----@field Name string The name of the preset.
+---@class Args.ConfigurationPreset.Format
+---@field PMParentheses integer? The amount of parentheses to include for names in PMs. Defaults to `2`.
 ---@field DefaultNameMode ('name' | 'username' | 'both')? The default name mode.
 ---@field DefaultNameModeForChatType table<omi.ChatTypeString, 'name' | 'username' | 'both'>? The default name mode per chat type.
+---@field VolumeIndicators table<string, string>? Volume indicator strings.
+
+---@class Args.ConfigurationPreset.General
+---@field Name string The name of the preset.
 ---@field AdminIcon string? The texture name to use as the admin icon. Defaults to `Item_Hammer`.
 ---@field CaseInsensitiveChatStreams boolean? Flag for whether chat streams are case-insensitive. Defaults to `true`.
 ---@field IncludeRangeIndicatorButton boolean? Flag for including the range indicator button. Defaults to `true`.
----@field ClearOnDeath Configuration.General.ClearOnDeath? Information taht should be cleared death.
+---@field ClearOnDeath Configuration.General.ClearOnDeath? Information that should be cleared death.
 ---@field Variables table<string, string>? Arbitrary key-value pairs for variables.
----@field PMParentheses integer? The amount of parentheses to include for names in PMs.
----@field VolumeIndicators table<string, string>? Volume indicator strings.
 
 ---@class Args.ConfigurationPreset.Language
 ---@field UseDefaultList boolean? Flag for whether the default language list should be used. Defaults to `true`.

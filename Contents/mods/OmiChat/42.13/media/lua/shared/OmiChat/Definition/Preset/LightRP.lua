@@ -8,9 +8,6 @@ return Preset:new {
     values = {
         General = Preset.general {
             Name = 'LightRP',
-            PMParentheses = 1,
-            DefaultNameModeForChatType = { admin = 'username' },
-            VolumeIndicators = {},
         },
         Buffs = Preset.buffs {
             Enable = false,
@@ -34,7 +31,11 @@ return Preset:new {
         EchoMessages = Preset.echo {
             Enable = false,
         },
-        Format = Preset.format(),
+        Format = Preset.format {
+            PMParentheses = 1,
+            DefaultNameModeForChatType = { admin = 'username' },
+            VolumeIndicators = {},
+        },
         Language = Preset.languages(),
         Macros = Preset.macros(),
         Mentions = Preset.mentions(),
