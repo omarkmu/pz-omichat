@@ -4,10 +4,6 @@
 
 ## Chat formatting
 
-# @translate-optional
-# @param $text string The text to wrap in RP emote characters.
-rp-emote = « { $text } »
-
 # @param $frequency string The radio frequency a message was sent over.
 radio = Radio ({ $frequency } MHz)
 

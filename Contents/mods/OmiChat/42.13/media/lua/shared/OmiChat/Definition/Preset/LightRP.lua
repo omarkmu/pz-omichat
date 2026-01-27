@@ -54,7 +54,9 @@ return Preset:new {
 
         Streams = {
             UseDefaultList = false,
-            GlobalTags = {},
+            GlobalTags = {
+                'ActionGuillemets',
+            },
             List = {
                 {
                     Stream = 'admin',

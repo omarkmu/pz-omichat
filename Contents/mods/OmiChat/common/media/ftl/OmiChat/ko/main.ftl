@@ -2,8 +2,6 @@
 
 ## Chat formatting
 
-rp-emote = &lt;&lt; { $text } &gt;&gt;
-
 radio = 라디오 ({ $frequency } MHz)
 
 private-chat-to = { $name }에게 보낸 개인 메시지

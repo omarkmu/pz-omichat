@@ -17,6 +17,8 @@ local getTextOrNull = utils.getTextOrNull
 
 local IS_CLIENT = not isServer()
 
+local LAQUO = string.char(171) .. ' '
+local RAQUO = ' ' .. string.char(187)
 local IGNORE_CHAR = string.char(config.SIGNAL_IGNORE)
 local ASTERISK_CHAR = string.char(config.SIGNAL_ASTERISK)
 local ASTERISK_PREFIX_PATTERN = '^(%s*[*' .. ASTERISK_CHAR .. '])(.+)'
@@ -943,8 +945,8 @@ end
 function Helpers.wrapActionChat(text, tags)
     if tags.ActionAsterisks or tags.ActionAsterisksChat then
         return '** <SPACE> ' .. text
-    elseif not (tags.ActionPlain or tags.ActionPlainChat) then
-        return getText('rp-emote', { text = ' <SPACE> ' .. text .. ' <SPACE> ' })
+    elseif tags.ActionGuillemets or tags.ActionGuillemetsChat then
+        return LAQUO .. '<SPACE> ' .. text .. ' <SPACE>' .. RAQUO
     end
 
     return text
@@ -957,8 +959,8 @@ end
 function Helpers.wrapActionOverhead(text, tags)
     if tags.ActionAsterisks or tags.ActionAsterisksOverhead then
         return '** ' .. text
-    elseif not (tags.ActionPlain or tags.ActionPlainOverhead) then
-        return '( ' .. text .. ' )'
+    elseif tags.ActionGuillemets or tags.ActionGuillemetsOverhead then
+        return LAQUO .. text .. RAQUO
     end
 
     return text

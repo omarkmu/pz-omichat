@@ -110,12 +110,12 @@ tag-ActionAsterisksOverhead = { -same-as(tag: "ActionAsterisks", context: "overh
 tag-ActionColorTarget = Indicates the stream that should be used to determine the color of embedded actions.
     { -color-target-suffix }
 
-tag-ActionPlain = Indicates that an action should not be surrounded by guillemets.
+tag-ActionGuillemets = Indicates that an action should be surrounded by guillemets.
     <LINE> This has no effect if { -highlight(text: "ActionAsterisks") } is specified.
 
-tag-ActionPlainChat = { -same-as(tag: "ActionPlain", context: "chat") }
+tag-ActionGuillemetsChat = { -same-as(tag: "ActionGuillemets", context: "chat") }
 
-tag-ActionPlainOverhead = { -same-as(tag: "ActionPlain", context: "overhead") }
+tag-ActionGuillemetsOverhead = { -same-as(tag: "ActionGuillemets", context: "overhead") }
 
 tag-AutoCapitalize = Indicates that messages sent on a stream should automatically have their first letter capitalized.
     <LINE> This does not have an effect for sneak callouts.
