@@ -420,7 +420,18 @@ player-data-manager =
 
 ## Configuration presets
 
-preset-user-defined = User-defined preset
+preset-custom = User-defined preset.
+
+# @do-not-translate
+preset-buffy = {" "}{ -highlight-inline(text: "Buffy") }: settings tailored to roleplay, based on buffy's roleplay chat.
+    This is the default preset.
+
+# @do-not-translate
+preset-omar = {" "}{ -highlight-inline(text: "Omar") }: settings designed for lighter roleplay, with narrative style disabled.
+    This is closer to the default settings from the legacy b41 version of { -mod-name }.
+
+# @do-not-translate
+preset-vanilla = {" "}{ -highlight-inline(text: "Vanilla") }: settings designed to mimic vanilla, with many mod features disabled.
 
 dialog-save-preset = Enter a name for the new preset.
 

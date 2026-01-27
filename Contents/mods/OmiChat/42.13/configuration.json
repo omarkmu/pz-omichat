@@ -94,8 +94,9 @@
           "type": "string",
           "default": "Buffy",
           "padBottom": 16,
-          "_description": "The preset dropdown can be used to select built-in and custom presets to apply to all chat settings. By default, three presets are provided:\n- **Buffy**: settings tailored to roleplay, based on buffy's roleplay chat.\n- **LightRP**: settings for lighter RP, with narrative style off by default. This is closer to the default settings from the legacy b41 version of OmiChat.\n- **Vanilla**: settings designed to mimic vanilla, with many mod features disabled.",
-          "_noDocKey": true
+          "_noDocKey": true,
+          "_description": "The preset dropdown can be used to select built-in and custom presets to apply to all chat settings.\n\nThe following presets are built-in:",
+          "_presetKeys": ["buffy", "omar", "vanilla"]
         },
         { "name": "AlwaysShowChat", "type": "checkbox", "default": false },
         {

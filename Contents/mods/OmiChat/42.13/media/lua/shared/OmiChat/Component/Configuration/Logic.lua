@@ -445,7 +445,7 @@ function Logic._getPresetOptions()
         list[#list + 1] = {
             data = preset:getID(),
             text = preset:getName(),
-            tooltip = preset:isCustom() and getText('preset-user-defined') or nil,
+            tooltip = preset:getTooltip(),
         }
     end
 

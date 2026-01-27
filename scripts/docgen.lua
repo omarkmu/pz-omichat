@@ -197,7 +197,7 @@ local function convertKey(key, pattern)
 end
 
 ---Gets the description to use for an element.
-local function getDescription(data, contentNode, vars)
+local function getDescription(data, contentNode, vars, contentBundle)
     local tooltip = contentNode:get_attribute('tooltip')
 
     local desc ---@type string?
@@ -221,6 +221,20 @@ local function getDescription(data, contentNode, vars)
         end
 
         desc = desc .. extraDesc
+    end
+
+    -- special case: built-in presets are loaded in from Lua, not the config file
+    -- the config file lists preset names so the tooltips can be loaded here
+    if data._presetKeys then
+        for i = 1, #data._presetKeys do
+            local name = data._presetKeys[i]
+            local presetTooltip = contentBundle:get_message('preset-' .. name)
+            if not presetTooltip then
+                quit('missing preset tooltip for built-in preset ' .. name)
+            end
+
+            desc = desc .. '\n- ' .. richTextToMarkdown(presetTooltip)
+        end
     end
 
     return desc
@@ -287,7 +301,7 @@ local function processConfigData(configData, contentBundle)
                 skipKey = data._noDocKey,
                 name = tostring(title),
                 type = data.type,
-                description = getDescription(data, content, vars),
+                description = getDescription(data, content, vars, contentBundle),
                 shortDescription = data._shortDescription,
             }
         elseif not skip then
@@ -298,7 +312,7 @@ local function processConfigData(configData, contentBundle)
                 type = data.type,
                 skipKey = data._noDocKey,
                 name = content.value and tostring(content.value) or data.name,
-                description = getDescription(data, content, vars),
+                description = getDescription(data, content, vars, contentBundle),
                 max = data.max,
                 min = data.min,
                 default = data.default,

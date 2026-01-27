@@ -8,6 +8,7 @@ local DEFAULT = '$Default()'
 
 ---@class ConfigurationPreset : omi.Class
 ---@field protected _name string The name of the preset.
+---@field protected _tooltip string? The tooltip to use for the preset.
 ---@field protected _isCustom boolean Flag for whether the preset is a custom, user-defined preset.
 ---@field protected _values Configuration The preset's configuration values.
 local Preset = utils.class('Preset')
@@ -390,6 +391,12 @@ function Preset:getName()
     return self._name
 end
 
+---Gets the tooltip to display for the preset.
+---@return string?
+function Preset:getTooltip()
+    return self._tooltip
+end
+
 ---Gets the values associated with the preset.
 ---@return Configuration values
 function Preset:getValues()
@@ -403,10 +410,16 @@ end
 function Preset:new(args)
     local this = utils.new(self)
 
-    args = args or {}
+    args = args or {} --[[@as Args.ConfigurationPreset]]
     this._name = args.name
     this._isCustom = args.isCustom or false
     this._values = args.values or {}
+
+    if this._isCustom then
+        this._tooltip = utils.getText('preset-custom')
+    else
+        this._tooltip = utils.getTextOrNull('preset-' .. this._name:lower())
+    end
 
     return this
 end

@@ -317,7 +317,7 @@ player-data-manager =
 
 ## Configuration presets
 
-preset-user-defined = User-defined preset
+preset-custom = User-defined preset.
 
 dialog-save-preset = Enter a name for the new preset.
 

@@ -40,7 +40,7 @@ Configuration._presetFilename = 'omichat/presets.json'
 ---@private
 Configuration._presets = {
     Buffy = require 'OmiChat/Definition/Preset/Buffy',
-    LightRP = require 'OmiChat/Definition/Preset/LightRP',
+    Omar = require 'OmiChat/Definition/Preset/Omar',
     Vanilla = require 'OmiChat/Definition/Preset/Vanilla',
 }
 

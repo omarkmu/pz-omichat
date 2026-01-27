@@ -1,13 +1,13 @@
----Light RP preset.
+---Omar's preset.
 ---@namespace omichat
 
 local Preset = require 'OmiChat/Component/Configuration/Preset'
 
 return Preset:new {
-    name = 'LightRP',
+    name = 'Omar',
     values = {
         General = Preset.general {
-            Name = 'LightRP',
+            Name = 'Omar',
         },
         Buffs = Preset.buffs {
             Enable = false,
