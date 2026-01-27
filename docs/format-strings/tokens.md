@@ -5,7 +5,7 @@ which are replaced with a relevant value when they're used.
 These are specified with a dollar sign followed by the name of the token.
 Like [functions](./functions.md), tokens are case-sensitive; `$author` is not the same as `$Author`.
 
-The available tokens for a given option are documented in the in-game configuration menu.
+The available tokens for a given option are documented in the in-game [configuration](../configuration/index.md) menu.
 
 ## Error Tokens
 

@@ -56,7 +56,7 @@ config-format-strings = <CENTRE> <SIZE:large> Format Strings <LINE> <SIZE:small>
     Like tokens, functions are case-sensitive. Function arguments are separated by spaces. To include a space in a
     single argument, enclose text in backticks (e.g., `text with spaces`).
     <BR> For a list of built-in functions and their behavior, see the <SPACE>
-    <LINK url=https://omarkmu.github.io/pz-omichat/format-strings/functions text="online documentation"> .
+    <LINK url=https://omarkmu.github.io/pz-omichat/format-strings/functions.html text="online documentation"> .
     { -format-section-heading(name: "Multimaps") }
     Multimaps (or 'at-maps') can be declared using an { -highlight(text: "@") } symbol followed
     by parenthesized elements.
@@ -104,7 +104,7 @@ config-General-IncludeRangeIndicatorButton = Range Indicator Button
     .tooltip = If enabled, a button to display the range of ranged chats will be included.
 
 config-General-ClearOnDeath = Clear On Death
-    .tooltip = Determines the information that is cleared when a player's character dies.
+    .tooltip = Information that is cleared when a player's character dies.
     .option-Icon = Icon
     .option-tooltip-Icon = If enabled, chat icons will be cleared on death.
     .option-Languages = Languages
@@ -115,8 +115,8 @@ config-General-ClearOnDeath = Clear On Death
     .option-tooltip-Status = If enabled, chat statuses will be cleared on death.
 
 config-General-AdminIcon = Admin Icon
-    .tooltip = Defines the value of the { -highlight(text: "adminIcon") } token in the icon format.
-        This expects a valid texture name.
+    .tooltip = The name of the texture used when an admin enables display of a chat icon.
+        Defines the value of the { -highlight(text: "adminIcon") } token in the icon format.
 
 config-General-InfoText = Info Text
     .tooltip = Information that can be accessed by clicking an info button on the chat window.
@@ -124,7 +124,7 @@ config-General-InfoText = Info Text
         <BR> This can use rich text formatting to include different colors and fonts.
 
 config-General-Variables = Variables
-    .tooltip = Arbitrary key-value pairs that can be used for providing information to integrations.
+    .tooltip = Arbitrary key-value pairs that can be used for providing information to extensions and integrations.
         <BR> Currently, the mod does not use anything specified here.
     .placeholder-key = Key
     .placeholder-value = Value
@@ -281,7 +281,7 @@ config-Customization-EnableNameColors = Name Colors
     .tooltip = If enabled, players' speech colors will be used to color their name in chat.
 
 config-Customization-EnableCharacterCustomization = Character Customization
-    .tooltip = Enables QoL options to change the character's appearance.
+    .tooltip = Enables quality of life options to change the character's appearance.
 
 config-Customization-CleanEffects = Clean Character Effects
     .tooltip = Controls the effects of the character customization option to clean blood & dirt.
@@ -301,7 +301,7 @@ config-Discord-DefaultColor = { -default-color }
 
 config-Discord-ShowColorOption = Show Discord Color Option
     .tooltip = Controls whether options to customize Discord message color are shown to the player.
-        <BR> The { -option(name: "Respect server setting") } option checks if Discord integration
+        <BR> The { -option(name: "Respect server setting") } option checks if the Discord integration
         is enabled for the server.
     .option-Yes = Yes
     .option-No = No
@@ -368,11 +368,11 @@ config-Format-Component-Name = Name
         and { -highlight(text: "rawName") } tokens in other format strings.
 
 config-Format-Component-Tag = Tag
-    .tooltip = Defines the format used for chat tags when a player enables the relevant option.
+    .tooltip = Format used for chat tags when a player enables the relevant option.
         This controls the value of the { -highlight(text: "tag") } token in other format strings.
 
 config-Format-Component-Timestamp = Timestamp
-    .tooltip = Defines the format used for timestamps when a player enables the relevant option.
+    .tooltip = Format used for timestamps when a player enables the relevant option.
         This controls the value of the { -highlight(text: "timestamp") } token in other format strings.
 
 config-Format-Component-Icon = Icon
@@ -386,7 +386,7 @@ config-Format-Component-EmbeddedQuote = Embedded Quotes
     .tooltip = Defines the format used for quotes embedded in actions.
 
 config-Format-Component-EmbeddedAction = Embedded Actions
-    .tooltip = Defines the format used for actions embedded in text.
+    .tooltip = Format used for actions embedded in text.
 
 config-Format-Filter = Filters
     .tooltip = Format strings used to control whether an input is allowed.
@@ -394,6 +394,7 @@ config-Format-Filter = Filters
 config-Format-Filter-ChatInput = Chat Input Filter
     .tooltip = Filters chat input before sending it.
         If this results in the empty string or sets an error token, the input won't be sent.
+        <BR> The default filter handles disallowing signed languages over the radio and truncation.
 
 config-Format-Filter-Name = Name Filter
     .tooltip = Filters names set with the { -command(name: "name") } and { -command(name: "nickname") } commands.
@@ -402,6 +403,7 @@ config-Format-Filter-Name = Name Filter
 config-Format-Filter-Status = Status Filter
     .tooltip = Filters statuses set with the { -command(name: "status") } command.
         If this results in the empty string or sets an error token, the command will fail.
+        <BR> The default filter handles enforcing minimum and maximum length.
 
 config-Format-MenuName = In-Game Names
     .tooltip = Options that control how character names are displayed within in-game menus.
@@ -421,7 +423,7 @@ config-Format-MenuName-MiniScoreboard = Mini-Scoreboard
     .tooltip = The format used for names in the admin mini-scoreboard.
 
 config-Format-Other = Other
-    .tooltip = Other options related formatting.
+    .tooltip = Other options related to formatting.
 
 config-Format-Other-PMParentheses = PM Parentheses
     .tooltip = The amount of parentheses to include around names in private messages.
@@ -440,7 +442,9 @@ config-Format-Other-DefaultNameModeForChatType = Default Name Mode (Per Chat Typ
 
 config-Format-Other-VolumeIndicators = Volume Indicator
     .tooltip = Text to use for volume indicators.
-        Keys should be one of "Loud", "Quiet", or "Whisper".
+        Keys should be one of <SPACE> { -option-inline(name: "Loud") },
+        <SPACE> { -option-inline(name: "Quiet") },
+        or <SPACE> { -option-inline(name: "Whisper") }.
     .placeholder-key = Volume
     .placeholder-value = Indicator Text
 
@@ -628,13 +632,16 @@ config-Streams-List-Range = Range
 
 config-Streams-List-VerticalRange = Vertical Range
     .tooltip = The vertical range of this stream.
+        <BR> A value of 0 means that vertical levels should be ignored.
 
 config-Streams-List-PerceptionRange = Perception Range
     .tooltip = The range in which an indicator that something was said out-of-range will send.
+        <BR> A value of 0 means nothing out-of-range will be perceived.
 
 config-Streams-List-PerceptionRangeSigned = Perception Range (Signed)
     .tooltip = The range in which an indicator that something was said out-of-range will send,
         when sent in a signed roleplay language.
+        <BR> A value of 0 means nothing out-of-range will be perceived.
 
 config-Streams-List-ChatFormat = { -chat-format }
     .tooltip = Controls how messages sent on this stream appear in chat.

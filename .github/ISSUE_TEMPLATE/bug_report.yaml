@@ -10,17 +10,17 @@ body:
     id: what-happened
     attributes:
       label: Bug Description
-      description: Describe what happened and what you expected.
+      description: What happened? What did you expect?
     validations:
       required: true
   - type: textarea
     id: additional-information
     attributes:
       label: Additional Information
-      description: Provide any additional information here. For example, it's helpful to know whether you're a player or a server admin.
+      description: Any other relevant information to share? For example, it's helpful to know whether you're a player or a server admin.
   - type: textarea
     id: logs
     attributes:
       label: Relevant Logs
-      description: Please include any relevant log output (`console.txt`). This will be automatically formatted, so no need for backticks.
+      description: Please include any relevant log output (e.g., `console.txt`). This will be automatically formatted, so no need for backticks. You can also upload the file directly, if you prefer.
       render: shell

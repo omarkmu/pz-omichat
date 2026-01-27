@@ -3,14 +3,16 @@
 The [GitHub repository](https://github.com/omarkmu/pz-omichat) includes Java mod files that are **optional** and **server-side only.**
 The mod functions equivalently in-game without them, but the Java mods may be useful to server operators to address [concerns](https://github.com/omarkmu/pz-omichat/issues/9) about messages including invisible characters.
 
+> [!WARNING]
+> Java mods are likely to break between updates during b42 unstable!
+> If this happens, delete the `.class` files from where they were placed.
+
 ## Functionality
 
-The `ChatServer.class` replacement cleans up the server-side `chat` log files so that they don't include the invisible characters added by this mod.
-This makes reading these log files much easier.
+The `ChatServer.class` replacement cleans up the server-side `chat` log files to remove data included in messages for mod functionality.
 
 The `GeneralChat.class` replacement is recommended for servers using the game's Discord integration.
-This cleans up messages sent from the in-game `/all` chat so they don't display extra characters surrounding the text on Discord.
-It also cleans up some log messages sent directly to the `DebugLog` file.
+This cleans up messages sent from the in-game `/all` chat to remove data included in messages for mod functionality.
 
 ## Installation
 

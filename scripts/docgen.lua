@@ -261,7 +261,7 @@ local function processConfigData(configData, contentBundle)
 
     local function processField(data, idPrefix)
         local isTopLevel = idPrefix == nil
-        local skip = data.noDoc or data.hidden
+        local skip = data._noDoc or data.hidden
         local id = (idPrefix or 'config-') .. data.name
 
         local content = contentBundle:get_message(id)
@@ -284,6 +284,7 @@ local function processConfigData(configData, contentBundle)
 
             element = {
                 key = data.name,
+                skipKey = data._noDocKey,
                 name = tostring(title),
                 type = data.type,
                 description = getDescription(data, content, vars),
@@ -295,6 +296,7 @@ local function processConfigData(configData, contentBundle)
             element = {
                 key = data.name,
                 type = data.type,
+                skipKey = data._noDocKey,
                 name = content.value and tostring(content.value) or data.name,
                 description = getDescription(data, content, vars),
                 max = data.max,
@@ -423,7 +425,7 @@ local function generateFromConfig(configData, contentBundle)
         rope[#rope + 1] = anchor
         rope[#rope + 1] = '}'
 
-        if level > 1 then
+        if level > 1 and not element.skipKey then
             rope[#rope + 1] = '\n`'
             rope[#rope + 1] = key
             rope[#rope + 1] = '`  \n'
@@ -432,14 +434,10 @@ local function generateFromConfig(configData, contentBundle)
         end
 
         local defaultValue
-        if not LIST_TYPES[_type] and _type ~= 'string-map' then
+        if _type == 'format-string' then
+            defaultValue = element.default or '$Default()'
+        elseif not LIST_TYPES[_type] and _type ~= 'string-map' then
             defaultValue = element.default
-        else
-            -- if there's one default value for a list type, use the singular display
-            local defaults = element.default
-            if defaults and #defaults == 1 then
-                defaultValue = defaults[1]
-            end
         end
 
         local addedExtra = false
@@ -498,7 +496,7 @@ local function generateFromConfig(configData, contentBundle)
             local defaults = element.default
 
             if defaults and not defaultValue and not isDropdown then
-                rope[#rope + 1] = '\n**Defaults**:'
+                rope[#rope + 1] = #defaults == 1 and '\n**Default**:' or '\n**Defaults**:'
                 writeOptList(defaults, rope, optNames, optDescs)
                 rope[#rope + 1] = '\n'
             end
@@ -522,7 +520,7 @@ local function generateFromConfig(configData, contentBundle)
             end)
 
             if #defaultList ~= 0 then
-                rope[#rope + 1] = '\n\n**Defaults**:'
+                rope[#rope + 1] = #defaultList == 1 and '\n\n**Default**:' or '\n\n**Defaults**:'
             end
 
             for i = 1, #defaultList do
@@ -690,7 +688,7 @@ end
 
 local success, err = pcall(main)
 if not success then
-    quit(err or 'an error ocurred')
+    quit(err or 'an error occurred')
 end
 
 --#region Type Definitions

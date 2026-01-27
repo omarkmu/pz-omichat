@@ -8,7 +8,7 @@ You can access the chat settings by clicking on the gear icon at the top right o
 
 ## Basic settings
 
-Most of the settings within the “chat settings” submenu exist in vanilla.
+Most of the settings within the **chat settings** submenu exist in vanilla.
 The existing settings work equivalently.
 There are two new options in this submenu.
 
@@ -17,7 +17,7 @@ There are two new options in this submenu.
 The **suggestions** submenu can be used to control whether suggestions are offered based on chat box input and how those suggestions are accepted.
 
 The **retain commands** submenu can be used to determine whether certain commands are “retained,” so that they are set as the initial input the next time the chat is used.
-The submenu contains three options: “Chat,” “RP,” and “Other.”
+The submenu contains three options: *Chat*, *RP*, and *Other*.
 The first option refers to streams such as `/say`, the second refers to streams like `/me`, and the third covers all other commands.
 
 ## Customization
@@ -26,11 +26,11 @@ The customization settings can be used to tailor the chat to your preferences.
 
 ![Screenshot of customization settings](../images/chat-settings-customization.png)
 
-The **enable/disable sign language emotes** option is only shown when the player character knows a signed language.
+The **enable/disable sign language emotes** option is only shown when the player character knows a [signed language](../configuration/language.md#list-signed).
 This controls whether a random [emote animation](./emote-shortcuts.md) is played whenever they send a message.
 
 The **enable/disable name colors** option allows players to toggle the appearance of name colors in their chat.
-This will only display if the [`Name Colors`](../configuration/customization.md##enablenamecolors) configuration option is enabled.
+This will only display if the [`Name Colors`](../configuration/customization.md#enablenamecolors) configuration option is enabled.
 
 The **manage profiles** option is used to open the profile manager, which can be used to customize callouts and chat colors.
 
@@ -59,7 +59,7 @@ These options only show up if the [`Custom Shouts`](../configuration/customizati
 ### Character customization
 
 If a server has [character customization](../configuration/customization.md#enablecharactercustomization) enabled,
-the customization submenu also includes QoL character modification options.
+the customization submenu also includes quality of life character modification options.
 The available options are self-explanatory.
 
 ![Screenshot of character customization settings](../images/chat-settings-customization-2.png)
@@ -71,7 +71,7 @@ The available options are self-explanatory.
 The **Language** submenu will only display for players that know multiple languages or can add new ones.
 From this menu, players can select the roleplay language that they want to use in chat.
 The currently selected language will be displayed with a checkmark.
-The option to add new languages will only be available if a player has more available language slots than languages.
+The option to add new languages will only be available if a player has more available [language slots](../configuration/language.md#defaultslots) than languages.
 
 Languages other than the default language will display an indicator for the language when used in chat.
 Players with characters that don't speak the language will see a chat message indicating that they don't understand it.

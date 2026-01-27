@@ -8,12 +8,12 @@ When the player has admin access, the gear button's context menu has an `Admin o
 
 The chat icon used for the **display chat icon** option is controlled by the [`Admin Icon`](../configuration/general.md#adminicon) configuration option.
 
-![The in-game admin menu](../images/admin-menu.png)
+![Screenshot of the in-game admin menu](../images/admin-menu.png)
 
-The **view mod data** option can be used to open a mod data viewer that displays data for all players, including those offline.
+The **view player data** option can be used to open a menu that displays data for all players, including those offline.
 It can also be used to modify mod data.
 
-![Mod data editor](../images/edit-mod-data.png)
+![Screenshot of the player data editor form](../images/edit-mod-data.png)
 
 ## Commands
 
@@ -48,13 +48,14 @@ Clears the chat icon for a player.
 **Usage**: `/iconinfo <name>`  
 Gets information about an icon.
 If provided a valid icon name or alias, it will display the icon.
+
 See the partial [list of icons](https://projectzomboid.com/chat_colours.txt) for possible aliases.
 
 ### `/addlanguage`
 
 **Usage**: `/addlanguage <username> <language>`  
 Adds a known language to a player.
-`language` must be one of the languages specified the **Languages** configuration.
+The provided `language` must be one of the configured [languages](../configuration/language.md#list).
 
 ### `/resetlanguages`
 

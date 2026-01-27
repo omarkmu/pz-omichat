@@ -86,15 +86,16 @@
     {
       "name": "General",
       "type": "object",
-      "_shortDescription": "Basic features.",
-      "_description": "These options are those that don't belong anywhere else.",
+      "_shortDescription": "feature flags, info text, and other basic features.",
+      "_description": "Options that don't belong anywhere else. This includes feature flags, the admin icon, and info text.",
       "fields": [
         {
           "name": "Preset",
           "type": "string",
           "default": "Buffy",
           "padBottom": 16,
-          "noDoc": true
+          "_description": "The preset dropdown can be used to select built-in and custom presets to apply to all chat settings. By default, three presets are provided:\n- **Buffy**: settings tailored to roleplay, based on buffy's roleplay chat.\n- **LightRP**: settings for lighter RP, with narrative style off by default. This is closer to the default settings from the legacy b41 version of OmiChat.\n- **Vanilla**: settings designed to mimic vanilla, with many mod features disabled.",
+          "_noDocKey": true
         },
         { "name": "AlwaysShowChat", "type": "checkbox", "default": false },
         {
@@ -132,7 +133,7 @@
     {
       "name": "Buffs",
       "type": "object",
-      "_shortDescription": "Options related to buffs.",
+      "_shortDescription": "boosts to players' stats based on chat messages.",
       "_description": "These options control buffs, which are configurable boosts to stats that are applied when messages are sent on certain streams.\n\nBy default, only roleplay streams (e.g., `/me`) apply buffs. Whether a stream applies buffs can be changed using the [`Allow Buffs`](./streams.md#list-allowbuffs) option.",
       "fields": [
         {
@@ -195,7 +196,7 @@
     {
       "name": "Callouts",
       "type": "object",
-      "_shortDescription": "Options for callouts.",
+      "_shortDescription": "shout ranges and formatting.",
       "_description": "These options control features related to callouts (shouts).",
       "fields": [
         {
@@ -229,7 +230,7 @@
     {
       "name": "Commands",
       "type": "object",
-      "_shortDescription": "Options for chat commands.",
+      "_shortDescription": "chat commands for player names, statuses, and more.",
       "_description": "These options control various commands that are available in chat.",
       "fields": [
         {
@@ -358,7 +359,7 @@
     {
       "name": "Compatibility",
       "type": "object",
-      "_shortDescription": "Options to control compatibility with other mods.",
+      "_shortDescription": "integrations and patches for other mods.",
       "_description": "These options control compatibility patches for other mods.\n\n> [!NOTE]\n> Currently, mod compatibility patches are soft-removed. They may be reintroduced when the relevant mods are updated for b42.",
       "fields": [
         { "name": "ApplyOverrides", "type": "checkbox", "default": true },
@@ -374,10 +375,15 @@
     {
       "name": "Customization",
       "type": "object",
-      "_shortDescription": "Options for player customization.",
+      "_shortDescription": "player customization, such as name colors and custom shouts.",
       "_description": "These options control the customization options available to players.",
       "fields": [
-        { "name": "AllowCustomShouts", "type": "checkbox", "default": true },
+        {
+          "name": "AllowCustomShouts",
+          "type": "checkbox",
+          "default": true,
+          "_extraDescription": "Custom shouts can be configured via profiles, in the [chat settings](../user-guide/chat-settings.md#callout-customization)."
+        },
         { "name": "EnableNameColors", "type": "checkbox", "default": true },
         {
           "name": "EnableCharacterCustomization",
@@ -397,7 +403,7 @@
     {
       "name": "Discord",
       "type": "object",
-      "_shortDescription": "Options for Discord integration.",
+      "_shortDescription": "formatting for Discord integration messages.",
       "_description": "These options control the formatting of messages that come from Discord.",
       "fields": [
         {
@@ -424,7 +430,7 @@
     {
       "name": "EchoMessages",
       "type": "object",
-      "_shortDescription": "Options for echo messages.",
+      "_shortDescription": "enabling and formatting echo messages.",
       "_description": "These options control echo messages, which are messages sent on one stream that automatically send to another.",
       "fields": [
         { "name": "Enable", "type": "page-checkbox", "default": true },
@@ -446,8 +452,8 @@
     {
       "name": "Format",
       "type": "object",
-      "_shortDescription": "Formatting options and advanced customization.",
-      "_description": "This section includes options related to formatting, including [format strings](../format-strings/index.md) which can be used for advanced customization.\n\nAll of the format strings default to `$Default()`, which gets the default content. The tokens and options that each format accepts are available in the in-game configuration menu.",
+      "_shortDescription": "formatting options and advanced customization.",
+      "_description": "This section includes options related to formatting, including various [format strings](../format-strings/index.md) which can be used for advanced customization.\n\nAll of the format strings default to `$Default()`, which gets the default content. The tokens and options that each format accepts are available in the in-game configuration menu.",
       "fields": [
         {
           "name": "Chat",
@@ -661,6 +667,7 @@
             {
               "name": "SearchPlayer",
               "type": "format-string",
+              "hidden": true,
               "_tokens": ["$TOKENS_MENU_NAME"]
             },
             {
@@ -712,7 +719,7 @@
     {
       "name": "Language",
       "type": "object",
-      "_shortDescription": "Options for roleplay languages.",
+      "_shortDescription": "customization of available roleplay languages and related behavior.",
       "_description": "These options are related to roleplay languages. Players will be unable to fully understand messages sent in a language their character cannot speak.",
       "fields": [
         {
@@ -733,14 +740,15 @@
           "noLabel": true,
           "useFullPage": true,
           "padBottom": 16,
-          "_description": "Configuration for roleplay languages."
+          "_description": "The list of roleplay languages players can use."
         },
         {
           "name": "DefaultSlots",
           "type": "integer",
           "default": 1,
           "min": 0,
-          "max": 50
+          "max": 50,
+          "_extraDescription": "Extra languages can also added using admin [commands](../user-guide/admins.md#addlanguage). This is necessary if the value of this option is less than 2."
         },
         {
           "name": "InterpretationRolls",
@@ -801,7 +809,7 @@
     {
       "name": "Macros",
       "type": "object",
-      "_shortDescription": "Options for macros.",
+      "_shortDescription": "configuration for macros available to players.",
       "_description": "These options control macros.\n\nCurrently, the only built-in macro is the one used for [emote shortcuts](../user-guide/emote-shortcuts.md).",
       "fields": [
         { "name": "Enable", "type": "page-checkbox", "default": true },
@@ -816,8 +824,8 @@
     {
       "name": "Mentions",
       "type": "object",
-      "_shortDescription": "Options to control mentions.",
-      "_description": "These options control mentions.",
+      "_shortDescription": "configuration for mentions.",
+      "_description": "These options control mentions.\n\nCurrently, these only display the mentioned user's name color.",
       "fields": [
         { "name": "Enable", "type": "page-checkbox", "default": true },
         {
@@ -850,7 +858,7 @@
     {
       "name": "NarrativeStyle",
       "type": "object",
-      "_shortDescription": "Options to control narrative style.",
+      "_shortDescription": "options for displaying messages in a narrative format.",
       "_description": "These options control narrative style. If narrative style is used, messages will be enclosed in quotes and prefixed with a dialogue tag depending on the stream.\n\nFor example, with the default settings, a message sent with `/yell Hey` will be transformed to `<Name> shouts, “Hey!”`.",
       "fields": [
         { "name": "Enable", "type": "page-checkbox", "default": true },
@@ -892,7 +900,7 @@
     {
       "name": "Radio",
       "type": "object",
-      "_shortDescription": "Options to control radio messages.",
+      "_shortDescription": "customization of messages sent over the radio.",
       "_description": "These options control formatting of messages sent over the radio.",
       "fields": [
         {
@@ -912,7 +920,7 @@
     {
       "name": "ServerMessages",
       "type": "object",
-      "_shortDescription": "Options to control server messages.",
+      "_shortDescription": "customization of server messages.",
       "_description": "These options control formatting of server messages.",
       "fields": [
         {
@@ -928,7 +936,7 @@
     {
       "name": "Streams",
       "type": "object",
-      "_shortDescription": "Configuration for custom streams.",
+      "_shortDescription": "advanced chat stream customization, including stream creation.",
       "_description": "These options control custom stream configuration. With the exception of [`Use Defaults`](#usedefaultlist) and [`Global Tags`](#globaltags), the options on this page are per-stream.",
       "fields": [
         {
@@ -1100,7 +1108,7 @@
     {
       "name": "TypingIndicator",
       "type": "object",
-      "_shortDescription": "Options for the typing indicator.",
+      "_shortDescription": "indicators for when players are typing in chat.",
       "_description": "These options control the typing indicator.",
       "fields": [
         { "name": "Enable", "type": "page-checkbox", "default": true },
@@ -1123,7 +1131,7 @@
     {
       "name": "ZombieAttraction",
       "type": "object",
-      "_shortDescription": "Options related to attracting zombies.",
+      "_shortDescription": "attracting zombies from chat messages.",
       "_description": "These options control attraction of zombies from chat messages.",
       "fields": [
         {

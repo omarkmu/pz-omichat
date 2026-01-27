@@ -2,12 +2,13 @@
 
 Some mod features allow for custom string translations, so that players can see text in their preferred languages.
 These features expect strings of a certain format to be included in a separate mod.
-This could be an unlisted mod used by specifically a single server, or an extension mod that adds default content for servers.
+This could be an unlisted mod used by a single server, or an extension mod that adds default content for servers.
 
-These translations are not defined using the game's translation system;
-see the information about [contributing translations](https://github.com/omarkmu/pz-omichat/blob/main/.github/CONTRIBUTING.md#contributing-translations) for details.
-
-The comment `### @bundle OmiChat` must be included at the top of translation files for them to be included.
+> [!NOTE]
+> These translations are not defined using the game's usual translation system.
+> See the information about [contributing translations](https://github.com/omarkmu/pz-omichat/blob/main/.github/CONTRIBUTING.md#contributing-translations) for details.
+>
+> The comment `### @bundle OmiChat` must be included at the top of translation files for them to be included.
 
 ## Dialogue Tags
 
@@ -29,7 +30,7 @@ unknown-language-mutters = { $name } mutters something in { $language }.
 
 unknown-language-signed-mutters = { $name } subtly signs something in { $language }.
 
-# or, since unknown-language-signed-mutters is the same as the string for 'whispers':
+# or, since it's the same as the built-in string for 'whispers':
 unknown-language-signed-mutters = { unknown-language-signed-whispers }
 ```
 
@@ -39,12 +40,12 @@ If a string is not defined for the tag, it will default to the translation for `
 
 Roleplay languages allow translations for language names.
 These can be defined with a `language-[name]` string.
-For example, `language-english` defines the text used for the `English` language.
+For example, `language-english` defines the translation used for the `English` roleplay language.
 
-When retrieving translations, language names will be converted to lowercase and spaces will be rreplaced with hyphens.
+When retrieving translations, language names will be converted to lowercase and spaces will be replaced with hyphens.
 Translations for `Haitian Creole`, for example, should be defined using `language-haitian-creole`.
 
 If the translation is absent, the language name will be used as-is regardless of a player's language.
-Translations are provided by the mod for the following language names:
+Translations are provided by the mod for the following roleplay language:
 
 {{#include _languages.md}}

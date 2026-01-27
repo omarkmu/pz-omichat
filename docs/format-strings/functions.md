@@ -11,8 +11,8 @@ Like [tokens](./tokens.md), functions are case-sensitive.
 If a function returns multiple values, it will return them as an [at-map](./at-maps.md).
 Individual return values can be accessed using the `$NthValue(o n)` function.
 
-To include a literal space or multiple words in a single argument, text within functions can be enclosed within pairs of \`.
-Escapes will still function inside the enclosed text, but they are only necessary to escape \`.
+To include a literal space or multiple words in a single argument, text within functions can be enclosed within pairs of backticks (`).
+Escapes still function inside the enclosed text, but they are only necessary to escape backticks.
 
 ```
 $Set(_token `hello world`)$_token → hello world
@@ -461,7 +461,7 @@ If there is no `tags` token or it is not an [at-map](./at-maps.md), this does no
 ### `$ColorActions(s options)` {#other-coloractions}
 
 Wraps actions within `s` in color tags.
-Actions are delimited by quote followed by an asterisk (`" *`).
+Actions are delimited by a quote followed by an asterisk (`" *`).
 
 This accepts the following options in the form of an [at-map](./at-maps.md):
 - `colorTargetTag`: if this is given, it will be used as the search tag for the stream to copy the color from. By default, this uses the appropriate tag based on existing tags.
@@ -473,6 +473,11 @@ Wraps quoted text within `s` in color tags.
 
 This accepts the following options in the form of an [at-map](./at-maps.md):
 - `colorTargetTag`: if this is given, it will be used as the search tag for the stream to copy the color from. By default, this uses the appropriate tag based on existing tags.
+
+### `$Default()` {#other-default}
+
+Returns the default content for a format string.
+If used outside of a valid format string, this returns the empty string.
 
 ### `$DisallowSignedOverRadio(options)` {#other-disallowsignedoverradio}
 

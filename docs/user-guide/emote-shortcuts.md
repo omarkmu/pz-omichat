@@ -12,7 +12,7 @@ This can be useful for text roleplay servers, since players can play an animatio
 The shortcuts can also be used without a message; sending `!hi` will play the animation without sending a message in chat.
 
 > [!NOTE]
-> Unless the emote is the only thing sent, it must come after a space.
+> Unless the emote is at the beginning of the message, it must come after a space.
 > This is to prevent accidentally including an emote after ending a sentence with an exclamation point.
 
 ## Shortcut list

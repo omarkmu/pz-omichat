@@ -8,13 +8,13 @@ This document provides a general overview of how contributing to the project wor
 There are a few different ways to contribute:
 
 - Create an [issue](https://github.com/omarkmu/pz-omichat/issues/new/choose); report a bug or ask for a feature.
-- Create a [pull request](https://github.com/omarkmu/pz-omichat/compare) after reviewing the code contribution [guidelines](#contributing-code) and making your changes in a fork.
 - Contribute [translations](#contributing-translations).
+- Create a [pull request](https://github.com/omarkmu/pz-omichat/compare) after reviewing the code contribution [guidelines](#contributing-code) and making your changes in a fork.
 - Ask and answer questions on [Discord](https://discord.gg/juv9TqygFu).
 
 ## New contributors
 
-If you're not familiar with the project, check out the [README](../docs/README.md).
+If you're not familiar with the project, check out the [documentation](https://omarkmu.github.io/pz-omichat).
 If you're totally new to contributing to GitHub repositories, here are some resources:
 
 - [Set up Git](https://docs.github.com/en/get-started/quickstart/set-up-git)
@@ -25,13 +25,11 @@ If you're totally new to contributing to GitHub repositories, here are some reso
 ## Contributing code
 
 This section assumes you're familiar with Git and GitHub.
-If you're not, please see the section above for [new contributors](#new-contributors).
 
-Start by creating a [fork](https://github.com/omarkmu/pz-omichat/fork).
-In your fork, you may want to create a new branch with `git switch -c your-branch-name`.
-This branch should be based on and merged into the `dev` branch.
-
-Once you're satisfied with your changes, create a [pull request](https://github.com/omarkmu/pz-omichat/compare/dev...) with the base branch set to `dev`.
+1. Start by creating a [fork](https://github.com/omarkmu/pz-omichat/fork).
+2. Check out the fork and switch the the `dev` branch. Changes should all be based on and merged into this branch, not `main`.
+3. You may want to create a new branch with `git switch -c your-branch-name`. This is optional.
+4. Once you're satisfied with your changes, create a [pull request](https://github.com/omarkmu/pz-omichat/compare/dev...) with the base branch set to `dev`.
 
 ### Guidelines
 
@@ -57,7 +55,6 @@ Please indicate how you tested your changes in the PR.
     - Clearly, succintly describe what you did in that commit.
     If you need to provide further information, do so *after* the first line. The first line should provide a quick summary; subsequent lines may have more details.
     - Be written in present tense, imperative mood (e.g., “Add x function”, *not* “Added x function”).
-    - If you need to provide further information, do so *after* the first line. The first line should provide a quick summary; subsequent lines may have more details.
 
 ## Contributing translations
 OmiChat's translations are defined using [Fluent](https://projectfluent.org) translation files, rather than the game's translation system.
@@ -74,7 +71,7 @@ If you're unsure about any of the steps, feel free to ask about it on [Discord](
 3. Modify the strings to use your translation.
     - The files have comments that explain the purpose of variable substitutions.
     Anything that is not marked as `@param X?` (where `X` is the variable name) **must** be included in the translation.
-4. Upload a `.zip` of the folder on [Discord](https://discord.gg/juv9TqygFu).
+4. Upload a `.zip` of the folder on [Discord](https://discord.gg/juv9TqygFu), in the `#translations` channel.
 If you're familiar with Git, you can instead create a pull request with your translation changes; see the section on [contributing code](#contributing-code).
 
 | Game Language       | Subdirectory |

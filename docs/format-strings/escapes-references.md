@@ -12,15 +12,12 @@ For example, `$$PI()` would result in `$PI()`.
 
 ## References
 
-Sometimes, it's non-trivial to include certain characters like `«` and `»`.
-The [`$Char`](functions.md#string-char) function can be used to include these characters, but format strings also accept **character references** for ease-of-use.
-
-The configuration menu can handle these characters directly, so this is primarily useful
-for including special characters from a mod using the API.
+Although you can directly include characters like `«` and `»`, format strings also accept **character references** for ease-of-use.
 
 Both named references and numeric references are supported.
-Numeric references behave similarly to the `$Char` function; the character with the number specified will be used in place of the reference.
+Numeric references behave similarly to the [`$Char`](functions.md#string-char) function;
+the character with the number specified will be used in place of the reference.
 
-Using character references, `« $1 »` can be specified as `&#171; $1 &#187;` or `&laquo; $1 &raquo;`.
+Using character references, `« $input »` can be specified as `&#171; $input &#187;` or `&laquo; $input &raquo;`.
 
 The available characters are limited to those in the [ISO-8859-1](https://www.w3schools.com/charsets/ref_html_8859.asp) character set.
