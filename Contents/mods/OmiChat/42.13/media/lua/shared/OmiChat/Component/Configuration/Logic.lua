@@ -947,7 +947,7 @@ function Logic._readDefinitions()
         log.fatal('Failed to open configuration file') ---@cast reader -?
     end
 
-    local data, err = schema.read({ reader = reader })
+    local data, err = utils.json.tryReadObject({ reader = reader })
     if not data then
         log.fatal(err or 'Failed to read configuration file') ---@cast data -?
     end

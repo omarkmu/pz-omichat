@@ -442,7 +442,7 @@ function Configuration:loadCustomPresets()
         return
     end
 
-    local result = utils.schema.read({ filename = self._presetFilename })
+    local result = utils.json.tryReadObject({ filename = self._presetFilename })
     if not result or type(result.list) ~= 'table' then
         return
     end
