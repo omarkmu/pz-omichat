@@ -17,9 +17,11 @@ local checkPlayerCanUseChat = checkPlayerCanUseChat
 ---@field protected chatType omi.ChatTypeString The chat type that stream messages are sent over.
 ---@field protected defaultColor omi.ColorTable<integer> The default color for messages on the stream.
 ---@field protected range integer The range of the chat stream.
+---@field protected rangeSigned integer The range of the chat stream when used with a signed language.
 ---@field protected tabID integer The 1-indexed tab ID of the tab in which this stream is available.
 ---@field protected useNarrativeStyle boolean Flag for whether the stream should apply narrative style (if narrative style is enabled).
 ---@field protected verticalRange integer The vertical range of the chat stream.
+---@field protected verticalRangeSigned integer The vertical range of the chat stream when used with a signed language.
 ---@field protected perceptionRange integer The perception range of the chat stream.
 ---@field protected perceptionRangeSigned integer The perception range of the chat stream, for signed languages.
 ---@field protected chatFormat? string The format to use for chat messages sent from this stream.
@@ -98,7 +100,9 @@ function ChatStream.fromDefinition(def, additionalTags)
         category = def.Category,
         disabled = def.Enable == false,
         range = def.Range,
+        rangeSigned = def.RangeSigned,
         verticalRange = def.VerticalRange,
+        verticalRangeSigned = def.VerticalRangeSigned,
         perceptionRange = def.PerceptionRange,
         perceptionRangeSigned = def.PerceptionRangeSigned,
         allowBuffs = def.AllowBuffs,
@@ -162,7 +166,9 @@ function ChatStream:copyFrom(other)
     self.useNarrativeStyle = other.useNarrativeStyle
     self.chatType = other.chatType
     self.range = other.range
+    self.rangeSigned = other.rangeSigned
     self.verticalRange = other.verticalRange
+    self.verticalRangeSigned = other.verticalRangeSigned
     self.tabID = other.tabID
     self.perceptionRange = other.perceptionRange
     self.perceptionRangeSigned = other.perceptionRangeSigned
@@ -230,20 +236,30 @@ function ChatStream:getOverheadFormat()
 end
 
 ---Returns the perception range of the stream if it's a ranged stream.
+---@param isSigned boolean? Flag for whether the signed range should be retrieved. Defaults to `false`.
 ---@return integer? perceptionRange
-function ChatStream:getPerceptionRange()
+function ChatStream:getPerceptionRange(isSigned)
     if not self:isRanged() then
         return
+    end
+
+    if isSigned then
+        return self.perceptionRangeSigned
     end
 
     return self.perceptionRange
 end
 
 ---Returns the range of the stream if it's a ranged stream.
+---@param isSigned boolean? Flag for whether the signed range should be retrieved. Defaults to `false`.
 ---@return integer? range
-function ChatStream:getRange()
+function ChatStream:getRange(isSigned)
     if not self:isRanged() then
         return
+    end
+
+    if isSigned and self.rangeSigned ~= 0 then
+        return self.rangeSigned
     end
 
     return self.range
@@ -266,10 +282,15 @@ function ChatStream:getTabID()
 end
 
 ---Returns the vertical range of the stream if it's a ranged stream.
+---@param isSigned boolean? Flag for whether the signed range should be retrieved. Defaults to `false`.
 ---@return integer? verticalRange
-function ChatStream:getVerticalRange()
+function ChatStream:getVerticalRange(isSigned)
     if not self:isRanged() then
         return
+    end
+
+    if isSigned and self.verticalRangeSigned ~= 0 then
+        return self.verticalRangeSigned
     end
 
     return self.verticalRange
@@ -325,8 +346,10 @@ function ChatStream:new(args)
     this.useNarrativeStyle = args.useNarrativeStyle or false
     this.chatType = args.chatType or 'say'
     this.range = args.range or (this.chatType == 'shout' and 60 or 30)
+    this.rangeSigned = args.rangeSigned or 0
     this.tabID = args.tabID or 1
     this.verticalRange = args.verticalRange or 2
+    this.verticalRangeSigned = args.verticalRangeSigned or 1
     this.perceptionRange = args.perceptionRange or 0
     this.perceptionRangeSigned = args.perceptionRangeSigned or 0
     this.defaultColor = utils.color.default(args.defaultColor, 255, 255, 255)
@@ -361,7 +384,9 @@ return ChatStream
 ---@field useNarrativeStyle? boolean Flag for whether the stream should apply narrative style if it's enabled.
 ---@field chatType? omi.ChatTypeString The chat type that stream messages are sent over.
 ---@field range? integer The range of the chat stream.
+---@field rangeSigned? integer The range of the chat stream, when used with a signed language.
 ---@field verticalRange? integer The vertical range of the chat stream.
+---@field verticalRangeSigned? integer The vertical range of the chat stream, when used with a signed language.
 ---@field perceptionRange? integer The perception range of the chat stream.
 ---@field perceptionRangeSigned? integer The perception range of the chat stream, for signed languages.
 ---@field tabID? integer The 1-indexed tab ID of the tab in which this stream is available.

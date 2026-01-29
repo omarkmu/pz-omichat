@@ -547,12 +547,14 @@ function Logic._handleStreamChange(form, item)
 
     -- update max range based on stream/chat type
     local chatType = item.ChatType or Logic._getStreamChatType(item.Stream)
-    local maxRange = 30
-    if chatType == 'shout' or item.Stream == 'yell' then
-        maxRange = 60
-    end
+    local maxRange = (chatType == 'shout' or item.Stream == 'yell') and 60 or 30
+    local rangeControlNames = {
+        'Range',
+        'RangeSigned',
+        'PerceptionRange',
+        'PerceptionRangeSigned',
+    }
 
-    local rangeControlNames = { 'Range', 'PerceptionRange', 'PerceptionRangeSigned' }
     for i = 1, #rangeControlNames do
         local name = rangeControlNames[i]
         local rangeControl = form:getFieldControl({ path = { 'Streams', 'List', name } }) --[[@as omi.TextEntry?]]
@@ -566,7 +568,9 @@ function Logic._handleStreamChange(form, item)
         local isRanged = chatType == 'say' or chatType == 'shout'
         local dependentFields = {
             { form:getFieldInfo('Streams.List.Range') },
+            { form:getFieldInfo('Streams.List.RangeSigned') },
             { form:getFieldInfo('Streams.List.VerticalRange') },
+            { form:getFieldInfo('Streams.List.VerticalRangeSigned') },
             { form:getFieldInfo('Streams.List.PerceptionRange') },
             { form:getFieldInfo('Streams.List.PerceptionRangeSigned') },
             { form:getFieldInfo('Streams.List.OverheadFormat') },

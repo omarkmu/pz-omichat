@@ -630,9 +630,17 @@ config-Streams-List-DefaultColor = { -default-color }
 config-Streams-List-Range = Range
     .tooltip = The range of this stream.
 
+config-Streams-List-RangeSigned = Range (Signed)
+    .tooltip = The range of this stream, when used with a signed language.
+        <BR> A value of 0 indicates that the non-signed range should be used.
+
 config-Streams-List-VerticalRange = Vertical Range
     .tooltip = The vertical range of this stream.
-        <BR> A value of 0 means that vertical levels should be ignored.
+        <BR> A value of 0 indicates that vertical levels should be ignored.
+
+config-Streams-List-VerticalRangeSigned = Vertical Range (Signed)
+    .tooltip = The vertical range of this stream, when used with a signed language.
+        <BR> A value of 0 indicates that the non-signed range should be used.
 
 config-Streams-List-PerceptionRange = Perception Range
     .tooltip = The range in which an indicator that something was said out-of-range will send.

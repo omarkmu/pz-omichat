@@ -851,7 +851,9 @@ return Configuration
 ---@field OverheadFormat string?
 ---@field ChatFormat string?
 ---@field Range integer?
+---@field RangeSigned integer?
 ---@field VerticalRange integer?
+---@field VerticalRangeSigned integer?
 ---@field PerceptionRange integer?
 ---@field PerceptionRangeSigned integer?
 ---@field AllowBuffs boolean?

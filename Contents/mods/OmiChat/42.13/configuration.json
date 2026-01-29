@@ -1023,11 +1023,27 @@
               "_extraDescription": "$RANGED_STREAM_OPT_DESC"
             },
             {
+              "name": "RangeSigned",
+              "type": "integer",
+              "default": 0,
+              "min": 0,
+              "max": 60,
+              "_extraDescription": "$RANGED_STREAM_OPT_DESC"
+            },
+            {
               "name": "VerticalRange",
               "type": "integer",
               "default": 2,
               "min": 1,
               "max": 32,
+              "_extraDescription": "$RANGED_STREAM_OPT_DESC"
+            },
+            {
+              "name": "VerticalRangeSigned",
+              "type": "integer",
+              "default": 1,
+              "min": 0,
+              "max": 60,
               "_extraDescription": "$RANGED_STREAM_OPT_DESC"
             },
             {

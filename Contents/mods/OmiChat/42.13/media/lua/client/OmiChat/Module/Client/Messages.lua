@@ -768,15 +768,18 @@ function Messages._checkRange(info, player)
         return
     end
 
+    local language = info.tokens.rawLanguage
+    local isSigned = language and API.language.isSigned(language)
     local maxRange = info.chatType == 'shout' and 60 or 30
-    local range = stream.range
+
+    local range
     if info.tags.IsCallout then
         range = config.Callouts.Range
     elseif info.tags.IsSneakCallout then
         range = config.Callouts.SneakRange
+    else
+        range = stream:getRange(isSigned) or maxRange
     end
-
-    range = range or maxRange
 
     if stream.attractZombies then
         info.zombieAttractRange = range * config.ZombieAttraction.ChatRangeMultiplier
@@ -798,7 +801,7 @@ function Messages._checkRange(info, player)
     end
 
     local outOfRange = false
-    local zMax = stream.verticalRange or 2
+    local zMax = stream:getVerticalRange(isSigned) or 2
 
     local dist
     if zMax > 0 and abs(author:getZ() - player:getZ()) >= zMax then
@@ -808,17 +811,15 @@ function Messages._checkRange(info, player)
         outOfRange = dist > range
     end
 
+    -- within range → done
     if not outOfRange then
         info.meta:setRangeResult('in-range')
         return
     end
 
     -- out of range → check whether we should show text indicating that
-    local language = info.tokens.rawLanguage
-    local isSigned = language and API.language.isSigned(language)
-
     if dist and not info.tags.Action then
-        range = isSigned and stream.perceptionRangeSigned or stream.perceptionRange
+        range = stream:getPerceptionRange(isSigned) or 0
         if API.hooks.has.perceptionRange then
             range = API.hooks.perceptionRange({
                 range = range,
@@ -1027,7 +1028,10 @@ function Messages._showOverhead(info)
         return
     end
 
-    local range = info.stream and info.stream:getRange()
+    local lang = info.meta.language
+    local isSigned = lang and API.language.isSigned(lang)
+
+    local range = info.stream and info.stream:getRange(isSigned)
     if not range then
         range = info.chatType == 'shout' and 60 or 30
     end

@@ -582,7 +582,8 @@ function Chat.updateTypingStatus(skipTimer)
         if not stream or not stream:isAllowTypingIndicator() then
             isTyping = false
         else
-            range = stream:getRange()
+            local lang = API.player.getCurrentLanguage()
+            range = stream:getRange(lang and API.language.isSigned(lang))
             chatType = stream:getChatType()
         end
     end
