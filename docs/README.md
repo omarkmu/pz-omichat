@@ -20,7 +20,7 @@ For details, including a list of features, please see the [documentation](https:
 Thank you to the translators!
 
 - French: [Inkredibehl](https://github.com/Inkredibehl)
-- Korean: 우로 (Wuro)
+- Korean: 우로 (Ssaulabby)
 
 If you'd like to see the mod translated into your language, please [contribute](https://github.com/omarkmu/pz-omichat/blob/main/.github/CONTRIBUTING.md#contributing-translations)!  
 Some features were inspired by buffy's roleplay chat. The range indicator and `/status` were inspired by Wasteland's RP chat.
