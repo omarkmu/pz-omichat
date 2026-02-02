@@ -707,9 +707,3 @@ config-ZombieAttraction = Zombie Attraction
 config-ZombieAttraction-ChatRangeMultiplier = Chat Range Multiplier
     .tooltip = A multiplier that will be applied to chat ranges to determine zombie attraction range.
         <BR> If this is zero, non-callout chat messages will not attract zombies.
-
-config-ZombieAttraction-CalloutRange = Callout Range
-    .tooltip = The maximum distance for callouts to attract zombies.
-
-config-ZombieAttraction-SneakCalloutRange = Sneak Callout Range
-    .tooltip = The maximum distance for sneak callouts to attract zombies.

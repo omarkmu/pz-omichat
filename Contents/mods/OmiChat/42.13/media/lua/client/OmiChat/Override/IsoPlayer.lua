@@ -5,23 +5,27 @@ local API = require 'OmiChat/Module/Client/Core'
 local utils = API.utils
 local config = API.Configuration
 local core = getCore()
+local getTextVanilla = getText
 
 local min = math.min
-local addSound = addSound
 local _IsoPlayer = __classmetatables[IsoPlayer.class].__index ---@type any
 local _Callout = _IsoPlayer.Callout
 
+local SHOUTS = {}
+local SNEAK_SHOUTS = {}
+for i = 1, 3 do
+    local shoutId = 'IGUI_PlayerText_Callout' .. i .. 'New'
+    local sneakShoutId = 'IGUI_PlayerText_Callout' .. i .. 'Sneak'
+    SHOUTS[shoutId] = getTextVanilla(shoutId)
+    SNEAK_SHOUTS[sneakShoutId] = getTextVanilla(sneakShoutId)
+end
 
----Override to enable custom callouts.
----@param playEmote boolean
-function _IsoPlayer:Callout(playEmote)
-    if core:getGameMode() == 'Tutorial' then
-        _Callout(self, playEmote)
-        return
-    end
-
-    local isSneaking = self:isSneaking()
-
+---Gets the chat stream to use for a callout.
+---@param player IsoPlayer
+---@param isSneaking boolean
+---@param playEmote boolean?
+---@return ChatStream?
+local function getCalloutStream(player, isSneaking, playEmote)
     local stream
     if isSneaking then
         stream = API.streams.firstChatStreamWithTag('SneakCallout')
@@ -33,21 +37,24 @@ function _IsoPlayer:Callout(playEmote)
 
     if not stream then
         utils.log.warn.once('No stream defined for callouts; add the `Callout` tag to a stream')
-        _Callout(self, playEmote)
+        _Callout(player, playEmote)
         return
     end
 
-    local zombieConfig = config.ZombieAttraction
-    local range = isSneaking and zombieConfig.SneakCalloutRange or zombieConfig.CalloutRange
+    return stream
+end
 
+---Gets the text to use for a callout.
+---@param isSneaking boolean
+---@return string
+local function getCalloutText(isSneaking)
     local shouts = API.preferences.getCustomShouts(isSneaking and 'sneakcallouts' or 'callouts')
-
-    -- this can't set .callOut, so minor boredom reduction will occur from shouting
-    -- already possible to use chat for that purpose, so this isn't really problematic
-    addSound(self, self:getX(), self:getY(), self:getY(), range, range)
+    if #shouts == 0 then
+        shouts = nil
+    end
 
     local shoutMax
-    if not shouts or #shouts == 0 then
+    if not shouts then
         shouts = API.player.getDefaultShouts(isSneaking)
         shoutMax = #shouts
     else
@@ -55,15 +62,43 @@ function _IsoPlayer:Callout(playEmote)
     end
 
     local shout = shouts[utils.randInt(1, shoutMax)] --[[@as string]]
-    if isSneaking then
-        shout = shout:lower()
-    else
-        shout = shout:upper()
+    return isSneaking and shout:lower() or shout:upper()
+end
+
+---Override to enable custom callouts.
+---@param self IsoPlayer
+---@param playEmote boolean?
+function _IsoPlayer.Callout(self, playEmote)
+    if core:getGameMode() == 'Tutorial' then
+        _Callout(self, playEmote)
+        return
+    end
+
+    local isSneaking = self:isSneaking()
+    local stream = getCalloutStream(self, isSneaking, playEmote)
+    if not stream then
+        return
+    end
+
+    -- as of b42, the `callOut` field is no longer just for boredom;
+    -- it also determines whether animals are attracted to voices, which is pretty essential
+    -- so, we have to set the strings to empty and run the regular logic
+    -- this also means no more callout range options, unfortunately
+
+    local defaultShouts = isSneaking and SNEAK_SHOUTS or SHOUTS
+    for id in pairs(defaultShouts) do
+        utils.l10n.setText(id, '')
+    end
+
+    _Callout(self, playEmote)
+
+    for id, default in pairs(defaultShouts) do
+        utils.l10n.setText(id, default)
     end
 
     API.chat.send {
         stream = stream,
-        text = shout,
+        text = getCalloutText(isSneaking),
         playSignedEmote = not playEmote,
         context = {
             type = 'omichat.callout',

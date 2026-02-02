@@ -828,9 +828,6 @@ return Configuration
 
 ---@class Configuration.ZombieAttraction
 ---@field ChatRangeMultiplier number
----@field CalloutRange integer
----@field SneakCalloutRange integer
-
 
 ---@class Configuration.LanguageDefinition
 ---@field Name string The name of the language.

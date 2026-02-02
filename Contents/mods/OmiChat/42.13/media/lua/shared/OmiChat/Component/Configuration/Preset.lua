@@ -362,8 +362,6 @@ function Preset.zombies(options)
     ---@type Configuration.ZombieAttraction
     return {
         ChatRangeMultiplier = options.ChatRangeMultiplier or 0,
-        CalloutRange = options.CalloutRange or 30,
-        SneakCalloutRange = options.SneakCalloutRange or 6,
     }
 end
 
@@ -413,7 +411,7 @@ function Preset:new(args)
     args = args or {} --[[@as Args.ConfigurationPreset]]
     this._name = args.name
     this._isCustom = args.isCustom or false
-    this._values = args.values or {}
+    this._values = args.values or {} --[[@as any]]
 
     if this._isCustom then
         this._tooltip = utils.getText('preset-custom')
@@ -497,8 +495,6 @@ return Preset
 
 ---@class Args.ConfigurationPreset.ZombieAttraction
 ---@field ChatRangeMultiplier number? The multiplier to use with the chat range to determine the zombie attraction range. Defaults to `0`.
----@field CalloutRange integer? The default zombie attraction range for callouts. Defaults to `30`.
----@field SneakCalloutRange integer? The default zombie attraction range for sneak callouts. Defaults to `6`.
 
 
 ---@class Configuration.PresetTable
