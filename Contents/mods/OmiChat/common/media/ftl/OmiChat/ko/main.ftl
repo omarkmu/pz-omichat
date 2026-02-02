@@ -6,7 +6,7 @@ radio = 라디오 ({ $frequency } MHz)
 
 private-chat-to = { $name }에게 보낸 개인 메시지
 
-private-chat-from = { KR_WITH_PARTICLE($name, type: "subj") } 보낸 개인 메시지
+private-chat-from = { KO_WITH_PARTICLE($name, type: "subj") } 보낸 개인 메시지
 
 faction-radio = (조직 라디오)
 
@@ -16,40 +16,40 @@ over-radio = (라디오)
 
 admin-indicator = (관리자)
 
-placeholder-language-indicator = { KR_WITH_PARTICLE($language, type: "ro") } 말하고 있음
+placeholder-language-indicator = { KO_WITH_PARTICLE($language, type: "ro") } 말하고 있음
 
 ## Typing indicator
 
-typing-1 = { KR_WITH_PARTICLE($name, type: "subj") } 입력하고 있습니다...
+typing-1 = { KO_WITH_PARTICLE($name, type: "subj") } 입력하고 있습니다...
 
-typing-2 = { KR_WITH_PARTICLE($name1, type: "gwa") } { KR_WITH_PARTICLE($name2, type: "subj") } 입력하고 있습니다...
+typing-2 = { KO_WITH_PARTICLE($name1, type: "gwa") } { KO_WITH_PARTICLE($name2, type: "subj") } 입력하고 있습니다...
 
-typing-3 = { $name1 }, { KR_WITH_PARTICLE($name2, type: "gwa") }
-    { KR_WITH_PARTICLE($name3, type: "subj") } 입력하고 있습니다...
+typing-3 = { $name1 }, { KO_WITH_PARTICLE($name2, type: "gwa") }
+    { KO_WITH_PARTICLE($name3, type: "subj") } 입력하고 있습니다...
 
 typing-many = 여러 사람이 입력하고 있습니다...
 
 ## Command messages
 
-command-card = { $name }{ KR_PARTICLE($rawName, type: "subj") }
-    { KR_WITH_PARTICLE($card, type: "obj", numeral: "sino") } 뽑았습니다
+command-card = { $name }{ KO_PARTICLE($rawName, type: "subj") }
+    { KO_WITH_PARTICLE($card, type: "obj", numeral: "sino") } 뽑았습니다
 
-command-card-global = { KR_WITH_PARTICLE($name, type: "subj") }
-    { KR_WITH_PARTICLE($card, type: "obj", numeral: "sino") } 뽑았습니다
+command-card-global = { KO_WITH_PARTICLE($name, type: "subj") }
+    { KO_WITH_PARTICLE($card, type: "obj", numeral: "sino") } 뽑았습니다
 
-command-roll = { $name }{ KR_PARTICLE($rawName, type: "subj") } { $sides }면 주사위를 굴려서
-    { KR_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
+command-roll = { $name }{ KO_PARTICLE($rawName, type: "subj") } { $sides }면 주사위를 굴려서
+    { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
 
-command-roll-global = { KR_WITH_PARTICLE($name, type: "subj") } { $sides }면 주사위를 굴려서
-    { KR_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
+command-roll-global = { KO_WITH_PARTICLE($name, type: "subj") } { $sides }면 주사위를 굴려서
+    { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
 
-command-flip-heads = { $name }{ KR_PARTICLE($rawName, type: "subj") } 동전을 뒤집고 머리를 잡았습니다
+command-flip-heads = { $name }{ KO_PARTICLE($rawName, type: "subj") } 동전을 뒤집고 머리를 잡았습니다
 
-command-flip-heads-global = { KR_WITH_PARTICLE($name, type: "subj") } 동전을 뒤집고 머리를 잡았습니다
+command-flip-heads-global = { KO_WITH_PARTICLE($name, type: "subj") } 동전을 뒤집고 머리를 잡았습니다
 
-command-flip-tails = { $name }{ KR_PARTICLE($rawName, type: "subj") } 동전을 뒤집고 꼬리를 잡았습니다
+command-flip-tails = { $name }{ KO_PARTICLE($rawName, type: "subj") } 동전을 뒤집고 꼬리를 잡았습니다
 
-command-flip-tails-global = { KR_WITH_PARTICLE($name, type: "subj") } 동전을 뒤집고 꼬리를 잡았습니다
+command-flip-tails-global = { KO_WITH_PARTICLE($name, type: "subj") } 동전을 뒤집고 꼬리를 잡았습니다
 
 ## Info messages
 
@@ -107,7 +107,7 @@ success-add-language-other = 플레이어 '{ $username }'에게 '{ $language }' 
 success-reset-languages-other = 플레이어 '{ $username }'의 롤플레이 언어가 리셋되었습니다.
 
 success-set-language-slots-other = 플레이어 '{ $username }'의 언어 슬롯이
-    { KR_WITH_PARTICLE($slots, type: "ro") } 설정되었습니다.
+    { KO_WITH_PARTICLE($slots, type: "ro") } 설정되었습니다.
 
 ## Error messages
 
@@ -121,24 +121,24 @@ error-signed-faction-radio = 조직 라디오에서는 수화를 사용할 수 �
 
 error-signed-safehouse-radio = 은신처 라디오에서는 수화를 사용할 수 없습니다.
 
-error-unknown-player = 플레이어 { KR_WITH_PARTICLE($username, type: "obj", wrap: "'") } 찾지 못했습니다.
+error-unknown-player = 플레이어 { KO_WITH_PARTICLE($username, type: "obj", wrap: "'") } 찾지 못했습니다.
 
-error-switch-unknown-language = 알 수 없는 언어 { KR_WITH_PARTICLE($language, type: "ro", wrap: "'") } 전환할 수 없습니다.
+error-switch-unknown-language = 알 수 없는 언어 { KO_WITH_PARTICLE($language, type: "ro", wrap: "'") } 전환할 수 없습니다.
 
 error-too-many-shouts = 너무 깁니다. { $max }번까지 외침을 사용할 수 있습니다.
 
 error-too-long-shout = 외칠 수 있는 단어수는 { $max }개 입니다.
 
-error-add-language-full = 플레이어 { KR_WITH_PARTICLE($username, type: "subj", wrap: "'") } 이미 쵀대 롤플레이 언어
+error-add-language-full = 플레이어 { KO_WITH_PARTICLE($username, type: "subj", wrap: "'") } 이미 쵀대 롤플레이 언어
     수를 알고 있습니다.
 
-error-add-language-known = 플레이어 { KR_WITH_PARTICLE($username, type: "subj", wrap: "'") }
-    { KR_WITH_PARTICLE($language, type: "obj") } 이미 알고 있습니다.
+error-add-language-known = 플레이어 { KO_WITH_PARTICLE($username, type: "subj", wrap: "'") }
+    { KO_WITH_PARTICLE($language, type: "obj") } 이미 알고 있습니다.
 
 error-add-language-not-configured = 설정에 '{ $language }' 언어가 포함되어 있지 않습니다.
 
-error-language-unknown = 플레이어 { KR_WITH_PARTICLE($username, type: "subj", wrap: "'") }
-    { KR_WITH_PARTICLE($language, type: "obj") } 모릅니다.
+error-language-unknown = 플레이어 { KO_WITH_PARTICLE($username, type: "subj", wrap: "'") }
+    { KO_WITH_PARTICLE($language, type: "obj") } 모릅니다.
 
 ## Help text
 
@@ -181,40 +181,40 @@ help-text-dance = /dance 명령어를 사용하여 랜덤한 춤을 춰보세요
 
 ## Unknown language
 
-unknown-language-no-author = { KR_WITH_PARTICLE($language, type: "ro") } 무슨 말을 했습니다.
+unknown-language-no-author = { KO_WITH_PARTICLE($language, type: "ro") } 무슨 말을 했습니다.
 
-unknown-language-asks = { KR_WITH_PARTICLE($name, type: "subj") }
-    { KR_WITH_PARTICLE($language, type: "ro") } 무슨 질문을 물었습니다.
+unknown-language-asks = { KO_WITH_PARTICLE($name, type: "subj") }
+    { KO_WITH_PARTICLE($language, type: "ro") } 무슨 질문을 물었습니다.
 
-unknown-language-says = { KR_WITH_PARTICLE($name, type: "subj") }
-    { KR_WITH_PARTICLE($language, type: "ro") } 무슨 말을 했습니다.
+unknown-language-says = { KO_WITH_PARTICLE($name, type: "subj") }
+    { KO_WITH_PARTICLE($language, type: "ro") } 무슨 말을 했습니다.
 
-unknown-language-signs = { KR_WITH_PARTICLE($name, type: "subj") }
-    { KR_WITH_PARTICLE($language, type: "ro") } 무슨 수화를 했습니다.
+unknown-language-signs = { KO_WITH_PARTICLE($name, type: "subj") }
+    { KO_WITH_PARTICLE($language, type: "ro") } 무슨 수화를 했습니다.
 
-unknown-language-states = { KR_WITH_PARTICLE($name, type: "subj") }
-    { KR_WITH_PARTICLE($language, type: "ro") } 무슨 말을 했습니다.
+unknown-language-states = { KO_WITH_PARTICLE($name, type: "subj") }
+    { KO_WITH_PARTICLE($language, type: "ro") } 무슨 말을 했습니다.
 
-unknown-language-shouts = { KR_WITH_PARTICLE($name, type: "subj") }
-    { KR_WITH_PARTICLE($language, type: "ro") } 무슨 말을 소리쳤습니다.
+unknown-language-shouts = { KO_WITH_PARTICLE($name, type: "subj") }
+    { KO_WITH_PARTICLE($language, type: "ro") } 무슨 말을 소리쳤습니다.
 
-unknown-language-hisses = { KR_WITH_PARTICLE($name, type: "subj") }
-    { KR_WITH_PARTICLE($language, type: "ro") } 무슨 말을 크게 속삭였습니다.
+unknown-language-hisses = { KO_WITH_PARTICLE($name, type: "subj") }
+    { KO_WITH_PARTICLE($language, type: "ro") } 무슨 말을 크게 속삭였습니다.
 
-unknown-language-exclaims = { KR_WITH_PARTICLE($name, type: "subj") }
-    { KR_WITH_PARTICLE($language, type: "ro") } 무슨 말을 했습니다.
+unknown-language-exclaims = { KO_WITH_PARTICLE($name, type: "subj") }
+    { KO_WITH_PARTICLE($language, type: "ro") } 무슨 말을 했습니다.
 
-unknown-language-whispers = { KR_WITH_PARTICLE($name, type: "subj") }
-    { KR_WITH_PARTICLE($language, type: "ro") } 무슨 말을 조용하게 했습니다.
+unknown-language-whispers = { KO_WITH_PARTICLE($name, type: "subj") }
+    { KO_WITH_PARTICLE($language, type: "ro") } 무슨 말을 조용하게 했습니다.
 
-unknown-language-whisper-shouts = { KR_WITH_PARTICLE($name, type: "subj") }
-    { KR_WITH_PARTICLE($language, type: "ro") } 무슨 말을 크게 속삭였습니다.
+unknown-language-whisper-shouts = { KO_WITH_PARTICLE($name, type: "subj") }
+    { KO_WITH_PARTICLE($language, type: "ro") } 무슨 말을 크게 속삭였습니다.
 
-unknown-language-signed-whispers = { KR_WITH_PARTICLE($name, type: "subj") }
-    { KR_WITH_PARTICLE($language, type: "ro") } 무슨 수화를 몰래 했습니다.
+unknown-language-signed-whispers = { KO_WITH_PARTICLE($name, type: "subj") }
+    { KO_WITH_PARTICLE($language, type: "ro") } 무슨 수화를 몰래 했습니다.
 
-unknown-language-signed-shouts = { KR_WITH_PARTICLE($name, type: "subj") }
-    { KR_WITH_PARTICLE($language, type: "ro") } 무슨 수화를 활기차게 했습니다.
+unknown-language-signed-shouts = { KO_WITH_PARTICLE($name, type: "subj") }
+    { KO_WITH_PARTICLE($language, type: "ro") } 무슨 수화를 활기차게 했습니다.
 
 ## Volume indicators
 
@@ -230,13 +230,13 @@ volume-indicator-whisper = 속삭임
 
 out-of-range = 범위를 벗어남
 
-perceived-chat = { KR_WITH_PARTICLE($name, type: "subj") } 무슨 말을 했습니다.
+perceived-chat = { KO_WITH_PARTICLE($name, type: "subj") } 무슨 말을 했습니다.
 
-perceived-chat-whisper = { KR_WITH_PARTICLE($name, type: "subj") } 무슨 말을 조용하게 했습니다.
+perceived-chat-whisper = { KO_WITH_PARTICLE($name, type: "subj") } 무슨 말을 조용하게 했습니다.
 
-perceived-chat-quiet = { KR_WITH_PARTICLE($name, type: "subj") } 무슨 말을 조용하게 했습니다.
+perceived-chat-quiet = { KO_WITH_PARTICLE($name, type: "subj") } 무슨 말을 조용하게 했습니다.
 
-perceived-chat-loud = { KR_WITH_PARTICLE($name, type: "subj") } 무슨 말을 소리쳤습니다.
+perceived-chat-loud = { KO_WITH_PARTICLE($name, type: "subj") } 무슨 말을 소리쳤습니다.
 
 perceived-chat-signed = { $name } 무슨 수화를 했습니다.
 
@@ -384,7 +384,7 @@ context-retain-commands-rp = 롤플레이
 context-retain-commands-other = 기타
 
 context-add-language = 언어 추가
-    .dialog = { KR_WITH_PARTICLE($language, type: "obj") } 추가하시겠습니까? 되돌릴 수 없습니다.
+    .dialog = { KO_WITH_PARTICLE($language, type: "obj") } 추가하시겠습니까? 되돌릴 수 없습니다.
 
 context-sign-emotes-enable = 수화 애니매이션 활성화
 
