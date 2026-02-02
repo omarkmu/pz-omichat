@@ -208,7 +208,7 @@ function Logic._generateField(def, vars, parentKey)
 
     local key = (parentKey and (parentKey .. '.') or '') .. def.name
 
-    local fields = def.fields or {}
+    local fields = def.fields or {} --[[@as ConfigurationFieldDef[] ]]
     for i = 1, #fields do
         local child = fields[i]
         properties[child.name], childRules[child.name] = Logic._generateField(child, vars, key)

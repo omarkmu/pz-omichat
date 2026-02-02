@@ -462,7 +462,7 @@ local function generateFromConfig(configData, contentBundle)
             rope[#rope + 1] = '**Default**: `'
 
             if element.type == 'color' then
-                local color = concat(defaultValue, ',')
+                local color = concat(defaultValue --[[@as table]], ',')
                 rope[#rope + 1] = color
                 rope[#rope + 1] = '`'
                 rope[#rope + 1] = ' <span style="--color-display: rgb('

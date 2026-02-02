@@ -39,10 +39,10 @@ function Request.applyBuff() return Topic.APPLY_BUFF:toServer() end
 ---@return boolean success
 ---@return string? error
 function Request.applyCustomization(customizationType, args)
-    args = utils.copy(args --[[@as Args.Request.Customization]])
-    args.type = customizationType
+    local _args = utils.copy(args) --[[@as Args.Request.Customization]]
+    _args.type = customizationType
 
-    return Topic.APPLY_CUSTOMIZATION:toServer(args)
+    return Topic.APPLY_CUSTOMIZATION:toServer(_args)
 end
 
 ---Requests clearing all player data for a username.

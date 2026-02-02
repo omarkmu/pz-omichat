@@ -421,7 +421,7 @@ function Streams._updateChatStreams()
     table.wipe(ISChat.allChatStreams)
     table.wipe(ISChat.defaultTabStream)
 
-    local tabs = ISChat.instance and ISChat.instance.tabs or {}
+    local tabs = ISChat.instance and ISChat.instance.tabs or {} --[[@as ChatTab[] ]]
     for i = 1, #tabs do
         table.wipe(tabs[i].chatStreams)
     end
