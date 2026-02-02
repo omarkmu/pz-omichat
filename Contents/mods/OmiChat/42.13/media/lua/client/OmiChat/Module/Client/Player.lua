@@ -146,7 +146,7 @@ function Player.getLanguages()
     end
 
     local filtered = {}
-    local configured = utils.set.table(API.language.getList())
+    local configured = API.language.getSet()
 
     for i = 1, #languages do
         local lang = languages[i]

@@ -59,6 +59,11 @@ Configuration._languageBlockSet = {}
 ---@private
 Configuration._languageNameList = {}
 
+---Set of configured language names.
+---@type omi.SetTable<string>
+---@private
+Configuration._languageNameSet = {}
+
 ---Associates language IDs to information about languages.
 ---@type table<integer, LanguageRecord>
 ---@private
@@ -284,6 +289,12 @@ function Configuration:getLanguageNameList()
     return utils.copyList(self._languageNameList)
 end
 
+---Retrieves the set of configured roleplay languages' names.
+---@return omi.SetTable<string> names
+function Configuration:getLanguageNameSet()
+    return utils.copy(self._languageNameSet)
+end
+
 ---Returns the format to use for a given menu type.
 ---@param menuType MenuTypeString The menu type.
 ---@return string format
@@ -491,6 +502,7 @@ function Configuration:_cacheLanguages()
     self._idToLanguage = {}
     self._nameToLanguage = {}
     self._languageNameList = {}
+    self._languageNameSet = {}
 
     for i = 1, #languages do
         local lang = languages[i]
@@ -501,6 +513,7 @@ function Configuration:_cacheLanguages()
             self._nameToLanguage[rec.Name] = rec
             self._idToLanguage[rec.ID] = rec
             self._languageNameList[#self._languageNameList + 1] = rec.Name
+            self._languageNameSet[rec.Name] = true
 
             -- ignore languages after the maximum
             if #self._idToLanguage >= self.MAX_LANGUAGES then

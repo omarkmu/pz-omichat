@@ -74,6 +74,12 @@ function Language.getList()
     return config:getLanguageNameList()
 end
 
+---Returns a set of configured roleplay languages.
+---@return omi.SetTable<string> list A list of language names.
+function Language.getSet()
+    return config:getLanguageNameSet()
+end
+
 ---Returns whether a configured roleplay language is signed.
 ---@param language string The language name.
 ---@return boolean signed `True` if the language is signed, `false` otherwise.
