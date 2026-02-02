@@ -746,7 +746,7 @@ function Library.Defaults.Overhead(interpolator, args)
     end
 
     if tags.DoubleBracketedText then
-        message = '[[' .. message .. ']]'
+        message = '[[ ' .. message .. ' ]]'
     end
 
     if (tags.OverRadio or tags.OverRadioOverhead) and not tags.IsUnknownLanguage and not tags.IsRadioStream then
