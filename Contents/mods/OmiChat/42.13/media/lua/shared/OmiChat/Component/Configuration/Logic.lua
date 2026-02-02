@@ -3,18 +3,14 @@
 ---@diagnostic disable: access-invisible
 
 local utils = require 'OmiChat/Utils'
-local utils_c = utils --[[@as omichat.utils.client]]
-
-local log = utils.log
-local schema = utils.schema
-
 local DefaultLanguages = require 'OmiChat/Definition/DefaultLanguageList'
 local DefaultStreams = require 'OmiChat/Definition/DefaultStreamList'
 local DefaultStreamData = require 'OmiChat/Definition/DefaultStreamData'
 
+local log = utils.log
+local utils_c = utils --[[@as omichat.utils.client]]
 local sort = table.sort
 local concat = table.concat
-local isempty = table.isempty
 local getText = utils.getText
 local getTextOrNull = utils.getTextOrNull
 local getAttr = utils.getAttr
@@ -42,10 +38,9 @@ function Logic.getSchema()
 end
 
 ---Reads the data file to generate the schema, form, and metadata.
----Throws an error for invalid data.
+---Logs an error for invalid data.
 function Logic.load()
-    local data = Logic._readDefinitions()
-    Logic._loadSchema(data.fields, data._VARS, data._VERSION)
+    Logic._loadSchema()
     Logic._loadTags()
 end
 
@@ -92,19 +87,19 @@ function Logic._applyPreset(form, preset)
 end
 
 ---Creates the tooltip to use for a format string option.
----@param def ConfigurationFieldDef
+---@param prop JSONSchemaPropertyWithExtras
 ---@param vars table<string, any>
 ---@return string
 ---@private
-function Logic._buildFormatTooltip(def, vars)
+function Logic._buildFormatTooltip(prop, vars)
     local rope = {
         getText('heading-format-string'),
     }
 
-    local tokens = Logic._resolveTableVars(def._tokens, vars)
-    local args = Logic._resolveTableVars(def._args, vars)
+    local tokens = Logic._resolveTableVars(prop._tokens, vars)
+    local args = Logic._resolveTableVars(prop._args, vars)
 
-    if def._errorTokens then
+    if prop._errorTokens then
         tokens = tokens or {}
         tokens[#tokens + 1] = 'error'
         tokens[#tokens + 1] = 'errorID'
@@ -113,14 +108,14 @@ function Logic._buildFormatTooltip(def, vars)
     Logic._writeFormatDataTranslations(
         getText('heading-tokens'),
         Logic._getFormatDataTranslations(tokens, 'token'),
-        def._descriptionTokens,
+        prop._descriptionTokens,
         rope
     )
 
     Logic._writeFormatDataTranslations(
         getText('heading-args'),
         Logic._getFormatDataTranslations(args, 'arg'),
-        def._descriptionArgs,
+        prop._descriptionArgs,
         rope
     )
 
@@ -129,6 +124,34 @@ function Logic._buildFormatTooltip(def, vars)
     end
 
     return concat(rope)
+end
+
+---Converts a JSON property into a field,
+---or updates rules or the property appropriately.
+---@param prop omi.JSONSchemaProperty
+---@param rules omi.forms.Rules
+---@param key string
+---@param raw table
+---@return omi.schema.Field?
+---@private
+function Logic._convertJsonProperty(prop, rules, key, raw)
+    local _type = prop.type
+
+    local field ---@type omi.schema.Field?
+    if _type == 'format-string' then
+        field = utils.schema.string(prop.default or '$Default()')
+        rules.onInfoClick = Logic._onClickFormatInfo
+        rules.infoTooltip = Logic._buildFormatTooltip(prop, raw._definitions)
+    elseif _type == 'tags' then
+        rules.onChange = Logic._onChangeTag
+        prop.type = 'string-list' -- just a string list with special behavior
+    end
+
+    if Logic._formRules[key] then
+        utils.extend(rules, Logic._formRules[key])
+    end
+
+    return field
 end
 
 ---Creates a new item for the stream list.
@@ -195,166 +218,6 @@ function Logic._deletePreset(form, state, value)
 
     form:removeOnDestroy(dialog)
     state.activePresetDialog = dialog
-end
-
----Generates a single schema field and its corresponding form rules.
----@return omi.schema.Field, omi.forms.Rules?
----@param vars table<string, any>
----@param def ConfigurationFieldDef
----@private
-function Logic._generateField(def, vars, parentKey)
-    local properties = {} ---@type table<string, omi.schema.Field>
-    local childRules = {} ---@type table<string, omi.forms.Rules>
-
-    local key = (parentKey and (parentKey .. '.') or '') .. def.name
-
-    local fields = def.fields or {} --[[@as ConfigurationFieldDef[] ]]
-    for i = 1, #fields do
-        local child = fields[i]
-        properties[child.name], childRules[child.name] = Logic._generateField(child, vars, key)
-    end
-
-    local rules = {} ---@type omi.forms.Rules
-    if not isempty(childRules) then
-        rules.children = childRules
-    end
-
-    local field ---@type omi.schema.Field
-    local _type = def.type
-    if _type == 'object' then
-        field = schema.container(properties)
-    elseif _type == 'string' or _type == 'textbox' then
-        field = schema.string(def.default)
-
-        if _type == 'textbox' then
-            rules.displayLines = 10
-        end
-    elseif _type == 'format-string' then
-        field = schema.string(def.default or '$Default()')
-        rules.onInfoClick = Logic._onClickFormatInfo
-        rules.infoTooltip = Logic._buildFormatTooltip(def, vars)
-    elseif _type == 'compatibility' then
-        field = schema.compatibility(def.default)
-    elseif _type == 'checkbox' then
-        field = schema.bool(def.default)
-    elseif _type == 'page-checkbox' then
-        field = schema.bool(def.default)
-        rules.togglePageFields = true
-    elseif _type == 'object-list' then
-        field = schema.array({
-            maxItems = def.maxItems,
-            items = schema.object({
-                skipMissing = true,
-                properties = properties,
-            }),
-        })
-    elseif _type == 'dropdown' then
-        field = schema.stringEnum({
-            default = def.default,
-            values = def.options,
-        })
-    elseif _type == 'checkbox-group' then
-        local options = def.options
-
-        local default
-        if def.default then
-            default = def.default
-        elseif def.defaultAll then
-            default = options
-        end
-
-        field = schema.set({
-            default = utils.set.table(default),
-            items = schema.stringEnum({ values = options }),
-        })
-    elseif _type == 'string-map' then
-        field = schema.object({
-            skipMissing = true,
-            default = def.default,
-            additionalProperties = schema.string(),
-        })
-    elseif _type == 'string-list' or _type == 'tags' then
-        field = schema.array({
-            items = schema.string(),
-            default = def.default,
-            maxItems = def.maxItems,
-        })
-
-        if _type == 'tags' then
-            rules.onChange = Logic._onChangeTag
-        end
-    elseif _type == 'color' then
-        local default
-        local raw = def.default
-        if raw then
-            default = { r = raw[1], g = raw[2], b = raw[3] }
-        end
-
-        field = schema.color({ default = default })
-    elseif _type == 'integer' or _type == 'number' then
-        local cons = _type == 'integer' and schema.int or schema.double
-
-        local max = def.max
-        local min = def.min
-        local default = def.default
-
-        if not max then
-            max = 0
-            log.error('Missing max value for field %s', key)
-        end
-
-        if not min then
-            min = 0
-            log.error('Missing min value for field %s', key)
-        end
-
-        if not default then
-            default = 0
-            log.error('Missing default value for field %s', key)
-        end
-
-        field = cons(default, min, max)
-    else
-        log.error('Invalid field type %s for field %s', _type, key)
-    end
-
-    rules.paddingTop = def.padTop
-    rules.paddingBottom = def.padBottom
-    rules.maxLines = def.maxLines
-    rules.displayLines = def.displayLines or rules.displayLines
-    rules.noReorderButtons = utils.default(def.noReorderButtons, true)
-
-    if def.toggle then
-        rules.toggleFields = utils.mapList(utils.split, def.toggle, '.')
-    end
-
-    if def.toggleInverse then
-        rules.inverseToggleFields = utils.mapList(utils.split, def.toggleInverse, '.')
-    end
-
-    local flags = {
-        'noLabel',
-        'useFullPage',
-        'noFullWidth',
-        'hidden',
-    }
-
-    for i = 1, #flags do
-        local flag = flags[i]
-        if def[flag] then
-            rules[flag] = true
-        end
-    end
-
-    if Logic._formRules[key] then
-        utils.extend(rules, Logic._formRules[key])
-    end
-
-    if isempty(rules) then
-        return field
-    end
-
-    return field, rules
 end
 
 ---Returns a list of default language definition objects.
@@ -589,37 +452,15 @@ function Logic._handleStreamChange(form, item)
 end
 
 ---Reads the data file to generate the schema and form.
----Throws an error for invalid data.
----@param definitions ConfigurationFieldDef[]
----@param vars table<string, any>
----@param version integer
 ---@private
-function Logic._loadSchema(definitions, vars, version)
-    ---@type table<string, omi.schema.Field>
-    local properties = {
-        VERSION = schema.int(version),
-    }
-
-    local rules = {} ---@type table<string, omi.forms.Rules>
-    for i = 1, #definitions do
-        local def = definitions[i]
-        if def.type ~= 'object' then
-            log.error('Invalid top-level field type for %s (%s)', def.name, def.type)
-        else
-            properties[def.name], rules[def.name] = Logic._generateField(def, vars)
-        end
-    end
-
-    Logic._schema = schema({
-        properties = properties,
-        form = {
-            prefix = 'OmiChat.config',
-            closeOnSave = false,
-            rules = rules,
-        },
-
+function Logic._loadSchema()
+    Logic._schema = utils.schema.fromJsonFile({
+        modId = 'OmiChat',
+        log = log,
+        form = { closeOnSave = false },
         onRead = Logic._onRead,
         sanitize = Logic._onSanitize,
+        convert = Logic._convertJsonProperty,
     })
 end
 
@@ -938,27 +779,6 @@ function Logic._processStreams(streams)
     return processed
 end
 
----Reads the configuration definition file.
----@return table data
----@private
-function Logic._readDefinitions()
-    local reader = getModFileReader('\\OmiChat', 'configuration.json', false)
-    if not reader then
-        log.fatal('Failed to open configuration file') ---@cast reader -?
-    end
-
-    local data, err = utils.json.tryReadObject({ reader = reader })
-    if not data then
-        log.fatal(err or 'Failed to read configuration file') ---@cast data -?
-    end
-
-    if type(data._VERSION) ~= 'number' then
-        log.fatal('Invalid value for _VERSION in configuration file')
-    end
-
-    return data
-end
-
 ---Refreshes the list of presets to match the current custom presets.
 ---@param form omi.forms.Form The form with the field to update.
 ---@private
@@ -1064,7 +884,7 @@ function Logic._savePreset(form, state)
     state.activePresetDialog = dialog
 end
 
----Writes a list of format data elements to a string list.
+---Writes a list of format string data elements to a string list.
 ---@param heading string A heading string to write at the top.
 ---@param list FormatDataTranslation[]? The list of format data elements.
 ---@param descID string? An optional string ID for description text.
@@ -1135,23 +955,7 @@ return Logic
 
 --#region Type Definitions
 
----@class ConfigurationFieldDef
----@field name string The name of the field.
----@field type string The type of the field.
----@field fields? ConfigurationFieldDef[] Child fields.
----@field default? any The default value of the field.
----@field max? any The maximum value of the field.
----@field min? any The minimum value of the field.
----@field defaultAll? boolean Whether to use all options as the default value.
----@field options? any Options for a field.
----@field padTop? number Padding to add to the top of the field in the form.
----@field padBottom? number Padding to add to the bottom of the field in the form.
----@field maxItems? integer The maximum number of items for a field.
----@field maxLines? integer The maximum number of lines for a field input.
----@field displayLines? integer The maximum number of lines to display for a field input.
----@field noReorderButtons? boolean Whether to exclude reorder buttons for a list control.
----@field toggle? string[] Fields to toggle when a checkbox is checked.
----@field toggleInverse? string[] Fields to toggle when a checkbox is unchecked.
+---@class JSONSchemaPropertyWithExtras : omi.JSONSchemaProperty
 ---@field _tokens? (string | FormatDataTranslation)[] Tokens available for a format string.
 ---@field _args? (string | FormatDataTranslation)[] Arguments available for a format string.
 ---@field _errorTokens? boolean Whether to include error tokens in the tokens.

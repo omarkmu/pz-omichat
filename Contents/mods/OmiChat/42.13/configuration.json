@@ -1,6 +1,6 @@
 {
-  "_VERSION": 1,
-  "_VARS": {
+  "SCHEMA_VERSION": 1,
+  "_definitions": {
     "CUSTOM_STREAM_OPT_DESC": "This option is only enabled if [`Stream Type`](#list-stream) is set to *custom*.",
     "RANGED_STREAM_OPT_DESC": "This option is only enabled for ranged [chat types](#list-chattype).",
     "TOKENS_MENU_NAME": ["name", "forename", "surname", "username", "menuType"],
@@ -82,13 +82,13 @@
     "ARGS_CHAT": ["input", "name", "colorTargetTag", "recipientName"],
     "ARGS_PREFIX": ["loudIndicator", "quietIndicator", "whisperIndicator"]
   },
-  "fields": [
+  "properties": [
     {
       "name": "General",
       "type": "object",
       "_shortDescription": "feature flags, info text, and other basic features.",
       "_description": "Options that don't belong anywhere else. This includes feature flags, the admin icon, and info text.",
-      "fields": [
+      "properties": [
         {
           "name": "Preset",
           "type": "string",
@@ -136,7 +136,7 @@
       "type": "object",
       "_shortDescription": "boosts to players' stats based on chat messages.",
       "_description": "These options control buffs, which are configurable boosts to stats that are applied when messages are sent on certain streams.\n\nBy default, only roleplay streams (e.g., `/me`) apply buffs. Whether a stream applies buffs can be changed using the [`Allow Buffs`](./streams.md#list-allowbuffs) option.",
-      "fields": [
+      "properties": [
         {
           "name": "Enable",
           "type": "page-checkbox",
@@ -199,7 +199,7 @@
       "type": "object",
       "_shortDescription": "shout ranges and formatting.",
       "_description": "These options control features related to callouts (shouts).",
-      "fields": [
+      "properties": [
         {
           "name": "Format",
           "type": "format-string",
@@ -233,14 +233,14 @@
       "type": "object",
       "_shortDescription": "chat commands for player names, statuses, and more.",
       "_description": "These options control various commands that are available in chat.",
-      "fields": [
+      "properties": [
         {
           "name": "Name",
           "type": "object",
-          "fields": [
+          "properties": [
             {
               "name": "Mode",
-              "type": "dropdown",
+              "type": "string-dropdown",
               "default": "Nickname",
               "noLabel": true,
               "options": [
@@ -257,12 +257,12 @@
         {
           "name": "Status",
           "type": "object",
-          "fields": [
+          "properties": [
             {
               "name": "Enable",
               "type": "checkbox",
               "default": true,
-              "toggle": ["Commands.Status.Range"]
+              "toggleFields": ["Commands.Status.Range"]
             },
             {
               "name": "Range",
@@ -276,12 +276,12 @@
         {
           "name": "Card",
           "type": "object",
-          "fields": [
+          "properties": [
             {
               "name": "Global",
               "type": "checkbox",
               "default": false,
-              "toggleInverse": [
+              "inverseToggleFields": [
                 "Commands.Card.OverheadFormat",
                 "Commands.Card.Tags"
               ]
@@ -299,12 +299,12 @@
         {
           "name": "Roll",
           "type": "object",
-          "fields": [
+          "properties": [
             {
               "name": "Global",
               "type": "checkbox",
               "default": false,
-              "toggleInverse": [
+              "inverseToggleFields": [
                 "Commands.Roll.OverheadFormat",
                 "Commands.Roll.Tags"
               ]
@@ -335,11 +335,11 @@
         {
           "name": "Flip",
           "type": "object",
-          "fields": [
+          "properties": [
             {
               "name": "Global",
               "type": "checkbox",
-              "toggleInverse": [
+              "inverseToggleFields": [
                 "Commands.Flip.OverheadFormat",
                 "Commands.Flip.Tags"
               ],
@@ -362,7 +362,7 @@
       "type": "object",
       "_shortDescription": "integrations and patches for other mods.",
       "_description": "These options control compatibility patches for other mods.\n\n> [!NOTE]\n> Currently, mod compatibility patches are soft-removed. They may be reintroduced when the relevant mods are updated for b42.",
-      "fields": [
+      "properties": [
         { "name": "ApplyOverrides", "type": "checkbox", "default": true },
         { "name": "ChatBubble", "type": "compatibility", "hidden": true },
         { "name": "SearchPlayers", "type": "compatibility", "hidden": true },
@@ -378,7 +378,7 @@
       "type": "object",
       "_shortDescription": "player customization, such as name colors and custom shouts.",
       "_description": "These options control the customization options available to players.",
-      "fields": [
+      "properties": [
         {
           "name": "AllowCustomShouts",
           "type": "checkbox",
@@ -390,7 +390,7 @@
           "name": "EnableCharacterCustomization",
           "type": "checkbox",
           "padTop": 10,
-          "toggle": ["Customization.CleanEffects"],
+          "toggleFields": ["Customization.CleanEffects"],
           "default": true
         },
         {
@@ -406,7 +406,7 @@
       "type": "object",
       "_shortDescription": "formatting for Discord integration messages.",
       "_description": "These options control the formatting of messages that come from Discord.",
-      "fields": [
+      "properties": [
         {
           "name": "ChatFormat",
           "type": "format-string",
@@ -416,7 +416,7 @@
         { "name": "DefaultColor", "type": "color", "default": [144, 137, 218] },
         {
           "name": "ShowColorOption",
-          "type": "dropdown",
+          "type": "string-dropdown",
           "padTop": 10,
           "default": "Respect-Server-Setting",
           "options": ["Yes", "No", "Respect-Server-Setting"]
@@ -433,7 +433,7 @@
       "type": "object",
       "_shortDescription": "enabling and formatting echo messages.",
       "_description": "These options control echo messages, which are messages sent on one stream that automatically send to another.",
-      "fields": [
+      "properties": [
         { "name": "Enable", "type": "page-checkbox", "default": true },
         {
           "name": "ChatFormat",
@@ -455,11 +455,11 @@
       "type": "object",
       "_shortDescription": "formatting options and advanced customization.",
       "_description": "This section includes options related to formatting, including various [format strings](../format-strings/index.md) which can be used for advanced customization.\n\nAll of the format strings default to `$Default()`, which gets the default content. The tokens and options that each format accepts are available in the in-game configuration menu.",
-      "fields": [
+      "properties": [
         {
           "name": "Chat",
           "type": "object",
-          "fields": [
+          "properties": [
             {
               "name": "Prefix",
               "type": "format-string",
@@ -480,7 +480,7 @@
         {
           "name": "Overhead",
           "type": "object",
-          "fields": [
+          "properties": [
             {
               "name": "Prefix",
               "type": "format-string",
@@ -501,7 +501,7 @@
         {
           "name": "PerceptionRange",
           "type": "object",
-          "fields": [
+          "properties": [
             {
               "name": "Chat",
               "type": "format-string",
@@ -519,7 +519,7 @@
         {
           "name": "Component",
           "type": "object",
-          "fields": [
+          "properties": [
             {
               "name": "Name",
               "type": "format-string",
@@ -609,7 +609,7 @@
         {
           "name": "Filter",
           "type": "object",
-          "fields": [
+          "properties": [
             {
               "name": "ChatInput",
               "type": "format-string",
@@ -654,7 +654,7 @@
         {
           "name": "MenuName",
           "type": "object",
-          "fields": [
+          "properties": [
             {
               "name": "Trade",
               "type": "format-string",
@@ -681,7 +681,7 @@
         {
           "name": "Other",
           "type": "object",
-          "fields": [
+          "properties": [
             {
               "name": "PMParentheses",
               "type": "integer",
@@ -692,7 +692,7 @@
             },
             {
               "name": "DefaultNameMode",
-              "type": "dropdown",
+              "type": "string-dropdown",
               "default": "name",
               "options": ["name", "username", "both"]
             },
@@ -722,18 +722,18 @@
       "type": "object",
       "_shortDescription": "customization of available roleplay languages and related behavior.",
       "_description": "These options are related to roleplay languages. Players will be unable to fully understand messages sent in a language their character cannot speak.",
-      "fields": [
+      "properties": [
         {
           "name": "UseDefaultList",
           "type": "checkbox",
-          "toggleInverse": ["Language.List"],
+          "inverseToggleFields": ["Language.List"],
           "default": true,
           "_description": "If this is enabled, the languages configured in the list will be ignored in favor of the default languages."
         },
         {
           "name": "List",
           "type": "object-list",
-          "fields": [
+          "properties": [
             { "name": "Name", "type": "string" },
             { "name": "Signed", "type": "checkbox", "default": false }
           ],
@@ -812,7 +812,7 @@
       "type": "object",
       "_shortDescription": "configuration for macros available to players.",
       "_description": "These options control macros.\n\nCurrently, the only built-in macro is the one used for [emote shortcuts](../user-guide/emote-shortcuts.md).",
-      "fields": [
+      "properties": [
         { "name": "Enable", "type": "page-checkbox", "default": true },
         {
           "name": "BuiltIn",
@@ -827,7 +827,7 @@
       "type": "object",
       "_shortDescription": "configuration for mentions.",
       "_description": "These options control mentions.\n\nCurrently, these only display the mentioned user's name color.",
-      "fields": [
+      "properties": [
         { "name": "Enable", "type": "page-checkbox", "default": true },
         {
           "name": "AlwaysUseNameColors",
@@ -861,7 +861,7 @@
       "type": "object",
       "_shortDescription": "options for displaying messages in a narrative format.",
       "_description": "These options control narrative style. If narrative style is used, messages will be enclosed in quotes and prefixed with a dialogue tag depending on the stream.\n\nFor example, with the default settings, a message sent with `/yell Hey` will be transformed to `<Name> shouts, “Hey!”`.",
-      "fields": [
+      "properties": [
         { "name": "Enable", "type": "page-checkbox", "default": true },
         {
           "name": "OverheadContentFormat",
@@ -903,7 +903,7 @@
       "type": "object",
       "_shortDescription": "customization of messages sent over the radio.",
       "_description": "These options control formatting of messages sent over the radio.",
-      "fields": [
+      "properties": [
         {
           "name": "ChatFormat",
           "type": "format-string",
@@ -923,7 +923,7 @@
       "type": "object",
       "_shortDescription": "customization of server messages.",
       "_description": "These options control formatting of server messages.",
-      "fields": [
+      "properties": [
         {
           "name": "ChatFormat",
           "type": "format-string",
@@ -939,18 +939,18 @@
       "type": "object",
       "_shortDescription": "advanced chat stream customization, including stream creation.",
       "_description": "These options control custom stream configuration. With the exception of [`Use Defaults`](#usedefaultlist) and [`Global Tags`](#globaltags), the options on this page are per-stream.",
-      "fields": [
+      "properties": [
         {
           "name": "UseDefaultList",
           "type": "checkbox",
-          "toggleInverse": ["Streams.List"],
+          "inverseToggleFields": ["Streams.List"],
           "default": true,
           "_description": "If this is enabled, the streams configured in the list will be ignored in favor of the default streams."
         },
         {
           "name": "List",
           "type": "object-list",
-          "fields": [
+          "properties": [
             {
               "name": "Enable",
               "type": "checkbox",
@@ -959,7 +959,7 @@
             },
             {
               "name": "Stream",
-              "type": "dropdown",
+              "type": "string-dropdown",
               "default": "custom",
               "options": [
                 "custom",
@@ -993,7 +993,7 @@
             { "name": "ShortCommand", "type": "string", "padBottom": 10 },
             {
               "name": "ChatType",
-              "type": "dropdown",
+              "type": "string-dropdown",
               "default": "say",
               "options": [
                 "say",
@@ -1008,7 +1008,7 @@
             },
             {
               "name": "Category",
-              "type": "dropdown",
+              "type": "string-dropdown",
               "default": "chat",
               "options": ["chat", "rp", "other"],
               "_extraDescription": "$CUSTOM_STREAM_OPT_DESC"
@@ -1127,7 +1127,7 @@
       "type": "object",
       "_shortDescription": "indicators for when players are typing in chat.",
       "_description": "These options control the typing indicator.",
-      "fields": [
+      "properties": [
         { "name": "Enable", "type": "page-checkbox", "default": true },
         {
           "name": "Format",
@@ -1150,7 +1150,7 @@
       "type": "object",
       "_shortDescription": "attracting zombies from chat messages.",
       "_description": "These options control attraction of zombies from chat messages.",
-      "fields": [
+      "properties": [
         {
           "name": "ChatRangeMultiplier",
           "type": "number",

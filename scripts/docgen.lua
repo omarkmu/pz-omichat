@@ -271,7 +271,7 @@ end
 ---@return table[]
 local function processConfigData(configData, contentBundle)
     local pages = {}
-    local vars = configData._VARS
+    local vars = configData._definitions
 
     local function processField(data, idPrefix)
         local isTopLevel = idPrefix == nil
@@ -335,17 +335,17 @@ local function processConfigData(configData, contentBundle)
             end
         end
 
-        if element and data.fields then
-            for i = 1, #data.fields do
-                element[#element + 1] = processField(data.fields[i], id .. '-')
+        if element and data.properties then
+            for i = 1, #data.properties do
+                element[#element + 1] = processField(data.properties[i], id .. '-')
             end
         end
 
         return element
     end
 
-    for i = 1, #configData.fields do
-        pages[#pages + 1] = processField(configData.fields[i])
+    for i = 1, #configData.properties do
+        pages[#pages + 1] = processField(configData.properties[i])
     end
 
     return pages --[[@as any]]
@@ -500,7 +500,7 @@ local function generateFromConfig(configData, contentBundle)
             rope[#rope + 1] = element.description
         end
 
-        local isDropdown = _type == 'dropdown'
+        local isDropdown = _type == 'string-dropdown'
         local supportsLists = LIST_TYPES[_type] or isDropdown
         local addListExtras = (element.default and not defaultValue) or element.options
         if supportsLists and addListExtras then
