@@ -457,7 +457,6 @@ function Logic._loadSchema()
     Logic._schema = utils.schema.fromJsonFile({
         modId = 'OmiChat',
         log = log,
-        form = { closeOnSave = false },
         onRead = Logic._onRead,
         sanitize = Logic._onSanitize,
         convert = Logic._convertJsonProperty,
