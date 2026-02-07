@@ -522,7 +522,7 @@ function Library.Defaults.MenuName(interpolator)
 
     if menuType == 'mini_scoreboard' then
         local username = interpolator:tokenString('username')
-        return username .. '[' .. name .. ']'
+        return username .. ' [' .. name .. ']'
     end
 
     return name

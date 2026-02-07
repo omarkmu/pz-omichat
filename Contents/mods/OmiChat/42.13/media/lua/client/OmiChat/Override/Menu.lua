@@ -148,7 +148,7 @@ end
 ---@param itemId integer
 function ISTradingUI.RemoveItem(player, itemId)
     local instance = ISTradingUI.instance
-    if not instance then
+    if not instance or not instance:isVisible() then
         return
     end
 
@@ -157,10 +157,11 @@ function ISTradingUI.RemoveItem(player, itemId)
         return
     end
 
-    ISTradingUI_RemoveItem(player, index)
-
     local removed = instance.hisOfferDatas.items[index]
-    if not removed or not removed.item or not instance or not instance:isVisible() or not instance.historyMessage then
+    local item = removed and removed.item
+    ISTradingUI_RemoveItem(player, itemId)
+
+    if not item or not instance.historyMessage then
         return
     end
 
@@ -169,7 +170,7 @@ function ISTradingUI.RemoveItem(player, itemId)
         return
     end
 
-    local message = getTextVanilla('IGUI_TradingUI_RemovedItem', name, removed.item:getName())
+    local message = getTextVanilla('IGUI_TradingUI_RemovedItem', name, item:getName())
     updateHistoryMessage(message, {
         message = message,
         add = false,
@@ -374,12 +375,13 @@ local ISWorldObjectContextMenu_createMenu = ISWorldObjectContextMenu.createMenu
 ---Modifies a context menu option if it matches one of the known options that uses the player name.
 ---@param opt table
 local function handleContextMenuOption(opt)
-    local otherPlayer = opt.param2
+    -- trade & medical use `onGetUpAndThen`
+    local otherPlayer = opt.param4
     if not otherPlayer or not instanceof(otherPlayer, 'IsoPlayer') then
         return
     end
 
-    local onSelect = opt.onSelect
+    local onSelect = opt.param1
     if onSelect == ISWorldObjectContextMenu.onTrade then
         local name = API.data.getPlayerMenuName(otherPlayer, 'trade')
         if not name then
