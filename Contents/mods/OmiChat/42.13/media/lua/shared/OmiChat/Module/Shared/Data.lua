@@ -11,6 +11,12 @@ local utils = API.utils
 local ModData = ModData
 local getPlayerByOnlineID = getPlayerByOnlineID
 
+---Stores indices for the player cache.
+local INDEX = {
+    USERNAME = 'username',
+    ONLINE_ID = 'onlineID',
+}
+
 
 ---@class(partial) api.shared.data
 ---@field protected _modData ModData? The cached mod data table. This is only present on the server.
@@ -92,7 +98,7 @@ end
 ---@return (PlayerData | PlayerCacheData)? data The player mod data or cache data.
 function Data.getPlayerData(username)
     if IS_CLIENT then
-        return Data._playerCache:get(username, false)
+        return Data._playerCache:getByIndex(INDEX.USERNAME, username, false)
     end
 
     return Data._getPlayerData(username)
@@ -110,7 +116,7 @@ function Data.getPlayerInfoByOnlineID(onlineID, noUpdate)
         end
     end
 
-    return Data._playerCache:getByIndex('onlineID', onlineID, not noUpdate)
+    return Data._playerCache:getByIndex(INDEX.ONLINE_ID, onlineID, not noUpdate)
 end
 
 ---Retrieves player information given a username.
@@ -125,7 +131,7 @@ function Data.getPlayerInfoByUsername(username, noUpdate)
         end
     end
 
-    return Data._playerCache:get(username, not noUpdate)
+    return Data._playerCache:getByIndex(INDEX.USERNAME, username, not noUpdate)
 end
 
 ---Retrieves the name that should be used in chat for the given menu type.
@@ -270,7 +276,7 @@ end
 function Data._createPlayerCacheData(player)
     local username = player:getUsername()
     if IS_CLIENT then
-        local existing = Data._playerCache:get(username, false)
+        local existing = Data._playerCache:getByIndex(INDEX.USERNAME, username, false)
         return existing or Data._playerCache:defaultCreatePlayerData(player)
     end
 
