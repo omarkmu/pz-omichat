@@ -66,6 +66,7 @@ return Preset:new {
         Streams = {
             UseDefaultList = false,
             GlobalTags = {
+                'NoNameOverhead',
                 'BracketedNames',
                 'NoPrefixSpaceChat',
                 'NoIcon',
