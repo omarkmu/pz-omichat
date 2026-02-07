@@ -2,6 +2,8 @@
 ---@namespace omichat
 
 local API = require 'OmiChat/Module/Client/Core'
+require 'OmiChat/Module/Client/Player'
+
 local utils = API.utils
 local getText = utils.getText
 

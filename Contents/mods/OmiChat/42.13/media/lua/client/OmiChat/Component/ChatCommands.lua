@@ -1,9 +1,6 @@
 ---Command stream definitions.
 ---@namespace omichat
 
--- load early for `player.canUseAdminCommands`
-require 'OmiChat/Module/Client/Player'
-
 return {
     require 'OmiChat/Component/ChatCommand/Card',
     require 'OmiChat/Component/ChatCommand/Flip',

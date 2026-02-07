@@ -2,6 +2,7 @@
 ---@namespace omichat
 
 local API = require 'OmiChat/Module/Client/Core'
+require 'OmiChat/Module/Client/Player'
 
 return API.CommandStream:new {
     name = 'setlanguageslots',
