@@ -12,12 +12,12 @@ If a function returns multiple values, it will return them as an [at-map](./at-m
 Individual return values can be accessed using the `$NthValue(o n)` function.
 
 To include a literal space or multiple words in a single argument, text within functions can be enclosed within pairs of backticks (`).
-Escapes still function inside the enclosed text, but they are only necessary to escape backticks.
+A dollar-sign can be used to escape backticks within the enclosed text.
 
 ```
 $Set(_token `hello world`)$_token → hello world
-$Reverse( `$)$(` ) → ()
-$Len(`$@-sign`) → 6
+$Reverse(`)(`) → ()
+$Len(`$``) → 1
 ```
 
 Other mods can [extend](../api/extending-format-strings.md) the list of available functions using the API.
@@ -107,7 +107,7 @@ Adds punctuation to the end of `s` if it isn't present.
 If `punctuation` is provided, it will be used as the punctuation (default: `.`).
 
 If `chars` is provided, the set of characters considered to be punctuation will be limited to the characters in this string.
-By default, the characters `'.,!?:/-~'` are used.
+By default, the characters `.,!?:/-~` are used.
 
 `$punctuate(hi)` → `hi.`  
 `$punctuate(hello !)` → `hello!`
