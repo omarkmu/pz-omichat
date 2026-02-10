@@ -9,10 +9,10 @@ The mod functions equivalently in-game without them, but the Java mods may be us
 
 ## Functionality
 
-The `ChatServer.class` replacement cleans up the server-side `chat` log files to remove data included in messages for mod functionality.
+The `ChatMessage.class` replacement cleans up the server-side `chat` log files by separating the chat text from the data included for mod functionality.
 
 The `GeneralChat.class` replacement is recommended for servers using the game's Discord integration.
-This cleans up messages sent from the in-game `/all` chat to remove data included in messages for mod functionality.
+This cleans up messages sent from the in-game `/all` chat to remove mod data.
 
 ## Installation
 
