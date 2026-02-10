@@ -2,6 +2,7 @@
 ---@namespace omichat
 
 local API = require 'OmiChat/Client'
+require 'OmiChat/Component/MessageInfo' -- must load first to use raw ChatMessage fields
 
 local ISChat = ISChat --[[@as omichat.ISChat]]
 
