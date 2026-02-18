@@ -9,7 +9,6 @@ return Preset:new {
         General = Preset.general {
             Name = 'Vanilla',
             CaseInsensitiveChatStreams = false,
-            IncludeRangeIndicatorButton = false,
         },
         Buffs = Preset.buffs {
             Enable = false,

@@ -107,7 +107,7 @@
         {
           "name": "IncludeRangeIndicatorButton",
           "type": "checkbox",
-          "default": true,
+          "default": false,
           "padBottom": 10
         },
         {

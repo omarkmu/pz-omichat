@@ -232,7 +232,7 @@ function Preset.general(options)
         Preset = options.Name,
         AlwaysShowChat = false,
         CaseInsensitiveChatStreams = options.CaseInsensitiveChatStreams ~= false,
-        IncludeRangeIndicatorButton = options.IncludeRangeIndicatorButton ~= false,
+        IncludeRangeIndicatorButton = options.IncludeRangeIndicatorButton or false,
         InfoText = '',
         AdminIcon = options.AdminIcon or 'Item_Hammer',
         ClearOnDeath = options.ClearOnDeath or Preset.clearOnDeath(),
@@ -465,7 +465,7 @@ return Preset
 ---@field Name string The name of the preset.
 ---@field AdminIcon string? The texture name to use as the admin icon. Defaults to `Item_Hammer`.
 ---@field CaseInsensitiveChatStreams boolean? Flag for whether chat streams are case-insensitive. Defaults to `true`.
----@field IncludeRangeIndicatorButton boolean? Flag for including the range indicator button. Defaults to `true`.
+---@field IncludeRangeIndicatorButton boolean? Flag for including the range indicator button. Defaults to `false`.
 ---@field ClearOnDeath Configuration.General.ClearOnDeath? Information that should be cleared death.
 ---@field Variables table<string, string>? Arbitrary key-value pairs for variables.
 
