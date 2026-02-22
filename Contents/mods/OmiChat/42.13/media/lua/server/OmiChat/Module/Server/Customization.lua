@@ -51,7 +51,7 @@ function Customization.cleanCharacter(player)
                     itemVisual:setBlood(part, 0)
                 end
 
-                item:setDirtyness(0)
+                item:setDirtiness(0)
                 item:setBloodLevel(0)
                 syncItemFields(player, item)
             end
