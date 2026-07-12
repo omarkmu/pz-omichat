@@ -180,6 +180,9 @@ tag-FlipCommandTarget = Indicates the stream that should be used for formatting 
 
 tag-HideOverhead = Indicates that messages should not be shown in overhead speech bubbles.
 
+tag-IgnoreRolesForCustomize = Indicates that players should be able to customize the stream's message color,
+    even if they lack the roles to use it.
+
 tag-IncludeColon = Indicates that a colon should be added after names.
     <LINE> This is the default behavior unless in narrative style or on the server message stream.
     <LINE> Takes precedence over <SPACE> { -highlight-inline(text: "NoColon") }.

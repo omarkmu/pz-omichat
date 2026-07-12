@@ -101,9 +101,16 @@ function Stream:checkMatch(input)
 end
 
 ---Checks whether the local player can use this stream.
+---@param ignoreRoles boolean? Flag for whether roles should be ignored for the check.
 ---@return boolean canUse
-function Stream:checkPlayerCanUse()
+function Stream:checkPlayerCanUse(ignoreRoles)
     return true
+end
+
+---Checks whether the local player can customize this stream's colors.
+---@return boolean canCustomize
+function Stream:checkPlayerCanCustomize()
+    return self:_isEnabled(self.tags.IgnoreRolesForCustomize)
 end
 
 ---Copies all settings from another stream into this stream.
@@ -160,15 +167,7 @@ end
 ---Returns whether the stream is enabled.
 ---@return boolean enabled
 function Stream:isEnabled()
-    if self.disabled or not self:checkPlayerCanUse() then
-        return false
-    end
-
-    if self.callbacks.isEnabled then
-        return self.callbacks.isEnabled(self)
-    end
-
-    return true
+    return self:_isEnabled()
 end
 
 ---Returns `true` if this is a special stream representing radio messages.
@@ -371,6 +370,23 @@ end
 ---@return string? message A translated error message to report to the player.
 ---@diagnostic disable-next-line: unused
 function Stream:validate(input)
+    return true
+end
+
+
+---Returns whether the stream is enabled.
+---@param ignoreRoles boolean? Flag for whether roles should be ignored for the check.
+---@return boolean enabled
+---@protected
+function Stream:_isEnabled(ignoreRoles)
+    if self.disabled or not self:checkPlayerCanUse(ignoreRoles) then
+        return false
+    end
+
+    if self.callbacks.isEnabled then
+        return self.callbacks.isEnabled(self)
+    end
+
     return true
 end
 

@@ -133,8 +133,9 @@ function ChatStream:canUseNarrativeStyle()
 end
 
 ---Checks whether the local player can use this stream.
+---@param ignoreRoles boolean? Flag for whether roles should be ignored for the check.
 ---@return boolean canUse
-function ChatStream:checkPlayerCanUse()
+function ChatStream:checkPlayerCanUse(ignoreRoles)
     local chatType = self:getChatType()
     local command = ChatStream._checkCommands[chatType]
     if command and not checkPlayerCanUseChat(command) then
@@ -142,11 +143,11 @@ function ChatStream:checkPlayerCanUse()
     end
 
     local roles = self.roleSet
-    if not roles then
+    if ignoreRoles or not roles then
         return true
     end
 
-    local player = utils.getAPI().player:get()
+    local player = utils.getAPI().player.get()
     if not player then
         return false
     end

@@ -471,6 +471,7 @@ local DefaultStreamData = {
             'DoubleBracketedText',
             'AutoCapitalize',
             'AutoPunctuate',
+            'IgnoreRolesForCustomize',
         },
     },
 }
