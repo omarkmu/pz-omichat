@@ -82,18 +82,14 @@ function _IsoPlayer.Callout(self, playEmote)
 
     -- as of b42, the `callOut` field is no longer just for boredom;
     -- it also determines whether animals are attracted to voices, which is pretty essential
-    -- so, we have to set the strings to empty and run the regular logic
-    -- this also means no more callout range options, unfortunately
+    -- so, we have to disable conversation and call the regular logic
 
-    local defaultShouts = isSneaking and SNEAK_SHOUTS or SHOUTS
-    for id in pairs(defaultShouts) do
-        utils.l10n.setText(id, '')
-    end
-
-    _Callout(self, playEmote)
-
-    for id, default in pairs(defaultShouts) do
-        utils.l10n.setText(id, default)
+    if self:isAllowConversation() then
+        self:setAllowConversation(false)
+        _Callout(self, playEmote)
+        self:setAllowConversation(true)
+    else
+        _Callout(self, playEmote)
     end
 
     API.chat.send {
@@ -105,8 +101,4 @@ function _IsoPlayer.Callout(self, playEmote)
             sneak = isSneaking,
         },
     }
-
-    if playEmote then
-        self:playEmote('shout')
-    end
 end
