@@ -30,7 +30,7 @@ description=[*]/doquiet [/dq]
 description=[*]/dowhisper [/dw]
 description=[*]/ooc [/o] (local out-of-character chat)
 description=[*]/admin [/a] (admin-only chat)
-description=[*]/narrate [/n] (chat for narration by admins, moderators, and GMs)
+description=[*]/narrate [/nr] (chat for narration by admins, moderators, and GMs)
 description=[/list]
 description=
 description=For more details, please see the [url=https://omarkmu.github.io/pz-omichat]documentation![/url]

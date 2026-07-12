@@ -444,7 +444,7 @@ local DefaultStreamData = {
         ChatType = 'say',
         Category = 'rp',
         Command = '/narrate',
-        ShortCommand = '/n',
+        ShortCommand = '/nr',
         DefaultColor = { r = 102, g = 204, b = 153 },
         Range = 16,
         RangeSigned = 0,
