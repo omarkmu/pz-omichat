@@ -1,7 +1,7 @@
 ---Helpers for interpolation functions.
 ---@namespace omichat
 
-local API = require 'OmiChat/Module/Shared/Core'
+local API = require 'OmiChat/Module/Core/Shared'
 local API_C = API --[[@as api.client]]
 
 local utils = API.utils

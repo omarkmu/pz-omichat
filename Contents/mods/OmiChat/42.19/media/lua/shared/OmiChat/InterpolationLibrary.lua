@@ -3,7 +3,7 @@
 ---@diagnostic disable: access-invisible
 
 
-local Library = require 'OmiChat/Module/InterpolationLibrary/Core'
+local Library = require 'OmiChat/Module/Core/InterpolationLibrary'
 local utils = require 'OmiChat/Utils'
 
 require 'OmiChat/Module/InterpolationLibrary/Defaults'

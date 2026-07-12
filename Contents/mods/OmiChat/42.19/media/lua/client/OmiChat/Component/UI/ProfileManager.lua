@@ -2,7 +2,7 @@
 ---@namespace omichat
 
 ---@class(partial) api.client
-local API = require 'OmiChat/Module/Client/Core'
+local API = require 'OmiChat/Module/Core/Client'
 
 local config = API.Configuration
 local utils = API.utils

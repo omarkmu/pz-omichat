@@ -1,10 +1,10 @@
 ---@namespace omichat
 ---Functionality for default interpolation formats.
 
-local API = require 'OmiChat/Module/Shared/Core'
+local API = require 'OmiChat/Module/Core/Shared'
 
 ---@class(partial) InterpolationLibrary
-local Library = require 'OmiChat/Module/InterpolationLibrary/Core'
+local Library = require 'OmiChat/Module/Core/InterpolationLibrary'
 
 ---@class(partial) InterpolationLibrary.Defaults
 Library.Defaults = Library.Defaults or {}

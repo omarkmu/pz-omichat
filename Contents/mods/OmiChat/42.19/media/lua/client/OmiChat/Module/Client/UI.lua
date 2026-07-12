@@ -2,7 +2,7 @@
 ---@namespace omichat
 
 ---@class(partial) api.client
-local API = require 'OmiChat/Module/Client/Core'
+local API = require 'OmiChat/Module/Core/Client'
 local StatusDisplay = require 'OmiChat/Component/UI/StatusDisplay'
 local ProfileManager = require 'OmiChat/Component/UI/ProfileManager'
 local PlayerDataManager = require 'OmiChat/Component/UI/PlayerDataManager'

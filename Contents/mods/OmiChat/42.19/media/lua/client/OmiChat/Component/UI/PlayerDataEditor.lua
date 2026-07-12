@@ -1,7 +1,7 @@
 ---UI element for the player data editor admin utility.
 ---@namespace omichat
 
-local API = require 'OmiChat/Module/Client/Core'
+local API = require 'OmiChat/Module/Core/Client'
 
 local utils = API.utils
 local config = API.Configuration

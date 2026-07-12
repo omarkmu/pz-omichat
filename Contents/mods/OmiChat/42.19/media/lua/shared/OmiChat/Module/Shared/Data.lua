@@ -2,7 +2,7 @@
 ---@namespace omichat
 
 ---@class(partial) api.shared
-local API = require 'OmiChat/Module/Shared/Core'
+local API = require 'OmiChat/Module/Core/Shared'
 
 local IS_CLIENT = not isServer()
 

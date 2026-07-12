@@ -1,7 +1,7 @@
 ---Command stream definition for `/language`.
 ---@namespace omichat
 
-local API = require 'OmiChat/Module/Client/Core'
+local API = require 'OmiChat/Module/Core/Client'
 local utils = API.utils
 local getText = utils.getText
 

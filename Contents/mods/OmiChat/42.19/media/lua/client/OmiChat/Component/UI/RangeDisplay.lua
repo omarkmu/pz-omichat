@@ -1,7 +1,7 @@
 ---UI element for displaying a range.
 ---@namespace omichat
 
-local API = require 'OmiChat/Module/Client/Core'
+local API = require 'OmiChat/Module/Core/Client'
 
 local floor = math.floor
 

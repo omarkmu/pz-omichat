@@ -1,7 +1,7 @@
 ---Command stream definition for `/seticon`.
 ---@namespace omichat
 
-local API = require 'OmiChat/Module/Client/Core'
+local API = require 'OmiChat/Module/Core/Client'
 require 'OmiChat/Module/Client/Player'
 
 local utils = API.utils

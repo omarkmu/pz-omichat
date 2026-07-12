@@ -3,7 +3,7 @@
 ---@diagnostic disable: access-invisible
 
 ---@class(partial) api.shared
-local API = require 'OmiChat/Module/Shared/Core'
+local API = require 'OmiChat/Module/Core/Shared'
 
 ---@class(partial) api.client
 local API_C = API

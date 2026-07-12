@@ -1,7 +1,7 @@
 ---Command stream definition for `/nickname`.
 ---@namespace omichat
 
-local API = require 'OmiChat/Module/Client/Core'
+local API = require 'OmiChat/Module/Core/Client'
 local config = API.Configuration
 
 return API.CommandStream:new {

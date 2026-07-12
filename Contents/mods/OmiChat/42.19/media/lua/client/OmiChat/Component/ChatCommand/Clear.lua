@@ -1,7 +1,7 @@
 ---Command stream definition for `/clear`.
 ---@namespace omichat
 
-local API = require 'OmiChat/Module/Client/Core'
+local API = require 'OmiChat/Module/Core/Client'
 local getText = API.utils.getText
 
 local CAPABILITY_DEBUG = Capability.DebugConsole

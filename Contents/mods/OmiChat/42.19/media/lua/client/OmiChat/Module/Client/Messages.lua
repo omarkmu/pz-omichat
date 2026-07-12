@@ -3,7 +3,7 @@
 ---@diagnostic disable: access-invisible
 
 ---@class(partial) api.client
-local API = require 'OmiChat/Module/Client/Core'
+local API = require 'OmiChat/Module/Core/Client'
 
 local utils = API.utils
 local MultiMap = utils.MultiMap

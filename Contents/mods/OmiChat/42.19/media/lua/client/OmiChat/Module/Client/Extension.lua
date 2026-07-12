@@ -6,7 +6,7 @@ local sort = table.sort
 local ISChat = ISChat --[[@as omichat.ISChat]]
 
 ---@class(partial) api.client
-local API = require 'OmiChat/Module/Client/Core'
+local API = require 'OmiChat/Module/Core/Client'
 local utils = API.utils
 
 

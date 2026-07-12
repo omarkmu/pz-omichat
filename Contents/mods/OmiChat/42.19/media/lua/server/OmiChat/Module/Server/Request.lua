@@ -4,7 +4,7 @@
 if isClient() then return end
 
 ---@class(partial) api.server
-local API = require 'OmiChat/Module/Server/Core'
+local API = require 'OmiChat/Module/Core/Server'
 
 
 ---@class api.server.request : api.shared.request

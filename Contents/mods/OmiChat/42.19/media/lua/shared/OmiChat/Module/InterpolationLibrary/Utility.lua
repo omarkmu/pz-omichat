@@ -1,7 +1,7 @@
 ---Utility interpolation library functions.
 ---@namespace omichat
 
-local API = require 'OmiChat/Module/Shared/Core'
+local API = require 'OmiChat/Module/Core/Shared'
 local API_C = API --[[@as api.client]]
 
 local utils = API.utils
@@ -11,7 +11,7 @@ local getText = utils.getText
 local IS_CLIENT = not isServer()
 
 ---@class(partial) InterpolationLibrary
-local Library = require 'OmiChat/Module/InterpolationLibrary/Core'
+local Library = require 'OmiChat/Module/Core/InterpolationLibrary'
 local Helpers = Library.Helpers
 
 
