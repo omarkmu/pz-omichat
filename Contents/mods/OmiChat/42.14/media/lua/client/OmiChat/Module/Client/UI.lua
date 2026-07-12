@@ -21,13 +21,9 @@ local concat = table.concat
 local getTimestampMs = getTimestampMs
 local getTextVanilla = getText
 local getText = utils.getText
-local getPicked = UIManager.getPicked
-local getClassFieldVal = getClassFieldVal
 local getServerOptions = getServerOptions
 local textManager = getTextManager()
 local ISChat = ISChat --[[@as omichat.ISChat]]
-
-local TILE_FIELD ---@type Field?
 
 
 ---@class api.client.ui
@@ -1098,63 +1094,6 @@ function UI._createChildren(instance)
     }
 end
 
----Gets a set of objects the mouse is hovering over.
----This uses the same logic as the name hovering functionality.
----@return omi.SetTable<IsoMovingObject>
----@private
-function UI._getHoveringObjects()
-    local square = UI._getPickedSquare()
-    if not square then
-        return {}
-    end
-
-    local hoverSet = {}
-
-    local squareX = square:getX()
-    local squareY = square:getY()
-    local squareZ = square:getZ()
-
-    local cell = getCell()
-    for x = squareX - 1, squareX + 1 do
-        for y = squareY - 1, squareY + 1 do
-            local checkSquare = cell:getGridSquare(x, y, squareZ)
-            local movingObjects = checkSquare and checkSquare:getMovingObjects()
-
-            if movingObjects then
-                for i = 0, movingObjects:size() - 1 do
-                    local obj = movingObjects:get(i) ---@type IsoMovingObject
-                    hoverSet[obj] = true
-                end
-            end
-        end
-    end
-
-    return hoverSet
-end
-
----Gets the square of the currently hovered object.
----@return IsoGridSquare?
----@private
-function UI._getPickedSquare()
-    local picked = getPicked()
-    if not picked then
-        return
-    end
-
-    if not TILE_FIELD then
-        TILE_FIELD = utils.getClassFieldByName(picked, 'tile')
-        assert(TILE_FIELD, 'Failed to get ClickObject.tile field')
-    end
-
-    local value = getClassFieldVal(picked, TILE_FIELD)
-    if not value or type(value) == 'string' then
-        return
-    end
-
-    ---@cast value IsoObject
-    return value:getSquare()
-end
-
 ---Updates the visibility of the chat and close button based on the `Always Show Chat` option.
 ---@private
 function UI._updateChatVisibility()
@@ -1176,6 +1115,7 @@ end
 
 ---Updates status display elements based on mouse hover.
 ---Called on every UI update.
+---@private
 function UI._updateStatusDisplays()
     local statusEnabled = config.Commands.Status.Enable
     if not statusEnabled and not UI._statusEnabled then
@@ -1194,7 +1134,6 @@ function UI._updateStatusDisplays()
     local onlineSet = {}
     local displayCache = UI._statusDisplayByUsername
     local range = config.Commands.Status.Range
-    local hoverSet = UI._getHoveringObjects()
     for i = 0, players:size() - 1 do
         local onlinePlayer = players:get(i) ---@type IsoPlayer
         local username = onlinePlayer:getUsername()
@@ -1209,8 +1148,7 @@ function UI._updateStatusDisplays()
             displayCache[username] = display
         end
 
-        local show = hoverSet[onlinePlayer] and display:shouldShow(onlinePlayer, range) or false
-        display:setVisible(show)
+        display:setVisible(display:shouldShow(onlinePlayer, range))
     end
 
     for username, display in pairs(displayCache) do
