@@ -1,4 +1,4 @@
----Handles defining topics for client and server requests.
+---Handles defining channels for client and server requests.
 ---@namespace omichat
 ---@diagnostic disable: access-invisible
 
@@ -28,11 +28,11 @@ local Request = {}
 ---Contains functions for sending server and client commands.
 API.request = Request
 
----@class api.shared.request.topic
-local TOPIC = {}
+---@class api.shared.request.channel
+local CHANNEL = {}
 
----Contains topics for request exchanges between the server and client.
-Request.TOPIC = TOPIC
+---Contains channels for request exchanges between the server and client.
+Request.CHANNEL = CHANNEL
 
 ---Dispatcher that handles routing requests.
 Request.dispatch = utils.dispatch {
@@ -68,7 +68,7 @@ end
 
 
 ---Client → server: Apply a buff.
-TOPIC.APPLY_BUFF = dispatch:topic('APPLY_BUFF', {
+CHANNEL.APPLY_BUFF = dispatch:channel('APPLY_BUFF', {
     onServerReceive = function(req)
         local player = req:getPlayer()
         local modData = player:getModData()
@@ -103,7 +103,7 @@ TOPIC.APPLY_BUFF = dispatch:topic('APPLY_BUFF', {
 
 ---Client → server: Apply a customization option (including character clean).
 ---Server → client: Indicates that customization was applied.
-TOPIC.APPLY_CUSTOMIZATION = dispatch:topic('APPLY_CUSTOMIZATION', {
+CHANNEL.APPLY_CUSTOMIZATION = dispatch:channel('APPLY_CUSTOMIZATION', {
     ---@param req omi.ClientRequest
     ---@param args Args.Request.Customization
     onServerReceive = function(req, args)
@@ -138,7 +138,7 @@ TOPIC.APPLY_CUSTOMIZATION = dispatch:topic('APPLY_CUSTOMIZATION', {
 })
 
 ---Client → server: Execute a chat command.
-TOPIC.COMMAND = dispatch:topic('COMMAND', {
+CHANNEL.COMMAND = dispatch:channel('COMMAND', {
     ---@param args Args.Request.Command
     ---@return boolean
     ---@return string?
@@ -182,7 +182,7 @@ TOPIC.COMMAND = dispatch:topic('COMMAND', {
 
 ---Client → server: update configuration on server (admin only).
 ---Server → client: update configuration.
-TOPIC.CONFIGURATION = dispatch:topic('CONFIGURATION', {
+CHANNEL.CONFIGURATION = dispatch:channel('CONFIGURATION', {
     canLogArgs = false,
     requireAdmin = true,
 
@@ -207,7 +207,7 @@ TOPIC.CONFIGURATION = dispatch:topic('CONFIGURATION', {
 
 ---Client → server: add/remove a preset (admin only).
 ---Server → client: update configuration presets.
-TOPIC.CONFIGURATION_PRESETS = dispatch:topic('CONFIGURATION_PRESETS', {
+CHANNEL.CONFIGURATION_PRESETS = dispatch:channel('CONFIGURATION_PRESETS', {
     requireAdmin = true,
 
     ---@param args Args.Request.AddOrRemovePreset
@@ -248,7 +248,7 @@ TOPIC.CONFIGURATION_PRESETS = dispatch:topic('CONFIGURATION_PRESETS', {
 })
 
 ---Client → server: request clearing player data for a username (admin only).
-TOPIC.DATA_CLEAR = dispatch:topic('DATA_CLEAR', {
+CHANNEL.DATA_CLEAR = dispatch:channel('DATA_CLEAR', {
     requireAdmin = true,
 
     ---@param args Args.Request.ClearPlayerData
@@ -260,7 +260,7 @@ TOPIC.DATA_CLEAR = dispatch:topic('DATA_CLEAR', {
 
 ---Client → server: request a list of all data for all players (admin only).
 ---Server → client: return a list of player data.
-TOPIC.DATA_LIST = dispatch:topic('DATA_LIST', {
+CHANNEL.DATA_LIST = dispatch:channel('DATA_LIST', {
     requireAdmin = true,
 
     ---@param args Args.Request.PlayerDataListResponse
@@ -291,7 +291,7 @@ TOPIC.DATA_LIST = dispatch:topic('DATA_LIST', {
 })
 
 ---Client → server: request updating data for a username.
-TOPIC.DATA_UPDATE = dispatch:topic('DATA_UPDATE', {
+CHANNEL.DATA_UPDATE = dispatch:channel('DATA_UPDATE', {
     ---@param req omi.ClientRequest
     ---@param args Args.Request.PlayerDataUpdate
     onServerReceive = function(req, args)
@@ -302,7 +302,7 @@ TOPIC.DATA_UPDATE = dispatch:topic('DATA_UPDATE', {
 
 ---Client → server: request that a card is drawn.
 ---Server → client: display the result of drawing a card.
-TOPIC.DRAW_CARD = dispatch:topic('DRAW_CARD', {
+CHANNEL.DRAW_CARD = dispatch:channel('DRAW_CARD', {
     onClientValidate = function(req)
         local player = req:getPlayer()
         if not utils.hasIgnoreItemReqPower(player) and not utils.hasAnyItemType(player, config.Commands.Card.Items) then
@@ -340,7 +340,7 @@ TOPIC.DRAW_CARD = dispatch:topic('DRAW_CARD', {
             },
         }
 
-        req:broadcastOn(TOPIC.SHOW_MESSAGE, args)
+        req:broadcastOn(CHANNEL.SHOW_MESSAGE, args)
     end,
 
     ---@param args Args.Request.ReportDrawCard
@@ -375,7 +375,7 @@ TOPIC.DRAW_CARD = dispatch:topic('DRAW_CARD', {
 
 ---Client → server: request that a coin is flipped.
 ---Server → client: display the result of flipping a coin.
-TOPIC.FLIP_COIN = dispatch:topic('FLIP_COIN', {
+CHANNEL.FLIP_COIN = dispatch:channel('FLIP_COIN', {
     onClientValidate = function(req)
         local player = req:getPlayer()
         if not utils.hasIgnoreItemReqPower(player) and not utils.hasAnyItemType(player, config.Commands.Flip.Items) then
@@ -402,7 +402,7 @@ TOPIC.FLIP_COIN = dispatch:topic('FLIP_COIN', {
             args = { name = name },
         }
 
-        req:broadcastOn(TOPIC.SHOW_MESSAGE, args)
+        req:broadcastOn(CHANNEL.SHOW_MESSAGE, args)
     end,
 
     ---@param args Args.Request.ReportFlipCoin
@@ -426,7 +426,7 @@ TOPIC.FLIP_COIN = dispatch:topic('FLIP_COIN', {
 
 ---Client → server: requests that the server refreshes the player cache for all players.
 ---Server → client: updates the player cache.
-TOPIC.PLAYER_CACHE = dispatch:topic('PLAYER_CACHE', {
+CHANNEL.PLAYER_CACHE = dispatch:channel('PLAYER_CACHE', {
     serverTriggers = {
         dispatch.trigger.onInterval(60000),
     },
@@ -454,7 +454,7 @@ TOPIC.PLAYER_CACHE = dispatch:topic('PLAYER_CACHE', {
 })
 
 ---Client → server: report that the player died.
-TOPIC.PLAYER_DEATH = dispatch:topic('PLAYER_DEATH', {
+CHANNEL.PLAYER_DEATH = dispatch:channel('PLAYER_DEATH', {
     allowDead = true,
 
     clientTriggers = {
@@ -502,12 +502,12 @@ TOPIC.PLAYER_DEATH = dispatch:topic('PLAYER_DEATH', {
 })
 
 ---Client → server: report that a player joined.
-TOPIC.PLAYER_JOINED = dispatch:topic('PLAYER_JOINED', {
+CHANNEL.PLAYER_JOINED = dispatch:channel('PLAYER_JOINED', {
     clientTriggers = {
         dispatch.trigger.onPlayerJoined(),
     },
 
-    -- TODO(vanilla bug): remove when https://theindiestone.com/forums/index.php?/topic/90037-42131 is fixed
+    -- TODO(vanilla bug): remove when https://theindiestone.com/forums/index.php?/channel/90037-42131 is fixed
     onClientSend = function()
         local player = API_C.player.get()
         if not player then
@@ -534,15 +534,15 @@ TOPIC.PLAYER_JOINED = dispatch:topic('PLAYER_JOINED', {
     end,
 
     onServerReceive = function(req)
-        req:broadcastOn(TOPIC.PLAYER_CACHE)
-        req:replyWith(TOPIC.CONFIGURATION)
-        req:replyWith(TOPIC.CONFIGURATION_PRESETS)
+        req:broadcastOn(CHANNEL.PLAYER_CACHE)
+        req:replyWith(CHANNEL.CONFIGURATION)
+        req:replyWith(CHANNEL.CONFIGURATION_PRESETS)
     end,
 })
 
 ---Client → server: request that dice is rolled.
 ---Server → client: display the result of rolling dice.
-TOPIC.ROLL_DICE = dispatch:topic('ROLL_DICE', {
+CHANNEL.ROLL_DICE = dispatch:channel('ROLL_DICE', {
     ---@param req omi.ClientRequest
     ---@param args Args.Request.RollDice
     ---@return boolean
@@ -566,7 +566,7 @@ TOPIC.ROLL_DICE = dispatch:topic('ROLL_DICE', {
         local sides = args.sides
         if sides < 1 or sides > 100 then
             local replyArgs = { id = 'help-text-roll' } ---@type Args.Request.ShowMessage
-            req:replyWith(TOPIC.SHOW_MESSAGE, replyArgs)
+            req:replyWith(CHANNEL.SHOW_MESSAGE, replyArgs)
             return
         end
 
@@ -585,7 +585,7 @@ TOPIC.ROLL_DICE = dispatch:topic('ROLL_DICE', {
                 },
             }
 
-            req:broadcastOn(TOPIC.SHOW_MESSAGE, replyArgs)
+            req:broadcastOn(CHANNEL.SHOW_MESSAGE, replyArgs)
         else
             local replyArgs = { roll = roll, sides = sides } ---@type Args.Request.ReportRoll
             req:reply(replyArgs)
@@ -613,7 +613,7 @@ TOPIC.ROLL_DICE = dispatch:topic('ROLL_DICE', {
 })
 
 ---Server → client: display an info message in chat.
-TOPIC.SHOW_MESSAGE = dispatch:topic('SHOW_MESSAGE', {
+CHANNEL.SHOW_MESSAGE = dispatch:channel('SHOW_MESSAGE', {
     ---@param args Args.Request.ShowMessage
     onClientReceive = function(_, args)
         local text
@@ -633,7 +633,7 @@ TOPIC.SHOW_MESSAGE = dispatch:topic('SHOW_MESSAGE', {
 
 ---Server → client: notify that another player is a typing.
 ---Client → server: send typing information to other players.
-TOPIC.TYPING = dispatch:topic('TYPING', {
+CHANNEL.TYPING = dispatch:channel('TYPING', {
     ---@param args Args.Request.UpdateTyping
     onClientReceive = function(_, args)
         local typingInfo ---@type TypingInformation?
@@ -667,7 +667,7 @@ TOPIC.TYPING = dispatch:topic('TYPING', {
                     typing = args.typing and Request._shouldSendTyping(sender, receiver, args.range, args.chatType),
                 }
 
-                TOPIC.TYPING:toPlayer(receiver, replyArgs, req)
+                CHANNEL.TYPING:toPlayer(receiver, replyArgs, req)
             end
         end
     end,

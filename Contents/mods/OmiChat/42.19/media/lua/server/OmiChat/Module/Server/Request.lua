@@ -9,7 +9,7 @@ local API = require 'OmiChat/Module/Core/Server'
 
 ---@class api.server.request : api.shared.request
 local Request = API.request
-local Topic = Request.TOPIC
+local Channel = Request.CHANNEL
 
 ---Contains functions for sending requests to the client.
 API.request = Request
@@ -19,14 +19,14 @@ API.request = Request
 ---@param player IsoPlayer?
 ---@return boolean success
 ---@return string? error
-function Request.sendConfiguration(player) return Topic.CONFIGURATION:toPlayerOrBroadcast(player) end
+function Request.sendConfiguration(player) return Channel.CONFIGURATION:toPlayerOrBroadcast(player) end
 
 ---Sends the user-defined configuration presets to the given player.
 ---If no player is given, presets are sent to all players.
 ---@param player IsoPlayer?
 ---@return boolean success
 ---@return string? error
-function Request.sendPresets(player) return Topic.CONFIGURATION_PRESETS:toPlayerOrBroadcast(player) end
+function Request.sendPresets(player) return Channel.CONFIGURATION_PRESETS:toPlayerOrBroadcast(player) end
 
 ---Notifies the client about another typing player.
 ---@param player IsoPlayer
@@ -38,7 +38,7 @@ function Request.sendTyping(player, target, isTyping)
     ---@type Args.Request.UpdateTyping
     local args = { username = target:getUsername(), typing = isTyping }
 
-    return Topic.TYPING:toPlayer(player, args)
+    return Channel.TYPING:toPlayer(player, args)
 end
 
 ---Sends an info message that will show only for the specified player.
@@ -51,7 +51,7 @@ function Request.sendInfoMessage(player, text, serverAlert)
     ---@type Args.Request.ShowMessage
     local args = { text = text, serverAlert = serverAlert }
 
-    return Topic.SHOW_MESSAGE:toPlayer(player, args)
+    return Channel.SHOW_MESSAGE:toPlayer(player, args)
 end
 
 ---Sends an info message that will show for all players.
@@ -63,7 +63,7 @@ function Request.sendServerMessage(text, serverAlert)
     ---@type Args.Request.ShowMessage
     local args = { text = text, serverAlert = serverAlert }
 
-    return Topic.SHOW_MESSAGE:broadcast(args)
+    return Channel.SHOW_MESSAGE:broadcast(args)
 end
 
 ---Sends an info message that will show only for the specified player.
@@ -77,7 +77,7 @@ function Request.sendTranslatedInfoMessage(player, stringID, stringArgs, serverA
     ---@type Args.Request.ShowMessage
     local args = { id = stringID, args = stringArgs, serverAlert = serverAlert }
 
-    return Topic.SHOW_MESSAGE:toPlayer(player, args)
+    return Channel.SHOW_MESSAGE:toPlayer(player, args)
 end
 
 ---Sends an info message that will show for all players.
@@ -90,13 +90,13 @@ function Request.sendTranslatedServerMessage(stringID, stringArgs, serverAlert)
     ---@type Args.Request.ShowMessage
     local args = { id = stringID, args = stringArgs, serverAlert = serverAlert }
 
-    return Topic.SHOW_MESSAGE:broadcast(args)
+    return Channel.SHOW_MESSAGE:broadcast(args)
 end
 
 ---Sends a request to all players to update the player cache.
 ---@return boolean success
 ---@return string? error
-function Request.updatePlayerCache() return Topic.PLAYER_CACHE:broadcast() end
+function Request.updatePlayerCache() return Channel.PLAYER_CACHE:broadcast() end
 
 
 return Request

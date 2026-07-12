@@ -9,7 +9,7 @@ local utils = API.utils
 
 ---@class api.client.request : api.shared.request
 local Request = API.request
-local Topic = Request.TOPIC
+local Channel = Request.CHANNEL
 
 ---Contains functions for sending requests to the server.
 API.request = Request
@@ -25,13 +25,13 @@ function Request.addPreset(name, values)
     ---@type Args.Request.AddOrRemovePreset
     local args = { type = 'ADD', name = name, values = values }
 
-    return Topic.CONFIGURATION_PRESETS:toServer(args)
+    return Channel.CONFIGURATION_PRESETS:toServer(args)
 end
 
 ---Requests attempting to apply a buff.
 ---@return boolean success
 ---@return string? error
-function Request.applyBuff() return Topic.APPLY_BUFF:toServer() end
+function Request.applyBuff() return Channel.APPLY_BUFF:toServer() end
 
 ---Requests applying a customization option.
 ---@param customizationType request.CustomizationType The customization to apply.
@@ -39,10 +39,10 @@ function Request.applyBuff() return Topic.APPLY_BUFF:toServer() end
 ---@return boolean success
 ---@return string? error
 function Request.applyCustomization(customizationType, args)
-    local _args = utils.copy(args) --[[@as Args.Request.Customization]]
+    local _args = utils.copy(args --[[@as any]]) --[[@as Args.Request.Customization]]
     _args.type = customizationType
 
-    return Topic.APPLY_CUSTOMIZATION:toServer(_args)
+    return Channel.APPLY_CUSTOMIZATION:toServer(_args)
 end
 
 ---Requests clearing all player data for a username.
@@ -54,13 +54,13 @@ function Request.clearData(username)
     ---@type Args.Request.ClearPlayerData
     local args = { username = username }
 
-    return Topic.DATA_CLEAR:toServer(args)
+    return Channel.DATA_CLEAR:toServer(args)
 end
 
 ---Requests drawing a card from a card deck in the player's inventory.
 ---@return boolean success
 ---@return string? error
-function Request.drawCard() return Topic.DRAW_CARD:toServer() end
+function Request.drawCard() return Channel.DRAW_CARD:toServer() end
 
 ---Sends a request to execute a chat command.
 ---@param command request.ChatCommandName The name of the command to execute.
@@ -71,19 +71,19 @@ function Request.executeCommand(command, text)
     ---@type Args.Request.Command
     local args = { name = command, text = text or '' }
 
-    return Topic.COMMAND:toServer(args)
+    return Channel.COMMAND:toServer(args)
 end
 
 ---Requests flipping a coin.
 ---@return boolean success
 ---@return string? error
-function Request.flipCoin() return Topic.FLIP_COIN:toServer() end
+function Request.flipCoin() return Channel.FLIP_COIN:toServer() end
 
 ---Requests a list of player data.
 ---Fails if the local player is not an admin.
 ---@return boolean success
 ---@return string? error
-function Request.getPlayerDataList() return Topic.DATA_LIST:toServer() end
+function Request.getPlayerDataList() return Channel.DATA_LIST:toServer() end
 
 ---Requests rolling dice.
 ---@param sides integer The number of sides on the die.
@@ -93,7 +93,7 @@ function Request.rollDice(sides)
     ---@type Args.Request.RollDice
     local args = { sides = sides }
 
-    return Topic.ROLL_DICE:toServer(args)
+    return Channel.ROLL_DICE:toServer(args)
 end
 
 ---Requests deleting a user-defined configuration preset.
@@ -105,7 +105,7 @@ function Request.removePreset(name)
     ---@type Args.Request.AddOrRemovePreset
     local args = { type = 'DELETE', name = name }
 
-    return Topic.CONFIGURATION_PRESETS:toServer(args)
+    return Channel.CONFIGURATION_PRESETS:toServer(args)
 end
 
 ---Requests setting player data to a given table.
@@ -126,18 +126,18 @@ end
 ---Fails if the local player is not an admin.
 ---@return boolean success
 ---@return string? error
-function Request.updateConfiguration() return Topic.CONFIGURATION:toServer() end
+function Request.updateConfiguration() return Channel.CONFIGURATION:toServer() end
 
 ---Requests an update to player data.
 ---@param args Args.Request.PlayerDataUpdate Arguments for the update.
 ---@return boolean success
 ---@return string? error
-function Request.updateData(args) return Topic.DATA_UPDATE:toServer(args) end
+function Request.updateData(args) return Channel.DATA_UPDATE:toServer(args) end
 
 ---Requests that the server broadcasts a player cache update.
 ---@return boolean success
 ---@return string? error
-function Request.updatePlayerCache() return Topic.PLAYER_CACHE:toServer() end
+function Request.updatePlayerCache() return Channel.PLAYER_CACHE:toServer() end
 
 ---Sends the current typing status to the server.
 ---@param range integer? The range of the current chat stream.
@@ -148,7 +148,7 @@ function Request.updateTypingStatus(range, chatType)
     ---@type Args.Request.Typing
     local args = { range = range, chatType = chatType, typing = API.chat.isTyping() }
 
-    return Topic.TYPING:toServer(args)
+    return Channel.TYPING:toServer(args)
 end
 
 
