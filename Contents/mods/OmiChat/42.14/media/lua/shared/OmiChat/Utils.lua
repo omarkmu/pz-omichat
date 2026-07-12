@@ -125,26 +125,6 @@ function utils.getAPI()
     return API_C
 end
 
----Gets a string from a message ID.
----@param id string The ID of the message to get.
----If a bundle is not included, it defaults to `OmiChat`.
----@param attr string The name of the attribute to get.
----@param args table<string, omi.l10n.FluentVariable?>? Arguments to pass for message resolution.
----@return string value
-function utils.getAttr(id, attr, args)
-    return l10n.getAttr(id, attr, args, 'OmiChat')
-end
-
----Gets a string from a message ID, or `nil` if no such message exists.
----@param id string The ID of the message to get.
----If a bundle is not included, it defaults to `OmiChat`.
----@param attr string The name of the attribute to get.
----@param args table<string, omi.l10n.FluentVariable?>? Arguments to pass for message resolution.
----@return string? value
-function utils.getAttrOrNull(id, attr, args)
-    return l10n.getAttrOrNull(id, attr, args, 'OmiChat')
-end
-
 ---Retrieves a BBCode icon name given a chat icon alias.
 ---@param icon string A chat icon alias.
 ---@return string? iconName The name of the icon for BBCode, or `nil` if not found.
@@ -181,24 +161,6 @@ function utils.getLines(text, maxLen)
     end
 
     return lines
-end
-
----Gets a string from a message ID.
----@param id string The ID of the message to get.
----If a bundle is not included, it defaults to `OmiChat`.
----@param args table<string, omi.l10n.FluentVariable?>? Arguments to pass for message resolution.
----@return string value
-function utils.getText(id, args)
-    return l10n.getText(id, args, 'OmiChat')
-end
-
----Gets a string from a message ID, or `nil` if no such message exists.
----@param id string The ID of the message to get.
----If a bundle is not included, it defaults to `OmiChat`.
----@param args table<string, omi.l10n.FluentVariable?>? Arguments to pass for message resolution.
----@return string? value
-function utils.getTextOrNull(id, args)
-    return l10n.getTextOrNull(id, args, 'OmiChat')
 end
 
 ---Retrieves a texture name given a chat icon alias.
