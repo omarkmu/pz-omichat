@@ -1,4 +1,6 @@
 {
     "runtime.version": "Lua5.1",
-    "diagnostics.disable": ["unnecessary-if", "unnecessary-assert", "invert-if"]
+    "diagnostics.disable": ["unnecessary-if", "unnecessary-assert", "invert-if"],
+    "workspace.library": ["$PZ_UMBRELLA", "$PZ_OMILIBRARY"],
+    "workspace.ignoreDir": ["Contents"]
 }
