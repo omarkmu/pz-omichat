@@ -12,8 +12,8 @@ local FluentBundle = require 'fluent'
 local concat = table.concat
 local format = string.format
 
-local DATA_PATH = 'Contents/mods/OmiChat/42.19/configuration.json'
-local FTL_PATH = 'Contents/mods/OmiChat/common/media/ftl/OmiChat/en/'
+local DATA_PATH = 'src/version/configuration.json'
+local FTL_PATH = 'src/common/media/ftl/OmiChat/en/'
 
 local COLORS = {
     ['0,1,0'] = 'code',          -- commands

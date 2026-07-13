@@ -1,8 +1,17 @@
+# Mod content folder
+Contents/
+
+# Local VS Code settings
 .vscode/
+
+# Generated documentation site
 site/
 
-# don't include generated documentation files
+# Generated documentation files
 !docs/configuration/index.md
 docs/configuration/*.md
 docs/SUMMARY.md
 docs/**/_*.md
+
+# .rockspec file for docgen
+scripts/*.rockspec
