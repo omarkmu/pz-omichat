@@ -156,16 +156,9 @@ end
 ---Writes the presets list to a file.
 ---@protected
 function Extension._writePresets()
-    pcall(function()
-        local list = config:getCustomPresetsForSave()
-        local obj = { list = list }
-
-        local outFile = getFileWriter(config._presetFilename, true, false)
-        if outFile then
-            outFile:write(utils.json.encode(obj))
-            outFile:close()
-        end
-    end)
+    local list = config:getCustomPresetsForSave()
+    local obj = { list = list }
+    utils.writeFile(config._presetFilename, utils.json.encode(obj))
 end
 
 

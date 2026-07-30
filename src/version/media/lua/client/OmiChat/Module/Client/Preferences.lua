@@ -268,14 +268,11 @@ function Preferences.save()
         utils.log.error('Failed to write preferences: %s', err)
         return false
     end
-
-    pcall(function()
-        local outFile = getFileWriter(Preferences._filename, true, false)
-        if outFile then
-            outFile:write(encoded)
-            outFile:close()
-        end
-    end)
+    
+    if not utils.writeFile(Preferences._filename, encoded) then
+        utils.log.error('Failed to write preferences file')
+        return false
+    end
 
     return true
 end
