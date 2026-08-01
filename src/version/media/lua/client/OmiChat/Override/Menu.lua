@@ -11,6 +11,7 @@ local textManager = getTextManager()
 --#region Medical
 
 local ISMedicalCheckAction_perform = ISMedicalCheckAction.perform
+local ISHealthPanel_ReceiveMedicalCheckRequest = ISHealthPanel.ReceiveMedicalCheckRequest
 local ISHealthPanel_update = ISHealthPanel.update
 
 function ISMedicalCheckAction:perform()
@@ -27,6 +28,22 @@ function ISMedicalCheckAction:perform()
     end
 
     healthWindow:setTitle(getTextVanilla('IGUI_health_playerHealth', name))
+end
+
+function ISHealthPanel.ReceiveMedicalCheckRequest(target, requester)
+    local name = API.data.getPlayerMenuName(requester, 'medical')
+    if not name then
+        ISHealthPanel_ReceiveMedicalCheckRequest(target, requester)
+        return
+    end
+
+    local modal = ISModalDialog:new(getCore():getScreenWidth() / 2 - 175,getCore():getScreenHeight() / 2 - 75, 350, 150, getText("ContextMenu_Medical_Check_Request", name), true, nil, ISHealthPanel.onAnswerMedicalCheckRequest)
+    modal:initialise()
+    modal:addToUIManager()
+    modal.target = target
+    modal.requester = requester ---@diagnostic disable-line: inject-field
+    modal.moveWithMouse = true
+    modal:bringToTop()
 end
 
 function ISHealthPanel:update()
@@ -48,6 +65,9 @@ function ISHealthPanel:update()
     self.blockingMessage = getTextVanilla('IGUI_TradingUI_TooFarAway', name)
 end
 
+Events.RequestMedicalCheck.Remove(ISHealthPanel_ReceiveMedicalCheckRequest)
+Events.RequestMedicalCheck.Add(ISHealthPanel.ReceiveMedicalCheckRequest)
+
 --#endregion
 
 --#region Trading
@@ -62,14 +82,10 @@ local ISTradingUI_prerender = ISTradingUI.prerender
 local ISTradingUIHistorical_prerender = ISTradingUIHistorical.prerender
 local ISWorldObjectContextMenu_onTrade = ISWorldObjectContextMenu.onTrade
 
+---@param instance ISTradingUI
 ---@param message string
 ---@param messageRecord table?
-local function updateHistoryMessage(message, messageRecord)
-    local instance = ISTradingUI.instance
-    if not instance then
-        return
-    end
-
+local function updateHistoryMessage(instance, message, messageRecord)
     instance.historyMessage = message
 
     if not messageRecord then
@@ -83,16 +99,17 @@ local function updateHistoryMessage(message, messageRecord)
 end
 
 
----@param requester IsoPlayer
-function ISTradingUI.ReceiveTradeRequest(requester)
-    ISTradingUI_ReceiveTradeRequest(requester)
+---@param otherPlayer IsoPlayer
+---@param player IsoPlayer
+function ISTradingUI.ReceiveTradeRequest(otherPlayer, player)
+    ISTradingUI_ReceiveTradeRequest(otherPlayer, player)
 
     local modal = ISTradingUI.tradeQuestionUI
     if not modal then
         return
     end
 
-    local name = API.data.getPlayerMenuName(requester, 'trade')
+    local name = API.data.getPlayerMenuName(otherPlayer, 'trade')
     if not name then
         return
     end
@@ -104,16 +121,18 @@ function ISTradingUI.ReceiveTradeRequest(requester)
     modal.height = h
 end
 
+---@param otherPlayer IsoPlayer
+---@param player IsoPlayer
 ---@param accepted boolean
-function ISTradingUI.AcceptedTrade(accepted)
-    ISTradingUI_AcceptedTrade(accepted)
+function ISTradingUI.AcceptedTrade(otherPlayer, player, accepted)
+    ISTradingUI_AcceptedTrade(otherPlayer, player, accepted)
 
-    local instance = ISTradingUI.instance
+    local instance = ISTradingUI.GetUIForPlayer(player)
     if accepted or not instance or not instance.blockingMessage then
         return
     end
 
-    local name = API.data.getPlayerMenuName(instance.otherPlayer, 'trade')
+    local name = API.data.getPlayerMenuName(otherPlayer, 'trade')
     if not name then
         return
     end
@@ -121,33 +140,35 @@ function ISTradingUI.AcceptedTrade(accepted)
     instance.blockingMessage = getTextVanilla('IGUI_TradingUI_RefusedTrade', name)
 end
 
+---@param otherPlayer IsoPlayer
 ---@param player IsoPlayer
 ---@param item InventoryItem
-function ISTradingUI.OtherAddNewItem(player, item)
-    ISTradingUI_OtherAddNewItem(player, item)
+function ISTradingUI.OtherAddNewItem(otherPlayer, player, item)
+    ISTradingUI_OtherAddNewItem(otherPlayer, player, item)
 
-    local instance = ISTradingUI.instance
+    local instance = ISTradingUI.GetUIForPlayer(player)
     if not instance or not instance:isVisible() or not instance.historyMessage then
         return
     end
 
-    local name = API.data.getPlayerMenuName(player, 'trade')
+    local name = API.data.getPlayerMenuName(otherPlayer, 'trade')
     if not name then
         return
     end
 
     local message = getTextVanilla('IGUI_TradingUI_AddedItem', name, item:getName())
-    updateHistoryMessage(message, {
+    updateHistoryMessage(instance, message, {
         message = message,
         add = true,
         remove = false,
     })
 end
 
+---@param otherPlayer IsoPlayer
 ---@param player IsoPlayer
 ---@param itemId integer
-function ISTradingUI.RemoveItem(player, itemId)
-    local instance = ISTradingUI.instance
+function ISTradingUI.RemoveItem(otherPlayer, player, itemId)
+    local instance = ISTradingUI.GetUIForPlayer(player)
     if not instance or not instance:isVisible() then
         return
     end
@@ -159,37 +180,38 @@ function ISTradingUI.RemoveItem(player, itemId)
 
     local removed = instance.hisOfferDatas.items[index]
     local item = removed and removed.item
-    ISTradingUI_RemoveItem(player, itemId)
+    ISTradingUI_RemoveItem(otherPlayer, player, itemId)
 
     if not item or not instance.historyMessage then
         return
     end
 
-    local name = API.data.getPlayerMenuName(player, 'trade')
+    local name = API.data.getPlayerMenuName(otherPlayer, 'trade')
     if not name then
         return
     end
 
     local message = getTextVanilla('IGUI_TradingUI_RemovedItem', name, item:getName())
-    updateHistoryMessage(message, {
+    updateHistoryMessage(instance, message, {
         message = message,
         add = false,
         remove = true,
     })
 end
 
+---@param otherPlayer IsoPlayer
 ---@param player IsoPlayer
 ---@param state integer
-function ISTradingUI.UpdateState(player, state)
+function ISTradingUI.UpdateState(otherPlayer, player, state)
     local wasModalVisible = ISTradingUI.tradeQuestionUI and ISTradingUI.tradeQuestionUI:isVisible()
-    ISTradingUI_UpdateState(player, state)
+    ISTradingUI_UpdateState(otherPlayer, player, state)
 
-    local instance = ISTradingUI.instance
+    local instance = ISTradingUI.GetUIForPlayer(player)
     if not instance or not instance:isVisible() then
         return
     end
 
-    local name = API.data.getPlayerMenuName(instance.otherPlayer, 'trade')
+    local name = API.data.getPlayerMenuName(otherPlayer, 'trade')
     if not name then
         return
     end
@@ -200,7 +222,7 @@ function ISTradingUI.UpdateState(player, state)
             return
         end
 
-        if instance.otherPlayer == player and instance.blockingMessage then
+        if instance.otherPlayer == otherPlayer and instance.blockingMessage then
             instance.blockingMessage = getTextVanilla('IGUI_TradingUI_ClosedTrade', name)
         end
     elseif state == ISTradingUI.States.SealOffer then
@@ -210,7 +232,7 @@ function ISTradingUI.UpdateState(player, state)
     end
 
     if historyMessage then
-        updateHistoryMessage(historyMessage, {
+        updateHistoryMessage(instance, historyMessage, {
             message = historyMessage,
             add = false,
             remove = false,
@@ -290,7 +312,7 @@ end
 function ISWorldObjectContextMenu.onTrade(worldobjects, player, otherPlayer)
     ISWorldObjectContextMenu_onTrade(worldobjects, player, otherPlayer)
 
-    local instance = ISTradingUI.instance
+    local instance = ISTradingUI.GetUIForPlayer(player)
     if not instance or not instance.blockingMessage then
         return
     end
