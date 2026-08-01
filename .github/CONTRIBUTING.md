@@ -10,7 +10,7 @@ There are a few different ways to contribute:
 - Create an [issue](https://github.com/omarkmu/pz-omichat/issues/new/choose); report a bug or ask for a feature.
 - Contribute [translations](#contributing-translations).
 - Create a [pull request](https://github.com/omarkmu/pz-omichat/compare) after reviewing the code contribution [guidelines](#contributing-code) and making your changes in a fork.
-- Ask and answer questions on [Discord](https://discord.gg/juv9TqygFu).
+- Ask and answer questions on Discord.
 
 ## New contributors
 
@@ -64,15 +64,14 @@ The `.ftl` files should be placed in the `media/ftl` directory, within a subdire
 See the table below for examples.
 
 The following steps can be used to contribute translations to the mod.
-If you're unsure about any of the steps, feel free to ask about it on [Discord](https://discord.gg/juv9TqygFu)!
+If you're unsure about any of the steps, feel free to ask about it on Discord (@omiyomy).
 
 1. Create a copy of the `common/media/ftl/OmiChat/en` folder.
 2. Rename the copy to one of the folder names in the table below, based on the target language.
 3. Modify the strings to use your translation.
     - The files have comments that explain the purpose of variable substitutions.
     Anything that is not marked as `@param X?` (where `X` is the variable name) **must** be included in the translation.
-4. Upload a `.zip` of the folder on [Discord](https://discord.gg/juv9TqygFu), in the `#translations` channel.
-If you're familiar with Git, you can instead create a pull request with your translation changes; see the section on [contributing code](#contributing-code).
+4. Create a pull request with your translation changes; see the section on [contributing code](#contributing-code).
 
 | Game Language       | Subdirectory |
 | ------------------- | ------------ |

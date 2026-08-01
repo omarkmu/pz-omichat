@@ -81,6 +81,6 @@ description=Thank you to Wuro (Ssaulabby) and Inkredibehl for providing translat
 description=Some features were inpsired by buffy's roleplay chat. The range indicator and /status were inspired by Wasteland's RP chat.
 description=[hr][/hr]Found a bug? Create an [url=https://github.com/omarkmu/pz-omichat/issues/new?template=bug_report.yaml]issue.[/url]
 description=Want to contribute? [url=https://github.com/omarkmu/pz-omichat/blob/main/.github/CONTRIBUTING.md]You can![/url]
-description=Questions (or don't want to use GitHub)? Join the [url=https://discord.gg/juv9TqygFu]Discord.[/url]
+description=Questions (or don't want to use GitHub)? Ask @omiyomy in the Project Zomboid Discord or the PZ Modding Community Discord.
 tags=Build 42;Interface;Multiplayer;Silly/Fun
 visibility=public
