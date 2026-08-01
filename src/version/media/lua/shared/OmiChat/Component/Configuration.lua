@@ -10,7 +10,7 @@ local isempty = table.isempty
 ---@class ConfigurationHelper : Configuration, omi.ConfigurationHelper<Configuration>
 local Configuration = utils.configuration {
     schema = Logic.getSchema(),
-    filename = string.format('omichat/configuration_%s.json', getServerName()),
+    filename = string.format('omichat/configuration_%s.json.txt', getServerName()),
     logger = utils.log,
 
     ---@param self ConfigurationHelper
@@ -34,7 +34,7 @@ Configuration.Preset = Preset
 
 ---Filename used for storing presets on the server.
 ---@private
-Configuration._presetFilename = 'omichat/presets.json'
+Configuration._presetFilename = 'omichat/presets.json.txt'
 
 ---Table containing built-in presets.
 ---@private

@@ -20,13 +20,13 @@ API.preferences = Preferences
 ---@private
 Preferences._version = 2
 
----The old filename used for preferences.
+---Old filenames used for preferences.
 ---@private
-Preferences._legacyFilename = 'omichat.json'
+Preferences._legacyFilenames = { 'omichat.json' }
 
 ---The filename from which preferences are loaded.
 ---@private
-Preferences._filename = 'omichat/settings.json'
+Preferences._filename = 'omichat/settings.json.txt'
 
 ---Associates admin options to setting names.
 ---@type table<AdminOption, string>
@@ -448,12 +448,19 @@ function Preferences._readPrefsJson()
     })
 
     if err then
-        -- read from legacy file when file is not found
+        -- check for legacy files when file is not found
         if utils.startsWith(err, 'could not open file') then
-            decoded, err = schema:readFile({
-                filename = Preferences._legacyFilename,
-                create = false,
-            })
+            for i = 1, #Preferences._legacyFilenames do
+                decoded, err = schema:readFile({
+                    filename = Preferences._legacyFilenames[i],
+                    create = false,
+                })
+
+                if decoded then
+                    err = nil
+                    break
+                end
+            end
         end
 
         if err then
