@@ -22,6 +22,10 @@ local getTimestampMs = getTimestampMs
 local getTextVanilla = getText
 local getText = utils.getText
 local getServerOptions = getServerOptions
+local getTileFromMouse = UIManager.getTileFromMouse
+local getSquare = getSquare
+local getMouseXScaled = getMouseXScaled
+local getMouseYScaled = getMouseYScaled
 local textManager = getTextManager()
 local ISChat = ISChat --[[@as omichat.ISChat]]
 
@@ -1094,6 +1098,46 @@ function UI._createChildren(instance)
     }
 end
 
+---Gets a set of objects the mouse is hovering over.
+---This does not use the same logic as the name hovering functionality, since that requires Reflection.
+---@return omi.SetTable<IsoMovingObject>
+---@private
+function UI._getHoveringObjects()
+    local player = getSpecificPlayer(0)
+    if not player then
+        return {}
+    end
+
+    local z = player:getZ()
+    local tile = getTileFromMouse(getMouseXScaled(), getMouseYScaled(), z)
+    local square = getSquare(tile:getX(), tile:getY(), z)
+    if not square then
+        return {}
+    end
+
+    local hoverSet = {}
+    local squareX = square:getX()
+    local squareY = square:getY()
+    local squareZ = square:getZ()
+
+    local cell = getCell()
+    for x = squareX - 1, squareX + 1 do
+        for y = squareY - 1, squareY + 1 do
+            local checkSquare = cell:getGridSquare(x, y, squareZ)
+            local movingObjects = checkSquare and checkSquare:getMovingObjects()
+
+            if movingObjects then
+                for i = 0, movingObjects:size() - 1 do
+                    local obj = movingObjects:get(i) ---@type IsoMovingObject
+                    hoverSet[obj] = true
+                end
+            end
+        end
+    end
+
+    return hoverSet
+end
+
 ---Updates the visibility of the chat and close button based on the `Always Show Chat` option.
 ---@private
 function UI._updateChatVisibility()
@@ -1134,6 +1178,7 @@ function UI._updateStatusDisplays()
     local onlineSet = {}
     local displayCache = UI._statusDisplayByUsername
     local range = config.Commands.Status.Range
+    local hoverSet = UI._getHoveringObjects()
     for i = 0, players:size() - 1 do
         local onlinePlayer = players:get(i) ---@type IsoPlayer
         local username = onlinePlayer:getUsername()
@@ -1148,7 +1193,8 @@ function UI._updateStatusDisplays()
             displayCache[username] = display
         end
 
-        display:setVisible(display:shouldShow(onlinePlayer, range))
+        local show = hoverSet[onlinePlayer] and display:shouldShow(onlinePlayer, range) or false
+        display:setVisible(show)
     end
 
     for username, display in pairs(displayCache) do
