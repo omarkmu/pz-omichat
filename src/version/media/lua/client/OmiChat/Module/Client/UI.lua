@@ -590,20 +590,13 @@ function UI.updateTypingDisplay()
         return
     end
 
-    local entries = {}
     sort(list)
-    for i = 1, #list do
-        entries[#entries + 1] = {
-            key = i,
-            value = list[i],
-        }
-    end
 
-    local tokens = {
-        names = MultiMap:new(entries),
-    }
+    ---@type string?
+    local text = utils.interpolateNamed('TypingIndicator', config.TypingIndicator.Format, {
+        names = MultiMap.fromList(list),
+    })
 
-    local text = utils.interpolateNamed('TypingIndicator', config.TypingIndicator.Format, tokens) ---@type string?
     if text == '' then
         text = nil
     end
