@@ -3,15 +3,17 @@ title = "OmiChat"
 authors = ["Omar M."]
 description = "Documentation for the OmiChat Project Zomboid mod."
 language = "en"
-multilingual = false
 src = "docs"
 
 [build]
-build-dir = "guide"
+build-dir = "site"
 use-default-preprocessors = false
+extra-watch-dirs = ["Contents/mods/OmiChat/common/media/ftl"]
+
+[preprocessor.links]
 
 [output.html]
 git-repository-url = "https://github.com/omarkmu/pz-omichat"
 site-url = "/pz-omichat/"
-
-[preprocessor.links]
+theme = "docs/_theme"
+additional-css = ["docs/_css/color-display.css"]

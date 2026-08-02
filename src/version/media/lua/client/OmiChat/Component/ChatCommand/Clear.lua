@@ -1,0 +1,23 @@
+---Command stream definition for `/clear`.
+---@namespace omichat
+
+local API = require 'OmiChat/Module/Core/Client'
+local getText = API.utils.getText
+
+local CAPABILITY_DEBUG = Capability.DebugConsole
+
+-- reimplementing this because the vanilla clear doesn't actually clear the chatbox
+return API.CommandStream:new {
+    name = 'clear',
+    command = '/clear ',
+    isEnabled = function()
+        return isCoopHost() or API.player.hasCapability(CAPABILITY_DEBUG)
+    end,
+    onUse = function()
+        API.chat.clear()
+
+        if not getDebug() then
+            API.chat.addInfoMessage(getText('info-clear'))
+        end
+    end,
+}

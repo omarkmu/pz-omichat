@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -e
+
+SCRIPT_DIR=$(realpath $(dirname "$0"))
+
+# check for dependencies
+if ! command -v mdbook > /dev/null; then
+    >&2 echo mdbook not found && exit 1
+fi
+if ! command -v luarocks > /dev/null; then
+    >&2 echo luarocks not found && exit 1
+fi
+
+# write and make rockspec
+cd $SCRIPT_DIR
+cat <<EOF > $SCRIPT_DIR/docgen-dev-0.rockspec 
+rockspec_format = "3.0"
+package = "docgen"
+version = "dev-0"
+
+dependencies = {
+    "lua >= 5.1",
+    "fluent >= 0.2.0",
+    "lua_cliargs >= 3.0.2",
+    "lpath >= 0.4.0",
+    "lua-cjson >= 2.1.0.10",
+}
+
+source = {
+    url = ""
+}
+
+build = {
+    install = {
+        bin = {
+            docgen = "docgen.lua",
+        }
+    }
+}
+EOF
+
+luarocks >/dev/null --local make ./docgen-dev-0.rockspec
+
+# run docgen script
+cd ..
+docgen $@
+
+# build docs with mdbook
+mdbook build

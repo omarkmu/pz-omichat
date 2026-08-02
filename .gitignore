@@ -1,4 +1,17 @@
+# Mod content folder
+Contents/
+
+# Local VS Code settings
 .vscode/
-guide/
-java/patch/
-docs/sandbox-presets/*.txt
+
+# Generated documentation site
+site/
+
+# Generated documentation files
+!docs/configuration/index.md
+docs/configuration/*.md
+docs/SUMMARY.md
+docs/**/_*.md
+
+# .rockspec file for docgen
+scripts/*.rockspec

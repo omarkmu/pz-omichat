@@ -3,11 +3,13 @@
 **At-maps** are multimaps that can be declared and used in [format strings](./index.md).
 Their keys can be associated with multiple values.
 
-When used with [functions](./functions.md#section-at-map) that accept at-maps, the objects are used directly. When converted to a string, at-maps use the stringified version of the first available value. This behavior allows use of at-maps to represent logic branches in a straightforward fashion.
+When used with [functions](./functions.md#section-at-map) that accept at-maps, the objects are used directly.
+When converted to a string, at-maps use the stringified version of the first available value.
+This behavior enables using at-maps to represent basic logic branches.
 
 For example, the following expressions have equivalent results:
 
-> `$ifelse($token $token default)`  
+> `$IfElse($token $token default)`  
 > `@($token:$token;1:default)`  
 > `@($token;default)`
 
@@ -18,13 +20,13 @@ Keys and values are separated by a colon, and entries are separated by a semicol
 
 > `@()`  
 > An empty at-map.
-> Evaluates to the empty string and—like the empty string—is treated as falsy in boolean operations.
+> Evaluates to the empty string and (like the empty string) is treated as falsy in boolean operations.
 
 > `@(key:value)`  
 > An at-map with a single key-value pair.
 > Evaluates to `value`.
 > If `key` is falsy or evaluates the empty string, it is not added to the at-map.
-> Falsy values are possible.
+> Falsy values are allowed.
 
 > `@(value)`  
 > Specifies an at-map with `value` as both the key and value.

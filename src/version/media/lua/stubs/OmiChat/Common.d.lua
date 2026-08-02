@@ -1,0 +1,25 @@
+---Type definitions that cannot be declared within the mod namespace.
+---@meta
+
+---@class omichat.ISChat : ISChat
+---@field instance? omichat.ISChat The ISChat instance.
+---@field focused boolean Flag for whether the chat is currently focused.
+---@field showTitle boolean Flag for whether chat type titles should display.
+---@field showTimestamp boolean Flag for whether timestamps should display.
+---@field chatFont omichat.ChatFont The current font of the chat.
+---@field chatText omichat.ChatTab The current chat tab.
+---@field tabs omichat.ChatTab[] List of available chat tabs.
+---@field allChatStreams (omichat.ChatStream | omichat.StreamTable)[] List of all available chat streams.
+---@field defaultTabStream table<integer, omichat.ChatStream?> An association of 1-indexed tab IDs to default streams.
+---@field gearButton ISButton The settings button.
+---@field textEntry omi.TextEntry The text entry UI element.
+---@field currentTabID integer The 1-indexed tab ID of the current tab.
+---@field tabCnt integer The number of available tabs.
+---@field infoButton omi.Button The info button.
+---@field rangeButton omi.Button The range indicator button.
+---@field infoRichText? omi.Dialog The rich text dialog.
+---@field activeProfilesPanel? omichat.ProfileManager The active profile manager panel.
+---@field activeConfigurationPanel? omi.forms.Form The active configuration menu panel.
+---@field activeLanguageDialog? omi.Dialog The active language add confirmation dialog.
+---@field activeColorDialog? omi.Dialog The active hair color dialog.
+---@field activePlayerDataPanel? omichat.PlayerDataManager The active player data manager panel.

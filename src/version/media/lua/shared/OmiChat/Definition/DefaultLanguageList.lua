@@ -1,0 +1,28 @@
+---Default list of roleplay languages.
+---@namespace omichat
+
+---@type Configuration.LanguageDefinition[]
+local DefaultLanguageList = {
+    { Name = 'English' },
+    { Name = 'French' },
+    { Name = 'Italian' },
+    { Name = 'German' },
+    { Name = 'Spanish' },
+    { Name = 'Danish' },
+    { Name = 'Dutch' },
+    { Name = 'Hungarian' },
+    { Name = 'Norwegian' },
+    { Name = 'Polish' },
+    { Name = 'Portuguese' },
+    { Name = 'Russian' },
+    { Name = 'Turkish' },
+    { Name = 'Japanese' },
+    { Name = 'Mandarin' },
+    { Name = 'Finnish' },
+    { Name = 'Korean' },
+    { Name = 'Thai' },
+    { Name = 'Ukrainian' },
+    { Name = 'ASL', Signed = true },
+}
+
+return DefaultLanguageList

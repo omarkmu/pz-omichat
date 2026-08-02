@@ -1,15 +1,13 @@
 version=1
-id=3178882070
-title=OmiChat
+id=3776040185
+title=OmiChat (Roleplay Chat) [b42]
 description=It's a chat mod.
-description=[b]This mod can be added or removed mid-save.[/b]
-description=
-description=[url=https://discord.gg/juv9TqygFu][img]https://img.shields.io/discord/1228107690354671626?style=for-the-badge&logo=discord&logoColor=%23fff&label=Discord&labelColor=%235865F2&color=%23555[/img][/url]
+description=This mod can be added or removed mid-save.
 description=
 description=[h2]Description[/h2]
-description=This mod improves the chat for players and offers a plethora of sandbox options for server operators. Among other features, it includes color customization, character naming, emote shortcuts, and new chat commands for roleplay.
+description=OmiChat improves the chat for players and offers many configuration options for server operators. Among other features, it includes color customization, character naming, emote shortcuts, and new chat commands for roleplay.
 description=
-description=The list of chat streams available with the default settings, including the vanilla streams: [list]
+description=Chat streams can be fully customized by admins, but many are available by default: [list]
 description=[*]/all
 description=[*]/faction [/f]
 description=[*]/safehouse [/sh]
@@ -19,72 +17,72 @@ description=[*]/yell [/y]
 description=[*]/low (short range chat)
 description=[*]/whisper [/w] (shorter range chat)
 description=[*]/me [/m] (describes a character's actions)
-description=[*]/mequiet [/mq]
 description=[*]/meloud [/ml]
+description=[*]/mequiet [/mq]
+description=[*]/mewhisper [/mw]
 description=[*]/do [/d] (describes an action or event)
-description=[*]/doquiet [/dq]
 description=[*]/doloud [/dl]
+description=[*]/doquiet [/dq]
+description=[*]/dowhisper [/dw]
 description=[*]/ooc [/o] (local out-of-character chat)
 description=[*]/admin [/a] (admin-only chat)
+description=[*]/narrate [/nr] (chat for narration by admins, moderators, and GMs)
 description=[/list]
 description=
 description=For more details, please see the [url=https://omarkmu.github.io/pz-omichat]documentation![/url]
 description=
 description=[h2]Features[/h2]
-description=This mod aims to be as configurable as possible. The vast majority of the features listed below can be configured or completely disabled via sandbox options.
+description=This mod aims to be as extensible and configurable as possible. The vast majority of the features listed below can be configured or completely disabled via the configuration.
 description=
-description=The default settings are tailored to usage for roleplay; by default, chats other than /all and /pm will use character forenames instead of usernames. Additionally, chat will use a colon for names instead of square brackets. Both of these can be reverted using the sandbox options.
+description=The default settings, based on buffy's roleplay chat, are tailored to usage for roleplay. Presets are also available for lighter RP and for mimicking vanilla.
 description=
 description=[b]Features for players:[/b] [list]
 description=[*]Chat color customization
 description=[*]Name color customization
-description=[*]Speech bubble color customization
 description=[*]Callout customization
 description=[*]Character naming with /name
-description=[*]Local /whisper chat
-description=[*]Local /card and /roll
-description=[*]Roleplay descriptions with /me and /do (and counterparts with larger and smaller ranges)
+description=[*]Customization profiles for character/style switching
+description=[*]Roleplay customization options (grow hair/beard, change hair color)
+description=[*]Roleplay chat buffs
 description=[*]Display of chat names in menus (Trading, Medical Check)
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556]True Actions Act 3 - Dancing[/url] compatibility with /dance
-description=[*]Input suggestion box
-description=[*]Emote animation shortcuts (.clap, .salute, .surrender, etc.) + /emotes command to display a list of emotes
-description=[*]Roleplay languages
-description=[*]Typing indicators (off by default)
+description=[*]/card, /roll, and /flip commands
+description=[*]Emote animation shortcuts (.clap, .salute, .surrender, etc.)
+description=[*]Roleplay languages, including a /language command for quick switching
+description=[*]Typing indicators
 description=[*]...and more!
 description=[/list]
 description=
 description=[b]Features for server operators:[/b] [list]
 description=[*]Various admin commands
+description=[*]Configurable chat streams
 description=[*]Configurable info text
-description=[*]Chat range options
+description=[*]Configurable roleplay languages
 description=[*]Customization of names, timestamps, all chat types, and more via powerful chat formats
-description=[*]Sandbox options to control the features listed above
-description=[*]Easy configuration with [url=https://omarkmu.github.io/pz-omichat/sandbox-presets]sandbox option presets[/url]
+description=[*]Configuration menu to control the features listed above in-game, including pre-made presets
 description=[*]Further extension of functionality using the API
 description=[/list]
 description=
 description=[h2]Compatibility[/h2]
 description=I don't expect this to be compatible with other mods that heavily modify chat, but it shouldn't cause compatibility issues otherwise. If there seems to be a conflict, [url=https://github.com/omarkmu/pz-omichat/issues/new?template=bug_report.yaml]let me know![/url]
 description=
-description=The mod is confirmed to be compatible with the following mods, for which there are options to control compatibility: [list]
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2688676019]Chat Bubble v0.6[/url]
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2873010748]Search Players For Weapons[/url]
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2648779556]True Actions. Act 3 - Dancing[/url]
-description=[*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=2728250841]buffy's tabletop RPG system[/url]
-description=[/list]
+description=Compatibility patches for other mods are included, but the relevant options are disabled since not everything is upgraded to b42.
+description=
+description=[h2]Mod Status[/h2]
+description=[b]OmiChat is currently in beta.[/b]
+description=Things may break. They will be fixed.
+description=Compatibility patches are currently soft-removed and waiting for the relevant mods to update.
+description=The API structure should not be considered final at this point.
 description=
 description=[h2]Permissions & Credits[/h2]
 description=This mod uses the [url=https://theindiestone.com/forums/index.php?/topic/2530-mod-permissions/#comment-36478]"Ask for permission" policy.[/url]
 description=You may [b]not[/b] reupload this mod or include it directly in modpacks. If there's something missing from the mod, [url=https://github.com/omarkmu/pz-omichat/blob/main/.github/CONTRIBUTING.md]contribute![/url]
-description=Permission is not required to list the mod as a requirement or extend it via the API. If you'd like to request permission to use it in another way (modpack requests will likely be denied), please start a [url=https://github.com/omarkmu/pz-omichat/discussions/new?category=general]discussion.[/url]
+description=Permission is not required to list the mod as a requirement or extend it via the API. If you'd like to request permission to use it in another way (modpack requests will be denied), please reach out on Discord.
 description=The code and associated documentation is licensed under the [url=https://github.com/omarkmu/pz-omichat/blob/main/LICENSE]MIT License.[/url]
 description=
-description=Thank you to Wuro and Inkredibehl for providing translations!
-description=Some features were inspired by [url=https://steamcommunity.com/sharedfiles/filedetails/?id=2688851521]buffy's roleplay chat.[/url]
-description=[hr][/hr]Questions? Use the [url=https://github.com/omarkmu/pz-omichat/discussions]GitHub discussions.[/url]
-description=Suggestions? Create a [url=https://github.com/omarkmu/pz-omichat/discussions/new?category=ideas]feature request.[/url]
-description=Problems? Create an [url=https://github.com/omarkmu/pz-omichat/issues/new?template=bug_report.yaml]issue.[/url]
+description=Thank you to Wuro (Ssaulabby) and Inkredibehl for providing translations!
+description=Some features were inpsired by buffy's roleplay chat. The range indicator and /status were inspired by Wasteland's RP chat.
+description=[hr][/hr]Found a bug? Create an [url=https://github.com/omarkmu/pz-omichat/issues/new?template=bug_report.yaml]issue.[/url]
 description=Want to contribute? [url=https://github.com/omarkmu/pz-omichat/blob/main/.github/CONTRIBUTING.md]You can![/url]
-description=Don't want to use GitHub? Join the [url=https://discord.gg/juv9TqygFu]Discord.[/url]
-tags=Build 41;Interface;Multiplayer;Silly/Fun
+description=Questions (or don't want to use GitHub)? Ask @omiyomy in the Project Zomboid Discord or the PZ Modding Community Discord.
+tags=Build 42;Interface;Multiplayer;Silly/Fun
 visibility=public

@@ -1,0 +1,1164 @@
+{
+  "SCHEMA_VERSION": 1,
+  "_definitions": {
+    "CUSTOM_STREAM_OPT_DESC": "This option is only enabled if [`Stream Type`](#list-stream) is set to *custom*.",
+    "RANGED_STREAM_OPT_DESC": "This option is only enabled for ranged [chat types](#list-chattype).",
+    "TOKENS_MENU_NAME": ["name", "forename", "surname", "username", "menuType"],
+    "TOKENS_OVERHEAD": [
+      "chatType",
+      "input",
+      "username",
+      "name",
+      "stream",
+      "echo",
+      "tags",
+      "language",
+      "rawLanguage",
+      "callout",
+      "sneakCallout",
+      "narrativeStyle",
+      "dialogueTag",
+      "unstyled"
+    ],
+    "TOKENS_OVERHEAD_NO_NARRATIVE": [
+      "chatType",
+      "input",
+      "username",
+      "name",
+      "stream",
+      "echo",
+      "tags",
+      "language",
+      "rawLanguage",
+      "callout",
+      "sneakCallout"
+    ],
+    "TOKENS_CHAT": [
+      "admin",
+      "stream",
+      "chatType",
+      "author",
+      "rawAuthor",
+      "name",
+      "rawName",
+      "tags",
+      "originalTags",
+      "originalStream",
+      "input",
+      "language",
+      "rawLanguage",
+      "unknownLanguage",
+      "faction",
+      "incomingPM",
+      "outgoingPM",
+      "recipient",
+      "rawRecipient",
+      "recipientName",
+      "rawRecipientName",
+      "card",
+      "heads",
+      "roll",
+      "sides",
+      "narrativeStyle",
+      "dialogueTag",
+      "unstyled"
+    ],
+    "TOKENS_CHAT_PROCESSED": [
+      "tag",
+      "chatType",
+      "timestamp",
+      "admin",
+      "echo",
+      "stream",
+      "rawIcon",
+      "tags",
+      "originalTags",
+      "originalStream",
+      { "name": "input", "id": "token-input-processed" },
+      { "name": "language", "id": "token-language-processed" },
+      { "name": "icon", "id": "token-icon-processed" }
+    ],
+    "ARGS_OVERHEAD": ["input", "name", "colorTargetTag"],
+    "ARGS_CHAT": ["input", "name", "colorTargetTag", "recipientName"],
+    "ARGS_PREFIX": ["loudIndicator", "quietIndicator", "whisperIndicator"]
+  },
+  "properties": [
+    {
+      "name": "General",
+      "type": "object",
+      "_shortDescription": "feature flags, info text, and other basic features.",
+      "_description": "Options that don't belong anywhere else. This includes feature flags, the admin icon, and info text.",
+      "properties": [
+        {
+          "name": "Preset",
+          "type": "string",
+          "default": "Buffy",
+          "padBottom": 16,
+          "_noDocKey": true,
+          "_description": "The preset dropdown can be used to select built-in and custom presets to apply to all chat settings.\n\nThe following presets are built-in:",
+          "_presetKeys": ["buffy", "omar", "vanilla"]
+        },
+        { "name": "AlwaysShowChat", "type": "checkbox", "default": false },
+        {
+          "name": "CaseInsensitiveChatStreams",
+          "type": "checkbox",
+          "default": true
+        },
+        {
+          "name": "IncludeRangeIndicatorButton",
+          "type": "checkbox",
+          "default": false,
+          "padBottom": 10
+        },
+        {
+          "name": "ClearOnDeath",
+          "type": "checkbox-group",
+          "defaultAll": true,
+          "options": ["Icon", "Languages", "Nickname", "Status"]
+        },
+        {
+          "name": "AdminIcon",
+          "type": "string",
+          "default": "Item_Hammer",
+          "padBottom": 10,
+          "noFullWidth": true
+        },
+        { "name": "InfoText", "type": "textbox", "maxLines": 50 },
+        {
+          "name": "Variables",
+          "type": "string-map",
+          "padTop": 10
+        }
+      ]
+    },
+    {
+      "name": "Buffs",
+      "type": "object",
+      "_shortDescription": "boosts to players' stats based on chat messages.",
+      "_description": "These options control buffs, which are configurable boosts to stats that are applied when messages are sent on certain streams.\n\nBy default, only roleplay streams (e.g., `/me`) apply buffs. Whether a stream applies buffs can be changed using the [`Allow Buffs`](./streams.md#list-allowbuffs) option.",
+      "properties": [
+        {
+          "name": "Enable",
+          "type": "page-checkbox",
+          "default": true,
+          "padBottom": 10
+        },
+        {
+          "name": "Cooldown",
+          "type": "integer",
+          "default": 15,
+          "min": 0,
+          "max": 1440
+        },
+        {
+          "name": "Boredom",
+          "type": "number",
+          "default": 0.2,
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Unhappiness",
+          "type": "number",
+          "default": 0.2,
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Hunger",
+          "type": "number",
+          "default": 0.1,
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Thirst",
+          "type": "number",
+          "default": 0.1,
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "Fatigue",
+          "type": "number",
+          "default": 0.1,
+          "min": 0,
+          "max": 1
+        },
+        {
+          "name": "CigaretteStress",
+          "type": "number",
+          "default": 0.2,
+          "min": 0,
+          "max": 1
+        }
+      ]
+    },
+    {
+      "name": "Callouts",
+      "type": "object",
+      "_shortDescription": "shout ranges and formatting.",
+      "_description": "These options control features related to callouts (shouts).",
+      "properties": [
+        {
+          "name": "Format",
+          "type": "format-string",
+          "_tokens": ["$TOKENS_OVERHEAD"],
+          "_args": ["$ARGS_OVERHEAD"]
+        },
+        {
+          "name": "SneakFormat",
+          "type": "format-string",
+          "_tokens": ["$TOKENS_OVERHEAD"],
+          "_args": ["$ARGS_OVERHEAD"]
+        },
+        {
+          "name": "Range",
+          "type": "integer",
+          "default": 48,
+          "min": 0,
+          "max": 60
+        },
+        {
+          "name": "SneakRange",
+          "type": "integer",
+          "default": 6,
+          "min": 0,
+          "max": 60
+        }
+      ]
+    },
+    {
+      "name": "Commands",
+      "type": "object",
+      "_shortDescription": "chat commands for player names, statuses, and more.",
+      "_description": "These options control various commands that are available in chat.",
+      "properties": [
+        {
+          "name": "Name",
+          "type": "object",
+          "properties": [
+            {
+              "name": "Mode",
+              "type": "string-dropdown",
+              "default": "Nickname",
+              "noLabel": true,
+              "options": [
+                "Disable",
+                "Nickname",
+                "Forename",
+                "Fullname",
+                "Forename-Plus-Nickname",
+                "Fullname-Plus-Nickname"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Status",
+          "type": "object",
+          "properties": [
+            {
+              "name": "Enable",
+              "type": "checkbox",
+              "default": true,
+              "toggleFields": ["Commands.Status.Range"]
+            },
+            {
+              "name": "Range",
+              "type": "integer",
+              "default": 15,
+              "min": 1,
+              "max": 100
+            }
+          ]
+        },
+        {
+          "name": "Card",
+          "type": "object",
+          "properties": [
+            {
+              "name": "Global",
+              "type": "checkbox",
+              "default": false,
+              "inverseToggleFields": [
+                "Commands.Card.OverheadFormat",
+                "Commands.Card.Tags"
+              ]
+            },
+            {
+              "name": "OverheadFormat",
+              "type": "format-string",
+              "_tokens": ["$TOKENS_OVERHEAD"],
+              "_args": ["$ARGS_OVERHEAD"]
+            },
+            { "name": "Items", "type": "string-list", "default": ["CardDeck"] },
+            { "name": "Tags", "type": "tags" }
+          ]
+        },
+        {
+          "name": "Roll",
+          "type": "object",
+          "properties": [
+            {
+              "name": "Global",
+              "type": "checkbox",
+              "default": false,
+              "inverseToggleFields": [
+                "Commands.Roll.OverheadFormat",
+                "Commands.Roll.Tags"
+              ]
+            },
+            {
+              "name": "OverheadFormat",
+              "type": "format-string",
+              "_tokens": ["$TOKENS_OVERHEAD"],
+              "_args": ["$ARGS_OVERHEAD"]
+            },
+            {
+              "name": "Items",
+              "type": "string-list",
+              "default": [
+                "Dice",
+                "Dice_00",
+                "Dice_4",
+                "Dice_6",
+                "Dice_8",
+                "Dice_10",
+                "Dice_12",
+                "Dice_20"
+              ]
+            },
+            { "name": "Tags", "type": "tags" }
+          ]
+        },
+        {
+          "name": "Flip",
+          "type": "object",
+          "properties": [
+            {
+              "name": "Global",
+              "type": "checkbox",
+              "inverseToggleFields": [
+                "Commands.Flip.OverheadFormat",
+                "Commands.Flip.Tags"
+              ],
+              "default": false
+            },
+            {
+              "name": "OverheadFormat",
+              "type": "format-string",
+              "_tokens": ["$TOKENS_OVERHEAD"],
+              "_args": ["$ARGS_OVERHEAD"]
+            },
+            { "name": "Items", "type": "string-list" },
+            { "name": "Tags", "type": "tags" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Compatibility",
+      "type": "object",
+      "_shortDescription": "integrations and patches for other mods.",
+      "_description": "These options control compatibility patches for other mods.\n\n> [!NOTE]\n> Currently, mod compatibility patches are soft-removed. They may be reintroduced when the relevant mods are updated for b42.",
+      "properties": [
+        { "name": "ApplyOverrides", "type": "checkbox", "default": true },
+        { "name": "ChatBubble", "type": "compatibility", "hidden": true },
+        { "name": "SearchPlayers", "type": "compatibility", "hidden": true },
+        {
+          "name": "TrueActionsDancing",
+          "type": "compatibility",
+          "hidden": true
+        }
+      ]
+    },
+    {
+      "name": "Customization",
+      "type": "object",
+      "_shortDescription": "player customization, such as name colors and custom shouts.",
+      "_description": "These options control the customization options available to players.",
+      "properties": [
+        {
+          "name": "AllowCustomShouts",
+          "type": "checkbox",
+          "default": true,
+          "_extraDescription": "Custom shouts can be configured via profiles, in the [chat settings](../user-guide/chat-settings.md#callout-customization)."
+        },
+        { "name": "EnableNameColors", "type": "checkbox", "default": true },
+        {
+          "name": "EnableCharacterCustomization",
+          "type": "checkbox",
+          "padTop": 10,
+          "toggleFields": ["Customization.CleanEffects"],
+          "default": true
+        },
+        {
+          "name": "CleanEffects",
+          "type": "checkbox-group",
+          "defaultAll": true,
+          "options": ["Body", "Clothing"]
+        }
+      ]
+    },
+    {
+      "name": "Discord",
+      "type": "object",
+      "_shortDescription": "formatting for Discord integration messages.",
+      "_description": "These options control the formatting of messages that come from Discord.",
+      "properties": [
+        {
+          "name": "ChatFormat",
+          "type": "format-string",
+          "_tokens": ["$TOKENS_CHAT"],
+          "_args": ["$ARGS_CHAT"]
+        },
+        { "name": "DefaultColor", "type": "color", "default": [144, 137, 218] },
+        {
+          "name": "ShowColorOption",
+          "type": "string-dropdown",
+          "padTop": 10,
+          "default": "Respect-Server-Setting",
+          "options": ["Yes", "No", "Respect-Server-Setting"]
+        },
+        {
+          "name": "Tags",
+          "type": "tags",
+          "default": ["OOC", "UseAuthorUsername"]
+        }
+      ]
+    },
+    {
+      "name": "EchoMessages",
+      "type": "object",
+      "_shortDescription": "enabling and formatting echo messages.",
+      "_description": "These options control echo messages, which are messages sent on one stream that automatically send to another.",
+      "properties": [
+        { "name": "Enable", "type": "page-checkbox", "default": true },
+        {
+          "name": "ChatFormat",
+          "type": "format-string",
+          "_tokens": ["$TOKENS_CHAT"],
+          "_args": ["$ARGS_CHAT"]
+        },
+        {
+          "name": "OverheadFormat",
+          "type": "format-string",
+          "_tokens": ["$TOKENS_OVERHEAD"],
+          "_args": ["$ARGS_OVERHEAD"]
+        },
+        { "name": "Tags", "type": "tags", "default": ["OverRadio"] }
+      ]
+    },
+    {
+      "name": "Format",
+      "type": "object",
+      "_shortDescription": "formatting options and advanced customization.",
+      "_description": "This section includes options related to formatting, including various [format strings](../format-strings/index.md) which can be used for advanced customization.\n\nAll of the format strings default to `$Default()`, which gets the default content. The tokens and options that each format accepts are available in the in-game configuration menu.",
+      "properties": [
+        {
+          "name": "Chat",
+          "type": "object",
+          "properties": [
+            {
+              "name": "Prefix",
+              "type": "format-string",
+              "_args": ["$ARGS_PREFIX"],
+              "_tokens": ["$TOKENS_CHAT_PROCESSED"]
+            },
+            {
+              "name": "Final",
+              "type": "format-string",
+              "_args": ["prefix", "input"],
+              "_tokens": [
+                "$TOKENS_CHAT_PROCESSED",
+                { "name": "prefix", "id": "token-prefix-chat-final" }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Overhead",
+          "type": "object",
+          "properties": [
+            {
+              "name": "Prefix",
+              "type": "format-string",
+              "_args": ["$ARGS_PREFIX"],
+              "_tokens": ["$TOKENS_OVERHEAD"]
+            },
+            {
+              "name": "Final",
+              "type": "format-string",
+              "_args": ["prefix", "input"],
+              "_tokens": [
+                "$TOKENS_OVERHEAD",
+                { "name": "prefix", "id": "token-prefix-overhead-final" }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "PerceptionRange",
+          "type": "object",
+          "properties": [
+            {
+              "name": "Chat",
+              "type": "format-string",
+              "_args": ["name"],
+              "_tokens": ["$TOKENS_CHAT"]
+            },
+            {
+              "name": "Overhead",
+              "type": "format-string",
+              "_args": ["name"],
+              "_tokens": ["$TOKENS_OVERHEAD"]
+            }
+          ]
+        },
+        {
+          "name": "Component",
+          "type": "object",
+          "properties": [
+            {
+              "name": "Name",
+              "type": "format-string",
+              "_args": ["mode", "defaultName", "name"],
+              "_tokens": [
+                "chatType",
+                "forename",
+                "username",
+                "surname",
+                "username",
+                { "name": "name", "id": "token-name-component" }
+              ]
+            },
+            {
+              "name": "Tag",
+              "type": "format-string",
+              "_tokens": [
+                "chatType",
+                "stream",
+                "tags",
+                "originalTags",
+                "originalStream",
+                { "name": "tag", "id": "token-tag-component" }
+              ]
+            },
+            {
+              "name": "Timestamp",
+              "type": "format-string",
+              "_tokens": [
+                "chatType",
+                "stream",
+                "tags",
+                "originalTags",
+                "originalStream",
+                "hourFormat",
+                "P",
+                "PP",
+                "h",
+                "hh",
+                "H",
+                "HH",
+                "m",
+                "mm",
+                "s",
+                "ss",
+                "ampm",
+                "AMPM"
+              ]
+            },
+            {
+              "name": "Icon",
+              "type": "format-string",
+              "_args": ["cardIcon", "flipIcon", "rollIcon"],
+              "_tokens": ["adminIcon", "icon"]
+            },
+            {
+              "name": "Language",
+              "type": "format-string",
+              "_tokens": [
+                "chatType",
+                "stream",
+                "language",
+                "rawLanguage",
+                "adminIcon",
+                "tags",
+                "originalTags",
+                "originalStream"
+              ]
+            },
+            {
+              "name": "EmbeddedQuote",
+              "type": "format-string",
+              "_args": ["input", "colorTargetTag"],
+              "_tokens": ["input", "tags"],
+              "padTop": 10,
+              "_descriptionTokens": "desc-token-embedded"
+            },
+            {
+              "name": "EmbeddedAction",
+              "type": "format-string",
+              "_args": ["input", "colorTargetTag"],
+              "_tokens": ["input", "tags"],
+              "_descriptionTokens": "desc-token-embedded"
+            }
+          ]
+        },
+        {
+          "name": "Filter",
+          "type": "object",
+          "properties": [
+            {
+              "name": "ChatInput",
+              "type": "format-string",
+              "_args": [
+                "input",
+                "maxLength",
+                {
+                  "name": "truncateTo",
+                  "id": "arg-truncateTo-filter-chat-input"
+                }
+              ],
+              "_tokens": ["$TOKENS_OVERHEAD"],
+              "_errorTokens": true
+            },
+            {
+              "name": "Name",
+              "type": "format-string",
+              "_args": [
+                "minLength",
+                "maxLength",
+                { "name": "truncateTo", "id": "arg-truncateTo-filter-name" }
+              ],
+              "_tokens": [
+                "input",
+                { "name": "target", "id": "token-target-filter-name" }
+              ],
+              "_errorTokens": true
+            },
+            {
+              "name": "Status",
+              "type": "format-string",
+              "_args": [
+                "truncateTo",
+                { "name": "maxLength", "id": "arg-maxLength-filter-status" },
+                { "name": "minLength", "id": "arg-minLength-filter-status" }
+              ],
+              "_tokens": ["input"],
+              "_errorTokens": true
+            }
+          ]
+        },
+        {
+          "name": "MenuName",
+          "type": "object",
+          "properties": [
+            {
+              "name": "Trade",
+              "type": "format-string",
+              "_tokens": ["$TOKENS_MENU_NAME"]
+            },
+            {
+              "name": "Medical",
+              "type": "format-string",
+              "_tokens": ["$TOKENS_MENU_NAME"]
+            },
+            {
+              "name": "SearchPlayer",
+              "type": "format-string",
+              "hidden": true,
+              "_tokens": ["$TOKENS_MENU_NAME"]
+            },
+            {
+              "name": "MiniScoreboard",
+              "type": "format-string",
+              "_tokens": ["$TOKENS_MENU_NAME"]
+            }
+          ]
+        },
+        {
+          "name": "Other",
+          "type": "object",
+          "properties": [
+            {
+              "name": "PMParentheses",
+              "type": "integer",
+              "default": 2,
+              "padBottom": 10,
+              "min": 0,
+              "max": 5
+            },
+            {
+              "name": "DefaultNameMode",
+              "type": "string-dropdown",
+              "default": "name",
+              "options": ["name", "username", "both"]
+            },
+            {
+              "name": "DefaultNameModeForChatType",
+              "type": "string-map",
+              "noLabel": true,
+              "padBottom": 10,
+              "default": {
+                "admin": "username",
+                "whisper": "both"
+              }
+            },
+            {
+              "name": "VolumeIndicators",
+              "type": "string-map",
+              "default": {
+                "Loud": "Long"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Language",
+      "type": "object",
+      "_shortDescription": "customization of available roleplay languages and related behavior.",
+      "_description": "These options are related to roleplay languages. Players will be unable to fully understand messages sent in a language their character cannot speak.",
+      "properties": [
+        {
+          "name": "UseDefaultList",
+          "type": "checkbox",
+          "inverseToggleFields": ["Language.List"],
+          "default": true,
+          "_description": "If this is enabled, the languages configured in the list will be ignored in favor of the default languages."
+        },
+        {
+          "name": "List",
+          "type": "object-list",
+          "properties": [
+            { "name": "Name", "type": "string" },
+            { "name": "Signed", "type": "checkbox", "default": false }
+          ],
+          "maxItems": 1000,
+          "noLabel": true,
+          "useFullPage": true,
+          "padBottom": 16,
+          "_description": "The list of roleplay languages players can use."
+        },
+        {
+          "name": "DefaultSlots",
+          "type": "integer",
+          "default": 1,
+          "min": 0,
+          "max": 50,
+          "_extraDescription": "Extra languages can also added using admin [commands](../user-guide/admins.md#addlanguage). This is necessary if the value of this option is less than 2."
+        },
+        {
+          "name": "InterpretationRolls",
+          "type": "integer",
+          "default": 2,
+          "min": 0,
+          "max": 10
+        },
+        {
+          "name": "InterpretationChance",
+          "type": "integer",
+          "padBottom": 10,
+          "default": 25,
+          "min": 0,
+          "max": 100
+        },
+        {
+          "name": "UnknownLanguageOverhead",
+          "type": "format-string",
+          "_tokens": ["$TOKENS_OVERHEAD"],
+          "_args": ["$ARGS_OVERHEAD", "language", "dialogueTag"],
+          "padTop": 10
+        },
+        {
+          "name": "UnknownLanguageChat",
+          "type": "format-string",
+          "_tokens": ["$TOKENS_CHAT"],
+          "_args": ["$ARGS_CHAT", "language", "dialogueTag"]
+        },
+        {
+          "name": "UnknownLanguageRadio",
+          "type": "format-string",
+          "_tokens": ["$TOKENS_CHAT"],
+          "_args": ["$ARGS_CHAT"]
+        },
+        {
+          "name": "PlaceholderFormat",
+          "type": "format-string",
+          "_tokens": ["language", "rawLanguage"],
+          "padTop": 10,
+          "_args": [
+            {
+              "name": "allowDefault",
+              "id": "arg-allowDefault-language-placeholder"
+            }
+          ]
+        },
+        {
+          "name": "PlaceholderColor",
+          "type": "color",
+          "default": [70, 70, 70],
+          "padBottom": 10
+        },
+        { "name": "SelfAddAllowlist", "type": "string-list" },
+        { "name": "SelfAddBlocklist", "type": "string-list" }
+      ]
+    },
+    {
+      "name": "Macros",
+      "type": "object",
+      "_shortDescription": "configuration for macros available to players.",
+      "_description": "These options control macros.\n\nCurrently, the only built-in macro is the one used for [emote shortcuts](../user-guide/emote-shortcuts.md).",
+      "properties": [
+        { "name": "Enable", "type": "page-checkbox", "default": true },
+        {
+          "name": "BuiltIn",
+          "type": "checkbox-group",
+          "defaultAll": true,
+          "options": ["Emote"]
+        }
+      ]
+    },
+    {
+      "name": "Mentions",
+      "type": "object",
+      "_shortDescription": "configuration for mentions.",
+      "_description": "These options control mentions.\n\nCurrently, these only display the mentioned user's name color.",
+      "properties": [
+        { "name": "Enable", "type": "page-checkbox", "default": true },
+        {
+          "name": "AlwaysUseNameColors",
+          "type": "page-checkbox",
+          "default": true
+        },
+        {
+          "name": "Range",
+          "type": "integer",
+          "padTop": 10,
+          "default": 20,
+          "min": 0,
+          "max": 60
+        },
+        {
+          "name": "ChatFormat",
+          "type": "format-string",
+          "_args": ["input"],
+          "_tokens": ["input", "onlineID", "stream", "chatType"]
+        },
+        {
+          "name": "OverheadFormat",
+          "type": "format-string",
+          "_args": ["input"],
+          "_tokens": ["input", "onlineID", "stream", "chatType"]
+        }
+      ]
+    },
+    {
+      "name": "NarrativeStyle",
+      "type": "object",
+      "_shortDescription": "options for displaying messages in a narrative format.",
+      "_description": "These options control narrative style. If narrative style is used, messages will be enclosed in quotes and prefixed with a dialogue tag depending on the stream.\n\nFor example, with the default settings, a message sent with `/yell Hey` will be transformed to `<Name> shouts, “Hey!”`.",
+      "properties": [
+        { "name": "Enable", "type": "page-checkbox", "default": true },
+        {
+          "name": "OverheadContentFormat",
+          "type": "format-string",
+          "_args": ["noComma"],
+          "_tokens": ["$TOKENS_OVERHEAD"]
+        },
+        {
+          "name": "ChatContentFormat",
+          "type": "format-string",
+          "_args": ["noComma"],
+          "_tokens": ["$TOKENS_CHAT"],
+          "padBottom": 10
+        },
+        {
+          "name": "DialogueTagFormat",
+          "type": "format-string",
+          "_args": [
+            "loudTag",
+            "whisperTag",
+            "sneakCalloutTag",
+            "questionTag",
+            "exclamationTag",
+            "statementTag",
+            "shortStatementTag"
+          ],
+          "_tokens": ["$TOKENS_OVERHEAD_NO_NARRATIVE"]
+        },
+        {
+          "name": "InputFilter",
+          "type": "format-string",
+          "_args": ["input"],
+          "_tokens": ["$TOKENS_OVERHEAD_NO_NARRATIVE"]
+        }
+      ]
+    },
+    {
+      "name": "Radio",
+      "type": "object",
+      "_shortDescription": "customization of messages sent over the radio.",
+      "_description": "These options control formatting of messages sent over the radio.",
+      "properties": [
+        {
+          "name": "ChatFormat",
+          "type": "format-string",
+          "_tokens": ["$TOKENS_CHAT", "frequency"]
+        },
+        {
+          "name": "OverheadFormat",
+          "type": "format-string",
+          "_tokens": ["$TOKENS_OVERHEAD", "frequency"]
+        },
+        { "name": "DefaultColor", "type": "color", "default": [178, 178, 178] },
+        { "name": "Tags", "type": "tags", "default": ["NoVolumeIndicator"] }
+      ]
+    },
+    {
+      "name": "ServerMessages",
+      "type": "object",
+      "_shortDescription": "customization of server messages.",
+      "_description": "These options control formatting of server messages.",
+      "properties": [
+        {
+          "name": "ChatFormat",
+          "type": "format-string",
+          "_args": ["input", "name", "colorTargetTag", "recipientName"],
+          "_tokens": ["$TOKENS_CHAT"]
+        },
+        { "name": "DefaultColor", "type": "color", "default": [0, 128, 255] },
+        { "name": "Tags", "type": "tags", "default": ["NoTimestamp"] }
+      ]
+    },
+    {
+      "name": "Streams",
+      "type": "object",
+      "_shortDescription": "advanced chat stream customization, including stream creation.",
+      "_description": "These options control custom stream configuration. With the exception of [`Use Defaults`](#usedefaultlist) and [`Global Tags`](#globaltags), the options on this page are per-stream.",
+      "properties": [
+        {
+          "name": "UseDefaultList",
+          "type": "checkbox",
+          "inverseToggleFields": ["Streams.List"],
+          "default": true,
+          "_description": "If this is enabled, the streams configured in the list will be ignored in favor of the default streams."
+        },
+        {
+          "name": "List",
+          "type": "object-list",
+          "properties": [
+            {
+              "name": "Enable",
+              "type": "checkbox",
+              "padBottom": 10,
+              "default": true
+            },
+            {
+              "name": "Stream",
+              "type": "string-dropdown",
+              "default": "custom",
+              "options": [
+                "custom",
+                "say",
+                "yell",
+                "private",
+                "faction",
+                "safehouse",
+                "general",
+                "admin",
+                "whisper",
+                "low",
+                "me",
+                "meloud",
+                "mequiet",
+                "mewhisper",
+                "do",
+                "doloud",
+                "doquiet",
+                "dowhisper",
+                "ooc",
+                "narrate"
+              ]
+            },
+            {
+              "name": "Name",
+              "type": "string",
+              "_extraDescription": "$CUSTOM_STREAM_OPT_DESC"
+            },
+            { "name": "Command", "type": "string" },
+            { "name": "ShortCommand", "type": "string", "padBottom": 10 },
+            {
+              "name": "ChatType",
+              "type": "string-dropdown",
+              "default": "say",
+              "options": [
+                "say",
+                "shout",
+                "faction",
+                "safehouse",
+                "whisper",
+                "general",
+                "admin"
+              ],
+              "_extraDescription": "$CUSTOM_STREAM_OPT_DESC"
+            },
+            {
+              "name": "Category",
+              "type": "string-dropdown",
+              "default": "chat",
+              "options": ["chat", "rp", "other"],
+              "_extraDescription": "$CUSTOM_STREAM_OPT_DESC"
+            },
+            { "name": "DefaultColor", "type": "color" },
+            {
+              "name": "Range",
+              "type": "integer",
+              "default": 30,
+              "min": 1,
+              "max": 60,
+              "_extraDescription": "$RANGED_STREAM_OPT_DESC"
+            },
+            {
+              "name": "RangeSigned",
+              "type": "integer",
+              "default": 0,
+              "min": 0,
+              "max": 60,
+              "_extraDescription": "$RANGED_STREAM_OPT_DESC"
+            },
+            {
+              "name": "VerticalRange",
+              "type": "integer",
+              "default": 2,
+              "min": 1,
+              "max": 32,
+              "_extraDescription": "$RANGED_STREAM_OPT_DESC"
+            },
+            {
+              "name": "VerticalRangeSigned",
+              "type": "integer",
+              "default": 1,
+              "min": 0,
+              "max": 60,
+              "_extraDescription": "$RANGED_STREAM_OPT_DESC"
+            },
+            {
+              "name": "PerceptionRange",
+              "type": "integer",
+              "default": 0,
+              "min": 0,
+              "max": 60,
+              "_extraDescription": "$RANGED_STREAM_OPT_DESC"
+            },
+            {
+              "name": "PerceptionRangeSigned",
+              "type": "integer",
+              "padBottom": 10,
+              "default": 0,
+              "min": 0,
+              "max": 60,
+              "_extraDescription": "$RANGED_STREAM_OPT_DESC"
+            },
+            {
+              "name": "ChatFormat",
+              "type": "format-string",
+              "_args": ["$ARGS_CHAT"],
+              "_tokens": ["$TOKENS_CHAT"]
+            },
+            {
+              "name": "OverheadFormat",
+              "type": "format-string",
+              "padBottom": 10,
+              "_tokens": ["$TOKENS_OVERHEAD"],
+              "_args": ["$ARGS_OVERHEAD"],
+              "_extraDescription": "$RANGED_STREAM_OPT_DESC"
+            },
+            { "name": "AllowBuffs", "type": "checkbox", "default": false },
+            { "name": "AllowMentions", "type": "checkbox", "default": false },
+            { "name": "AllowLanguages", "type": "checkbox", "default": false },
+            {
+              "name": "AllowTypingIndicator",
+              "type": "checkbox",
+              "default": false
+            },
+            {
+              "name": "AttractZombies",
+              "type": "checkbox",
+              "default": false,
+              "_extraDescription": "$RANGED_STREAM_OPT_DESC"
+            },
+            {
+              "name": "UseNarrativeStyle",
+              "type": "checkbox",
+              "padBottom": 10,
+              "default": false
+            },
+            { "name": "Tags", "type": "tags" },
+            {
+              "name": "Aliases",
+              "type": "string-list",
+              "noReorderButtons": false
+            },
+            {
+              "name": "Roles",
+              "type": "string-list",
+              "padBottom": 10
+            }
+          ],
+          "maxItems": 50,
+          "noLabel": true,
+          "useFullPage": true,
+          "padBottom": 16,
+          "_description": "Configuration for chat streams. The options in this section are per-stream.\n\nSome options are not available for certain chat types; if this is the case, they will not be editable in the configuration menu."
+        },
+        {
+          "name": "GlobalTags",
+          "type": "tags",
+          "default": ["ActionAsterisks", "IncludeAdminIndicator"]
+        }
+      ]
+    },
+    {
+      "name": "TypingIndicator",
+      "type": "object",
+      "_shortDescription": "indicators for when players are typing in chat.",
+      "_description": "These options control the typing indicator.",
+      "properties": [
+        { "name": "Enable", "type": "page-checkbox", "default": true },
+        {
+          "name": "Format",
+          "type": "format-string",
+          "_args": [{ "name": "names", "id": "arg-names-typing" }],
+          "_tokens": [
+            { "name": "alt", "id": "token-alt-typing" },
+            { "name": "names", "id": "token-names-typing" }
+          ]
+        },
+        {
+          "name": "NameFormat",
+          "type": "format-string",
+          "_tokens": ["name", "forename", "surname", "username"]
+        }
+      ]
+    },
+    {
+      "name": "ZombieAttraction",
+      "type": "object",
+      "_shortDescription": "attracting zombies from chat messages.",
+      "_description": "These options control attraction of zombies from chat messages.",
+      "properties": [
+        {
+          "name": "ChatRangeMultiplier",
+          "type": "number",
+          "default": 0,
+          "min": 0,
+          "max": 10
+        }
+      ]
+    }
+  ]
+}
