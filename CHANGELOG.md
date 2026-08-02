@@ -1,5 +1,76 @@
 # Changelog
 
+## 2.0.0-beta
+
+### Added
+- Added support for custom chat streams
+- Added support for user-defined presets
+- Added a stream tagging system for modifying stream behavior
+- Added `/status` command and corresponding status display
+- Added chat range indicator
+    - The initial version will likely need improvements. Please feel free to share feedback.
+- Added configuration for out-of-range messages
+- Added automatic quoting, to include missed end quotes in narrative style
+- Added interpolation functions for default formats
+- Added a content format for narrative style
+- Added support for embedded quotes and actions
+    - This means that quote colors can be used within an action (`/me`), and vice versa.
+- Added in-game documentation for configuration
+- Added player mention feature
+- Added separate range options for signed languages
+- Added hooks module, for hooking into functionality from other mods
+    - This will be extended in the future as needed.
+- Added placeholder text to indicate current roleplay language
+- Added role-based limits for streams
+    - This is used for the new built-in `/narrate` stream.
+
+### Changed
+- Restructured the API significantly
+- Configuration is now saved to a server-side file instead of mod data
+- Consolidated `Options` and `config` into one configuration object
+- Consolidated `EnableSetNameColor`,  `EnableSetSpeechColor`, and `EnableSpeechColorAsDefaultNameColor` into `EnableNameColors`
+- Improved behavior and appearance of the functionality to color actions and quotes
+- Player profiles can now define colors for custom streams
+- Error tokens are now read by all filter formats
+- Empty formats no longer indicate disabling features; there are now dedicated options and tags for this purpose
+- `AdminIcon` is no longer a format string; instead, it expects a texture directly
+- The info text dialog will now update periodically while open
+    - This means token values will be kept up to date.
+- Rich text panels, including the chat, will now use a custom implementation
+- Moved custom interpolator logic to the library mod
+- Emote shortcuts have been formalized as a a built-in macro
+- Emote shortcut prefix has been changed from `.` to `!`
+- Message metadata is now encoded directly as a JSON object, instead of invisible characters
+- Renamed `clap02` emote to `slowclap`
+- Moved buffs and customization handling to the server
+- Updated default `/flip` icon to be a coin
+- Soft-removed compatibility options
+- Updated Java mods to patch `ChatMessage` instead of `ChatServer`
+
+### Fixed
+- Vanilla `/dance` easter egg will now work when not overridden with a stream
+
+### Removed
+- Removed all deprecated features
+- Removed `EnableFactionColorAsDefault`
+- Removed `PredicateShowTypingIndicator` in favor of a per-stream toggle
+- Removed `PredicateEnableStream` in favor of a per-stream toggle
+- Removed `PredicateUseNarrativeStyle` in favor of a per-stream toggle
+- Removed `PredicateApplyBuff` in favor of a per-stream toggle
+- Removed `PredicateAttractZombies` in favor of a per-stream toggle
+- Removed `PredicateClearOnDeath` in favor of a configuration option
+- Removed `PredicateUseNameColor` in favor of the `UseNameColor` tag
+- Removed `PredicateTransmitOverRadio` in favor of the `TransmitOverRadio` and `NoTransmitOverRadio` tags
+    - Defaults to transmitting if the stream is not tagged with `OOC` nor `Action`.
+- Removed `PatternNarrativeCustomTag`
+    - This may be introduced in another form in the future.
+- Removed interpolation functions that serve the same purpose as default format functions
+- Removed name colors as a distinct field; this is now always tied to speech color
+- Removed `SuggesterBox` in favor of OmiLibrary `SuggestBox`
+- Removed obsolete icon picker
+- Removed compatibility suport for Buffy's Character Bios and Buffy's Tabletop Roleplay System
+- Removed suggesters and transformers in favor of hooks
+
 ## 1.5.0
 
 ### Added
