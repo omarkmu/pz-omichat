@@ -3,11 +3,6 @@ title=OmiChat (Roleplay Chat) [b42]
 description=It's a chat mod.
 description=This mod can be added or removed mid-save.
 description=
-description=[b]OmiChat is currently in beta.[/b]
-description=Things may break. They will be fixed.
-description=Compatibility patches are currently soft-removed and waiting for the relevant mods to update.
-description=The API structure should not be considered final at this point.
-description=
 description=[h2]Description[/h2]
 description=OmiChat improves the chat for players and offers many configuration options for server operators. Among other features, it includes color customization, character naming, emote shortcuts, and new chat commands for roleplay.
 description=
@@ -70,6 +65,12 @@ description=[h2]Compatibility[/h2]
 description=I don't expect this to be compatible with other mods that heavily modify chat, but it shouldn't cause compatibility issues otherwise. If there seems to be a conflict, [url=https://github.com/omarkmu/pz-omichat/issues/new?template=bug_report.yaml]let me know![/url]
 description=
 description=Compatibility patches for other mods are included, but the relevant options are disabled since not everything is upgraded to b42.
+description=
+description=[h2]Mod Status[/h2]
+description=[b]OmiChat is currently in beta.[/b]
+description=Things may break. They will be fixed.
+description=Compatibility patches are currently soft-removed and waiting for the relevant mods to update.
+description=The API structure should not be considered final at this point.
 description=
 description=[h2]Permissions & Credits[/h2]
 description=This mod uses the [url=https://theindiestone.com/forums/index.php?/topic/2530-mod-permissions/#comment-36478]"Ask for permission" policy.[/url]
