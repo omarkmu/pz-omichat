@@ -22,11 +22,11 @@ Preferences._version = 2
 
 ---Old filenames used for preferences.
 ---@private
-Preferences._legacyFilenames = { 'omichat.json' }
+Preferences._legacyFilenames = { 'omichat.json', 'omichat/settings.json.txt' }
 
 ---The filename from which preferences are loaded.
 ---@private
-Preferences._filename = 'omichat/settings.json.txt'
+Preferences._filename = 'omichat/settings.json'
 
 ---Associates admin options to setting names.
 ---@type table<AdminOption, string>
@@ -268,7 +268,7 @@ function Preferences.save()
         utils.log.error('Failed to write preferences: %s', err)
         return false
     end
-    
+
     if not utils.writeFile(Preferences._filename, encoded) then
         utils.log.error('Failed to write preferences file')
         return false
@@ -447,25 +447,22 @@ function Preferences._readPrefsJson()
         create = false,
     })
 
-    if err then
-        -- check for legacy files when file is not found
-        if utils.startsWith(err, 'could not open file') then
-            for i = 1, #Preferences._legacyFilenames do
-                decoded, err = schema:readFile({
-                    filename = Preferences._legacyFilenames[i],
-                    create = false,
-                })
+    if err and utils.startsWith(err, 'could not open file') then
+        for i = 1, #Preferences._legacyFilenames do
+            decoded = schema:readFile({
+                filename = Preferences._legacyFilenames[i],
+                create = false,
+            })
 
-                if decoded then
-                    err = nil
-                    break
-                end
+            if decoded then
+                err = nil
+                break
             end
         end
+    end
 
-        if err then
-            utils.log.error('Failed to read preferences: %s', err)
-        end
+    if err then
+        utils.log.warn('Failed to read preferences: %s', err)
     end
 
     if not decoded then
