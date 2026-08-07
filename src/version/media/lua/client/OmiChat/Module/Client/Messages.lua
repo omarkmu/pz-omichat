@@ -89,6 +89,7 @@ function Messages.addContextData(args)
         if args.addCommandTokens then
             tokens.roll = ctx.roll
             tokens.sides = ctx.sides
+            tokens.diceResult = ctx.diceResult
         end
     end
 end

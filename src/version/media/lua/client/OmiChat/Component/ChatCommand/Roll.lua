@@ -20,16 +20,19 @@ API._rollCommand = API.CommandStream:new {
         end
 
         local command = utils.trim(ctx.text)
-        local first = command:split(' ')[1]
-        local sides = utils.tointeger(first)
-        if not sides and #command == 0 then
-            sides = 6
-        elseif not sides then
-            ctx.stream:showHelpText()
-            return
+        local sides = utils.tointeger(command)
+        if sides then
+            if sides < 0 or sides > 100 then
+                ctx.stream:showHelpText()
+                return
+            end
+
+            command = 'd' .. sides
+        elseif #command == 0 then
+            command = 'd6'
         end
 
-        if not API.request.rollDice(sides) then
+        if not API.request.rollDice(command) then
             ctx.stream:showHelpText()
         end
     end,

@@ -37,7 +37,11 @@ command-card-global = { $name } a tiré { $card }
 
 command-roll = { $name }{ $space } lance { $roll } sur un dé à { $sides } faces
 
+command-roll-expression = { $name }{ $space } lance { $roll }
+
 command-roll-global = { $name } a lancé un { $roll } sur un dé à { $sides } faces
+
+command-roll-global-expression  = { $name } a lancé un { $roll }
 
 command-flip-heads = { $name }{ $space } lance une pièce de monnaie et obtient face
 

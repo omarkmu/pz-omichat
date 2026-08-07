@@ -12,6 +12,7 @@ local stringLib = baseLib.string
 
 local sort = table.sort
 local concat = table.concat
+local format = string.format
 local getText = utils.getText
 local getTextOrNull = utils.getTextOrNull
 
@@ -634,13 +635,32 @@ function Helpers.getMessage(interpolator, tags, name, forChat, rawName)
             rawName = rawName,
         })
     elseif tags.IsRollCommand then
-        message = getText('command-roll', {
-            name = name,
-            space = space,
-            rawName = rawName,
-            roll = interpolator:tokenString('roll'),
-            sides = interpolator:tokenString('sides'),
-        })
+        local diceResult = interpolator:tokenString('diceResult')
+        local roll = interpolator:tokenString('roll')
+        if diceResult ~= '' then
+            local rollText
+            if forChat then
+                local fmt = " <SPACE> <HOVER text='%s'> %d </HOVER> "
+                rollText = format(fmt, diceResult:gsub('"', '\\\'\\\''), roll)
+            else
+                rollText = roll
+            end
+
+            message = getText('command-roll-expression', {
+                name = name,
+                space = space,
+                rawName = rawName,
+                roll = rollText,
+            })
+        else
+            message = getText('command-roll', {
+                name = name,
+                space = space,
+                rawName = rawName,
+                roll = interpolator:tokenString('roll'),
+                sides = interpolator:tokenString('sides'),
+            })
+        end
     else
         return interpolator:tokenString('input'), name
     end

@@ -40,7 +40,13 @@ command-card-global = { KO_WITH_PARTICLE($name, type: "subj") }
 command-roll = { $name }{ KO_PARTICLE($rawName, type: "subj") } { $sides }면 주사위를 굴려서
     { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
 
+command-roll-expression = { $name }{ KO_PARTICLE($rawName, type: "subj") } 주사위를 굴려서
+    { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
+
 command-roll-global = { KO_WITH_PARTICLE($name, type: "subj") } { $sides }면 주사위를 굴려서
+    { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
+
+command-roll-global-expression = { KO_WITH_PARTICLE($name, type: "subj") } 주사위를 굴려서
     { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
 
 command-flip-heads = { $name }{ KO_PARTICLE($rawName, type: "subj") } 동전을 뒤집고 머리를 잡았습니다

@@ -20,7 +20,8 @@ local getOnlinePlayers = getOnlinePlayers
 local CharacterStat = CharacterStat
 
 local IS_DEBUG = getDebug()
-
+local diceRoller = utils.dice.Roller:new({ maxRolls = 100 })
+local diceStringifier = utils.dice.RichTextStringifier:new({ includeTotal = false })
 
 ---@class(partial) api.shared.request
 local Request = {}
@@ -543,6 +544,16 @@ CHANNEL.PLAYER_JOINED = dispatch:channel('PLAYER_JOINED', {
 ---Client → server: request that dice is rolled.
 ---Server → client: display the result of rolling dice.
 CHANNEL.ROLL_DICE = dispatch:channel('ROLL_DICE', {
+    ---@param args Args.Request.ReportRoll
+    ---@return string?
+    onStringifyServerArgs = function(args)
+        if not args.result then
+            return
+        end
+
+        return format('{"roll": %d, "result": {...}}', args.roll)
+    end,
+
     ---@param req omi.ClientRequest
     ---@param args Args.Request.RollDice
     ---@return boolean
@@ -553,8 +564,9 @@ CHANNEL.ROLL_DICE = dispatch:channel('ROLL_DICE', {
             return false, 'Missing required item'
         end
 
-        if args.sides < 1 or args.sides > 100 then
-            return false, 'Invalid value for sides'
+        local expr, err = diceRoller:tryParse(args.command)
+        if not expr then
+            return false, err and err.message or nil
         end
 
         return true
@@ -563,31 +575,55 @@ CHANNEL.ROLL_DICE = dispatch:channel('ROLL_DICE', {
     ---@param req omi.ClientRequest
     ---@param args Args.Request.RollDice
     onServerReceive = function(req, args)
-        local sides = args.sides
-        if sides < 1 or sides > 100 then
+        local result = diceRoller:tryRoll(args.command, { stringifier = diceStringifier })
+        if not result then
             local replyArgs = { id = 'help-text-roll' } ---@type Args.Request.ShowMessage
             req:replyWith(CHANNEL.SHOW_MESSAGE, replyArgs)
             return
         end
 
+        local roll = result:tryGetTotal()
+        if not roll then
+            return
+        end
+
         local player = req:getPlayer()
-        local roll = utils.randInt(1, sides)
+        local sides = utils.tointeger(args.command:match('^d(%d+)$'))
         if config.Commands.Roll.Global then
             local name = API.data.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
 
             ---@type Args.Request.ShowMessage
-            local replyArgs = {
-                id = 'command-roll-global',
-                args = {
-                    name = name,
-                    roll = roll,
-                    sides = sides,
-                },
-            }
+            local replyArgs
+            if sides then
+                replyArgs = {
+                    id = 'command-roll-global',
+                    args = {
+                        name = name,
+                        roll = roll,
+                        sides = sides,
+                    },
+                }
+            else
+                local fmt = " <SPACE> <HOVER text='%s'> %d </HOVER> "
+                local rollText = format(fmt, result:getString():gsub('"', '\\\'\\\''), roll)
+                replyArgs = {
+                    id = 'command-roll-global-expression',
+                    args = {
+                        name = name,
+                        roll = rollText,
+                    },
+                }
+            end
 
             req:broadcastOn(CHANNEL.SHOW_MESSAGE, replyArgs)
         else
-            local replyArgs = { roll = roll, sides = sides } ---@type Args.Request.ReportRoll
+            ---@type Args.Request.ReportRoll
+            local replyArgs = {
+                roll = roll,
+                result = not sides and result:toNetwork() or nil,
+                sides = sides,
+            }
+
             req:reply(replyArgs)
         end
     end,
@@ -599,6 +635,11 @@ CHANNEL.ROLL_DICE = dispatch:channel('ROLL_DICE', {
             return
         end
 
+        local result
+        if args.result then
+            result = utils.dice.RollResult.fromNetwork(args.result, diceRoller, diceStringifier)
+        end
+
         API_C.chat.send {
             allowEmpty = true,
             stream = targetStream,
@@ -607,6 +648,7 @@ CHANNEL.ROLL_DICE = dispatch:channel('ROLL_DICE', {
                 type = 'omichat.roll',
                 roll = args.roll,
                 sides = args.sides,
+                diceResult = result and result:getString(),
             },
         }
     end,
@@ -774,7 +816,8 @@ return Request
 ---Server to client request to report the result of rolling dice.
 ---@class Args.Request.ReportRoll
 ---@field roll integer The value of the dice roll.
----@field sides integer The number of sides on the dice that was rolled.
+---@field result table? The result of a complex dice roll.
+---@field sides integer? The number of sides on the dice that was rolled.
 
 ---Server to client request to display a message.
 ---@class Args.Request.ShowMessage : omi.PartialTranslateTable<number | string>
@@ -783,7 +826,7 @@ return Request
 
 ---Client to server request to roll dice.
 ---@class Args.Request.RollDice
----@field sides integer The number of sides on the dice to roll.
+---@field command string A dice expression for the roll (e.g., d6, 2d20, 5d10kh1+3).
 
 ---Client to server request to notify other players about typing status.
 ---@class Args.Request.Typing

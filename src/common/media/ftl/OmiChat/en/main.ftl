@@ -59,10 +59,20 @@ command-card-global = { $name } drew { $card }
 # @param $space? string The rich text space to include after the name, or an empty string if not rich text.
 command-roll = { $name }{ $space } rolls { $roll } on a { $sides }-sided die
 
+# @param $name string The name of the player who rolled a die. This may include rich text formatting.
+# @param $roll string The result of the dice roll. May contain rich text.
+# @param $rawName? string The name of the player who rolled a die, without formatting.
+# @param $space? string The rich text space to include after the name, or an empty string if not rich text.
+command-roll-expression = { $name }{ $space } rolls { $roll }
+
 # @param $name string The name of the player who rolled a die.
 # @param $roll integer The result of the dice roll.
 # @param $sides integer The number of sides on the die.
 command-roll-global = { $name } rolled { $roll } on a { $sides }-sided die
+
+# @param $name string The name of the player who rolled a die.
+# @param $roll string The result of the dice roll. May contain rich text.
+command-roll-global-expression = { $name } rolled { $roll }
 
 # @param $name string The name of the player who flipped a coin. This may include rich text formatting.
 # @param $rawName? string The name of the player who flipped a coin, without formatting.

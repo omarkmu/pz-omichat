@@ -441,6 +441,8 @@ token-roll = The number that was rolled.
 
 token-sides = The number of sides on the die that was rolled.
 
+token-diceResult = The result of the dice expression as rich text.
+
 token-sneakCallout = Populated if the message was a callout sent while sneaking.
 
 token-stream = The name of the chat stream on which the message was sent or will be sent.
