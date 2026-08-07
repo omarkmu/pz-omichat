@@ -46,6 +46,6 @@ When retrieving translations, language names will be converted to lowercase and 
 Translations for `Haitian Creole`, for example, should be defined using `language-haitian-creole`.
 
 If the translation is absent, the language name will be used as-is regardless of a player's language.
-Translations are provided by the mod for the following roleplay language:
+Translations are provided by the mod for the following roleplay languages:
 
 {{#include _languages.md}}
