@@ -49,7 +49,7 @@ end
 ---@return string
 local function getCalloutText(isSneaking)
     local shouts = API.preferences.getCustomShouts(isSneaking and 'sneakcallouts' or 'callouts')
-    if #shouts == 0 then
+    if not shouts or #shouts == 0 then
         shouts = nil
     end
 
