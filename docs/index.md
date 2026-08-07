@@ -9,6 +9,7 @@ The vast majority of the features in the mod can be configured or completely dis
 - Name color [customization](./configuration/customization.md#enablenamecolors)
 - Callout [customization](./configuration/customization.md#allowcustomshouts)
 - Character naming with [`/name`](./configuration/commands.md#name)
+- Status displays with [`/status`](./configuration/commands.md#status)
 - Customization [profiles](./user-guide/chat-settings.md#customization) for character/style switching
 - Roleplay customization [options](./user-guide/chat-settings.md#character-customization)
 - Roleplay chat [buffs](./configuration/buffs.md)
