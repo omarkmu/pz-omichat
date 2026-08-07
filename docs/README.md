@@ -5,7 +5,7 @@
 </a>
 
 OmiChat is a mod for [Project Zomboid](https://projectzomboid.com) that extends chat functionality.
-It's available on the [Steam workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3178882070).
+It's available on the [Steam workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3776040185).
 
 <!-- ANCHOR_END: intro -->
 
