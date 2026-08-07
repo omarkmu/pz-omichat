@@ -13,6 +13,10 @@ local Configuration = utils.configuration {
     logger = utils.log,
     filename = (function()
         local serverName = getServerName()
+        if not serverName or serverName == '' then
+            return
+        end
+
         local filename = string.format('omichat/configuration_%s.json', serverName)
 
         -- 42.20.0 must use .json.txt
