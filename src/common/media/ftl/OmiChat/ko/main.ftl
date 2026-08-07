@@ -403,6 +403,8 @@ context-admin = 관리자
 context-admin-view-player-data = 데이터 관리
 
 context-admin-open-settings = 설정
+    .sandbox-tooltip = { -mod-name } does not use sandbox options for configuration. <BR>
+        Click here to open the settings menu, which can also be accessed from the chat window's admin options.
 
 context-admin-show-icon = 관리자 아이콘 표시
 

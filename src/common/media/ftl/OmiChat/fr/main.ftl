@@ -391,6 +391,8 @@ context-admin = Options administrateur
 context-admin-view-player-data = View player data
 
 context-admin-open-settings = Paramètres
+    .sandbox-tooltip = { -mod-name } does not use sandbox options for configuration. <BR>
+        Click here to open the settings menu, which can also be accessed from the chat window's admin options.
 
 context-admin-show-icon = Afficher l'icône de discussion
 
