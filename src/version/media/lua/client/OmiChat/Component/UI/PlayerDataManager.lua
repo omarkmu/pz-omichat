@@ -345,11 +345,13 @@ function PlayerDataManager:openEditPanel(item, isAdd)
         self.activeEditorPanel:destroy()
     end
 
+    local w = 400 + 100 * UI.getScale()
+    local h = w * 0.2
     self.activeEditorPanel = Editor:new {
-        x = self.x + (self.width - 500) * 0.5,
-        y = self.y + (self.height - 600) * 0.5,
-        w = 500,
-        h = 100,
+        x = self.x + (self.width - w) * 0.5,
+        y = self.y + (self.height - h) * 0.5,
+        w = w,
+        h = h,
         item = item,
         target = self,
         onSave = self.refresh,

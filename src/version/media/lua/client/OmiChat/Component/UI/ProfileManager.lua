@@ -132,7 +132,7 @@ function ProfileManager:createChildren()
     local titleH = FONT_H_LARGE
 
     local padX = 24
-    local btnW = 100
+    local btnW = math.min(75 + 25 * UI.getScale(), self.width * 0.25)
     local btnH = math.max(25, FONT_H_SMALL + 6)
     local btnY = self.height - 10 - btnH
 
@@ -149,7 +149,7 @@ function ProfileManager:createChildren()
         parent = self,
         x = padX,
         y = titleH + 20,
-        w = math.min(100, self.width / 4),
+        w = btnW,
         h = self.height - btnH - titleH - 40,
         drawBorder = true,
         anchorLeft = true,
@@ -709,6 +709,7 @@ function ProfileManager:_updateUIState(resetItems, selectIdx)
         listbox:setVisible(false)
         emptyLabel:setVisible(true)
         createBtn:setTitle(self.createText)
+        createBtn:setWidthToTitle(self.minimumWidth)
         createBtn:setX((self.width - createBtn.width) * 0.5)
         createBtn:setY((self.height - createBtn.height) * 0.5)
         return
@@ -718,6 +719,7 @@ function ProfileManager:_updateUIState(resetItems, selectIdx)
     listbox:setVisible(true)
     emptyLabel:setVisible(false)
     createBtn:setTitle(self.addText)
+    createBtn:setWidth(listbox.width)
     createBtn:setX(listbox.x + (listbox.width - createBtn.width) * 0.5)
     createBtn:setY(self.height - 10 - math.max(25, FONT_H_SMALL + 6))
     self:_updateControlState()

@@ -129,7 +129,9 @@ function UI.getConfigPanel()
         return UI._configPanel
     end
 
-    local w, h = 800, 600
+    local w = 725 + UI_LIB.getScale() * 75
+    local h = w * 0.75
+
     local x, y = UI_LIB.getScreenCenter(w, h)
     local schema = config:getSchema()
     local panel = schema:generateForm {
@@ -144,7 +146,6 @@ function UI.getConfigPanel()
         onUpdate = API.callback.onConfigurationUpdate,
     }
 
-    panel:initialise()
     panel:setVisible(false)
     UI._configPanel = panel
 
@@ -233,13 +234,15 @@ function UI.openPlayerDataManager()
         instance.activePlayerDataPanel:destroy()
     end
 
-    local x, y = UI_LIB.getScreenCenter(1200, 650)
-    local panel = PlayerDataManager:new({
+    local w = 1100 + 100 * UI_LIB.getScale()
+    local h = w * 0.55
+    local x, y = UI_LIB.getScreenCenter(w, h)
+    local panel = PlayerDataManager:new {
         x = x,
         y = y,
-        w = 1200,
-        h = 650,
-    })
+        w = w,
+        h = h,
+    }
 
     panel:initialise()
     panel:addToUIManager()
@@ -257,12 +260,14 @@ function UI.openProfileManager()
         instance.activeProfilesPanel:destroy()
     end
 
-    local x, y = UI_LIB.getScreenCenter(800, 600)
+    local w = 725 + UI_LIB.getScale() * 75
+    local h = w * 0.75
+    local x, y = UI_LIB.getScreenCenter(w, h)
     local panel = ProfileManager:new({
         x = x,
         y = y,
-        w = 800,
-        h = 600,
+        w = w,
+        h = h,
         profiles = API.preferences.getProfiles(),
     })
 
@@ -427,7 +432,9 @@ function UI.updateButtons()
     instance.rangeButton:setVisible(config.General.IncludeRangeIndicatorButton)
 
     local th = instance:titleBarHeight()
+    local pad = (5 - UI_LIB.getScale()) * 2 + th - 1
     local lastBtn = instance.gearButton
+
     for i = 1, #UI._customButtons do
         local btn = UI._customButtons[i]
         if btn:getParent() ~= instance then
@@ -435,8 +442,7 @@ function UI.updateButtons()
         end
 
         if btn:isVisible() then
-            local pad = max(lastBtn:getWidth(), th)
-            btn:setX(lastBtn:getX() - pad * 1.5)
+            btn:setX(lastBtn:getX() - pad)
             lastBtn = btn
         end
     end
