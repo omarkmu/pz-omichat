@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.0-beta.1
+
+### Fixed
+- Fixed callouts failing when custom shouts are not enabled
+
 ## 2.0.0-beta
 
 ### Added
