@@ -10,7 +10,7 @@
 ---@field chatText omichat.ChatTab The current chat tab.
 ---@field tabs omichat.ChatTab[] List of available chat tabs.
 ---@field allChatStreams (omichat.ChatStream | omichat.StreamTable)[] List of all available chat streams.
----@field defaultTabStream table<integer, omichat.ChatStream?> An association of 1-indexed tab IDs to default streams.
+---@field defaultTabStream table<integer, (omichat.ChatStream | omichat.StreamTable)?> An association of 1-indexed tab IDs to default streams.
 ---@field gearButton ISButton The settings button.
 ---@field textEntry omi.TextEntry The text entry UI element.
 ---@field currentTabID integer The 1-indexed tab ID of the current tab.

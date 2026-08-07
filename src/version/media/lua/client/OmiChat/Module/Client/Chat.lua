@@ -540,6 +540,11 @@ function Chat.updateState(redraw)
 
     API.preferences.get()
     API.ui.updateState(redraw)
+
+    local tabs = ISChat.instance.tabs or {}
+    for i = 1, #tabs do
+        Chat._checkLastCommand(tabs[i])
+    end
 end
 
 ---Updates the typing status based on the current input.
@@ -694,6 +699,7 @@ function Chat._addDisabledStreamMessage(stream)
 end
 
 ---Clears the last chat command for a tab based on retain options.
+---This also sets the last chat command to the default stream, if there has not been any input yet.
 ---@param tab ChatTab
 ---@private
 function Chat._checkLastCommand(tab)
@@ -703,6 +709,15 @@ function Chat._checkLastCommand(tab)
     end
 
     local stream = API.streams.chatCommandToStream(lastChatCommand)
+    if #tab.log == 0 then
+        local defaultStream = API.streams.getDefaultTabStream(tab.tabID + 1)
+        if defaultStream and defaultStream ~= stream and defaultStream:isEnabled() then
+            tab.lastChatCommand = API.streams.cycle(defaultStream:getName())
+        end
+
+        return
+    end
+
     local commandCategory = stream and stream:getCategory() or 'other'
     if not API.preferences.getRetainCommand(commandCategory) then
         tab.lastChatCommand = ''
