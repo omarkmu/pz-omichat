@@ -303,7 +303,7 @@ end
 function Streams.getDisplayCommand(name)
     local stream = Streams.getChatStream(name)
     if stream then
-        return stream:getCommand()
+        return stream:getCommand():trim()
     end
 
     return '/' .. name
