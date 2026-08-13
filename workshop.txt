@@ -1,6 +1,6 @@
 version=1
 id=3776040185
-title=OmiChat (Roleplay Chat) [b42]
+title=OmiChat (Roleplay Chat)
 description=It's a chat mod.
 description=This mod can be added or removed mid-save.
 description=
@@ -41,6 +41,7 @@ description=[*]Chat color customization
 description=[*]Name color customization
 description=[*]Callout customization
 description=[*]Character naming with /name
+description=[*]Status displays with /status
 description=[*]Customization profiles for character/style switching
 description=[*]Roleplay customization options (grow hair/beard, change hair color)
 description=[*]Roleplay chat buffs

@@ -466,6 +466,8 @@ local DefaultStreamData = {
         },
         Tags = {
             'NoName',
+            'NoIcon',
+            'NoAdminIndicator',
             'NoEmbeddedActions',
             'NoTransmitOverRadio',
             'HideOverhead',

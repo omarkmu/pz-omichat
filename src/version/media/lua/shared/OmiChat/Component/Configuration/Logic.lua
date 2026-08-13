@@ -603,16 +603,18 @@ function Logic._onClickFormatInfo(args)
     local state = args.state --[[@as ConfigurationFormState]]
 
     if state.activeFormatStringDialog then
-        local isVisible = state.activeFormatStringDialog:isReallyVisible()
+        local wasVisible = state.activeFormatStringDialog:isReallyVisible()
         state.activeFormatStringDialog:destroy()
         state.activeFormatStringDialog = nil
 
-        if isVisible then
+        if wasVisible then
             return
         end
     end
 
-    local w = 600
+    API_C = API_C or utils.getAPI()
+    local scale = API_C.utils.ui.getScale()
+    local w = 500 + 100 * scale
     local x = form:getRight()
     if x + w > getPlayerScreenWidth(0) then
         x = form:getX() - w
@@ -621,8 +623,8 @@ function Logic._onClickFormatInfo(args)
     local dialog = utils_c.ui.okDialog {
         x = x,
         y = form:getY(),
-        w = 600,
-        h = 200,
+        w = w,
+        h = w * 0.5,
         richText = true,
         moveWithMouse = true,
         setHeightToContents = true,

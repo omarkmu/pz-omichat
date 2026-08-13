@@ -4,6 +4,8 @@
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Core/Client'
 
+local CustomSandboxUI = require 'OmiChat/Component/UI/CustomSandboxUI'
+
 
 ---Called when a player is created.
 ---@param playerNum integer
@@ -20,6 +22,13 @@ end
 ---@private
 function API._onGameStart()
     API.chat.updateState(true)
+
+    -- only inject into the ingame sandbox UI,
+    -- not the host menu one
+    API.utils.ui.injectSandboxPage({
+        name = 'OmiChat',
+        ui = CustomSandboxUI,
+    })
 end
 
 

@@ -1,5 +1,24 @@
 # Changelog
 
+## 2.0.0-beta.2
+
+### Added
+- Added support for higher UI scales
+- Added notice on sandbox options UI about separate configuration
+
+### Changed
+- Switched configuration filenames back to use `.json`
+    - `.json.txt` will be treated as a legacy filename for the near future.
+- Updated default stream logic to use the default stream as the initial stream
+    - This means that the first stream listed will be the default stream that shows in chat.
+- Updated status displays so that players' own displays are hidden while aiming
+- Added `NoIcon` and `NoAdminIndicator` to default tags for `/narrate`
+
+### Fixed
+- Fixed configuration loading logic running after including the mod in the Host menu
+- Fixed command names having an extra space in the profile manager
+- Fixed extra space in overhead text for an unknown language
+
 ## 2.0.0-beta.1
 
 ### Fixed

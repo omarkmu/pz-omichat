@@ -425,7 +425,7 @@ function Helpers.getBaseUnknownLanguageString(tags, language, author, dialogueTa
 
     author = tostring(author or '')
     if author ~= '' then
-        author = author .. (overhead and ' ' or ' <SPACE> ')
+        author = author .. (overhead and '' or ' <SPACE> ')
     else
         return getText('unknown-language-no-author', { language = languageName })
     end

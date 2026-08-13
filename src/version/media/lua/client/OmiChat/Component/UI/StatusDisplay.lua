@@ -71,7 +71,11 @@ function StatusDisplay:shouldShow(player, range)
         return false
     end
 
-    if target == player or player:canSeeAll() then
+    if target == player then
+        return not player:isAiming()
+    end
+
+    if player:canSeeAll() then
         return true
     end
 

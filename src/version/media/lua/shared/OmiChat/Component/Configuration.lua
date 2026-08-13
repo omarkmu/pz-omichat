@@ -10,16 +10,47 @@ local isempty = table.isempty
 ---@class ConfigurationHelper : Configuration, omi.ConfigurationHelper<Configuration>
 local Configuration = utils.configuration {
     schema = Logic.getSchema(),
-    filename = string.format('omichat/configuration_%s.json.txt', getServerName()),
     logger = utils.log,
+    filename = (function()
+        local serverName = getServerName()
+        if not serverName or serverName == '' then
+            return
+        end
+
+        local filename = string.format('omichat/configuration_%s.json', serverName)
+
+        -- 42.20.0 must use .json.txt
+        -- this code can be removed in 42.21, since a new version subfolder can be used
+        if utils.compareGameVersion(42, 20) == 0 then
+            return filename .. '.txt'
+        end
+
+        return filename
+    end)(),
 
     ---@param self ConfigurationHelper
     init = function(self)
         self:loadCustomPresets()
         self:loadDefaults()
 
-        if not isClient() then
-            self:loadFile()
+        if isClient() then
+            return
+        end
+
+        local filename = self:getFilename()
+        if not filename then
+            return
+        end
+
+        -- 42.20.0 didn't support .json, so we have to check for the .txt
+        local success = self:loadFile()
+        if not success and not utils.endsWith(filename, '.txt') then
+            success = self:loadFile(filename .. '.txt')
+        end
+
+        -- saving after load to ensure the .json file exists
+        if success then
+            self:saveFile()
         end
     end,
 
@@ -32,9 +63,13 @@ local Configuration = utils.configuration {
 ---Class representing a configuration preset.
 Configuration.Preset = Preset
 
+---Old filenames used for presets.
+---@private
+Configuration._legacyPresetFilenames = { 'omichat/presets.json.txt' }
+
 ---Filename used for storing presets on the server.
 ---@private
-Configuration._presetFilename = 'omichat/presets.json.txt'
+Configuration._presetFilename = 'omichat/presets.json'
 
 ---Table containing built-in presets.
 ---@private
@@ -453,7 +488,29 @@ function Configuration:loadCustomPresets()
         return
     end
 
-    local result = utils.json.tryReadObject({ filename = self._presetFilename })
+    local result, err = utils.json.tryReadObject({
+        filename = self._presetFilename,
+        create = false,
+    })
+
+    if err and utils.startsWith(err, 'could not open file') then
+        for i = 1, #Configuration._legacyPresetFilenames do
+            result = utils.json.tryReadObject({
+                filename = Configuration._legacyPresetFilenames[i],
+                create = false,
+            })
+
+            if result then
+                err = nil
+                break
+            end
+        end
+    end
+
+    if err then
+        utils.log.warn('Failed to read presets: %s', err)
+    end
+
     if not result or type(result.list) ~= 'table' then
         return
     end
