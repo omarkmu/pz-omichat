@@ -86,12 +86,12 @@ function Request.flipCoin() return Channel.FLIP_COIN:toServer() end
 function Request.getPlayerDataList() return Channel.DATA_LIST:toServer() end
 
 ---Requests rolling dice.
----@param sides integer The number of sides on the die.
+---@param command string The dice expression.
 ---@return boolean success
 ---@return string? error
-function Request.rollDice(sides)
+function Request.rollDice(command)
     ---@type Args.Request.RollDice
-    local args = { sides = sides }
+    local args = { command = command }
 
     return Channel.ROLL_DICE:toServer(args)
 end

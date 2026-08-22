@@ -40,8 +40,18 @@ command-card-global = { KO_WITH_PARTICLE($name, type: "subj") }
 command-roll = { $name }{ KO_PARTICLE($rawName, type: "subj") } { $sides }면 주사위를 굴려서
     { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
 
+command-roll-expression = { $name }{ KO_PARTICLE($rawName, type: "subj") } '{ $expression }'를 굴려서
+    { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
+
+command-roll-percentile = { $name }{ $space } rolls { $roll } on a percentile die
+
 command-roll-global = { KO_WITH_PARTICLE($name, type: "subj") } { $sides }면 주사위를 굴려서
     { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
+
+command-roll-global-expression = { KO_WITH_PARTICLE($name, type: "subj") } '{ $expression }'를 굴려서
+    { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
+
+command-roll-global-percentile = { $name } rolled { $roll } on a percentile die
 
 command-flip-heads = { $name }{ KO_PARTICLE($rawName, type: "subj") } 동전을 뒤집고 머리를 잡았습니다
 
@@ -178,6 +188,8 @@ help-text-flip = 동전을 뒤집기 위해, '/flip'을 사용하세요.
 
 help-text-dance = /dance 명령어를 사용하여 랜덤한 춤을 춰보세요. /dance 명령어와 특정 춤 이름을 입력하여 특정 춤을 춰보세요.
     사용가능한 춤 목록을 보려면, '/dance list'라고 입력하세요.
+
+help-text-roll = Roll a random number. Use: /roll 20, /roll 2d10 + 3
 
 ## Unknown language
 

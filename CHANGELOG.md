@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.0.0-beta.3
+
+### Added
+- Added a temporary troubleshooting flag for the default stream feature
+- Added complex dice rolling ability to `/roll`
+    - This means that, for example, `/roll d20 + 6` is now supported.
+- Added stream query based on a stream's predefined type
+
+### Changed
+- Moved game version utilities to the library mod
+
+### Fixed
+- Fixed a mod compatibility issue in which an error could occur during a UI redraw
+
 ## 2.0.0-beta.2
 
 ### Added

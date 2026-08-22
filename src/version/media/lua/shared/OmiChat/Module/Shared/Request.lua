@@ -20,7 +20,11 @@ local getOnlinePlayers = getOnlinePlayers
 local CharacterStat = CharacterStat
 
 local IS_DEBUG = getDebug()
-
+local diceStringifier = utils.dice.SimpleStringifier:new({
+    includeTotal = false,
+    includeValues = false,
+    doStrikethrough = false,
+})
 
 ---@class(partial) api.shared.request
 local Request = {}
@@ -553,8 +557,9 @@ CHANNEL.ROLL_DICE = dispatch:channel('ROLL_DICE', {
             return false, 'Missing required item'
         end
 
-        if args.sides < 1 or args.sides > 100 then
-            return false, 'Invalid value for sides'
+        local expr, err = utils.roller:tryParse(args.command:lower())
+        if not expr then
+            return false, err and err.message or nil
         end
 
         return true
@@ -563,31 +568,50 @@ CHANNEL.ROLL_DICE = dispatch:channel('ROLL_DICE', {
     ---@param req omi.ClientRequest
     ---@param args Args.Request.RollDice
     onServerReceive = function(req, args)
-        local sides = args.sides
-        if sides < 1 or sides > 100 then
+        local command = args.command:lower()
+        local expr = utils.roller:tryParse(command)
+        local result = expr and utils.roller:tryRoll(expr, { stringifier = diceStringifier })
+        local roll = result and result:tryGetTotal()
+        if not roll then
             local replyArgs = { id = 'help-text-roll' } ---@type Args.Request.ShowMessage
             req:replyWith(CHANNEL.SHOW_MESSAGE, replyArgs)
             return
         end
 
+        ---@cast result -?
         local player = req:getPlayer()
-        local roll = utils.randInt(1, sides)
+        local sides = utils.tointeger(command:match('^d(%d+)$'))
         if config.Commands.Roll.Global then
             local name = API.data.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
 
             ---@type Args.Request.ShowMessage
-            local replyArgs = {
-                id = 'command-roll-global',
-                args = {
-                    name = name,
-                    roll = roll,
-                    sides = sides,
-                },
-            }
+            local replyArgs
+            if sides then
+                replyArgs = {
+                    id = 'command-roll-global',
+                    args = { name = name, roll = roll, sides = sides },
+                }
+            elseif command == 'd%' then
+                replyArgs = {
+                    id = 'command-roll-global-percentile',
+                    args = { name = name, roll = roll },
+                }
+            else
+                replyArgs = {
+                    id = 'command-roll-global-expression',
+                    args = { name = name, roll = roll, expression = result:getString() },
+                }
+            end
 
             req:broadcastOn(CHANNEL.SHOW_MESSAGE, replyArgs)
         else
-            local replyArgs = { roll = roll, sides = sides } ---@type Args.Request.ReportRoll
+            ---@type Args.Request.ReportRoll
+            local replyArgs = {
+                roll = roll,
+                sides = sides,
+                expression = not sides and result:getString() or nil,
+            }
+
             req:reply(replyArgs)
         end
     end,
@@ -607,6 +631,7 @@ CHANNEL.ROLL_DICE = dispatch:channel('ROLL_DICE', {
                 type = 'omichat.roll',
                 roll = args.roll,
                 sides = args.sides,
+                diceExpression = args.expression,
             },
         }
     end,
@@ -774,7 +799,8 @@ return Request
 ---Server to client request to report the result of rolling dice.
 ---@class Args.Request.ReportRoll
 ---@field roll integer The value of the dice roll.
----@field sides integer The number of sides on the dice that was rolled.
+---@field expression string? The expression for a dice roll. Only included for complex rolls.
+---@field sides integer? The number of sides on the dice that was rolled. Only included for simple rolls.
 
 ---Server to client request to display a message.
 ---@class Args.Request.ShowMessage : omi.PartialTranslateTable<number | string>
@@ -783,7 +809,7 @@ return Request
 
 ---Client to server request to roll dice.
 ---@class Args.Request.RollDice
----@field sides integer The number of sides on the dice to roll.
+---@field command string A dice expression for the roll (e.g., d6, 2d20, 5d10kh1+3).
 
 ---Client to server request to notify other players about typing status.
 ---@class Args.Request.Typing

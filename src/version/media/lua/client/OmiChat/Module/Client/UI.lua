@@ -294,7 +294,8 @@ function UI.redraw(doScroll)
             local message = messages[j]
             local text = message:getTextWithPrefix()
 
-            if message:isShowInChat() then
+            -- check before calling so this doesn't break for fake messages from other mods
+            if not message.isShowInChat or message:isShowInChat() then
                 newText[#newText + 1] = text
                 newLines[#newLines + 1] = text .. ' <LINE> '
             end

@@ -704,6 +704,13 @@ end
 ---@private
 function Chat._checkLastCommand(tab)
     local lastChatCommand = tab.lastChatCommand
+
+    -- troubleshooting problems with this feature
+    local doLog = config:getVariable('DBG_DEFAULT_COMMAND')
+    if doLog then
+        utils.log.info('DBG_DEFAULT_COMMAND: tabId=%d; #log=%d; lastChatCommand=%s', tab.tabID, #tab.log, lastChatCommand)
+    end
+
     if not lastChatCommand or lastChatCommand == '' then
         return
     end
@@ -711,8 +718,21 @@ function Chat._checkLastCommand(tab)
     local stream = API.streams.chatCommandToStream(lastChatCommand)
     if #tab.log == 0 then
         local defaultStream = API.streams.getDefaultTabStream(tab.tabID + 1)
+
         if defaultStream and defaultStream ~= stream and defaultStream:isEnabled() then
+            if doLog then
+                utils.log.info('DBG_DEFAULT_COMMAND: default to %s for tab %d', defaultStream:getName(), tab.tabID)
+            end
+
             tab.lastChatCommand = API.streams.cycle(defaultStream:getName())
+        elseif doLog then
+            if not defaultStream then
+                utils.log.info('DBG_DEFAULT_COMMAND: no default stream')
+            elseif defaultStream == stream then
+                utils.log.info('DBG_DEFAULT_COMMAND: default stream is current stream')
+            else
+                utils.log.info('DBG_DEFAULT_COMMAND: stream not enabled')
+            end
         end
 
         return

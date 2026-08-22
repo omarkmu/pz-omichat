@@ -158,23 +158,32 @@ function Streams.cycle(target)
     end
 end
 
+---Returns the first enabled chat stream with the given stream type.
+---@param streamType string
+---@return ChatStream? stream
+function Streams.firstChatStreamOfType(streamType)
+    for stream in Streams.chatStreams() do
+        if stream:isEnabled() and stream:getStreamType() == streamType then
+            return stream
+        end
+    end
+end
+
 ---Returns the first enabled chat stream with the given tag.
 ---@param tag string The tag to query for.
 ---@param excludeTags string[]? Tags to exclude. If a stream includes one of these tags, it will not be returned.
 ---@return ChatStream? stream
 function Streams.firstChatStreamWithTag(tag, excludeTags)
+    excludeTags = excludeTags or {}
+
     local list = Streams._tagToChatStreams[tag]
     if not list then
         return
     end
 
-    if not excludeTags then
-        return list[1]
-    end
-
     for i = 1, #list do
         local stream = list[i]
-        if not stream:hasAnyTags(excludeTags) then
+        if stream:isEnabled() and not stream:hasAnyTags(excludeTags) then
             return stream
         end
     end
@@ -230,19 +239,17 @@ end
 ---@param excludeTags string[]? Tags to exclude. If a stream includes one of these tags, it will not be included.
 ---@return ChatStream[] streams
 function Streams.getChatStreamsWithTag(tag, excludeTags)
+    excludeTags = excludeTags or {}
+
     local list = Streams._tagToChatStreams[tag]
     if not list then
         return {}
     end
 
-    if not excludeTags then
-        return utils.copyList(list)
-    end
-
     local matches = {}
     for i = 1, #list do
         local stream = list[i]
-        if not stream:hasAnyTags(excludeTags) then
+        if stream:isEnabled() and not stream:hasAnyTags(excludeTags) then
             matches[#matches + 1] = stream
         end
     end

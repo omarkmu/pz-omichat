@@ -62,6 +62,9 @@ utils._cards = {
     'king',
 }
 
+---Shared dice roller.
+utils.roller = utils.dice.Roller:new({ maxRolls = 100 })
+
 
 local API_C ---@type api.client?
 local loadedIcons = false
@@ -94,40 +97,6 @@ function utils.canAccessTarget(player, target, fromCommand)
     end
 
     return role:hasCapability(CAPABILITY_ADMINCHAT)
-end
-
----Compares the game version with the given version numbers.
----Returns 0 for an equal version,
----1 if the given version is greater than the game version,
----and -1 if the given version is lesser than the game version.
----@param major integer
----@param minor integer?
----@param patch integer?
----@return integer
-function utils.compareGameVersion(major, minor, patch)
-    local gameMajor, gameMinor, gamePatch = utils.getGameVersion()
-
-    if major > gameMajor then
-        return 1
-    elseif major < gameMajor then
-        return -1
-    end
-
-    minor = minor or 0
-    if minor > gameMinor then
-        return 1
-    elseif minor < gameMinor then
-        return -1
-    end
-
-    patch = patch or 0
-    if patch > gamePatch then
-        return 1
-    elseif patch < gamePatch then
-        return -1
-    end
-
-    return 0
 end
 
 ---Gets an error from the error tokens, if one is set, and unsets the tokens.
@@ -170,23 +139,6 @@ function utils.getBBCodeNameFromIcon(icon)
     end
 
     return iconToBBCodeNameMap[icon]
-end
-
----Gets the game version as three integers.
----@return integer, integer, integer
-function utils.getGameVersion()
-    if not gameVersion then
-        local fullVersion = getCore():getVersion()
-        local version = GameVersion.parse(getCore():getVersion())
-
-        local major = version:getMajor()
-        local minor = version:getMinor()
-        local patch = tonumber(fullVersion:match('%.(%d+) '))
-
-        gameVersion = newarray({ major, minor, patch or 0 }) --[[@as [integer, integer, integer] ]]
-    end
-
-    return gameVersion[1], gameVersion[2], gameVersion[3]
 end
 
 ---Returns the non-empty lines of a string.
