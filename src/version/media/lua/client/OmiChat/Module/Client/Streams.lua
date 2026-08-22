@@ -174,18 +174,16 @@ end
 ---@param excludeTags string[]? Tags to exclude. If a stream includes one of these tags, it will not be returned.
 ---@return ChatStream? stream
 function Streams.firstChatStreamWithTag(tag, excludeTags)
+    excludeTags = excludeTags or {}
+
     local list = Streams._tagToChatStreams[tag]
     if not list then
         return
     end
 
-    if not excludeTags then
-        return list[1]
-    end
-
     for i = 1, #list do
         local stream = list[i]
-        if not stream:hasAnyTags(excludeTags) then
+        if stream:isEnabled() and not stream:hasAnyTags(excludeTags) then
             return stream
         end
     end
@@ -241,19 +239,17 @@ end
 ---@param excludeTags string[]? Tags to exclude. If a stream includes one of these tags, it will not be included.
 ---@return ChatStream[] streams
 function Streams.getChatStreamsWithTag(tag, excludeTags)
+    excludeTags = excludeTags or {}
+
     local list = Streams._tagToChatStreams[tag]
     if not list then
         return {}
     end
 
-    if not excludeTags then
-        return utils.copyList(list)
-    end
-
     local matches = {}
     for i = 1, #list do
         local stream = list[i]
-        if not stream:hasAnyTags(excludeTags) then
+        if stream:isEnabled() and not stream:hasAnyTags(excludeTags) then
             matches[#matches + 1] = stream
         end
     end
