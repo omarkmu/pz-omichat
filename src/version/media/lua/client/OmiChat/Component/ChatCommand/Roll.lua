@@ -4,8 +4,41 @@
 ---@class(partial) api.client
 local API = require 'OmiChat/Module/Core/Client'
 
+local concat = table.concat
 local utils = API.utils
 local config = API.Configuration
+
+---Roll-Command-Plus semi-parity: attempts to resolve dice from literals.
+---e.g., `/roll 20 6 2d3` -> `/roll d20 + d6 + 2d3`.
+---@param command string
+---@return string
+local function inferDice(command)
+    local dice = {}
+    local parts = utils.split(command, ' ')
+
+    local hasDice = false
+    for i = 1, #parts do
+        local substr = parts[i]:trim()
+        if substr:match('^%d*d%d+$') then
+            hasDice = true
+            dice[#dice + 1] = substr
+        elseif substr == '%' or substr:match('^%d+$') then
+            dice[#dice + 1] = 'd' .. substr
+        elseif substr == '+' and hasDice then
+            -- e.g., d20 + 3; use command as-is
+            return command
+        elseif substr ~= '+' then
+            return command
+        end
+    end
+
+    if #dice > 0 then
+        return concat(dice, ' + ')
+    end
+
+    return command
+end
+
 
 ---Command stream for the `/roll` command.
 ---@private
@@ -20,11 +53,10 @@ API._rollCommand = API.CommandStream:new {
         end
 
         local command = utils.trim(ctx.text)
-        local sides = utils.tointeger(command)
-        if sides then
-            command = 'd' .. sides
-        elseif #command == 0 then
+        if #command == 0 then
             command = 'd6'
+        else
+            command = inferDice(command)
         end
 
         if not API.request.rollDice(command) then
