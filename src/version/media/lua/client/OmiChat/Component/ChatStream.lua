@@ -27,6 +27,7 @@ local checkPlayerCanUseChat = checkPlayerCanUseChat
 ---@field protected chatFormat? string The format to use for chat messages sent from this stream.
 ---@field protected overheadFormat? string The format to use for overhead messages sent from this stream.
 ---@field protected roleSet omi.SetTable<string>? Roles that allow using the stream.
+---@field protected streamType string? The predefined stream type of the stream.
 local ChatStream = Stream:derive('ChatStream')
 
 
@@ -84,6 +85,7 @@ function ChatStream.fromDefinition(def, additionalTags)
         return
     end
 
+    local streamType = def.Stream ~= 'custom' and def.Stream or nil
     local name = (not def.Stream or def.Stream == 'custom') and def.Name or def.Stream
     if not name then
         return
@@ -91,6 +93,7 @@ function ChatStream.fromDefinition(def, additionalTags)
 
     return ChatStream:new {
         name = utils.trim(name):lower(),
+        streamType = streamType,
         command = def.Command,
         shortCommand = def.ShortCommand,
         tabID = def.ChatType == 'admin' and 2 or 1,
@@ -179,39 +182,6 @@ function ChatStream:copyFrom(other)
     self.roleSet = other.roleSet and utils.copy(other.roleSet)
 end
 
-
----Returns whether the stream applies buffs.
----@return boolean allowed
-function ChatStream:isAllowBuffs()
-    return self.allowBuffs
-end
-
----Returns whether the stream allows messages to be sent using roleplay languages.
----@return boolean allowed
-function ChatStream:isAllowLanguages()
-    return self.allowLanguages
-end
-
----Returns whether typing on the stream triggers a typing indicator.
----@return boolean allowed
-function ChatStream:isAllowTypingIndicator()
-    return self.allowTypingIndicator
-end
-
----Returns whether the chat stream is a ranged chat stream.
----@return boolean isRanged
-function ChatStream:isRanged()
-    local chatType = self.chatType
-    return chatType == 'say' or chatType == 'shout'
-end
-
----Checks the stream's tab ID against a given tab ID.
----@param otherTabID integer The tab ID to match against.
----@return boolean isMatch `True` if the tab ID is a match. Otherwise, `false`.
-function ChatStream:isTabID(otherTabID)
-    return self:getTabID() == otherTabID
-end
-
 ---Returns the format string used for chat content on the stream.
 ---@return string? formatString
 function ChatStream:getChatFormat()
@@ -276,6 +246,12 @@ function ChatStream:getSignedPerceptionRange()
     return self.perceptionRangeSigned
 end
 
+---Returns the predefined stream type of the stream.
+---@return string? streamType
+function ChatStream:getStreamType()
+    return self.streamType
+end
+
 ---Gets the 1-indexed tab ID of the stream.
 ---@return integer tabID
 function ChatStream:getTabID()
@@ -295,6 +271,38 @@ function ChatStream:getVerticalRange(isSigned)
     end
 
     return self.verticalRange
+end
+
+---Returns whether the stream applies buffs.
+---@return boolean allowed
+function ChatStream:isAllowBuffs()
+    return self.allowBuffs
+end
+
+---Returns whether the stream allows messages to be sent using roleplay languages.
+---@return boolean allowed
+function ChatStream:isAllowLanguages()
+    return self.allowLanguages
+end
+
+---Returns whether typing on the stream triggers a typing indicator.
+---@return boolean allowed
+function ChatStream:isAllowTypingIndicator()
+    return self.allowTypingIndicator
+end
+
+---Returns whether the chat stream is a ranged chat stream.
+---@return boolean isRanged
+function ChatStream:isRanged()
+    local chatType = self.chatType
+    return chatType == 'say' or chatType == 'shout'
+end
+
+---Checks the stream's tab ID against a given tab ID.
+---@param otherTabID integer The tab ID to match against.
+---@return boolean isMatch `True` if the tab ID is a match. Otherwise, `false`.
+function ChatStream:isTabID(otherTabID)
+    return self:getTabID() == otherTabID
 end
 
 ---Sets the format string used for the chat format of the stream.
@@ -354,6 +362,7 @@ function ChatStream:new(args)
     this.perceptionRange = args.perceptionRange or 0
     this.perceptionRangeSigned = args.perceptionRangeSigned or 0
     this.defaultColor = utils.color.default(args.defaultColor, 255, 255, 255)
+    this.streamType = args.streamType
 
     if args.roles and #args.roles > 0 then
         this.roleSet = utils.set.table(args.roles)
@@ -394,5 +403,6 @@ return ChatStream
 ---@field chatFormat? string The format to use for the stream in chat.
 ---@field overheadFormat? string The overhead format to use for the stream.
 ---@field roles? string[] A list of roles that allow using the stream. An empty list means there is no limit based on roles.
+---@field streamType string? The predefined stream type of the stream.
 
 --#endregion

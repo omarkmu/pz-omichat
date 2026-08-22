@@ -158,6 +158,17 @@ function Streams.cycle(target)
     end
 end
 
+---Returns the first enabled chat stream with the given stream type.
+---@param streamType string
+---@return ChatStream? stream
+function Streams.firstChatStreamOfType(streamType)
+    for stream in Streams.chatStreams() do
+        if stream:isEnabled() and stream:getStreamType() == streamType then
+            return stream
+        end
+    end
+end
+
 ---Returns the first enabled chat stream with the given tag.
 ---@param tag string The tag to query for.
 ---@param excludeTags string[]? Tags to exclude. If a stream includes one of these tags, it will not be returned.
