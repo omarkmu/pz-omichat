@@ -22,11 +22,6 @@ API._rollCommand = API.CommandStream:new {
         local command = utils.trim(ctx.text)
         local sides = utils.tointeger(command)
         if sides then
-            if sides < 0 or sides > 100 then
-                ctx.stream:showHelpText()
-                return
-            end
-
             command = 'd' .. sides
         elseif #command == 0 then
             command = 'd6'

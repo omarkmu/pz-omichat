@@ -62,6 +62,9 @@ utils._cards = {
     'king',
 }
 
+---Shared dice roller.
+utils.roller = utils.dice.Roller:new({ maxRolls = 100 })
+
 
 local API_C ---@type api.client?
 local loadedIcons = false

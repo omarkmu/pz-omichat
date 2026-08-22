@@ -60,10 +60,17 @@ command-card-global = { $name } drew { $card }
 command-roll = { $name }{ $space } rolls { $roll } on a { $sides }-sided die
 
 # @param $name string The name of the player who rolled a die. This may include rich text formatting.
-# @param $roll string The result of the dice roll. May contain rich text.
+# @param $roll integer The result of the dice roll.
+# @param $expression string The dice expression. May contain rich text.
 # @param $rawName? string The name of the player who rolled a die, without formatting.
 # @param $space? string The rich text space to include after the name, or an empty string if not rich text.
-command-roll-expression = { $name }{ $space } rolls { $roll }
+command-roll-expression = { $name }{ $space } rolls { $roll } with { $expression }
+
+# @param $name string The name of the player who rolled a die. This may include rich text formatting.
+# @param $roll integer The result of the dice roll.
+# @param $rawName? string The name of the player who rolled a die, without formatting.
+# @param $space? string The rich text space to include after the name, or an empty string if not rich text.
+command-roll-percentile = { $name }{ $space } rolls { $roll } on a percentile die
 
 # @param $name string The name of the player who rolled a die.
 # @param $roll integer The result of the dice roll.
@@ -71,8 +78,13 @@ command-roll-expression = { $name }{ $space } rolls { $roll }
 command-roll-global = { $name } rolled { $roll } on a { $sides }-sided die
 
 # @param $name string The name of the player who rolled a die.
-# @param $roll string The result of the dice roll. May contain rich text.
-command-roll-global-expression = { $name } rolled { $roll }
+# @param $roll integer The result of the dice roll.
+# @param $expression string The dice expression. May contain rich text.
+command-roll-global-expression = { $name } rolled { $roll } with { $expression }
+
+# @param $name string The name of the player who rolled a die.
+# @param $roll integer The result of the dice roll.
+command-roll-global-percentile = { $name } rolled { $roll } on a percentile die
 
 # @param $name string The name of the player who flipped a coin. This may include rich text formatting.
 # @param $rawName? string The name of the player who flipped a coin, without formatting.
@@ -248,8 +260,7 @@ help-text-dance = Use /dance to do a random dance. Use /dance followed by the na
 # @do-not-translate
 help-text-card = { GETTEXT("UI_ServerOptionDesc_Card") }
 
-# @do-not-translate
-help-text-roll = { GETTEXT("UI_ServerOptionDesc_Roll") }
+help-text-roll = Roll a random number. Use: /roll 20, /roll 2d10 + 3
 
 ## Unknown language
 

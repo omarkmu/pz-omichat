@@ -441,7 +441,7 @@ token-roll = The number that was rolled.
 
 token-sides = The number of sides on the die that was rolled.
 
-token-diceResult = The result of the dice expression as rich text.
+token-diceExpression = The dice expression that was rolled.
 
 token-sneakCallout = Populated if the message was a callout sent while sneaking.
 

@@ -635,29 +635,29 @@ function Helpers.getMessage(interpolator, tags, name, forChat, rawName)
             rawName = rawName,
         })
     elseif tags.IsRollCommand then
-        local diceResult = interpolator:tokenString('diceResult')
+        local diceExpression = interpolator:tokenString('diceExpression')
         local roll = interpolator:tokenString('roll')
-        if diceResult ~= '' then
-            local rollText
-            if forChat then
-                local fmt = " <SPACE> <HOVER text='%s'> %d </HOVER> "
-                rollText = format(fmt, diceResult:gsub('"', '\\\'\\\''), roll)
-            else
-                rollText = roll
-            end
-
+        if diceExpression == 'd%' then
+            message = getText('command-roll-percentile', {
+                name = name,
+                space = space,
+                rawName = rawName,
+                roll = roll,
+            })
+        elseif diceExpression ~= '' then
             message = getText('command-roll-expression', {
                 name = name,
                 space = space,
                 rawName = rawName,
-                roll = rollText,
+                roll = roll,
+                expression = diceExpression,
             })
         else
             message = getText('command-roll', {
                 name = name,
                 space = space,
                 rawName = rawName,
-                roll = interpolator:tokenString('roll'),
+                roll = roll,
                 sides = interpolator:tokenString('sides'),
             })
         end
