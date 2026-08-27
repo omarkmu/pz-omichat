@@ -576,8 +576,13 @@ CHANNEL.ROLL_DICE = dispatch:channel('ROLL_DICE', {
     onServerReceive = function(req, args)
         local command = args.command:lower()
         local expr = utils.roller:tryParse(command)
-        local stringifier = getDiceStringifier(config.Commands.Roll.IncludeSumOfRolls, config.Commands.Roll.IncludeIndividualRolls)
-        local result = expr and utils.roller:tryRoll(expr, { stringifier = stringifier })
+        local result = expr and utils.roller:tryRoll(expr, {
+            stringifier = getDiceStringifier(
+                config.Commands.Roll.IncludeSumOfRolls,
+                config.Commands.Roll.IncludeIndividualRolls
+            ),
+        })
+
         local roll = result and result:tryGetTotal()
         if not roll then
             local replyArgs = { id = 'help-text-roll' } ---@type Args.Request.ShowMessage
@@ -603,9 +608,14 @@ CHANNEL.ROLL_DICE = dispatch:channel('ROLL_DICE', {
                     id = 'command-roll-global-percentile',
                     args = { name = name, roll = roll },
                 }
-            else
+            elseif config.Commands.Roll.IncludeSumOfRolls then
                 replyArgs = {
                     id = 'command-roll-global-expression',
+                    args = { name = name, expression = result:getString() },
+                }
+            else
+                replyArgs = {
+                    id = 'command-roll-global-with-expression',
                     args = { name = name, roll = roll, expression = result:getString() },
                 }
             end

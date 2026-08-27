@@ -37,13 +37,17 @@ command-card-global = { $name } a tiré { $card }
 
 command-roll = { $name }{ $space } lance { $roll } sur un dé à { $sides } faces
 
-command-roll-expression = { $name }{ $space } lance { $roll } sur { $expression }
+command-roll-expression = { $name }{ $space } lance { $expression }
+
+command-roll-with-expression = { $name }{ $space } lance { $roll } sur { $expression }
 
 command-roll-percentile = { $name }{ $space } rolls { $roll } on a percentile die
 
 command-roll-global = { $name } a lancé un { $roll } sur un dé à { $sides } faces
 
-command-roll-global-expression  = { $name } a lancé un { $roll } sur { $expression }
+command-roll-global-expression  = { $name } a lancé { $expression }
+
+command-roll-global-with-expression  = { $name } a lancé un { $roll } sur { $expression }
 
 command-roll-global-percentile = { $name } rolled { $roll } on a percentile die
 

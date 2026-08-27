@@ -64,7 +64,13 @@ command-roll = { $name }{ $space } rolls { $roll } on a { $sides }-sided die
 # @param $expression string The dice expression. May contain rich text.
 # @param $rawName? string The name of the player who rolled a die, without formatting.
 # @param $space? string The rich text space to include after the name, or an empty string if not rich text.
-command-roll-expression = { $name }{ $space } rolls { $roll } with { $expression }
+command-roll-with-expression = { $name }{ $space } rolls { $roll } with { $expression }
+
+# @param $name string The name of the player who rolled a die. This may include rich text formatting.
+# @param $expression string The dice expression, including the total. May contain rich text.
+# @param $rawName? string The name of the player who rolled a die, without formatting.
+# @param $space? string The rich text space to include after the name, or an empty string if not rich text.
+command-roll-expression = { $name }{ $space } rolls { $expression }
 
 # @param $name string The name of the player who rolled a die. This may include rich text formatting.
 # @param $roll integer The result of the dice roll.
@@ -78,9 +84,13 @@ command-roll-percentile = { $name }{ $space } rolls { $roll } on a percentile di
 command-roll-global = { $name } rolled { $roll } on a { $sides }-sided die
 
 # @param $name string The name of the player who rolled a die.
+# @param $expression string The dice expression, including the total. May contain rich text.
+command-roll-global-expression = { $name } rolled { $expression }
+
+# @param $name string The name of the player who rolled a die.
 # @param $roll integer The result of the dice roll.
 # @param $expression string The dice expression. May contain rich text.
-command-roll-global-expression = { $name } rolled { $roll } with { $expression }
+command-roll-global-with-expression = { $name } rolled { $roll } with { $expression }
 
 # @param $name string The name of the player who rolled a die.
 # @param $roll integer The result of the dice roll.

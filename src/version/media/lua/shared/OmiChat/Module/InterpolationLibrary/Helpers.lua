@@ -645,7 +645,11 @@ function Helpers.getMessage(interpolator, tags, name, forChat, rawName)
                 roll = roll,
             })
         elseif diceExpression ~= '' then
-            message = getText('command-roll-expression', {
+            local id = config.Commands.Roll.IncludeSumOfRolls
+                and 'command-roll-expression'
+                or 'command-roll-with-expression'
+
+            message = getText(id, {
                 name = name,
                 space = space,
                 rawName = rawName,

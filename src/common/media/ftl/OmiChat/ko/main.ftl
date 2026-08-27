@@ -40,7 +40,9 @@ command-card-global = { KO_WITH_PARTICLE($name, type: "subj") }
 command-roll = { $name }{ KO_PARTICLE($rawName, type: "subj") } { $sides }면 주사위를 굴려서
     { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
 
-command-roll-expression = { $name }{ KO_PARTICLE($rawName, type: "subj") } '{ $expression }'를 굴려서
+command-roll-expression = { $name }{ KO_PARTICLE($rawName, type: "subj") } '{ $expression }'를 굴렸습니다
+
+command-roll-with-expression = { $name }{ KO_PARTICLE($rawName, type: "subj") } '{ $expression }'를 굴려서
     { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
 
 command-roll-percentile = { $name }{ $space } rolls { $roll } on a percentile die
@@ -48,7 +50,9 @@ command-roll-percentile = { $name }{ $space } rolls { $roll } on a percentile di
 command-roll-global = { KO_WITH_PARTICLE($name, type: "subj") } { $sides }면 주사위를 굴려서
     { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
 
-command-roll-global-expression = { KO_WITH_PARTICLE($name, type: "subj") } '{ $expression }'를 굴려서
+command-roll-global-expression = { KO_WITH_PARTICLE($name, type: "subj") } '{ $expression }'를 굴렸습니다
+
+command-roll-global-with-expression = { KO_WITH_PARTICLE($name, type: "subj") } '{ $expression }'를 굴려서
     { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
 
 command-roll-global-percentile = { $name } rolled { $roll } on a percentile die
