@@ -753,7 +753,7 @@ return Configuration
 ---@field Name Configuration.Commands.Name
 ---@field Status Configuration.Commands.Status
 ---@field Card Configuration.Commands.ItemCommand
----@field Roll Configuration.Commands.ItemCommand
+---@field Roll Configuration.Commands.RollCommand
 ---@field Flip Configuration.Commands.ItemCommand
 
 ---@class Configuration.Commands.Name
@@ -768,6 +768,10 @@ return Configuration
 ---@field OverheadFormat string
 ---@field Items string[]
 ---@field Tags string[]
+
+---@class Configuration.Commands.RollCommand : Configuration.Commands.ItemCommand
+---@field IncludeIndividualRolls boolean
+---@field IncludeSumOfRolls boolean
 
 ---@class Configuration.Compatibility
 ---@field ApplyOverrides boolean
