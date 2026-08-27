@@ -310,6 +310,16 @@
               ]
             },
             {
+              "name": "IncludeIndividualRolls",
+              "type": "checkbox",
+              "default": false
+            },
+            {
+              "name": "IncludeSumOfRolls",
+              "type": "checkbox",
+              "default": false
+            },
+            {
               "name": "OverheadFormat",
               "type": "format-string",
               "_tokens": ["$TOKENS_OVERHEAD"],

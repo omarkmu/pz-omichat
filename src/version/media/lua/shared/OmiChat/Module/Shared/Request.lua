@@ -20,11 +20,17 @@ local getOnlinePlayers = getOnlinePlayers
 local CharacterStat = CharacterStat
 
 local IS_DEBUG = getDebug()
-local diceStringifier = utils.dice.SimpleStringifier:new({
-    includeTotal = false,
-    includeValues = false,
-    doStrikethrough = false,
-})
+
+---Creates a new dice stringifier with the given settings.
+---@param includeTotal boolean? Whether to include the roll's total in the stringified result.
+---@param includeValues boolean? Whether to include individual dice values in the stringified result.
+local function getDiceStringifier(includeTotal, includeValues)
+    return utils.dice.SimpleStringifier:new({
+        includeTotal = includeTotal or false,
+        includeValues = includeValues or false,
+        doStrikethrough = false,
+    })
+end
 
 ---@class(partial) api.shared.request
 local Request = {}
@@ -570,7 +576,8 @@ CHANNEL.ROLL_DICE = dispatch:channel('ROLL_DICE', {
     onServerReceive = function(req, args)
         local command = args.command:lower()
         local expr = utils.roller:tryParse(command)
-        local result = expr and utils.roller:tryRoll(expr, { stringifier = diceStringifier })
+        local stringifier = getDiceStringifier(config.Commands.Roll.IncludeSumOfRolls, config.Commands.Roll.IncludeIndividualRolls)
+        local result = expr and utils.roller:tryRoll(expr, { stringifier = stringifier })
         local roll = result and result:tryGetTotal()
         if not roll then
             local replyArgs = { id = 'help-text-roll' } ---@type Args.Request.ShowMessage
