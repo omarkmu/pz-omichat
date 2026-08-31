@@ -52,29 +52,13 @@ Request.dispatch = utils.dispatch {
 
 
 local dispatch = Request.dispatch
-
-local STAT_SYNC_FLAGS = 0
-do
-    -- build bit flags for character stat sync
-    local syncStats = {
-        [CharacterStat.HUNGER] = true,
-        [CharacterStat.THIRST] = true,
-        [CharacterStat.FATIGUE] = true,
-        [CharacterStat.BOREDOM] = true,
-        [CharacterStat.UNHAPPINESS] = true,
-        [CharacterStat.NICOTINE_WITHDRAWAL] = true,
-    }
-
-    ---@type ArrayList<CharacterStat>
-    local arrayList = ArrayList.new(Array.new(CharacterStat.ORDERED_STATS))
-
-    for i = 0, arrayList:size() - 1 do
-        local stat = arrayList:get(i)
-        if syncStats[stat] then
-            STAT_SYNC_FLAGS = STAT_SYNC_FLAGS + (2 ^ i) --[[@as integer]]
-        end
-    end
-end
+local STAT_SYNC_FLAGS =
+    SyncPlayerStatsPacket.getBitMaskForStat(CharacterStat.HUNGER) +
+    SyncPlayerStatsPacket.getBitMaskForStat(CharacterStat.THIRST) +
+    SyncPlayerStatsPacket.getBitMaskForStat(CharacterStat.FATIGUE) +
+    SyncPlayerStatsPacket.getBitMaskForStat(CharacterStat.BOREDOM) +
+    SyncPlayerStatsPacket.getBitMaskForStat(CharacterStat.UNHAPPINESS) +
+    SyncPlayerStatsPacket.getBitMaskForStat(CharacterStat.NICOTINE_WITHDRAWAL)
 
 
 ---Client → server: Apply a buff.
