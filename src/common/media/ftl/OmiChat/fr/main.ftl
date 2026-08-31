@@ -35,17 +35,17 @@ command-card = { $name }{ $space } tire { $card }
 
 command-card-global = { $name } a tiré { $card }
 
-command-roll = { $name }{ $space } lance { $roll } sur un dé à { $sides } faces
+command-roll =
+    .sides = { $name }{ $space } lance { $roll } sur un dé à { $sides } faces
+    .percentile = { $name }{ $space } lance { $roll } sur un dé à 100 faces
+    .expression = { $name }{ $space } lance { $expression }
+    .with-expression = { $name }{ $space } lance { $roll } sur { $expression }
 
-command-roll-expression = { $name }{ $space } lance { $roll } sur { $expression }
-
-command-roll-percentile = { $name }{ $space } rolls { $roll } on a percentile die
-
-command-roll-global = { $name } a lancé un { $roll } sur un dé à { $sides } faces
-
-command-roll-global-expression  = { $name } a lancé un { $roll } sur { $expression }
-
-command-roll-global-percentile = { $name } rolled { $roll } on a percentile die
+command-roll-global =
+    .sides = { $name } a lancé un { $roll } sur un dé à { $sides } faces
+    .percentile = { $name } a lancé un { $roll } sur un dé à 100 faces
+    .expression = { $name } a lancé { $expression }
+    .with-expression = { $name } a lancé un { $roll } sur { $expression }
 
 command-flip-heads = { $name }{ $space } lance une pièce de monnaie et obtient face
 

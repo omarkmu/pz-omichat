@@ -89,6 +89,8 @@ function Preset.commands(options)
             Format = DEFAULT,
             OverheadFormat = DEFAULT,
             ChatFormat = DEFAULT,
+            IncludeIndividualRolls = true,
+            IncludeSumOfRolls = false,
             Items = {
                 'Dice',
                 'Dice_00',

@@ -12,7 +12,7 @@ local stringLib = baseLib.string
 
 local sort = table.sort
 local concat = table.concat
-local format = string.format
+local getAttr = utils.getAttr
 local getText = utils.getText
 local getTextOrNull = utils.getTextOrNull
 
@@ -635,17 +635,19 @@ function Helpers.getMessage(interpolator, tags, name, forChat, rawName)
             rawName = rawName,
         })
     elseif tags.IsRollCommand then
-        local diceExpression = interpolator:tokenString('diceExpression')
         local roll = interpolator:tokenString('roll')
-        if diceExpression == 'd%' then
-            message = getText('command-roll-percentile', {
-                name = name,
-                space = space,
-                rawName = rawName,
-                roll = roll,
-            })
-        elseif diceExpression ~= '' then
-            message = getText('command-roll-expression', {
+        local diceExpression = interpolator:tokenString('diceExpression')
+        if diceExpression ~= '' then
+            local attr
+            if interpolator:tokenBoolean('percentileDice') then
+                attr = 'percentile'
+            elseif config.Commands.Roll.IncludeSumOfRolls then
+                attr = 'expression'
+            else
+                attr = 'with-expression'
+            end
+
+            message = getAttr('command-roll', attr, {
                 name = name,
                 space = space,
                 rawName = rawName,
@@ -653,7 +655,7 @@ function Helpers.getMessage(interpolator, tags, name, forChat, rawName)
                 expression = diceExpression,
             })
         else
-            message = getText('command-roll', {
+            message = getAttr('command-roll', 'sides', {
                 name = name,
                 space = space,
                 rawName = rawName,

@@ -224,6 +224,12 @@ config-Commands-Roll = /roll
 config-Commands-Roll-Global = { -command-option-global }
     .tooltip = { -command-tooltip-global }
 
+config-Commands-Roll-IncludeIndividualRolls = Include Individual Dice Rolls
+    .tooltip = If enabled, the result of each individual die included in a roll will be shown in the roll message.
+
+config-Commands-Roll-IncludeSumOfRolls = Include Sum of Dice Rolls
+    .tooltip = If enabled, the sum of all dice included in a roll will be shown in the roll message.
+
 config-Commands-Roll-OverheadFormat = { -overhead-format }
     .tooltip = { -command-tooltip-overhead }
 

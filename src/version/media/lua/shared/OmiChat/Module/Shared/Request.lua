@@ -20,11 +20,17 @@ local getOnlinePlayers = getOnlinePlayers
 local CharacterStat = CharacterStat
 
 local IS_DEBUG = getDebug()
-local diceStringifier = utils.dice.SimpleStringifier:new({
-    includeTotal = false,
-    includeValues = false,
-    doStrikethrough = false,
-})
+
+---Creates a new dice stringifier with the given settings.
+---@param includeTotal boolean? Whether to include the roll's total in the stringified result.
+---@param includeValues boolean? Whether to include individual dice values in the stringified result.
+local function getDiceStringifier(includeTotal, includeValues)
+    return utils.dice.SimpleStringifier:new({
+        includeTotal = includeTotal or false,
+        includeValues = includeValues or false,
+        doStrikethrough = false,
+    })
+end
 
 ---@class(partial) api.shared.request
 local Request = {}
@@ -46,29 +52,13 @@ Request.dispatch = utils.dispatch {
 
 
 local dispatch = Request.dispatch
-
-local STAT_SYNC_FLAGS = 0
-do
-    -- build bit flags for character stat sync
-    local syncStats = {
-        [CharacterStat.HUNGER] = true,
-        [CharacterStat.THIRST] = true,
-        [CharacterStat.FATIGUE] = true,
-        [CharacterStat.BOREDOM] = true,
-        [CharacterStat.UNHAPPINESS] = true,
-        [CharacterStat.NICOTINE_WITHDRAWAL] = true,
-    }
-
-    ---@type ArrayList<CharacterStat>
-    local arrayList = ArrayList.new(Array.new(CharacterStat.ORDERED_STATS))
-
-    for i = 0, arrayList:size() - 1 do
-        local stat = arrayList:get(i)
-        if syncStats[stat] then
-            STAT_SYNC_FLAGS = STAT_SYNC_FLAGS + (2 ^ i) --[[@as integer]]
-        end
-    end
-end
+local STAT_SYNC_FLAGS =
+    SyncPlayerStatsPacket.getBitMaskForStat(CharacterStat.HUNGER) +
+    SyncPlayerStatsPacket.getBitMaskForStat(CharacterStat.THIRST) +
+    SyncPlayerStatsPacket.getBitMaskForStat(CharacterStat.FATIGUE) +
+    SyncPlayerStatsPacket.getBitMaskForStat(CharacterStat.BOREDOM) +
+    SyncPlayerStatsPacket.getBitMaskForStat(CharacterStat.UNHAPPINESS) +
+    SyncPlayerStatsPacket.getBitMaskForStat(CharacterStat.NICOTINE_WITHDRAWAL)
 
 
 ---Client → server: Apply a buff.
@@ -570,7 +560,13 @@ CHANNEL.ROLL_DICE = dispatch:channel('ROLL_DICE', {
     onServerReceive = function(req, args)
         local command = args.command:lower()
         local expr = utils.roller:tryParse(command)
-        local result = expr and utils.roller:tryRoll(expr, { stringifier = diceStringifier })
+        local result = expr and utils.roller:tryRoll(expr, {
+            stringifier = getDiceStringifier(
+                config.Commands.Roll.IncludeSumOfRolls,
+                config.Commands.Roll.IncludeIndividualRolls
+            ),
+        })
+
         local roll = result and result:tryGetTotal()
         if not roll then
             local replyArgs = { id = 'help-text-roll' } ---@type Args.Request.ShowMessage
@@ -584,24 +580,27 @@ CHANNEL.ROLL_DICE = dispatch:channel('ROLL_DICE', {
         if config.Commands.Roll.Global then
             local name = API.data.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
 
-            ---@type Args.Request.ShowMessage
-            local replyArgs
+            local attribute, translationArgs
             if sides then
-                replyArgs = {
-                    id = 'command-roll-global',
-                    args = { name = name, roll = roll, sides = sides },
-                }
+                attribute = 'sides'
+                translationArgs = { name = name, roll = roll, sides = sides }
             elseif command == 'd%' then
-                replyArgs = {
-                    id = 'command-roll-global-percentile',
-                    args = { name = name, roll = roll },
-                }
+                attribute = 'percentile'
+                translationArgs = { name = name, roll = roll }
+            elseif config.Commands.Roll.IncludeSumOfRolls then
+                attribute = 'expression'
+                translationArgs = { name = name, expression = result:getString() }
             else
-                replyArgs = {
-                    id = 'command-roll-global-expression',
-                    args = { name = name, roll = roll, expression = result:getString() },
-                }
+                attribute = 'with-expression'
+                translationArgs = { name = name, roll = roll, expression = result:getString() }
             end
+
+            ---@type Args.Request.ShowMessage
+            local replyArgs = {
+                id = 'command-roll-global',
+                attribute = attribute,
+                args = translationArgs,
+            }
 
             req:broadcastOn(CHANNEL.SHOW_MESSAGE, replyArgs)
         else
@@ -610,6 +609,7 @@ CHANNEL.ROLL_DICE = dispatch:channel('ROLL_DICE', {
                 roll = roll,
                 sides = sides,
                 expression = not sides and result:getString() or nil,
+                isPercentile = command == 'd%',
             }
 
             req:reply(replyArgs)
@@ -632,6 +632,7 @@ CHANNEL.ROLL_DICE = dispatch:channel('ROLL_DICE', {
                 roll = args.roll,
                 sides = args.sides,
                 diceExpression = args.expression,
+                percentileDice = args.isPercentile,
             },
         }
     end,
@@ -800,6 +801,7 @@ return Request
 ---@class Args.Request.ReportRoll
 ---@field roll integer The value of the dice roll.
 ---@field expression string? The expression for a dice roll. Only included for complex rolls.
+---@field isPercentile boolean? Flag for whether a single percentile dice was rolled.
 ---@field sides integer? The number of sides on the dice that was rolled. Only included for simple rolls.
 
 ---Server to client request to display a message.

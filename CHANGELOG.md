@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.0.0-beta.4
+
+### Added
+- Added configuration options for display of complex dice rolls
+    - Thank you to Shissei4427 for this addition!
+
+### Changed
+- Documented format string tokens for `/roll`, `/card`, and `/flip`
+
+### Fixed
+- Fixed chat buffs not always syncing correctly
+
 ## 2.0.0-beta.3
 
 ### Added
