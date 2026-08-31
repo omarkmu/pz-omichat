@@ -627,6 +627,7 @@ CHANNEL.ROLL_DICE = dispatch:channel('ROLL_DICE', {
                 roll = roll,
                 sides = sides,
                 expression = not sides and result:getString() or nil,
+                isPercentile = command == 'd%',
             }
 
             req:reply(replyArgs)
@@ -649,6 +650,7 @@ CHANNEL.ROLL_DICE = dispatch:channel('ROLL_DICE', {
                 roll = args.roll,
                 sides = args.sides,
                 diceExpression = args.expression,
+                percentileDice = args.isPercentile,
             },
         }
     end,
@@ -817,6 +819,7 @@ return Request
 ---@class Args.Request.ReportRoll
 ---@field roll integer The value of the dice roll.
 ---@field expression string? The expression for a dice roll. Only included for complex rolls.
+---@field isPercentile boolean? Flag for whether a single percentile dice was rolled.
 ---@field sides integer? The number of sides on the dice that was rolled. Only included for simple rolls.
 
 ---Server to client request to display a message.

@@ -637,7 +637,7 @@ function Helpers.getMessage(interpolator, tags, name, forChat, rawName)
     elseif tags.IsRollCommand then
         local diceExpression = interpolator:tokenString('diceExpression')
         local roll = interpolator:tokenString('roll')
-        if diceExpression == 'd%' then
+        if interpolator:tokenBoolean('percentileDice') then
             message = getText('command-roll-percentile', {
                 name = name,
                 space = space,

@@ -90,6 +90,7 @@ function Messages.addContextData(args)
             tokens.roll = ctx.roll
             tokens.sides = ctx.sides
             tokens.diceExpression = ctx.diceExpression
+            tokens.percentileDice = ctx.percentileDice and '1' or nil
         end
     end
 end
