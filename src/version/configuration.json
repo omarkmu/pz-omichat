@@ -312,7 +312,7 @@
             {
               "name": "IncludeIndividualRolls",
               "type": "checkbox",
-              "default": false
+              "default": true
             },
             {
               "name": "IncludeSumOfRolls",
