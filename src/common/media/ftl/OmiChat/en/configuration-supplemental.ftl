@@ -439,9 +439,9 @@ token-recipientName = The name to use in chat for the recipient of a PM.
 
 token-roll = The number that was rolled.
 
-token-sides = The number of sides on the die that was rolled.
+token-sides = The number of sides on the die that was rolled. This is not included for complex dice rolls.
 
-token-diceExpression = The dice expression that was rolled.
+token-diceExpression = The dice expression that was rolled. This is not included for single-die dice rolls.
 
 token-percentileDice = Populated if a single percentile dice was rolled.
 

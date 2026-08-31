@@ -59,6 +59,8 @@
       "heads",
       "roll",
       "sides",
+      "diceExpression",
+      "percentileDice",
       "narrativeStyle",
       "dialogueTag",
       "unstyled"
@@ -289,7 +291,7 @@
             {
               "name": "OverheadFormat",
               "type": "format-string",
-              "_tokens": ["$TOKENS_OVERHEAD"],
+              "_tokens": ["$TOKENS_OVERHEAD", "card"],
               "_args": ["$ARGS_OVERHEAD"]
             },
             { "name": "Items", "type": "string-list", "default": ["CardDeck"] },
@@ -322,7 +324,13 @@
             {
               "name": "OverheadFormat",
               "type": "format-string",
-              "_tokens": ["$TOKENS_OVERHEAD"],
+              "_tokens": [
+                "$TOKENS_OVERHEAD",
+                "roll",
+                "sides",
+                "diceExpression",
+                "percentileDice"
+              ],
               "_args": ["$ARGS_OVERHEAD"]
             },
             {
@@ -358,7 +366,7 @@
             {
               "name": "OverheadFormat",
               "type": "format-string",
-              "_tokens": ["$TOKENS_OVERHEAD"],
+              "_tokens": ["$TOKENS_OVERHEAD", "heads"],
               "_args": ["$ARGS_OVERHEAD"]
             },
             { "name": "Items", "type": "string-list" },
