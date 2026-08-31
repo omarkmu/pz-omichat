@@ -596,29 +596,27 @@ CHANNEL.ROLL_DICE = dispatch:channel('ROLL_DICE', {
         if config.Commands.Roll.Global then
             local name = API.data.getNameInChatRichText(player:getUsername(), 'general') or player:getUsername()
 
-            ---@type Args.Request.ShowMessage
-            local replyArgs
+            local attribute, translationArgs
             if sides then
-                replyArgs = {
-                    id = 'command-roll-global',
-                    args = { name = name, roll = roll, sides = sides },
-                }
+                attribute = 'sides'
+                translationArgs = { name = name, roll = roll, sides = sides }
             elseif command == 'd%' then
-                replyArgs = {
-                    id = 'command-roll-global-percentile',
-                    args = { name = name, roll = roll },
-                }
+                attribute = 'percentile'
+                translationArgs = { name = name, roll = roll }
             elseif config.Commands.Roll.IncludeSumOfRolls then
-                replyArgs = {
-                    id = 'command-roll-global-expression',
-                    args = { name = name, expression = result:getString() },
-                }
+                attribute = 'expression'
+                translationArgs = { name = name, expression = result:getString() }
             else
-                replyArgs = {
-                    id = 'command-roll-global-with-expression',
-                    args = { name = name, roll = roll, expression = result:getString() },
-                }
+                attribute = 'with-expression'
+                translationArgs = { name = name, roll = roll, expression = result:getString() }
             end
+
+            ---@type Args.Request.ShowMessage
+            local replyArgs = {
+                id = 'command-roll-global',
+                attribute = attribute,
+                args = translationArgs,
+            }
 
             req:broadcastOn(CHANNEL.SHOW_MESSAGE, replyArgs)
         else

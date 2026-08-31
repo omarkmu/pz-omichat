@@ -37,25 +37,23 @@ command-card = { $name }{ KO_PARTICLE($rawName, type: "subj") }
 command-card-global = { KO_WITH_PARTICLE($name, type: "subj") }
     { KO_WITH_PARTICLE($card, type: "obj", numeral: "sino") } 뽑았습니다
 
-command-roll = { $name }{ KO_PARTICLE($rawName, type: "subj") } { $sides }면 주사위를 굴려서
-    { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
+command-roll =
+    .sides = { $name }{ KO_PARTICLE($rawName, type: "subj") } { $sides }면 주사위를 굴려서
+        { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
+    .percentile = { $name }{ KO_PARTICLE($rawName, type: "subj") } 백분위 주사위를 굴려서
+        { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
+    .expression = { $name }{ KO_PARTICLE($rawName, type: "subj") } '{ $expression }'를 굴렸습니다
+    .with-expression = { $name }{ KO_PARTICLE($rawName, type: "subj") } '{ $expression }'를 굴려서
+        { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
 
-command-roll-expression = { $name }{ KO_PARTICLE($rawName, type: "subj") } '{ $expression }'를 굴렸습니다
-
-command-roll-with-expression = { $name }{ KO_PARTICLE($rawName, type: "subj") } '{ $expression }'를 굴려서
-    { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
-
-command-roll-percentile = { $name }{ $space } rolls { $roll } on a percentile die
-
-command-roll-global = { KO_WITH_PARTICLE($name, type: "subj") } { $sides }면 주사위를 굴려서
-    { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
-
-command-roll-global-expression = { KO_WITH_PARTICLE($name, type: "subj") } '{ $expression }'를 굴렸습니다
-
-command-roll-global-with-expression = { KO_WITH_PARTICLE($name, type: "subj") } '{ $expression }'를 굴려서
-    { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
-
-command-roll-global-percentile = { $name } rolled { $roll } on a percentile die
+command-roll-global =
+    .sides = { KO_WITH_PARTICLE($name, type: "subj") } { $sides }면 주사위를 굴려서
+        { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
+    .percentile = { KO_WITH_PARTICLE($name, type: "subj") } 백분위 주사위를 굴려서
+        { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
+    .expression = { KO_WITH_PARTICLE($name, type: "subj") } '{ $expression }'를 굴렸습니다
+    .with-expression = { KO_WITH_PARTICLE($name, type: "subj") } '{ $expression }'를 굴려서
+        { KO_WITH_PARTICLE($roll, type: "subj", numeral: "sino") } 나왔습니다
 
 command-flip-heads = { $name }{ KO_PARTICLE($rawName, type: "subj") } 동전을 뒤집고 머리를 잡았습니다
 
